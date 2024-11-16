@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generador de Menú Semanal</title>
+  <style>
+    :root {
+      --space-blue: #1B263B;
+      --neon-green: #4EC9B0;
+      --dark-blue: #0F2027;
+      --light-blue: #3498DB;
+      --white: #ECF0F1;
+      --button-color: #1A5F7A;
+      --hover-color: #0E4D64;
+      --border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      background: radial-gradient(circle, var(--dark-blue), var(--space-blue));
+      color: var(--white);
+      display: flex;
+      flex-direction: column; 
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      overflow-x: hidden;
+    }
+
+    .container {
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.2));
+      border-radius: 20px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+      padding: 20px;
+      margin: 10px;
+      width: 100%;
+      max-width: 600px;
+      overflow-y: auto;
+      height: auto;
+      max-height: calc(100vh - 20px);
+    }
+
+    h1, h2 {
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--neon-green);
+      text-shadow: 0 0 5px rgba(78, 201, 176, 0.5);
+    }
+
+    h1 {
+      font-size: 1.5em;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      font-size: 1.2em;
+    }
+
+    form, .btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      margin: 0;
+    }
+
+    .btn {
+      background: var(--button-color);
+      color: var(--white);
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      margin: 10px 0;
+      width: 100%;
+      font-size: 1em;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn:hover {
+      background: var(--hover-color);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    label {
+      display: block;
+      margin: 5px 0;
+      width: 100%;
+      text-align: center;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin: 5px auto;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid var(--border-color);
+      color: var(--white);
+      border-radius: 5px;
+      font-size: 14px;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      overflow-x: auto;
+      font-size: 0.9em;
+    }
+
+    th, td {
+      padding: 8px;
+      text-align: center;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    th {
+      background: var(--button-color);
+      color: var(--white);
+      font-weight: bold;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .menu-generator-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 5px 10px;
+      background: var(--neon-green);
+      color: var(--space-blue);
+      border: none;
+      border-radius: 5px;
+      font-size: 0.8em;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .menu-generator-btn:hover {
+      background: var(--light-blue);
+    }
+
+    @media (min-width: 600px) {
+      .container {
+        padding: 30px;
+        margin: 20px 0;
+        max-width: 1200px;
+      }
+
+      h1 {
+        font-size: 2em;
+        margin-bottom: 30px;
+      }
+
+      h2 {
+        font-size: 1.5em;
+        margin-bottom: 20px;
+      }
+
+      .btn {
+        width: 200px;
+      }
+
+      input, select {
+        max-width: 300px;
+        font-size: 16px;
+      }
+
+      table, th, td {
+        font-size: 1em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <button id="menuGeneratorBtn" class="menu-generator-btn">Generador de Menú</button>
+  <div class="container">
+    <h1>Generador de Menú Semanal</h1>
+
+    <section id="calculator">
+      <h2>Registro de Usuario y Cálculo Nutricional</h2>
+      <form id="userForm">
+        <label>Edad: <input type="number" id="age" required></label>
+        <label>Altura (cm): <input type="number" id="height" required></label>
+        <label>Peso (kg): <input type="number" id="weight" required></label>
+        <label>Sexo:
+          <select id="gender" required>
+            <option value="male">Hombre</option>
+            <option value="female">Mujer</option>
+          </select>
+        </label>
+        <label>Actividad Física:
+          <select id="activity" required>
+            <option value="1.2">Sedentario (nada)</option>
+            <option value="1.375">Ligero (1-3 veces a la semana)</option>
+            <option value="1.55">Moderado (3-5 veces a la semana)</option>
+            <option value="1.725">Activo (5-7 veces a la semana)</option>
+            <option value="1.9">Muy Activo (más de 7 veces a la semana)</option>
+          </select>
+        </label>
+        <label>Déficit calórico:
+          <select id="deficit" required>
+            <option value="0.7">Alto</option>
+            <option value="0.85">Medio</option>
+            <option value="0.9">Bajo</option>
+          </select>
+        </label>
+        <button type="button" class="btn">Calcular</button>
+      </form>
+    </section>
+
+    <section id="results" class="hidden">
+      <h2>Resultados Nutricionales</h2>
+      <p id="maintenanceCalories">Calorías para mantener peso (según Harris y Benedict):</p>
+      <p id="deficitCalories">Calorías objetivo según déficit:</p>
+      <p id="macroResult">Macronutrientes según usuario:</p>
+      <button class="btn">Generar Menú</button>
+    </section>
+
+    <section id="menu" class="hidden">
+      <h2>Menú Semanal</h2>
+      <table id="menuTable">
+        <thead>
+          <tr>
+            <th>Día</th>
+            <th>Comida</th>
+            <th>Plato</th>
+            <th>Estilo</th>
+            <th>Ingredientes</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const calculateBtn = document.querySelector('#calculator .btn');
+      const generateMenuBtn = document.querySelector('#results .btn');
+      const menuGeneratorBtn = document.getElementById('menuGeneratorBtn');
+
+      calculateBtn.addEventListener('click', calculateMetrics);
+      calculateBtn.addEventListener('touchstart', calculateMetrics);
+
+      generateMenuBtn.addEventListener('click', generateWeeklyMenu);
+      generateMenuBtn.addEventListener('touchstart', generateWeeklyMenu);
+
+      menuGeneratorBtn.addEventListener('click', generateNewMenu);
+      menuGeneratorBtn.addEventListener('touchstart', generateNewMenu);
+
+      document.getElementById("userForm").addEventListener('submit', function(event) {
+        event.preventDefault();
+        calculateMetrics(event);
+      });
+    });
+
+    function calculateMetrics(event) {
+      event.preventDefault();
+
+      const weight = parseFloat(document.getElementById("weight").value);
+      const height = parseFloat(document.getElementById("height").value);
+      const age = parseInt(document.getElementById("age").value);
+      const gender = document.getElementById("gender").value;
+      const activity = parseFloat(document.getElementById("activity").value);
+      const deficit = parseFloat(document.getElementById("deficit").value);
+
+      // Harris-Benedict Equation
+      const bmr = gender === "male"
+        ? 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age)
+        : 447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age);
+
+      const maintenanceCalories = bmr * activity;
+
+      // Adjusting for deficit
+      const deficitPercentage = deficit === 0.7 ? 0.3 : (deficit === 0.85 ? 0.2 : 0.1);
+      const targetCalories = maintenanceCalories * (1 - deficitPercentage);
+
+      // Macronutrients
+      const protein = weight * 1.5;
+      const carbs = deficit === 0.7 ? weight * 2 : (deficit === 0.85 ? weight * 2.5 : weight * 3);
+      const fats = (targetCalories * 0.2) / 9; // 20% of calories from fat
+
+      document.getElementById("maintenanceCalories").textContent = `Calorías para mantener peso actual según Harris y Benedict: ${Math.round(maintenanceCalories)}`;
+      document.getElementById("deficitCalories").textContent = `Calorías a ingerir según déficit seleccionado: ${Math.round(targetCalories)}`;
+      document.getElementById("macroResult").textContent = `Macronutrientes a ingerir: Proteínas: ${Math.round(protein)}g, Carbohidratos: ${Math.round(carbs)}g, Grasas: ${Math.round(fats)}g`;
+      document.getElementById("results").classList.remove("hidden");
+    }
+
+    function generateWeeklyMenu(event) {
+      event.preventDefault();
+      const menuTable = document.getElementById("menuTable").getElementsByTagName("tbody")[0];
+      menuTable.innerHTML = "";
+      const days = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+      const usedMeals = {
+        breakfast: [],
+        lunch: [],
+        dinner: []
+      };
+
+      days.forEach(day => {
+        let breakfast, lunch, dinner;
+
+        do {
+          breakfast = breakfasts[Math.floor(Math.random() * breakfasts.length)];
+        } while (usedMeals.breakfast.includes(breakfast));
+
+        do {
+          lunch = meals[Math.floor(Math.random() * meals.length)];
+        } while (usedMeals.lunch.includes(lunch));
+
+        do {
+          dinner = meals[Math.floor(Math.random() * meals.length)];
+        } while (usedMeals.dinner.includes(dinner) || lunch == dinner);
+
+        usedMeals.breakfast.push(breakfast);
+        usedMeals.lunch.push(lunch);
+        usedMeals.dinner.push(dinner);
+
+        [breakfast, lunch, dinner].forEach((meal, index) => {
+          const row = menuTable.insertRow();
+          row.innerHTML = `
+            <td>${day}</td>
+            <td>${index === 0 ? "Desayuno" : index === 1 ? "Almuerzo" : "Cena"}</td>
+            <td>${meal.name}</td>
+            <td>${meal.origin}</td>
+            <td>${meal.ingredients}</td>
+          `;
+        });
+      });
+
+      document.getElementById("menu").classList.remove("hidden");
+    }
+
+    function generateNewMenu() {
+      const menuSection = document.getElementById("menu");
+      const tableBody = menuSection.querySelector("tbody");
+      
+      tableBody.innerHTML = "";
+
+      const days = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+      const usedMeals = {
+        breakfast: [],
+        lunch: [],
+        dinner: []
+      };
+
+      days.forEach(day => {
+        let breakfast, lunch, dinner;
+
+        do {
+          breakfast = breakfasts[Math.floor(Math.random() * breakfasts.length)];
+        } while (usedMeals.breakfast.includes(breakfast));
+
+        do {
+          lunch = meals[Math.floor(Math.random() * meals.length)];
+        } while (usedMeals.lunch.includes(lunch));
+
+        do {
+          dinner = meals[Math.floor(Math.random() * meals.length)];
+        } while (usedMeals.dinner.includes(dinner) || lunch == dinner);
+
+        usedMeals.breakfast.push(breakfast);
+        usedMeals.lunch.push(lunch);
+        usedMeals.dinner.push(dinner);
+
+        [breakfast, lunch, dinner].forEach((meal, index) => {
+          const row = tableBody.insertRow();
+          row.innerHTML = `
+            <td>${day}</td>
+            <td>${index === 0 ? "Desayuno" : index === 1 ? "Almuerzo" : "Cena"}</td>
+            <td>${meal.name}</td>
+            <td>${meal.origin}</td>
+            <td>${meal.ingredients}</td>
+          `;
+        });
+      });
+
+      menuSection.classList.remove("hidden");
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    const breakfasts = [  { name: "Tortilla de Claras y Espinacas", origin: "España", ingredients: "Claras: 200g, Espinacas: 50g, Aceite: 5g", protein: 20, carbs: 3, fats: 5, calories: 150 },
+  { name: "Avena con Proteína en Polvo", origin: "Internacional", ingredients: "Avena: 50g, Proteína: 30g, Leche: 200ml", protein: 30, carbs: 40, fats: 5, calories: 300 },
+  { name: "Panqueques de Plátano y Claras", origin: "Internacional", ingredients: "Claras: 150g, Plátano: 100g, Harina de avena: 30g", protein: 15, carbs: 40, fats: 3, calories: 250 },
+  { name: "Huevos Rancheros con Frijoles", origin: "México", ingredients: "Huevos: 100g, Frijoles: 50g, Salsa: 30g", protein: 20, carbs: 15, fats: 8, calories: 200 },
+  { name: "Smoothie de Proteína y Espinacas", origin: "Internacional", ingredients: "Proteína: 30g, Espinacas: 50g, Plátano: 50g", protein: 30, carbs: 25, fats: 3, calories: 250 },
+  { name: "Skyr con Nueces y Frutas", origin: "Islandia", ingredients: "Skyr: 150g, Nueces: 15g, Fresas: 50g", protein: 20, carbs: 10, fats: 7, calories: 200 },
+  { name: "Arepas de Pollo", origin: "Venezuela", ingredients: "Harina de maíz: 50g, Pollo: 80g, Aguacate: 30g", protein: 25, carbs: 35, fats: 10, calories: 300 },
+  { name: "Tostada de Aguacate y Salmón", origin: "Internacional", ingredients: "Pan integral: 50g, Salmón: 50g, Aguacate: 30g", protein: 18, carbs: 20, fats: 12, calories: 250 },
+  { name: "Yogur Griego con Granola", origin: "Grecia", ingredients: "Yogur: 150g, Granola: 30g, Miel: 10g", protein: 20, carbs: 25, fats: 5, calories: 250 },
+  { name: "Revuelto de Tofu y Verduras", origin: "Japón", ingredients: "Tofu: 150g, Pimientos: 50g, Aceite: 5g", protein: 20, carbs: 5, fats: 7, calories: 200 },
+  { name: "Omelette de Jamón y Queso", origin: "Francia", ingredients: "Huevos: 100g, Jamón: 50g, Queso: 30g", protein: 25, carbs: 2, fats: 10, calories: 220 },
+  { name: "Chia Pudding con Proteína", origin: "Internacional", ingredients: "Chía: 30g, Proteína: 30g, Leche de almendra: 200ml", protein: 25, carbs: 10, fats: 10, calories: 250 },
+  { name: "Bagel de Huevo y Pavo", origin: "EE.UU.", ingredients: "Bagel integral: 50g, Huevos: 100g, Pavo: 50g", protein: 30, carbs: 40, fats: 8, calories: 350 },
+  { name: "Batido de Café y Proteína", origin: "Internacional", ingredients: "Café: 150ml, Proteína: 30g, Leche: 100ml", protein: 25, carbs: 5, fats: 2, calories: 150 },
+  { name: "Porridge con Quinoa y Frutas", origin: "Internacional", ingredients: "Quinoa: 50g, Leche: 150ml, Frutas: 30g", protein: 12, carbs: 35, fats: 5, calories: 200 },
+  { name: "Huevos Cocidos con Aguacate", origin: "Internacional", ingredients: "Huevos: 100g, Aguacate: 50g", protein: 15, carbs: 2, fats: 15, calories: 200 },
+  { name: "Wrap de Claras y Pollo", origin: "Internacional", ingredients: "Tortilla integral: 50g, Claras: 100g, Pollo: 50g", protein: 25, carbs: 20, fats: 5, calories: 200 },
+  { name: "Bowl de Frijoles y Huevo", origin: "México", ingredients: "Frijoles: 50g, Huevos: 100g, Salsa: 20g", protein: 20, carbs: 15, fats: 8, calories: 180 },
+  { name: "Pan Integral con Hummus y Pollo", origin: "Internacional", ingredients: "Pan: 50g, Hummus: 30g, Pollo: 50g", protein: 20, carbs: 25, fats: 7, calories: 250 }
+];
+
+const meals = [
+  { name: "Pollo a la Parmesana", origin: "Italia", ingredients: "Pollo: 200g, Queso: 50g, Salsa de tomate: 50g", protein: 40, carbs: 10, fats: 20, calories: 450 },
+  { name: "Paella de Mariscos", origin: "España", ingredients: "Arroz: 200g, Mariscos: 200g", protein: 25, carbs: 45, fats: 10, calories: 400 },
+  { name: "Curry de Pollo", origin: "India", ingredients: "Pollo: 150g, Leche de coco: 100ml, Curry: 10g", protein: 35, carbs: 40, fats: 15, calories: 500 },
+  { name: "Lasaña Vegetariana", origin: "Italia", ingredients: "Pasta: 100g, Espinacas: 50g, Queso Ricotta: 50g", protein: 12, carbs: 30, fats: 10, calories: 300 },
+  { name: "Tacos de Pescado", origin: "México", ingredients: "Tortilla: 50g, Pescado: 100g, Salsa: 30g", protein: 20, carbs: 25, fats: 5, calories: 200 },
+  { name: "Ramen de Pollo", origin: "Japón", ingredients: "Fideos: 150g, Pollo: 100g, Caldo: 300ml", protein: 25, carbs: 35, fats: 8, calories: 350 },
+  { name: "Sopa Minestrone", origin: "Italia", ingredients: "Vegetales: 200g, Fideos: 50g, Caldo: 300ml", protein: 8, carbs: 20, fats: 5, calories: 150 },
+  { name: "Estofado de Res", origin: "Reino Unido", ingredients: "Res: 200g, Zanahorias: 100g, Patatas: 100g", protein: 30, carbs: 25, fats: 15, calories: 400 },
+  { name: "Ceviche de Pescado", origin: "Perú", ingredients: "Pescado: 150g, Limón: 50ml, Cebolla: 50g", protein: 25, carbs: 10, fats: 5, calories: 150 },
+  { name: "Hamburguesa Veggie", origin: "Estados Unidos", ingredients: "Lentejas: 100g, Pan Integral: 100g, Vegetales: 50g", protein: 15, carbs: 45, fats: 8, calories: 350 },
+  { name: "Tallarines con Pollo al Pesto", origin: "Italia", ingredients: "Tallarines: 150g, Pollo: 100g, Pesto: 50g", protein: 25, carbs: 45, fats: 12, calories: 450 },
+  { name: "Pollo Teriyaki", origin: "Japón", ingredients: "Pollo: 150g, Salsa Teriyaki: 50g, Arroz: 100g", protein: 35, carbs: 40, fats: 10, calories: 400 },
+  { name: "Salmón a la Plancha con Espárragos", origin: "Noruega", ingredients: "Salmón: 150g, Espárragos: 100g", protein: 30, carbs: 5, fats: 15, calories: 300 },
+  { name: "Guiso de Lentejas", origin: "España", ingredients: "Lentejas: 150g, Vegetales: 100g, Chorizo: 50g", protein: 25, carbs: 40, fats: 12, calories: 350 },
+  { name: "Risotto de Champiñones", origin: "Italia", ingredients: "Arroz Arborio: 100g, Champiñones: 100g, Queso Parmesano: 20g", protein: 15, carbs: 55, fats: 12, calories: 400 },
+  { name: "Tamales de Pollo", origin: "México", ingredients: "Masa de Maíz: 200g, Pollo: 100g, Salsa: 50g", protein: 20, carbs: 40, fats: 12, calories: 350 },
+  { name: "Shakshuka", origin: "Israel", ingredients: "Huevos: 2, Tomate: 200g, Pimientos: 50g", protein: 10, carbs: 15, fats: 10, calories: 200 },
+  { name: "Pollo al Curry con Arroz", origin: "India", ingredients: "Pollo: 150g, Curry: 50g, Arroz: 100g", protein: 35, carbs: 40, fats: 12, calories: 400 },
+  { name: "Fajitas de Res", origin: "México", ingredients: "Carne de Res: 150g, Pimientos: 100g, Tortilla: 50g", protein: 30, carbs: 35, fats: 12, calories: 450 },
+  { name: "Ensalada de Quinoa y Pollo", origin: "General", ingredients: "Quinoa: 100g, Pollo: 150g, Vegetales: 100g", protein: 30, carbs: 40, fats: 10, calories: 400 },
+  { name: "Ensalada César con Pollo", origin: "Italia", ingredients: "Lechuga: 100g, Pollo: 150g, Parmesano: 20g", protein: 25, carbs: 10, fats: 15, calories: 300 },
+  { name: "Pasta Integral con Atún", origin: "Italia", ingredients: "Pasta: 150g, Atún: 100g, Salsa de Tomate: 50g", protein: 30, carbs: 50, fats: 5, calories: 400 },
+  { name: "Cazuela de Mariscos", origin: "Chile", ingredients: "Mariscos: 200g, Paprika: 5g, Pimientos: 50g", protein: 25, carbs: 15, fats: 10, calories: 250 },
+  { name: "Brochetas de Pollo y Verduras", origin: "Turquía", ingredients: "Pollo: 150g, Pimientos: 50g, Cebolla: 50g", protein: 30, carbs: 10, fats: 5, calories: 250 },
+  { name: "Goulash de Res", origin: "Hungría", ingredients: "Res: 200g, Pimientos: 50g, Pimentón: 10g", protein: 35, carbs: 20, fats: 15, calories: 350 },
+  { name: "Pad Thai", origin: "Tailandia", ingredients: "Fideos de Arroz: 100g, Tofu: 50g, Salsa de Tamarindo: 30ml", protein: 15, carbs: 55, fats: 20, calories: 500 },
+  { name: "Paella Vegetariana", origin: "España", ingredients: "Arroz: 200g, Verduras Mixtas: 200g, Azafrán: 1g", protein: 10, carbs: 60, fats: 10, calories: 400 },
+  { name: "Falafel con Tahini", origin: "Medio Oriente", ingredients: "Garbanzos: 150g, Tahini: 20g", protein: 15, carbs: 40, fats: 15, calories: 350 },
+  { name: "Tacos al Pastor", origin: "México", ingredients: "Carne de Cerdo: 100g, Tortillas: 50g, Salsa: 30g", protein: 20, carbs: 30, fats: 10, calories: 300 },
+  { name: "Ropa Vieja", origin: "Cuba", ingredients: "Carne de Res: 200g, Tomate: 100g, Pimientos: 50g", protein: 35, carbs: 20, fats: 12, calories: 350 },
+  { name: "Chili con Carne", origin: "EE.UU.", ingredients: "Carne de Res: 150g, Frijoles: 100g, Tomate: 100g", protein: 25, carbs: 30, fats: 15, calories: 400 },
+  { name: "Hamburguesa de Pollo", origin: "EE.UU.", ingredients: "Pollo: 150g, Pan Integral: 100g, Vegetales: 50g", protein: 25, carbs: 40, fats: 10, calories: 350 },
+  { name: "Enchiladas Verdes", origin: "México", ingredients: "Tortilla: 50g, Pollo: 100g, Salsa Verde: 50g", protein: 20, carbs: 25, fats: 8, calories: 300 },
+  { name: "Tofu en Salsa Teriyaki", origin: "Japón", ingredients: "Tofu: 150g, Salsa Teriyaki: 50g, Verduras: 100g", protein: 15, carbs: 20, fats: 10, calories: 250 },
+  { name: "Canelones de Espinaca y Ricotta", origin: "Italia", ingredients: "Pasta: 150g, Espinacas: 50g, Ricotta: 50g", protein: 18, carbs: 30, fats: 12, calories: 300 },
+  { name: "Arroz con Pollo", origin: "Latinoamérica", ingredients: "Arroz: 150g, Pollo: 150g, Verduras: 100g", protein: 30, carbs: 50, fats: 10, calories: 400 },
+  { name: "Polenta con Ragú de Res", origin: "Italia", ingredients: "Polenta: 150g, Carne de Res: 150g, Salsa de Tomate: 50g", protein: 25, carbs: 40, fats: 10, calories: 400 },
+  { name: "Pescado al Ajillo", origin: "España", ingredients: "Pescado: 200g, Ajo: 5g, Aceite de Oliva: 10g", protein: 35, carbs: 5, fats: 10, calories: 250 },
+  { name: "Moussaka", origin: "Grecia", ingredients: "Berenjena: 200g, Carne de Res: 150g, Bechamel: 100g", protein: 25, carbs: 20, fats: 15, calories: 400 },
+  { name: "Sopa de Pollo", origin: "México", ingredients: "Pollo: 150g, Caldo de Verduras: 200ml, Arroz: 50g", protein: 25, carbs: 20, fats: 10, calories: 300 },
+  { name: "Ensalada de Salmón y Aguacate", origin: "General", ingredients: "Salmón: 150g, Aguacate: 100g, Lechuga: 50g", protein: 30, carbs: 15, fats: 25, calories: 450 },
+  { name: "Biryani de Cordero", origin: "India", ingredients: "Cordero: 200g, Arroz Basmati: 150g, Especias: 10g", protein: 25, carbs: 50, fats: 15, calories: 450 },
+  { name: "Pollo a la Cacciatora", origin: "Italia", ingredients: "Pollo: 200g, Tomates: 100g, Aceitunas: 20g", protein: 35, carbs: 10, fats: 15, calories: 300 }
+]; 
+  </script>
+</body>
+</html>

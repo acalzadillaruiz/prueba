@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import { z } from "zod";
+import { captureSchema } from "@newplace/config";
 import { prisma } from "@newplace/db";
 import { body, currentUser, handler, ok, requireUser } from "@/server/api";
 import { isStaff, requireAgency } from "@/server/access";
@@ -13,17 +13,7 @@ export const GET = handler(async () => {
   return ok({ items: await getCaptures(requireAgency(u)) });
 });
 
-const Create = z.object({
-  address: z.string().min(5),
-  zone: z.string().min(2),
-  ownerName: z.string().min(2),
-  phone: z.string().min(6),
-  kind: z.string().default("apartment"),
-  areaM2: z.number().int().positive(),
-  askingPrice: z.number().int().positive(),
-  lat: z.number().optional(),
-  lng: z.number().optional(),
-});
+const Create = captureSchema;
 
 export const POST = handler(async (req: NextRequest) => {
   const u = requireUser(await currentUser());

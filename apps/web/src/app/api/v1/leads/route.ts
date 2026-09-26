@@ -1,21 +1,12 @@
 import type { NextRequest } from "next/server";
-import { z } from "zod";
+import { leadSchema } from "@newplace/config";
 import { prisma } from "@newplace/db";
 import { ApiError, body, currentUser, handler, ok, requireUser } from "@/server/api";
 import { aiProvider } from "@/server/ai";
 import { leadToDomain, queueEmail } from "@/server/data";
 import { isManager } from "@/server/access";
 
-const Create = z.object({
-  listingId: z.string(),
-  name: z.string().min(2).max(80),
-  email: z.string().email(),
-  phone: z.string().max(30).optional().or(z.literal("")),
-  message: z.string().min(2).max(1000),
-  budget: z.number().int().positive().optional(),
-  tourStart: z.string().datetime().optional(),
-  virtual: z.boolean().optional(),
-});
+const Create = leadSchema;
 
 /** Public: contact form / tour request from a listing. Creates Lead (+ Tour, thread, emails). */
 export const POST = handler(async (req: NextRequest) => {

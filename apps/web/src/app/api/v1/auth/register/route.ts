@@ -1,17 +1,11 @@
 import type { NextRequest } from "next/server";
-import { z } from "zod";
+import { registerSchema } from "@newplace/config";
 import bcrypt from "bcryptjs";
 import { prisma } from "@newplace/db";
 import { ApiError, body, handler, ok } from "@/server/api";
 import { audit, queueEmail } from "@/server/data";
 
-const Reg = z.object({
-  name: z.string().min(2).max(80),
-  email: z.string().email(),
-  password: z.string().min(8).max(100),
-  agencyName: z.string().min(2).max(80).optional(),
-  agencyCity: z.string().max(60).optional(),
-});
+const Reg = registerSchema;
 
 /** Email + password sign-up. "¿Eres agencia?" creates the Agency (TRIAL, FREE) with the user as AGENCY_OWNER. */
 export const POST = handler(async (req: NextRequest) => {

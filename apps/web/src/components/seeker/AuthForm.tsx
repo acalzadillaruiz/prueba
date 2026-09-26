@@ -1,6 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { registerSchema } from "@newplace/config";
+import { fieldError } from "@/lib/form";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
@@ -30,10 +34,10 @@ function GoogleG() {
 export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "register" }) {
   const [show, setShow] = useState(false);
   const [agency, setAgency] = useState(false);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [agencyName, setAgencyName] = useState("");
+  const schema = mode === "login" ? registerSchema.pick({ email: true, password: true }) : agency ? registerSchema.required({ agencyName: true }) : registerSchema;
+  type FormValues = { name?: string; email: string; password: string; agencyName?: string };
+  const { register, handleSubmit, formState } = useForm<FormValues>({ resolver: zodResolver(schema as never), mode: "onTouched" });
+  const errs = formState.errors;
   const [busy, setBusy] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const router = useRouter();
@@ -45,8 +49,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
     router.refresh();
   };
 
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const submit = async ({ name, email, password, agencyName }: FormValues) => {
     setErr(null);
     setBusy("form");
     try {
@@ -78,14 +81,14 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
             <GoogleG /> {tx(locale, "Continuar con Google", "Continue with Google")}
           </button>
           <div className="my-6 flex items-center gap-3 text-xs text-ink/40"><span className="h-px flex-1 bg-line" />{tx(locale, "o con tu correo", "or with email")}<span className="h-px flex-1 bg-line" /></div>
-          <form className="space-y-4" onSubmit={submit}>
+          <form className="space-y-4" onSubmit={handleSubmit(submit)} noValidate>
             {mode === "register" && (
-              <Field label={tx(locale, "Nombre completo", "Full name")}><input className={inputCls} value={name} onChange={(e) => setName(e.target.value)} required minLength={2} autoComplete="name" /></Field>
+              <Field label={tx(locale, "Nombre completo", "Full name")} error={fieldError(errs.name, locale, "name")}><input className={inputCls} {...register("name")} aria-invalid={!!errs.name} autoComplete="name" /></Field>
             )}
-            <Field label="Email"><input className={inputCls} type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" placeholder="tu@gmail.com" /></Field>
-            <Field label={tx(locale, "Contraseña", "Password")} hint={mode === "register" ? tx(locale, "Mínimo 8 caracteres.", "At least 8 characters.") : undefined}>
+            <Field label="Email" error={fieldError(errs.email, locale, "email")}><input className={inputCls} type="email" {...register("email")} aria-invalid={!!errs.email} autoComplete="email" placeholder="tu@gmail.com" /></Field>
+            <Field label={tx(locale, "Contraseña", "Password")} error={fieldError(errs.password, locale, "password")} hint={(mode === "register" ? tx(locale, "Mínimo 8 caracteres.", "At least 8 characters.") : undefined)}>
               <div className="relative">
-                <input className={inputCls} type={show ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} autoComplete={mode === "login" ? "current-password" : "new-password"} />
+                <input className={inputCls} type={show ? "text" : "password"} {...register("password")} aria-invalid={!!errs.password} autoComplete={mode === "login" ? "current-password" : "new-password"} />
                 <button type="button" onClick={() => setShow(!show)} className="absolute right-3 top-1/2 -translate-y-1/2 text-ink/50" aria-label={tx(locale, "Mostrar contraseña", "Show password")}>{show ? <EyeOff size={18} /> : <Eye size={18} />}</button>
               </div>
             </Field>
@@ -98,7 +101,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
                 </span>
               </label>
             )}
-            {agency && <Field label={tx(locale, "Nombre de la agencia", "Agency name")}><input className={inputCls} value={agencyName} onChange={(e) => setAgencyName(e.target.value)} required minLength={2} placeholder="Andes Prime" /></Field>}
+            {agency && <Field label={tx(locale, "Nombre de la agencia", "Agency name")} error={fieldError(errs.agencyName, locale, "agencyName")}><input className={inputCls} {...register("agencyName")} placeholder="Andes Prime" /></Field>}
             {err && <div className="rounded-lg bg-[#B423181A] px-3 py-2 text-sm text-danger" role="alert">{err}</div>}
             <Button className="w-full" size="lg" disabled={!!busy}>
               {busy === "form" && <Loader2 size={16} className="animate-spin" />}

@@ -72,12 +72,16 @@ export function Avatar({ initials, hue = 12, size = 36, className }: { initials:
   );
 }
 
-export function Field({ label, children, hint, dark }: { label: string; children: ReactNode; hint?: string; dark?: boolean }) {
+export function Field({ label, children, hint, dark, error }: { label: string; children: ReactNode; hint?: string; dark?: boolean; error?: string }) {
   return (
     <label className="block">
       <span className={cn("mb-1.5 block text-sm font-semibold", dark ? "text-ivory/80" : "text-ink/80")}>{label}</span>
       {children}
-      {hint && <span className={cn("mt-1 block text-xs", dark ? "text-mist" : "text-ink/50")}>{hint}</span>}
+      {error ? (
+        <span role="alert" className={cn("mt-1 block text-xs font-semibold", dark ? "text-[#FF8A7A]" : "text-danger")}>{error}</span>
+      ) : (
+        hint && <span className={cn("mt-1 block text-xs", dark ? "text-mist" : "text-ink/50")}>{hint}</span>
+      )}
     </label>
   );
 }

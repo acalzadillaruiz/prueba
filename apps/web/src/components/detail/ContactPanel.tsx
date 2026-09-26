@@ -1,6 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { leadSchema } from "@newplace/config";
+import { fieldError } from "@/lib/form";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { CalendarCheck, CheckCircle2, Loader2, MessageSquare, Phone, ShieldCheck, Video } from "lucide-react";
 import type { Listing, Locale } from "@/types/domain";
@@ -23,10 +27,14 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
   const [day, setDay] = useState(0);
   const [iso, setIso] = useState<string | null>(null);
   const [virtual, setVirtual] = useState(false);
-  const [name, setName] = useState(user?.name ?? "");
-  const [email, setEmail] = useState(user?.email ?? "");
-  const [phone, setPhone] = useState(user?.phone ?? "");
-  const [msg, setMsg] = useState(tx(locale, "Hola, me interesa este inmueble. ¿Sigue disponible?", "Hi, I’m interested in this property. Is it still available?"));
+  type F = { name: string; email: string; phone?: string; message: string };
+  const form = useForm<F>({
+    resolver: zodResolver(leadSchema.pick({ name: true, email: true, phone: true, message: true })),
+    defaultValues: { name: user?.name ?? "", email: user?.email ?? "", phone: user?.phone ?? "", message: tx(locale, "Hola, me interesa este inmueble. ¿Sigue disponible?", "Hi, I’m interested in this property. Is it still available?") },
+    mode: "onTouched",
+  });
+  const errs = form.formState.errors;
+  const email = form.watch("email");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [done, setDone] = useState<string | null>(null);
@@ -35,9 +43,8 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
   const firstAvailable = days[day]?.hours.find((h) => h.available)?.iso ?? null;
   const chosen = iso ?? firstAvailable;
 
-  const submit = async () => {
+  const submit = async ({ name, email, phone, message: msg }: F) => {
     setErr(null);
-    if (!name || !email) return setErr(tx(locale, "Escribe tu nombre y email.", "Enter your name and email."));
     setBusy(true);
     try {
       await api("leads", {
@@ -145,15 +152,18 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
           </>
         )}
         <div className="mt-3 space-y-2">
-          <input className={field} placeholder={tx(locale, "Nombre", "Name")} value={name} onChange={(e) => setName(e.target.value)} aria-label={tx(locale, "Nombre", "Name")} />
+          <input className={field} placeholder={tx(locale, "Nombre", "Name")} {...form.register("name")} aria-invalid={!!errs.name} aria-label={tx(locale, "Nombre", "Name")} />
           <div className="grid grid-cols-2 gap-2">
-            <input className={field} type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} aria-label="Email" />
-            <input className={field} placeholder={tx(locale, "Teléfono", "Phone")} value={phone} onChange={(e) => setPhone(e.target.value)} aria-label={tx(locale, "Teléfono", "Phone")} />
+            <input className={field} type="email" placeholder="Email" {...form.register("email")} aria-invalid={!!errs.email} aria-label="Email" />
+            <input className={field} placeholder={tx(locale, "Teléfono", "Phone")} {...form.register("phone")} aria-label={tx(locale, "Teléfono", "Phone")} />
           </div>
-          <textarea className={cn(field, "h-20 py-2")} value={msg} onChange={(e) => setMsg(e.target.value)} aria-label={tx(locale, "Mensaje", "Message")} />
+          <textarea className={cn(field, "h-20 py-2")} {...form.register("message")} aria-invalid={!!errs.message} aria-label={tx(locale, "Mensaje", "Message")} />
+          {(errs.name || errs.email || errs.message) && (
+            <div className="text-xs font-semibold text-danger" role="alert">{fieldError(errs.email, locale, "email") ?? fieldError(errs.name ?? errs.message, locale, "text")}</div>
+          )}
         </div>
         {err && <div className="mt-2 rounded-lg bg-[#B423181A] px-3 py-2 text-sm text-danger">{err}</div>}
-        <Button className="mt-3 w-full" size="lg" onClick={submit} disabled={busy || (mode === "tour" && !chosen)} variant={dark ? "gold" : "coral"}>
+        <Button className="mt-3 w-full" size="lg" onClick={form.handleSubmit(submit)} disabled={busy || (mode === "tour" && !chosen)} variant={dark ? "gold" : "coral"}>
           {busy && <Loader2 size={16} className="animate-spin" />}
           {mode === "tour" ? tx(locale, "Solicitar visita", "Request tour") : tx(locale, "Enviar mensaje", "Send message")}
         </Button>

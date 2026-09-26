@@ -54,7 +54,9 @@ const PLATFORM_NAV: Item[] = [
 export function AdminShell({ locale, area, children, title, actions }: { locale: Locale; area: "agency" | "platform"; children: React.ReactNode; title: string; actions?: React.ReactNode }) {
   const pathname = usePathname();
   const { userId } = useDemo();
-  const u = userById(userId ?? undefined) ?? userById(area === "platform" ? "u-super" : "u-owner")!;
+  const raw = userById(userId ?? undefined);
+  const valid = raw && (raw.role === "SUPERADMIN" || (area === "agency" && !!raw.agencyId));
+  const u = valid ? raw : userById(area === "platform" ? "u-super" : "u-owner")!;
   const agency = agencyById(u.agencyId) ?? agencyById("ag-andes")!;
   const base = `/${locale}/${area}`;
   const items = (area === "agency" ? AGENCY_NAV : PLATFORM_NAV).filter((i) => !i.roles || i.roles.includes(u.role));

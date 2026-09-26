@@ -3,7 +3,7 @@
 import { Info, Sparkles } from "lucide-react";
 import type { Listing, Locale } from "@/types/domain";
 import { useDemo } from "@/lib/store";
-import { money, num, priceSuffix, tx } from "@/lib/i18n";
+import { compactMoney, money, num, priceSuffix, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import { listingById } from "@/mock/listings";
 
@@ -54,14 +54,14 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
             {tx(locale, "Comparables usados", "Comparables used")} <Info size={14} className={muted} />
           </div>
           <div className="overflow-hidden rounded-lg border border-inherit">
-            <table className="w-full text-sm">
+            <table className="w-full whitespace-nowrap text-sm">
               <thead className={cn("text-left text-xs", dark ? "bg-white/5 text-mist" : "bg-ivory text-ink/55")}>
                 <tr>
                   <th className="px-3 py-2 font-semibold">{tx(locale, "Inmueble", "Property")}</th>
                   <th className="px-3 py-2 text-right font-semibold">m²</th>
                   <th className="px-3 py-2 text-right font-semibold">{tx(locale, "Precio", "Price")}</th>
                   <th className="hidden px-3 py-2 text-right font-semibold sm:table-cell">USD/m²</th>
-                  <th className="hidden px-3 py-2 text-right font-semibold sm:table-cell">{tx(locale, "Dist.", "Dist.")}</th>
+                  {!dark && <th className="hidden px-3 py-2 text-right font-semibold sm:table-cell">{tx(locale, "Dist.", "Dist.")}</th>}
                 </tr>
               </thead>
               <tbody>
@@ -70,13 +70,13 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
                   return (
                     <tr key={c.id} className={cn("border-t", dark ? "border-navy-line" : "border-line")}>
                       <td className="px-3 py-2">
-                        <div className="line-clamp-1 font-semibold">{cl ? tx(locale, cl.title_es, cl.title_en) : c.title}</div>
+                        <div className="max-w-[180px] truncate font-semibold">{cl ? tx(locale, cl.title_es, cl.title_en) : c.title}</div>
                         <div className={cn("text-xs", muted)}>{c.zone}</div>
                       </td>
                       <td className="px-3 py-2 text-right">{num(c.areaM2, locale)}</td>
-                      <td className="px-3 py-2 text-right">{money(c.priceAmount, locale)}</td>
+                      <td className="px-3 py-2 text-right">{dark ? compactMoney(c.priceAmount, locale) : money(c.priceAmount, locale)}</td>
                       <td className="hidden px-3 py-2 text-right sm:table-cell">{num(c.pricePerM2, locale)}</td>
-                      <td className="hidden px-3 py-2 text-right sm:table-cell">{c.distanceKm} km</td>
+                      {!dark && <td className="hidden px-3 py-2 text-right sm:table-cell">{c.distanceKm} km</td>}
                     </tr>
                   );
                 })}

@@ -8,5 +8,5 @@ p.on("console", (m) => m.type() === "error" && errs.push(m.text()));
 await p.goto(url, { waitUntil: "networkidle", timeout: 120000 });
 await p.waitForTimeout(600);
 await p.screenshot({ path: out, fullPage: full === "1" });
-if (errs.length) console.log("ERRORS:", errs.slice(0, 5).join("\n"));
+if (errs.length) console.log("ERRORS:", errs.slice(0, 3).map((e) => e.slice(0, 300)).join("\n"));
 await b.close();

@@ -10,15 +10,15 @@ import type {
 } from "./types";
 
 const AMENITY_WEIGHT: Record<string, number> = {
-  pool: 0.04,
-  gym: 0.02,
-  security: 0.03,
-  generator: 0.04,
-  waterTank: 0.03,
-  view: 0.05,
-  terrace: 0.03,
-  elevator: 0.02,
-  garden: 0.03,
+  pool: 0.02,
+  gym: 0.01,
+  security: 0.015,
+  generator: 0.02,
+  waterTank: 0.015,
+  view: 0.025,
+  terrace: 0.015,
+  elevator: 0.01,
+  garden: 0.015,
 };
 
 export function haversineKm(a: { lat: number; lng: number }, b: { lat: number; lng: number }): number {

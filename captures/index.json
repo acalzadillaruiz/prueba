@@ -196,7 +196,7 @@
     "section": "Propietario particular",
     "title": "Asistente 3/6 · características",
     "file": "25-owner-step3.jpg",
-    "path": "/es/owner/new?step=2",
+    "path": "/es/owner/new",
     "mobile": false
   },
   {
@@ -204,7 +204,7 @@
     "section": "Propietario particular",
     "title": "Asistente 4/6 · fotos, orden y portada",
     "file": "26-owner-step4.jpg",
-    "path": "/es/owner/new?step=3",
+    "path": "/es/owner/new",
     "mobile": false
   },
   {
@@ -212,7 +212,7 @@
     "section": "Propietario particular",
     "title": "Asistente 5/6 · PlaceEstimate en vivo + «Redactar con IA»",
     "file": "27-owner-step5.jpg",
-    "path": "/es/owner/new?step=4",
+    "path": "/es/owner/new",
     "mobile": false
   },
   {
@@ -220,7 +220,7 @@
     "section": "Propietario particular",
     "title": "Asistente 6/6 · revisión y calidad de ficha",
     "file": "28-owner-step6.jpg",
-    "path": "/es/owner/new?step=5",
+    "path": "/es/owner/new",
     "mobile": false
   },
   {
@@ -228,7 +228,7 @@
     "section": "Propietario particular",
     "title": "Publicado en Altamira",
     "file": "29-owner-published.jpg",
-    "path": "/es/owner/new?step=5",
+    "path": "/es/owner/new",
     "mobile": false
   },
   {
@@ -404,7 +404,7 @@
     "section": "Móvil (PWA)",
     "title": "Asistente del propietario en móvil",
     "file": "m6-wizard.jpg",
-    "path": "/es/owner/new?step=4",
+    "path": "/es/owner/new",
     "mobile": true
   },
   {

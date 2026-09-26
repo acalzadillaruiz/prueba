@@ -10,7 +10,7 @@ import { PrismaClient, type Prisma } from "@prisma/client";
 import { AGENCIES, NOW, USERS } from "./seed-data/people";
 import { LISTINGS } from "./seed-data/listings";
 import { ZONES } from "./seed-data/zones";
-import { AGENT_SLOTS, AUDIT, CAPTURES, EMAILS, FX_RATES, LEADS, LEAD_THREAD, MEDIA_JOBS, MODERATION_QUEUE, OFFERS, OWNER_THREAD, SAVED_SEARCHES, TOURS } from "./seed-data/ops";
+import { AGENT_SLOTS, AUDIT, CAPTURES, EMAILS, FX_RATES, LEADS, MEDIA_JOBS, MODERATION_QUEUE, OFFERS, OWNER_THREAD, SAVED_SEARCHES, TOURS } from "./seed-data/ops";
 
 const prisma = new PrismaClient();
 const SHIFT = Date.now() - NOW.getTime();
@@ -179,8 +179,8 @@ async function main() {
     data: { listingId: mandateListing.id, subject: "Encargo · Casa en Barquisimeto", participants: { create: [{ userId: "u-priv" }, { userId: "u-agent" }] } },
   });
   for (const m of OWNER_THREAD) await prisma.message.create({ data: { threadId: ownerThread.id, senderId: m.mine ? "u-priv" : "u-agent", body: m.body, createdAt: d(m.at) } });
-  const leadThread = await prisma.messageThread.create({ data: { leadId: "ld-01", listingId: LISTINGS[0].id, participants: { create: [{ userId: "u-agent" }] } } });
-  for (const m of LEAD_THREAD) await prisma.message.create({ data: { threadId: leadThread.id, senderId: "u-agent", body: m.body, createdAt: d(m.at) } });
+  await prisma.messageThread.create({ data: { leadId: "ld-01", listingId: LISTINGS[0].id, participants: { create: [{ userId: "u-agent" }] } } });
+  // The buyer's first message lives on the lead itself; the thread starts empty until the agent replies
 
   for (const o of OFFERS) await prisma.offer.create({ data: { listingId: o.listingId, bidderName: o.bidder, amount: o.amount, status: o.status, note: o.note, createdAt: d(o.createdAt) } });
   for (const c of CAPTURES)

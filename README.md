@@ -1,39 +1,49 @@
 # New Place — Un nuevo lugar. / Real estate. Redefined.
 
-**ES** · Prototipo navegable de la PWA de New Place: marketplace inmobiliario, sistema operativo de agencias y consola SaaS. Datos 100 % ficticios (Venezuela), marca «Caracas Night».
+**ES** · PWA de New Place v1: marketplace inmobiliario, sistema operativo de agencias y consola SaaS. Next.js 15 + PostgreSQL/Prisma + Auth.js, datos seed de Venezuela, marca «Caracas Night». Las apps iOS/Android (Capacitor) quedan para la fase 2.
 
-**EN** · Clickable prototype of the New Place PWA: real-estate marketplace, agency OS and SaaS console. 100 % fictional data (Venezuela), “Caracas Night” brand.
-
-## Ver sin instalar / See without installing
-- `captures/` — 52 capturas (45 escritorio + 7 móvil) · `captures/index.json` las describe.
-- `videos/new-place-cliente.mp4`, `videos/new-place-admin.mp4`, `videos/new-place-propietario.mp4` — recorridos narrados.
+**EN** · New Place v1 PWA: real-estate marketplace, agency OS and SaaS console. Next.js 15 + PostgreSQL/Prisma + Auth.js, Venezuela seed data, “Caracas Night” brand. Native apps (Capacitor) are phase 2.
 
 ## 10 minutos a localhost:3000 / 10 minutes to localhost:3000
 ```bash
+cp .env.example apps/web/.env.local   # rellena AUTH_SECRET (openssl rand -base64 32)
 npm install
-npm run dev            # http://localhost:3000/es
+npm run db:up        # Postgres 16 local (o: docker compose up -d)
+npm run db:reset     # prisma db push + seed
+npm run dev          # http://localhost:3000/es
 ```
-Producción / Production:
-```bash
-npm run build && npm start
-```
-No necesita base de datos, claves de Google ni de IA: el prototipo usa datos mock, mapa ilustrado y el proveedor de IA local (`HeuristicProvider`). Usa el botón **Demo** (abajo a la izquierda) para «Entrar como…» cualquier rol.
+Contraseña de todos los usuarios seed / password for every seed user: **`NewPlace!2026`**. Con `DEMO_AUTH=true`, `/es/login` muestra «Entrar como…» para cada rol.
 
-No database, Google or AI keys needed: mock data, illustrated map and the local AI provider. Use the **Demo** pill (bottom-left) to “Sign in as…” any role.
+| Rol | Email |
+|---|---|
+| Superadmin | `superadmin@newplace.app` |
+| Dueño de agencia | `owner@andesprime.ve` |
+| Agente | `agent@andesprime.ve` |
+| Backoffice · Captador · Fotógrafo | `sofia@` · `rosa@` · `miguel@andesprime.ve` |
+| Propietario particular | `owner.priv@gmail.com` |
+| Buscador | `seeker@gmail.com` |
+
+(La lista completa está en `packages/db/prisma/seed-data/people.ts`.)
+
+Sin claves de Google ni de IA la app funciona igual: mapa ilustrado, geocodificador local y `HeuristicProvider`. Con `NEXT_PUBLIC_GOOGLE_MAPS_KEY` usa Google Maps + Places; con `AI_BASE_URL`/`AI_API_KEY` usa cualquier API compatible con OpenAI (Grok, OpenAI, etc.).
 
 ## Scripts
 | | |
 |---|---|
-| `npm run dev` | Next.js dev server (port 3000) |
-| `npm test` | Vitest — dominio IA (estimate, NL parser, lead score) |
-| `BASE=http://localhost:3001 node scripts/capture.mjs` | Regenera las capturas |
-| `BASE=http://localhost:3001 node scripts/video.mjs cliente\|admin\|propietario` | Regenera los vídeos |
+| `npm run dev` / `npm run build && npm start` | Desarrollo / producción |
+| `npm run db:reset` | Recrea el esquema y vuelve a sembrar |
+| `npm test` | Vitest: IA, RBAC, schemas Zod, geo, filtros de búsqueda |
+| `npm run e2e` | Playwright: los 10 criterios de aceptación §15 + smoke + RBAC |
+| `npm run lint` · `npm run typecheck -w apps/web` | ESLint · TypeScript |
+| `npm run photos -w apps/web` | Genera fotos IA de los listings (requiere `GEMINI_API_KEY` o acceso a Pollinations) |
+| `npm run shots` · `node scripts/video.mjs cliente\|admin\|propietario` | Capturas y vídeos (ver RUNBOOK) |
 
 ## Estructura
 ```
-apps/web          Next.js 15 App Router + TS + Tailwind (todas las vistas)
-packages/ai       AIProvider + HeuristicProvider (estimate, searchParse, writeListing, leadScore)
-packages/config   Tokens Caracas Night + matriz RBAC
-docs/             ARCHITECTURE, RUNBOOK, DECISIONS, DEVIATIONS
+apps/web          Next.js 15 App Router: páginas, API REST /api/v1, Auth.js, Serwist, next-intl
+packages/db       Prisma schema (§8), cliente y seed Venezuela
+packages/ai       AIProvider: HeuristicProvider + OpenAICompatibleProvider
+packages/config   Tokens Caracas Night, matriz RBAC, schemas Zod compartidos, catálogos es/en
+docs/             ARCHITECTURE · RUNBOOK · DECISIONS · DEVIATIONS · V1_PROGRESS
+captures/ videos/ Capturas y recorridos en vídeo
 ```
-Ver `docs/` para arquitectura, decisiones y diferencias entre este prototipo y la v1 completa.

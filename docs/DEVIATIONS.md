@@ -1,18 +1,15 @@
-# Diferencias del prototipo respecto al brief v1
+# Diferencias de la v1 respecto al brief
 
-Este entregable es el **prototipo visual navegable** que se pidió antes de aprobar el desarrollo. Brechas conocidas, todas previstas para v1:
-
-| Brief | Prototipo | Motivo |
+| Brief | v1 | Motivo / cómo completarlo |
 |---|---|---|
-| Fotos (Unsplash u otras) | Ilustraciones SVG propias en la paleta de marca | La red del entorno bloquea CDNs de imágenes (images.unsplash.com, etc.). |
-| Google Maps JS + Places + Drawing | Mapa SVG ilustrado con clusters, polígono y radio; autocompletado simulado | Sin `NEXT_PUBLIC_GOOGLE_MAPS_KEY` y teselas bloqueadas. El brief exige no romper sin key: es exactamente ese modo. |
-| Prisma + PostgreSQL + API `/api/v1` | Datos mock en memoria + `localStorage` | Solo vistas en esta fase. |
-| Auth.js (Google + Credentials) | Solo `DEMO_AUTH` («Entrar como…») y formularios visuales | Ídem. |
-| `OpenAICompatibleProvider` | Solo selector visual; se usa `HeuristicProvider` real | Sin key. |
-| next-intl | Helper `tx(locale, es, en)` con rutas `/[locale]` | Más rápido para el prototipo; v1 migra a catálogos next-intl. |
+| Fotos reales / generadas | Ilustraciones SVG deterministas en la paleta de marca; las fotos subidas por usuarios sí se guardan y muestran | La red del entorno de desarrollo bloquea los CDNs de imágenes y generadores. El script `npm run photos -w apps/web` genera fotos IA (Gemini o Pollinations) y el seed las asocia automáticamente. |
+| Google Maps JS + Places + Drawing | Implementado (`GoogleMapView`, `PlacesSearch`); sin key se usa el mapa ilustrado y un geocodificador local | Sin `NEXT_PUBLIC_GOOGLE_MAPS_KEY` en este entorno. El brief exige no romper sin key: es exactamente ese modo. |
+| next-intl para todos los textos | next-intl gestiona locale, middleware y catálogos (cabecera, pie, menús de admin); el contenido de páginas usa el helper `tx(locale, es, en)` | Migración parcial; los textos siguen siendo bilingües en todas las rutas. Pendiente mover los strings restantes a `messages/*.json`. |
+| Sesiones de Auth.js en BD | Sesiones JWT (cuentas y usuarios sí en Postgres vía PrismaAdapter) | Necesario para comprobar roles en el middleware edge. |
+| Emails transaccionales | Se escriben en `EmailOutbox` (visibles en `/platform`) sin envío SMTP | Falta configurar un proveedor (Resend/SES). |
+| Push notifications | `PushProvider` no-op | Web Push / FCM en fase 2 con las apps nativas. |
+| Almacenamiento S3 | `STORAGE=local` funcional; `s3` es stub | Implementar con credenciales del cliente. |
+| Digest de alertas | Endpoint `POST /api/v1/alerts/run` (Bearer `CRON_SECRET`) | Programar en el hosting (Vercel Cron, etc.). Las alertas instantáneas ya se generan al publicar. |
 | `next/font/google` | `@fontsource/outfit` + `@fontsource/source-sans-3` (mismas fuentes, autoalojadas) | Build sin depender de Google Fonts. |
-| Serwist | Service worker manual equivalente (`public/sw.js`) | Menos dependencias en el prototipo. |
-| shadcn/ui | Componentes propios con el mismo estilo (radius 14, tokens) | CLI de shadcn requiere red externa. |
-| Capacitor | Fuera de alcance (fase 2 acordada) | — |
-| Modo oscuro público | No implementado (admin siempre dark) | Pendiente para v1. |
-| Playwright smoke | Scripts de captura y vídeo recorren los flujos; sin aserciones formales | v1 añade specs. |
+| shadcn/ui | Componentes propios con el mismo estilo (radius 14, tokens) | El CLI de shadcn requiere red externa. |
+| Capacitor iOS / Android | Fuera de alcance | Fase 2 acordada. |

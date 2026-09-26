@@ -1,8 +1,9 @@
-// Records narrated walkthrough videos of the prototype (Playwright → webm → mp4).
+// Records narrated walkthrough videos (Playwright → webm → mp4). Needs DEMO_AUTH=true and a fresh `npm run db:seed`.
 // Usage: BASE=http://localhost:3001 node scripts/video.mjs cliente|admin|propietario
 import { chromium } from "playwright";
 import { execFileSync } from "node:child_process";
 import { mkdirSync, readdirSync, renameSync, rmSync } from "node:fs";
+import { coverPhoto, login } from "./auth.mjs";
 
 const BASE = process.env.BASE ?? "http://localhost:3001";
 const which = process.argv[2] ?? "cliente";
@@ -13,14 +14,12 @@ const FFMPEG = process.env.FFMPEG ?? execFileSync("python3", ["-c", "import imag
 
 const SIZE = { width: 1440, height: 900 };
 const browser = await chromium.launch();
+const PHOTO = await coverPhoto(browser, BASE, "los-palos-grandes-3h-118m-l5u136", TMP + "upload.jpg");
 const ctx = await browser.newContext({ viewport: SIZE, recordVideo: { dir: TMP, size: SIZE } });
+if (which === "cliente") await login(ctx, BASE, "seeker");
 
 // Overlay: visible cursor + caption bar (injected on every page).
 await ctx.addInitScript(() => {
-  if (!sessionStorage.getItem("np-video-init")) {
-    localStorage.removeItem("np-demo-v1");
-    sessionStorage.setItem("np-video-init", "1");
-  }
   const boot = () => {
     if (document.getElementById("np-cursor")) return;
     const c = document.createElement("div");
@@ -99,6 +98,7 @@ async function demoLogin(label, expectPath) {
 }
 
 const LPG = "/es/listing/los-palos-grandes-3h-118m-l5u136";
+const freeSlot = () => page.locator("button:not([disabled])", { hasText: /^\d\d:00$/ });
 
 async function cliente() {
   await go("/es", 600);
@@ -152,8 +152,7 @@ async function cliente() {
   await page.evaluate(() => window.scrollTo({ top: 0, behavior: "smooth" }));
   await wait(1200);
   await caption("Pedir visita con los horarios reales de la agenda del agente.");
-  await realClick(page.getByRole("button", { name: /^Lun 28|lun 28/i }).first(), { after: 400 });
-  await realClick(page.getByRole("button", { name: "11:00" }).first(), { after: 500 });
+  await realClick(freeSlot().nth(1), { after: 500 });
   await realClick(page.getByRole("button", { name: /Solicitar visita/ }), { after: 2600 });
   await caption("Lead creado: el agente lo recibe al instante con score de IA.", 1800);
   await caption("Guardar y comparar (hasta 3 inmuebles).");
@@ -183,8 +182,10 @@ async function cliente() {
 async function admin() {
   await go(LPG, 800);
   await caption("Perfil admin. Primero, un cliente pide visita desde la ficha…", 1500);
-  await realClick(page.getByRole("button", { name: "11:00" }).first(), { after: 400 });
-  await realClick(page.getByRole("button", { name: /Solicitar visita/ }), { after: 1800 });
+  await realClick(freeSlot().nth(2), { after: 400 });
+  await type(page.getByRole("textbox", { name: "Nombre" }), "Mariana Suárez", 35);
+  await type(page.getByRole("textbox", { name: "Email" }), "mariana.s@gmail.com", 30);
+  await realClick(page.getByRole("button", { name: /Solicitar visita/ }), { after: 2200 });
   await caption("Entramos como agente (modo demo «Entrar como…»).");
   await demoLogin("Agente", "/agency/leads");
   await caption("Bandeja de leads: SLA de 15 min, score IA 0-100 y siguiente mejor acción.", 2500);
@@ -237,11 +238,10 @@ async function admin() {
   await realClick(page.locator('[data-listing="19if9a"]').getByRole("button", { name: /Apagar/ }), { after: 1800 });
   await caption("…y desaparece de la búsqueda pública (ahora 2 resultados en Chacao).");
   await go("/es/search?type=SALE&zone=Chacao&beds=2&max=250000", 2800);
-  await caption("Cambio de proveedor de IA en caliente, tasas FX y herramientas de seed.");
+  await caption("Cambio de proveedor de IA en caliente y tasas FX de referencia.");
   await go("/es/platform/ai", 1200);
   await realClick(page.getByRole("button", { name: /OpenAICompatibleProvider/ }), { after: 1800 });
   await realClick(page.getByRole("button", { name: /HeuristicProvider/ }), { after: 800 });
-  await realClick(page.getByRole("button", { name: /db:seed/ }), { after: 1800 });
   await caption("Fin del recorrido admin · New Place — Un nuevo lugar.", 2500);
 }
 
@@ -251,23 +251,30 @@ async function propietario() {
   await demoLogin("Propietario particular", "/owner/listings");
   await go("/es/owner/new", 600);
   await caption("Propietario particular: publicar FSBO en Altamira en 6 pasos.", 2200);
+  await page.evaluate(() => sessionStorage.removeItem("np-owner-draft-v1"));
+  await go("/es/owner/new", 600);
+  await realClick(page.getByRole("button", { name: /Publicar yo mismo/ }), { after: 500 });
   await realClick(page.getByRole("button", { name: /Continuar/ }));
-  await type(page.getByPlaceholder(/dirección/), "San Juan Bosco", 70);
-  await realClick(page.getByRole("button", { name: /Edif. Mirasol/ }), { after: 1800 });
+  await type(page.getByRole("textbox", { name: "Dirección" }), "Av. San Juan Bosco, Res. Los Samanes", 45);
+  await realClick(page.getByRole("option").filter({ hasText: "Altamira" }).first(), { after: 1800 });
   await realClick(page.getByRole("button", { name: /Continuar/ }));
   await caption("Características y amenidades.");
-  await realClick(page.getByRole("button", { name: "+" }).first(), { after: 500 });
+  await realClick(page.getByRole("button", { name: /\+$/ }).first(), { after: 500 });
   await realClick(page.getByRole("button", { name: /Piscina/ }), { after: 800 });
   await realClick(page.getByRole("button", { name: /Continuar/ }));
   await caption("Fotos: subida, orden y portada.");
-  await realClick(page.getByRole("button", { name: /Arrastra tus fotos/ }), { after: 1800 });
+  await moveTo(page.getByText(/Arrastra tus fotos/), { pause: 400 });
+  await page.getByTestId("photo-input").setInputFiles(PHOTO);
+  await wait(1800);
   await realClick(page.getByRole("button", { name: /Continuar/ }));
   await caption("PlaceEstimate en vivo y «Redactar con IA» en español e inglés.", 1500);
   await realClick(page.getByRole("button", { name: /Redactar con IA/ }), { after: 1800 });
   await realClick(page.getByRole("button", { name: "EN" }).first(), { after: 1500 });
   await realClick(page.getByRole("button", { name: /Continuar/ }));
   await caption("Revisión: calidad de ficha y publicar.", 1800);
-  await realClick(page.getByRole("button", { name: /Publicar ahora/ }), { after: 2500 });
+  await realClick(page.getByRole("button", { name: /Publicar ahora/ }), { after: 600 });
+  await page.getByTestId("owner-published").waitFor({ timeout: 30000 });
+  await wait(2200);
   await caption("Mis inmuebles: estado del encargo, ofertas recibidas y chat con el agente.");
   await go("/es/owner/listings", 2500);
   await scrollBy(700, 12);
@@ -290,6 +297,7 @@ await caption("", 300);
 await ctx.close();
 await browser.close();
 
+rmSync(PHOTO, { force: true });
 const webm = readdirSync(TMP).find((f) => f.endsWith(".webm"));
 const src = TMP + webm;
 const dst = OUT + `new-place-${which}.mp4`;

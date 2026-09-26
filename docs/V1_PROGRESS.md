@@ -13,4 +13,4 @@ Stack: Next.js 15 · Prisma + PostgreSQL 16 · Auth.js v5 · Zod · TanStack Que
 - [x] F7 PWA Serwist + offline; next-intl (routing, detección, mensajes de chrome)
 - [x] F8 Calidad: RBAC duro, Zod compartido en forms y API (RHF), errores i18n, loading/error/not-found, ESLint 0 warnings + Prettier, dark mode público
 - [x] F9 Tests: Playwright 15/15 (criterios §15 + smoke + RBAC) · Vitest 15 (IA, RBAC, schemas, geo, filtros)
-- [ ] F10 Docs, capturas y vídeos actualizados, galería
+- [x] F10 Docs v1 (README, ARCHITECTURE, RUNBOOK, DECISIONS, DEVIATIONS, .env.example), capturas y vídeos regrabados sobre la app real, galería actualizada

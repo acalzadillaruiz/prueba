@@ -2,8 +2,8 @@
 // Needs a running app with DEMO_AUTH=true and a freshly seeded DB (`npm run db:seed`).
 // Usage: BASE=http://localhost:3001 node scripts/capture.mjs [filter]
 import { chromium } from "playwright";
-import { mkdirSync, writeFileSync } from "node:fs";
-import { login, wizardTo } from "./auth.mjs";
+import { mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { coverPhoto, login, wizardTo } from "./auth.mjs";
 
 const BASE = process.env.BASE ?? "http://localhost:3001";
 const OUT = new URL("../captures/", import.meta.url).pathname;
@@ -93,18 +93,7 @@ const SHOTS = [
 ];
 
 const browser = await chromium.launch();
-{
-  // A real-looking upload for the wizard: the cover image of a seeded listing.
-  const p = await browser.newPage({ viewport: { width: 1200, height: 800 } });
-  await p.goto(`${BASE}/es/listing/${LPG}?shot=1`, { waitUntil: "networkidle" });
-  const box = await p.evaluate(() => {
-    const els = [...document.querySelectorAll("main svg, main img")].map((e) => e.getBoundingClientRect()).sort((a, b) => b.width * b.height - a.width * a.height);
-    const r = els[0];
-    return { x: r.x, y: r.y, width: r.width, height: r.height };
-  });
-  await p.screenshot({ path: PHOTO, type: "jpeg", quality: 85, clip: box });
-  await p.close();
-}
+await coverPhoto(browser, BASE, LPG, PHOTO);
 const index = [];
 for (const s of SHOTS) {
   if (only && !s.id.includes(only)) continue;
@@ -133,4 +122,5 @@ for (const s of SHOTS) {
   await ctx.close();
 }
 await browser.close();
+rmSync(PHOTO, { force: true });
 if (!only) writeFileSync(OUT + "index.json", JSON.stringify(index, null, 2));

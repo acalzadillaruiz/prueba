@@ -55,7 +55,7 @@ export function ListingsTable({ locale }: { locale: Locale }) {
                 <tr key={l.id} className="border-t border-navy-line hover:bg-white/[.03]">
                   <td className="px-4 py-2.5">
                     <Link href={`/${locale}/agency/listings/${l.id}/edit`} className="flex items-center gap-3">
-                      <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l.id, 0)} className="h-11 w-14 shrink-0 rounded-md" />
+                      <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="h-11 w-14 shrink-0 rounded-md" />
                       <div className="min-w-0">
                         <div className="line-clamp-1 font-semibold hover:text-coral">{tx(locale, l.title_es, l.title_en)}</div>
                         <div className="text-xs text-mist">{lbl(TYPE_LABEL[l.listingType], locale)} · {l.zone} · {num(l.areaM2, locale)} m²</div>

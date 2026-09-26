@@ -82,7 +82,7 @@ export function AgencyDashboard({ locale }: { locale: Locale }) {
                   <tr key={l.id} className="border-t border-navy-line">
                     <td className="py-2.5">
                       <Link href={`/${locale}/agency/listings/${l.id}/edit`} className="flex items-center gap-3 hover:text-coral">
-                        <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l.id, 0)} className="h-9 w-12 shrink-0 rounded" />
+                        <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="h-9 w-12 shrink-0 rounded" />
                         <span className="line-clamp-1 font-semibold">{tx(locale, l.title_es, l.title_en)}</span>
                       </Link>
                     </td>

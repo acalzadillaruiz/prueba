@@ -35,7 +35,7 @@ export function MediaView({ locale }: { locale: Locale }) {
             const jl = listingById(j.listingId)!;
             return (
               <button key={j.id} onClick={() => setSel(j.id)} className={cn("flex w-full gap-3 rounded-np border p-3 text-left", sel === j.id ? "border-coral bg-white/[.04]" : "border-navy-line bg-navy-card hover:bg-white/[.03]")}>
-                <PropertyArt scene={jl.scenes[0]} seed={jl.id} photo={listingPhoto(jl.id, 0)} className="h-14 w-20 shrink-0 rounded-md" />
+                <PropertyArt scene={jl.scenes[0]} seed={jl.id} photo={listingPhoto(jl, 0)} className="h-14 w-20 shrink-0 rounded-md" />
                 <div className="min-w-0 flex-1">
                   <div className="line-clamp-1 font-semibold">{tx(locale, jl.title_es, jl.title_en)}</div>
                   <div className="text-xs capitalize text-mist">{dateTime(j.date, locale)}</div>
@@ -62,7 +62,7 @@ export function MediaView({ locale }: { locale: Locale }) {
           <div className="mt-5 grid grid-cols-3 gap-2 sm:grid-cols-5 lg:grid-cols-6">
             {photos.map((s, i) => (
               <div key={i} className={cn("np-in group relative overflow-hidden rounded-md ring-2", cover === i ? "ring-coral" : "ring-transparent")} style={{ animationDelay: `${(i % 6) * 40}ms` }}>
-                <PropertyArt scene={s} seed={l.id + "m" + i} photo={listingPhoto(l.id, i % Math.max(1, l.scenes.length))} className="aspect-[4/3] w-full" />
+                <PropertyArt scene={s} seed={l.id + "m" + i} photo={listingPhoto(l, i % Math.max(1, l.scenes.length))} className="aspect-[4/3] w-full" />
                 <span className="absolute left-1 top-1 rounded bg-navy/80 px-1 text-[10px] font-bold">{i + 1}</span>
                 <GripVertical size={13} className="absolute right-1 top-1 text-white drop-shadow" />
                 {cover === i ? <span className="absolute bottom-1 left-1 rounded-full bg-coral px-1.5 text-[10px] font-bold text-white">{tx(locale, "Portada", "Cover")}</span> : <button onClick={() => setCover(i)} className="absolute bottom-1 left-1 rounded-full bg-white/90 px-1.5 text-[10px] font-bold text-navy opacity-0 group-hover:opacity-100">{tx(locale, "Portada", "Cover")}</button>}

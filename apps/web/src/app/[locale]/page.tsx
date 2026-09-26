@@ -91,7 +91,7 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
             {lux.map((l) => (
               <Link key={l.id} href={`/${locale}/listing/${l.slug}`} className="group">
                 <div className="overflow-hidden rounded-np border border-gold/60 p-1.5">
-                  <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l.id, 0)} className="aspect-[4/3] w-full rounded-[10px] transition-transform duration-500 group-hover:scale-[1.02]" />
+                  <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="aspect-[4/3] w-full rounded-[10px] transition-transform duration-500 group-hover:scale-[1.02]" />
                 </div>
                 <div className="mt-3 flex items-baseline justify-between">
                   <span className="font-display text-lg">{tx(locale, l.title_es, l.title_en)}</span>

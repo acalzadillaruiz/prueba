@@ -1,0 +1,215 @@
+import "server-only";
+import { prisma, type Prisma } from "@newplace/db";
+import type { EstimateResult } from "@newplace/ai";
+import type { Amenity, Kind, Listing, ListingStatus, ListingType, Scene } from "@/types/domain";
+import { inShape, type Shape } from "@/lib/geo";
+
+export const listingInclude = {
+  photos: { orderBy: [{ isCover: "desc" }, { order: "asc" }] },
+  priceHistory: { orderBy: { date: "asc" } },
+  estimates: { orderBy: { createdAt: "desc" }, take: 1 },
+} satisfies Prisma.ListingInclude;
+
+export type ListingRow = Prisma.ListingGetPayload<{ include: typeof listingInclude }>;
+
+export const PUBLIC_STATUSES: ListingStatus[] = ["COMING_SOON", "ACTIVE", "UNDER_OFFER", "SOLD", "RENTED"];
+
+export function publicWhere(): Prisma.ListingWhereInput {
+  return { status: { in: PUBLIC_STATUSES }, review: "APPROVED", privateListing: false };
+}
+
+export function toDomain(r: ListingRow): Listing {
+  const est = r.estimates[0];
+  const estimate: EstimateResult = est
+    ? { mid: est.mid, low: est.low, high: est.high, confidence: est.confidence, comparables: est.comparables as unknown as EstimateResult["comparables"], method: est.method }
+    : { mid: r.priceAmount, low: Math.round(r.priceAmount * 0.9), high: Math.round(r.priceAmount * 1.1), confidence: 0.4, comparables: [], method: "pending" };
+  const photos = r.photos.map((p) => p.url);
+  const baseScenes = (r.scenes.length ? r.scenes : ["living"]) as Scene[];
+  const scenes = photos.length ? photos.map((_, i) => baseScenes[i % baseScenes.length]) : baseScenes;
+  const publishedAt = (r.publishedAt ?? r.createdAt).toISOString();
+  return {
+    id: r.id,
+    slug: r.slug,
+    title_es: r.titleEs,
+    title_en: r.titleEn,
+    body_es: r.bodyEs,
+    body_en: r.bodyEn,
+    address: r.address,
+    zone: r.zone,
+    city: r.city,
+    state: r.state,
+    countryCode: "VE",
+    lat: r.lat,
+    lng: r.lng,
+    kind: r.kind as Kind,
+    listingType: r.listingType as ListingType,
+    category: r.category,
+    luxury: r.luxury,
+    furnished: r.furnished,
+    pets: r.pets,
+    priceAmount: r.priceAmount,
+    priceCurrency: r.priceCurrency as Listing["priceCurrency"],
+    pricePeriod: (r.pricePeriod ?? undefined) as Listing["pricePeriod"],
+    areaM2: r.areaM2,
+    plotM2: r.plotM2 ?? undefined,
+    beds: r.beds,
+    baths: r.baths,
+    parking: r.parking,
+    yearBuilt: r.yearBuilt,
+    amenities: r.amenities as Amenity[],
+    status: r.status as ListingStatus,
+    review: r.review,
+    takedownReason: r.takedownReason,
+    publishedAt,
+    updatedAt: r.updatedAt.toISOString(),
+    agencyId: r.agencyId ?? undefined,
+    agentId: r.agentId ?? undefined,
+    ownerUserId: r.ownerUserId ?? undefined,
+    scenes,
+    photos,
+    hasFloorplan: r.hasFloorplan,
+    hasVideo: r.hasVideo,
+    hasVirtualTour: r.hasVirtualTour,
+    estimate,
+    priceHistory: r.priceHistory.map((p) => ({ date: p.date.toISOString(), amount: p.amount, kind: p.kind as Listing["priceHistory"][number]["kind"] })),
+    daysOnMarket: Math.max(0, Math.round((Date.now() - Date.parse(publishedAt)) / 864e5)),
+    stats: { impressions: r.impressions, saves: r.saves, leads: r.leadsCount, avgTimeSec: r.avgTimeSec, interactions: r.interactions },
+    quality: r.quality,
+    privateListing: r.privateListing,
+    shortRent: (r.shortRent ?? undefined) as Listing["shortRent"],
+    commercial: (r.commercial ?? undefined) as Listing["commercial"],
+    fingerprint: r.fingerprint,
+  };
+}
+
+export interface SearchFilters {
+  type?: string;
+  zone?: string;
+  city?: string;
+  max?: number;
+  min?: number;
+  beds?: number;
+  baths?: number;
+  minM2?: number;
+  lux?: boolean;
+  kind?: string;
+  furnished?: boolean;
+  pets?: boolean;
+  verified?: boolean;
+  pub?: "24h" | "7d";
+  amenities?: string[];
+  bbox?: [number, number, number, number]; // south, west, north, east
+  shape?: Shape;
+  sort?: "new" | "price-asc" | "price-desc" | "ppm";
+  cursor?: string;
+  take?: number;
+}
+
+export function filtersFromParams(sp: URLSearchParams): SearchFilters {
+  const num = (k: string) => (sp.get(k) ? Number(sp.get(k)) : undefined);
+  const poly = sp.get("poly");
+  const radius = sp.get("radius");
+  let shape: Shape = null;
+  if (poly) {
+    const pts = poly.split(";").map((p) => p.split(",").map(Number)).filter((p) => p.length === 2 && p.every(Number.isFinite)).map(([lat, lng]) => ({ lat, lng }));
+    if (pts.length >= 3) shape = { type: "poly", pts };
+  } else if (radius) {
+    const [lat, lng, km] = radius.split(",").map(Number);
+    if ([lat, lng, km].every(Number.isFinite)) shape = { type: "radius", center: { lat, lng }, km };
+  }
+  const bbox = sp.get("bbox")?.split(",").map(Number);
+  return {
+    type: sp.get("type") ?? undefined,
+    zone: sp.get("zone") ?? undefined,
+    city: sp.get("city") ?? undefined,
+    max: num("max"),
+    min: num("min"),
+    beds: num("beds"),
+    baths: num("baths"),
+    minM2: num("m2"),
+    lux: sp.get("lux") === "1",
+    kind: sp.get("kind") ?? undefined,
+    furnished: sp.get("furnished") === "1",
+    pets: sp.get("pets") === "1",
+    verified: sp.get("verified") === "1",
+    pub: (sp.get("pub") as SearchFilters["pub"]) ?? undefined,
+    amenities: (sp.get("am") ?? "").split(",").filter(Boolean),
+    bbox: bbox?.length === 4 && bbox.every(Number.isFinite) ? (bbox as SearchFilters["bbox"]) : undefined,
+    shape,
+    sort: (sp.get("sort") as SearchFilters["sort"]) ?? "new",
+    cursor: sp.get("cursor") ?? undefined,
+    take: num("take"),
+  };
+}
+
+export function whereFromFilters(f: SearchFilters): Prisma.ListingWhereInput {
+  const and: Prisma.ListingWhereInput[] = [publicWhere()];
+  if (f.type === "COMMERCIAL") and.push({ listingType: { in: ["COMMERCIAL_SALE", "COMMERCIAL_RENT"] } });
+  else if (f.type) and.push({ listingType: f.type as ListingType });
+  if (f.zone) and.push({ OR: [{ zone: f.zone }, { city: f.zone }] });
+  if (f.city) and.push({ city: f.city });
+  if (f.max) and.push({ priceAmount: { lte: f.max } });
+  if (f.min) and.push({ priceAmount: { gte: f.min } });
+  if (f.beds) and.push({ beds: { gte: f.beds } });
+  if (f.baths) and.push({ baths: { gte: f.baths } });
+  if (f.minM2) and.push({ areaM2: { gte: f.minM2 } });
+  if (f.lux) and.push({ luxury: true });
+  if (f.kind === "penthouse") and.push({ kind: "penthouse" });
+  if (f.kind === "house") and.push({ kind: { in: ["house", "townhouse", "villa", "chalet"] } });
+  if (f.kind === "apartment") and.push({ kind: { in: ["apartment", "studio", "penthouse"] } });
+  if (f.kind === "land") and.push({ kind: "land" });
+  if (f.furnished) and.push({ furnished: true });
+  if (f.pets) and.push({ pets: true });
+  if (f.verified) and.push({ agency: { verified: true } });
+  if (f.pub) and.push({ publishedAt: { gte: new Date(Date.now() - (f.pub === "24h" ? 1 : 7) * 864e5) } });
+  if (f.amenities?.length) and.push({ amenities: { hasEvery: f.amenities } });
+  if (f.bbox) {
+    const [s, w, n, e] = f.bbox;
+    and.push({ lat: { gte: s, lte: n }, lng: { gte: w, lte: e } });
+  }
+  return { AND: and };
+}
+
+export async function searchListings(f: SearchFilters): Promise<{ items: Listing[]; nextCursor: string | null; total: number }> {
+  const where = whereFromFilters(f);
+  const orderBy: Prisma.ListingOrderByWithRelationInput[] =
+    f.sort === "price-asc" ? [{ priceAmount: "asc" }] : f.sort === "price-desc" ? [{ priceAmount: "desc" }] : [{ publishedAt: "desc" }];
+  const take = Math.min(f.take ?? 500, 500);
+  const rows = await prisma.listing.findMany({ where, include: listingInclude, orderBy: [...orderBy, { id: "asc" }], take: take + 1, ...(f.cursor ? { cursor: { id: f.cursor }, skip: 1 } : {}) });
+  let items = rows.slice(0, take).map(toDomain);
+  if (f.shape) items = items.filter((l) => inShape(l, f.shape!));
+  if (f.sort === "ppm") items.sort((a, b) => a.priceAmount / a.areaM2 - b.priceAmount / b.areaM2);
+  const total = f.shape ? items.length : await prisma.listing.count({ where });
+  return { items, nextCursor: rows.length > take ? rows[take - 1].id : null, total };
+}
+
+export async function publicListings(): Promise<Listing[]> {
+  const rows = await prisma.listing.findMany({ where: publicWhere(), include: listingInclude, orderBy: { publishedAt: "desc" } });
+  return rows.map(toDomain);
+}
+
+export async function listingBySlug(slug: string): Promise<Listing | null> {
+  const r = await prisma.listing.findUnique({ where: { slug }, include: listingInclude });
+  return r ? toDomain(r) : null;
+}
+
+export async function listingById(id: string): Promise<Listing | null> {
+  const r = await prisma.listing.findUnique({ where: { id }, include: listingInclude });
+  return r ? toDomain(r) : null;
+}
+
+export async function listingsByIds(ids: string[]): Promise<Listing[]> {
+  if (!ids.length) return [];
+  const rows = await prisma.listing.findMany({ where: { id: { in: ids } }, include: listingInclude });
+  const map = new Map(rows.map((r) => [r.id, toDomain(r)]));
+  return ids.map((id) => map.get(id)).filter(Boolean) as Listing[];
+}
+
+export async function agencyListings(agencyId: string | null, opts: { agentId?: string } = {}): Promise<Listing[]> {
+  const rows = await prisma.listing.findMany({
+    where: { ...(agencyId ? { agencyId } : {}), ...(opts.agentId ? { agentId: opts.agentId } : {}) },
+    include: listingInclude,
+    orderBy: { updatedAt: "desc" },
+  });
+  return rows.map(toDomain);
+}

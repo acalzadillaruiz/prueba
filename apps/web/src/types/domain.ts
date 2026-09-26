@@ -108,6 +108,10 @@ export interface Listing {
   agentId?: string;
   ownerUserId?: string;
   scenes: Scene[];
+  /** Uploaded photo URLs (ordered, cover first). */
+  photos?: string[];
+  review?: "PENDING" | "APPROVED" | "REJECTED";
+  takedownReason?: string | null;
   hasFloorplan: boolean;
   hasVideo: boolean;
   hasVirtualTour: boolean;

@@ -30,16 +30,16 @@ export function Gallery({ l, locale, luxury }: { l: Listing; locale: Locale; lux
     <>
       {luxury ? (
         <button onClick={() => show(0)} className="relative block h-[72vh] max-h-[760px] w-full overflow-hidden">
-          <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l.id, 0)} className="h-full w-full" />
+          <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="h-full w-full" />
         </button>
       ) : (
         <div className="grid h-[300px] grid-cols-4 grid-rows-2 gap-2 overflow-hidden rounded-np md:h-[460px]">
           <button onClick={() => show(0)} className="col-span-4 row-span-2 overflow-hidden md:col-span-2">
-            <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l.id, 0)} className="h-full w-full transition-transform duration-500 hover:scale-[1.02]" />
+            <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="h-full w-full transition-transform duration-500 hover:scale-[1.02]" />
           </button>
           {l.scenes.slice(1, 5).map((s, n) => (
             <button key={n} onClick={() => show(n + 1)} className="relative hidden overflow-hidden md:block">
-              <PropertyArt scene={s} seed={l.id + n} photo={listingPhoto(l.id, n + 1)} className="h-full w-full transition-transform duration-500 hover:scale-[1.03]" />
+              <PropertyArt scene={s} seed={l.id + n} photo={listingPhoto(l, n + 1)} className="h-full w-full transition-transform duration-500 hover:scale-[1.03]" />
               {n === 3 && (
                 <span className="absolute inset-0 flex items-center justify-center bg-navy/55 font-display text-lg text-ivory">
                   +{l.scenes.length - 5} {tx(locale, "fotos", "photos")}
@@ -76,7 +76,7 @@ export function Gallery({ l, locale, luxury }: { l: Listing; locale: Locale; lux
           <div className="relative flex min-h-0 flex-1 items-center justify-center px-4 md:px-16">
             {tab === "photos" && (
               <>
-                <PropertyArt scene={l.scenes[i]} seed={i === 0 ? l.id : l.id + (i - 1)} photo={listingPhoto(l.id, i)} className="max-h-full w-full max-w-5xl rounded-np" />
+                <PropertyArt scene={l.scenes[i]} seed={i === 0 ? l.id : l.id + (i - 1)} photo={listingPhoto(l, i)} className="max-h-full w-full max-w-5xl rounded-np" />
                 <button onClick={() => setI((i - 1 + l.scenes.length) % l.scenes.length)} className="absolute left-3 rounded-full bg-white/10 p-3 hover:bg-white/20"><ChevronLeft /></button>
                 <button onClick={() => setI((i + 1) % l.scenes.length)} className="absolute right-3 rounded-full bg-white/10 p-3 hover:bg-white/20"><ChevronRight /></button>
               </>
@@ -84,7 +84,7 @@ export function Gallery({ l, locale, luxury }: { l: Listing; locale: Locale; lux
             {tab === "plan" && <Floorplan seed={l.id} beds={l.beds} className="max-h-full w-full max-w-4xl rounded-np" />}
             {(tab === "video" || tab === "tour") && (
               <div className="relative w-full max-w-5xl">
-                <PropertyArt scene={l.scenes[1] ?? l.scenes[0]} seed={l.id + "v"} photo={listingPhoto(l.id, 1) ?? listingPhoto(l.id, 0)} className="w-full rounded-np opacity-60" />
+                <PropertyArt scene={l.scenes[1] ?? l.scenes[0]} seed={l.id + "v"} photo={listingPhoto(l, 1) ?? listingPhoto(l, 0)} className="w-full rounded-np opacity-60" />
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
                   <span className="flex h-20 w-20 items-center justify-center rounded-full bg-coral shadow-np">{tab === "video" ? <Film size={32} /> : <Box size={32} />}</span>
                   <span className="font-display text-lg">{tab === "video" ? tx(locale, "Video del inmueble · 1:42", "Property video · 1:42") : tx(locale, "Tour virtual 360° (enlace externo)", "360° virtual tour (external link)")}</span>
@@ -93,7 +93,7 @@ export function Gallery({ l, locale, luxury }: { l: Listing; locale: Locale; lux
             )}
             {tab === "street" && (
               <div className="relative w-full max-w-5xl">
-                <PropertyArt scene={l.kind === "house" || l.kind === "villa" ? "house-dusk" : "tower-day"} seed={l.id + "s"} photo={listingPhoto(l.id, 0)} className="w-full rounded-np" />
+                <PropertyArt scene={l.kind === "house" || l.kind === "villa" ? "house-dusk" : "tower-day"} seed={l.id + "s"} photo={listingPhoto(l, 0)} className="w-full rounded-np" />
                 <span className="absolute left-3 top-3 rounded-full bg-navy/80 px-3 py-1 text-sm">Google Street View · {l.address}</span>
               </div>
             )}
@@ -102,7 +102,7 @@ export function Gallery({ l, locale, luxury }: { l: Listing; locale: Locale; lux
             <div className="no-scrollbar flex gap-2 overflow-x-auto px-4 py-3">
               {l.scenes.map((s, n) => (
                 <button key={n} onClick={() => setI(n)} className={cn("h-16 w-24 shrink-0 overflow-hidden rounded-lg ring-2", n === i ? "ring-coral" : "ring-transparent opacity-60")}>
-                  <PropertyArt scene={s} seed={n === 0 ? l.id : l.id + (n - 1)} photo={listingPhoto(l.id, n)} className="h-full w-full" />
+                  <PropertyArt scene={s} seed={n === 0 ? l.id : l.id + (n - 1)} photo={listingPhoto(l, n)} className="h-full w-full" />
                 </button>
               ))}
             </div>

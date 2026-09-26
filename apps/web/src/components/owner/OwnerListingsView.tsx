@@ -57,7 +57,7 @@ export function OwnerListingsView({ locale }: { locale: Locale }) {
             return (
               <Card key={l.id} className="overflow-hidden">
                 <div className="grid sm:grid-cols-[220px_1fr]">
-                  <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l.id, 0)} className="aspect-[4/3] h-full w-full" />
+                  <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="aspect-[4/3] h-full w-full" />
                   <div className="p-5">
                     <div className="flex flex-wrap items-center gap-2">
                       <StatusBadge status={l.status} locale={locale} />

@@ -164,7 +164,7 @@ export function PlatformModeration({ locale }: { locale: Locale }) {
             const down = takedowns.includes(l.id);
             return (
               <div key={l.id} data-listing={l.id} className={cn("flex items-center gap-3 border-t border-navy-line px-4 py-2.5 first:border-0", down && "bg-[#B4231814]")}>
-                <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l.id, 0)} className={cn("h-11 w-14 shrink-0 rounded-md", down && "opacity-40 grayscale")} />
+                <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className={cn("h-11 w-14 shrink-0 rounded-md", down && "opacity-40 grayscale")} />
                 <div className="min-w-0 flex-1">
                   <div className={cn("truncate font-semibold", down && "text-mist line-through")}>{tx(locale, l.title_es, l.title_en)}</div>
                   <div className="text-xs text-mist">{agencyById(l.agencyId)?.name ?? tx(locale, "Particular", "Private owner")} · {l.zone} · {money(l.priceAmount, locale)}</div>

@@ -7,13 +7,12 @@ import { ListingCard } from "@/components/listing/ListingCard";
 import { listingPhoto } from "@/lib/photos";
 import { PropertyArt } from "@/components/art/PropertyArt";
 import { Button, EmptyState } from "@/components/ui";
-import { useDemo } from "@/lib/store";
+import { useApp } from "@/lib/store";
 import { AMENITY_LABEL, TYPE_LABEL, lbl, money, num, priceSuffix, tx } from "@/lib/i18n";
-import { agencyById } from "@/mock/people";
 import { cn } from "@/lib/cn";
 
 export function SavedView({ locale, all }: { locale: Locale; all: Listing[] }) {
-  const { saved, compare, toggleCompare } = useDemo();
+  const { saved, compare, toggleCompare } = useApp();
   const items = saved.map((id) => all.find((l) => l.id === id)).filter(Boolean) as Listing[];
   const cmp = compare.map((id) => all.find((l) => l.id === id)).filter(Boolean) as Listing[];
   const rows: [string, (l: Listing) => React.ReactNode, ((l: Listing) => number)?, ("min" | "max")?][] = [
@@ -28,7 +27,7 @@ export function SavedView({ locale, all }: { locale: Locale; all: Listing[] }) {
     [tx(locale, "Año", "Year"), (l) => l.yearBuilt, (l) => l.yearBuilt, "max"],
     [tx(locale, "Zona", "Area"), (l) => `${l.zone}, ${l.city}`],
     [tx(locale, "Operación", "Type"), (l) => lbl(TYPE_LABEL[l.listingType], locale)],
-    [tx(locale, "Agencia", "Agency"), (l) => agencyById(l.agencyId)?.name ?? tx(locale, "Dueño directo", "By owner")],
+    [tx(locale, "Agencia", "Agency"), (l) => l.agency?.name ?? tx(locale, "Dueño directo", "By owner")],
     [tx(locale, "Días publicado", "Days listed"), (l) => l.daysOnMarket, (l) => l.daysOnMarket, "min"],
   ];
   const keyAmen = ["generator", "waterTank", "pool", "security", "gym", "elevator", "terrace", "view"] as const;

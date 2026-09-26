@@ -3,13 +3,16 @@ import type { Locale } from "@/types/domain";
 import { PublicPage } from "@/components/layout/PublicPage";
 import { listingPhoto } from "@/lib/photos";
 import { PropertyArt } from "@/components/art/PropertyArt";
-import { publicListings } from "@/mock/listings";
+import { publicListings } from "@/server/listings";
+import { prisma } from "@newplace/db";
 import { money, num, tx } from "@/lib/i18n";
 
 export default async function LuxuryPage({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params;
-  const lux = publicListings().filter((l) => l.luxury);
+  const lux = (await publicListings()).filter((l) => l.luxury);
+  const privateCount = await prisma.listing.count({ where: { luxury: true, privateListing: true, status: "ACTIVE" } });
   const [hero, ...rest] = lux;
+  if (!hero) return <PublicPage locale={locale} header="dark"><div className="bg-navy p-20 text-center text-ivory">—</div></PublicPage>;
   return (
     <PublicPage locale={locale} header="dark">
       <div className="bg-navy text-ivory">
@@ -42,7 +45,7 @@ export default async function LuxuryPage({ params }: { params: Promise<{ locale:
             ))}
           </div>
           <div className="mt-16 rounded-np border border-gold/40 p-8 text-center">
-            <div className="font-display text-2xl">{tx(locale, "1 propiedad privada disponible", "1 private listing available")}</div>
+            <div className="font-display text-2xl">{tx(locale, `${privateCount} ${privateCount === 1 ? "propiedad privada disponible" : "propiedades privadas disponibles"}`, `${privateCount} private listing${privateCount === 1 ? "" : "s"} available`)}</div>
             <p className="mx-auto mt-2 max-w-lg text-mist">{tx(locale, "Pide acceso a un agente Luxury. Te enviamos el enlace tras una precalificación breve.", "Ask a Luxury agent for access. We’ll send the link after a short pre-qualification.")}</p>
             <button className="mt-5 rounded-np bg-gold px-5 py-2.5 font-display text-navy">{tx(locale, "Solicitar acceso", "Request access")}</button>
           </div>

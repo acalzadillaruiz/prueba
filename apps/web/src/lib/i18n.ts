@@ -1,5 +1,4 @@
 import type { Amenity, Listing, ListingStatus, ListingType, Locale } from "@/types/domain";
-import { NOW } from "@/mock/people";
 
 export const LOCALES: Locale[] = ["es", "en"];
 export const isLocale = (s: string): s is Locale => s === "es" || s === "en";
@@ -22,7 +21,7 @@ export function num(n: number, l: Locale) {
 }
 
 export function ago(iso: string, l: Locale) {
-  const m = Math.round((NOW.getTime() - new Date(iso).getTime()) / 60000);
+  const m = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
   const future = m < 0;
   const a = Math.abs(m);
   let v: string;

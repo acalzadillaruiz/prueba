@@ -1,8 +1,10 @@
 import { notFound } from "next/navigation";
-import { DemoStoreProvider } from "@/lib/store";
+import { prisma } from "@newplace/db";
+import { AppStateProvider } from "@/lib/store";
 import { isLocale } from "@/lib/i18n";
-import { LISTINGS } from "@/mock/listings";
 import { DemoBar } from "@/components/layout/DemoBar";
+import { HtmlLang } from "@/components/layout/HtmlLang";
+import { getAppAgency, getAppUser } from "@/server/session";
 
 export function generateStaticParams() {
   return [{ locale: "es" }, { locale: "en" }];
@@ -11,11 +13,16 @@ export function generateStaticParams() {
 export default async function LocaleLayout({ children, params }: { children: React.ReactNode; params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
-  const initialSaved = [LISTINGS[0].id, LISTINGS[1].id, LISTINGS[6].id, LISTINGS[41].id, LISTINGS[17].id];
+  const user = await getAppUser();
+  const [agency, saved] = await Promise.all([
+    getAppAgency(user?.agencyId ?? null),
+    user ? prisma.savedListing.findMany({ where: { userId: user.id }, select: { listingId: true }, orderBy: { createdAt: "desc" } }) : Promise.resolve([]),
+  ]);
   return (
-    <DemoStoreProvider initialSaved={initialSaved}>
+    <AppStateProvider user={user} agency={agency} savedIds={saved.map((s) => s.listingId)}>
+      <HtmlLang locale={locale} />
       {children}
       <DemoBar locale={locale} />
-    </DemoStoreProvider>
+    </AppStateProvider>
   );
 }

@@ -111,6 +111,8 @@ export interface Listing {
   /** Uploaded photo URLs (ordered, cover first). */
   photos?: string[];
   review?: "PENDING" | "APPROVED" | "REJECTED";
+  agency?: { id: string; name: string; verified: boolean; color: string; initials: string; phone: string; whatsapp: string };
+  agent?: { id: string; name: string; hue: number; verified: boolean; phone?: string };
   takedownReason?: string | null;
   hasFloorplan: boolean;
   hasVideo: boolean;

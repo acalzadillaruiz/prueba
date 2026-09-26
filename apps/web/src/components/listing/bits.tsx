@@ -2,12 +2,12 @@
 
 import { Heart, Scale } from "lucide-react";
 import type { Listing, ListingStatus, Locale } from "@/types/domain";
-import { useDemo } from "@/lib/store";
+import { useApp } from "@/lib/store";
 import { cn } from "@/lib/cn";
 import { STATUS_LABEL, ago, lbl, tx } from "@/lib/i18n";
 
 export function SaveButton({ id, className, locale }: { id: string; className?: string; locale: Locale }) {
-  const { saved, toggleSaved } = useDemo();
+  const { saved, toggleSaved } = useApp();
   const on = saved.includes(id);
   return (
     <button
@@ -26,7 +26,7 @@ export function SaveButton({ id, className, locale }: { id: string; className?: 
 }
 
 export function CompareButton({ id, locale, dark }: { id: string; locale: Locale; dark?: boolean }) {
-  const { compare, toggleCompare } = useDemo();
+  const { compare, toggleCompare } = useApp();
   const on = compare.includes(id);
   return (
     <button
@@ -65,7 +65,7 @@ export function StatusBadge({ status, locale, className }: { status: ListingStat
 }
 
 export function Freshness({ iso, locale, className }: { iso: string; locale: Locale; className?: string }) {
-  const minutes = Math.round((Date.parse("2026-09-26T18:00:00Z") - Date.parse(iso)) / 60000);
+  const minutes = Math.round((Date.now() - Date.parse(iso)) / 60000);
   return (
     <span className={cn("inline-flex items-center gap-1.5 text-xs", className)}>
       <span className={cn("relative h-2 w-2 rounded-full", minutes < 60 ? "np-pulse bg-coral" : "bg-mist")} />

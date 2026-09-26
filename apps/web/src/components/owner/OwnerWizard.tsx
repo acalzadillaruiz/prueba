@@ -1,20 +1,19 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { ArrowLeft, ArrowRight, Building2, Check, CheckCircle2, GripVertical, ImagePlus, Loader2, MapPin, Search, ShieldCheck, Sparkles, Star, User } from "lucide-react";
-import { heuristicEstimate, heuristicWriteListing } from "@newplace/ai";
-import type { Amenity, Kind, Listing, Locale, Scene } from "@/types/domain";
-import { photo } from "@/lib/photos";
+import { useRouter } from "next/navigation";
+import { AlertTriangle, ArrowLeft, ArrowRight, Building2, Check, CheckCircle2, ImagePlus, Loader2, MapPin, ShieldCheck, Sparkles, Star, User, X } from "lucide-react";
+import type { EstimateResult } from "@newplace/ai";
+import type { Agency, Amenity, Kind, Locale, Zone } from "@/types/domain";
 import { PropertyArt } from "@/components/art/PropertyArt";
-import { NightMap } from "@/components/map/NightMap";
+import { PlacesSearch, type PlacePick } from "@/components/map/PlacesSearch";
+import { MapView } from "@/components/map/MapView";
 import { Button, Field, Progress, inputCls } from "@/components/ui";
+import { useApp } from "@/lib/store";
+import { api, ApiClientError } from "@/lib/api";
 import { AMENITY_LABEL, lbl, money, num, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
-import { ZONES, zoneByName } from "@/mock/zones";
-import { LISTINGS } from "@/mock/listings";
-import { AGENCIES } from "@/mock/people";
 
 const STEPS: [string, string][] = [
   ["Tipo", "Type"],
@@ -25,94 +24,205 @@ const STEPS: [string, string][] = [
   ["Revisión", "Review"],
 ];
 
-const SUGGESTIONS = [
-  { main: "Av. San Juan Bosco, Edif. Mirasol", sub: "Altamira, Chacao, Miranda, Venezuela", zone: "Altamira", lat: 10.4972, lng: -66.8497 },
-  { main: "Av. San Juan Bosco con 2da Transversal", sub: "Altamira, Caracas, Venezuela", zone: "Altamira", lat: 10.4981, lng: -66.8489 },
-  { main: "Plaza Francia (Altamira)", sub: "Chacao, Miranda, Venezuela", zone: "Altamira", lat: 10.4963, lng: -66.8497 },
-];
+type Copy = { title_es: string; title_en: string; body_es: string; body_en: string };
+type Draft = {
+  mode: "FSBO" | "MANDATE";
+  op: string;
+  kind: Kind;
+  addr: PlacePick | null;
+  unit: string;
+  m2: number;
+  beds: number;
+  baths: number;
+  parking: number;
+  year: number;
+  amen: Amenity[];
+  price: number;
+  copy: Copy;
+  agency: string;
+};
+const DRAFT_KEY = "np-owner-draft-v1";
 
-const UPLOAD: Scene[] = ["living", "kitchen", "bedroom", "bath", "terrace", "tower-day", "bedroom", "lobby", "living"];
-
-export function OwnerWizard({ locale }: { locale: Locale }) {
-  const sp = useSearchParams();
-  const [step, setStep] = useState(Number(sp.get("step") ?? 0));
-  const [mode, setMode] = useState<"FSBO" | "AGENCY">("FSBO");
-  const [op, setOp] = useState("SALE");
-  const [kind, setKind] = useState<Kind>("apartment");
-  const [q, setQ] = useState(step >= 1 ? SUGGESTIONS[0].main : "");
-  const [addr, setAddr] = useState<(typeof SUGGESTIONS)[number] | null>(step >= 1 ? SUGGESTIONS[0] : null);
-  const [m2, setM2] = useState(118);
-  const [beds, setBeds] = useState(3);
-  const [baths, setBaths] = useState(2);
-  const [parking, setParking] = useState(2);
-  const [year, setYear] = useState(2004);
-  const [amen, setAmen] = useState<Amenity[]>(["generator", "waterTank", "security", "elevator", "terrace"]);
-  const [photos, setPhotos] = useState<number>(step >= 3 ? 9 : 0);
+export function OwnerWizard({ locale, zones, agencies, fxVes }: { locale: Locale; zones: Zone[]; agencies: Agency[]; fxVes: number }) {
+  const router = useRouter();
+  const { user, requireLogin } = useApp();
+  const [step, setStep] = useState(0);
+  const [d, setD] = useState<Draft>({
+    mode: "FSBO",
+    op: "SALE",
+    kind: "apartment",
+    addr: null,
+    unit: "",
+    m2: 110,
+    beds: 3,
+    baths: 2,
+    parking: 1,
+    year: 2005,
+    amen: ["generator", "waterTank", "security"],
+    price: 150000,
+    copy: { title_es: "", title_en: "", body_es: "", body_en: "" },
+    agency: agencies.find((a) => a.verified)?.id ?? agencies[0]?.id ?? "",
+  });
+  const set = (p: Partial<Draft>) => setD((x) => ({ ...x, ...p }));
+  const [files, setFiles] = useState<File[]>([]);
   const [cover, setCover] = useState(0);
-  const [price, setPrice] = useState(185000);
-  const [copy, setCopy] = useState<ReturnType<typeof heuristicWriteListing> | null>(step >= 5 ? heuristicWriteListing({ kind: "apartment", zone: "Altamira", city: "Caracas", areaM2: 118, beds: 3, baths: 2, parking: 2, amenities: [], highlights: "Terraza techada con vista a El Ávila y planta eléctrica del edificio." }) : null);
+  const [dup, setDup] = useState<{ title: string; slug: string } | null>(null);
+  const [checking, setChecking] = useState(false);
+  const [estimate, setEstimate] = useState<EstimateResult | null>(null);
   const [writing, setWriting] = useState(false);
   const [lang, setLang] = useState<Locale>(locale);
-  const [agency, setAgency] = useState("ag-andes");
-  const [published, setPublished] = useState(false);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [err, setErr] = useState<string | null>(null);
+  const [done, setDone] = useState<{ slug: string; mode: Draft["mode"] } | null>(null);
+  const [confirm, setConfirm] = useState(true);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const previews = useMemo(() => files.map((f) => URL.createObjectURL(f)), [files]);
+  useEffect(() => () => previews.forEach((u) => URL.revokeObjectURL(u)), [previews]);
 
-  const zone = addr ? zoneByName(addr.zone) : zoneByName("Altamira");
-  const estimate = useMemo(
-    () =>
-      heuristicEstimate({
-        zone: zone.name,
-        zonePricePerM2: zone.salePpm,
-        areaM2: m2,
-        beds,
-        baths,
-        parking,
-        yearBuilt: year,
-        amenities: amen,
-        luxury: false,
-        lat: addr?.lat ?? zone.lat,
-        lng: addr?.lng ?? zone.lng,
-        pool: LISTINGS.filter((l) => l.listingType === "SALE" && l.city === "Caracas" && !l.luxury).map((l) => ({ id: l.id, title: l.title_es, zone: l.zone, areaM2: l.areaM2, priceAmount: l.priceAmount, lat: l.lat, lng: l.lng })),
-      }),
-    [zone, m2, beds, baths, parking, year, amen, addr],
-  );
-  const quality = Math.min(100, (photos >= 8 ? 35 : photos * 4) + (copy ? 20 : 0) + (addr ? 20 : 0) + 15 + (amen.length >= 4 ? 10 : 5));
+  // restore draft after login redirect
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem(DRAFT_KEY);
+      if (raw) {
+        const saved = JSON.parse(raw) as { d: Draft; step: number };
+        setD(saved.d);
+        setStep(saved.step);
+      }
+    } catch {}
+  }, []);
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(DRAFT_KEY, JSON.stringify({ d, step }));
+    } catch {}
+  }, [d, step]);
 
-  const writeAI = () => {
+  const zone = zones.find((z) => z.name === d.addr?.zone) ?? zones.find((z) => z.name === "Altamira") ?? zones[0];
+  const listingType = d.op === "COMMERCIAL" ? "COMMERCIAL_SALE" : d.op;
+
+  // duplicate check once the address is known
+  useEffect(() => {
+    if (!d.addr) return setDup(null);
+    setChecking(true);
+    const t = setTimeout(() => {
+      api<{ duplicate: { title: string; slug: string } | null }>("capture/check", { method: "POST", json: { address: `${d.addr!.main} ${d.unit}`.trim(), areaM2: d.m2, lat: d.addr!.lat, lng: d.addr!.lng } })
+        .then((r) => setDup(r.duplicate))
+        .catch(() => setDup(null))
+        .finally(() => setChecking(false));
+    }, 400);
+    return () => clearTimeout(t);
+  }, [d.addr, d.unit, d.m2]);
+
+  // live PlaceEstimate (debounced)
+  useEffect(() => {
+    if (!zone) return;
+    const t = setTimeout(() => {
+      api<{ estimate: EstimateResult }>("ai/estimate", {
+        method: "POST",
+        json: { zone: zone.name, listingType, areaM2: d.m2, beds: d.beds, baths: d.baths, parking: d.parking, yearBuilt: d.year, amenities: d.amen, lat: d.addr?.lat, lng: d.addr?.lng },
+      })
+        .then((r) => setEstimate(r.estimate))
+        .catch(() => {});
+    }, 350);
+    return () => clearTimeout(t);
+  }, [zone, listingType, d.m2, d.beds, d.baths, d.parking, d.year, d.amen, d.addr]);
+
+  const writeAI = async () => {
     setWriting(true);
-    setTimeout(() => {
-      setCopy(heuristicWriteListing({ kind, zone: zone.name, city: zone.city, areaM2: m2, beds, baths, parking, amenities: amen, highlights: tx(locale, "Terraza techada con vista a El Ávila y planta eléctrica del edificio.", "Covered terrace facing El Ávila and full-building generator.") }));
+    try {
+      const r = await api<{ copy: Copy }>("ai/write-listing", {
+        method: "POST",
+        json: { kind: d.kind, zone: zone?.name ?? "", city: zone?.city ?? "Caracas", areaM2: d.m2, beds: d.beds, baths: d.baths, parking: d.parking, amenities: d.amen },
+      });
+      set({ copy: r.copy });
+    } finally {
       setWriting(false);
-    }, 900);
+    }
+  };
+
+  const quality = Math.min(100, (files.length >= 8 ? 35 : files.length * 4) + (d.copy.title_en && d.copy.body_en ? 20 : 0) + (d.addr ? 20 : 0));
+
+  const publish = async () => {
+    if (!requireLogin()) return;
+    if (!d.addr) return setStep(1);
+    setErr(null);
+    setBusy("create");
+    try {
+      const created = await api<{ id: string; slug: string }>("listings", {
+        method: "POST",
+        json: {
+          mode: d.mode,
+          agencyId: d.mode === "MANDATE" ? d.agency : undefined,
+          listingType,
+          kind: d.kind,
+          address: `${d.addr.main}${d.unit ? `, ${d.unit}` : ""}`,
+          zone: d.addr.zone,
+          city: d.addr.city,
+          state: d.addr.state ?? "",
+          countryCode: d.addr.country ?? "VE",
+          lat: d.addr.lat,
+          lng: d.addr.lng,
+          areaM2: d.m2,
+          beds: d.beds,
+          baths: d.baths,
+          parking: d.parking,
+          yearBuilt: d.year,
+          amenities: d.amen,
+          priceAmount: d.price,
+          ...(d.copy.title_es ? d.copy : {}),
+        },
+      });
+      if (files.length) {
+        setBusy("photos");
+        const ordered = [files[cover], ...files.filter((_, i) => i !== cover)];
+        const fd = new FormData();
+        ordered.forEach((f) => fd.append("files", f));
+        const r = await fetch(`/api/v1/listings/${created.id}/photos`, { method: "POST", body: fd });
+        if (!r.ok) throw new Error((await r.json()).error?.message ?? "upload failed");
+      }
+      sessionStorage.removeItem(DRAFT_KEY);
+      setDone({ slug: created.slug, mode: d.mode });
+      router.refresh();
+    } catch (e) {
+      if (e instanceof ApiClientError && e.code === "CONFLICT") {
+        const dd = (e.details as { duplicateOf?: { title: string; slug: string } })?.duplicateOf;
+        if (dd) setDup(dd);
+        setErr(tx(locale, "Este inmueble ya está publicado en New Place (anti-duplicados).", "This property is already on New Place (duplicate check)."));
+      } else setErr((e as Error).message);
+    } finally {
+      setBusy(null);
+    }
   };
 
   const opt = (active: boolean) => cn("rounded-np border p-4 text-left transition-colors duration-np", active ? "border-coral bg-[#F26B4D0D] ring-1 ring-coral" : "border-line bg-white hover:border-navy/30");
-  const stepper = (label: string, v: number, set: (n: number) => void) => (
+  const stepper = (label: string, v: number, onChange: (n: number) => void) => (
     <div className="flex items-center justify-between rounded-np border border-line bg-white px-4 py-3">
       <span className="font-semibold">{label}</span>
       <div className="flex items-center gap-3">
-        <button onClick={() => set(Math.max(0, v - 1))} className="h-8 w-8 rounded-full border border-line text-lg">−</button>
+        <button type="button" aria-label={`${label} −`} onClick={() => onChange(Math.max(0, v - 1))} className="h-8 w-8 rounded-full border border-line text-lg">−</button>
         <span className="w-5 text-center font-display text-lg">{v}</span>
-        <button onClick={() => set(v + 1)} className="h-8 w-8 rounded-full border border-line text-lg">+</button>
+        <button type="button" aria-label={`${label} +`} onClick={() => onChange(v + 1)} className="h-8 w-8 rounded-full border border-line text-lg">+</button>
       </div>
     </div>
   );
 
-  if (published)
+  if (done)
     return (
-      <div className="mx-auto max-w-xl px-4 py-20 text-center">
+      <div className="mx-auto max-w-xl px-4 py-20 text-center" data-testid="owner-published">
         <CheckCircle2 size={56} className="mx-auto text-ok" />
-        <h1 className="mt-4 font-display text-3xl font-semibold">{mode === "FSBO" ? tx(locale, "¡Publicado en Altamira!", "Live in Altamira!") : tx(locale, "Encargo enviado", "Request sent")}</h1>
+        <h1 className="mt-4 font-display text-3xl font-semibold">{done.mode === "FSBO" ? tx(locale, `¡Publicado en ${d.addr?.zone}!`, `Live in ${d.addr?.zone}!`) : tx(locale, "Encargo enviado", "Request sent")}</h1>
         <p className="mt-2 text-ink/60">
-          {mode === "FSBO"
-            ? tx(locale, "Tu anuncio pasó la revisión automática (anti-duplicados OK) y ya aparece en el mapa.", "Your listing passed automated checks (no duplicates) and is live on the map.")
-            : tx(locale, "Andes Prime asignará un agente en menos de 24 h. Estado: SOLICITADO.", "Andes Prime will assign an agent within 24 h. Status: REQUESTED.")}
+          {done.mode === "FSBO"
+            ? tx(locale, "Pasó la revisión automática (sin duplicados) y ya aparece en el mapa.", "It passed automated checks (no duplicates) and is live on the map.")
+            : tx(locale, `${agencies.find((a) => a.id === d.agency)?.name} asignará un agente. Estado: SOLICITADO.`, `${agencies.find((a) => a.id === d.agency)?.name} will assign an agent. Status: REQUESTED.`)}
         </p>
-        <div className="mt-6 flex justify-center gap-3">
+        <div className="mt-6 flex flex-wrap justify-center gap-3">
           <Button href={`/${locale}/owner/listings`}>{tx(locale, "Ver mis inmuebles", "My properties")}</Button>
-          <Button href={`/${locale}/search?type=SALE&zone=Altamira`} variant="outline">{tx(locale, "Ver en el mapa", "See on map")}</Button>
+          {done.mode === "FSBO" && <Button href={`/${locale}/listing/${done.slug}`} variant="outline">{tx(locale, "Ver la ficha", "View listing")}</Button>}
         </div>
       </div>
     );
+
+  const canNext = step === 1 ? !!d.addr && !dup : step === 4 ? d.price > 0 : true;
 
   return (
     <div className="mx-auto grid max-w-[1200px] gap-8 px-4 py-8 md:px-6 lg:grid-cols-[1fr_340px]">
@@ -120,11 +230,11 @@ export function OwnerWizard({ locale }: { locale: Locale }) {
         <div className="mb-6">
           <div className="mb-3 flex items-center justify-between text-sm">
             <span className="font-display font-semibold">{tx(locale, `Paso ${step + 1} de 6`, `Step ${step + 1} of 6`)} · {tx(locale, STEPS[step][0], STEPS[step][1])}</span>
-            <span className="text-ink/50">{tx(locale, "Se guarda automáticamente", "Autosaved")}</span>
+            <span className="text-ink/50">{tx(locale, "Borrador guardado en este dispositivo", "Draft saved on this device")}</span>
           </div>
           <div className="grid grid-cols-6 gap-1.5">
             {STEPS.map((s, i) => (
-              <button key={i} onClick={() => setStep(i)} className="text-left">
+              <button key={i} onClick={() => i <= step && setStep(i)} className="text-left" aria-label={tx(locale, s[0], s[1])}>
                 <div className={cn("h-1.5 rounded-full", i <= step ? "bg-coral" : "bg-black/10")} />
                 <div className={cn("mt-1.5 hidden text-xs sm:block", i === step ? "font-semibold text-ink" : "text-ink/45")}>{tx(locale, s[0], s[1])}</div>
               </button>
@@ -136,21 +246,21 @@ export function OwnerWizard({ locale }: { locale: Locale }) {
           <div className="np-in space-y-6">
             <h1 className="font-display text-3xl font-semibold">{tx(locale, "¿Cómo quieres vender o alquilar?", "How do you want to sell or rent?")}</h1>
             <div className="grid gap-3 sm:grid-cols-2">
-              <button className={opt(mode === "FSBO")} onClick={() => setMode("FSBO")}>
+              <button className={opt(d.mode === "FSBO")} onClick={() => set({ mode: "FSBO" })}>
                 <User className="text-coral" />
                 <div className="mt-2 font-display text-lg font-semibold">{tx(locale, "Publicar yo mismo", "List it myself")}</div>
                 <div className="text-sm text-ink/60">{tx(locale, "Gratis. Tú gestionas visitas y ofertas.", "Free. You handle tours and offers.")}</div>
               </button>
-              <button className={opt(mode === "AGENCY")} onClick={() => setMode("AGENCY")}>
+              <button className={opt(d.mode === "MANDATE")} onClick={() => set({ mode: "MANDATE" })}>
                 <Building2 className="text-coral" />
                 <div className="mt-2 font-display text-lg font-semibold">{tx(locale, "Encargar a una agencia", "Hire an agency")}</div>
                 <div className="text-sm text-ink/60">{tx(locale, "Un agente verificado se encarga de todo.", "A verified agent handles everything.")}</div>
               </button>
             </div>
-            {mode === "AGENCY" && (
+            {d.mode === "MANDATE" && (
               <div className="grid gap-2 sm:grid-cols-3">
-                {AGENCIES.map((a) => (
-                  <button key={a.id} onClick={() => setAgency(a.id)} className={opt(agency === a.id)}>
+                {agencies.map((a) => (
+                  <button key={a.id} onClick={() => set({ agency: a.id })} className={opt(d.agency === a.id)}>
                     <div className="flex items-center gap-2">
                       <span className="flex h-8 w-8 items-center justify-center rounded-lg font-display text-xs font-bold text-navy" style={{ background: a.color }}>{a.initials}</span>
                       <span className="font-semibold">{a.name}</span>
@@ -164,15 +274,15 @@ export function OwnerWizard({ locale }: { locale: Locale }) {
               <div className="mb-2 font-semibold">{tx(locale, "Operación", "Operation")}</div>
               <div className="flex flex-wrap gap-2">
                 {[["SALE", "Venta", "Sale"], ["LONG_RENT", "Alquiler", "Rent"], ["SHORT_RENT", "Vacacional", "Vacation"], ["COMMERCIAL", "Comercial", "Commercial"]].map(([k, es, en]) => (
-                  <button key={k} onClick={() => setOp(k)} className={cn("rounded-full border px-4 py-2 font-display text-sm", op === k ? "border-navy bg-navy text-ivory" : "border-line bg-white")}>{tx(locale, es, en)}</button>
+                  <button key={k} onClick={() => set({ op: k })} className={cn("rounded-full border px-4 py-2 font-display text-sm", d.op === k ? "border-navy bg-navy text-ivory" : "border-line bg-white")}>{tx(locale, es, en)}</button>
                 ))}
               </div>
             </div>
             <div>
               <div className="mb-2 font-semibold">{tx(locale, "Tipo de inmueble", "Property type")}</div>
               <div className="flex flex-wrap gap-2">
-                {([["apartment", "Apartamento", "Apartment"], ["house", "Casa", "House"], ["penthouse", "Penthouse", "Penthouse"], ["townhouse", "Townhouse", "Townhouse"], ["office", "Oficina", "Office"], ["land", "Terreno", "Land"]] as [Kind, string, string][]).map(([k, es, en]) => (
-                  <button key={k} onClick={() => setKind(k)} className={cn("rounded-full border px-4 py-2 font-display text-sm", kind === k ? "border-navy bg-navy text-ivory" : "border-line bg-white")}>{tx(locale, es, en)}</button>
+                {([["apartment", "Apartamento", "Apartment"], ["house", "Casa", "House"], ["penthouse", "Penthouse", "Penthouse"], ["townhouse", "Townhouse", "Townhouse"], ["studio", "Estudio", "Studio"], ["office", "Oficina", "Office"], ["retail", "Local", "Retail"], ["land", "Terreno", "Land"]] as [Kind, string, string][]).map(([k, es, en]) => (
+                  <button key={k} onClick={() => set({ kind: k })} className={cn("rounded-full border px-4 py-2 font-display text-sm", d.kind === k ? "border-navy bg-navy text-ivory" : "border-line bg-white")}>{tx(locale, es, en)}</button>
                 ))}
               </div>
             </div>
@@ -182,35 +292,37 @@ export function OwnerWizard({ locale }: { locale: Locale }) {
         {step === 1 && (
           <div className="np-in space-y-5">
             <h1 className="font-display text-3xl font-semibold">{tx(locale, "¿Dónde está?", "Where is it?")}</h1>
-            <div className="flex gap-2">
-              <select className={cn(inputCls, "w-40")} defaultValue="VE"><option value="VE">🇻🇪 Venezuela</option><option value="CO">🇨🇴 Colombia</option><option value="ES">🇪🇸 España</option><option value="US">🇺🇸 USA</option></select>
-              <div className="relative flex-1">
-                <Search size={17} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink/40" />
-                <input className={cn(inputCls, "pl-10")} value={q} onChange={(e) => { setQ(e.target.value); setAddr(null); }} placeholder={tx(locale, "Escribe la dirección…", "Type the address…")} />
-                {q.length > 2 && !addr && (
-                  <div className="np-in absolute inset-x-0 top-full z-20 mt-1 overflow-hidden rounded-np border border-line bg-white shadow-np">
-                    {SUGGESTIONS.map((s) => (
-                      <button key={s.main} onClick={() => { setAddr(s); setQ(s.main); }} className="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-ivory">
-                        <MapPin size={17} className="mt-0.5 text-coral" />
-                        <span><span className="block font-semibold">{s.main}</span><span className="text-sm text-ink/55">{s.sub}</span></span>
-                      </button>
-                    ))}
-                    <div className="border-t border-line px-4 py-1.5 text-right text-[10px] text-ink/40">Google Places Autocomplete · VE</div>
-                  </div>
-                )}
-              </div>
-            </div>
+            <PlacesSearch locale={locale} zones={zones} value={d.addr} onPick={(p) => set({ addr: p })} />
             <div className="grid gap-3 sm:grid-cols-3">
-              <Field label={tx(locale, "Piso / apto", "Floor / unit")}><input className={inputCls} defaultValue="Piso 6, apto 6-B" /></Field>
-              <Field label={tx(locale, "Urbanización", "Neighborhood")}><input className={inputCls} value={addr?.zone ?? ""} readOnly /></Field>
-              <Field label={tx(locale, "Ciudad", "City")}><input className={inputCls} value={addr ? "Caracas" : ""} readOnly /></Field>
+              <Field label={tx(locale, "Piso / apto / casa", "Floor / unit")}><input className={inputCls} value={d.unit} onChange={(e) => set({ unit: e.target.value })} placeholder="Piso 6, apto 6-B" /></Field>
+              <Field label={tx(locale, "Urbanización", "Neighborhood")}><input className={inputCls} value={d.addr?.zone ?? ""} readOnly /></Field>
+              <Field label={tx(locale, "Ciudad", "City")}><input className={inputCls} value={d.addr?.city ?? ""} readOnly /></Field>
             </div>
-            <NightMap listings={[]} locale={locale} focus={addr ?? { lat: 10.4965, lng: -66.8505 }} initialScale={4} className="h-72 rounded-np" controls={false} key={addr?.main ?? "none"} />
-            {addr && (
-              <div className="np-in flex flex-wrap items-center gap-3 rounded-np border border-[#2F6F4E55] bg-[#2F6F4E0D] p-3 text-sm">
-                <CheckCircle2 size={18} className="text-ok" />
-                <span className="font-semibold">{tx(locale, "Geocodificado", "Geocoded")}: {addr.lat.toFixed(4)}, {addr.lng.toFixed(4)}</span>
-                <span className="text-ink/60">· {tx(locale, "Sin duplicados (fingerprint lat/lng + m² + dirección)", "No duplicates (fingerprint lat/lng + m² + address)")}</span>
+            <MapView
+              key={d.addr ? `${d.addr.lat.toFixed(3)}` : "none"}
+              listings={[]}
+              locale={locale}
+              focus={d.addr ?? { lat: 10.4965, lng: -66.8505 }}
+              initialScale={d.addr?.city === "Caracas" || !d.addr ? 4 : 5}
+              region={!d.addr || d.addr.city === "Caracas" ? "caracas" : "venezuela"}
+              pin={d.addr ?? undefined}
+              onPick={(p) => d.addr && set({ addr: { ...d.addr, lat: p.lat, lng: p.lng } })}
+              className="h-72 rounded-np"
+              controls={false}
+            />
+            {d.addr && <p className="text-xs text-ink/50">{tx(locale, "Toca el mapa para ajustar el punto exacto.", "Tap the map to fine-tune the exact point.")}</p>}
+            {d.addr && (
+              <div className={cn("np-in flex flex-wrap items-center gap-3 rounded-np border p-3 text-sm", dup ? "border-warn/60 bg-[#C9862A14]" : "border-[#2F6F4E55] bg-[#2F6F4E0D]")}>
+                {checking ? <Loader2 size={18} className="animate-spin" /> : dup ? <AlertTriangle size={18} className="text-warn" /> : <CheckCircle2 size={18} className="text-ok" />}
+                <span className="font-semibold">{tx(locale, "Ubicación", "Location")}: {d.addr.lat.toFixed(5)}, {d.addr.lng.toFixed(5)}</span>
+                {dup ? (
+                  <span>
+                    · {tx(locale, "Ya existe:", "Already listed:")}{" "}
+                    <Link className="font-semibold text-coral underline" href={`/${locale}/listing/${dup.slug}`}>{dup.title}</Link>
+                  </span>
+                ) : (
+                  <span className="text-ink/60">· {tx(locale, "Sin duplicados (fingerprint lat/lng + m² + dirección)", "No duplicates (fingerprint lat/lng + m² + address)")}</span>
+                )}
               </div>
             )}
           </div>
@@ -220,19 +332,19 @@ export function OwnerWizard({ locale }: { locale: Locale }) {
           <div className="np-in space-y-5">
             <h1 className="font-display text-3xl font-semibold">{tx(locale, "Cuéntanos cómo es", "Tell us about it")}</h1>
             <div className="grid gap-3 sm:grid-cols-2">
-              <Field label={tx(locale, "Superficie construida (m²)", "Built area (m²)")}><input className={inputCls} type="number" value={m2} onChange={(e) => setM2(+e.target.value)} /></Field>
-              <Field label={tx(locale, "Año de construcción", "Year built")}><input className={inputCls} type="number" value={year} onChange={(e) => setYear(+e.target.value)} /></Field>
-              {stepper(tx(locale, "Habitaciones", "Bedrooms"), beds, setBeds)}
-              {stepper(tx(locale, "Baños", "Bathrooms"), baths, setBaths)}
-              {stepper(tx(locale, "Puestos", "Parking"), parking, setParking)}
+              <Field label={tx(locale, "Superficie construida (m²)", "Built area (m²)")}><input className={inputCls} type="number" min={1} value={d.m2} onChange={(e) => set({ m2: Math.max(1, +e.target.value) })} /></Field>
+              <Field label={tx(locale, "Año de construcción", "Year built")}><input className={inputCls} type="number" value={d.year} onChange={(e) => set({ year: +e.target.value })} /></Field>
+              {stepper(tx(locale, "Habitaciones", "Bedrooms"), d.beds, (v) => set({ beds: v }))}
+              {stepper(tx(locale, "Baños", "Bathrooms"), d.baths, (v) => set({ baths: v }))}
+              {stepper(tx(locale, "Puestos", "Parking"), d.parking, (v) => set({ parking: v }))}
             </div>
             <div>
               <div className="mb-2 font-semibold">{tx(locale, "Amenidades", "Amenities")}</div>
               <div className="flex flex-wrap gap-2">
-                {(["generator", "waterTank", "security", "elevator", "terrace", "pool", "gym", "view", "garden", "bbq", "pets", "furnished"] as Amenity[]).map((a) => {
-                  const on = amen.includes(a);
+                {(["generator", "waterTank", "security", "elevator", "terrace", "pool", "gym", "view", "garden", "bbq", "pets", "furnished", "ac"] as Amenity[]).map((a) => {
+                  const on = d.amen.includes(a);
                   return (
-                    <button key={a} onClick={() => setAmen(on ? amen.filter((x) => x !== a) : [...amen, a])} className={cn("inline-flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-sm font-semibold", on ? "border-navy bg-navy text-ivory" : "border-line bg-white")}>
+                    <button key={a} onClick={() => set({ amen: on ? d.amen.filter((x) => x !== a) : [...d.amen, a] })} className={cn("inline-flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-sm font-semibold", on ? "border-navy bg-navy text-ivory" : "border-line bg-white")}>
                       {on && <Check size={14} />} {lbl(AMENITY_LABEL[a], locale)}
                     </button>
                   );
@@ -245,32 +357,55 @@ export function OwnerWizard({ locale }: { locale: Locale }) {
         {step === 3 && (
           <div className="np-in space-y-5">
             <h1 className="font-display text-3xl font-semibold">{tx(locale, "Fotos que venden", "Photos that sell")}</h1>
-            <button onClick={() => setPhotos(9)} className="flex w-full flex-col items-center rounded-np border-2 border-dashed border-line bg-white py-10 hover:border-coral">
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              multiple
+              className="hidden"
+              data-testid="photo-input"
+              onChange={(e) => {
+                const list = Array.from(e.target.files ?? []).filter((f) => f.size <= 12 * 1024 * 1024);
+                setFiles((prev) => [...prev, ...list].slice(0, 30));
+                e.target.value = "";
+              }}
+            />
+            <button
+              onClick={() => fileRef.current?.click()}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={(e) => {
+                e.preventDefault();
+                setFiles((prev) => [...prev, ...Array.from(e.dataTransfer.files).filter((f) => f.type.startsWith("image/"))].slice(0, 30));
+              }}
+              className="flex w-full flex-col items-center rounded-np border-2 border-dashed border-line bg-white py-10 hover:border-coral"
+            >
               <ImagePlus size={30} className="text-coral" />
               <span className="mt-2 font-display font-semibold">{tx(locale, "Arrastra tus fotos o haz clic", "Drag your photos or click")}</span>
-              <span className="text-sm text-ink/55">JPG / PNG / HEIC · {tx(locale, "mínimo 8, ideal 20", "min 8, ideal 20")}</span>
+              <span className="text-sm text-ink/55">JPG / PNG / WebP · {tx(locale, "máx. 12 MB c/u · ideal 8 a 20", "max 12 MB each · ideally 8 to 20")}</span>
             </button>
-            {photos > 0 && (
+            {files.length > 0 && (
               <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
-                {UPLOAD.slice(0, photos).map((s, i) => (
-                  <div key={i} className={cn("np-in group relative overflow-hidden rounded-lg ring-2", cover === i ? "ring-coral" : "ring-transparent")} style={{ animationDelay: `${i * 60}ms` }}>
-                    <PropertyArt scene={s} seed={"up" + i} photo={photo(`upload-${i}`)} className="aspect-[4/3] w-full" />
+                {previews.map((src, i) => (
+                  <div key={src} className={cn("group relative overflow-hidden rounded-lg ring-2", cover === i ? "ring-coral" : "ring-transparent")}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={src} alt="" className="aspect-[4/3] w-full object-cover" />
                     <span className="absolute left-1.5 top-1.5 rounded bg-navy/80 px-1.5 text-xs font-bold text-ivory">{i + 1}</span>
-                    <GripVertical size={16} className="absolute right-1.5 top-1.5 text-white drop-shadow" />
+                    <button onClick={() => { setFiles(files.filter((_, j) => j !== i)); if (cover >= i && cover > 0) setCover(cover - 1); }} className="absolute right-1.5 top-1.5 rounded-full bg-navy/70 p-0.5 text-white" aria-label={tx(locale, "Quitar", "Remove")}><X size={14} /></button>
                     {cover === i ? (
                       <span className="absolute bottom-1.5 left-1.5 inline-flex items-center gap-1 rounded-full bg-coral px-2 py-0.5 text-[11px] font-bold text-white"><Star size={11} /> {tx(locale, "Portada", "Cover")}</span>
                     ) : (
-                      <button onClick={() => setCover(i)} className="absolute bottom-1.5 left-1.5 rounded-full bg-white/90 px-2 py-0.5 text-[11px] font-bold opacity-0 group-hover:opacity-100">{tx(locale, "Usar de portada", "Set cover")}</button>
+                      <button onClick={() => setCover(i)} className="absolute bottom-1.5 left-1.5 rounded-full bg-white/90 px-2 py-0.5 text-[11px] font-bold">{tx(locale, "Usar de portada", "Set cover")}</button>
                     )}
                   </div>
                 ))}
               </div>
             )}
-            <div className="grid gap-2 text-sm sm:grid-cols-3">
-              {[[photos >= 8, tx(locale, `${photos}/8 fotos mínimas`, `${photos}/8 min photos`)], [photos > 0, tx(locale, "Portada elegida", "Cover set")], [false, tx(locale, "Plano (opcional)", "Floor plan (optional)")]].map(([ok, t]) => (
+            <div className="grid gap-2 text-sm sm:grid-cols-2">
+              {[[files.length >= 8, tx(locale, `${files.length}/8 fotos recomendadas`, `${files.length}/8 recommended photos`)], [files.length > 0, tx(locale, "Portada elegida", "Cover set")]].map(([ok, t]) => (
                 <div key={String(t)} className={cn("flex items-center gap-2 rounded-lg border px-3 py-2", ok ? "border-[#2F6F4E55] text-ok" : "border-line text-ink/55")}>{ok ? <CheckCircle2 size={16} /> : <span className="h-4 w-4 rounded-full border-2 border-current" />}{t as string}</div>
               ))}
             </div>
+            {files.length === 0 && <p className="text-sm text-ink/55">{tx(locale, "Puedes continuar sin fotos y subirlas después desde «Mis inmuebles».", "You can continue without photos and add them later from “My properties”.")}</p>}
           </div>
         )}
 
@@ -278,16 +413,24 @@ export function OwnerWizard({ locale }: { locale: Locale }) {
           <div className="np-in space-y-5">
             <h1 className="font-display text-3xl font-semibold">{tx(locale, "Precio y descripción", "Price & description")}</h1>
             <div className="rounded-np border border-line bg-white p-5">
-              <div className="flex items-center gap-2 font-display font-semibold"><Sparkles size={17} className="text-coral" /> PlaceEstimate · {zone.name}</div>
-              <div className="mt-2 font-display text-3xl font-semibold">{money(estimate.low, locale)} – {money(estimate.high, locale)}</div>
-              <div className="text-sm text-ink/55">{tx(locale, "Valor medio", "Mid value")} {money(estimate.mid, locale)} · {tx(locale, "confianza", "confidence")} {Math.round(estimate.confidence * 100)} % · {estimate.comparables.length} {tx(locale, "comparables", "comparables")}</div>
+              <div className="flex items-center gap-2 font-display font-semibold"><Sparkles size={17} className="text-coral" /> PlaceEstimate · {zone?.name}</div>
+              {estimate ? (
+                <>
+                  <div className="mt-2 font-display text-3xl font-semibold">{money(estimate.low, locale)} – {money(estimate.high, locale)}</div>
+                  <div className="text-sm text-ink/55">{tx(locale, "Valor medio", "Mid value")} {money(estimate.mid, locale)} · {tx(locale, "confianza", "confidence")} {Math.round(estimate.confidence * 100)} % · {estimate.comparables.length} {tx(locale, "comparables", "comparables")}</div>
+                </>
+              ) : (
+                <div className="mt-2 flex items-center gap-2 text-ink/55"><Loader2 size={16} className="animate-spin" /> {tx(locale, "Calculando…", "Calculating…")}</div>
+              )}
               <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto]">
-                <Field label={tx(locale, "Tu precio (USD)", "Your price (USD)")}><input className={inputCls} type="number" value={price} onChange={(e) => setPrice(+e.target.value)} /></Field>
-                <div className="self-end pb-2.5 text-sm">
-                  {price > estimate.high ? <span className="font-semibold text-warn">{tx(locale, "Por encima del rango", "Above range")}</span> : price < estimate.low ? <span className="font-semibold text-ok">{tx(locale, "Por debajo: venta rápida", "Below: quick sale")}</span> : <span className="font-semibold text-ok">{tx(locale, "Dentro del rango ✓", "Within range ✓")}</span>}
-                </div>
+                <Field label={tx(locale, "Tu precio (USD)", "Your price (USD)")}><input className={inputCls} type="number" min={1} value={d.price} onChange={(e) => set({ price: Math.max(0, +e.target.value) })} /></Field>
+                {estimate && (
+                  <div className="self-end pb-2.5 text-sm">
+                    {d.price > estimate.high ? <span className="font-semibold text-warn">{tx(locale, "Por encima del rango", "Above range")}</span> : d.price < estimate.low ? <span className="font-semibold text-ok">{tx(locale, "Por debajo: venta rápida", "Below: quick sale")}</span> : <span className="font-semibold text-ok">{tx(locale, "Dentro del rango ✓", "Within range ✓")}</span>}
+                  </div>
+                )}
               </div>
-              <div className="mt-2 text-xs text-ink/45">≈ Bs. {num(Math.round(price * 186.4), locale)} ({tx(locale, "tasa referencial", "reference rate")})</div>
+              {fxVes > 0 && <div className="mt-2 text-xs text-ink/45">≈ Bs. {num(Math.round(d.price * fxVes), locale)} ({tx(locale, "tasa referencial", "reference rate")})</div>}
             </div>
             <div className="rounded-np border border-line bg-white p-5">
               <div className="flex flex-wrap items-center justify-between gap-2">
@@ -301,9 +444,21 @@ export function OwnerWizard({ locale }: { locale: Locale }) {
                   <button key={x} onClick={() => setLang(x)} className={cn("rounded-full px-3 py-0.5 text-xs font-bold", lang === x ? "bg-navy text-ivory" : "bg-black/5")}>{x.toUpperCase()}</button>
                 ))}
               </div>
-              <input className={cn(inputCls, "mt-3")} placeholder={tx(locale, "Título", "Title")} value={copy ? (lang === "es" ? copy.title_es : copy.title_en) : ""} readOnly />
-              <textarea className={cn(inputCls, "mt-2 h-32 py-2")} placeholder={tx(locale, "Describe tu inmueble… o deja que la IA lo haga.", "Describe your place… or let AI do it.")} value={copy ? (lang === "es" ? copy.body_es : copy.body_en) : ""} readOnly />
-              {copy && <div className="mt-2 text-xs text-ink/50">{tx(locale, "Generado con modelo local · puedes editarlo", "Generated with local model · you can edit it")}</div>}
+              <input
+                className={cn(inputCls, "mt-3")}
+                placeholder={tx(locale, "Título", "Title")}
+                aria-label={tx(locale, "Título", "Title")}
+                value={lang === "es" ? d.copy.title_es : d.copy.title_en}
+                onChange={(e) => set({ copy: { ...d.copy, [lang === "es" ? "title_es" : "title_en"]: e.target.value } })}
+              />
+              <textarea
+                className={cn(inputCls, "mt-2 h-32 py-2")}
+                placeholder={tx(locale, "Describe tu inmueble… o deja que la IA lo haga.", "Describe your place… or let AI do it.")}
+                aria-label={tx(locale, "Descripción", "Description")}
+                value={lang === "es" ? d.copy.body_es : d.copy.body_en}
+                onChange={(e) => set({ copy: { ...d.copy, [lang === "es" ? "body_es" : "body_en"]: e.target.value } })}
+              />
+              <div className="mt-2 text-xs text-ink/50">{tx(locale, "Si lo dejas vacío, generamos un texto base al publicar.", "Leave empty and we’ll generate a base text on publish.")}</div>
             </div>
           </div>
         )}
@@ -313,13 +468,18 @@ export function OwnerWizard({ locale }: { locale: Locale }) {
             <h1 className="font-display text-3xl font-semibold">{tx(locale, "Revisa y publica", "Review & publish")}</h1>
             <div className="overflow-hidden rounded-np border border-line bg-white">
               <div className="grid sm:grid-cols-[260px_1fr]">
-                <PropertyArt scene={UPLOAD[cover]} seed={"up" + cover} photo={photo(`upload-${cover}`)} className="aspect-[4/3] w-full" />
+                {files.length ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={previews[cover]} alt="" className="aspect-[4/3] w-full object-cover" />
+                ) : (
+                  <PropertyArt scene={d.kind === "house" ? "house-dusk" : "tower-day"} seed="wiz" className="aspect-[4/3] w-full" />
+                )}
                 <div className="p-5">
-                  <div className="font-display text-2xl font-semibold">{money(price, locale)}</div>
-                  <div className="font-semibold">{copy ? tx(locale, copy.title_es, copy.title_en) : "—"}</div>
-                  <div className="text-sm text-ink/55">{addr?.main}, {zone.name}, Caracas</div>
-                  <div className="mt-2 text-sm">{beds} {tx(locale, "hab", "bd")} · {baths} {tx(locale, "baños", "ba")} · {m2} m² · {parking} {tx(locale, "puestos", "parking")}</div>
-                  <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#F26B4D14] px-2.5 py-1 text-xs font-bold text-coral-hover">{mode === "FSBO" ? tx(locale, "Publicación directa (FSBO)", "For sale by owner") : tx(locale, "Encargo a agencia", "Agency mandate")}</div>
+                  <div className="font-display text-2xl font-semibold">{money(d.price, locale)}</div>
+                  <div className="font-semibold">{(lang === "es" ? d.copy.title_es : d.copy.title_en) || tx(locale, "(título automático)", "(auto title)")}</div>
+                  <div className="text-sm text-ink/55">{d.addr?.main}, {d.addr?.zone}, {d.addr?.city}</div>
+                  <div className="mt-2 text-sm">{d.beds} {tx(locale, "hab", "bd")} · {d.baths} {tx(locale, "baños", "ba")} · {d.m2} m² · {d.parking} {tx(locale, "puestos", "parking")}</div>
+                  <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#F26B4D14] px-2.5 py-1 text-xs font-bold text-coral-hover">{d.mode === "FSBO" ? tx(locale, "Publicación directa (FSBO)", "For sale by owner") : tx(locale, "Encargo a agencia", "Agency mandate")}</div>
                 </div>
               </div>
             </div>
@@ -327,21 +487,26 @@ export function OwnerWizard({ locale }: { locale: Locale }) {
               <div className="flex items-center justify-between"><span className="font-display font-semibold">{tx(locale, "Calidad de la ficha", "Listing quality")}</span><span className="font-display text-2xl font-semibold text-ok">{quality}/100</span></div>
               <Progress value={quality} tone="ok" className="mt-2" />
               <ul className="mt-3 grid gap-1.5 text-sm sm:grid-cols-2">
-                {[[photos >= 8, tx(locale, "8+ fotos", "8+ photos")], [!!copy, tx(locale, "Bilingüe ES/EN", "Bilingual ES/EN")], [!!addr, tx(locale, "Geolocalizado", "Geolocated")], [false, tx(locale, "Plano (+15)", "Floor plan (+15)")]].map(([ok, t]) => (
+                {[[files.length >= 8, tx(locale, "8+ fotos (+35)", "8+ photos (+35)")], [!!(d.copy.title_en && d.copy.body_en), tx(locale, "Bilingüe ES/EN (+20)", "Bilingual ES/EN (+20)")], [!!d.addr, tx(locale, "Geolocalizado (+20)", "Geolocated (+20)")], [false, tx(locale, "Plano (+15, después)", "Floor plan (+15, later)")]].map(([ok, t]) => (
                   <li key={String(t)} className={cn("flex items-center gap-2", ok ? "text-ok" : "text-ink/45")}>{ok ? <Check size={15} /> : <span className="h-3.5 w-3.5 rounded-full border-2 border-current" />}{t as string}</li>
                 ))}
               </ul>
             </div>
-            <label className="flex items-start gap-2 text-sm text-ink/65"><input type="checkbox" defaultChecked className="mt-1 accent-[#F26B4D]" /> {tx(locale, "Confirmo que soy el propietario o tengo autorización para publicar.", "I confirm I’m the owner or authorised to list.")}</label>
+            <label className="flex items-start gap-2 text-sm text-ink/65"><input type="checkbox" checked={confirm} onChange={(e) => setConfirm(e.target.checked)} className="mt-1 accent-[#F26B4D]" /> {tx(locale, "Confirmo que soy el propietario o tengo autorización para publicar.", "I confirm I’m the owner or authorised to list.")}</label>
+            {!user && <p className="rounded-lg bg-[#F26B4D0D] px-3 py-2 text-sm">{tx(locale, "Te pediremos iniciar sesión para publicar. Tu borrador se conserva.", "We’ll ask you to sign in to publish. Your draft is kept.")}</p>}
+            {err && <div className="rounded-lg bg-[#B423181A] px-3 py-2 text-sm text-danger" role="alert">{err}</div>}
           </div>
         )}
 
         <div className="mt-8 flex items-center justify-between border-t border-line pt-5">
           <Button variant="ghost" onClick={() => setStep(Math.max(0, step - 1))} disabled={step === 0}><ArrowLeft size={16} /> {tx(locale, "Atrás", "Back")}</Button>
           {step < 5 ? (
-            <Button onClick={() => setStep(step + 1)} disabled={(step === 1 && !addr) || (step === 3 && photos < 8)}>{tx(locale, "Continuar", "Continue")} <ArrowRight size={16} /></Button>
+            <Button onClick={() => setStep(step + 1)} disabled={!canNext}>{tx(locale, "Continuar", "Continue")} <ArrowRight size={16} /></Button>
           ) : (
-            <Button size="lg" onClick={() => setPublished(true)}>{mode === "FSBO" ? tx(locale, "Publicar ahora", "Publish now") : tx(locale, "Enviar encargo", "Send request")}</Button>
+            <Button size="lg" onClick={publish} disabled={!!busy || !confirm || !d.addr}>
+              {busy && <Loader2 size={16} className="animate-spin" />}
+              {busy === "photos" ? tx(locale, "Subiendo fotos…", "Uploading photos…") : d.mode === "FSBO" ? tx(locale, "Publicar ahora", "Publish now") : tx(locale, "Enviar encargo", "Send request")}
+            </Button>
           )}
         </div>
       </div>
@@ -349,22 +514,28 @@ export function OwnerWizard({ locale }: { locale: Locale }) {
       <aside className="hidden lg:block">
         <div className="sticky top-24 space-y-4">
           <div className="overflow-hidden rounded-np border border-line bg-white">
-            <PropertyArt scene={photos ? UPLOAD[cover] : "tower-day"} seed={photos ? "up" + cover : "ph"} photo={photos ? photo(`upload-${cover}`) : undefined} className={cn("aspect-[4/3] w-full", !photos && "opacity-40")} />
+            {files.length ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={previews[cover]} alt="" className="aspect-[4/3] w-full object-cover" />
+            ) : (
+              <PropertyArt scene={d.kind === "house" ? "house-dusk" : "tower-day"} seed="ph" className="aspect-[4/3] w-full opacity-40" />
+            )}
             <div className="p-4">
               <div className="text-xs font-semibold uppercase tracking-wide text-ink/45">{tx(locale, "Vista previa", "Preview")}</div>
-              <div className="font-display text-xl font-semibold">{money(price, locale)}</div>
-              <div className="text-sm">{beds} {tx(locale, "hab", "bd")} · {baths} {tx(locale, "baños", "ba")} · {m2} m²</div>
-              <div className="text-sm text-ink/55">{addr ? `${zone.name}, Caracas` : tx(locale, "Dirección pendiente", "Address pending")}</div>
+              <div className="font-display text-xl font-semibold">{money(d.price, locale)}</div>
+              <div className="text-sm">{d.beds} {tx(locale, "hab", "bd")} · {d.baths} {tx(locale, "baños", "ba")} · {d.m2} m²</div>
+              <div className="text-sm text-ink/55">{d.addr ? `${d.addr.zone}, ${d.addr.city}` : tx(locale, "Dirección pendiente", "Address pending")}</div>
             </div>
           </div>
           <div className="rounded-np bg-navy p-4 text-ivory">
             <div className="flex items-center gap-2 font-display font-semibold"><Sparkles size={16} className="text-coral" /> PlaceEstimate</div>
-            <div className="mt-1 font-display text-2xl">{money(estimate.mid, locale)}</div>
+            <div className="mt-1 font-display text-2xl">{estimate ? money(estimate.mid, locale) : "—"}</div>
             <div className="text-xs text-mist">{tx(locale, "Se actualiza mientras completas", "Updates as you go")}</div>
           </div>
-          <Link href={`/${locale}/owner/listings`} className="block text-center text-sm text-ink/55 hover:text-coral">{tx(locale, "Guardar y salir", "Save & exit")}</Link>
+          <Link href={`/${locale}/owner/listings`} className="block text-center text-sm text-ink/55 hover:text-coral"><MapPin size={13} className="inline" /> {tx(locale, "Guardar y salir", "Save & exit")}</Link>
         </div>
       </aside>
     </div>
   );
 }
+

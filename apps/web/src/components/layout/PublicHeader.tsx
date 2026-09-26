@@ -6,15 +6,13 @@ import { Heart, Menu, Plus } from "lucide-react";
 import type { Locale } from "@/types/domain";
 import { Logo } from "@/components/brand/Logo";
 import { Avatar, Button } from "@/components/ui";
-import { useDemo } from "@/lib/store";
-import { userById } from "@/mock/people";
+import { useApp } from "@/lib/store";
 import { tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 
 export function PublicHeader({ locale, variant = "light" }: { locale: Locale; variant?: "light" | "dark" | "transparent" }) {
   const pathname = usePathname();
-  const { saved, userId } = useDemo();
-  const u = userById(userId ?? undefined);
+  const { saved, user: u } = useApp();
   const other = locale === "es" ? "en" : "es";
   const switchHref = pathname.replace(/^\/(es|en)/, `/${other}`);
   const dark = variant !== "light";

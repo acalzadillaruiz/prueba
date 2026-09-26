@@ -8,17 +8,18 @@ import { ListingCard } from "@/components/listing/ListingCard";
 import { listingPhoto } from "@/lib/photos";
 import { PropertyArt } from "@/components/art/PropertyArt";
 import { Button, SectionTitle } from "@/components/ui";
-import { publicListings } from "@/mock/listings";
-import { ZONES } from "@/mock/zones";
+import { publicListings } from "@/server/listings";
+import { getZones } from "@/server/data";
 import { money, num, tx } from "@/lib/i18n";
 
 export default async function Home({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params;
-  const all = publicListings();
+  const [all, ZONES] = await Promise.all([publicListings(), getZones()]);
   const fresh = [...all].filter((l) => l.status === "ACTIVE" || l.status === "COMING_SOON").sort((a, b) => b.publishedAt.localeCompare(a.publishedAt)).slice(0, 8);
   const lux = all.filter((l) => l.luxury).slice(0, 3);
   const caracas = all.filter((l) => l.city === "Caracas");
   const zones = ZONES.filter((z) => z.city === "Caracas").slice(0, 8);
+  const verifiedCount = all.length;
   return (
     <PublicPage locale={locale} header="dark">
       {/* HERO */}
@@ -26,7 +27,7 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
         <div className="mx-auto grid max-w-[1400px] gap-8 px-4 pb-12 pt-10 md:px-6 lg:grid-cols-[1fr_1.1fr] lg:pb-16 lg:pt-16">
           <div className="flex flex-col justify-center">
             <span className="mb-4 inline-flex w-fit items-center gap-2 rounded-full border border-white/15 px-3 py-1 text-xs font-semibold text-mist">
-              <span className="h-1.5 w-1.5 rounded-full bg-coral" /> {num(all.length, locale)} {tx(locale, "inmuebles verificados en Venezuela", "verified listings in Venezuela")}
+              <span className="h-1.5 w-1.5 rounded-full bg-coral" /> {num(verifiedCount, locale)} {tx(locale, "inmuebles verificados en Venezuela", "verified listings in Venezuela")}
             </span>
             <h1 className="font-display text-5xl font-bold leading-[1.02] md:text-7xl">
               {tx(locale, "Un nuevo", "Real estate.")}

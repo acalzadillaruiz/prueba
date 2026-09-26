@@ -24,8 +24,11 @@ import type { Role } from "@newplace/config";
 import type { Locale } from "@/types/domain";
 import { Logo } from "@/components/brand/Logo";
 import { Avatar } from "@/components/ui";
-import { useDemo } from "@/lib/store";
-import { agencyById, userById } from "@/mock/people";
+import { useQuery } from "@tanstack/react-query";
+import { signOut } from "next-auth/react";
+import { LogOut } from "lucide-react";
+import { useApp } from "@/lib/store";
+import { api } from "@/lib/api";
 import { tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 
@@ -33,7 +36,7 @@ type Item = { href: string; icon: React.ElementType; label: [string, string]; ro
 
 const AGENCY_NAV: Item[] = [
   { href: "", icon: Gauge, label: ["Panel", "Dashboard"], roles: ["AGENCY_OWNER", "AGENT", "BACKOFFICE", "SUPERADMIN"] },
-  { href: "/leads", icon: Inbox, label: ["Leads", "Leads"], roles: ["AGENCY_OWNER", "AGENT", "BACKOFFICE", "SUPERADMIN"], badge: "4" },
+  { href: "/leads", icon: Inbox, label: ["Leads", "Leads"], roles: ["AGENCY_OWNER", "AGENT", "BACKOFFICE", "SUPERADMIN"] },
   { href: "/listings", icon: LayoutGrid, label: ["Inmuebles", "Listings"] },
   { href: "/calendar", icon: Calendar, label: ["Calendario", "Calendar"], roles: ["AGENCY_OWNER", "AGENT", "BACKOFFICE", "PHOTOGRAPHER", "SUPERADMIN"] },
   { href: "/capture", icon: Target, label: ["Captación", "Capture"], roles: ["AGENCY_OWNER", "CAPTOR", "BACKOFFICE", "SUPERADMIN"] },
@@ -47,17 +50,22 @@ const PLATFORM_NAV: Item[] = [
   { href: "", icon: Gauge, label: ["Métricas globales", "Global metrics"] },
   { href: "/agencies", icon: Building2, label: ["Agencias", "Agencies"] },
   { href: "/users", icon: Users, label: ["Usuarios", "Users"] },
-  { href: "/moderation", icon: ShieldAlert, label: ["Moderación", "Moderation"], badge: "3" },
+  { href: "/moderation", icon: ShieldAlert, label: ["Moderación", "Moderation"] },
   { href: "/ai", icon: Bot, label: ["IA · FX · Seed", "AI · FX · Seed"] },
 ];
 
 export function AdminShell({ locale, area, children, title, actions }: { locale: Locale; area: "agency" | "platform"; children: React.ReactNode; title: string; actions?: React.ReactNode }) {
   const pathname = usePathname();
-  const { userId } = useDemo();
-  const raw = userById(userId ?? undefined);
-  const valid = raw && (raw.role === "SUPERADMIN" || (area === "agency" && !!raw.agencyId));
-  const u = valid ? raw : userById(area === "platform" ? "u-super" : "u-owner")!;
-  const agency = agencyById(u.agencyId) ?? agencyById("ag-andes")!;
+  const { user, agency } = useApp();
+  const u = user ?? { id: "", name: "—", email: "", role: "SEEKER" as Role, agencyId: null, hue: 200, initials: "?" };
+  const canLeads = area === "agency" && ["AGENCY_OWNER", "AGENT", "BACKOFFICE", "SUPERADMIN"].includes(u.role) && !!u.agencyId;
+  const newLeads = useQuery({
+    queryKey: ["leads", "NEW"],
+    queryFn: () => api<{ items: unknown[] }>("leads?stage=NEW"),
+    enabled: canLeads,
+    refetchInterval: 15_000,
+  });
+  const badges: Record<string, number | undefined> = { "/leads": newLeads.data?.items.length };
   const base = `/${locale}/${area}`;
   const items = (area === "agency" ? AGENCY_NAV : PLATFORM_NAV).filter((i) => !i.roles || i.roles.includes(u.role));
   const roleLabel: Record<Role, [string, string]> = {
@@ -77,7 +85,7 @@ export function AdminShell({ locale, area, children, title, actions }: { locale:
           <Link href={`/${locale}`}><Logo tone="ivory" size="sm" /></Link>
           <span className="ml-2 rounded bg-white/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-mist">{area === "agency" ? "Agency" : "Platform"}</span>
         </div>
-        {area === "agency" && (
+        {area === "agency" && agency && (
           <div className="mx-3 mb-3 flex items-center gap-2.5 rounded-np border border-navy-line bg-navy-card p-2.5">
             <span className="flex h-9 w-9 items-center justify-center rounded-lg font-display text-sm font-bold text-navy" style={{ background: agency.color }}>{agency.initials}</span>
             <div className="min-w-0">
@@ -101,7 +109,7 @@ export function AdminShell({ locale, area, children, title, actions }: { locale:
               >
                 <i.icon size={17} className={active ? "text-coral" : ""} />
                 <span className="flex-1">{tx(locale, i.label[0], i.label[1])}</span>
-                {i.badge && <span className="rounded-full bg-coral px-1.5 text-[11px] font-bold text-white">{i.badge}</span>}
+                {(badges[i.href] ?? 0) > 0 && <span className="rounded-full bg-coral px-1.5 text-[11px] font-bold text-white">{badges[i.href]}</span>}
               </Link>
             );
           })}
@@ -111,6 +119,9 @@ export function AdminShell({ locale, area, children, title, actions }: { locale:
           {area === "agency" && u.role === "SUPERADMIN" && (
             <Link href={`/${locale}/platform`} className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-ivory/60 hover:bg-white/5"><ClipboardList size={16} /> Platform</Link>
           )}
+          <button onClick={async () => { await signOut({ redirect: false }); window.location.href = `/${locale}`; }} className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-ivory/60 hover:bg-white/5">
+            <LogOut size={16} /> {tx(locale, "Cerrar sesión", "Sign out")}
+          </button>
         </div>
       </aside>
       <div className="lg:pl-60">
@@ -144,6 +155,12 @@ export function AdminShell({ locale, area, children, title, actions }: { locale:
             );
           })}
         </nav>
+        {area === "agency" && u.role === "SUPERADMIN" && (
+          <div className="flex items-center gap-3 border-b border-coral/40 bg-[#F26B4D1a] px-4 py-2 text-sm md:px-6">
+            {agency ? tx(locale, `Viendo como superadmin: ${agency.name}`, `Viewing as superadmin: ${agency.name}`) : tx(locale, "Elige una agencia en Platform → Agencias para impersonarla.", "Pick an agency in Platform → Agencies to impersonate it.")}
+            <Link href={`/${locale}/platform/agencies`} className="ml-auto font-semibold text-coral">Platform →</Link>
+          </div>
+        )}
         <main className="p-4 md:p-6">{children}</main>
       </div>
     </div>

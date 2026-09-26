@@ -10,14 +10,19 @@ import { BilingualBody, PriceHistory } from "@/components/detail/Bits";
 import { DetailMap } from "@/components/detail/DetailMap";
 import { ListingCard } from "@/components/listing/ListingCard";
 import { CompareButton, Freshness, SaveButton, StatusBadge } from "@/components/listing/bits";
-import { LISTINGS, listingBySlug, publicListings } from "@/mock/listings";
-import { zoneByName } from "@/mock/zones";
-import { FX_RATES } from "@/mock/ops";
+import { prisma } from "@newplace/db";
+import { listingBySlug, listingInclude, publicWhere, toDomain } from "@/server/listings";
+import { getFx } from "@/server/data";
+import { getAppUser } from "@/server/session";
 import { AMENITY_LABEL, TYPE_LABEL, lbl, money, num, priceSuffix, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 
-export function generateStaticParams() {
-  return LISTINGS.flatMap((l) => [{ locale: "es", slug: l.slug }, { locale: "en", slug: l.slug }]);
+export const dynamic = "force-dynamic";
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: Locale; slug: string }> }) {
+  const { locale, slug } = await params;
+  const l = await listingBySlug(slug);
+  return l ? { title: tx(locale, l.title_es, l.title_en), description: tx(locale, l.body_es, l.body_en).slice(0, 160) } : {};
 }
 
 function Facts({ l, locale, dark }: { l: Listing; locale: Locale; dark?: boolean }) {
@@ -47,20 +52,29 @@ function Facts({ l, locale, dark }: { l: Listing; locale: Locale; dark?: boolean
 
 export default async function ListingPage({ params }: { params: Promise<{ locale: Locale; slug: string }> }) {
   const { locale, slug } = await params;
-  const l = listingBySlug(slug);
+  const l = await listingBySlug(slug);
   if (!l) notFound();
-  const zone = zoneByName(l.zone);
-  const all = publicListings();
-  const similar = all.filter((o) => o.id !== l.id && o.listingType === l.listingType && (o.city === l.city || o.luxury === l.luxury)).sort((a, b) => Math.abs(a.priceAmount - l.priceAmount) - Math.abs(b.priceAmount - l.priceAmount)).slice(0, 4);
-  const nearby = all.filter((o) => o.id !== l.id && o.city === l.city).slice(0, 12);
-  const ves = FX_RATES.find((f) => f.code === "VES")!.perUsd;
-  const eur = FX_RATES.find((f) => f.code === "EUR")!.perUsd;
+  const user = await getAppUser();
+  const isPublic = ["COMING_SOON", "ACTIVE", "UNDER_OFFER", "SOLD", "RENTED"].includes(l.status) && l.review === "APPROVED";
+  const canSeeHidden = !!user && (user.role === "SUPERADMIN" || user.id === l.ownerUserId || (!!l.agencyId && user.agencyId === l.agencyId));
+  if (!isPublic && !canSeeHidden) notFound();
+  prisma.listing.update({ where: { id: l.id }, data: { views: { increment: 1 }, interactions: { increment: 1 } } }).catch(() => {});
+  const [zoneRow, fx, similarRows, nearbyRows, soldRows] = await Promise.all([
+    prisma.zone.findUnique({ where: { name: l.zone } }),
+    getFx(),
+    prisma.listing.findMany({ where: { AND: [publicWhere(), { id: { not: l.id }, listingType: l.listingType }, { OR: [{ city: l.city }, { luxury: l.luxury }] }] }, include: listingInclude, take: 24 }),
+    prisma.listing.findMany({ where: { AND: [publicWhere(), { id: { not: l.id }, city: l.city }] }, include: listingInclude, take: 12 }),
+    prisma.listing.findMany({ where: { id: { not: l.id }, zone: l.zone, status: { in: ["SOLD", "RENTED"] } }, include: listingInclude, take: 3, orderBy: { updatedAt: "desc" } }),
+  ]);
+  const zone = zoneRow ?? { salePpm: Math.round(l.priceAmount / l.areaM2), rentPpm: 0, activeListings: 0, daysOnMarket: 0 };
+  const all = [...similarRows.map(toDomain), ...nearbyRows.map(toDomain)];
+  const similar = similarRows.map(toDomain).sort((a, b) => Math.abs(a.priceAmount - l.priceAmount) - Math.abs(b.priceAmount - l.priceAmount)).slice(0, 4);
+  const nearby = nearbyRows.map(toDomain);
+  void all;
+  const ves = fx.find((f) => f.code === "VES")?.perUsd ?? 0;
+  const eur = fx.find((f) => f.code === "EUR")?.perUsd ?? 0;
   const dark = l.luxury;
-  const soldNearby = [
-    { t: tx(locale, `Apartamento ${Math.max(1, l.beds - 1)} hab · ${Math.round(l.areaM2 * 0.8)} m²`, `${Math.max(1, l.beds - 1)}-bed · ${Math.round(l.areaM2 * 0.8)} m²`), p: Math.round((l.priceAmount * 0.82) / 1000) * 1000, d: tx(locale, "hace 3 meses", "3 months ago") },
-    { t: tx(locale, `Apartamento ${l.beds} hab · ${Math.round(l.areaM2 * 1.05)} m²`, `${l.beds}-bed · ${Math.round(l.areaM2 * 1.05)} m²`), p: Math.round((l.priceAmount * 1.03) / 1000) * 1000, d: tx(locale, "hace 5 meses", "5 months ago") },
-    { t: tx(locale, `Apartamento ${l.beds + 1} hab · ${Math.round(l.areaM2 * 1.3)} m²`, `${l.beds + 1}-bed · ${Math.round(l.areaM2 * 1.3)} m²`), p: Math.round((l.priceAmount * 1.28) / 1000) * 1000, d: tx(locale, "hace 8 meses", "8 months ago") },
-  ];
+  const soldNearby = soldRows.map(toDomain).map((o) => ({ t: `${tx(locale, o.title_es, o.title_en)} · ${o.areaM2} m²`, p: o.priceAmount, d: tx(locale, o.status === "SOLD" ? "Vendido" : "Alquilado", o.status === "SOLD" ? "Sold" : "Rented") }));
   const H = ({ children }: { children: React.ReactNode }) => <h3 className="mb-4 font-display text-xl font-semibold">{children}</h3>;
   const sec = cn("border-t py-8", dark ? "border-navy-line" : "border-line");
 
@@ -72,6 +86,12 @@ export default async function ListingPage({ params }: { params: Promise<{ locale
             <Link href={`/${locale}/search?type=${l.listingType.startsWith("COMMERCIAL") ? "COMMERCIAL" : l.listingType}`}>{lbl(TYPE_LABEL[l.listingType], locale)}</Link>
             <ChevronRight size={14} /> <span>{l.city}</span> <ChevronRight size={14} /> <span>{l.zone}</span>
           </nav>
+          {!isPublic && (
+            <div className="mb-3 rounded-np border border-warn/60 bg-[#C9862A1a] px-4 py-2.5 text-sm font-semibold text-[#8F5E1C]">
+              {l.review === "PENDING" ? tx(locale, "Pendiente de aprobación: solo tu equipo ve esta ficha.", "Pending approval: only your team can see this listing.") : tx(locale, `No publicado (${l.status}). Solo tu equipo ve esta ficha.`, `Not public (${l.status}). Only your team can see this listing.`)}
+              {l.takedownReason && ` · ${l.takedownReason}`}
+            </div>
+          )}
           <Gallery l={l} locale={locale} luxury={dark} />
         </div>
 
@@ -164,7 +184,7 @@ export default async function ListingPage({ params }: { params: Promise<{ locale
               </div>
             </div>
 
-            {!l.listingType.includes("RENT") && (
+            {soldNearby.length > 0 && (
               <div className={sec}>
                 <H>{tx(locale, "Vendidos cerca", "Sold nearby")}</H>
                 <div className={cn("divide-y rounded-np border", dark ? "divide-navy-line border-navy-line" : "divide-line border-line bg-white")}>

@@ -3,14 +3,13 @@ import { Bath, BedDouble, Car, Maximize2, ShieldCheck } from "lucide-react";
 import type { Listing, Locale } from "@/types/domain";
 import { listingPhoto } from "@/lib/photos";
 import { PropertyArt } from "@/components/art/PropertyArt";
-import { agencyById } from "@/mock/people";
 import { TYPE_LABEL, lbl, money, num, priceSuffix, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import { CompareButton, Freshness, SaveButton, StatusBadge } from "./bits";
 
 export function ListingCard({ l, locale, compact, className, showCompare }: { l: Listing; locale: Locale; compact?: boolean; className?: string; showCompare?: boolean }) {
-  const agency = agencyById(l.agencyId);
-  const fresh = Date.parse("2026-09-26T18:00:00Z") - Date.parse(l.publishedAt) < 24 * 3600_000;
+  const agency = l.agency;
+  const fresh = Date.now() - Date.parse(l.publishedAt) < 24 * 3600_000;
   const drop = l.priceHistory.find((p) => p.kind === "DROP");
   return (
     <Link

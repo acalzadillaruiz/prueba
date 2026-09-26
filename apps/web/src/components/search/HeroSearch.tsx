@@ -31,9 +31,15 @@ export function HeroSearch({ locale }: { locale: Locale }) {
     ["COMMERCIAL", tx(locale, "Comercial", "Commercial")],
     ["LUX", "Luxury"],
   ];
-  const go = () => {
+  const go = async () => {
     if (tab === "LUX" && !text) return router.push(`/${locale}/luxury`);
-    const q = heuristicSearchParse(text);
+    let q = heuristicSearchParse(text);
+    if (text.trim()) {
+      try {
+        const r = await fetch("/api/v1/ai/search-parse", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ q: text, locale }) });
+        if (r.ok) q = (await r.json()).query;
+      } catch {}
+    }
     if (!q.listingType && tab !== "LUX") q.listingType = tab as never;
     if (tab === "LUX") q.luxury = true;
     router.push(`/${locale}/search?${queryToParams(q, text).toString()}`);

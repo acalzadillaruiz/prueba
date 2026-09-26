@@ -2,13 +2,11 @@
 
 import { Info, Sparkles } from "lucide-react";
 import type { Listing, Locale } from "@/types/domain";
-import { useDemo } from "@/lib/store";
 import { compactMoney, money, num, priceSuffix, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
-import { listingById } from "@/mock/listings";
 
 export function EstimateCard({ l, locale, dark, showComparables = true }: { l: Listing; locale: Locale; dark?: boolean; showComparables?: boolean }) {
-  const { aiProvider } = useDemo();
+  const aiProvider = l.estimate.method.startsWith("llm") ? "openai-compatible" : "heuristic";
   const e = l.estimate;
   const lo = Math.min(e.low, l.priceAmount) * 0.97;
   const hi = Math.max(e.high, l.priceAmount) * 1.03;
@@ -66,11 +64,10 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
               </thead>
               <tbody>
                 {e.comparables.map((c) => {
-                  const cl = listingById(c.id);
                   return (
                     <tr key={c.id} className={cn("border-t", dark ? "border-navy-line" : "border-line")}>
                       <td className="px-3 py-2">
-                        <div className="max-w-[180px] truncate font-semibold">{cl ? tx(locale, cl.title_es, cl.title_en) : c.title}</div>
+                        <div className="max-w-[180px] truncate font-semibold">{c.title}</div>
                         <div className={cn("text-xs", muted)}>{c.zone}</div>
                       </td>
                       <td className="px-3 py-2 text-right">{num(c.areaM2, locale)}</td>

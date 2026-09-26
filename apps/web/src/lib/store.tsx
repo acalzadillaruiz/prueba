@@ -1,100 +1,89 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import type { Lead } from "@/types/domain";
-import { LEADS } from "@/mock/ops";
-import { minutesAgo } from "@/mock/people";
+import { usePathname, useRouter } from "next/navigation";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import type { Role } from "@newplace/config";
+import type { Agency } from "@/types/domain";
+import { api } from "./api";
 
-/**
- * Prototype-only client state (demo session, saved, compare, created leads, takedowns).
- * Production replaces this with Auth.js sessions + REST API (/api/v1) + Postgres.
- */
-interface DemoState {
-  userId: string | null;
+export interface AppUser {
+  id: string;
+  name: string;
+  email: string;
+  role: Role;
+  agencyId: string | null;
+  hue: number;
+  initials: string;
+  phone?: string;
+}
+
+interface Ctx {
+  user: AppUser | null;
+  agency: Agency | null;
   saved: string[];
   compare: string[];
-  extraLeads: Lead[];
-  takedowns: string[];
-  aiProvider: "heuristic" | "openai-compatible";
-}
-
-const DEFAULT: DemoState = {
-  userId: "u-seeker",
-  saved: [],
-  compare: [],
-  extraLeads: [],
-  takedowns: [],
-  aiProvider: "heuristic",
-};
-
-interface Ctx extends DemoState {
-  ready: boolean;
-  login: (id: string | null) => void;
   toggleSaved: (id: string) => void;
   toggleCompare: (id: string) => void;
-  addLead: (l: Omit<Lead, "id" | "createdAt" | "stage" | "messages">) => Lead;
-  toggleTakedown: (id: string) => void;
-  setAi: (p: DemoState["aiProvider"]) => void;
-  leads: Lead[];
-  reset: () => void;
+  requireLogin: () => boolean;
 }
 
-const StoreCtx = createContext<Ctx | null>(null);
-const KEY = "np-demo-v1";
+const AppCtx = createContext<Ctx | null>(null);
+const CMP = "np-compare-v1";
 
-export function DemoStoreProvider({ children, initialSaved }: { children: ReactNode; initialSaved: string[] }) {
-  const [state, setState] = useState<DemoState>({ ...DEFAULT, saved: initialSaved });
-  const [ready, setReady] = useState(false);
+export function AppStateProvider({ children, user, agency, savedIds }: { children: ReactNode; user: AppUser | null; agency: Agency | null; savedIds: string[] }) {
+  const [client] = useState(() => new QueryClient({ defaultOptions: { queries: { staleTime: 10_000, refetchOnWindowFocus: false } } }));
+  const [saved, setSaved] = useState(savedIds);
+  const [compare, setCompare] = useState<string[]>([]);
+  const router = useRouter();
+  const pathname = usePathname();
 
+  useEffect(() => setSaved(savedIds), [savedIds]);
   useEffect(() => {
     try {
-      const raw = localStorage.getItem(KEY);
-      if (raw) setState((s) => ({ ...s, ...JSON.parse(raw) }));
+      setCompare(JSON.parse(localStorage.getItem(CMP) ?? "[]"));
     } catch {}
-    setReady(true);
   }, []);
 
-  useEffect(() => {
-    if (!ready) return;
-    try {
-      localStorage.setItem(KEY, JSON.stringify(state));
-    } catch {}
-  }, [state, ready]);
+  const requireLogin = useCallback(() => {
+    if (user) return true;
+    const locale = pathname.split("/")[1] || "es";
+    router.push(`/${locale}/login?next=${encodeURIComponent(pathname)}`);
+    return false;
+  }, [user, pathname, router]);
 
-  const login = useCallback((id: string | null) => setState((s) => ({ ...s, userId: id })), []);
   const toggleSaved = useCallback(
-    (id: string) => setState((s) => ({ ...s, saved: s.saved.includes(id) ? s.saved.filter((x) => x !== id) : [id, ...s.saved] })),
-    [],
+    (id: string) => {
+      if (!requireLogin()) return;
+      const on = !saved.includes(id);
+      setSaved((s) => (on ? [id, ...s] : s.filter((x) => x !== id)));
+      api<{ ids: string[] }>("me/saved", { method: "POST", json: { listingId: id, saved: on } })
+        .then((r) => setSaved(r.ids))
+        .catch(() => setSaved((s) => (on ? s.filter((x) => x !== id) : [id, ...s])));
+    },
+    [saved, requireLogin],
   );
-  const toggleCompare = useCallback(
-    (id: string) =>
-      setState((s) => ({
-        ...s,
-        compare: s.compare.includes(id) ? s.compare.filter((x) => x !== id) : [...s.compare, id].slice(-3),
-      })),
-    [],
-  );
-  const addLead = useCallback((l: Omit<Lead, "id" | "createdAt" | "stage" | "messages">) => {
-    const lead: Lead = { ...l, id: `ld-new-${Date.now().toString(36)}`, createdAt: minutesAgo(0), stage: "NEW", messages: 1 };
-    setState((s) => ({ ...s, extraLeads: [lead, ...s.extraLeads] }));
-    return lead;
-  }, []);
-  const toggleTakedown = useCallback(
-    (id: string) => setState((s) => ({ ...s, takedowns: s.takedowns.includes(id) ? s.takedowns.filter((x) => x !== id) : [...s.takedowns, id] })),
-    [],
-  );
-  const setAi = useCallback((p: DemoState["aiProvider"]) => setState((s) => ({ ...s, aiProvider: p })), []);
-  const reset = useCallback(() => setState({ ...DEFAULT, saved: initialSaved }), [initialSaved]);
 
-  const value = useMemo<Ctx>(
-    () => ({ ...state, ready, login, toggleSaved, toggleCompare, addLead, toggleTakedown, setAi, reset, leads: [...state.extraLeads, ...LEADS] }),
-    [state, ready, login, toggleSaved, toggleCompare, addLead, toggleTakedown, setAi, reset],
+  const toggleCompare = useCallback((id: string) => {
+    setCompare((c) => {
+      const next = c.includes(id) ? c.filter((x) => x !== id) : [...c, id].slice(-3);
+      try {
+        localStorage.setItem(CMP, JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+  }, []);
+
+  const value = useMemo(() => ({ user, agency, saved, compare, toggleSaved, toggleCompare, requireLogin }), [user, agency, saved, compare, toggleSaved, toggleCompare, requireLogin]);
+  return (
+    <QueryClientProvider client={client}>
+      <AppCtx.Provider value={value}>{children}</AppCtx.Provider>
+    </QueryClientProvider>
   );
-  return <StoreCtx.Provider value={value}>{children}</StoreCtx.Provider>;
 }
 
-export function useDemo() {
-  const c = useContext(StoreCtx);
-  if (!c) throw new Error("useDemo outside provider");
+export function useApp() {
+  const c = useContext(AppCtx);
+  if (!c) throw new Error("useApp outside provider");
   return c;
 }

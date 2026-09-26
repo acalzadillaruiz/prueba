@@ -1,7 +1,7 @@
 "use client";
 
 import type { Listing, Locale } from "@/types/domain";
-import { NightMap } from "@/components/map/NightMap";
+import { MapView as NightMap } from "@/components/map/MapView";
 
 export function DetailMap({ l, locale, nearby }: { l: Listing; locale: Locale; nearby: Listing[] }) {
   const caracas = l.city === "Caracas";

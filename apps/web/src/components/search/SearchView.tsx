@@ -2,17 +2,18 @@
 
 import { useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Bell, BellRing, Check, ChevronDown, List, Map as MapIcon, SlidersHorizontal, Sparkles, X } from "lucide-react";
+import { Bell, BellRing, Check, Loader2, ChevronDown, List, Map as MapIcon, SlidersHorizontal, Sparkles, X } from "lucide-react";
 import { heuristicSearchParse } from "@newplace/ai";
 import type { Amenity, Listing, Locale } from "@/types/domain";
-import { NightMap } from "@/components/map/NightMap";
+import { MapView as NightMap } from "@/components/map/MapView";
 import { ListingCard, MapPreviewCard } from "@/components/listing/ListingCard";
 import { EmptyState } from "@/components/ui";
-import { inShape, type Shape } from "@/lib/geo";
+import type { Shape } from "@/lib/geo";
 import { AMENITY_LABEL, lbl, money, num, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
-import { useDemo } from "@/lib/store";
-import { agencyById } from "@/mock/people";
+import { useApp } from "@/lib/store";
+import { api } from "@/lib/api";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { queryToParams } from "./HeroSearch";
 
 const TYPES = [
@@ -31,10 +32,11 @@ const PRICE_STEPS: Record<string, number[]> = {
 
 const FILTER_AMENITIES: Amenity[] = ["pool", "generator", "waterTank", "security", "gym", "terrace", "view", "garden", "elevator", "ac"];
 
-export function SearchView({ locale, all }: { locale: Locale; all: Listing[] }) {
+export function SearchView({ locale, initial, zones }: { locale: Locale; initial: { items: Listing[]; total: number }; zones: string[] }) {
   const sp = useSearchParams();
   const router = useRouter();
-  const { takedowns } = useDemo();
+  const { requireLogin } = useApp();
+  const [savingAlert, setSavingAlert] = useState(false);
   const [shape, setShape] = useState<Shape>(null);
   const [sel, setSel] = useState<string | null>(null);
   const [hover, setHover] = useState<string | null>(null);
@@ -63,30 +65,26 @@ export function SearchView({ locale, all }: { locale: Locale; all: Listing[] }) 
     setAlertSaved(false);
   };
 
-  const results = useMemo(() => {
-    const now = Date.parse("2026-09-26T18:00:00Z");
-    let r = all.filter((l) => {
-      if (takedowns.includes(l.id)) return false;
-      if (type === "COMMERCIAL" ? !l.listingType.startsWith("COMMERCIAL") : l.listingType !== type) return false;
-      if (zone && l.zone !== zone && l.city !== zone) return false;
-      if (max && l.priceAmount > max) return false;
-      if (beds && l.beds < beds) return false;
-      if (lux && !l.luxury) return false;
-      if (kind === "penthouse" && l.kind !== "penthouse") return false;
-      if (kind === "house" && !["house", "townhouse", "villa", "chalet"].includes(l.kind)) return false;
-      if (furnished && !l.furnished) return false;
-      if (pets && !l.pets) return false;
-      if (verified && !agencyById(l.agencyId)?.verified) return false;
-      if (pub === "24h" && now - Date.parse(l.publishedAt) > 24 * 3600e3) return false;
-      if (pub === "7d" && now - Date.parse(l.publishedAt) > 7 * 24 * 3600e3) return false;
-      if (amen.some((a) => !l.amenities.includes(a))) return false;
-      return inShape(l, shape);
-    });
-    r = [...r].sort((a, b) =>
-      sort === "new" ? b.publishedAt.localeCompare(a.publishedAt) : sort === "price-asc" ? a.priceAmount - b.priceAmount : sort === "price-desc" ? b.priceAmount - a.priceAmount : a.priceAmount / a.areaM2 - b.priceAmount / b.areaM2,
-    );
-    return r;
-  }, [takedowns, all, type, zone, max, beds, lux, kind, furnished, pets, verified, pub, amen, shape, sort]);
+  const shapeParam = shape?.type === "poly" ? `&poly=${shape.pts.map((p) => `${p.lat.toFixed(5)},${p.lng.toFixed(5)}`).join(";")}` : shape?.type === "radius" ? `&radius=${shape.center.lat.toFixed(5)},${shape.center.lng.toFixed(5)},${shape.km}` : "";
+  const qs = `${sp.toString()}&sort=${sort}${shapeParam}`;
+  const query = useQuery({
+    queryKey: ["search", qs],
+    queryFn: () => api<{ items: Listing[]; total: number }>(`/api/v1/listings?${qs}`),
+    placeholderData: keepPreviousData,
+    initialData: qs === `${sp.toString()}&sort=new` ? initial : undefined,
+  });
+  const results = query.data?.items ?? [];
+  const createAlert = async () => {
+    if (!requireLogin()) return;
+    setSavingAlert(true);
+    try {
+      const name = [tx(locale, TYPES.find((t) => t[0] === type)?.[1] ?? "", TYPES.find((t) => t[0] === type)?.[2] ?? ""), zone, beds ? `${beds}+ ${tx(locale, "hab", "bd")}` : "", max ? `< ${max.toLocaleString("es-VE")}` : "", shape ? tx(locale, "zona dibujada", "drawn area") : ""].filter(Boolean).join(" · ");
+      await api("me/searches", { method: "POST", json: { name, query: sp.toString(), frequency: "INSTANT", ...(shape?.type === "poly" ? { polygon: shape.pts } : {}) } });
+      setAlertSaved(true);
+    } finally {
+      setSavingAlert(false);
+    }
+  };
 
   const [regionPick, setRegionPick] = useState<"caracas" | "venezuela" | null>(null);
   const autoRegion = results.length > 0 && results.every((l) => l.city !== "Caracas") ? "venezuela" : "caracas";
@@ -169,7 +167,7 @@ export function SearchView({ locale, all }: { locale: Locale; all: Listing[] }) 
           </select>
           <select value={zone ?? ""} onChange={(e) => set({ zone: e.target.value || null })} className={cn(pill, "appearance-none border-line bg-white", zone && "border-navy")} aria-label={tx(locale, "Zona", "Area")}>
             <option value="">{tx(locale, "Todas las zonas", "All areas")}</option>
-            {[...new Set(all.map((l) => l.zone))].sort().map((z) => (
+            {zones.map((z) => (
               <option key={z} value={z}>{z}</option>
             ))}
           </select>
@@ -183,10 +181,10 @@ export function SearchView({ locale, all }: { locale: Locale; all: Listing[] }) 
             Luxury
           </button>
           <button
-            onClick={() => setAlertSaved(true)}
+            onClick={createAlert}
             className={cn(pill, "ml-auto", alertSaved ? "border-ok bg-ok text-white" : "border-coral bg-coral text-white hover:bg-coral-hover")}
           >
-            {alertSaved ? <Check size={15} /> : <Bell size={15} />} {alertSaved ? tx(locale, "Alerta creada", "Alert saved") : tx(locale, "Guardar búsqueda", "Save search")}
+            {alertSaved ? <Check size={15} /> : savingAlert ? <Loader2 size={15} className="animate-spin" /> : <Bell size={15} />} {alertSaved ? tx(locale, "Alerta creada", "Alert saved") : tx(locale, "Guardar búsqueda", "Save search")}
           </button>
         </div>
         {moreOpen && (
@@ -258,7 +256,7 @@ export function SearchView({ locale, all }: { locale: Locale; all: Listing[] }) 
             <div className="flex items-center justify-between gap-2">
               <div>
                 <div className="font-display text-lg font-semibold">
-                  {num(results.length, locale)} {tx(locale, "resultados", "results")}
+                  {num(query.data?.total ?? results.length, locale)} {tx(locale, "resultados", "results")}{query.isFetching && <Loader2 size={15} className="ml-2 inline animate-spin text-ink/40" />}
                   {shape && <span className="ml-2 rounded-full bg-coral/10 bg-[#F26B4D1A] px-2 py-0.5 text-xs text-coral-hover">{tx(locale, "en tu zona dibujada", "in your drawn area")}</span>}
                 </div>
                 <div className="text-xs text-ink/50">{tx(locale, "Precios en USD · actualizados en tiempo real", "Prices in USD · updated in real time")}</div>
@@ -293,7 +291,7 @@ export function SearchView({ locale, all }: { locale: Locale; all: Listing[] }) 
                 icon={<BellRing size={20} />}
                 title={tx(locale, "Nada por aquí… todavía", "Nothing here… yet")}
                 body={tx(locale, "Guarda la búsqueda y te avisamos en cuanto aparezca algo que encaje.", "Save this search and we’ll tell you as soon as something matches.")}
-                cta={<button onClick={() => setAlertSaved(true)} className="rounded-np bg-coral px-4 py-2 font-display text-white">{tx(locale, "Crear alerta", "Create alert")}</button>}
+                cta={<button onClick={createAlert} className="rounded-np bg-coral px-4 py-2 font-display text-white">{tx(locale, "Crear alerta", "Create alert")}</button>}
               />
             </div>
           )}

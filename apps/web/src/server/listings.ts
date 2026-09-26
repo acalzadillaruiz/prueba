@@ -8,6 +8,9 @@ export const listingInclude = {
   photos: { orderBy: [{ isCover: "desc" }, { order: "asc" }] },
   priceHistory: { orderBy: { date: "asc" } },
   estimates: { orderBy: { createdAt: "desc" }, take: 1 },
+  agency: { select: { id: true, name: true, verified: true, color: true, initials: true, phone: true, whatsapp: true } },
+  agent: { select: { id: true, name: true, hue: true, phone: true, memberships: { select: { verified: true }, take: 1 } } },
+  owner: { select: { id: true, name: true, hue: true, phone: true } },
 } satisfies Prisma.ListingInclude;
 
 export type ListingRow = Prisma.ListingGetPayload<{ include: typeof listingInclude }>;
@@ -79,6 +82,12 @@ export function toDomain(r: ListingRow): Listing {
     shortRent: (r.shortRent ?? undefined) as Listing["shortRent"],
     commercial: (r.commercial ?? undefined) as Listing["commercial"],
     fingerprint: r.fingerprint,
+    agency: r.agency ? { ...r.agency, phone: r.agency.phone ?? "", whatsapp: r.agency.whatsapp ?? "" } : undefined,
+    agent: r.agent
+      ? { id: r.agent.id, name: r.agent.name ?? "", hue: r.agent.hue, verified: !!r.agent.memberships[0]?.verified, phone: r.agent.phone ?? undefined }
+      : r.owner
+        ? { id: r.owner.id, name: r.owner.name ?? "", hue: r.owner.hue, verified: false, phone: r.owner.phone ?? undefined }
+        : undefined,
   };
 }
 

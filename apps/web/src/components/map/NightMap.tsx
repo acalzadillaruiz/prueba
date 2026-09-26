@@ -82,6 +82,10 @@ export interface NightMapProps {
   initialTheme?: Theme;
   initialScale?: number;
   focus?: LatLng;
+  /** Single marker (e.g. the owner wizard address). */
+  pin?: LatLng;
+  /** Click on the map (pan mode) returns the lat/lng. */
+  onPick?: (p: LatLng) => void;
 }
 
 export function NightMap({
@@ -99,6 +103,8 @@ export function NightMap({
   initialTheme = "night",
   initialScale,
   focus,
+  pin,
+  onPick,
 }: NightMapProps) {
   const B = BOUNDS[region];
   const P = useCallback(
@@ -126,12 +132,16 @@ export function NightMap({
   const pal = PAL[theme];
   // px → svg units (so pins keep a constant on-screen size)
   const [k, setK] = useState(1.4);
+  const [box, setBox] = useState({ w: 0, h: 0 });
   useEffect(() => {
     const el = svgRef.current;
     if (!el) return;
     const ro = new ResizeObserver(() => {
       const r = el.getBoundingClientRect();
-      if (r.width) setK(Math.min(B.W / r.width, B.H / r.height));
+      if (r.width) {
+        setK(Math.min(B.W / r.width, B.H / r.height));
+        setBox({ w: r.width, h: r.height });
+      }
     });
     ro.observe(el);
     return () => ro.disconnect();
@@ -175,7 +185,8 @@ export function NightMap({
     else if (mode === "radius") {
       onShape?.({ type: "radius", center: ll, km: 1.2 });
       setMode("pan");
-    } else if (!drag.current?.moved && (e.target as Element).tagName === "rect") onSelect?.(null);
+    } else if (!drag.current?.moved && onPick) onPick(ll);
+    else if (!drag.current?.moved && (e.target as Element).tagName === "rect") onSelect?.(null);
   };
 
   const closePoly = () => {
@@ -406,6 +417,16 @@ export function NightMap({
         )}
       </svg>
 
+      {pin && (() => {
+        const p = P(pin.lat, pin.lng);
+        const x = p.x * view.s + view.x;
+        const y = p.y * view.s + view.y;
+        return (
+          <div className="pointer-events-none absolute z-10" style={{ left: x / k - (B.W / k - box.w) / 2, top: y / k - (B.H / k - box.h) / 2, transform: "translate(-50%, -100%)" }}>
+            <svg viewBox="0 0 32 36" width="30" height="34" aria-hidden><path d="M16 35C14.6 35 13.8 34.2 13 33L3.2 16.4C-.6 9.8 4.2 1.5 11.8 1.5H20.2C27.8 1.5 32.6 9.8 28.8 16.4L19 33C18.2 34.2 17.4 35 16 35Z" fill="#F26B4D" stroke="#0B1220" strokeWidth="1.5" /><circle cx="16" cy="12.5" r="4.6" fill="#F7F4EF" /></svg>
+          </div>
+        );
+      })()}
       {selected && selPt && renderPreview && (
         <div
           className="np-in pointer-events-auto absolute z-20 w-64 -translate-x-1/2"

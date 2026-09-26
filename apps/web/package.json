@@ -13,10 +13,12 @@
     "@auth/prisma-adapter": "^2.11.3",
     "@fontsource/outfit": "^5.2.5",
     "@fontsource/source-sans-3": "^5.2.5",
+    "@googlemaps/markerclusterer": "^2.6.2",
     "@newplace/ai": "*",
     "@newplace/config": "*",
     "@newplace/db": "^0.1.0",
     "@tanstack/react-query": "^5.104.0",
+    "@vis.gl/react-google-maps": "^1.10.1",
     "bcryptjs": "^3.0.3",
     "clsx": "^2.1.1",
     "lucide-react": "^0.460.0",
@@ -29,6 +31,7 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@types/google.maps": "^3.66.4",
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",

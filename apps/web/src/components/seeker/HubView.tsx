@@ -3,21 +3,33 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Bell, CalendarCheck, Check, CircleDollarSign, FileCheck2, Heart, KeyRound, MessageSquare, Video } from "lucide-react";
-import type { Locale } from "@/types/domain";
+import type { Lead, Listing, Locale, Tour } from "@/types/domain";
 import { listingPhoto } from "@/lib/photos";
 import { PropertyArt } from "@/components/art/PropertyArt";
 import { Avatar, Badge, Button, Card, Progress } from "@/components/ui";
-import { useDemo } from "@/lib/store";
-import { listingById } from "@/mock/listings";
-import { SAVED_SEARCHES, TOURS } from "@/mock/ops";
-import { userById } from "@/mock/people";
+import { useApp } from "@/lib/store";
 import { ago, dateTime, money, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 
-export function HubView({ locale }: { locale: Locale }) {
-  const { saved, extraLeads, userId } = useDemo();
-  const me = userById(userId ?? undefined) ?? userById("u-seeker")!;
-  const myTours = TOURS.filter((t) => t.seekerName === "Daniel Ortega");
+export interface HubData {
+  tours: (Tour & { agentName: string; agentHue: number })[];
+  requests: Lead[];
+  listings: Listing[];
+  savedIds: string[];
+  searches: { id: string; name: string; newCount: number }[];
+  lastMessage: { from: string; body: string; at: string } | null;
+}
+
+export function HubView({ locale, data }: { locale: Locale; data: HubData }) {
+  const { user } = useApp();
+  const me = user ?? { name: "—", initials: "?", hue: 200 };
+  const byId = new Map(data.listings.map((l) => [l.id, l]));
+  const listingById = (id: string) => byId.get(id);
+  const saved = data.savedIds;
+  const myTours = data.tours;
+  const extraLeads = data.requests.filter((r) => !data.tours.some((t) => t.leadId === r.id));
+  const SAVED_SEARCHES = data.searches;
+  const [letter, setLetter] = useState(false);
   const [price, setPrice] = useState(180000);
   const [down, setDown] = useState(30);
   const [years, setYears] = useState(15);
@@ -27,10 +39,10 @@ export function HubView({ locale }: { locale: Locale }) {
   const r = rate / 12;
   const monthly = (loan * r) / (1 - Math.pow(1 + r, -n));
   const steps = [
-    { done: true, t: tx(locale, "Define tu búsqueda", "Define your search"), d: tx(locale, "3 alertas activas", "3 active alerts") },
+    { done: SAVED_SEARCHES.length > 0, t: tx(locale, "Define tu búsqueda", "Define your search"), d: tx(locale, `${SAVED_SEARCHES.length} alertas activas`, `${SAVED_SEARCHES.length} active alerts`) },
     { done: saved.length > 0, t: tx(locale, "Guarda y compara", "Save and compare"), d: `${saved.length} ${tx(locale, "guardados", "saved")}` },
     { done: myTours.length + extraLeads.length > 0, t: tx(locale, "Visita tus favoritos", "Tour your favorites"), d: `${myTours.length + extraLeads.length} ${tx(locale, "visitas", "tours")}` },
-    { done: false, t: tx(locale, "Precalificación (simulada)", "Pre-qualification (mock)"), d: tx(locale, "Sin compromiso", "No commitment") },
+    { done: letter, t: tx(locale, "Precalificación (simulada)", "Pre-qualification (mock)"), d: tx(locale, "Sin compromiso", "No commitment") },
     { done: false, t: tx(locale, "Haz una oferta", "Make an offer"), d: tx(locale, "Con tu agente", "With your agent") },
   ];
   const doneCount = steps.filter((s) => s.done).length;
@@ -73,7 +85,8 @@ export function HubView({ locale }: { locale: Locale }) {
           </div>
           <div className="mt-4 space-y-3">
             {extraLeads.map((ld) => {
-              const l = listingById(ld.listingId)!;
+              const l = listingById(ld.listingId);
+              if (!l) return null;
               return (
                 <div key={ld.id} className="np-in flex flex-wrap items-center gap-4 rounded-np border border-coral/40 bg-[#F26B4D0A] p-3 sm:flex-nowrap">
                   <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="h-16 w-24 shrink-0 rounded-lg" />
@@ -81,13 +94,14 @@ export function HubView({ locale }: { locale: Locale }) {
                     <div className="line-clamp-1 font-semibold">{tx(locale, l.title_es, l.title_en)}</div>
                     <div className="line-clamp-1 text-sm text-ink/60">{ld.message}</div>
                   </div>
-                  <Badge tone="warn">{tx(locale, "Esperando confirmación", "Awaiting confirmation")}</Badge>
+                  <Badge tone={ld.stage === "NEW" ? "warn" : "ok"}>{ld.stage === "NEW" ? tx(locale, "Esperando respuesta", "Awaiting reply") : tx(locale, "En contacto", "In contact")}</Badge>
                 </div>
               );
             })}
             {myTours.map((t) => {
-              const l = listingById(t.listingId)!;
-              const a = userById(t.agentId)!;
+              const l = listingById(t.listingId);
+              if (!l) return null;
+              const a = { name: t.agentName, hue: t.agentHue, initials: t.agentName.split(" ").map((p) => p[0]).slice(0, 2).join("") };
               return (
                 <div key={t.id} className="flex flex-wrap items-center gap-4 rounded-np border border-line p-3 sm:flex-nowrap">
                   <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="h-16 w-24 shrink-0 rounded-lg" />
@@ -119,7 +133,14 @@ export function HubView({ locale }: { locale: Locale }) {
             <div className="text-xs text-mist">{tx(locale, "Cuota estimada (10,5 % anual)", "Est. payment (10.5% APR)")}</div>
             <div className="font-display text-3xl font-semibold">{money(Math.round(monthly), locale)}<span className="text-sm font-normal text-mist"> / {tx(locale, "mes", "mo")}</span></div>
           </div>
-          <Button className="mt-3 w-full" variant="outline"><FileCheck2 size={16} /> {tx(locale, "Generar carta (mock)", "Generate letter (mock)")}</Button>
+          <Button className="mt-3 w-full" variant="outline" onClick={() => setLetter(true)}><FileCheck2 size={16} /> {tx(locale, "Generar carta (mock)", "Generate letter (mock)")}</Button>
+          {letter && (
+            <div className="np-in mt-3 rounded-np border border-dashed border-line p-3 text-xs leading-relaxed text-ink/70">
+              <b>{tx(locale, "Carta de precalificación (simulada)", "Pre-qualification letter (mock)")}</b>
+              <br />
+              {tx(locale, `${me.name} califica de forma preliminar para un inmueble de hasta ${money(price, locale)} con ${down} % de inicial a ${years} años. Documento sin validez bancaria.`, `${me.name} is preliminarily qualified for a home up to ${money(price, locale)} with ${down}% down over ${years} years. Not a bank document.`)}
+            </div>
+          )}
         </Card>
 
         {/* saved */}
@@ -154,20 +175,24 @@ export function HubView({ locale }: { locale: Locale }) {
             </div>
             {SAVED_SEARCHES.map((s) => (
               <div key={s.id} className="mt-3 flex items-center justify-between text-sm">
-                <span className="line-clamp-1">{tx(locale, s.name.es, s.name.en)}</span>
+                <span className="line-clamp-1">{s.name}</span>
                 {s.newCount > 0 && <Badge tone="coral">+{s.newCount}</Badge>}
               </div>
             ))}
           </Card>
           <Card className="p-5">
             <div className="flex items-center gap-2 font-display text-lg font-semibold"><MessageSquare size={18} className="text-coral" /> {tx(locale, "Mensajes", "Messages")}</div>
-            <div className="mt-3 flex items-start gap-3">
-              <Avatar initials="VR" hue={340} size={34} />
-              <div className="text-sm">
-                <div className="font-semibold">Valentina Rojas <span className="font-normal text-ink/50">· {ago(new Date(Date.parse("2026-09-26T18:00:00Z") - 25 * 60000).toISOString(), locale)}</span></div>
-                <div className="text-ink/65">{tx(locale, "Te confirmo la visita de hoy a las 16:00 en Torre Alba. ¡Nos vemos en el lobby!", "Confirming today’s 4 pm tour at Torre Alba. See you in the lobby!")}</div>
+            {data.lastMessage ? (
+              <div className="mt-3 flex items-start gap-3">
+                <Avatar initials={data.lastMessage.from.split(" ").map((p) => p[0]).slice(0, 2).join("")} hue={340} size={34} />
+                <div className="text-sm">
+                  <div className="font-semibold">{data.lastMessage.from} <span className="font-normal text-ink/50">· {ago(data.lastMessage.at, locale)}</span></div>
+                  <div className="text-ink/65">{data.lastMessage.body}</div>
+                </div>
               </div>
-            </div>
+            ) : (
+              <p className="mt-3 text-sm text-ink/55">{tx(locale, "Aún no tienes mensajes. Escribe desde cualquier ficha.", "No messages yet. Write from any listing.")}</p>
+            )}
             <div className="mt-3 flex gap-2">
               <Button size="sm" variant="outline"><Video size={14} /> {tx(locale, "Videollamada", "Video call")}</Button>
               <Button size="sm" variant="outline"><KeyRound size={14} /> {tx(locale, "Documentos", "Documents")}</Button>

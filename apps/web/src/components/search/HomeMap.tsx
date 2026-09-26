@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { Listing, Locale } from "@/types/domain";
-import { NightMap } from "@/components/map/NightMap";
+import { MapView as NightMap } from "@/components/map/MapView";
 import { MapPreviewCard } from "@/components/listing/ListingCard";
 
 export function HomeMap({ listings, locale }: { listings: Listing[]; locale: Locale }) {

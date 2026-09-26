@@ -1,6 +1,6 @@
 # New Place v1 — plan y progreso
 
-Rama: `claude/new-place-pwa-estimate-knqqgn`. Reactivador horario: trigger `trig_0123f1FTV1KK75c3pstxqyQA` (borrar al terminar).
+Rama: `claude/new-place-pwa-estimate-knqqgn`. Estado: v1 completa (26-09-2026).
 Stack: Next.js 15 · Prisma + PostgreSQL 16 · Auth.js v5 · Zod · TanStack Query · Serwist · next-intl · Vitest · Playwright.
 
 ## Fases

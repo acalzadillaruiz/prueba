@@ -40,7 +40,7 @@ const D = 60 * 24;
 
 const SEEDS: Seed[] = [
   // ───────── 16 venta residencial Caracas
-  { z: "Los Palos Grandes", t: "SALE", k: "penthouse", b: 3, ba: 2, p: 2, m2: 142, price: 178000, y: 1998, am: ["terrace", "view", "generator", "waterTank", "elevator", "security"], te: "Ático luminoso con terraza a El Ávila", tn: "Bright penthouse with Ávila-facing terrace", he: "Terraza de 28 m² orientada al norte y luz natural todo el día.", hn: "28 m² north-facing terrace and daylight all day long.", ag: "ag-andes", agent: "u-agent", pub: 3 * H, upd: 12, street: "3ra Transversal, Res. Mirador del Parque, PH-B", d: [4, 6], drop: 4, vt: true },
+  { z: "Los Palos Grandes", t: "SALE", k: "penthouse", b: 3, ba: 2, p: 2, m2: 142, price: 178000, y: 1998, am: ["terrace", "view", "generator", "waterTank", "elevator", "security"], te: "Ático luminoso con terraza a El Ávila", tn: "Bright penthouse with Ávila-facing terrace", he: "Terraza de 28 m² orientada al norte y luz natural todo el día.", hn: "28 m² north-facing terrace and daylight all day long.", ag: "ag-andes", agent: "u-agent", pub: 18 * D, upd: 12, street: "3ra Transversal, Res. Mirador del Parque, PH-B", d: [4, 6], drop: 4, vt: true },
   { z: "Altamira", t: "SALE", k: "apartment", b: 3, ba: 2, p: 2, m2: 142, price: 235000, y: 2006, am: ["pool", "gym", "generator", "waterTank", "security", "elevator"], te: "Apartamento familiar a dos cuadras de la plaza", tn: "Family apartment two blocks from the plaza", he: "Edificio con planta eléctrica total, piscina y gimnasio.", hn: "Full-building generator, pool and gym.", ag: "ag-andes", agent: "u-agent", pub: 26 * H, upd: 40, street: "Av. San Juan Bosco, Torre Alba, piso 9", d: [-3, 2], vt: true },
   { z: "La Castellana", t: "SALE", k: "apartment", b: 2, ba: 2, p: 1, m2: 98, price: 168000, y: 2012, am: ["generator", "waterTank", "security", "elevator", "gym"], te: "2 habitaciones remodelado en calle tranquila", tn: "Renovated 2-bed on a quiet street", he: "Cocina abierta, pisos de porcelanato y closets empotrados.", hn: "Open kitchen, porcelain floors and built-in closets.", ag: "ag-night", agent: "u-agent3", pub: 4 * D, upd: 5 * H, street: "Calle José Ángel Lamas, Res. Castell, piso 4", d: [-2, -3] },
   { z: "Las Mercedes", t: "SALE", k: "apartment", b: 2, ba: 2, p: 2, m2: 85, price: 139000, y: 2015, am: ["pool", "gym", "security", "generator", "elevator"], te: "Apartamento moderno cerca del bulevar", tn: "Modern apartment near the boulevard", he: "Caminable a restaurantes, cafés y oficinas.", hn: "Walk to restaurants, cafés and offices.", ag: "ag-night", agent: "u-agent4", pub: 9 * D, upd: 2 * D, street: "Calle Madrid, Res. Mercedes Park, piso 6", d: [3, 4], drop: 6 },
@@ -130,7 +130,7 @@ function scenesFor(s: Seed): Scene[] {
   if (s.z === "Lechería" || s.z === "Los Roques") return ["beach", "living", "bedroom", "terrace", "kitchen", "bath"];
   if (s.k === "house" || s.k === "townhouse")
     return s.lux
-      ? ["house-dusk", "villa-pool", "living", "kitchen", "bedroom", "terrace", "bath", "living", "bedroom", "lobby"]
+      ? ["villa-pool", "house-dusk", "living", "kitchen", "bedroom", "terrace", "bath", "living", "bedroom", "lobby"]
       : ["house-dusk", "living", "kitchen", "bedroom", "terrace", "bath", "bedroom", "living"];
   if (s.k === "penthouse") return ["terrace", "tower-dusk", "living", "kitchen", "bedroom", "bath", "terrace", "living", "bedroom", "lobby"];
   const h = hash(s.street);
@@ -272,7 +272,7 @@ function build(): Listing[] {
     const ppm =
       group(l) === "sale" ? zone.salePpm * (l.kind === "warehouse" ? 0.7 : 1) : group(l) === "short" ? zone.rentPpm * 0.075 : zone.rentPpm;
     const pool = base
-      .filter((o) => o.id !== l.id && group(o) === group(l) && o.city === l.city && o.kind !== "land")
+      .filter((o) => o.id !== l.id && group(o) === group(l) && o.city === l.city && o.kind !== "land" && o.luxury === l.luxury)
       .map((o) => ({ id: o.id, title: o.title_es, zone: o.zone, areaM2: o.areaM2, priceAmount: o.priceAmount, lat: o.lat, lng: o.lng }));
     const est = heuristicEstimate({
       zone: l.zone,

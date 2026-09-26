@@ -131,37 +131,67 @@ function TowerScene({ id, seed, dusk }: { id: string; seed: number; dusk: boolea
 
 function HouseScene({ id, seed, dusk, pool }: { id: string; seed: number; dusk: boolean; pool?: boolean }) {
   const wall = dusk ? "#E9E1D4" : "#F4EFE7";
-  const glass = dusk ? "#F2C57C" : "#8FB0C4";
+  const glow = dusk ? `url(#${id}-glow)` : "#8FB0C4";
+  const roof = dusk ? "#23272E" : "#3A3F46";
+  const wood = dusk ? "#7A5638" : "#A7774F";
   return (
     <>
+      <defs>
+        <linearGradient id={`${id}-glow`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#F7D39A" />
+          <stop offset="1" stopColor="#E9A866" />
+        </linearGradient>
+        <linearGradient id={`${id}-water`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor={dusk ? "#2D8BA3" : "#6FD0E0"} />
+          <stop offset="1" stopColor={dusk ? "#1B5B72" : "#3BA7C2"} />
+        </linearGradient>
+      </defs>
       <Sky id={id} dusk={dusk} />
+      {dusk && [30, 90, 150, 240, 330, 370, 60, 200].map((x, i) => <circle key={x} cx={x} cy={20 + ((i * 37) % 70)} r={1.1} fill="#F7F4EF" opacity={0.7} />)}
       <Avila dusk={dusk} y={175} />
-      <rect y={200} width={400} height={100} fill={dusk ? "#1E3326" : "#6F9A6A"} />
-      {/* volumes */}
-      <rect x={60} y={120} width={170} height={100} fill={wall} />
-      <rect x={200} y={90} width={150} height={80} fill={wall} />
-      <rect x={196} y={84} width={160} height={8} fill={dusk ? "#2B2F36" : "#3A3F46"} />
-      <rect x={56} y={114} width={178} height={8} fill={dusk ? "#2B2F36" : "#3A3F46"} />
-      <rect x={200} y={170} width={150} height={50} fill={dusk ? "#D8CEBF" : "#E7DFD3"} />
-      <rect x={80} y={140} width={120} height={70} fill={glass} opacity={dusk ? 0.95 : 0.85} />
-      <rect x={215} y={102} width={120} height={56} fill={glass} opacity={dusk ? 0.9 : 0.8} />
-      {[110, 140, 170].map((x) => (
-        <rect key={x} x={x} y={140} width={2} height={70} fill={dusk ? "#8A6A3C" : "#5E6A73"} />
-      ))}
-      <rect x={250} y={180} width={60} height={40} fill={pick(ACCENTS, seed)} opacity=".9" />
+      <rect y={196} width={400} height={104} fill={dusk ? "#1B2E23" : "#6F9A6A"} />
+      {/* upper volume */}
+      <rect x={176} y={86} width={190} height={78} fill={wall} />
+      <rect x={168} y={78} width={206} height={9} fill={roof} />
+      <rect x={190} y={98} width={132} height={54} fill={glow} opacity={dusk ? 1 : 0.85} />
+      {[222, 256, 290].map((x) => <rect key={x} x={x} y={98} width={2} height={54} fill={dusk ? "#8A6A3C" : "#5E6A73"} />)}
+      <rect x={332} y={98} width={24} height={54} fill={wood} />
+      {[336, 342, 348].map((x) => <rect key={x} x={x} y={98} width={1.5} height={54} fill="#000" opacity=".25" />)}
+      {dusk && <path d="M200 152 l12 -14 h18 l10 14 Z" fill="#8A6A3C" opacity=".45" />}
+      {/* lower volume */}
+      <rect x={40} y={128} width={250} height={92} fill={wall} />
+      <rect x={32} y={120} width={266} height={9} fill={roof} />
+      <rect x={56} y={142} width={160} height={70} fill={glow} opacity={dusk ? 1 : 0.85} />
+      {[96, 136, 176].map((x) => <rect key={x} x={x} y={142} width={2} height={70} fill={dusk ? "#8A6A3C" : "#5E6A73"} />)}
+      {dusk && (
+        <>
+          <rect x={70} y={186} width={60} height={16} rx={4} fill="#5B4632" opacity=".55" />
+          <circle cx={165} cy={160} r={9} fill="#FFF3D6" opacity=".6" />
+        </>
+      )}
+      <rect x={228} y={142} width={48} height={78} fill={wood} />
+      {[234, 242, 250, 258, 266].map((x) => <rect key={x} x={x} y={142} width={1.5} height={78} fill="#000" opacity=".22" />)}
+      <rect x={290} y={164} width={76} height={56} fill={dusk ? "#D8CEBF" : "#E7DFD3"} />
+      <rect x={300} y={174} width={56} height={40} fill={dusk ? "#2B3A55" : "#9FB6C6"} />
       {pool ? (
         <>
-          <rect x={20} y={232} width={360} height={46} rx="4" fill={dusk ? "#2E7F95" : "#5CC2D6"} />
-          <rect x={20} y={232} width={360} height={10} fill="#FFFFFF" opacity=".25" />
-          <rect x={80} y={248} width={120} height={3} fill="#FFFFFF" opacity=".35" />
-          <rect x={220} y={262} width={90} height={3} fill="#FFFFFF" opacity=".3" />
-          <rect x={20} y={278} width={360} height={22} fill={dusk ? "#CBBFAE" : "#E9E1D4"} />
+          <rect x={10} y={228} width={380} height={50} rx={3} fill={`url(#${id}-water)`} />
+          <rect x={56} y={230} width={160} height={14} fill={dusk ? "#F7D39A" : "#FFFFFF"} opacity={dusk ? 0.35 : 0.3} />
+          <rect x={190} y={232} width={130} height={8} fill={dusk ? "#F7D39A" : "#FFFFFF"} opacity=".22" />
+          {[252, 262, 270].map((y, i) => <rect key={y} x={40 + i * 90} y={y} width={80} height={2} fill="#FFFFFF" opacity=".3" />)}
+          <rect x={0} y={278} width={400} height={22} fill={dusk ? "#CBBFAE" : "#E9E1D4"} />
+          <rect x={60} y={283} width={46} height={8} rx={3} fill="#F7F4EF" />
+          <rect x={120} y={283} width={46} height={8} rx={3} fill="#F7F4EF" />
+          <rect x={290} y={280} width={40} height={12} rx={6} fill="#F26B4D" />
         </>
       ) : (
-        <path d="M150 300 L190 220 L215 220 L235 300 Z" fill={dusk ? "#8C8577" : "#D9D1C3"} />
+        <>
+          <path d="M150 300 L178 220 L204 220 L222 300 Z" fill={dusk ? "#8C8577" : "#D9D1C3"} />
+          {dusk && [120, 250, 300, 80].map((x) => <circle key={x} cx={x} cy={238} r={2.2} fill="#F7D39A" />)}
+        </>
       )}
-      <Palm x={30} y={230} s={0.9} dark={dusk} />
-      <Palm x={372} y={236} s={1} dark={dusk} />
+      <Palm x={24} y={232} s={0.95} dark={dusk} />
+      <Palm x={378} y={238} s={1.05} dark={dusk} />
     </>
   );
 }

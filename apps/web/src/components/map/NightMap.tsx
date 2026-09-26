@@ -193,7 +193,12 @@ export function NightMap({
     const cell = view.s > 5 ? 0 : (region === "venezuela" ? 44 : 50) * k;
     if (!cell) return pts.map((p) => ({ ...p, items: [p.l] }));
     const groups = new Map<string, { x: number; y: number; items: Listing[]; l: Listing }>();
+    const solo: typeof pts = [];
     for (const p of pts) {
+      if (p.l.id === selectedId) {
+        solo.push(p);
+        continue;
+      }
       const key = `${Math.round(p.x / cell)}:${Math.round(p.y / cell)}`;
       const g = groups.get(key);
       if (g) {
@@ -202,8 +207,8 @@ export function NightMap({
         g.y = (g.y * (g.items.length - 1) + p.y) / g.items.length;
       } else groups.set(key, { x: p.x, y: p.y, items: [p.l], l: p.l });
     }
-    return [...groups.values()];
-  }, [listings, view, P, region, k]);
+    return [...groups.values(), ...solo.map((p) => ({ ...p, items: [p.l] }))];
+  }, [listings, view, P, region, k, selectedId]);
 
   const selected = listings.find((l) => l.id === selectedId);
   const selPt = selected ? { x: P(selected.lat, selected.lng).x * view.s + view.x, y: P(selected.lat, selected.lng).y * view.s + view.y } : null;

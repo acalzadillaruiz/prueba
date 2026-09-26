@@ -7,8 +7,10 @@ export const isLocale = (s: string): s is Locale => s === "es" || s === "en";
 /** Inline bilingual helper for the prototype. The production build uses next-intl message catalogs. */
 export const tx = (l: Locale, es: string, en: string) => (l === "es" ? es : en);
 
+const clean = (s: string) => s.replace(/[\u202f\u00a0]/g, " ");
+
 export function money(amount: number, l: Locale, currency = "USD") {
-  return new Intl.NumberFormat(l === "es" ? "es-VE" : "en-US", { style: "currency", currency, maximumFractionDigits: 0 }).format(amount);
+  return clean(new Intl.NumberFormat(l === "es" ? "es-VE" : "en-US", { style: "currency", currency, maximumFractionDigits: 0 }).format(amount));
 }
 export function compactMoney(amount: number, l: Locale) {
   if (amount >= 1_000_000) return `$${(amount / 1_000_000).toFixed(amount >= 10_000_000 ? 0 : 2).replace(/\.?0+$/, "")}M`;
@@ -16,7 +18,7 @@ export function compactMoney(amount: number, l: Locale) {
   return `$${amount}`;
 }
 export function num(n: number, l: Locale) {
-  return new Intl.NumberFormat(l === "es" ? "es-VE" : "en-US").format(n);
+  return clean(new Intl.NumberFormat(l === "es" ? "es-VE" : "en-US").format(n));
 }
 
 export function ago(iso: string, l: Locale) {
@@ -32,7 +34,7 @@ export function ago(iso: string, l: Locale) {
 }
 
 export function dateTime(iso: string, l: Locale, opts: Intl.DateTimeFormatOptions = { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) {
-  return new Intl.DateTimeFormat(l === "es" ? "es-VE" : "en-US", { ...opts, timeZone: "America/Caracas" }).format(new Date(iso));
+  return clean(new Intl.DateTimeFormat(l === "es" ? "es-VE" : "en-US", { hourCycle: l === "es" ? "h23" : "h12", ...opts, timeZone: "America/Caracas" }).format(new Date(iso)));
 }
 
 export const TYPE_LABEL: Record<ListingType, [string, string]> = {

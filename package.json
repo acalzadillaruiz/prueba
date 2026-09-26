@@ -1,0 +1,19 @@
+{
+  "name": "new-place",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w apps/web",
+    "build": "npm run build -w apps/web",
+    "start": "npm run start -w apps/web",
+    "test": "npm run test -w packages/ai",
+    "shots": "node scripts/capture.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.56.1"
+  }
+}

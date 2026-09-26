@@ -15,7 +15,7 @@ export function SavedView({ locale, all }: { locale: Locale; all: Listing[] }) {
   const { saved, compare, toggleCompare } = useDemo();
   const items = saved.map((id) => all.find((l) => l.id === id)).filter(Boolean) as Listing[];
   const cmp = compare.map((id) => all.find((l) => l.id === id)).filter(Boolean) as Listing[];
-  const rows: [string, (l: Listing) => React.ReactNode, ((l: Listing) => number)?, "min" | "max"?][] = [
+  const rows: [string, (l: Listing) => React.ReactNode, ((l: Listing) => number)?, ("min" | "max")?][] = [
     [tx(locale, "Precio", "Price"), (l) => <span className="font-display text-lg font-semibold">{money(l.priceAmount, locale)}<span className="text-xs font-normal text-ink/50">{priceSuffix(l, locale)}</span></span>, (l) => l.priceAmount, "min"],
     ["PlaceEstimate", (l) => money(l.estimate.mid, locale)],
     [tx(locale, "Vs. estimación", "Vs. estimate"), (l) => { const d = ((l.priceAmount - l.estimate.mid) / l.estimate.mid) * 100; return <span className={d <= 0 ? "font-semibold text-ok" : "font-semibold text-warn"}>{d > 0 ? "+" : ""}{d.toFixed(0)} %</span>; }, (l) => (l.priceAmount - l.estimate.mid) / l.estimate.mid, "min"],

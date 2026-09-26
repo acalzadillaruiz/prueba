@@ -34,7 +34,7 @@ const FILTER_AMENITIES: Amenity[] = ["pool", "generator", "waterTank", "security
 export function SearchView({ locale, all }: { locale: Locale; all: Listing[] }) {
   const sp = useSearchParams();
   const router = useRouter();
-  const { toggleSaved } = useDemo();
+  const { takedowns } = useDemo();
   const [shape, setShape] = useState<Shape>(null);
   const [sel, setSel] = useState<string | null>(null);
   const [hover, setHover] = useState<string | null>(null);
@@ -66,6 +66,7 @@ export function SearchView({ locale, all }: { locale: Locale; all: Listing[] }) 
   const results = useMemo(() => {
     const now = Date.parse("2026-09-26T18:00:00Z");
     let r = all.filter((l) => {
+      if (takedowns.includes(l.id)) return false;
       if (type === "COMMERCIAL" ? !l.listingType.startsWith("COMMERCIAL") : l.listingType !== type) return false;
       if (zone && l.zone !== zone && l.city !== zone) return false;
       if (max && l.priceAmount > max) return false;
@@ -85,7 +86,7 @@ export function SearchView({ locale, all }: { locale: Locale; all: Listing[] }) 
       sort === "new" ? b.publishedAt.localeCompare(a.publishedAt) : sort === "price-asc" ? a.priceAmount - b.priceAmount : sort === "price-desc" ? b.priceAmount - a.priceAmount : a.priceAmount / a.areaM2 - b.priceAmount / b.areaM2,
     );
     return r;
-  }, [all, type, zone, max, beds, lux, kind, furnished, pets, verified, pub, amen, shape, sort]);
+  }, [takedowns, all, type, zone, max, beds, lux, kind, furnished, pets, verified, pub, amen, shape, sort]);
 
   const [regionPick, setRegionPick] = useState<"caracas" | "venezuela" | null>(null);
   const autoRegion = results.length > 0 && results.every((l) => l.city !== "Caracas") ? "venezuela" : "caracas";

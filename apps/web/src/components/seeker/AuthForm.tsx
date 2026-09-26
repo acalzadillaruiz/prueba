@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Building2, Eye, EyeOff, FlaskConical } from "lucide-react";
 import type { Locale } from "@/types/domain";
 import { Logo } from "@/components/brand/Logo";
+import { photo } from "@/lib/photos";
 import { PropertyArt } from "@/components/art/PropertyArt";
 import { Avatar, Button, Field, inputCls } from "@/components/ui";
 import { DEMO_LOGINS, userById } from "@/mock/people";
@@ -95,7 +96,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
         </div>
       </div>
       <div className="relative hidden overflow-hidden bg-navy lg:block">
-        <PropertyArt scene="terrace" seed="auth2" className="absolute inset-0 h-full w-full opacity-90" />
+        <PropertyArt scene="terrace" seed="auth2" photo={photo("auth")} className="absolute inset-0 h-full w-full opacity-90" />
         <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/30 to-transparent" />
         <div className="absolute bottom-12 left-12 right-12 text-ivory">
           <div className="font-display text-5xl font-bold leading-tight">{tx(locale, "Un nuevo", "Real estate.")}<br /><span className="text-coral">{tx(locale, "lugar.", "Redefined.")}</span></div>

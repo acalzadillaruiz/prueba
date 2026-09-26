@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Locale } from "@/types/domain";
 import { PublicPage } from "@/components/layout/PublicPage";
+import { listingPhoto } from "@/lib/photos";
 import { PropertyArt } from "@/components/art/PropertyArt";
 import { publicListings } from "@/mock/listings";
 import { money, num, tx } from "@/lib/i18n";
@@ -13,7 +14,7 @@ export default async function LuxuryPage({ params }: { params: Promise<{ locale:
     <PublicPage locale={locale} header="dark">
       <div className="bg-navy text-ivory">
         <Link href={`/${locale}/listing/${hero.slug}`} className="relative block h-[78vh] min-h-[520px] overflow-hidden">
-          <PropertyArt scene={hero.scenes[0]} seed={hero.id} className="h-full w-full" />
+          <PropertyArt scene={hero.scenes[0]} seed={hero.id} photo={listingPhoto(hero.id, 0)} className="h-full w-full" />
           <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/20 to-transparent" />
           <div className="absolute inset-x-0 bottom-0 mx-auto max-w-[1280px] px-4 pb-12 md:px-6">
             <div className="font-display text-sm font-semibold uppercase tracking-[0.3em] text-gold">New Place Luxury</div>
@@ -30,7 +31,7 @@ export default async function LuxuryPage({ params }: { params: Promise<{ locale:
             {rest.map((l, i) => (
               <Link key={l.id} href={`/${locale}/listing/${l.slug}`} className={i % 3 === 0 ? "group md:col-span-2" : "group"}>
                 <div className="overflow-hidden rounded-np border border-gold/60 p-2">
-                  <PropertyArt scene={l.scenes[0]} seed={l.id} className={(i % 3 === 0 ? "aspect-[21/9]" : "aspect-[4/3]") + " w-full rounded-[10px] transition-transform duration-700 group-hover:scale-[1.02]"} />
+                  <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l.id, 0)} className={(i % 3 === 0 ? "aspect-[21/9]" : "aspect-[4/3]") + " w-full rounded-[10px] transition-transform duration-700 group-hover:scale-[1.02]"} />
                 </div>
                 <div className="mt-4 flex flex-wrap items-baseline justify-between gap-2">
                   <span className="font-display text-2xl">{tx(locale, l.title_es, l.title_en)}</span>

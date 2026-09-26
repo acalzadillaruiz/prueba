@@ -5,6 +5,7 @@ import { Check, Eye, GripVertical, ImagePlus, Loader2, Save, Sparkles, Star, X }
 import { heuristicWriteListing } from "@newplace/ai";
 import type { Listing, ListingStatus, Locale } from "@/types/domain";
 import { AdminShell } from "@/components/layout/AdminShell";
+import { listingPhoto } from "@/lib/photos";
 import { PropertyArt } from "@/components/art/PropertyArt";
 import { EstimateCard } from "@/components/detail/Estimate";
 import { PriceHistory } from "@/components/detail/Bits";
@@ -95,7 +96,7 @@ export function ListingEditor({ l, locale }: { l: Listing; locale: Locale }) {
             <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">
               {l.scenes.map((s, i) => (
                 <div key={i} className={cn("group relative overflow-hidden rounded-lg ring-2", cover === i ? "ring-coral" : "ring-transparent")}>
-                  <PropertyArt scene={s} seed={i === 0 ? l.id : l.id + (i - 1)} className="aspect-[4/3] w-full" />
+                  <PropertyArt scene={s} seed={i === 0 ? l.id : l.id + (i - 1)} photo={listingPhoto(l.id, i)} className="aspect-[4/3] w-full" />
                   <GripVertical size={14} className="absolute left-1 top-1 text-white drop-shadow" />
                   <button className="absolute right-1 top-1 rounded-full bg-navy/70 p-0.5 opacity-0 group-hover:opacity-100"><X size={12} /></button>
                   {cover === i ? <span className="absolute bottom-1 left-1 rounded-full bg-coral px-1.5 text-[10px] font-bold text-white"><Star size={9} className="inline" /> {tx(locale, "Portada", "Cover")}</span> : <button onClick={() => setCover(i)} className="absolute bottom-1 left-1 rounded-full bg-white/90 px-1.5 text-[10px] font-bold text-navy opacity-0 group-hover:opacity-100">{tx(locale, "Portada", "Cover")}</button>}

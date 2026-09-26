@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Check, Heart, Minus, Scale, X } from "lucide-react";
 import type { Listing, Locale } from "@/types/domain";
 import { ListingCard } from "@/components/listing/ListingCard";
+import { listingPhoto } from "@/lib/photos";
 import { PropertyArt } from "@/components/art/PropertyArt";
 import { Button, EmptyState } from "@/components/ui";
 import { useDemo } from "@/lib/store";
@@ -56,7 +57,7 @@ export function SavedView({ locale, all }: { locale: Locale; all: Listing[] }) {
                   {cmp.map((l) => (
                     <th key={l.id} className="p-4 text-left align-top font-normal">
                       <div className="relative">
-                        <PropertyArt scene={l.scenes[0]} seed={l.id} className="aspect-[4/3] w-full rounded-lg" />
+                        <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l.id, 0)} className="aspect-[4/3] w-full rounded-lg" />
                         <button onClick={() => toggleCompare(l.id)} className="absolute right-2 top-2 rounded-full bg-white p-1 shadow"><X size={14} /></button>
                       </div>
                       <Link href={`/${locale}/listing/${l.slug}`} className="mt-2 line-clamp-2 block font-display font-semibold hover:text-coral">{tx(locale, l.title_es, l.title_en)}</Link>

@@ -2,6 +2,7 @@ import { heuristicEstimate } from "@newplace/ai";
 import type { Amenity, Kind, Listing, ListingStatus, ListingType, PriceEvent, Scene } from "@/types/domain";
 import { minutesAgo } from "./people";
 import { zoneByName } from "./zones";
+import { photoCount } from "@/lib/photos";
 
 type Seed = {
   z: string;
@@ -243,7 +244,8 @@ function build(): Listing[] {
       agencyId: s.ag,
       agentId: s.agent,
       ownerUserId: s.owner,
-      scenes,
+      // With AI photos, the gallery shows exactly the photographed shots.
+      scenes: photoCount(id) ? scenes.slice(0, photoCount(id)) : scenes,
       hasFloorplan: s.k !== "land",
       hasVideo: !!s.vt || !!s.lux,
       hasVirtualTour: !!s.vt,

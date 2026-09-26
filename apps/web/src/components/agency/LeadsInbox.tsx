@@ -5,6 +5,7 @@ import { CalendarPlus, Clock, Mail, MessageCircle, Phone, RefreshCw, Send, Spark
 import { heuristicLeadScore, type NextAction } from "@newplace/ai";
 import type { Lead, LeadStage, Locale } from "@/types/domain";
 import { AdminShell } from "@/components/layout/AdminShell";
+import { listingPhoto } from "@/lib/photos";
 import { PropertyArt } from "@/components/art/PropertyArt";
 import { Avatar, Badge, Button } from "@/components/ui";
 import { useDemo } from "@/lib/store";
@@ -164,7 +165,7 @@ export function LeadsInbox({ locale }: { locale: Locale }) {
 
               <div className="rounded-np border border-navy-line bg-navy-card p-4">
                 <div className="flex gap-3">
-                  <PropertyArt scene={sel.listing.scenes[0]} seed={sel.listing.id} className="h-20 w-28 shrink-0 rounded-lg" />
+                  <PropertyArt scene={sel.listing.scenes[0]} seed={sel.listing.id} photo={listingPhoto(sel.listing.id, 0)} className="h-20 w-28 shrink-0 rounded-lg" />
                   <div className="min-w-0">
                     <div className="line-clamp-1 font-semibold">{tx(locale, sel.listing.title_es, sel.listing.title_en)}</div>
                     <div className="text-sm text-mist">{sel.listing.zone} · {money(sel.listing.priceAmount, locale)}{priceSuffix(sel.listing, locale)}</div>

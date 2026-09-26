@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Bath, BedDouble, Car, Maximize2, ShieldCheck } from "lucide-react";
 import type { Listing, Locale } from "@/types/domain";
+import { listingPhoto } from "@/lib/photos";
 import { PropertyArt } from "@/components/art/PropertyArt";
 import { agencyById } from "@/mock/people";
 import { TYPE_LABEL, lbl, money, num, priceSuffix, tx } from "@/lib/i18n";
@@ -17,7 +18,7 @@ export function ListingCard({ l, locale, compact, className, showCompare }: { l:
       className={cn("group block overflow-hidden rounded-np border border-line bg-white transition-shadow duration-np hover:shadow-np", l.luxury && "ring-1 ring-gold/60", className)}
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-navy">
-        <PropertyArt scene={l.scenes[0]} seed={l.id} className="h-full w-full transition-transform duration-500 group-hover:scale-[1.03]" label={tx(locale, l.title_es, l.title_en)} />
+        <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l.id, 0)} className="h-full w-full transition-transform duration-500 group-hover:scale-[1.03]" label={tx(locale, l.title_es, l.title_en)} />
         <div className="absolute left-2.5 top-2.5 flex flex-wrap gap-1.5">
           {l.status !== "ACTIVE" && <StatusBadge status={l.status} locale={locale} />}
           {fresh && l.status === "ACTIVE" && <span className="rounded-full bg-coral px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-white">{tx(locale, "Nuevo hoy", "New today")}</span>}
@@ -72,7 +73,7 @@ export function MapPreviewCard({ l, locale }: { l: Listing; locale: Locale }) {
   return (
     <Link href={`/${locale}/listing/${l.slug}`} className="block overflow-hidden rounded-np bg-white shadow-np ring-1 ring-black/5">
       <div className="relative aspect-[16/9]">
-        <PropertyArt scene={l.scenes[0]} seed={l.id} className="h-full w-full" />
+        <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l.id, 0)} className="h-full w-full" />
         <SaveButton id={l.id} locale={locale} className="absolute right-2 top-2 h-8 w-8" />
       </div>
       <div className="p-3">

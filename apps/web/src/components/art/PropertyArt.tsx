@@ -562,12 +562,18 @@ export function PropertyArt({
   seed = "np",
   className,
   label,
+  photo,
 }: {
   scene: Scene;
   seed?: string;
   className?: string;
   label?: string;
+  /** AI-generated photo URL. When present it replaces the illustration. */
+  photo?: string;
 }) {
+  if (photo)
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img src={photo} alt={label ?? scene} loading="lazy" decoding="async" className={`${className ?? ""} object-cover`} />;
   const n = hashStr(seed + scene);
   const id = `pa${n.toString(36)}`;
   let content: React.ReactNode;

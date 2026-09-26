@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Bell, CalendarCheck, Check, CircleDollarSign, FileCheck2, Heart, KeyRound, MessageSquare, Video } from "lucide-react";
 import type { Locale } from "@/types/domain";
+import { listingPhoto } from "@/lib/photos";
 import { PropertyArt } from "@/components/art/PropertyArt";
 import { Avatar, Badge, Button, Card, Progress } from "@/components/ui";
 import { useDemo } from "@/lib/store";
@@ -75,7 +76,7 @@ export function HubView({ locale }: { locale: Locale }) {
               const l = listingById(ld.listingId)!;
               return (
                 <div key={ld.id} className="np-in flex flex-wrap items-center gap-4 rounded-np border border-coral/40 bg-[#F26B4D0A] p-3 sm:flex-nowrap">
-                  <PropertyArt scene={l.scenes[0]} seed={l.id} className="h-16 w-24 shrink-0 rounded-lg" />
+                  <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l.id, 0)} className="h-16 w-24 shrink-0 rounded-lg" />
                   <div className="min-w-0 flex-1">
                     <div className="line-clamp-1 font-semibold">{tx(locale, l.title_es, l.title_en)}</div>
                     <div className="line-clamp-1 text-sm text-ink/60">{ld.message}</div>
@@ -89,7 +90,7 @@ export function HubView({ locale }: { locale: Locale }) {
               const a = userById(t.agentId)!;
               return (
                 <div key={t.id} className="flex flex-wrap items-center gap-4 rounded-np border border-line p-3 sm:flex-nowrap">
-                  <PropertyArt scene={l.scenes[0]} seed={l.id} className="h-16 w-24 shrink-0 rounded-lg" />
+                  <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l.id, 0)} className="h-16 w-24 shrink-0 rounded-lg" />
                   <div className="min-w-0 flex-1">
                     <div className="line-clamp-1 font-semibold">{tx(locale, l.title_es, l.title_en)}</div>
                     <div className="text-sm text-ink/60">{l.address}</div>
@@ -133,7 +134,7 @@ export function HubView({ locale }: { locale: Locale }) {
               if (!l) return null;
               return (
                 <Link key={id} href={`/${locale}/listing/${l.slug}`} className="flex items-center gap-3">
-                  <PropertyArt scene={l.scenes[0]} seed={l.id} className="h-12 w-16 shrink-0 rounded-md" />
+                  <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l.id, 0)} className="h-12 w-16 shrink-0 rounded-md" />
                   <div className="min-w-0">
                     <div className="line-clamp-1 text-sm font-semibold">{tx(locale, l.title_es, l.title_en)}</div>
                     <div className="text-sm text-ink/55">{money(l.priceAmount, locale)} · {l.zone}</div>

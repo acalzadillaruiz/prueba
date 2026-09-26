@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { ArrowLeft, ArrowRight, Building2, Check, CheckCircle2, GripVertical, ImagePlus, Loader2, MapPin, Search, ShieldCheck, Sparkles, Star, User } from "lucide-react";
 import { heuristicEstimate, heuristicWriteListing } from "@newplace/ai";
 import type { Amenity, Kind, Listing, Locale, Scene } from "@/types/domain";
+import { photo } from "@/lib/photos";
 import { PropertyArt } from "@/components/art/PropertyArt";
 import { NightMap } from "@/components/map/NightMap";
 import { Button, Field, Progress, inputCls } from "@/components/ui";
@@ -253,7 +254,7 @@ export function OwnerWizard({ locale }: { locale: Locale }) {
               <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
                 {UPLOAD.slice(0, photos).map((s, i) => (
                   <div key={i} className={cn("np-in group relative overflow-hidden rounded-lg ring-2", cover === i ? "ring-coral" : "ring-transparent")} style={{ animationDelay: `${i * 60}ms` }}>
-                    <PropertyArt scene={s} seed={"up" + i} className="aspect-[4/3] w-full" />
+                    <PropertyArt scene={s} seed={"up" + i} photo={photo(`upload-${i}`)} className="aspect-[4/3] w-full" />
                     <span className="absolute left-1.5 top-1.5 rounded bg-navy/80 px-1.5 text-xs font-bold text-ivory">{i + 1}</span>
                     <GripVertical size={16} className="absolute right-1.5 top-1.5 text-white drop-shadow" />
                     {cover === i ? (
@@ -312,7 +313,7 @@ export function OwnerWizard({ locale }: { locale: Locale }) {
             <h1 className="font-display text-3xl font-semibold">{tx(locale, "Revisa y publica", "Review & publish")}</h1>
             <div className="overflow-hidden rounded-np border border-line bg-white">
               <div className="grid sm:grid-cols-[260px_1fr]">
-                <PropertyArt scene={UPLOAD[cover]} seed={"up" + cover} className="aspect-[4/3] w-full" />
+                <PropertyArt scene={UPLOAD[cover]} seed={"up" + cover} photo={photo(`upload-${cover}`)} className="aspect-[4/3] w-full" />
                 <div className="p-5">
                   <div className="font-display text-2xl font-semibold">{money(price, locale)}</div>
                   <div className="font-semibold">{copy ? tx(locale, copy.title_es, copy.title_en) : "—"}</div>
@@ -348,7 +349,7 @@ export function OwnerWizard({ locale }: { locale: Locale }) {
       <aside className="hidden lg:block">
         <div className="sticky top-24 space-y-4">
           <div className="overflow-hidden rounded-np border border-line bg-white">
-            <PropertyArt scene={photos ? UPLOAD[cover] : "tower-day"} seed={photos ? "up" + cover : "ph"} className={cn("aspect-[4/3] w-full", !photos && "opacity-40")} />
+            <PropertyArt scene={photos ? UPLOAD[cover] : "tower-day"} seed={photos ? "up" + cover : "ph"} photo={photos ? photo(`upload-${cover}`) : undefined} className={cn("aspect-[4/3] w-full", !photos && "opacity-40")} />
             <div className="p-4">
               <div className="text-xs font-semibold uppercase tracking-wide text-ink/45">{tx(locale, "Vista previa", "Preview")}</div>
               <div className="font-display text-xl font-semibold">{money(price, locale)}</div>

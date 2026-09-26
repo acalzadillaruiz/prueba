@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Check, Eye, Heart, Inbox, Plus, Send, TrendingDown } from "lucide-react";
 import type { Locale } from "@/types/domain";
+import { listingPhoto } from "@/lib/photos";
 import { PropertyArt } from "@/components/art/PropertyArt";
 import { StatusBadge } from "@/components/listing/bits";
 import { Avatar, Badge, Button, Card } from "@/components/ui";
@@ -56,7 +57,7 @@ export function OwnerListingsView({ locale }: { locale: Locale }) {
             return (
               <Card key={l.id} className="overflow-hidden">
                 <div className="grid sm:grid-cols-[220px_1fr]">
-                  <PropertyArt scene={l.scenes[0]} seed={l.id} className="aspect-[4/3] h-full w-full" />
+                  <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l.id, 0)} className="aspect-[4/3] h-full w-full" />
                   <div className="p-5">
                     <div className="flex flex-wrap items-center gap-2">
                       <StatusBadge status={l.status} locale={locale} />

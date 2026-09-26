@@ -11,7 +11,11 @@
     "build": "npm run build -w apps/web",
     "start": "npm run start -w apps/web",
     "test": "npm run test -w packages/ai",
-    "shots": "node scripts/capture.mjs"
+    "shots": "node scripts/capture.mjs",
+    "db:up": "bash scripts/db-local.sh",
+    "db:push": "npm run push -w packages/db",
+    "db:seed": "TSX_TSCONFIG_PATH=apps/web/tsconfig.json tsx packages/db/prisma/seed.ts",
+    "db:reset": "npm run db:push && npm run db:seed"
   },
   "devDependencies": {
     "playwright": "^1.56.1",

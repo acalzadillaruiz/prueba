@@ -1,0 +1,683 @@
+// New Place v1 — data model (brief §8). PostgreSQL 16.
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  SUPERADMIN
+  AGENCY_OWNER
+  AGENT
+  CAPTOR
+  PHOTOGRAPHER
+  BACKOFFICE
+  OWNER_PRIVATE
+  SEEKER
+}
+
+enum ListingType {
+  SALE
+  LONG_RENT
+  SHORT_RENT
+  COMMERCIAL_SALE
+  COMMERCIAL_RENT
+}
+
+enum Category {
+  RESIDENTIAL
+  COMMERCIAL
+  LAND
+  LUXURY
+}
+
+enum ListingStatus {
+  DRAFT
+  COMING_SOON
+  ACTIVE
+  UNDER_OFFER
+  SOLD
+  RENTED
+  WITHDRAWN
+  EXPIRED
+}
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum Plan {
+  FREE
+  PRO
+  ENTERPRISE
+}
+
+enum AgencyStatus {
+  ACTIVE
+  SUSPENDED
+  TRIAL
+}
+
+enum LeadStage {
+  NEW
+  CONTACTED
+  TOUR
+  OFFER
+  WON
+  LOST
+}
+
+enum LeadSource {
+  LISTING_FORM
+  TOUR_REQUEST
+  WHATSAPP_NOTE
+  ALERT
+  REFERRAL
+}
+
+enum TourStatus {
+  REQUESTED
+  CONFIRMED
+  DONE
+  CANCELLED
+}
+
+enum CaptureResult {
+  PENDING
+  CAPTURED
+  REJECTED
+  DUPLICATE
+}
+
+enum MediaStatus {
+  SCHEDULED
+  SHOOTING
+  UPLOADING
+  DELIVERED
+}
+
+enum OfferStatus {
+  RECEIVED
+  COUNTERED
+  ACCEPTED
+  REJECTED
+}
+
+enum MandateStatus {
+  REQUESTED
+  ASSIGNED
+  ACTIVE
+  CANCELLED
+}
+
+enum AlertFrequency {
+  INSTANT
+  DAILY
+  WEEKLY
+}
+
+enum EmailKind {
+  ALERT
+  TOUR
+  INVITE
+  VERIFY
+  LEAD
+}
+
+enum EmailStatus {
+  QUEUED
+  SENT
+}
+
+// ───────────────────────── Auth.js
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  passwordHash  String?
+  role          Role      @default(SEEKER)
+  phone         String?
+  hue           Int       @default(200)
+  locale        String    @default("es")
+  budget        Int?
+  interests     String?
+  suspended     Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  lastSeenAt    DateTime  @default(now())
+
+  accounts      Account[]
+  sessions      Session[]
+  memberships   AgencyMember[]
+  savedListings SavedListing[]
+  savedSearches SavedSearch[]
+  ownedListings Listing[]       @relation("OwnerListings")
+  agentListings Listing[]       @relation("AgentListings")
+  leadsAsAgent  Lead[]          @relation("LeadAgent")
+  leadsAsSeeker Lead[]          @relation("LeadSeeker")
+  slots         TourSlot[]
+  toursAsAgent  Tour[]          @relation("TourAgent")
+  toursAsSeeker Tour[]          @relation("TourSeeker")
+  threads       ThreadParticipant[]
+  messages      Message[]
+  captures      CaptureLead[]
+  mediaJobs     MediaJob[]
+  mandates      Mandate[]       @relation("MandateOwner")
+  mandatesAgent Mandate[]       @relation("MandateAgent")
+  audit         AuditLog[]
+  commissions   CommissionEntry[]
+}
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+}
+
+model Session {
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
+}
+
+// ───────────────────────── Tenancy
+model Agency {
+  id           String       @id @default(cuid())
+  name         String
+  slug         String       @unique
+  verified     Boolean      @default(false)
+  verificationDoc String?
+  plan         Plan         @default(FREE)
+  status       AgencyStatus @default(TRIAL)
+  city         String
+  phone        String?
+  whatsapp     String?
+  color        String       @default("#F26B4D")
+  logoUrl      String?
+  initials     String
+  createdAt    DateTime     @default(now())
+
+  members      AgencyMember[]
+  listings     Listing[]
+  leads        Lead[]
+  captures     CaptureLead[]
+  commission   CommissionRule?
+  commissions  CommissionEntry[]
+  invitations  Invitation[]
+  mandates     Mandate[]
+}
+
+model AgencyMember {
+  id              String   @id @default(cuid())
+  agencyId        String
+  userId          String
+  role            Role
+  verified        Boolean  @default(false)
+  verificationDoc String?
+  createdAt       DateTime @default(now())
+  agency          Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([agencyId, userId])
+}
+
+model Invitation {
+  id         String    @id @default(cuid())
+  agencyId   String
+  email      String
+  role       Role
+  token      String    @unique
+  createdAt  DateTime  @default(now())
+  acceptedAt DateTime?
+  agency     Agency    @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+}
+
+// ───────────────────────── Market
+model Zone {
+  id             String @id @default(cuid())
+  name           String @unique
+  slug           String @unique
+  city           String
+  state          String
+  lat            Float
+  lng            Float
+  salePpm        Int
+  rentPpm        Float
+  activeListings Int
+  daysOnMarket   Int
+  trend12m       Float
+}
+
+model Listing {
+  id             String        @id @default(cuid())
+  slug           String        @unique
+  titleEs        String
+  titleEn        String
+  bodyEs         String
+  bodyEn         String
+  address        String
+  zone           String
+  city           String
+  state          String
+  countryCode    String        @default("VE")
+  lat            Float
+  lng            Float
+  polygon        Json?
+  kind           String
+  listingType    ListingType
+  category       Category
+  luxury         Boolean       @default(false)
+  furnished      Boolean       @default(false)
+  pets           Boolean       @default(false)
+  priceAmount    Int
+  priceCurrency  String        @default("USD")
+  pricePeriod    String?
+  areaM2         Int
+  plotM2         Int?
+  beds           Int           @default(0)
+  baths          Int           @default(0)
+  parking        Int           @default(0)
+  yearBuilt      Int
+  amenities      String[]
+  status         ListingStatus @default(DRAFT)
+  review         ReviewStatus  @default(APPROVED)
+  takedownReason String?
+  publishedAt    DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  agencyId       String?
+  agentId        String?
+  ownerUserId    String?
+  scenes         String[]
+  floorplanUrl   String?
+  videoUrl       String?
+  virtualTourUrl String?
+  hasFloorplan   Boolean       @default(false)
+  hasVideo       Boolean       @default(false)
+  hasVirtualTour Boolean       @default(false)
+  brochurePdf    String?
+  privateListing Boolean       @default(false)
+  shortRent      Json?
+  commercial     Json?
+  fingerprint    String
+  quality        Int           @default(0)
+  impressions    Int           @default(0)
+  views          Int           @default(0)
+  saves          Int           @default(0)
+  leadsCount     Int           @default(0)
+  avgTimeSec     Int           @default(60)
+  interactions   Int           @default(0)
+
+  agency         Agency?       @relation(fields: [agencyId], references: [id])
+  agent          User?         @relation("AgentListings", fields: [agentId], references: [id])
+  owner          User?         @relation("OwnerListings", fields: [ownerUserId], references: [id])
+  photos         ListingPhoto[]
+  priceHistory   ListingPriceHistory[]
+  estimates      PlaceEstimateSnapshot[]
+  leads          Lead[]
+  tours          Tour[]
+  savedBy        SavedListing[]
+  offers         Offer[]
+  mediaJobs      MediaJob[]
+  threads        MessageThread[]
+  commissions    CommissionEntry[]
+  fingerprints   DuplicateFingerprint[]
+  mandates       Mandate[]
+
+  @@index([status, countryCode, city, listingType])
+  @@index([priceAmount])
+  @@index([publishedAt])
+  @@index([lat, lng])
+  @@index([zone])
+}
+
+model ListingPhoto {
+  id        String   @id @default(cuid())
+  listingId String
+  url       String
+  order     Int      @default(0)
+  isCover   Boolean  @default(false)
+  scene     String?
+  createdAt DateTime @default(now())
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([listingId, order])
+}
+
+model ListingPriceHistory {
+  id        String   @id @default(cuid())
+  listingId String
+  amount    Int
+  kind      String
+  date      DateTime @default(now())
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([listingId, date])
+}
+
+model PlaceEstimateSnapshot {
+  id          String   @id @default(cuid())
+  listingId   String
+  mid         Int
+  low         Int
+  high        Int
+  confidence  Float
+  comparables Json
+  method      String
+  provider    String   @default("heuristic")
+  createdAt   DateTime @default(now())
+  listing     Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([listingId, createdAt])
+}
+
+model DuplicateFingerprint {
+  id          String  @id @default(cuid())
+  fingerprint String  @unique
+  listingId   String
+  listing     Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+}
+
+// ───────────────────────── CRM
+model Lead {
+  id              String     @id @default(cuid())
+  listingId       String
+  agencyId        String?
+  agentId         String?
+  seekerUserId    String?
+  name            String
+  email           String
+  phone           String?
+  stage           LeadStage  @default(NEW)
+  source          LeadSource @default(LISTING_FORM)
+  budget          Int?
+  message         String
+  score           Int?
+  nextAction      String?
+  reason          String?
+  messagesCount   Int        @default(1)
+  toursRequested  Int        @default(0)
+  priority        Boolean    @default(false)
+  firstResponseAt DateTime?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  listing         Listing    @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  agency          Agency?    @relation(fields: [agencyId], references: [id])
+  agent           User?      @relation("LeadAgent", fields: [agentId], references: [id])
+  seeker          User?      @relation("LeadSeeker", fields: [seekerUserId], references: [id])
+  events          LeadEvent[]
+  tours           Tour[]
+  threads         MessageThread[]
+
+  @@index([agencyId, stage])
+  @@index([agentId, createdAt])
+}
+
+model LeadEvent {
+  id        String   @id @default(cuid())
+  leadId    String
+  type      String
+  data      Json?
+  actorId   String?
+  createdAt DateTime @default(now())
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  @@index([leadId, createdAt])
+}
+
+model TourSlot {
+  id      String @id @default(cuid())
+  agentId String
+  weekday Int // 0 = Monday … 6 = Sunday
+  hour    Int
+  agent   User   @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@unique([agentId, weekday, hour])
+}
+
+model Tour {
+  id           String     @id @default(cuid())
+  listingId    String
+  leadId       String?
+  agentId      String
+  seekerUserId String?
+  seekerName   String
+  start        DateTime
+  virtual      Boolean    @default(false)
+  status       TourStatus @default(REQUESTED)
+  createdAt    DateTime   @default(now())
+  listing      Listing    @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  lead         Lead?      @relation(fields: [leadId], references: [id])
+  agent        User       @relation("TourAgent", fields: [agentId], references: [id])
+  seeker       User?      @relation("TourSeeker", fields: [seekerUserId], references: [id])
+
+  @@index([agentId, start])
+}
+
+model SavedListing {
+  userId    String
+  listingId String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@id([userId, listingId])
+}
+
+model SavedSearch {
+  id         String         @id @default(cuid())
+  userId     String
+  name       String
+  query      String
+  polygon    Json?
+  frequency  AlertFrequency @default(DAILY)
+  newCount   Int            @default(0)
+  lastSentAt DateTime?
+  createdAt  DateTime       @default(now())
+  user       User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model MessageThread {
+  id           String              @id @default(cuid())
+  listingId    String?
+  leadId       String?
+  subject      String?
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+  listing      Listing?            @relation(fields: [listingId], references: [id], onDelete: SetNull)
+  lead         Lead?               @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  participants ThreadParticipant[]
+  messages     Message[]
+}
+
+model ThreadParticipant {
+  threadId String
+  userId   String
+  lastRead DateTime      @default(now())
+  thread   MessageThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  user     User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([threadId, userId])
+}
+
+model Message {
+  id        String        @id @default(cuid())
+  threadId  String
+  senderId  String
+  body      String
+  createdAt DateTime      @default(now())
+  thread    MessageThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  sender    User          @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([threadId, createdAt])
+}
+
+model Offer {
+  id           String      @id @default(cuid())
+  listingId    String
+  bidderName   String
+  bidderUserId String?
+  amount       Int
+  status       OfferStatus @default(RECEIVED)
+  note         String?
+  createdAt    DateTime    @default(now())
+  listing      Listing     @relation(fields: [listingId], references: [id], onDelete: Cascade)
+}
+
+model Mandate {
+  id          String        @id @default(cuid())
+  ownerUserId String
+  agencyId    String
+  agentId     String?
+  listingId   String?
+  status      MandateStatus @default(REQUESTED)
+  note        String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  owner       User          @relation("MandateOwner", fields: [ownerUserId], references: [id], onDelete: Cascade)
+  agent       User?         @relation("MandateAgent", fields: [agentId], references: [id])
+  agency      Agency        @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  listing     Listing?      @relation(fields: [listingId], references: [id], onDelete: SetNull)
+}
+
+model CaptureLead {
+  id            String        @id @default(cuid())
+  agencyId      String
+  captorId      String
+  address       String
+  zone          String
+  ownerName     String
+  phone         String
+  kind          String
+  areaM2        Int
+  askingPrice   Int
+  lat           Float?
+  lng           Float?
+  fingerprint   String?
+  result        CaptureResult @default(PENDING)
+  duplicateOfId String?
+  createdAt     DateTime      @default(now())
+  agency        Agency        @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  captor        User          @relation(fields: [captorId], references: [id])
+}
+
+model MediaJob {
+  id             String      @id @default(cuid())
+  listingId      String
+  photographerId String
+  date           DateTime
+  status         MediaStatus @default(SCHEDULED)
+  photos         Int         @default(0)
+  cover          Boolean     @default(false)
+  floorplan      Boolean     @default(false)
+  video          Boolean     @default(false)
+  listing        Listing     @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  photographer   User        @relation(fields: [photographerId], references: [id])
+}
+
+model CommissionRule {
+  id            String @id @default(cuid())
+  agencyId      String @unique
+  salePct       Float  @default(5)
+  agentSplitPct Float  @default(50)
+  rentMonths    Float  @default(1)
+  captorPct     Float  @default(10)
+  agency        Agency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+}
+
+model CommissionEntry {
+  id        String   @id @default(cuid())
+  agencyId  String
+  listingId String
+  agentId   String
+  amount    Int
+  agentPart Int
+  status    String   @default("ESTIMATED")
+  createdAt DateTime @default(now())
+  agency    Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  agent     User     @relation(fields: [agentId], references: [id])
+}
+
+// ───────────────────────── Platform
+model FxRate {
+  code      String   @id
+  perUsd    Float
+  source    String   @default("manual")
+  updatedAt DateTime @updatedAt
+}
+
+model EmailOutbox {
+  id        String      @id @default(cuid())
+  to        String
+  subject   String
+  body      String      @default("")
+  kind      EmailKind
+  status    EmailStatus @default(QUEUED)
+  createdAt DateTime    @default(now())
+  sentAt    DateTime?
+
+  @@index([to, createdAt])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actorId   String?
+  action    String
+  target    String
+  data      Json?
+  createdAt DateTime @default(now())
+  actor     User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+}
+
+model PlatformSetting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt
+}
+
+model ModerationReport {
+  id        String   @id @default(cuid())
+  listingId String?
+  title     String
+  reasonEs  String
+  reasonEn  String
+  reporter  String
+  agency    String
+  severity  String
+  resolved  Boolean  @default(false)
+  createdAt DateTime @default(now())
+}

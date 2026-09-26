@@ -11,7 +11,7 @@ import { BarChart, Funnel, Spark } from "./charts";
 import { useApp } from "@/lib/store";
 import type { Lead, Listing, Tour } from "@/types/domain";
 import type { DashboardStats } from "@/server/agency-stats";
-import { ago, dateTime, money, num, tx } from "@/lib/i18n";
+import { dateTime, money, num, tx } from "@/lib/i18n";
 
 export function AgencyDashboard({ locale, stats, listings, newLeads, tours, agencyName }: { locale: Locale; stats: DashboardStats; listings: Listing[]; newLeads: Lead[]; tours: (Tour & { agentName: string; agentHue: number })[]; agencyName: string }) {
   const { user } = useApp();

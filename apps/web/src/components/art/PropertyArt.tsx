@@ -129,7 +129,7 @@ function TowerScene({ id, seed, dusk }: { id: string; seed: number; dusk: boolea
   );
 }
 
-function HouseScene({ id, seed, dusk, pool }: { id: string; seed: number; dusk: boolean; pool?: boolean }) {
+function HouseScene({ id, dusk, pool }: { id: string; seed: number; dusk: boolean; pool?: boolean }) {
   const wall = dusk ? "#E9E1D4" : "#F4EFE7";
   const glow = dusk ? `url(#${id}-glow)` : "#8FB0C4";
   const roof = dusk ? "#23272E" : "#3A3F46";
@@ -481,7 +481,7 @@ function Office({ id, seed }: { id: string; seed: number }) {
   );
 }
 
-function Retail({ id, seed }: { id: string; seed: number }) {
+function Retail({ seed }: { id: string; seed: number }) {
   return (
     <>
       <rect width="400" height="300" fill="#E9E2D6" />

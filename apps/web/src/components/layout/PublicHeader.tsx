@@ -9,7 +9,6 @@ import { Logo } from "@/components/brand/Logo";
 import { Avatar, Button } from "@/components/ui";
 import { useTranslations } from "next-intl";
 import { useApp } from "@/lib/store";
-import { tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 
 export function PublicHeader({ locale, variant = "light" }: { locale: Locale; variant?: "light" | "dark" | "transparent" }) {

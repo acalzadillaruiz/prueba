@@ -60,7 +60,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
 
   const set = (patch: Record<string, string | null>) => {
     const p = new URLSearchParams(sp.toString());
-    for (const [k, v] of Object.entries(patch)) v === null ? p.delete(k) : p.set(k, v);
+    for (const [k, v] of Object.entries(patch)) { if (v === null) p.delete(k); else p.set(k, v); }
     router.replace(`/${locale}/search?${p.toString()}`, { scroll: false });
     setAlertSaved(false);
   };

@@ -90,12 +90,12 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
         setStep(saved.step);
       }
     } catch {}
-  }, []);
+  }, [DRAFT_KEY]);
   useEffect(() => {
     try {
       sessionStorage.setItem(DRAFT_KEY, JSON.stringify({ d, step }));
     } catch {}
-  }, [d, step]);
+  }, [DRAFT_KEY, d, step]);
 
   const zone = zones.find((z) => z.name === d.addr?.zone) ?? zones.find((z) => z.name === "Altamira") ?? zones[0];
   const listingType = d.op === "COMMERCIAL" ? "COMMERCIAL_SALE" : d.op;

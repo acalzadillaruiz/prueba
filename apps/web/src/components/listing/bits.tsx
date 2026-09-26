@@ -1,7 +1,7 @@
 "use client";
 
 import { Heart, Scale } from "lucide-react";
-import type { Listing, ListingStatus, Locale } from "@/types/domain";
+import type { ListingStatus, Locale } from "@/types/domain";
 import { useApp } from "@/lib/store";
 import { cn } from "@/lib/cn";
 import { STATUS_LABEL, ago, lbl, tx } from "@/lib/i18n";

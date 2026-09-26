@@ -1,0 +1,6 @@
+.next
+.next-prod
+node_modules
+public/sw.js
+package-lock.json
+*.md

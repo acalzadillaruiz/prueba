@@ -11,6 +11,6 @@ Stack: Next.js 15 · Prisma + PostgreSQL 16 · Auth.js v5 · Zod · TanStack Que
 - [x] F5 IA: OpenAICompatibleProvider + switch persistido + fallback
 - [x] F6 Mapas: Google Maps (@vis.gl) con clusters, polígono, Places; fallback ilustrado sin key
 - [x] F7 PWA Serwist + offline; next-intl (routing, detección, mensajes de chrome)
-- [ ] F8 Calidad: RBAC duro, Zod en forms, errores i18n, ESLint/Prettier, dark mode público
-- [~] F9 Tests: Playwright 15/15 OK (criterios §15 + smoke + RBAC); falta Vitest ampliado
+- [x] F8 Calidad: RBAC duro, Zod compartido en forms y API (RHF), errores i18n, loading/error/not-found, ESLint 0 warnings + Prettier, dark mode público
+- [x] F9 Tests: Playwright 15/15 (criterios §15 + smoke + RBAC) · Vitest 15 (IA, RBAC, schemas, geo, filtros)
 - [ ] F10 Docs, capturas y vídeos actualizados, galería

@@ -11,7 +11,7 @@ const clean = (s: string) => s.replace(/[\u202f\u00a0]/g, " ");
 export function money(amount: number, l: Locale, currency = "USD") {
   return clean(new Intl.NumberFormat(l === "es" ? "es-VE" : "en-US", { style: "currency", currency, maximumFractionDigits: 0 }).format(amount));
 }
-export function compactMoney(amount: number, l: Locale) {
+export function compactMoney(amount: number, _l?: Locale) {
   if (amount >= 1_000_000) return `$${(amount / 1_000_000).toFixed(amount >= 10_000_000 ? 0 : 2).replace(/\.?0+$/, "")}M`;
   if (amount >= 1000) return `$${Math.round(amount / 1000)}k`;
   return `$${amount}`;

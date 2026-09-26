@@ -10,16 +10,19 @@
     "dev": "npm run dev -w apps/web",
     "build": "npm run build -w apps/web",
     "start": "npm run start -w apps/web",
-    "test": "npm run test -w packages/ai",
+    "test": "npm run test --workspaces --if-present",
     "shots": "node scripts/capture.mjs",
     "db:up": "bash scripts/db-local.sh",
     "db:push": "npm run push -w packages/db",
     "db:seed": "TSX_TSCONFIG_PATH=apps/web/tsconfig.json tsx packages/db/prisma/seed.ts",
-    "db:reset": "npm run db:push && npm run db:seed"
+    "db:reset": "npm run db:push && npm run db:seed",
+    "lint": "npm run lint -w apps/web",
+    "e2e": "npm run e2e -w apps/web"
   },
   "devDependencies": {
     "playwright": "^1.56.1",
     "sharp": "^0.34.5",
-    "tsx": "^4.23.15"
+    "tsx": "^4.23.15",
+    "vitest": "^3.2.7"
   }
 }

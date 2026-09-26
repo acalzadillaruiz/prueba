@@ -7,3 +7,4 @@ out
 .DS_Store
 /captures/tmp
 .next-prod
+videos/*.webm

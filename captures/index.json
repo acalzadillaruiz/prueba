@@ -1,0 +1,418 @@
+[
+  {
+    "id": "01-home",
+    "section": "Público",
+    "title": "Home · mapa night de Caracas y búsqueda con IA",
+    "file": "01-home.jpg",
+    "path": "/es",
+    "mobile": false
+  },
+  {
+    "id": "02-home-en",
+    "section": "Público",
+    "title": "Home en inglés (/en)",
+    "file": "02-home-en.jpg",
+    "path": "/en",
+    "mobile": false
+  },
+  {
+    "id": "03-search",
+    "section": "Público",
+    "title": "Búsqueda mapa 60 % + lista 40 %",
+    "file": "03-search.jpg",
+    "path": "/es/search?type=SALE",
+    "mobile": false
+  },
+  {
+    "id": "04-search-chacao",
+    "section": "Público",
+    "title": "Filtro: comprar · 2+ hab · < 250.000 USD · Chacao",
+    "file": "04-search-chacao.jpg",
+    "path": "/es/search?type=SALE&zone=Chacao&beds=2&max=250000",
+    "mobile": false
+  },
+  {
+    "id": "05-search-nl",
+    "section": "Público",
+    "title": "Búsqueda en lenguaje natural: «ático con luz en Los Palos Grandes por menos de 180 mil»",
+    "file": "05-search-nl.jpg",
+    "path": "/es/search?type=SALE&zone=Los+Palos+Grandes&max=180000&kind=penthouse&q=%C3%A1tico+con+luz+en+Los+Palos+Grandes+por+menos+de+180+mil",
+    "mobile": false
+  },
+  {
+    "id": "06-search-polygon",
+    "section": "Público",
+    "title": "Dibujar zona en el mapa (polígono)",
+    "file": "06-search-polygon.jpg",
+    "path": "/es/search?type=SALE",
+    "mobile": false
+  },
+  {
+    "id": "07-search-filters",
+    "section": "Público",
+    "title": "Más filtros: publicado, amoblado, mascotas, agencia verificada, amenidades",
+    "file": "07-search-filters.jpg",
+    "path": "/es/search?type=LONG_RENT",
+    "mobile": false
+  },
+  {
+    "id": "08-search-pin",
+    "section": "Público",
+    "title": "Clic en un pin → tarjeta de vista previa",
+    "file": "08-search-pin.jpg",
+    "path": "/es/search?type=SALE",
+    "mobile": false
+  },
+  {
+    "id": "09-listing",
+    "section": "Público",
+    "title": "Ficha: galería, PlaceEstimate + comparables, mapa, historial de precio, zona",
+    "file": "09-listing.jpg",
+    "path": "/es/listing/los-palos-grandes-3h-118m-l5u136",
+    "mobile": false
+  },
+  {
+    "id": "10-listing-gallery",
+    "section": "Público",
+    "title": "Galería a pantalla completa (fotos, plano, video, tour 360°, calle)",
+    "file": "10-listing-gallery.jpg",
+    "path": "/es/listing/los-palos-grandes-3h-118m-l5u136",
+    "mobile": false
+  },
+  {
+    "id": "11-listing-plan",
+    "section": "Público",
+    "title": "Plano del inmueble",
+    "file": "11-listing-plan.jpg",
+    "path": "/es/listing/los-palos-grandes-3h-118m-l5u136",
+    "mobile": false
+  },
+  {
+    "id": "12-tour-requested",
+    "section": "Público",
+    "title": "Visita solicitada → lead creado para el agente",
+    "file": "12-tour-requested.jpg",
+    "path": "/es/listing/los-palos-grandes-3h-118m-l5u136",
+    "mobile": false
+  },
+  {
+    "id": "13-listing-luxury",
+    "section": "Público",
+    "title": "Ficha Luxury (galería full-bleed, marco gold)",
+    "file": "13-listing-luxury.jpg",
+    "path": "/es/listing/lomas-de-san-roman-6h-850m-eoaur5",
+    "mobile": false
+  },
+  {
+    "id": "14-luxury",
+    "section": "Público",
+    "title": "Colección Luxury",
+    "file": "14-luxury.jpg",
+    "path": "/es/luxury",
+    "mobile": false
+  },
+  {
+    "id": "15-listing-vacation",
+    "section": "Público",
+    "title": "Ficha vacacional (Lechería)",
+    "file": "15-listing-vacation.jpg",
+    "path": "/es/listing/lecheria-2h-85m-fyhrjd",
+    "mobile": false
+  },
+  {
+    "id": "16-listing-commercial",
+    "section": "Público",
+    "title": "Ficha comercial (galpón, altura libre, zonificación)",
+    "file": "16-listing-commercial.jpg",
+    "path": "/es/listing/la-trinidad-warehouse-900m-haz6bp",
+    "mobile": false
+  },
+  {
+    "id": "17-saved-compare",
+    "section": "Público",
+    "title": "Guardados + comparador (máx. 3)",
+    "file": "17-saved-compare.jpg",
+    "path": "/es/saved",
+    "mobile": false
+  },
+  {
+    "id": "18-alerts",
+    "section": "Público",
+    "title": "Alertas de búsqueda + bandeja «Enviados» (email_outbox)",
+    "file": "18-alerts.jpg",
+    "path": "/es/alerts",
+    "mobile": false
+  },
+  {
+    "id": "19-login",
+    "section": "Público",
+    "title": "Login: Google + email · modo demo «Entrar como…»",
+    "file": "19-login.jpg",
+    "path": "/es/login",
+    "mobile": false
+  },
+  {
+    "id": "20-register",
+    "section": "Público",
+    "title": "Registro con flujo «¿Eres agencia?»",
+    "file": "20-register.jpg",
+    "path": "/es/register",
+    "mobile": false
+  },
+  {
+    "id": "21-account",
+    "section": "Público",
+    "title": "Perfil del buscador",
+    "file": "21-account.jpg",
+    "path": "/es/account",
+    "mobile": false
+  },
+  {
+    "id": "22-hub",
+    "section": "Público",
+    "title": "Homebuyer Hub: pasos, visitas, precalificación simulada",
+    "file": "22-hub.jpg",
+    "path": "/es/app",
+    "mobile": false
+  },
+  {
+    "id": "23-owner-step1",
+    "section": "Propietario particular",
+    "title": "Asistente 1/6 · FSBO o encargo a agencia",
+    "file": "23-owner-step1.jpg",
+    "path": "/es/owner/new",
+    "mobile": false
+  },
+  {
+    "id": "24-owner-step2",
+    "section": "Propietario particular",
+    "title": "Asistente 2/6 · dirección con autocompletado (Places) y anti-duplicados",
+    "file": "24-owner-step2.jpg",
+    "path": "/es/owner/new",
+    "mobile": false
+  },
+  {
+    "id": "25-owner-step3",
+    "section": "Propietario particular",
+    "title": "Asistente 3/6 · características",
+    "file": "25-owner-step3.jpg",
+    "path": "/es/owner/new?step=2",
+    "mobile": false
+  },
+  {
+    "id": "26-owner-step4",
+    "section": "Propietario particular",
+    "title": "Asistente 4/6 · fotos, orden y portada",
+    "file": "26-owner-step4.jpg",
+    "path": "/es/owner/new?step=3",
+    "mobile": false
+  },
+  {
+    "id": "27-owner-step5",
+    "section": "Propietario particular",
+    "title": "Asistente 5/6 · PlaceEstimate en vivo + «Redactar con IA»",
+    "file": "27-owner-step5.jpg",
+    "path": "/es/owner/new?step=4",
+    "mobile": false
+  },
+  {
+    "id": "28-owner-step6",
+    "section": "Propietario particular",
+    "title": "Asistente 6/6 · revisión y calidad de ficha",
+    "file": "28-owner-step6.jpg",
+    "path": "/es/owner/new?step=5",
+    "mobile": false
+  },
+  {
+    "id": "29-owner-published",
+    "section": "Propietario particular",
+    "title": "Publicado en Altamira",
+    "file": "29-owner-published.jpg",
+    "path": "/es/owner/new?step=5",
+    "mobile": false
+  },
+  {
+    "id": "30-owner-listings",
+    "section": "Propietario particular",
+    "title": "Mis inmuebles: estado del encargo, ofertas y chat con el agente",
+    "file": "30-owner-listings.jpg",
+    "path": "/es/owner/listings",
+    "mobile": false
+  },
+  {
+    "id": "31-agency-dashboard",
+    "section": "Agencia",
+    "title": "Panel del dueño de agencia",
+    "file": "31-agency-dashboard.jpg",
+    "path": "/es/agency",
+    "mobile": false
+  },
+  {
+    "id": "32-agency-leads",
+    "section": "Agencia",
+    "title": "Leads: SLA 15 min, score IA y siguiente mejor acción",
+    "file": "32-agency-leads.jpg",
+    "path": "/es/agency/leads",
+    "mobile": false
+  },
+  {
+    "id": "33-agency-listings",
+    "section": "Agencia",
+    "title": "Inmuebles: estados, aprobación, calidad y asignación de agente",
+    "file": "33-agency-listings.jpg",
+    "path": "/es/agency/listings",
+    "mobile": false
+  },
+  {
+    "id": "34-agency-edit",
+    "section": "Agencia",
+    "title": "Editar inmueble: PlaceEstimate + comparables, calidad, comisión",
+    "file": "34-agency-edit.jpg",
+    "path": "/es/agency/listings/l5u136/edit",
+    "mobile": false
+  },
+  {
+    "id": "35-agency-calendar",
+    "section": "Agencia",
+    "title": "Calendario de visitas y slots del agente",
+    "file": "35-agency-calendar.jpg",
+    "path": "/es/agency/calendar",
+    "mobile": false
+  },
+  {
+    "id": "36-agency-team",
+    "section": "Agencia",
+    "title": "Equipo, roles, verificación e invitaciones",
+    "file": "36-agency-team.jpg",
+    "path": "/es/agency/team",
+    "mobile": false
+  },
+  {
+    "id": "37-agency-reports",
+    "section": "Agencia",
+    "title": "Informes y exportación CSV",
+    "file": "37-agency-reports.jpg",
+    "path": "/es/agency/reports",
+    "mobile": false
+  },
+  {
+    "id": "38-agency-capture",
+    "section": "Agencia",
+    "title": "Captador: cola y detección de duplicados",
+    "file": "38-agency-capture.jpg",
+    "path": "/es/agency/capture",
+    "mobile": false
+  },
+  {
+    "id": "39-agency-media",
+    "section": "Agencia",
+    "title": "Fotógrafo: trabajos, checklist y subida masiva",
+    "file": "39-agency-media.jpg",
+    "path": "/es/agency/media",
+    "mobile": false
+  },
+  {
+    "id": "40-agency-settings",
+    "section": "Agencia",
+    "title": "Marca de agencia y reglas de comisión",
+    "file": "40-agency-settings.jpg",
+    "path": "/es/agency/settings",
+    "mobile": false
+  },
+  {
+    "id": "41-platform",
+    "section": "Superadmin",
+    "title": "Métricas globales, salud del sistema y auditoría",
+    "file": "41-platform.jpg",
+    "path": "/es/platform",
+    "mobile": false
+  },
+  {
+    "id": "42-platform-agencies",
+    "section": "Superadmin",
+    "title": "Agencias: plan (sin cobro), verificación e impersonar",
+    "file": "42-platform-agencies.jpg",
+    "path": "/es/platform/agencies",
+    "mobile": false
+  },
+  {
+    "id": "43-platform-users",
+    "section": "Superadmin",
+    "title": "Usuarios",
+    "file": "43-platform-users.jpg",
+    "path": "/es/platform/users",
+    "mobile": false
+  },
+  {
+    "id": "44-platform-moderation",
+    "section": "Superadmin",
+    "title": "Moderación: reportes y apagar un anuncio",
+    "file": "44-platform-moderation.jpg",
+    "path": "/es/platform/moderation",
+    "mobile": false
+  },
+  {
+    "id": "45-platform-ai",
+    "section": "Superadmin",
+    "title": "Cambio de proveedor IA, tasas FX y herramientas de seed",
+    "file": "45-platform-ai.jpg",
+    "path": "/es/platform/ai",
+    "mobile": false
+  },
+  {
+    "id": "m1-home",
+    "section": "Móvil (PWA)",
+    "title": "Home móvil",
+    "file": "m1-home.jpg",
+    "path": "/es",
+    "mobile": true
+  },
+  {
+    "id": "m2-search-map",
+    "section": "Móvil (PWA)",
+    "title": "Búsqueda móvil: mapa a pantalla completa",
+    "file": "m2-search-map.jpg",
+    "path": "/es/search?type=SALE",
+    "mobile": true
+  },
+  {
+    "id": "m3-search-list",
+    "section": "Móvil (PWA)",
+    "title": "Búsqueda móvil: lista",
+    "file": "m3-search-list.jpg",
+    "path": "/es/search?type=SALE",
+    "mobile": true
+  },
+  {
+    "id": "m4-listing",
+    "section": "Móvil (PWA)",
+    "title": "Ficha móvil",
+    "file": "m4-listing.jpg",
+    "path": "/es/listing/los-palos-grandes-3h-118m-l5u136",
+    "mobile": true
+  },
+  {
+    "id": "m5-hub",
+    "section": "Móvil (PWA)",
+    "title": "Homebuyer Hub móvil",
+    "file": "m5-hub.jpg",
+    "path": "/es/app",
+    "mobile": true
+  },
+  {
+    "id": "m6-wizard",
+    "section": "Móvil (PWA)",
+    "title": "Asistente del propietario en móvil",
+    "file": "m6-wizard.jpg",
+    "path": "/es/owner/new?step=4",
+    "mobile": true
+  },
+  {
+    "id": "m7-leads",
+    "section": "Móvil (PWA)",
+    "title": "Leads del agente en móvil",
+    "file": "m7-leads.jpg",
+    "path": "/es/agency/leads",
+    "mobile": true
+  }
+]

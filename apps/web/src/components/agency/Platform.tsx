@@ -162,7 +162,7 @@ export function PlatformModeration({ locale }: { locale: Locale }) {
           {listings.map((l) => {
             const down = takedowns.includes(l.id);
             return (
-              <div key={l.id} className={cn("flex items-center gap-3 border-t border-navy-line px-4 py-2.5 first:border-0", down && "bg-[#B4231814]")}>
+              <div key={l.id} data-listing={l.id} className={cn("flex items-center gap-3 border-t border-navy-line px-4 py-2.5 first:border-0", down && "bg-[#B4231814]")}>
                 <PropertyArt scene={l.scenes[0]} seed={l.id} className={cn("h-11 w-14 shrink-0 rounded-md", down && "opacity-40 grayscale")} />
                 <div className="min-w-0 flex-1">
                   <div className={cn("truncate font-semibold", down && "text-mist line-through")}>{tx(locale, l.title_es, l.title_en)}</div>

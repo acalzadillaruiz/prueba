@@ -133,6 +133,17 @@ export function AdminShell({ locale, area, children, title, actions }: { locale:
             </div>
           </div>
         </header>
+        <nav className="no-scrollbar sticky top-16 z-20 flex gap-1 overflow-x-auto border-b border-navy-line bg-navy px-3 py-2 lg:hidden">
+          {items.map((i) => {
+            const href = base + i.href;
+            const active = i.href === "" ? pathname === href : pathname.startsWith(href);
+            return (
+              <Link key={i.href} href={href} className={cn("flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm", active ? "bg-coral text-white" : "text-ivory/75")}>
+                <i.icon size={15} /> {tx(locale, i.label[0], i.label[1])}
+              </Link>
+            );
+          })}
+        </nav>
         <main className="p-4 md:p-6">{children}</main>
       </div>
     </div>

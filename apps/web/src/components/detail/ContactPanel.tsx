@@ -20,7 +20,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
   const agency = agencyById(l.agencyId);
   const [mode, setMode] = useState<"tour" | "msg">("tour");
   const [day, setDay] = useState(0);
-  const [hour, setHour] = useState<number | null>(10);
+  const [hour, setHour] = useState<number | null>(11);
   const [virtual, setVirtual] = useState(false);
   const [name, setName] = useState(me?.role === "SEEKER" ? me.name : "");
   const [email, setEmail] = useState(me?.role === "SEEKER" ? me.email : "");

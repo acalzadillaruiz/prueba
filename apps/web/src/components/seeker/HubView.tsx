@@ -74,7 +74,7 @@ export function HubView({ locale }: { locale: Locale }) {
             {extraLeads.map((ld) => {
               const l = listingById(ld.listingId)!;
               return (
-                <div key={ld.id} className="np-in flex items-center gap-4 rounded-np border border-coral/40 bg-[#F26B4D0A] p-3">
+                <div key={ld.id} className="np-in flex flex-wrap items-center gap-4 rounded-np border border-coral/40 bg-[#F26B4D0A] p-3 sm:flex-nowrap">
                   <PropertyArt scene={l.scenes[0]} seed={l.id} className="h-16 w-24 shrink-0 rounded-lg" />
                   <div className="min-w-0 flex-1">
                     <div className="line-clamp-1 font-semibold">{tx(locale, l.title_es, l.title_en)}</div>
@@ -88,14 +88,14 @@ export function HubView({ locale }: { locale: Locale }) {
               const l = listingById(t.listingId)!;
               const a = userById(t.agentId)!;
               return (
-                <div key={t.id} className="flex items-center gap-4 rounded-np border border-line p-3">
+                <div key={t.id} className="flex flex-wrap items-center gap-4 rounded-np border border-line p-3 sm:flex-nowrap">
                   <PropertyArt scene={l.scenes[0]} seed={l.id} className="h-16 w-24 shrink-0 rounded-lg" />
                   <div className="min-w-0 flex-1">
                     <div className="line-clamp-1 font-semibold">{tx(locale, l.title_es, l.title_en)}</div>
                     <div className="text-sm text-ink/60">{l.address}</div>
                     <div className="mt-0.5 flex items-center gap-1.5 text-sm"><Avatar initials={a.initials} hue={a.hue} size={18} /> {a.name}</div>
                   </div>
-                  <div className="text-right">
+                  <div className="w-full sm:w-auto sm:text-right">
                     <div className="font-display font-semibold capitalize">{dateTime(t.start, locale)}</div>
                     <Badge tone={t.status === "CONFIRMED" ? "ok" : "warn"}>{t.status === "CONFIRMED" ? tx(locale, "Confirmada", "Confirmed") : tx(locale, "Solicitada", "Requested")}</Badge>
                   </div>

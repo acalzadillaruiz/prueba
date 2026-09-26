@@ -91,6 +91,17 @@ export function SearchView({ locale, all }: { locale: Locale; all: Listing[] }) 
   const [regionPick, setRegionPick] = useState<"caracas" | "venezuela" | null>(null);
   const autoRegion = results.length > 0 && results.every((l) => l.city !== "Caracas") ? "venezuela" : "caracas";
   const region = regionPick ?? autoRegion;
+  const mapListings = region === "caracas" ? results.filter((l) => l.city === "Caracas") : results;
+  const fit = useMemo(() => {
+    if (region !== "caracas" || mapListings.length === 0) return { focus: undefined, scale: region === "caracas" ? 1.7 : 1 };
+    const lats = mapListings.map((l) => l.lat);
+    const lngs = mapListings.map((l) => l.lng);
+    const dLat = Math.max(...lats) - Math.min(...lats);
+    const dLng = Math.max(...lngs) - Math.min(...lngs);
+    const scale = Math.max(1.7, Math.min(5, Math.min(0.185 / (dLng * 1.8 || 0.01), 0.14 / (dLat * 2.2 || 0.01))));
+    return { focus: { lat: (Math.max(...lats) + Math.min(...lats)) / 2, lng: (Math.max(...lngs) + Math.min(...lngs)) / 2 }, scale };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [region, sp.toString()]);
   const activeChips: [string, string, Record<string, string | null>][] = [];
   if (zone) activeChips.push(["zone", zone, { zone: null }]);
   if (max) activeChips.push(["max", `≤ ${money(max, locale)}`, { max: null }]);
@@ -103,13 +114,13 @@ export function SearchView({ locale, all }: { locale: Locale; all: Listing[] }) 
   if (verified) activeChips.push(["verified", tx(locale, "Agencia verificada", "Verified agency"), { verified: null }]);
   amen.forEach((a) => activeChips.push([a, lbl(AMENITY_LABEL[a], locale), { am: amen.filter((x) => x !== a).join(",") || null }]));
 
-  const pill = "flex h-9 items-center gap-1.5 rounded-full border px-3.5 font-display text-sm transition-colors duration-np";
+  const pill = "flex h-9 shrink-0 items-center gap-1.5 rounded-full border px-3.5 font-display text-sm transition-colors duration-np";
 
   return (
     <div className="flex h-[calc(100vh-64px)] flex-col">
       {/* filter bar */}
       <div className="relative z-30 border-b border-line bg-ivory">
-        <div className="flex flex-wrap items-center gap-2 px-4 py-2.5 md:px-5">
+        <div className="no-scrollbar flex items-center gap-2 overflow-x-auto px-4 py-2.5 md:flex-wrap md:overflow-visible md:px-5">
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -118,7 +129,7 @@ export function SearchView({ locale, all }: { locale: Locale; all: Listing[] }) 
               if (!q.listingType) p.set("type", type);
               router.replace(`/${locale}/search?${p.toString()}`);
             }}
-            className="flex h-9 min-w-[220px] flex-1 items-center gap-2 rounded-full border border-line bg-white px-3 xl:max-w-[300px]"
+            className="flex h-9 min-w-[220px] shrink-0 items-center gap-2 rounded-full border border-line bg-white px-3 md:flex-1 xl:max-w-[300px]"
           >
             <Sparkles size={15} className="shrink-0 text-coral" />
             <input
@@ -128,7 +139,7 @@ export function SearchView({ locale, all }: { locale: Locale; all: Listing[] }) 
               className="min-w-0 flex-1 bg-transparent text-sm focus:outline-none"
             />
           </form>
-          <div className="flex rounded-full border border-line bg-white p-0.5">
+          <div className="flex shrink-0 rounded-full border border-line bg-white p-0.5">
             {TYPES.map(([k, es, en]) => (
               <button
                 key={k}
@@ -219,9 +230,10 @@ export function SearchView({ locale, all }: { locale: Locale; all: Listing[] }) 
         {/* map 60% */}
         <div className={cn("relative min-h-0 flex-1 lg:basis-[60%]", mobileList && "hidden lg:block")}>
           <NightMap
-            key={region}
+            key={region + sp.toString()}
             region={region}
-            listings={results}
+            listings={mapListings}
+            focus={fit.focus}
             locale={locale}
             selectedId={sel}
             hoverId={hover}
@@ -230,7 +242,7 @@ export function SearchView({ locale, all }: { locale: Locale; all: Listing[] }) 
             onShape={setShape}
             className="h-full w-full"
             renderPreview={(l) => <MapPreviewCard l={l} locale={locale} />}
-            initialScale={region === "caracas" ? 1.7 : 1}
+            initialScale={fit.scale}
           />
           <div className="absolute bottom-8 right-3 z-10 flex overflow-hidden rounded-full border border-white/10 bg-navy/90 p-0.5 font-display text-xs text-ivory shadow-np">
             {(["caracas", "venezuela"] as const).map((r) => (

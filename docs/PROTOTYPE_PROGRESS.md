@@ -1,12 +1,14 @@
 # Prototipo New Place — progreso
 
-Objetivo: todas las vistas con datos ficticios + capturas + 2 vídeos (cliente, admin).
+Objetivo: todas las vistas con datos ficticios + capturas + vídeos (cliente, admin), para aprobación.
 
 - [x] Monorepo, tokens Caracas Night, datos mock VE (48 listings), ilustraciones, mapa night
-- [x] Home, Search
-- [x] Ficha, Luxury, Saved/Comparador, Alertas, Login/Register, Account, Hub, Owner wizard, Owner listings
-- [ ] Agency: dashboard, leads, listings, edit, calendar, team, reports, capture, media, settings
-- [ ] Platform: métricas, agencies, users, moderation, ai
-- [ ] PWA manifest + iconos
-- [ ] Capturas (desktop + móvil) y galería
-- [ ] Vídeos (cliente, admin)
+- [x] Público: home, búsqueda (filtros, IA NL, polígono, radio), ficha, luxury, guardados/comparador, alertas, login/registro, cuenta, Hub
+- [x] Propietario: asistente 6 pasos, mis inmuebles (encargo, ofertas, chat)
+- [x] Agencia: dashboard, leads, inmuebles, edición, calendario, equipo, informes, captación, fotografía, ajustes
+- [x] Superadmin: métricas, agencias, usuarios, moderación, IA/FX/seed
+- [x] PWA: manifest, iconos, service worker
+- [x] 52 capturas (captures/) y 3 vídeos (videos/): cliente, admin, propietario
+- [x] Build de producción OK · tests del dominio IA OK
+
+Pendiente de aprobación del cliente para iniciar el desarrollo v1 (ver docs/DEVIATIONS.md).

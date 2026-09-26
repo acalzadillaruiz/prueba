@@ -10,9 +10,9 @@ export default async function NewAgencyListing({ params }: { params: Promise<{ l
   const { locale } = await params;
   const [zones, agencies, fx] = await Promise.all([getZones(), getAgencies(), getFx()]);
   return (
-    <>
+    <div className="np-public min-h-screen">
       <PublicHeader locale={locale} />
       <OwnerWizard locale={locale} zones={zones} agencies={agencies} fxVes={fx.find((f) => f.code === "VES")?.perUsd ?? 0} staff />
-    </>
+    </div>
   );
 }

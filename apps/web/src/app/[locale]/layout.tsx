@@ -1,4 +1,6 @@
 import { notFound } from "next/navigation";
+import { NextIntlClientProvider } from "next-intl";
+import { setRequestLocale } from "next-intl/server";
 import { prisma } from "@newplace/db";
 import { AppStateProvider } from "@/lib/store";
 import { isLocale } from "@/lib/i18n";
@@ -13,16 +15,19 @@ export function generateStaticParams() {
 export default async function LocaleLayout({ children, params }: { children: React.ReactNode; params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
+  setRequestLocale(locale);
   const user = await getAppUser();
   const [agency, saved] = await Promise.all([
     getAppAgency(user?.agencyId ?? null),
     user ? prisma.savedListing.findMany({ where: { userId: user.id }, select: { listingId: true }, orderBy: { createdAt: "desc" } }) : Promise.resolve([]),
   ]);
   return (
+    <NextIntlClientProvider>
     <AppStateProvider user={user} agency={agency} savedIds={saved.map((s) => s.listingId)}>
       <HtmlLang locale={locale} />
       {children}
       <DemoBar locale={locale} />
     </AppStateProvider>
+    </NextIntlClientProvider>
   );
 }

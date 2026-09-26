@@ -25,6 +25,20 @@
   --np-map-dark: #0B1220;
   --font-display: "Outfit", ui-sans-serif, system-ui;
   --font-body: "Source Sans 3", ui-sans-serif, system-ui;
+  /* rgb channels for Tailwind opacity modifiers (text-ink/60, bg-ivory/90…) */
+  --np-navy-rgb: 11 18 32;
+  --np-navy-2-rgb: 17 24 39;
+  --np-coral-rgb: 242 107 77;
+  --np-coral-hover-rgb: 226 85 56;
+  --np-ivory-rgb: 247 244 239;
+  --np-mist-rgb: 138 164 181;
+  --np-gold-rgb: 212 175 119;
+  --np-ink-rgb: 17 24 39;
+  --np-line-rgb: 230 225 216;
+  --np-ok-rgb: 47 111 78;
+  --np-warn-rgb: 201 134 42;
+  --np-danger-rgb: 180 35 24;
+  --np-surface-rgb: 255 255 255;
   --radius: 14px;
   --shadow: 0 12px 40px rgba(11,18,32,.12);
 }
@@ -34,7 +48,29 @@ body { font-family: var(--font-body); background: var(--np-ivory); color: var(--
 h1, h2, h3, .font-display { font-family: var(--font-display); letter-spacing: -0.02em; }
 *:focus-visible { outline: 2px solid var(--np-coral); outline-offset: 2px; }
 
-.public-dark body, html.dark body { background: var(--np-navy); color: var(--np-ivory); }
+/* Public dark mode (toggle). Admin is always dark; only light surfaces of the public scope are remapped,
+   so navy sections (hero, footer, Luxury) keep their ivory text. */
+html.dark body { background: #0E1626; }
+html.dark .np-public {
+  --np-ink: #EEF1F4;
+  --np-ink-rgb: 238 241 244;
+  --np-line: #22304A;
+  --np-line-rgb: 34 48 74;
+  --shadow: 0 12px 40px rgba(0,0,0,.35);
+  color-scheme: dark;
+  background: #0E1626;
+  color: var(--np-ink);
+}
+html.dark .np-public .bg-white { background-color: #152033; }
+html.dark .np-public .bg-white\/90 { background-color: rgb(21 32 51 / .9); }
+html.dark .np-public .bg-white\/60 { background-color: rgb(21 32 51 / .6); }
+html.dark .np-public .bg-ivory { background-color: #0E1626; }
+html.dark .np-public .bg-ivory\/90, html.dark .np-public .bg-ivory\/95 { background-color: rgb(14 22 38 / .92); }
+html.dark .np-public .hover\:bg-ivory:hover { background-color: #1B2840; }
+html.dark .np-public .text-navy { color: #F7F4EF; }
+html.dark .np-public .bg-black\/5, html.dark .np-public .hover\:bg-black\/5:hover { background-color: rgb(255 255 255 / .06); }
+html.dark .np-public .bg-black\/10 { background-color: rgb(255 255 255 / .12); }
+html.dark .np-public :is(input, select, textarea) { color-scheme: dark; }
 
 .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
 .scrollbar-thin::-webkit-scrollbar-thumb { background: #8AA4B566; border-radius: 6px; }

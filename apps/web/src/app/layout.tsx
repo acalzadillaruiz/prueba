@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import { PwaRegister } from "@/components/layout/PwaRegister";
 
 export const metadata: Metadata = {
   title: { default: "New Place — Un nuevo lugar.", template: "%s · New Place" },
@@ -14,9 +13,11 @@ export const viewport: Viewport = { themeColor: "#0B1220", width: "device-width"
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: "try{if(localStorage.getItem('np-theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}" }} />
+      </head>
       <body className="min-h-screen">
         {children}
-        <PwaRegister />
       </body>
     </html>
   );

@@ -1,0 +1,18 @@
+{
+  "brand": { "tagline": "Un nuevo lugar." },
+  "nav": { "buy": "Comprar", "rent": "Alquilar", "vacation": "Vacacional", "commercial": "Comercial", "luxury": "Luxury", "saved": "Guardados", "publish": "Publicar", "signIn": "Entrar", "signOut": "Cerrar sesión", "menu": "Menú" },
+  "footer": {
+    "about": "Marketplace y sistema operativo para inmobiliarias. Hecho en Caracas, pensado para el mundo.",
+    "search": "Buscar", "owners": "Propietarios", "agencies": "Agencias",
+    "listFree": "Publicar gratis", "hireAgency": "Encargar a agencia", "myProperties": "Mis inmuebles",
+    "forAgencies": "New Place para agencias", "legal": "Precios en USD. Conversión a VES/EUR solo referencial.", "listedOn": "Listed on New Place"
+  },
+  "admin": {
+    "dashboard": "Panel", "leads": "Leads", "listings": "Inmuebles", "calendar": "Calendario", "capture": "Captación", "media": "Fotografía", "team": "Equipo", "reports": "Informes", "settings": "Ajustes",
+    "globalMetrics": "Métricas globales", "agencies": "Agencias", "users": "Usuarios", "moderation": "Moderación", "ai": "IA · FX · Seed",
+    "publicSite": "Ver sitio público", "search": "Buscar lead, inmueble, persona…", "notifications": "Notificaciones"
+  },
+  "roles": { "SUPERADMIN": "Superadmin", "AGENCY_OWNER": "Dueño de agencia", "AGENT": "Agente", "CAPTOR": "Captador", "PHOTOGRAPHER": "Fotógrafo", "BACKOFFICE": "Backoffice", "OWNER_PRIVATE": "Propietario", "SEEKER": "Buscador" },
+  "errors": { "UNAUTHORIZED": "Inicia sesión para continuar.", "FORBIDDEN": "No tienes permiso para esta acción.", "NOT_FOUND": "No encontrado.", "VALIDATION": "Revisa los datos enviados.", "CONFLICT": "Ya existe un registro igual.", "INTERNAL": "Algo salió mal. Inténtalo de nuevo." },
+  "common": { "loading": "Cargando…", "retry": "Reintentar", "back": "Volver al inicio", "notFound": "No encontramos esta página", "notFoundBody": "Puede que el inmueble ya no esté publicado.", "error": "Algo salió mal", "errorBody": "Intenta de nuevo en unos segundos." }
+}

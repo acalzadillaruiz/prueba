@@ -9,9 +9,9 @@ export default async function OwnerNew({ params }: { params: Promise<{ locale: L
   const { locale } = await params;
   const [zones, agencies, fx] = await Promise.all([getZones(), getAgencies(), getFx()]);
   return (
-    <>
+    <div className="np-public min-h-screen">
       <PublicHeader locale={locale} />
       <OwnerWizard locale={locale} zones={zones} agencies={agencies.filter((a) => a.status !== "SUSPENDED")} fxVes={fx.find((f) => f.code === "VES")?.perUsd ?? 0} />
-    </>
+    </div>
   );
 }

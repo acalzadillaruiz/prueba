@@ -27,36 +27,39 @@ import { Avatar } from "@/components/ui";
 import { useQuery } from "@tanstack/react-query";
 import { signOut } from "next-auth/react";
 import { LogOut } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useApp } from "@/lib/store";
 import { api } from "@/lib/api";
 import { tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 
-type Item = { href: string; icon: React.ElementType; label: [string, string]; roles?: Role[]; badge?: string };
+type Item = { href: string; icon: React.ElementType; label: string; roles?: Role[] };
 
 const AGENCY_NAV: Item[] = [
-  { href: "", icon: Gauge, label: ["Panel", "Dashboard"], roles: ["AGENCY_OWNER", "AGENT", "BACKOFFICE", "SUPERADMIN"] },
-  { href: "/leads", icon: Inbox, label: ["Leads", "Leads"], roles: ["AGENCY_OWNER", "AGENT", "BACKOFFICE", "SUPERADMIN"] },
-  { href: "/listings", icon: LayoutGrid, label: ["Inmuebles", "Listings"] },
-  { href: "/calendar", icon: Calendar, label: ["Calendario", "Calendar"], roles: ["AGENCY_OWNER", "AGENT", "BACKOFFICE", "PHOTOGRAPHER", "SUPERADMIN"] },
-  { href: "/capture", icon: Target, label: ["Captación", "Capture"], roles: ["AGENCY_OWNER", "CAPTOR", "BACKOFFICE", "SUPERADMIN"] },
-  { href: "/media", icon: Camera, label: ["Fotografía", "Media"], roles: ["AGENCY_OWNER", "PHOTOGRAPHER", "BACKOFFICE", "SUPERADMIN"] },
-  { href: "/team", icon: Users, label: ["Equipo", "Team"], roles: ["AGENCY_OWNER", "BACKOFFICE", "SUPERADMIN"] },
-  { href: "/reports", icon: BarChart3, label: ["Informes", "Reports"], roles: ["AGENCY_OWNER", "BACKOFFICE", "SUPERADMIN"] },
-  { href: "/settings", icon: Settings, label: ["Ajustes", "Settings"], roles: ["AGENCY_OWNER", "SUPERADMIN"] },
+  { href: "", icon: Gauge, label: "dashboard", roles: ["AGENCY_OWNER", "AGENT", "BACKOFFICE", "SUPERADMIN"] },
+  { href: "/leads", icon: Inbox, label: "leads", roles: ["AGENCY_OWNER", "AGENT", "BACKOFFICE", "SUPERADMIN"] },
+  { href: "/listings", icon: LayoutGrid, label: "listings" },
+  { href: "/calendar", icon: Calendar, label: "calendar", roles: ["AGENCY_OWNER", "AGENT", "BACKOFFICE", "PHOTOGRAPHER", "SUPERADMIN"] },
+  { href: "/capture", icon: Target, label: "capture", roles: ["AGENCY_OWNER", "CAPTOR", "BACKOFFICE", "SUPERADMIN"] },
+  { href: "/media", icon: Camera, label: "media", roles: ["AGENCY_OWNER", "PHOTOGRAPHER", "BACKOFFICE", "SUPERADMIN"] },
+  { href: "/team", icon: Users, label: "team", roles: ["AGENCY_OWNER", "BACKOFFICE", "SUPERADMIN"] },
+  { href: "/reports", icon: BarChart3, label: "reports", roles: ["AGENCY_OWNER", "BACKOFFICE", "SUPERADMIN"] },
+  { href: "/settings", icon: Settings, label: "settings", roles: ["AGENCY_OWNER", "SUPERADMIN"] },
 ];
 
 const PLATFORM_NAV: Item[] = [
-  { href: "", icon: Gauge, label: ["Métricas globales", "Global metrics"] },
-  { href: "/agencies", icon: Building2, label: ["Agencias", "Agencies"] },
-  { href: "/users", icon: Users, label: ["Usuarios", "Users"] },
-  { href: "/moderation", icon: ShieldAlert, label: ["Moderación", "Moderation"] },
-  { href: "/ai", icon: Bot, label: ["IA · FX · Seed", "AI · FX · Seed"] },
+  { href: "", icon: Gauge, label: "globalMetrics" },
+  { href: "/agencies", icon: Building2, label: "agencies" },
+  { href: "/users", icon: Users, label: "users" },
+  { href: "/moderation", icon: ShieldAlert, label: "moderation" },
+  { href: "/ai", icon: Bot, label: "ai" },
 ];
 
 export function AdminShell({ locale, area, children, title, actions }: { locale: Locale; area: "agency" | "platform"; children: React.ReactNode; title: string; actions?: React.ReactNode }) {
   const pathname = usePathname();
   const { user, agency } = useApp();
+  const t = useTranslations("admin");
+  const tr = useTranslations("roles");
   const u = user ?? { id: "", name: "—", email: "", role: "SEEKER" as Role, agencyId: null, hue: 200, initials: "?" };
   const canLeads = area === "agency" && ["AGENCY_OWNER", "AGENT", "BACKOFFICE", "SUPERADMIN"].includes(u.role) && !!u.agencyId;
   const newLeads = useQuery({
@@ -68,16 +71,6 @@ export function AdminShell({ locale, area, children, title, actions }: { locale:
   const badges: Record<string, number | undefined> = { "/leads": newLeads.data?.items.length };
   const base = `/${locale}/${area}`;
   const items = (area === "agency" ? AGENCY_NAV : PLATFORM_NAV).filter((i) => !i.roles || i.roles.includes(u.role));
-  const roleLabel: Record<Role, [string, string]> = {
-    SUPERADMIN: ["Superadmin", "Superadmin"],
-    AGENCY_OWNER: ["Dueño de agencia", "Agency owner"],
-    AGENT: ["Agente", "Agent"],
-    CAPTOR: ["Captador", "Captor"],
-    PHOTOGRAPHER: ["Fotógrafo", "Photographer"],
-    BACKOFFICE: ["Backoffice", "Backoffice"],
-    OWNER_PRIVATE: ["Propietario", "Owner"],
-    SEEKER: ["Buscador", "Seeker"],
-  };
   return (
     <div className="dark min-h-screen bg-navy-2 text-ivory">
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-60 flex-col border-r border-navy-line bg-navy lg:flex">
@@ -108,14 +101,14 @@ export function AdminShell({ locale, area, children, title, actions }: { locale:
                 )}
               >
                 <i.icon size={17} className={active ? "text-coral" : ""} />
-                <span className="flex-1">{tx(locale, i.label[0], i.label[1])}</span>
+                <span className="flex-1">{t(i.label)}</span>
                 {(badges[i.href] ?? 0) > 0 && <span className="rounded-full bg-coral px-1.5 text-[11px] font-bold text-white">{badges[i.href]}</span>}
               </Link>
             );
           })}
         </nav>
         <div className="space-y-1 border-t border-navy-line p-3">
-          <Link href={`/${locale}`} className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-ivory/60 hover:bg-white/5"><Home size={16} /> {tx(locale, "Ver sitio público", "View public site")}</Link>
+          <Link href={`/${locale}`} className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-ivory/60 hover:bg-white/5"><Home size={16} /> {t("publicSite")}</Link>
           {area === "agency" && u.role === "SUPERADMIN" && (
             <Link href={`/${locale}/platform`} className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-ivory/60 hover:bg-white/5"><ClipboardList size={16} /> Platform</Link>
           )}
@@ -129,10 +122,10 @@ export function AdminShell({ locale, area, children, title, actions }: { locale:
           <h1 className="font-display text-lg font-semibold md:text-xl">{title}</h1>
           <div className="relative ml-auto hidden w-72 md:block">
             <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-mist" />
-            <input className="h-9 w-full rounded-lg border border-navy-line bg-navy pl-9 pr-3 text-sm placeholder:text-mist/60 focus:border-coral focus:outline-none" placeholder={tx(locale, "Buscar lead, inmueble, persona…", "Search lead, listing, person…")} />
+            <input className="h-9 w-full rounded-lg border border-navy-line bg-navy pl-9 pr-3 text-sm placeholder:text-mist/60 focus:border-coral focus:outline-none" placeholder={t("search")} aria-label={t("search")} />
           </div>
           {actions}
-          <button className="relative rounded-lg p-2 text-ivory/80 hover:bg-white/5" aria-label="Notificaciones">
+          <button className="relative rounded-lg p-2 text-ivory/80 hover:bg-white/5" aria-label={t("notifications")}>
             <Bell size={18} />
             <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-coral" />
           </button>
@@ -140,7 +133,7 @@ export function AdminShell({ locale, area, children, title, actions }: { locale:
             <Avatar initials={u.initials} hue={u.hue} size={32} />
             <div className="hidden leading-tight xl:block">
               <div className="text-sm font-semibold">{u.name}</div>
-              <div className="text-xs text-mist">{tx(locale, roleLabel[u.role][0], roleLabel[u.role][1])}</div>
+              <div className="text-xs text-mist">{tr(u.role)}</div>
             </div>
           </div>
         </header>
@@ -150,7 +143,7 @@ export function AdminShell({ locale, area, children, title, actions }: { locale:
             const active = i.href === "" ? pathname === href : pathname.startsWith(href);
             return (
               <Link key={i.href} href={href} className={cn("flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm", active ? "bg-coral text-white" : "text-ivory/75")}>
-                <i.icon size={15} /> {tx(locale, i.label[0], i.label[1])}
+                <i.icon size={15} /> {t(i.label)}
               </Link>
             );
           })}

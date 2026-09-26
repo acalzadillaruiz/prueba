@@ -62,7 +62,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
   };
 
   return (
-    <div className="grid min-h-screen lg:grid-cols-2">
+    <div className="np-public grid min-h-screen lg:grid-cols-2">
       <div className="flex flex-col px-6 py-8 md:px-16">
         <Link href={`/${locale}`}><Logo /></Link>
         <div className="mx-auto my-auto w-full max-w-md py-10">

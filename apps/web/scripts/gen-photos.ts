@@ -8,7 +8,7 @@
 import { existsSync, mkdirSync, readdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import sharp from "sharp";
-import { LISTINGS } from "../src/mock/listings";
+import { LISTINGS } from "../../../packages/db/prisma/seed-data/listings";
 import type { Listing, Scene } from "../src/types/domain";
 
 const OUT = join(__dirname, "../public/photos");

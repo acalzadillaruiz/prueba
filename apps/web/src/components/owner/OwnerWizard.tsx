@@ -26,7 +26,7 @@ const STEPS: [string, string][] = [
 
 type Copy = { title_es: string; title_en: string; body_es: string; body_en: string };
 type Draft = {
-  mode: "FSBO" | "MANDATE";
+  mode: "FSBO" | "MANDATE" | "AGENCY";
   op: string;
   kind: Kind;
   addr: PlacePick | null;
@@ -41,14 +41,14 @@ type Draft = {
   copy: Copy;
   agency: string;
 };
-const DRAFT_KEY = "np-owner-draft-v1";
+const DRAFT_KEY_BASE = "np-owner-draft-v1";
 
-export function OwnerWizard({ locale, zones, agencies, fxVes }: { locale: Locale; zones: Zone[]; agencies: Agency[]; fxVes: number }) {
+export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: { locale: Locale; zones: Zone[]; agencies: Agency[]; fxVes: number; staff?: boolean }) {
   const router = useRouter();
   const { user, requireLogin } = useApp();
   const [step, setStep] = useState(0);
   const [d, setD] = useState<Draft>({
-    mode: "FSBO",
+    mode: staff ? "AGENCY" : "FSBO",
     op: "SALE",
     kind: "apartment",
     addr: null,
@@ -73,12 +73,13 @@ export function OwnerWizard({ locale, zones, agencies, fxVes }: { locale: Locale
   const [lang, setLang] = useState<Locale>(locale);
   const [busy, setBusy] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
-  const [done, setDone] = useState<{ slug: string; mode: Draft["mode"] } | null>(null);
+  const [done, setDone] = useState<{ slug: string; id: string; mode: Draft["mode"] } | null>(null);
   const [confirm, setConfirm] = useState(true);
   const fileRef = useRef<HTMLInputElement>(null);
   const previews = useMemo(() => files.map((f) => URL.createObjectURL(f)), [files]);
   useEffect(() => () => previews.forEach((u) => URL.revokeObjectURL(u)), [previews]);
 
+  const DRAFT_KEY = `${DRAFT_KEY_BASE}${staff ? "-agency" : ""}`;
   // restore draft after login redirect
   useEffect(() => {
     try {
@@ -180,7 +181,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes }: { locale: Locale
         if (!r.ok) throw new Error((await r.json()).error?.message ?? "upload failed");
       }
       sessionStorage.removeItem(DRAFT_KEY);
-      setDone({ slug: created.slug, mode: d.mode });
+      setDone({ slug: created.slug, id: created.id, mode: d.mode });
       router.refresh();
     } catch (e) {
       if (e instanceof ApiClientError && e.code === "CONFLICT") {
@@ -209,14 +210,22 @@ export function OwnerWizard({ locale, zones, agencies, fxVes }: { locale: Locale
     return (
       <div className="mx-auto max-w-xl px-4 py-20 text-center" data-testid="owner-published">
         <CheckCircle2 size={56} className="mx-auto text-ok" />
-        <h1 className="mt-4 font-display text-3xl font-semibold">{done.mode === "FSBO" ? tx(locale, `¡Publicado en ${d.addr?.zone}!`, `Live in ${d.addr?.zone}!`) : tx(locale, "Encargo enviado", "Request sent")}</h1>
+        <h1 className="mt-4 font-display text-3xl font-semibold">{done.mode === "AGENCY" ? tx(locale, "Inmueble creado", "Listing created") : done.mode === "FSBO" ? tx(locale, `¡Publicado en ${d.addr?.zone}!`, `Live in ${d.addr?.zone}!`) : tx(locale, "Encargo enviado", "Request sent")}</h1>
         <p className="mt-2 text-ink/60">
-          {done.mode === "FSBO"
+          {done.mode === "AGENCY"
+            ? user?.role === "AGENT"
+              ? tx(locale, "Quedó pendiente de aprobación del backoffice.", "It’s pending backoffice approval.")
+              : tx(locale, "Publicado y visible en el mapa.", "Published and visible on the map.")
+            : done.mode === "FSBO"
             ? tx(locale, "Pasó la revisión automática (sin duplicados) y ya aparece en el mapa.", "It passed automated checks (no duplicates) and is live on the map.")
             : tx(locale, `${agencies.find((a) => a.id === d.agency)?.name} asignará un agente. Estado: SOLICITADO.`, `${agencies.find((a) => a.id === d.agency)?.name} will assign an agent. Status: REQUESTED.`)}
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-3">
-          <Button href={`/${locale}/owner/listings`}>{tx(locale, "Ver mis inmuebles", "My properties")}</Button>
+          {done.mode === "AGENCY" ? (
+            <Button href={`/${locale}/agency/listings/${done.id}/edit`}>{tx(locale, "Editar en el panel", "Edit in dashboard")}</Button>
+          ) : (
+            <Button href={`/${locale}/owner/listings`}>{tx(locale, "Ver mis inmuebles", "My properties")}</Button>
+          )}
           {done.mode === "FSBO" && <Button href={`/${locale}/listing/${done.slug}`} variant="outline">{tx(locale, "Ver la ficha", "View listing")}</Button>}
         </div>
       </div>
@@ -244,8 +253,8 @@ export function OwnerWizard({ locale, zones, agencies, fxVes }: { locale: Locale
 
         {step === 0 && (
           <div className="np-in space-y-6">
-            <h1 className="font-display text-3xl font-semibold">{tx(locale, "¿Cómo quieres vender o alquilar?", "How do you want to sell or rent?")}</h1>
-            <div className="grid gap-3 sm:grid-cols-2">
+            <h1 className="font-display text-3xl font-semibold">{staff ? tx(locale, "Nuevo inmueble de la agencia", "New agency listing") : tx(locale, "¿Cómo quieres vender o alquilar?", "How do you want to sell or rent?")}</h1>
+            {!staff && <div className="grid gap-3 sm:grid-cols-2">
               <button className={opt(d.mode === "FSBO")} onClick={() => set({ mode: "FSBO" })}>
                 <User className="text-coral" />
                 <div className="mt-2 font-display text-lg font-semibold">{tx(locale, "Publicar yo mismo", "List it myself")}</div>
@@ -256,7 +265,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes }: { locale: Locale
                 <div className="mt-2 font-display text-lg font-semibold">{tx(locale, "Encargar a una agencia", "Hire an agency")}</div>
                 <div className="text-sm text-ink/60">{tx(locale, "Un agente verificado se encarga de todo.", "A verified agent handles everything.")}</div>
               </button>
-            </div>
+            </div>}
             {d.mode === "MANDATE" && (
               <div className="grid gap-2 sm:grid-cols-3">
                 {agencies.map((a) => (
@@ -479,7 +488,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes }: { locale: Locale
                   <div className="font-semibold">{(lang === "es" ? d.copy.title_es : d.copy.title_en) || tx(locale, "(título automático)", "(auto title)")}</div>
                   <div className="text-sm text-ink/55">{d.addr?.main}, {d.addr?.zone}, {d.addr?.city}</div>
                   <div className="mt-2 text-sm">{d.beds} {tx(locale, "hab", "bd")} · {d.baths} {tx(locale, "baños", "ba")} · {d.m2} m² · {d.parking} {tx(locale, "puestos", "parking")}</div>
-                  <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#F26B4D14] px-2.5 py-1 text-xs font-bold text-coral-hover">{d.mode === "FSBO" ? tx(locale, "Publicación directa (FSBO)", "For sale by owner") : tx(locale, "Encargo a agencia", "Agency mandate")}</div>
+                  <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#F26B4D14] px-2.5 py-1 text-xs font-bold text-coral-hover">{d.mode === "AGENCY" ? tx(locale, "Inventario de la agencia", "Agency inventory") : d.mode === "FSBO" ? tx(locale, "Publicación directa (FSBO)", "For sale by owner") : tx(locale, "Encargo a agencia", "Agency mandate")}</div>
                 </div>
               </div>
             </div>
@@ -492,7 +501,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes }: { locale: Locale
                 ))}
               </ul>
             </div>
-            <label className="flex items-start gap-2 text-sm text-ink/65"><input type="checkbox" checked={confirm} onChange={(e) => setConfirm(e.target.checked)} className="mt-1 accent-[#F26B4D]" /> {tx(locale, "Confirmo que soy el propietario o tengo autorización para publicar.", "I confirm I’m the owner or authorised to list.")}</label>
+            <label className="flex items-start gap-2 text-sm text-ink/65"><input type="checkbox" aria-label="confirm" checked={confirm} onChange={(e) => setConfirm(e.target.checked)} className="mt-1 accent-[#F26B4D]" /> {tx(locale, "Confirmo que soy el propietario o tengo autorización para publicar.", "I confirm I’m the owner or authorised to list.")}</label>
             {!user && <p className="rounded-lg bg-[#F26B4D0D] px-3 py-2 text-sm">{tx(locale, "Te pediremos iniciar sesión para publicar. Tu borrador se conserva.", "We’ll ask you to sign in to publish. Your draft is kept.")}</p>}
             {err && <div className="rounded-lg bg-[#B423181A] px-3 py-2 text-sm text-danger" role="alert">{err}</div>}
           </div>
@@ -505,7 +514,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes }: { locale: Locale
           ) : (
             <Button size="lg" onClick={publish} disabled={!!busy || !confirm || !d.addr}>
               {busy && <Loader2 size={16} className="animate-spin" />}
-              {busy === "photos" ? tx(locale, "Subiendo fotos…", "Uploading photos…") : d.mode === "FSBO" ? tx(locale, "Publicar ahora", "Publish now") : tx(locale, "Enviar encargo", "Send request")}
+              {busy === "photos" ? tx(locale, "Subiendo fotos…", "Uploading photos…") : d.mode === "MANDATE" ? tx(locale, "Enviar encargo", "Send request") : tx(locale, "Publicar ahora", "Publish now")}
             </Button>
           )}
         </div>

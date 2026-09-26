@@ -8,3 +8,6 @@ out
 /captures/tmp
 .next-prod
 videos/*.webm
+test-results
+playwright-report
+uploads/

@@ -3,12 +3,14 @@
  * Reuses the prototype fixtures in apps/web/src/mock and shifts every date so the data feels "live" at seed time.
  */
 import bcrypt from "bcryptjs";
+import { existsSync, readdirSync } from "node:fs";
+import { join } from "node:path";
 import { heuristicLeadScore } from "@newplace/ai";
 import { PrismaClient, type Prisma } from "@prisma/client";
-import { AGENCIES, NOW, USERS } from "../../../apps/web/src/mock/people";
-import { LISTINGS } from "../../../apps/web/src/mock/listings";
-import { ZONES } from "../../../apps/web/src/mock/zones";
-import { AGENT_SLOTS, AUDIT, CAPTURES, EMAILS, FX_RATES, LEADS, LEAD_THREAD, MEDIA_JOBS, MODERATION_QUEUE, OFFERS, OWNER_THREAD, SAVED_SEARCHES, TOURS } from "../../../apps/web/src/mock/ops";
+import { AGENCIES, NOW, USERS } from "./seed-data/people";
+import { LISTINGS } from "./seed-data/listings";
+import { ZONES } from "./seed-data/zones";
+import { AGENT_SLOTS, AUDIT, CAPTURES, EMAILS, FX_RATES, LEADS, LEAD_THREAD, MEDIA_JOBS, MODERATION_QUEUE, OFFERS, OWNER_THREAD, SAVED_SEARCHES, TOURS } from "./seed-data/ops";
 
 const prisma = new PrismaClient();
 const SHIFT = Date.now() - NOW.getTime();
@@ -112,6 +114,15 @@ async function main() {
         fingerprints: { create: { fingerprint: l.fingerprint } },
       },
     });
+  }
+  // AI-generated photos (apps/web/public/photos/<listingId>-<n>.jpg), if present → real ListingPhoto rows.
+  const photoDir = join(__dirname, "../../../apps/web/public/photos");
+  if (existsSync(photoDir)) {
+    const files = readdirSync(photoDir).filter((f) => /^[a-z0-9]+-\d+\.jpg$/.test(f));
+    for (const l of LISTINGS) {
+      const mine = files.filter((f) => f.startsWith(`${l.id}-`)).sort((a, b) => Number(a.split("-")[1].split(".")[0]) - Number(b.split("-")[1].split(".")[0]));
+      if (mine.length) await prisma.listingPhoto.createMany({ data: mine.map((f, i) => ({ listingId: l.id, url: `/photos/${f}`, order: i, isCover: i === 0, scene: l.scenes[i] })) });
+    }
   }
   // two listings pending review so backoffice has something to approve
   await prisma.listing.updateMany({ where: { id: { in: [LISTINGS[12].id, LISTINGS[20].id] } }, data: { review: "PENDING" } });

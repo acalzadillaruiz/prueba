@@ -113,7 +113,7 @@ export async function getTours(where: { agentId?: string; agencyId?: string | nu
 export async function getSlots(agentId: string) {
   const rows = await prisma.tourSlot.findMany({ where: { agentId }, orderBy: [{ weekday: "asc" }, { hour: "asc" }] });
   const days: { day: number; hours: number[] }[] = [];
-  for (let d = 0; d < 5; d++) days.push({ day: d, hours: rows.filter((r) => r.weekday === d).map((r) => r.hour) });
+  for (let d = 0; d < 7; d++) days.push({ day: d, hours: rows.filter((r) => r.weekday === d).map((r) => r.hour) });
   return days;
 }
 

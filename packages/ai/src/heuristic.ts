@@ -193,7 +193,12 @@ const AMENITY_COPY: Record<string, { es: string; en: string }> = {
   loadingDock: { es: "andén de carga", en: "a loading dock" },
 };
 
-export function heuristicWriteListing(b: ListingBrief) {
+/** Kinds where bedrooms (and for land, bathrooms and parking) don't describe the property. */
+const NO_ROOMS = new Set(["land", "office", "retail", "warehouse"]);
+
+export function heuristicWriteListing(brief: ListingBrief) {
+  // A plot is never "Terreno 3 hab." and an office has no bedrooms, whatever the form sent.
+  const b = NO_ROOMS.has(brief.kind) ? { ...brief, beds: 0, ...(brief.kind === "land" ? { baths: 0, parking: 0 } : {}) } : brief;
   const k = KIND_LABEL[b.kind] ?? KIND_LABEL.apartment;
   const bedsEs = b.beds ? `${b.beds} hab. · ` : "";
   const bedsEn = b.beds ? `${b.beds} bd · ` : "";

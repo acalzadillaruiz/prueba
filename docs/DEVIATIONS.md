@@ -8,7 +8,7 @@
 | Sesiones de Auth.js en BD | Sesiones JWT (cuentas y usuarios sí en Postgres vía PrismaAdapter) | Necesario para comprobar roles en el middleware edge. |
 | Emails transaccionales | Se escriben en `EmailOutbox` (visibles en `/platform`) sin envío SMTP | Falta configurar un proveedor (Resend/SES). |
 | Push notifications | `PushProvider` no-op | Web Push / FCM en fase 2 con las apps nativas. |
-| Almacenamiento S3 | `STORAGE=local` funcional; `s3` es stub | Implementar con credenciales del cliente. |
+| Almacenamiento S3 | `local` y Vercel Blob funcionales (Blob se activa solo con `BLOB_READ_WRITE_TOKEN`); `s3` es stub | Implementar con credenciales del cliente. |
 | Digest de alertas | Endpoint `POST /api/v1/alerts/run` (Bearer `CRON_SECRET`) | Programar en el hosting (Vercel Cron, etc.). Las alertas instantáneas ya se generan al publicar. |
 | `next/font/google` | `@fontsource/outfit` + `@fontsource/source-sans-3` (mismas fuentes, autoalojadas) | Build sin depender de Google Fonts. |
 | shadcn/ui | Componentes propios con el mismo estilo (radius 14, tokens) | El CLI de shadcn requiere red externa. |

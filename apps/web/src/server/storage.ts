@@ -2,7 +2,7 @@ import "server-only";
 import { mkdir, readFile, unlink, writeFile } from "node:fs/promises";
 import { dirname, join, normalize } from "node:path";
 
-/** Brief §3: StorageProvider (Local | S3). Local writes to UPLOAD_DIR and is served by /uploads/[...path]. */
+/** Brief §3: StorageProvider (Local | Vercel Blob | S3). Local writes to UPLOAD_DIR and is served by /uploads/[...path]. */
 export interface StorageProvider {
   id: string;
   put(key: string, data: Buffer, contentType: string): Promise<string>;
@@ -38,7 +38,28 @@ class S3Storage implements StorageProvider {
   async remove() {}
 }
 
-export const storage: StorageProvider = process.env.STORAGE === "s3" ? new S3Storage() : new LocalStorage();
+/** Vercel Blob: used automatically when BLOB_READ_WRITE_TOKEN is set (serverless hosts have no persistent disk). */
+class BlobStorage implements StorageProvider {
+  id = "blob";
+  async put(key: string, data: Buffer, contentType: string) {
+    const { put } = await import("@vercel/blob");
+    const r = await put(key, data, { access: "public", contentType, addRandomSuffix: false, allowOverwrite: true });
+    return r.url;
+  }
+  async remove(key: string) {
+    const { del } = await import("@vercel/blob");
+    await del(key).catch(() => {});
+  }
+}
+
+function pick(): StorageProvider {
+  const kind = process.env.STORAGE ?? (process.env.BLOB_READ_WRITE_TOKEN ? "blob" : "local");
+  if (kind === "blob") return new BlobStorage();
+  if (kind === "s3") return new S3Storage();
+  return new LocalStorage();
+}
+
+export const storage: StorageProvider = pick();
 
 export async function readLocal(key: string) {
   const safe = normalize(key).replace(/^(\.\.[/\\])+/, "");

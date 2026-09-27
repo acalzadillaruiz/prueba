@@ -148,6 +148,8 @@ model User {
   locale        String    @default("es")
   budget        Int?
   interests     String?
+  /// Homebuyer Hub pre-qualification (price, down payment %, years, rate) — persisted per user
+  prequal       Json?
   suspended     Boolean   @default(false)
   createdAt     DateTime  @default(now())
   lastSeenAt    DateTime  @default(now())
@@ -589,6 +591,8 @@ model CaptureLead {
   fingerprint   String?
   result        CaptureResult @default(PENDING)
   duplicateOfId String?
+  /// Listing created from this capture ("Convertir en inmueble")
+  listingId     String?
   createdAt     DateTime      @default(now())
   agency        Agency        @relation(fields: [agencyId], references: [id], onDelete: Cascade)
   captor        User          @relation(fields: [captorId], references: [id])

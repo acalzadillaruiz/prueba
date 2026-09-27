@@ -14,8 +14,9 @@
     "shots": "node scripts/capture.mjs",
     "db:up": "bash scripts/db-local.sh",
     "db:push": "npm run push -w packages/db",
+    "db:migrate": "npm run migrate -w packages/db",
     "db:seed": "TSX_TSCONFIG_PATH=apps/web/tsconfig.json tsx packages/db/prisma/seed.ts",
-    "db:reset": "npm run db:push && npm run db:seed",
+    "db:reset": "npm run migrate:deploy -w packages/db && npm run db:seed",
     "lint": "npm run lint -w apps/web",
     "e2e": "npm run e2e -w apps/web",
     "db:setup": "TSX_TSCONFIG_PATH=apps/web/tsconfig.json tsx packages/db/prisma/setup.ts"

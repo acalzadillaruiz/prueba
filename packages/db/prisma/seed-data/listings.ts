@@ -1,4 +1,4 @@
-import { heuristicEstimate } from "@newplace/ai";
+import { CLASS_FACTOR, heuristicEstimate, kindClass } from "@newplace/ai";
 import type { Amenity, Kind, Listing, ListingStatus, ListingType, PriceEvent, Scene } from "@/types/domain";
 import { minutesAgo } from "./people";
 import { zoneByName } from "./zones";
@@ -269,20 +269,21 @@ function build(): Listing[] {
     const zone = zoneByName(l.zone);
     const group = (x: typeof l) =>
       x.listingType === "SALE" || x.listingType === "COMMERCIAL_SALE" ? "sale" : x.listingType === "SHORT_RENT" ? "short" : "rent";
-    const ppm =
-      group(l) === "sale" ? zone.salePpm * (l.kind === "warehouse" ? 0.7 : 1) : group(l) === "short" ? zone.rentPpm * 0.075 : zone.rentPpm;
+    const cls = kindClass(l.kind);
+    const ppm = (group(l) === "sale" ? zone.salePpm : group(l) === "short" ? zone.rentPpm * 0.075 : zone.rentPpm) * CLASS_FACTOR[cls];
+    const land = cls === "land";
     const pool = base
-      .filter((o) => o.id !== l.id && group(o) === group(l) && o.city === l.city && o.kind !== "land" && o.luxury === l.luxury)
+      .filter((o) => o.id !== l.id && group(o) === group(l) && o.city === l.city && kindClass(o.kind) === cls && (cls !== "residential" || o.luxury === l.luxury))
       .map((o) => ({ id: o.id, title: o.title_es, zone: o.zone, areaM2: o.areaM2, priceAmount: o.priceAmount, lat: o.lat, lng: o.lng }));
     const est = heuristicEstimate({
       zone: l.zone,
       zonePricePerM2: ppm,
       areaM2: l.areaM2,
-      beds: l.beds,
-      baths: l.baths,
-      parking: l.parking,
-      yearBuilt: l.yearBuilt,
-      amenities: l.amenities,
+      beds: land ? 0 : l.beds,
+      baths: land ? 0 : l.baths,
+      parking: land ? 0 : l.parking,
+      yearBuilt: land ? 2016 : l.yearBuilt,
+      amenities: land ? [] : l.amenities,
       luxury: l.luxury,
       lat: l.lat,
       lng: l.lng,

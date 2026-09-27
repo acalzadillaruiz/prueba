@@ -42,6 +42,7 @@ type Draft = {
   agency: string;
 };
 const DRAFT_KEY_BASE = "np-owner-draft-v1";
+const DEFAULT_PRICE: Record<string, number> = { SALE: 150000, LONG_RENT: 900, SHORT_RENT: 80, COMMERCIAL_SALE: 250000, COMMERCIAL_RENT: 1500 };
 
 export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: { locale: Locale; zones: Zone[]; agencies: Agency[]; fxVes: number; staff?: boolean }) {
   const router = useRouter();
@@ -64,6 +65,10 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
     agency: agencies.find((a) => a.verified)?.id ?? agencies[0]?.id ?? "",
   });
   const set = (p: Partial<Draft>) => setD((x) => ({ ...x, ...p }));
+  /** Switching operation swaps an untouched default price (a sale's 150.000 must not become 150.000/month). */
+  const setOp = (op: string) =>
+    setD((x) => ({ ...x, op, price: x.price === DEFAULT_PRICE[x.op] || !x.price ? (DEFAULT_PRICE[op] ?? x.price) : x.price }));
+  const [dupError, setDupError] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const [cover, setCover] = useState(0);
   const [dup, setDup] = useState<{ title: string; slug: string } | null>(null);
@@ -106,8 +111,15 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
     setChecking(true);
     const t = setTimeout(() => {
       api<{ duplicate: { title: string; slug: string } | null }>("capture/check", { method: "POST", json: { address: `${d.addr!.main} ${d.unit}`.trim(), areaM2: d.m2, lat: d.addr!.lat, lng: d.addr!.lng } })
-        .then((r) => setDup(r.duplicate))
-        .catch(() => setDup(null))
+        .then((r) => {
+          setDup(r.duplicate);
+          setDupError(false);
+        })
+        .catch(() => {
+          // Never claim "no duplicates" when the check could not run; the server re-checks at publish anyway.
+          setDup(null);
+          setDupError(true);
+        })
         .finally(() => setChecking(false));
     }, 400);
     return () => clearTimeout(t);
@@ -119,13 +131,13 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
     const t = setTimeout(() => {
       api<{ estimate: EstimateResult }>("ai/estimate", {
         method: "POST",
-        json: { zone: zone.name, listingType, areaM2: d.m2, beds: d.beds, baths: d.baths, parking: d.parking, yearBuilt: d.year, amenities: d.amen, lat: d.addr?.lat, lng: d.addr?.lng },
+        json: { kind: d.kind, zone: zone.name, listingType, areaM2: d.m2, beds: d.beds, baths: d.baths, parking: d.parking, yearBuilt: d.year, amenities: d.amen, lat: d.addr?.lat, lng: d.addr?.lng },
       })
         .then((r) => setEstimate(r.estimate))
         .catch(() => {});
     }, 350);
     return () => clearTimeout(t);
-  }, [zone, listingType, d.m2, d.beds, d.baths, d.parking, d.year, d.amen, d.addr]);
+  }, [zone, listingType, d.kind, d.m2, d.beds, d.baths, d.parking, d.year, d.amen, d.addr]);
 
   const writeAI = async () => {
     setWriting(true);
@@ -282,15 +294,15 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
             <div>
               <div className="mb-2 font-semibold">{tx(locale, "Operación", "Operation")}</div>
               <div className="flex flex-wrap gap-2">
-                {[["SALE", "Venta", "Sale"], ["LONG_RENT", "Alquiler", "Rent"], ["SHORT_RENT", "Vacacional", "Vacation"], ["COMMERCIAL", "Comercial", "Commercial"]].map(([k, es, en]) => (
-                  <button key={k} onClick={() => set({ op: k })} className={cn("rounded-full border px-4 py-2 font-display text-sm", d.op === k ? "border-navy bg-navy text-ivory" : "border-line bg-white")}>{tx(locale, es, en)}</button>
+                {[["SALE", "Venta", "Sale"], ["LONG_RENT", "Alquiler", "Rent"], ["SHORT_RENT", "Vacacional", "Vacation"], ["COMMERCIAL_SALE", "Comercial · venta", "Commercial · sale"], ["COMMERCIAL_RENT", "Comercial · alquiler", "Commercial · rent"]].map(([k, es, en]) => (
+                  <button key={k} onClick={() => setOp(k)} aria-pressed={d.op === k} className={cn("rounded-full border px-4 py-2 font-display text-sm", d.op === k ? "border-navy bg-navy text-ivory" : "border-line bg-white")}>{tx(locale, es, en)}</button>
                 ))}
               </div>
             </div>
             <div>
               <div className="mb-2 font-semibold">{tx(locale, "Tipo de inmueble", "Property type")}</div>
               <div className="flex flex-wrap gap-2">
-                {([["apartment", "Apartamento", "Apartment"], ["house", "Casa", "House"], ["penthouse", "Penthouse", "Penthouse"], ["townhouse", "Townhouse", "Townhouse"], ["studio", "Estudio", "Studio"], ["office", "Oficina", "Office"], ["retail", "Local", "Retail"], ["land", "Terreno", "Land"]] as [Kind, string, string][]).map(([k, es, en]) => (
+                {([["apartment", "Apartamento", "Apartment"], ["house", "Casa", "House"], ["penthouse", "Penthouse", "Penthouse"], ["townhouse", "Townhouse", "Townhouse"], ["studio", "Estudio", "Studio"], ["office", "Oficina", "Office"], ["retail", "Local", "Retail"], ["warehouse", "Galpón", "Warehouse"], ["land", "Terreno", "Land"]] as [Kind, string, string][]).map(([k, es, en]) => (
                   <button key={k} onClick={() => set({ kind: k })} className={cn("rounded-full border px-4 py-2 font-display text-sm", d.kind === k ? "border-navy bg-navy text-ivory" : "border-line bg-white")}>{tx(locale, es, en)}</button>
                 ))}
               </div>
@@ -329,8 +341,10 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                     · {tx(locale, "Ya existe:", "Already listed:")}{" "}
                     <Link className="font-semibold text-coral underline" href={`/${locale}/listing/${dup.slug}`}>{dup.title}</Link>
                   </span>
+                ) : dupError ? (
+                  <span className="text-ink/65">· {tx(locale, "No pudimos verificar duplicados ahora; lo revisaremos al publicar.", "Couldn’t check for duplicates now; we’ll check again when you publish.")}</span>
                 ) : (
-                  <span className="text-ink/60">· {tx(locale, "Sin duplicados (fingerprint lat/lng + m² + dirección)", "No duplicates (fingerprint lat/lng + m² + address)")}</span>
+                  <span className="text-ink/65">· {tx(locale, "Sin duplicados (fingerprint lat/lng + m² + dirección)", "No duplicates (fingerprint lat/lng + m² + address)")}</span>
                 )}
               </div>
             )}
@@ -475,6 +489,15 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
         {step === 5 && (
           <div className="np-in space-y-5">
             <h1 className="font-display text-3xl font-semibold">{tx(locale, "Revisa y publica", "Review & publish")}</h1>
+            {dup && (
+              <div className="flex items-center gap-2 rounded-np border border-warn/60 bg-[#C9862A14] p-3 text-sm" role="alert">
+                <AlertTriangle size={18} className="text-warn" />
+                <span>
+                  {tx(locale, "Con estos datos ya existe un anuncio:", "A listing with these details already exists:")}{" "}
+                  <Link className="font-semibold text-coral underline" href={`/${locale}/listing/${dup.slug}`}>{dup.title}</Link>
+                </span>
+              </div>
+            )}
             <div className="overflow-hidden rounded-np border border-line bg-white">
               <div className="grid sm:grid-cols-[260px_1fr]">
                 {files.length ? (

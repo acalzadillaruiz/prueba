@@ -60,7 +60,9 @@ export function heuristicEstimate(input: EstimateInput): EstimateResult {
   }
   const confidence = Math.min(0.92, 0.45 + comparables.length * 0.08);
   const spread = 0.16 - confidence * 0.1;
-  const round = (n: number) => Math.round(n / 1000) * 1000;
+  // Round to a sensible step for the magnitude (a USD 950/month rent must not become "1.000 – 1.000").
+  const step = mid >= 100_000 ? 1000 : mid >= 10_000 ? 100 : mid >= 1000 ? 10 : 5;
+  const round = (n: number) => Math.round(n / step) * step;
   return {
     mid: round(mid),
     low: round(mid * (1 - spread)),
@@ -91,6 +93,9 @@ const ZONE_ALIASES = [
   "Barquisimeto",
 ];
 
+/** Short names people type → the city/zone name used in listings. */
+const ZONE_CANONICAL: Record<string, string> = { Margarita: "Isla de Margarita" };
+
 function norm(s: string): string {
   return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 }
@@ -103,7 +108,7 @@ export function heuristicSearchParse(nl: string): SearchQuery {
   if (/local|oficina|office|galpon|warehouse|comercial|commercial/.test(t)) q.listingType = "COMMERCIAL";
   if (/compr|venta|buy|sale/.test(t) && !q.listingType) q.listingType = "SALE";
   if (/lujo|luxury|exclusiv/.test(t)) q.luxury = true;
-  for (const z of ZONE_ALIASES) if (t.includes(norm(z))) q.zone = z;
+  for (const z of ZONE_ALIASES) if (t.includes(norm(z))) q.zone = ZONE_CANONICAL[z] ?? z;
 
   const money = t.match(/(menos de|under|max(?:imo)?|hasta|below)\s*\$?\s*([\d.,]+)\s*(mil|k|m|millon(?:es)?)?/);
   if (money) {
@@ -113,7 +118,7 @@ export function heuristicSearchParse(nl: string): SearchQuery {
     else if (unit === "m" || unit.startsWith("millon")) n *= 1_000_000;
     q.maxPrice = Math.round(n);
   }
-  const beds = t.match(/(\d)\s*(hab|habitaciones|cuartos|dormitorios|beds?|bedrooms?|br)\b/);
+  const beds = t.match(/(\d)\s*-?\s*(hab|habitaciones|habitacion|cuartos|dormitorios|beds?|bedrooms?|br)\b/);
   if (beds) q.minBeds = parseInt(beds[1], 10);
 
   const kinds: [RegExp, string][] = [
@@ -136,15 +141,34 @@ const KIND_LABEL: Record<string, { es: string; en: string }> = {
   land: { es: "Terreno", en: "Plot" },
 };
 
+const AMENITY_COPY: Record<string, { es: string; en: string }> = {
+  pool: { es: "piscina", en: "a pool" },
+  gym: { es: "gimnasio", en: "a gym" },
+  security: { es: "vigilancia 24 h", en: "24h security" },
+  generator: { es: "planta eléctrica", en: "a backup generator" },
+  waterTank: { es: "tanque de agua", en: "a water tank" },
+  view: { es: "vista abierta", en: "open views" },
+  terrace: { es: "terraza", en: "a terrace" },
+  elevator: { es: "ascensor", en: "an elevator" },
+  garden: { es: "jardín", en: "a garden" },
+};
+
 export function heuristicWriteListing(b: ListingBrief) {
   const k = KIND_LABEL[b.kind] ?? KIND_LABEL.apartment;
   const bedsEs = b.beds ? `${b.beds} hab. · ` : "";
   const bedsEn = b.beds ? `${b.beds} bd · ` : "";
+  const n = (x: number, one: string, many: string) => `${x} ${x === 1 ? one : many}`;
+  const list = (xs: string[], and: string) => (xs.length <= 1 ? xs.join("") : `${xs.slice(0, -1).join(", ")} ${and} ${xs[xs.length - 1]}`);
+  const factsEs = list([b.beds ? n(b.beds, "habitación", "habitaciones") : "", b.baths ? n(b.baths, "baño", "baños") : "", b.parking ? n(b.parking, "puesto de estacionamiento", "puestos de estacionamiento") : ""].filter(Boolean), "y");
+  const factsEn = list([b.beds ? n(b.beds, "bedroom", "bedrooms") : "", b.baths ? n(b.baths, "bathroom", "bathrooms") : "", b.parking ? n(b.parking, "parking space", "parking spaces") : ""].filter(Boolean), "and");
+  const amen = b.amenities.map((a) => AMENITY_COPY[a]).filter(Boolean).slice(0, 5);
+  const amenEs = list(amen.map((a) => a!.es), "y");
+  const amenEn = list(amen.map((a) => a!.en), "and");
   return {
     title_es: `${k.es} ${bedsEs}${b.areaM2} m² en ${b.zone}`,
     title_en: `${k.en} ${bedsEn}${b.areaM2} m² in ${b.zone}`,
-    body_es: `${k.es} de ${b.areaM2} m² en ${b.zone}, ${b.city}. ${b.beds} habitaciones, ${b.baths} baños y ${b.parking} puesto(s) de estacionamiento. ${b.highlights ?? "Distribución eficiente y buena iluminación natural."} Cerca de servicios, transporte y comercios. Documentos al día.`,
-    body_en: `${b.areaM2} m² ${k.en.toLowerCase()} in ${b.zone}, ${b.city}. ${b.beds} bedrooms, ${b.baths} bathrooms and ${b.parking} parking space(s). ${b.highlights ? "Highlights: " + b.highlights : "Efficient layout with great natural light."} Walk to shops, services and transit. Paperwork in order.`,
+    body_es: `${k.es} de ${b.areaM2} m² en ${b.zone}, ${b.city}.${factsEs ? ` ${factsEs}.` : ""}${amenEs ? ` Cuenta con ${amenEs}.` : ""} ${b.highlights ?? "Distribución eficiente y buena iluminación natural."} Cerca de servicios, transporte y comercios. Documentos al día.`,
+    body_en: `${b.areaM2} m² ${k.en.toLowerCase()} in ${b.zone}, ${b.city}.${factsEn ? ` ${factsEn}.` : ""}${amenEn ? ` Features ${amenEn}.` : ""} ${b.highlights ? "Highlights: " + b.highlights : "Efficient layout with great natural light."} Walk to shops, services and transit. Paperwork in order.`,
   };
 }
 

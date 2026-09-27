@@ -29,19 +29,24 @@ export function SaveButton({ id, className, locale }: { id: string; className?: 
 export function CompareButton({ id, locale, dark }: { id: string; locale: Locale; dark?: boolean }) {
   const { compare, toggleCompare } = useApp();
   const on = compare.includes(id);
+  const [full, setFull] = useState(false);
   return (
     <button
+      aria-pressed={on}
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();
-        toggleCompare(id);
+        if (!toggleCompare(id)) {
+          setFull(true);
+          window.setTimeout(() => setFull(false), 2500);
+        }
       }}
       className={cn(
         "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold transition-colors duration-np",
         on ? "border-navy bg-navy text-ivory" : dark ? "border-white/20 text-ivory" : "border-line bg-white text-ink/70 hover:border-navy/40",
       )}
     >
-      <Scale size={13} /> {on ? tx(locale, "Comparando", "Comparing") : tx(locale, "Comparar", "Compare")}
+      <Scale size={13} /> <span aria-live="polite">{full ? tx(locale, "Máximo 3: quita uno", "Max 3: remove one") : on ? tx(locale, "Comparando", "Comparing") : tx(locale, "Comparar", "Compare")}</span>
     </button>
   );
 }

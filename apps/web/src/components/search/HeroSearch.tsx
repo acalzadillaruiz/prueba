@@ -16,6 +16,10 @@ export function queryToParams(q: ReturnType<typeof heuristicSearchParse>, raw: s
   if (q.minBeds) p.set("beds", String(q.minBeds));
   if (q.luxury) p.set("lux", "1");
   if (q.propertyKind) p.set("kind", q.propertyKind);
+  // "con piscina / terraza / vista" → amenity filters; "acepta mascotas" → pets
+  const am = q.keywords.filter((k) => ["pool", "terrace", "view"].includes(k));
+  if (am.length) p.set("am", am.join(","));
+  if (q.keywords.includes("pets")) p.set("pets", "1");
   if (raw) p.set("q", raw);
   return p;
 }

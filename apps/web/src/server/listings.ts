@@ -168,7 +168,8 @@ export function filtersFromParams(sp: URLSearchParams): SearchFilters {
 }
 
 export function whereFromFilters(f: SearchFilters): Prisma.ListingWhereInput {
-  const and: Prisma.ListingWhereInput[] = [publicWhere()];
+  // Search shows what can still be bought or rented; sold/rented stay reachable by link and as "sold nearby".
+  const and: Prisma.ListingWhereInput[] = [publicWhere(), { status: { in: ["COMING_SOON", "ACTIVE", "UNDER_OFFER"] } }];
   if (f.type === "COMMERCIAL") and.push({ listingType: { in: ["COMMERCIAL_SALE", "COMMERCIAL_RENT"] } });
   else if (f.type) and.push({ listingType: f.type as ListingType });
   if (f.zone) and.push({ OR: [{ zone: f.zone }, { city: f.zone }] });

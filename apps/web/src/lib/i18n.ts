@@ -78,3 +78,9 @@ export const lbl = (pair: [string, string], l: Locale) => (l === "es" ? pair[0] 
 export function priceSuffix(l: Pick<Listing, "pricePeriod">, locale: Locale) {
   return l.pricePeriod === "night" ? tx(locale, " / noche", " / night") : l.pricePeriod === "month" ? tx(locale, " / mes", " / mo") : "";
 }
+
+/** "1 baño" / "2 baños", "1 day" / "2 days". */
+export function plural(n: number, locale: Locale, es: [string, string], en: [string, string]) {
+  const [one, many] = locale === "es" ? es : en;
+  return `${n} ${n === 1 ? one : many}`;
+}

@@ -14,7 +14,7 @@ import { prisma } from "@newplace/db";
 import { listingBySlug, listingInclude, publicWhere, toDomain } from "@/server/listings";
 import { getFx } from "@/server/data";
 import { getAppUser } from "@/server/session";
-import { AMENITY_LABEL, TYPE_LABEL, lbl, money, num, priceSuffix, tx } from "@/lib/i18n";
+import { AMENITY_LABEL, TYPE_LABEL, lbl, money, num, priceSuffix, tx, plural } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import { alternates } from "@/lib/seo";
 
@@ -41,10 +41,10 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: L
 function Facts({ l, locale, dark }: { l: Listing; locale: Locale; dark?: boolean }) {
   const items = [
     l.beds > 0 && [BedDouble, `${l.beds}`, tx(locale, "habitaciones", "bedrooms")],
-    l.baths > 0 && [Bath, `${l.baths}`, tx(locale, "baños", "baths")],
+    l.baths > 0 && [Bath, `${l.baths}`, l.baths === 1 ? tx(locale, "baño", "bath") : tx(locale, "baños", "baths")],
     [Maximize2, `${num(l.areaM2, locale)} m²`, tx(locale, "construidos", "built")],
     l.plotM2 && [Ruler, `${num(l.plotM2, locale)} m²`, tx(locale, "terreno", "plot")],
-    l.parking > 0 && [Car, `${l.parking}`, tx(locale, "puestos", "parking")],
+    l.parking > 0 && [Car, `${l.parking}`, l.parking === 1 ? tx(locale, "puesto", "parking spot") : tx(locale, "puestos", "parking")],
     l.kind !== "land" && [Calendar, `${l.yearBuilt}`, tx(locale, "año", "built in")],
     l.shortRent && [Users, `${l.shortRent.maxGuests}`, tx(locale, "huéspedes", "guests")],
   ].filter(Boolean) as [React.ElementType, string, string][];
@@ -140,7 +140,7 @@ export default async function ListingPage({ params }: { params: Promise<{ locale
             <div className={cn("mt-5 flex flex-wrap gap-4 text-sm", dark ? "text-mist" : "text-ink/65")}>
               <span className="inline-flex items-center gap-1.5"><Eye size={15} /> {num(l.stats.impressions, locale)} {tx(locale, "vistas", "views")}</span>
               <span className="inline-flex items-center gap-1.5"><Heart size={15} /> {l.stats.saves} {tx(locale, "lo guardaron", "saves")}</span>
-              <span className="inline-flex items-center gap-1.5"><Clock size={15} /> {l.daysOnMarket} {tx(locale, "días publicado", "days on New Place")}</span>
+              <span className="inline-flex items-center gap-1.5"><Clock size={15} /> {l.daysOnMarket === 0 ? tx(locale, "Publicado hoy", "Listed today") : plural(l.daysOnMarket, locale, ["día publicado", "días publicado"], ["day on New Place", "days on New Place"])}</span>
             </div>
 
             <div className={sec + " mt-8"}><BilingualBody l={l} locale={locale} dark={dark} /></div>

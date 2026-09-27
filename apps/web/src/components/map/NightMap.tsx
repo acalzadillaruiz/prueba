@@ -175,7 +175,10 @@ export function NightMap({
     if (Math.abs(dx) + Math.abs(dy) > 4) drag.current.moved = true;
     setView((v) => ({ ...v, x: drag.current!.vx + dx, y: drag.current!.vy + dy }));
   };
+  // The click event fires after pointerup: remember whether this gesture was a drag so panning never drops a pin.
+  const wasDrag = useRef(false);
   const onPointerUp = () => {
+    wasDrag.current = !!drag.current?.moved;
     drag.current = null;
   };
   const onClick = (e: React.MouseEvent) => {
@@ -185,8 +188,9 @@ export function NightMap({
     else if (mode === "radius") {
       onShape?.({ type: "radius", center: ll, km: 1.2 });
       setMode("pan");
-    } else if (!drag.current?.moved && onPick) onPick(ll);
-    else if (!drag.current?.moved && (e.target as Element).tagName === "rect") onSelect?.(null);
+    } else if (!wasDrag.current && onPick) onPick(ll);
+    else if (!wasDrag.current && (e.target as Element).tagName === "rect") onSelect?.(null);
+    wasDrag.current = false;
   };
 
   const closePoly = () => {

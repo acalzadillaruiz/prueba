@@ -33,11 +33,15 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates 
   const other = thread?.participants.find((p) => p.id !== user?.id);
 
   const stageIdx = { REQUESTED: 0, ASSIGNED: 1, ACTIVE: 2, CANCELLED: -1 };
+  const [error, setError] = useState<string | null>(null);
   const act = async (fn: () => Promise<unknown>, key: string) => {
     setBusy(key);
+    setError(null);
     try {
       await fn();
       router.refresh();
+    } catch (e) {
+      setError((e as Error).message);
     } finally {
       setBusy(null);
     }
@@ -52,6 +56,11 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates 
         </div>
         <Button href={`/${locale}/owner/new`}><Plus size={16} /> {tx(locale, "Publicar otro", "List another")}</Button>
       </div>
+      {error && (
+        <div className="mt-4 rounded-lg bg-[#B423181A] px-3 py-2 text-sm text-danger" role="alert">
+          {error}
+        </div>
+      )}
       <input
         ref={fileRef}
         type="file"
@@ -63,7 +72,10 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates 
           if (!files.length || !uploadFor) return;
           const fd = new FormData();
           files.forEach((f) => fd.append("files", f));
-          await act(() => fetch(`/api/v1/listings/${uploadFor}/photos`, { method: "POST", body: fd }), `photos-${uploadFor}`);
+          await act(async () => {
+            const r = await fetch(`/api/v1/listings/${uploadFor}/photos`, { method: "POST", body: fd });
+            if (!r.ok) throw new Error(((await r.json().catch(() => null)) as { error?: { message?: string } } | null)?.error?.message ?? tx(locale, "No se pudieron subir las fotos.", "Photos could not be uploaded."));
+          }, `photos-${uploadFor}`);
           e.target.value = "";
         }}
       />
@@ -138,7 +150,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates 
                         <Button size="sm" variant="outline" disabled={busy === `photos-${l.id}`} onClick={() => { setUploadFor(l.id); fileRef.current?.click(); }}>
                           {busy === `photos-${l.id}` ? <Loader2 size={13} className="animate-spin" /> : <ImagePlus size={13} />} {tx(locale, "Subir fotos", "Upload photos")}
                         </Button>
-                        {l.status === "ACTIVE" && (
+                        {(l.status === "ACTIVE" || l.status === "UNDER_OFFER") && (
                           <Button size="sm" variant="outline" onClick={() => act(() => api(`listings/${l.id}`, { method: "PATCH", json: { status: l.listingType.includes("RENT") ? "RENTED" : "SOLD" } }), `sold-${l.id}`)}>
                             {l.listingType.includes("RENT") ? tx(locale, "Marcar alquilado", "Mark rented") : tx(locale, "Marcar vendido", "Mark sold")}
                           </Button>

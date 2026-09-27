@@ -7,14 +7,20 @@ import { ListingCard } from "@/components/listing/ListingCard";
 import { listingPhoto } from "@/lib/photos";
 import { PropertyArt } from "@/components/art/PropertyArt";
 import { Button, EmptyState } from "@/components/ui";
+import { useQuery } from "@tanstack/react-query";
 import { useApp } from "@/lib/store";
+import { api } from "@/lib/api";
 import { AMENITY_LABEL, TYPE_LABEL, lbl, money, num, priceSuffix, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 
 export function SavedView({ locale, all }: { locale: Locale; all: Listing[] }) {
   const { saved, compare, toggleCompare } = useApp();
   const items = saved.map((id) => all.find((l) => l.id === id)).filter(Boolean) as Listing[];
-  const cmp = compare.map((id) => all.find((l) => l.id === id)).filter(Boolean) as Listing[];
+  // Compared listings don't have to be saved: fetch the ones we don't already have.
+  const missing = compare.filter((id) => !all.some((l) => l.id === id));
+  const extra = useQuery({ queryKey: ["compare", missing.join(",")], queryFn: () => api<{ items: Listing[] }>(`listings?ids=${missing.join(",")}`), enabled: missing.length > 0 });
+  const pool = [...all, ...(extra.data?.items ?? [])];
+  const cmp = compare.map((id) => pool.find((l) => l.id === id)).filter(Boolean) as Listing[];
   const rows: [string, (l: Listing) => React.ReactNode, ((l: Listing) => number)?, ("min" | "max")?][] = [
     [tx(locale, "Precio", "Price"), (l) => <span className="font-display text-lg font-semibold">{money(l.priceAmount, locale)}<span className="text-xs font-normal text-ink/65">{priceSuffix(l, locale)}</span></span>, (l) => l.priceAmount, "min"],
     ["PlaceEstimate", (l) => money(l.estimate.mid, locale)],

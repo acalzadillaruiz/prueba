@@ -2,12 +2,20 @@ import type { NextRequest } from "next/server";
 import { z } from "zod";
 import { prisma } from "@newplace/db";
 import { ApiError, body, currentUser, handler, ok, requireUser } from "@/server/api";
-import { filtersFromParams, listingById, searchListings } from "@/server/listings";
+import { filtersFromParams, listingById, listingInclude, publicWhere, searchListings, toDomain } from "@/server/listings";
 import { draftCopy, findDuplicate, fingerprintOf, notifySavedSearches, qualityOf, scenesFor, slugify, snapshotEstimate, uniqueSlug } from "@/server/listing-service";
 import { audit } from "@/server/data";
 import { isStaff } from "@/server/access";
 
 export const GET = handler(async (req: NextRequest) => {
+  // ?ids=a,b,c → those published listings in that order (comparator for listings that aren't saved)
+  const ids = req.nextUrl.searchParams.get("ids");
+  if (ids) {
+    const list = ids.split(",").filter(Boolean).slice(0, 10);
+    const rows = await prisma.listing.findMany({ where: { AND: [{ id: { in: list } }, publicWhere()] }, include: listingInclude });
+    const map = new Map(rows.map((r) => [r.id, toDomain(r)]));
+    return ok({ items: list.map((id) => map.get(id)).filter(Boolean), total: rows.length, nextCursor: null });
+  }
   const f = filtersFromParams(req.nextUrl.searchParams);
   const res = await searchListings(f);
   // impressions (Rightmove-style performance stats)

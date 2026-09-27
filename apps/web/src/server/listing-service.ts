@@ -1,8 +1,8 @@
 import "server-only";
+import { estimateFor } from "./estimate";
 import { prisma, type Prisma } from "@newplace/db";
 import { heuristicWriteListing } from "@newplace/ai";
 import type { Scene } from "@/types/domain";
-import { aiProvider } from "./ai";
 import { queueEmail } from "./data";
 import { filtersFromParams, whereFromFilters } from "./listings";
 import { inShape } from "@/lib/geo";
@@ -52,30 +52,10 @@ export function scenesFor(kind: string, luxury: boolean): Scene[] {
 export async function snapshotEstimate(listingId: string) {
   const l = await prisma.listing.findUnique({ where: { id: listingId } });
   if (!l) return null;
-  const zone = await prisma.zone.findUnique({ where: { name: l.zone } });
-  const group = l.listingType === "SALE" || l.listingType === "COMMERCIAL_SALE" ? "sale" : l.listingType === "SHORT_RENT" ? "short" : "rent";
-  const types = group === "sale" ? ["SALE", "COMMERCIAL_SALE"] : group === "short" ? ["SHORT_RENT"] : ["LONG_RENT", "COMMERCIAL_RENT"];
-  const pool = await prisma.listing.findMany({
-    where: { id: { not: l.id }, city: l.city, listingType: { in: types as Prisma.EnumListingTypeFilter["in"] }, luxury: l.luxury, kind: { not: "land" }, status: { in: ["ACTIVE", "UNDER_OFFER", "SOLD", "RENTED"] } },
-    select: { id: true, titleEs: true, zone: true, areaM2: true, priceAmount: true, lat: true, lng: true },
-    take: 60,
-  });
-  const ppm = zone ? (group === "sale" ? zone.salePpm * (l.kind === "warehouse" ? 0.7 : 1) : group === "short" ? zone.rentPpm * 0.075 : zone.rentPpm) : l.priceAmount / l.areaM2;
-  const provider = await aiProvider();
-  const est = await provider.estimate({
-    zone: l.zone,
-    zonePricePerM2: ppm,
-    areaM2: l.areaM2,
-    beds: l.beds,
-    baths: l.baths,
-    parking: l.parking,
-    yearBuilt: l.yearBuilt,
-    amenities: l.amenities,
-    luxury: l.luxury,
-    lat: l.lat,
-    lng: l.lng,
-    pool: pool.map((p) => ({ id: p.id, title: p.titleEs, zone: p.zone, areaM2: p.areaM2, priceAmount: p.priceAmount, lat: p.lat, lng: p.lng })),
-  });
+  const { provider: providerId, estimate: est, poolSize } = await estimateFor({ ...l, excludeId: l.id });
+  const group = l.listingType === "SALE" || l.listingType === "COMMERCIAL_SALE" ? "sale" : "rent";
+  const provider = { id: providerId };
+  const pool = { length: poolSize };
   if (group !== "sale" && pool.length < 3) {
     // Rentals with few comparables: anchor on the asking price (±10 %).
     est.mid = Math.round(l.priceAmount / 5) * 5;

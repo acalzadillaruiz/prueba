@@ -24,7 +24,8 @@ interface Ctx {
   saved: string[];
   compare: string[];
   toggleSaved: (id: string) => void;
-  toggleCompare: (id: string) => void;
+  /** Returns false when the comparator is already full (3). */
+  toggleCompare: (id: string) => boolean;
   requireLogin: () => boolean;
 }
 
@@ -64,15 +65,18 @@ export function AppStateProvider({ children, user, agency, savedIds }: { childre
     [saved, requireLogin],
   );
 
-  const toggleCompare = useCallback((id: string) => {
-    setCompare((c) => {
-      const next = c.includes(id) ? c.filter((x) => x !== id) : [...c, id].slice(-3);
+  const toggleCompare = useCallback(
+    (id: string) => {
+      if (!compare.includes(id) && compare.length >= 3) return false;
+      const next = compare.includes(id) ? compare.filter((x) => x !== id) : [...compare, id];
+      setCompare(next);
       try {
         localStorage.setItem(CMP, JSON.stringify(next));
       } catch {}
-      return next;
-    });
-  }, []);
+      return true;
+    },
+    [compare],
+  );
 
   const value = useMemo(() => ({ user, agency, saved, compare, toggleSaved, toggleCompare, requireLogin }), [user, agency, saved, compare, toggleSaved, toggleCompare, requireLogin]);
   return (

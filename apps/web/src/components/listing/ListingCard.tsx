@@ -3,7 +3,7 @@ import { Bath, BedDouble, Car, Maximize2, ShieldCheck } from "lucide-react";
 import type { Listing, Locale } from "@/types/domain";
 import { listingPhoto } from "@/lib/photos";
 import { PropertyArt } from "@/components/art/PropertyArt";
-import { TYPE_LABEL, lbl, money, num, priceSuffix, tx } from "@/lib/i18n";
+import { TYPE_LABEL, lbl, money, num, priceSuffix, tx, plural } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import { CompareButton, Freshness, SaveButton, StatusBadge } from "./bits";
 
@@ -82,7 +82,7 @@ export function MapPreviewCard({ l, locale }: { l: Listing; locale: Locale }) {
         </div>
         <div className="text-sm text-ink/70">
           {l.beds > 0 && `${l.beds} ${tx(locale, "hab", "bd")} · `}
-          {l.baths > 0 && `${l.baths} ${tx(locale, "baños", "ba")} · `}
+          {l.baths > 0 && `${plural(l.baths, locale, ["baño", "baños"], ["ba", "ba"])} · `}
           {l.areaM2} m²
         </div>
         <div className="line-clamp-1 text-sm font-semibold">{tx(locale, l.title_es, l.title_en)}</div>

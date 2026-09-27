@@ -204,6 +204,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
               value={nl}
               onChange={(e) => setNl(e.target.value)}
               placeholder={tx(locale, "Escribe lo que buscas…", "Describe what you want…")}
+              aria-label={tx(locale, "Búsqueda en lenguaje natural", "Natural-language search")}
               className="min-w-0 flex-1 bg-transparent text-sm focus:outline-none"
             />
           </form>
@@ -211,13 +212,25 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
             {TYPES.map(([k, es, en]) => (
               <button
                 key={k}
-                onClick={() => set({ type: k, max: null })}
+                onClick={() => set({ type: k, max: null, min: null })}
+                aria-pressed={type === k}
                 className={cn("rounded-full px-3 py-1 font-display text-sm", type === k ? "bg-navy text-ivory" : "text-ink/70 hover:text-ink")}
               >
                 {tx(locale, es, en)}
               </button>
             ))}
           </div>
+          <select
+            value={min ?? ""}
+            onChange={(e) => set({ min: e.target.value || null })}
+            className={cn(pill, "appearance-none border-line bg-white pr-8", min && "border-navy")}
+            aria-label={tx(locale, "Precio mínimo", "Min price")}
+          >
+            <option value="">{tx(locale, "Precio mín.", "Min price")}</option>
+            {[...(PRICE_STEPS[type] ?? [])].slice(0, -1).map((v) => (
+              <option key={v} value={v} disabled={!!max && v >= max}>≥ {money(v, locale)}</option>
+            ))}
+          </select>
           <select
             value={max ?? ""}
             onChange={(e) => set({ max: e.target.value || null })}
@@ -226,7 +239,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
           >
             <option value="">{tx(locale, "Precio máx.", "Max price")}</option>
             {PRICE_STEPS[type]?.map((v) => (
-              <option key={v} value={v}>≤ {money(v, locale)}</option>
+              <option key={v} value={v} disabled={!!min && v <= min}>≤ {money(v, locale)}</option>
             ))}
           </select>
           <select value={beds ?? ""} onChange={(e) => set({ beds: e.target.value || null })} className={cn(pill, "appearance-none border-line bg-white", beds && "border-navy")} aria-label={tx(locale, "Habitaciones", "Bedrooms")}>
@@ -241,24 +254,50 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
               <option key={z} value={z}>{z}</option>
             ))}
           </select>
-          <button onClick={() => setMoreOpen((o) => !o)} className={cn(pill, "border-line bg-white", moreOpen && "border-navy")}>
+          <button onClick={() => setMoreOpen((o) => !o)} aria-expanded={moreOpen} aria-controls="search-more-filters" className={cn(pill, "border-line bg-white", (moreOpen || baths || minM2) && "border-navy")}>
             <SlidersHorizontal size={15} /> {tx(locale, "Más filtros", "More filters")} <ChevronDown size={14} />
           </button>
           <button
             onClick={() => set({ lux: lux ? null : "1" })}
+            aria-pressed={lux}
             className={cn(pill, lux ? "border-gold bg-gold text-navy" : "border-gold/60 bg-white text-[#8A6A3C]")}
           >
             Luxury
           </button>
           <button
             onClick={createAlert}
-            className={cn(pill, "ml-auto", alertSaved ? "border-ok bg-ok text-white" : "border-coral bg-coral-cta text-white hover:bg-coral-cta-hover")}
+            disabled={alertSaved || savingAlert}
+            aria-live="polite"
+            className={cn(pill, "ml-auto disabled:cursor-default", alertSaved ? "border-ok bg-ok text-white" : "border-coral bg-coral-cta text-white hover:bg-coral-cta-hover")}
           >
             {alertSaved ? <Check size={15} /> : savingAlert ? <Loader2 size={15} className="animate-spin" /> : <Bell size={15} />} {alertSaved ? tx(locale, "Alerta creada", "Alert saved") : tx(locale, "Guardar búsqueda", "Save search")}
           </button>
         </div>
+        {alertError && (
+          <div role="alert" className="border-t border-line bg-[#B423181A] px-4 py-2 text-sm text-danger md:px-5">{alertError}</div>
+        )}
         {moreOpen && (
-          <div className="np-in absolute inset-x-0 top-full border-b border-line bg-white px-5 py-4 shadow-np">
+          <div id="search-more-filters" className="np-in absolute inset-x-0 top-full max-h-[70vh] overflow-y-auto border-b border-line bg-white px-4 py-4 shadow-np md:px-5">
+            <div className="mb-5 grid grid-cols-2 gap-3 sm:max-w-md">
+              <label className="block">
+                <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-ink/65">{tx(locale, "Baños", "Bathrooms")}</span>
+                <select value={baths ?? ""} onChange={(e) => set({ baths: e.target.value || null })} className={cn(pill, "w-full appearance-none border-line bg-white", baths && "border-navy")}>
+                  <option value="">{tx(locale, "Cualquiera", "Any")}</option>
+                  {[1, 2, 3, 4].map((b) => (
+                    <option key={b} value={b}>{b}+ {tx(locale, b === 1 ? "baño" : "baños", b === 1 ? "bath" : "baths")}</option>
+                  ))}
+                </select>
+              </label>
+              <label className="block">
+                <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-ink/65">{tx(locale, "Superficie mínima", "Min. area")}</span>
+                <select value={minM2 ?? ""} onChange={(e) => set({ m2: e.target.value || null })} className={cn(pill, "w-full appearance-none border-line bg-white", minM2 && "border-navy")}>
+                  <option value="">{tx(locale, "Cualquiera", "Any")}</option>
+                  {MIN_M2_STEPS.map((v) => (
+                    <option key={v} value={v}>≥ {num(v, locale)} m²</option>
+                  ))}
+                </select>
+              </label>
+            </div>
             <div className="grid gap-6 md:grid-cols-4">
               <div>
                 <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink/65">{tx(locale, "Publicado", "Published")}</div>
@@ -298,7 +337,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
         {/* map 60% */}
         <div className={cn("relative min-h-0 flex-1 lg:basis-[60%]", mobileList && "hidden lg:block")}>
           <NightMap
-            key={region + sp.toString()}
+            key={region + filtersKey}
             region={region}
             listings={mapListings}
             focus={fit.focus}
@@ -331,7 +370,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
                 </div>
                 <div className="text-xs text-ink/65">{tx(locale, "Precios en USD · actualizados en tiempo real", "Prices in USD · updated in real time")}</div>
               </div>
-              <select value={sort} onChange={(e) => setSort(e.target.value as typeof sort)} className="h-8 rounded-lg border border-line bg-white px-2 text-sm">
+              <select value={sort} onChange={(e) => set({ sort: e.target.value === "new" ? null : e.target.value })} aria-label={tx(locale, "Ordenar por", "Sort by")} className="h-8 rounded-lg border border-line bg-white px-2 text-sm">
                 <option value="new">{tx(locale, "Más nuevos", "Newest")}</option>
                 <option value="price-asc">{tx(locale, "Precio ↑", "Price ↑")}</option>
                 <option value="price-desc">{tx(locale, "Precio ↓", "Price ↓")}</option>
@@ -341,7 +380,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
             {activeChips.length > 0 && (
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {activeChips.map(([k, label, patch]) => (
-                  <button key={k} onClick={() => set(patch)} className="inline-flex items-center gap-1 rounded-full bg-navy px-2.5 py-0.5 text-xs font-semibold text-ivory">
+                  <button key={k} onClick={() => set(patch)} aria-label={`${tx(locale, "Quitar filtro", "Remove filter")}: ${label}`} className="inline-flex items-center gap-1 rounded-full bg-navy px-2.5 py-0.5 text-xs font-semibold text-ivory">
                     {label} <X size={12} />
                   </button>
                 ))}
@@ -361,7 +400,11 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
                 icon={<BellRing size={20} />}
                 title={tx(locale, "Nada por aquí… todavía", "Nothing here… yet")}
                 body={tx(locale, "Guarda la búsqueda y te avisamos en cuanto aparezca algo que encaje.", "Save this search and we’ll tell you as soon as something matches.")}
-                cta={<button onClick={createAlert} className="rounded-np bg-coral-cta px-4 py-2 font-display text-white">{tx(locale, "Crear alerta", "Create alert")}</button>}
+                cta={
+                  <button onClick={createAlert} disabled={alertSaved || savingAlert} className="rounded-np bg-coral-cta px-4 py-2 font-display text-white disabled:opacity-60">
+                    {alertSaved ? tx(locale, "Alerta creada", "Alert saved") : tx(locale, "Crear alerta", "Create alert")}
+                  </button>
+                }
               />
             </div>
           )}

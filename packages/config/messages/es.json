@@ -9,7 +9,7 @@
   },
   "admin": {
     "dashboard": "Panel", "leads": "Leads", "listings": "Inmuebles", "calendar": "Calendario", "capture": "Captación", "media": "Fotografía", "team": "Equipo", "reports": "Informes", "settings": "Ajustes",
-    "globalMetrics": "Métricas globales", "agencies": "Agencias", "users": "Usuarios", "moderation": "Moderación", "ai": "IA · FX · Seed",
+    "globalMetrics": "Métricas globales", "agencies": "Agencias", "users": "Usuarios", "moderation": "Moderación", "audit": "Auditoría", "ai": "IA · FX · Seed",
     "publicSite": "Ver sitio público", "search": "Buscar lead, inmueble, persona…", "notifications": "Notificaciones"
   },
   "roles": { "SUPERADMIN": "Superadmin", "AGENCY_OWNER": "Dueño de agencia", "AGENT": "Agente", "CAPTOR": "Captador", "PHOTOGRAPHER": "Fotógrafo", "BACKOFFICE": "Backoffice", "OWNER_PRIVATE": "Propietario", "SEEKER": "Buscador" },

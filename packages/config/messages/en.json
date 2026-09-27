@@ -9,7 +9,7 @@
   },
   "admin": {
     "dashboard": "Dashboard", "leads": "Leads", "listings": "Listings", "calendar": "Calendar", "capture": "Capture", "media": "Media", "team": "Team", "reports": "Reports", "settings": "Settings",
-    "globalMetrics": "Global metrics", "agencies": "Agencies", "users": "Users", "moderation": "Moderation", "ai": "AI · FX · Seed",
+    "globalMetrics": "Global metrics", "agencies": "Agencies", "users": "Users", "moderation": "Moderation", "audit": "Audit log", "ai": "AI · FX · Seed",
     "publicSite": "View public site", "search": "Search lead, listing, person…", "notifications": "Notifications"
   },
   "roles": { "SUPERADMIN": "Superadmin", "AGENCY_OWNER": "Agency owner", "AGENT": "Agent", "CAPTOR": "Captor", "PHOTOGRAPHER": "Photographer", "BACKOFFICE": "Backoffice", "OWNER_PRIVATE": "Owner", "SEEKER": "Seeker" },

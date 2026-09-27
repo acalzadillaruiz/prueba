@@ -43,8 +43,8 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
       ["email", errs.email && fieldError(errs.email, locale, "email")],
       ["phone", errs.phone && tx(locale, "El teléfono admite hasta 30 caracteres.", "Phone allows up to 30 characters.")],
       ["message", errs.message && `${tx(locale, "Mensaje", "Message")}: ${fieldError(errs.message, locale, "text")}`],
-    ] as const
-  ).filter((e): e is readonly [string, string] => !!e[1]);
+    ] as [string, string | false | undefined][]
+  ).filter((e): e is [string, string] => !!e[1]);
   const email = form.watch("email");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);

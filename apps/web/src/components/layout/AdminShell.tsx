@@ -55,6 +55,7 @@ const PLATFORM_NAV: Item[] = [
   { href: "/agencies", icon: Building2, label: "agencies" },
   { href: "/users", icon: Users, label: "users" },
   { href: "/moderation", icon: ShieldAlert, label: "moderation" },
+  { href: "/audit", icon: ClipboardList, label: "audit" },
   { href: "/ai", icon: Bot, label: "ai" },
 ];
 

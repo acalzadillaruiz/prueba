@@ -1,8 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { AlertTriangle, Ban, Bot, CheckCircle2, Eye, Loader2, LogIn, Plus, RefreshCw, RotateCcw, Search, ShieldAlert, ShieldCheck, Sprout } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { AlertTriangle, Ban, Bot, CheckCircle2, ChevronLeft, ChevronRight, Eye, Loader2, LogIn, Plus, RefreshCw, RotateCcw, Search, ShieldAlert, ShieldCheck, Sprout } from "lucide-react";
+import type { Role } from "@newplace/config";
 import type { Agency, Listing, Locale, User } from "@/types/domain";
 import { AdminShell } from "@/components/layout/AdminShell";
 import { PropertyArt } from "@/components/art/PropertyArt";
@@ -10,7 +13,9 @@ import { StatusBadge } from "@/components/listing/bits";
 import { Avatar, Badge, Button, Field, Stat, darkInputCls } from "@/components/ui";
 import { BarChart } from "./charts";
 import { useApp } from "@/lib/store";
-import { api } from "@/lib/api";
+import { api, type ApiClientError } from "@/lib/api";
+import { AUDIT_PREFIXES, auditDetail, auditLabel } from "@/lib/audit-labels";
+import type { AuditPage } from "@/server/audit-log";
 import { listingPhoto } from "@/lib/photos";
 import { ago, dateTime, money, num, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
@@ -85,12 +90,15 @@ export function PlatformHome({ locale, data }: { locale: Locale; data: PlatformH
           ))}
         </div>
         <div className="rounded-np border border-navy-line bg-navy-card p-5">
-          <div className="mb-3 font-display text-lg font-semibold">{tx(locale, "Auditoría reciente", "Recent audit log")}</div>
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <span className="font-display text-lg font-semibold">{tx(locale, "Auditoría reciente", "Recent audit log")}</span>
+            <Link href={`/${locale}/platform/audit`} className="text-sm font-semibold text-coral hover:underline">{tx(locale, "Ver todo", "View all")} →</Link>
+          </div>
           {data.audit.map((a, i) => (
             <div key={i} className="flex items-center gap-3 border-t border-navy-line py-2 text-sm first:border-0">
               <span className="w-20 shrink-0 text-xs text-mist">{ago(a.at, locale)}</span>
               <span className="shrink-0 font-semibold">{a.actor}</span>
-              <code className="shrink-0 rounded bg-white/5 px-1.5 text-xs text-coral">{a.action}</code>
+              <span className="shrink-0 rounded bg-white/5 px-1.5 text-xs text-coral">{auditLabel(a.action, locale)}</span>
               <span className="flex-1 truncate text-mist">{a.target}</span>
             </div>
           ))}
@@ -107,7 +115,7 @@ export function PlatformAgencies({ locale, agencies }: { locale: Locale; agencie
   const [f, setF] = useState({ name: "", city: "Caracas" });
   return (
     <AdminShell locale={locale} area="platform" title={tx(locale, "Agencias", "Agencies")} actions={<Button size="sm" onClick={() => setCreating(!creating)}><Plus size={15} /> {tx(locale, "Nueva agencia", "New agency")}</Button>}>
-      {err && <div className="mb-4 rounded-lg bg-[#B4231833] px-3 py-2 text-sm text-[#FF8A7A]">{err}</div>}
+      {err && <div role="alert" className="mb-4 rounded-lg bg-[#B4231833] px-3 py-2 text-sm text-[#FF8A7A]">{err}</div>}
       {current && (
         <div className="np-in mb-4 flex flex-wrap items-center gap-3 rounded-np border border-coral bg-[#F26B4D1a] p-3 text-sm">
           <LogIn size={16} className="text-coral" /> {tx(locale, `Impersonando a ${current.name}. Todo queda en el registro de auditoría.`, `Impersonating ${current.name}. Everything is audit-logged.`)}
@@ -133,10 +141,10 @@ export function PlatformAgencies({ locale, agencies }: { locale: Locale; agencie
                 <td className="px-4 py-3"><div className="flex items-center gap-3"><span className="flex h-9 w-9 items-center justify-center rounded-lg font-display text-xs font-bold text-navy" style={{ background: a.color }}>{a.initials}</span><div><div className="font-semibold">{a.name}</div><div className="text-xs text-mist">{a.city} · {tx(locale, "desde", "since")} {dateTime(a.createdAt, locale, { month: "short", year: "numeric" })}</div></div></div></td>
                 <td className="px-3">
                   <select value={a.status} onChange={(e) => run(a.id, () => api(`platform/agencies/${a.id}`, { method: "PATCH", json: { status: e.target.value } }))} className="h-8 rounded-md border border-navy-line bg-navy-2 px-2 text-xs" aria-label={tx(locale, "Estado", "Status")}>
-                    <option>ACTIVE</option><option>TRIAL</option><option>SUSPENDED</option>
+                    <option value="ACTIVE">{tx(locale, "Activa", "Active")}</option><option value="TRIAL">{tx(locale, "En prueba", "Trial")}</option><option value="SUSPENDED">{tx(locale, "Suspendida", "Suspended")}</option>
                   </select>
                 </td>
-                <td className="px-3">{a.verified ? <span className="flex items-center gap-1 text-[#7FD3A8]"><ShieldCheck size={15} /> VERIFIED</span> : <Button size="sm" variant="dark-outline" disabled={busy === a.id} onClick={() => run(a.id, () => api(`platform/agencies/${a.id}`, { method: "PATCH", json: { verified: true } }))}><Eye size={13} /> {tx(locale, "Verificar", "Verify")}</Button>}</td>
+                <td className="px-3">{a.verified ? <span className="flex items-center gap-1 text-[#7FD3A8]"><ShieldCheck size={15} /> {tx(locale, "Verificada", "Verified")}</span> : <Button size="sm" variant="dark-outline" disabled={busy === a.id} onClick={() => run(a.id, () => api(`platform/agencies/${a.id}`, { method: "PATCH", json: { verified: true } }))}><Eye size={13} /> {tx(locale, "Verificar", "Verify")}</Button>}</td>
                 <td className="px-3">
                   <select value={a.plan} onChange={(e) => run(a.id, () => api(`platform/agencies/${a.id}`, { method: "PATCH", json: { plan: e.target.value } }))} className="h-8 rounded-md border border-navy-line bg-navy-2 px-2 text-xs" aria-label="Plan">
                     <option>FREE</option><option>PRO</option><option>ENTERPRISE</option>
@@ -159,14 +167,37 @@ export function PlatformAgencies({ locale, agencies }: { locale: Locale; agencie
   );
 }
 
+const AGENCY_ROLES: Role[] = ["AGENCY_OWNER", "BACKOFFICE", "AGENT", "CAPTOR", "PHOTOGRAPHER"];
+const PERSONAL_ROLES: Role[] = ["SEEKER", "OWNER_PRIVATE", "SUPERADMIN"];
+
 export function PlatformUsers({ locale, users, providers }: { locale: Locale; users: (User & { suspended: boolean; agencyName?: string })[]; providers: Record<string, string[]> }) {
   const { user: me } = useApp();
+  const tr = useTranslations("roles");
   const { busy, err, run } = useRun();
+  const [roleErr, setRoleErr] = useState<string | null>(null);
   const [q, setQ] = useState("");
-  const rows = users.filter((u) => (u.name + u.email + u.role + (u.agencyName ?? "")).toLowerCase().includes(q.toLowerCase()));
+  const rows = users.filter((u) => (u.name + u.email + u.role + tr(u.role) + (u.agencyName ?? "")).toLowerCase().includes(q.toLowerCase()));
+  const changeRole = (u: User & { agencyName?: string }, role: Role) =>
+    run(`role-${u.id}`, async () => {
+      setRoleErr(null);
+      try {
+        await api(`platform/users/${u.id}`, { method: "PATCH", json: { role } });
+      } catch (e) {
+        const why = ((e as ApiClientError).details as { role?: string } | undefined)?.role;
+        setRoleErr(
+          why === "last owner"
+            ? tx(locale, `${u.name} es el último dueño de ${u.agencyName ?? "su agencia"}. Nombra otro dueño antes de cambiar su rol.`, `${u.name} is the last owner of ${u.agencyName ?? "their agency"}. Appoint another owner before changing this role.`)
+            : why === "no agency membership"
+              ? tx(locale, "Los roles de agencia solo se asignan a miembros de una agencia (invítalo desde la agencia).", "Agency roles can only be given to agency members (invite them from the agency).")
+              : why === "agency member needs an agency role"
+                ? tx(locale, "Un miembro de agencia solo puede tener roles de agencia.", "An agency member can only have agency roles.")
+                : (e as Error).message,
+        );
+      }
+    });
   return (
     <AdminShell locale={locale} area="platform" title={tx(locale, "Usuarios", "Users")}>
-      {err && <div className="mb-4 rounded-lg bg-[#B4231833] px-3 py-2 text-sm text-[#FF8A7A]">{err}</div>}
+      {(roleErr || err) && <div role="alert" className="mb-4 rounded-lg bg-[#B4231833] px-3 py-2 text-sm text-[#FF8A7A]">{roleErr ?? err}</div>}
       <div className="mb-4 flex flex-wrap items-center gap-3">
         <div className="relative w-80 max-w-full"><Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-mist" /><input value={q} onChange={(e) => setQ(e.target.value)} className={darkInputCls + " pl-9"} placeholder={tx(locale, "Nombre, email, rol o agencia…", "Name, email, role or agency…")} aria-label={tx(locale, "Buscar", "Search")} /></div>
         <span className="text-sm text-mist">{rows.length} / {users.length}</span>
@@ -178,7 +209,21 @@ export function PlatformUsers({ locale, users, providers }: { locale: Locale; us
             {rows.map((u) => (
               <tr key={u.id} className={cn("border-t border-navy-line", u.suspended && "opacity-50")}>
                 <td className="px-4 py-2.5"><div className="flex items-center gap-3"><Avatar initials={u.initials} hue={u.hue} size={32} /><div><div className="font-semibold">{u.name}</div><div className="text-xs text-mist">{u.email}</div></div></div></td>
-                <td className="px-3"><code className="rounded bg-white/5 px-1.5 py-0.5 text-xs text-coral">{u.role}</code></td>
+                <td className="px-3">
+                  {u.id === me?.id ? (
+                    <span className="rounded bg-white/5 px-1.5 py-0.5 text-xs text-coral">{tr(u.role)}</span>
+                  ) : (
+                    <select
+                      value={u.role}
+                      disabled={busy === `role-${u.id}`}
+                      onChange={(e) => changeRole(u, e.target.value as Role)}
+                      className="h-8 rounded-md border border-navy-line bg-navy-2 px-2 text-xs"
+                      aria-label={tx(locale, `Rol de ${u.name}`, `Role of ${u.name}`)}
+                    >
+                      {[...new Set([u.role, ...(u.agencyId ? AGENCY_ROLES : PERSONAL_ROLES)])].map((r) => <option key={r} value={r}>{tr(r)}</option>)}
+                    </select>
+                  )}
+                </td>
                 <td className="px-3 text-mist">{u.agencyName ?? "—"}</td>
                 <td className="px-3 text-xs text-mist">{providers[u.id]?.join(" · ") || "—"}</td>
                 <td className="px-3 text-xs text-mist">{u.suspended ? tx(locale, "Suspendido", "Suspended") : ago(u.lastSeen, locale)}</td>
@@ -204,7 +249,7 @@ export function PlatformModeration({ locale, reports, listings }: { locale: Loca
   const rows = listings.filter((l) => (l.title_es + l.zone + (l.agency?.name ?? "")).toLowerCase().includes(q.toLowerCase())).slice(0, 40);
   return (
     <AdminShell locale={locale} area="platform" title={tx(locale, "Moderación", "Moderation")}>
-      {err && <div className="mb-4 rounded-lg bg-[#B4231833] px-3 py-2 text-sm text-[#FF8A7A]">{err}</div>}
+      {err && <div role="alert" className="mb-4 rounded-lg bg-[#B4231833] px-3 py-2 text-sm text-[#FF8A7A]">{err}</div>}
       <div className="grid gap-6 [&>*]:min-w-0 xl:grid-cols-[1fr_1.3fr]">
         <div className="rounded-np border border-navy-line bg-navy-card p-5">
           <div className="mb-3 flex items-center gap-2 font-display text-lg font-semibold"><ShieldAlert size={18} className="text-coral" /> {tx(locale, "Reportes", "Reports")} · {reports.length}</div>
@@ -267,7 +312,7 @@ export function PlatformAI({ locale, settings, fx, counts }: { locale: Locale; s
   const [msg, setMsg] = useState<string | null>(null);
   return (
     <AdminShell locale={locale} area="platform" title={tx(locale, "IA · Tasas FX · Seed", "AI · FX rates · Seed")}>
-      {err && <div className="mb-4 rounded-lg bg-[#B4231833] px-3 py-2 text-sm text-[#FF8A7A]">{err}</div>}
+      {err && <div role="alert" className="mb-4 rounded-lg bg-[#B4231833] px-3 py-2 text-sm text-[#FF8A7A]">{err}</div>}
       <div className="grid gap-6 [&>*]:min-w-0 xl:grid-cols-2">
         <div className="rounded-np border border-navy-line bg-navy-card p-5">
           <div className="flex items-center gap-2 font-display text-lg font-semibold"><Bot size={18} className="text-coral" /> {tx(locale, "Proveedor de IA", "AI provider")}</div>
@@ -336,3 +381,89 @@ export function PlatformAI({ locale, settings, fx, counts }: { locale: Locale; s
 }
 
 
+
+export function PlatformAudit({
+  locale,
+  page,
+  options,
+  filters,
+}: {
+  locale: Locale;
+  page: AuditPage;
+  options: { prefixes: string[]; actions: string[]; actors: { id: string; name: string }[]; hasSystem: boolean };
+  filters: { cursor?: string; action?: string; actor?: string };
+}) {
+  const router = useRouter();
+  const base = `/${locale}/platform/audit`;
+  const href = (next: { cursor?: string; action?: string; actor?: string }) => {
+    const p = new URLSearchParams(Object.entries(next).filter((e): e is [string, string] => !!e[1]));
+    const qs = p.toString();
+    return qs ? `${base}?${qs}` : base;
+  };
+  const setFilter = (k: "action" | "actor", v: string) => router.push(href({ action: filters.action, actor: filters.actor, [k]: v || undefined }));
+  const system = tx(locale, "Sistema", "System");
+  const famLabel = (p: string) => (AUDIT_PREFIXES[p] ? tx(locale, AUDIT_PREFIXES[p][0], AUDIT_PREFIXES[p][1]) : p);
+  return (
+    <AdminShell locale={locale} area="platform" title={tx(locale, "Auditoría", "Audit log")}>
+      <div className="mb-4 flex flex-wrap items-end gap-3">
+        <div className="w-72 max-w-full">
+          <Field dark label={tx(locale, "Acción", "Action")}>
+            <select className={darkInputCls} value={filters.action ?? ""} onChange={(e) => setFilter("action", e.target.value)}>
+              <option value="">{tx(locale, "Todas", "All")}</option>
+              {options.prefixes.map((p) => (
+                <optgroup key={p} label={famLabel(p)}>
+                  <option value={p}>{tx(locale, `${famLabel(p)} · todas`, `${famLabel(p)} · all`)}</option>
+                  {options.actions.filter((a) => a.startsWith(`${p}.`)).map((a) => <option key={a} value={a}>{auditLabel(a, locale)}</option>)}
+                </optgroup>
+              ))}
+            </select>
+          </Field>
+        </div>
+        <div className="w-64 max-w-full">
+          <Field dark label={tx(locale, "Autor", "Actor")}>
+            <select className={darkInputCls} value={filters.actor ?? ""} onChange={(e) => setFilter("actor", e.target.value)}>
+              <option value="">{tx(locale, "Todos", "Everyone")}</option>
+              {options.hasSystem && <option value="system">{system}</option>}
+              {options.actors.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
+            </select>
+          </Field>
+        </div>
+        {(filters.action || filters.actor) && <Link href={base} className="pb-2 text-sm text-coral hover:underline">{tx(locale, "Quitar filtros", "Clear filters")}</Link>}
+      </div>
+      <div className="overflow-x-auto rounded-np border border-navy-line bg-navy-card">
+        <table className="w-full min-w-[860px] text-sm">
+          <thead className="border-b border-navy-line text-left text-xs uppercase tracking-wide text-mist">
+            <tr><th className="px-4 py-3">{tx(locale, "Fecha", "Date")}</th><th className="px-3 py-3">{tx(locale, "Autor", "Actor")}</th><th className="px-3 py-3">{tx(locale, "Acción", "Action")}</th><th className="px-3 py-3">{tx(locale, "Sobre", "Target")}</th><th className="px-3 py-3">{tx(locale, "Detalle", "Details")}</th></tr>
+          </thead>
+          <tbody>
+            {page.items.map((a) => (
+              <tr key={a.id} className="border-t border-navy-line align-top" data-testid="audit-row">
+                <td className="whitespace-nowrap px-4 py-2.5 text-xs text-mist" title={a.at}>{dateTime(a.at, locale, { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}</td>
+                <td className="px-3 py-2.5 font-semibold">{a.actor || system}</td>
+                <td className="px-3 py-2.5"><span className="rounded bg-white/5 px-1.5 py-0.5 text-xs text-coral" title={a.action}>{auditLabel(a.action, locale)}</span></td>
+                <td className="max-w-xs truncate px-3 py-2.5" title={a.target}>{a.target === "-" ? "—" : a.target}</td>
+                <td className="px-3 py-2.5 text-xs text-mist">{auditDetail(a.data, locale)}</td>
+              </tr>
+            ))}
+            {!page.items.length && (
+              <tr><td colSpan={5} className="p-8 text-center text-mist">{tx(locale, "No hay entradas con estos filtros.", "No entries match these filters.")}</td></tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+      <nav className="mt-4 flex items-center justify-between gap-3 text-sm" aria-label={tx(locale, "Paginación", "Pagination")}>
+        {filters.cursor ? (
+          <button type="button" onClick={() => router.back()} className="flex items-center gap-1 text-coral hover:underline"><ChevronLeft size={15} /> {tx(locale, "Anterior", "Previous")}</button>
+        ) : <span />}
+        <div className="flex items-center gap-4">
+          {filters.cursor && <Link href={href({ action: filters.action, actor: filters.actor })} className="text-mist hover:underline">{tx(locale, "Más recientes", "Newest")}</Link>}
+          {page.nextCursor && (
+            <Link href={href({ action: filters.action, actor: filters.actor, cursor: page.nextCursor })} className="flex items-center gap-1 font-semibold text-coral hover:underline">
+              {tx(locale, "Siguiente", "Next")} <ChevronRight size={15} />
+            </Link>
+          )}
+        </div>
+      </nav>
+    </AdminShell>
+  );
+}

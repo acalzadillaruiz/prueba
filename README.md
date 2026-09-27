@@ -34,7 +34,7 @@ Sin claves de Google ni de IA la app funciona igual: mapa ilustrado, geocodifica
 | `npm run db:reset` | Recrea el esquema y vuelve a sembrar |
 | `npm run db:setup` | Crea las tablas y siembra solo si la base está vacía (lo usa el despliegue) |
 | `npm test` | Vitest: IA, RBAC, schemas Zod, geo, filtros de búsqueda |
-| `npm run e2e` | Playwright: los 10 criterios de aceptación §15 + smoke + RBAC |
+| `npm run e2e` | Playwright (18): los 10 criterios de aceptación §15 + smoke + RBAC + seguridad + reservas simultáneas + invitaciones |
 | `npm run lint` · `npm run typecheck -w apps/web` | ESLint · TypeScript |
 | `npm run photos -w apps/web` | Genera fotos IA de los listings (requiere `GEMINI_API_KEY` o acceso a Pollinations) |
 | `npm run shots` · `node scripts/video.mjs cliente\|admin\|propietario` | Capturas y vídeos (ver RUNBOOK) |
@@ -45,6 +45,6 @@ apps/web          Next.js 15 App Router: páginas, API REST /api/v1, Auth.js, Se
 packages/db       Prisma schema (§8), cliente y seed Venezuela
 packages/ai       AIProvider: HeuristicProvider + OpenAICompatibleProvider
 packages/config   Tokens Caracas Night, matriz RBAC, schemas Zod compartidos, catálogos es/en
-docs/             DEPLOY (publicar en Vercel) · ARCHITECTURE · RUNBOOK · DECISIONS · DEVIATIONS · V1_PROGRESS
+docs/             DEPLOY (publicar en Vercel) · REVIEW (revisión experta) · ARCHITECTURE · RUNBOOK · DECISIONS · DEVIATIONS · V1_PROGRESS
 captures/ videos/ Capturas y recorridos en vídeo
 ```

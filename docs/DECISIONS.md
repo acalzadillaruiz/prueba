@@ -13,3 +13,7 @@
 - **Sesiones JWT** (no de base de datos) para que el middleware edge pueda comprobar el rol sin consultar Postgres.
 - **Zona horaria:** agenda y slots en America/Caracas (UTC-4); semana empieza en lunes.
 - **Datos seed** con fechas relativas a la ejecución para que dashboards, SLA y agenda siempre tengan datos «de hoy».
+- **Comisión vacacional:** % de venta aplicado a 30 noches (una mensualidad equivalente).
+- **Límites de uso:** por IP en producción (contacto 10/10 min, registro 5/h, IA pública 30–60/min, ofertas 10/h); el bloqueo de login por cuenta (10 fallos/15 min) aplica siempre. Se guardan en Postgres para que valgan entre instancias serverless.
+- **Búsqueda:** muestra solo lo disponible (próximamente, activo, en oferta); vendidos/alquilados siguen accesibles por enlace y como «vendidos cerca».
+- **Service worker:** solo cachea contenido público; las áreas privadas y la API de usuario van siempre a red, y al cerrar sesión se borran las cachés.

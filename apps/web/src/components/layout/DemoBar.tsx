@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { logout } from "@/lib/logout";
 import { FlaskConical, Loader2, LogIn, LogOut } from "lucide-react";
@@ -10,6 +10,7 @@ import { useApp } from "@/lib/store";
 import { DEMO_ENABLED, DEMO_LOGINS } from "@/lib/demo";
 import { Avatar } from "@/components/ui";
 import { tx } from "@/lib/i18n";
+import { cn } from "@/lib/cn";
 
 /** DEMO_AUTH=true — "Entrar como…" for QA without Google console. Uses the real Auth.js "demo" provider. */
 export function DemoBar({ locale }: { locale: Locale }) {
@@ -18,6 +19,8 @@ export function DemoBar({ locale }: { locale: Locale }) {
   const [busy, setBusy] = useState<string | null>(null);
   const [hidden, setHidden] = useState(false);
   const router = useRouter();
+  // In the back-office the sidebar (sign out, public site) sits bottom-left: keep the pill clear of it.
+  const admin = /^\/(es|en)\/(agency|platform)(\/|$)/.test(usePathname());
   useEffect(() => setHidden(new URLSearchParams(window.location.search).has("shot")), []);
   if (!DEMO_ENABLED || hidden) return null;
   const go = async (email: string, home: string) => {
@@ -29,7 +32,7 @@ export function DemoBar({ locale }: { locale: Locale }) {
     router.refresh();
   };
   return (
-    <div className="fixed bottom-4 left-4 z-50 print:hidden" data-demobar>
+    <div className={cn("fixed bottom-4 left-4 z-50 print:hidden", admin && "lg:left-64")} style={{ marginBottom: "env(safe-area-inset-bottom)" }} data-demobar>
       {open && (
         <div className="np-in mb-2 w-64 overflow-hidden rounded-np border border-navy-line bg-navy text-ivory shadow-np">
           <div className="border-b border-navy-line px-3 py-2 text-xs font-semibold uppercase tracking-wide text-mist">{tx(locale, "Entrar como… (modo demo)", "Sign in as… (demo mode)")}</div>

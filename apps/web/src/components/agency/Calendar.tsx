@@ -8,7 +8,7 @@ import type { Locale } from "@/types/domain";
 import { AdminShell } from "@/components/layout/AdminShell";
 import { Button } from "@/components/ui";
 import { api } from "@/lib/api";
-import { tx } from "@/lib/i18n";
+import { plural, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 
 export type CalEvent = { id: string; start: string; title: string; sub: string; kind: "tour" | "req" | "done" | "media" | "cancelled"; agentName: string; tourId?: string };
@@ -184,7 +184,11 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
           )}
           <div className="rounded-np border border-navy-line bg-navy-card p-4 text-sm">
             <div className="font-display text-lg font-semibold">{tx(locale, "Esta semana", "This week")}</div>
-            <div className="mt-2 text-mist">{inWeek.filter((e) => e.kind === "tour" || e.kind === "req").length} {tx(locale, "visitas", "tours")} · {inWeek.filter((e) => e.kind === "media").length} {tx(locale, "sesiones de fotos", "photo shoots")}</div>
+            <div className="mt-2 text-mist">{(() => {
+              const t = inWeek.filter((e) => e.kind === "tour" || e.kind === "req").length;
+              const m = inWeek.filter((e) => e.kind === "media").length;
+              return `${plural(t, locale, ["visita", "visitas"], ["tour", "tours"])} · ${plural(m, locale, ["sesión de fotos", "sesiones de fotos"], ["photo shoot", "photo shoots"])}`;
+            })()}</div>
           </div>
         </div>
       </div>

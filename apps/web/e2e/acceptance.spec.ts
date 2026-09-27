@@ -46,7 +46,7 @@ test.describe.serial("Criterios de aceptación §15", () => {
     await expect(row).toBeVisible();
     await row.click();
     await expect(page.getByText(/Score IA/)).toBeVisible();
-    await expect(page.getByText(/nextAction: PROPOSE_TOUR/)).toBeVisible();
+    await expect(page.getByTestId("next-action")).toHaveAttribute("data-action", "PROPOSE_TOUR");
   });
 
   test("5 · propietario publica FSBO en Altamira", async ({ page }) => {

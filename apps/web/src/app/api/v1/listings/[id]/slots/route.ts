@@ -6,11 +6,14 @@ type Ctx = { params: Promise<{ id: string }> };
 const TZ_OFFSET_H = -4; // America/Caracas (no DST)
 
 /** Real availability for the next 7 days: agent weekly slots minus tours already booked. */
-export const GET = handler(async (_req: NextRequest, { params }: Ctx) => {
+export const GET = handler(async (req: NextRequest, { params }: Ctx) => {
   const { id } = await params;
-  const l = await prisma.listing.findUnique({ where: { id }, select: { agentId: true, ownerUserId: true } });
+  const l = await prisma.listing.findUnique({ where: { id }, select: { agentId: true, ownerUserId: true, agencyId: true } });
   if (!l) throw new ApiError("NOT_FOUND");
-  const agentId = l.agentId;
+  // ?agent= another AGENT of the same agency (a reassigned lead is toured by its new agent).
+  const requested = req.nextUrl.searchParams.get("agent");
+  const agentOk = requested && l.agencyId ? await prisma.agencyMember.findFirst({ where: { userId: requested, agencyId: l.agencyId, role: "AGENT" }, select: { userId: true } }) : null;
+  const agentId = agentOk?.userId ?? l.agentId;
   if (!agentId) return ok({ agentId: null, days: [] });
   const slots = await prisma.tourSlot.findMany({ where: { agentId } });
   const now = new Date();

@@ -36,6 +36,12 @@ export const PATCH = handler(async (req: NextRequest, { params }: Ctx) => {
   if (reassign) {
     await prisma.leadEvent.create({ data: { leadId: id, type: "ASSIGN", data: reassign, actorId: u.id } });
     await audit(u.id, "lead.assign", lead.name, { from: reassign.fromName, to: reassign.toName });
+    // Upcoming tours move with the lead, unless the new agent is already busy at that time (then they stay and are flagged in the timeline).
+    const upcoming = await prisma.tour.findMany({ where: { leadId: id, start: { gt: new Date() }, status: { in: ["REQUESTED", "CONFIRMED"] } } });
+    for (const t of upcoming) {
+      const clash = await prisma.tour.findFirst({ where: { agentId: reassign.to, id: { not: t.id }, status: { in: ["REQUESTED", "CONFIRMED"] }, start: { gte: new Date(t.start.getTime() - 59 * 60e3), lte: new Date(t.start.getTime() + 59 * 60e3) } } });
+      if (!clash) await prisma.tour.update({ where: { id: t.id }, data: { agentId: reassign.to } });
+    }
     // The new agent joins the lead's conversation.
     const threads = await prisma.messageThread.findMany({ where: { leadId: id }, select: { id: true } });
     for (const t of threads) await prisma.threadParticipant.upsert({ where: { threadId_userId: { threadId: t.id, userId: reassign.to } }, create: { threadId: t.id, userId: reassign.to }, update: {} });

@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { CalendarPlus, Clock, Mail, MessageCircle, Phone, RefreshCw, Send, Sparkles, Star, Target } from "lucide-react";
+import { CalendarPlus, Clock, Loader2, Mail, MessageCircle, Phone, RefreshCw, Search, Send, Sparkles, Star, Target, UserRoundCog, X } from "lucide-react";
 import type { NextAction } from "@newplace/ai";
 import type { Lead, LeadStage, Listing, Locale } from "@/types/domain";
 import { api } from "@/lib/api";
@@ -14,6 +14,7 @@ import { PropertyArt } from "@/components/art/PropertyArt";
 import { Avatar, Badge, Button } from "@/components/ui";
 import { ago, dateTime, money, priceSuffix, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
+import { caracasInputToIso, isoToCaracasInput } from "@/lib/caracas-time";
 
 const STAGES: [LeadStage, string, string][] = [
   ["NEW", "Nuevo", "New"],
@@ -60,7 +61,65 @@ function Sla({ lead, locale }: { lead: Lead; locale: Locale }) {
 }
 
 type ScoredLead = Lead & { score?: number | null; nextAction?: string | null; reason?: string | null; priority?: boolean };
-type Detail = { lead: ScoredLead; events: { type: string; data: unknown; at: string }[]; messages: { id: string; from: string; body: string; at: string; mine: boolean }[] };
+type Detail = { lead: ScoredLead; events: { type: string; data: unknown; at: string }[]; messages: { id: string; from: string; body: string; at: string; mine: boolean }[]; agents: { id: string; name: string }[] | null };
+type Slots = { agentId: string | null; days: { date: string; hours: { hour: number; iso: string; available: boolean }[] }[] };
+
+/** Accent- and case-insensitive text for the inbox search. */
+const fold = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
+function TourPicker({ locale, listingId, agentId, busy, onPropose, onClose }: { locale: Locale; listingId: string; agentId?: string | null; busy: boolean; onPropose: (iso: string) => void; onClose: () => void }) {
+  const slots = useQuery({ queryKey: ["slots", listingId, agentId], queryFn: () => api<Slots>(`listings/${listingId}/slots${agentId ? `?agent=${agentId}` : ""}`) });
+  const [pick, setPick] = useState<string | null>(null);
+  const [custom, setCustom] = useState("");
+  const [err, setErr] = useState<string | null>(null);
+  const days = (slots.data?.days ?? []).map((d) => ({ ...d, hours: d.hours.filter((h) => h.available) })).filter((d) => d.hours.length);
+  const minInput = isoToCaracasInput(Date.now() + 5 * 60e3);
+  return (
+    <div className="np-in mt-4 rounded-lg border border-navy-line bg-navy-2/60 p-3" role="group" aria-label={tx(locale, "Proponer visita", "Propose a tour")}>
+      <div className="flex items-center justify-between">
+        <div className="text-sm font-semibold">{tx(locale, "Horarios libres del agente", "Agent’s free slots")}</div>
+        <button type="button" onClick={onClose} className="rounded p-1 text-mist hover:bg-white/5" aria-label={tx(locale, "Cerrar", "Close")}><X size={14} /></button>
+      </div>
+      {slots.isLoading ? (
+        <div className="mt-2 flex items-center gap-2 text-xs text-mist"><Loader2 size={13} className="animate-spin" /> {tx(locale, "Cargando agenda…", "Loading calendar…")}</div>
+      ) : days.length ? (
+        <div className="mt-2 max-h-40 space-y-2 overflow-y-auto scrollbar-thin">
+          {days.map((d) => (
+            <div key={d.date}>
+              <div className="text-[11px] capitalize text-mist">{dateTime(d.date, locale, { weekday: "long", day: "numeric", month: "short" })}</div>
+              <div className="mt-1 flex flex-wrap gap-1.5">
+                {d.hours.map((h) => (
+                  <button key={h.iso} type="button" aria-pressed={pick === h.iso} onClick={() => { setPick(h.iso); setCustom(""); setErr(null); }} className={cn("rounded-md border px-2 py-1 text-xs", pick === h.iso ? "border-coral bg-coral-cta text-white" : "border-navy-line hover:border-coral")}>
+                    {dateTime(h.iso, locale, { hour: "2-digit", minute: "2-digit" })}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="mt-2 text-xs text-mist">{tx(locale, "Sin horarios libres publicados en los próximos días. Propón una hora libre abajo.", "No free published slots in the coming days. Propose any time below.")}</div>
+      )}
+      <label className="mt-3 block text-xs text-mist">
+        {tx(locale, "…u otra fecha y hora (Caracas)", "…or another date & time (Caracas)")}
+        <input type="datetime-local" min={minInput} value={custom} onChange={(e) => { setCustom(e.target.value); setPick(null); setErr(null); }} className="mt-1 h-9 w-full rounded-lg border border-navy-line bg-navy-2 px-2 text-sm text-ivory" />
+      </label>
+      {err && <div role="alert" className="mt-2 text-xs text-[#FF8A7A]">{err}</div>}
+      <Button
+        size="sm"
+        className="mt-3"
+        disabled={busy || (!pick && !custom)}
+        onClick={() => {
+          const iso = pick ?? caracasInputToIso(custom);
+          if (!iso || Date.parse(iso) <= Date.now()) return setErr(tx(locale, "Elige una fecha y hora futura.", "Pick a future date and time."));
+          onPropose(iso);
+        }}
+      >
+        {busy ? <Loader2 size={14} className="animate-spin" /> : <CalendarPlus size={14} />} {tx(locale, "Proponer y avisar al cliente", "Propose and notify the client")}
+      </Button>
+    </div>
+  );
+}
 
 const stageLabel = (locale: Locale, st: string) => {
   const s = STAGES.find(([k]) => k === st);
@@ -85,8 +144,17 @@ export function LeadsInbox({ locale, initial, listings, agents }: { locale: Loca
   const [selId, setSelId] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
+  const [q, setQ] = useState("");
+  const [tourOpen, setTourOpen] = useState(false);
   const leads = list.data;
-  const visible = leads
+  const needle = fold(q.trim());
+  const matches = (l: ScoredLead) => {
+    if (!needle) return true;
+    const lst = byId.get(l.listingId);
+    return fold([l.name, l.email, l.phone ?? "", (l.phone ?? "").replace(/\D/g, ""), lst?.title_es ?? "", lst?.title_en ?? ""].join(" ")).includes(needle);
+  };
+  const found = leads.filter(matches);
+  const visible = found
     .filter((l) => stage === "ALL" || l.stage === stage)
     .sort((a, b) => (a.stage === "NEW" ? 0 : 1) - (b.stage === "NEW" ? 0 : 1) || Number(!!b.priority) - Number(!!a.priority) || (b.score ?? 0) - (a.score ?? 0));
   const sel = leads.find((l) => l.id === (selId ?? visible[0]?.id));
@@ -112,31 +180,46 @@ export function LeadsInbox({ locale, initial, listings, agents }: { locale: Loca
       setBusy(null);
     }
   };
-  const doNextAction = () =>
-    run("action", async () => {
+  const proposeTour = (iso: string) =>
+    run("tour", async () => {
       if (!sel) return;
-      if (sel.nextAction === "PROPOSE_TOUR" && listing) {
-        const slots = await api<{ days: { hours: { iso: string; available: boolean }[] }[] }>(`listings/${listing.id}/slots`);
-        const first = slots.days.flatMap((d) => d.hours).find((h) => h.available);
-        if (first) {
-          await api(`leads/${sel.id}/tour`, { method: "POST", json: { start: first.iso } });
-          const when = dateTime(first.iso, locale);
-          await api(`leads/${sel.id}/messages`, { method: "POST", json: { body: tx(locale, `¡Hola ${sel.name.split(" ")[0]}! Te confirmo la visita el ${when}. ¿Te funciona?`, `Hi ${sel.name.split(" ")[0]}! Your tour is set for ${when}. Does that work?`) } });
-          return;
-        }
-      }
+      await api(`leads/${sel.id}/tour`, { method: "POST", json: { start: iso } });
+      const when = dateTime(iso, locale);
+      await api(`leads/${sel.id}/messages`, { method: "POST", json: { body: tx(locale, `¡Hola ${sel.name.split(" ")[0]}! Te confirmo la visita el ${when}. ¿Te funciona?`, `Hi ${sel.name.split(" ")[0]}! Your tour is set for ${when}. Does that work?`) } });
+      setTourOpen(false);
+    });
+  const doNextAction = () => {
+    if (sel?.nextAction === "PROPOSE_TOUR" && listing) return setTourOpen(true);
+    return run("action", async () => {
+      if (!sel) return;
       const text =
         sel.nextAction === "SEND_SIMILARS"
           ? tx(locale, "Te comparto 3 inmuebles similares dentro de tu presupuesto. ¿Te gustaría visitarlos?", "Here are 3 similar homes within your budget. Want to see them?")
           : tx(locale, `¡Hola ${sel.name.split(" ")[0]}! Soy de la agencia. ¿Te llamo ahora para resolver tus dudas?`, `Hi ${sel.name.split(" ")[0]}! This is your agent. Can I call you now?`);
       await api(`leads/${sel.id}/messages`, { method: "POST", json: { body: text } });
     });
+  };
+  const eventText = (e: Detail["events"][number]) => {
+    const d = (e.data ?? {}) as { from?: string; to?: string; auto?: boolean; start?: string; toName?: string };
+    if (e.type === "CREATED") return tx(locale, "Lead creado", "Lead created");
+    if (e.type === "STAGE") return `${tx(locale, "Etapa", "Stage")}: ${stageName(d.from ?? "")} → ${stageName(d.to ?? "")}${d.auto ? ` (${tx(locale, "al responder", "on reply")})` : ""}`;
+    if (e.type === "TOUR") return d.start ? `${tx(locale, "Visita agendada", "Tour booked")} · ${dateTime(d.start, locale)}` : tx(locale, "Visita agendada", "Tour booked");
+    if (e.type === "ASSIGN") return `${tx(locale, "Reasignado a", "Reassigned to")} ${d.toName ?? agents[d.to ?? ""] ?? "—"}`;
+    return tx(locale, "Mensaje enviado", "Message sent");
+  };
 
   return (
     <AdminShell locale={locale} area="agency" title={tx(locale, "Leads", "Leads")} actions={<span className="hidden items-center gap-1.5 text-xs text-mist md:flex"><RefreshCw size={12} className={list.isFetching ? "animate-spin" : ""} /> {tx(locale, "auto cada 15 s", "auto every 15 s")}</span>}>
+      <div className="mb-3 flex flex-wrap items-center gap-3">
+        <div className="relative w-96 max-w-full">
+          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-mist" />
+          <input type="search" value={q} onChange={(e) => setQ(e.target.value)} className="h-10 w-full rounded-lg border border-navy-line bg-navy-2 pl-9 pr-3 text-sm focus:border-coral focus:outline-none" placeholder={tx(locale, "Buscar por nombre, email, teléfono o inmueble…", "Search by name, email, phone or listing…")} aria-label={tx(locale, "Buscar leads", "Search leads")} />
+        </div>
+        {needle && <span className="text-sm text-mist">{found.length} / {leads.length}</span>}
+      </div>
       <div className="mb-4 flex flex-wrap gap-2">
         {[["ALL", "Todos", "All"] as const, ...STAGES].map(([k, es, en]) => {
-          const n = k === "ALL" ? leads.length : leads.filter((l) => l.stage === k).length;
+          const n = k === "ALL" ? found.length : found.filter((l) => l.stage === k).length;
           return (
             <button key={k} onClick={() => setStage(k)} className={cn("flex items-center gap-2 rounded-full border px-3.5 py-1.5 font-display text-sm", stage === k ? "border-coral bg-coral-cta text-white" : "border-navy-line text-ivory/80 hover:bg-white/5")}>
               {tx(locale, es, en)} <span className={cn("rounded-full px-1.5 text-xs", stage === k ? "bg-white/25" : "bg-white/10")}>{n}</span>
@@ -178,7 +261,7 @@ export function LeadsInbox({ locale, initial, listings, agents }: { locale: Loca
               </button>
             );
           })}
-          {visible.length === 0 && <div className="p-8 text-center text-sm text-mist">{tx(locale, "Sin leads en esta etapa", "No leads in this stage")}</div>}
+          {visible.length === 0 && <div className="p-8 text-center text-sm text-mist">{needle ? tx(locale, "Ningún lead coincide con la búsqueda", "No leads match your search") : tx(locale, "Sin leads en esta etapa", "No leads in this stage")}</div>}
         </div>
 
         {sel ? (
@@ -196,6 +279,23 @@ export function LeadsInbox({ locale, initial, listings, agents }: { locale: Loca
                     {sel.agentId && agents[sel.agentId] && <Badge tone="dark">{agents[sel.agentId]}</Badge>}
                   </div>
                 </div>
+                {detail.data?.agents && (
+                  <label className="flex items-center gap-2 text-xs text-mist">
+                    <UserRoundCog size={15} />
+                    <span className="sr-only">{tx(locale, "Agente asignado", "Assigned agent")}</span>
+                    <select
+                      value={sel.agentId || ""}
+                      disabled={busy === "assign"}
+                      aria-label={tx(locale, "Agente asignado", "Assigned agent")}
+                      onChange={(e) => run("assign", () => api(`leads/${sel.id}`, { method: "PATCH", json: { agentId: e.target.value } }))}
+                      className="h-9 rounded-lg border border-navy-line bg-navy-2 px-3 text-sm text-ivory"
+                    >
+                      {!sel.agentId && <option value="">{tx(locale, "Sin asignar", "Unassigned")}</option>}
+                      {sel.agentId && !detail.data.agents.some((a) => a.id === sel.agentId) && <option value={sel.agentId}>{agents[sel.agentId] ?? "—"}</option>}
+                      {detail.data.agents.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
+                    </select>
+                  </label>
+                )}
                 <select value={sel.stage} aria-label={tx(locale, "Etapa", "Stage")} onChange={(e) => run("stage", () => api(`leads/${sel.id}`, { method: "PATCH", json: { stage: e.target.value } }))} className="h-9 rounded-lg border border-navy-line bg-navy-2 px-3 text-sm">
                   {STAGES.map(([k, es, en]) => <option key={k} value={k}>{tx(locale, es, en)}</option>)}
                 </select>
@@ -208,15 +308,20 @@ export function LeadsInbox({ locale, initial, listings, agents }: { locale: Loca
                 <div className="mt-3 flex items-center gap-4">
                   <ScoreRing score={sel.score ?? 0} />
                   <div>
-                    <div className="font-display text-xl font-semibold">{tx(locale, A[0], A[1])}</div>
+                    <div className="font-display text-xl font-semibold" data-testid="next-action" data-action={sel.nextAction ?? ""}>{tx(locale, A[0], A[1])}</div>
                     <div className="text-sm text-mist">{sel.reason}</div>
-                    <div className="mt-1 font-mono text-[11px] text-mist/70">nextAction: {sel.nextAction}</div>
+                    <div className="mt-1 text-[11px] text-mist/70">{tx(locale, "Siguiente acción sugerida por la IA", "Next action suggested by AI")}</div>
                   </div>
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2">
                   <Button size="sm" onClick={doNextAction} disabled={busy === "action"}>
                     <ActionIcon size={15} /> {tx(locale, A[0], A[1])}
                   </Button>
+                  {sel.nextAction !== "PROPOSE_TOUR" && listing && (
+                    <Button size="sm" variant="dark-outline" onClick={() => setTourOpen(!tourOpen)} aria-expanded={tourOpen}>
+                      <CalendarPlus size={14} /> {tx(locale, "Proponer visita", "Propose tour")}
+                    </Button>
+                  )}
                   <Button size="sm" variant="dark-outline" onClick={() => run("prio", () => api(`leads/${sel.id}`, { method: "PATCH", json: { priority: !sel.priority } }))}>
                     <Star size={14} className={sel.priority ? "fill-gold text-gold" : ""} /> {sel.priority ? tx(locale, "Prioritario", "Priority") : tx(locale, "Marcar prioridad", "Flag priority")}
                   </Button>
@@ -224,6 +329,7 @@ export function LeadsInbox({ locale, initial, listings, agents }: { locale: Loca
                     <RefreshCw size={13} /> {tx(locale, "Recalcular", "Re-score")}
                   </Button>
                 </div>
+                {tourOpen && listing && <TourPicker agentId={sel?.agentId} locale={locale} listingId={listing.id} busy={busy === "tour"} onPropose={proposeTour} onClose={() => setTourOpen(false)} />}
               </div>
 
               <div className="rounded-np border border-navy-line bg-navy-card p-4">
@@ -242,7 +348,7 @@ export function LeadsInbox({ locale, initial, listings, agents }: { locale: Loca
                   {(detail.data?.events ?? []).map((e, i) => (
                     <li key={i} className="relative">
                       <span className={cn("absolute -left-[21px] top-1.5 h-2 w-2 rounded-full", i === 0 ? "bg-coral" : "bg-mist")} />
-                      {e.type === "CREATED" ? tx(locale, "Lead creado", "Lead created") : e.type === "STAGE" ? `${tx(locale, "Etapa", "Stage")}: ${stageName((e.data as { from: string }).from)} → ${stageName((e.data as { to: string }).to)}` : e.type === "TOUR" ? tx(locale, "Visita agendada", "Tour booked") : tx(locale, "Mensaje enviado", "Message sent")}{" "}
+                      {eventText(e)}{" "}
                       <span className="text-mist">· {ago(e.at, locale)}</span>
                     </li>
                   ))}

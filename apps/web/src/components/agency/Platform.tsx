@@ -141,7 +141,12 @@ export function PlatformAgencies({ locale, agencies }: { locale: Locale; agencie
               <tr key={a.id} className="border-t border-navy-line">
                 <td className="px-4 py-3"><div className="flex items-center gap-3"><span className="flex h-9 w-9 items-center justify-center rounded-lg font-display text-xs font-bold text-navy" style={{ background: a.color }}>{a.initials}</span><div><div className="font-semibold">{a.name}</div><div className="text-xs text-mist">{a.city} · {tx(locale, "desde", "since")} {dateTime(a.createdAt, locale, { month: "short", year: "numeric" })}</div></div></div></td>
                 <td className="px-3">
-                  <select value={a.status} onChange={(e) => run(a.id, () => api(`platform/agencies/${a.id}`, { method: "PATCH", json: { status: e.target.value } }))} className="h-8 rounded-md border border-navy-line bg-navy-2 px-2 text-xs" aria-label={tx(locale, "Estado", "Status")}>
+                  <select value={a.status} onChange={(e) => {
+                      const status = e.target.value;
+                      // Suspending hides every listing of the agency and signs its team out: ask first.
+                      if (status === "SUSPENDED" && !window.confirm(tx(locale, `¿Suspender ${a.name}? Sus inmuebles dejarán de verse y su equipo perderá el acceso.`, `Suspend ${a.name}? Its listings will be hidden and its team will lose access.`))) return;
+                      run(a.id, () => api(`platform/agencies/${a.id}`, { method: "PATCH", json: { status } }));
+                    }} className="h-8 rounded-md border border-navy-line bg-navy-2 px-2 text-xs" aria-label={tx(locale, "Estado", "Status")}>
                     <option value="ACTIVE">{tx(locale, "Activa", "Active")}</option><option value="TRIAL">{tx(locale, "En prueba", "Trial")}</option><option value="SUSPENDED">{tx(locale, "Suspendida", "Suspended")}</option>
                   </select>
                 </td>
@@ -230,7 +235,10 @@ export function PlatformUsers({ locale, users, providers }: { locale: Locale; us
                 <td className="px-3 text-xs text-mist">{u.suspended ? tx(locale, "Suspendido", "Suspended") : ago(u.lastSeen, locale)}</td>
                 <td className="px-3">
                   {u.id !== me?.id && (
-                    <button disabled={busy === u.id} onClick={() => run(u.id, () => api(`platform/users/${u.id}`, { method: "PATCH", json: { suspended: !u.suspended } }))} className={cn("rounded-md p-1.5 hover:bg-white/5", u.suspended ? "text-[#7FD3A8]" : "text-[#FF8A7A]")} aria-label={u.suspended ? tx(locale, "Reactivar", "Restore") : tx(locale, "Suspender", "Suspend")} title={u.suspended ? tx(locale, "Reactivar", "Restore") : tx(locale, "Suspender", "Suspend")}>
+                    <button disabled={busy === u.id} onClick={() => {
+                      if (!u.suspended && !window.confirm(tx(locale, `¿Suspender a ${u.name}? No podrá iniciar sesión.`, `Suspend ${u.name}? They won’t be able to sign in.`))) return;
+                      run(u.id, () => api(`platform/users/${u.id}`, { method: "PATCH", json: { suspended: !u.suspended } }));
+                    }} className={cn("rounded-md p-1.5 hover:bg-white/5", u.suspended ? "text-[#7FD3A8]" : "text-[#FF8A7A]")} aria-label={u.suspended ? tx(locale, "Reactivar", "Restore") : tx(locale, "Suspender", "Suspend")} title={u.suspended ? tx(locale, "Reactivar", "Restore") : tx(locale, "Suspender", "Suspend")}>
                       {u.suspended ? <RotateCcw size={14} /> : <Ban size={14} />}
                     </button>
                   )}

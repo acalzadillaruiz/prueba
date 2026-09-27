@@ -65,7 +65,7 @@ const STATUS_TONE: Record<ListingStatus, string> = {
 
 export function StatusBadge({ status, locale, className }: { status: ListingStatus; locale: Locale; className?: string }) {
   return (
-    <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide", STATUS_TONE[status], className)}>
+    <span className={cn("inline-flex items-center whitespace-nowrap rounded-full px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide", STATUS_TONE[status], className)}>
       {lbl(STATUS_LABEL[status], locale)}
     </span>
   );

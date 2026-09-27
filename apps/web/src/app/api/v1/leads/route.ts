@@ -75,7 +75,7 @@ export const GET = handler(async (req: NextRequest) => {
   let scope: Prisma.LeadWhereInput;
   if (u.role === "SUPERADMIN") scope = u.agencyId ? { agencyId: u.agencyId } : {};
   else if (isManager(u)) scope = { agencyId: u.agencyId };
-  else if (u.role === "AGENT") scope = { agentId: u.id };
+  else if (u.role === "AGENT") scope = { agentId: u.id, agencyId: u.agencyId };
   else if (u.role === "OWNER_PRIVATE") scope = { listing: { ownerUserId: u.id } };
   else scope = { seekerUserId: u.id };
   const where: Prisma.LeadWhereInput = q.stage ? { ...scope, stage: q.stage } : scope;

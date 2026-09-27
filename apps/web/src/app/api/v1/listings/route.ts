@@ -87,7 +87,9 @@ export const POST = handler(async (req: NextRequest) => {
   const copy = b.title_es && b.body_es ? null : draftCopy(b);
   // A mandate is only a request: the listing stays the owner's (no agency, not public) until the agency accepts it
   // (PATCH /mandates/:id links agencyId on assignment and publishes on ACTIVE).
-  const agencyId = b.mode === "AGENCY" ? (u.role === "SUPERADMIN" ? b.agencyId : u.agencyId) : null;
+  // A superadmin impersonating an agency publishes into it when the wizard sends no explicit agencyId.
+  const agencyId = b.mode === "AGENCY" ? (u.role === "SUPERADMIN" ? (b.agencyId ?? u.agencyId) : u.agencyId) : null;
+  if (b.mode === "AGENCY" && !agencyId) throw new ApiError("VALIDATION", { agencyId: "required" });
   const agentId = b.mode === "AGENCY" ? (u.role === "AGENT" ? u.id : b.agentId ?? null) : null;
   if (agentId && agentId !== u.id) {
     // Assigning someone else: they must be an AGENT of the listing's agency (otherwise leads would leak across agencies).

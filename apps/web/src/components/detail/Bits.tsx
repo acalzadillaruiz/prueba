@@ -13,14 +13,15 @@ export function BilingualBody({ l, locale, dark }: { l: Listing; locale: Locale;
       <div className="mb-3 flex items-center gap-2">
         <Languages size={16} className={dark ? "text-mist" : "text-ink/65"} />
         {(["es", "en"] as Locale[]).map((x) => (
-          <button key={x} onClick={() => setLang(x)} className={cn("rounded-full px-2.5 py-0.5 text-xs font-bold", lang === x ? (dark ? "bg-ivory text-navy" : "bg-navy text-ivory") : dark ? "text-mist" : "text-ink/65")}>
-            {x.toUpperCase()}
+          // 44 px tap area around the small pill
+          <button key={x} onClick={() => setLang(x)} aria-pressed={lang === x} aria-label={x === "es" ? "Español" : "English"} lang={x} className="-my-2.5 flex min-h-11 min-w-11 items-center justify-center">
+            <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-bold", lang === x ? (dark ? "bg-ivory text-navy" : "bg-navy text-ivory") : dark ? "text-mist" : "text-ink/65")}>{x.toUpperCase()}</span>
           </button>
         ))}
         <span className={cn("text-xs", dark ? "text-mist" : "text-ink/65")}>{tx(locale, "Ficha bilingüe", "Bilingual listing")}</span>
       </div>
-      <h2 className="font-display text-xl font-semibold">{lang === "es" ? l.title_es : l.title_en}</h2>
-      <p className={cn("mt-2 leading-relaxed", dark ? "text-ivory/80" : "text-ink/75")}>{lang === "es" ? l.body_es : l.body_en}</p>
+      <h2 lang={lang} className="font-display text-xl font-semibold">{lang === "es" ? l.title_es : l.title_en}</h2>
+      <p lang={lang} className={cn("mt-2 leading-relaxed", dark ? "text-ivory/80" : "text-ink/75")}>{lang === "es" ? l.body_es : l.body_en}</p>
     </div>
   );
 }

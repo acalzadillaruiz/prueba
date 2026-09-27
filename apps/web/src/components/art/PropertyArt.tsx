@@ -583,7 +583,7 @@ export function PropertyArt({
   const uid = useId().replace(/[^a-zA-Z0-9]/g, "");
   if (photo)
     // next/image: AVIF/WebP, responsive srcset and lazy loading (eager + high priority for the LCP image).
-    return <Image src={photo} alt={label ?? scene} width={1200} height={800} sizes={sizes} priority={priority} className={`${className ?? ""} object-cover`} />;
+    return <Image src={photo} alt={label ?? ""}width={1200} height={800} sizes={sizes} priority={priority} className={`${className ?? ""} object-cover`} />;
   const n = hashStr(seed + scene);
   const id = `pa${n.toString(36)}${uid}`;
   let content: React.ReactNode;
@@ -643,8 +643,9 @@ export function PropertyArt({
       viewBox="0 0 400 300"
       preserveAspectRatio="xMidYMid slice"
       className={className}
-      role="img"
-      aria-label={label ?? scene}
+      // Without a caller-provided label the illustration is decorative (the card/button around it names it):
+      // a scene key such as "tower-dusk" is not a useful accessible name.
+      {...(label ? { role: "img", "aria-label": label } : { "aria-hidden": true })}
     >
       {mirror ? <g transform="translate(400 0) scale(-1 1)">{content}</g> : content}
     </svg>

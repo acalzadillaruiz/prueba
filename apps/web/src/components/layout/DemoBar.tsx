@@ -54,7 +54,7 @@ export function DemoBar({ locale }: { locale: Locale }) {
           )}
         </div>
       )}
-      <button onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label={tx(locale, "Modo demo: entrar como…", "Demo mode: sign in as…")} className="flex min-h-11 items-center gap-2 rounded-full border border-navy-line bg-navy/95 p-1.5 text-sm text-ivory opacity-80 shadow-np backdrop-blur transition-opacity hover:opacity-100 sm:pr-3.5 sm:opacity-100">
+      <button onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label={tx(locale, "Modo demo: entrar como…", "Demo mode: sign in as…")} className="flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-full border border-navy-line bg-navy/95 p-1.5 text-sm text-ivory opacity-80 shadow-np backdrop-blur transition-opacity hover:opacity-100 sm:pr-3.5 sm:opacity-100">
         {user ? <Avatar initials={user.initials} hue={user.hue} size={26} /> : <span className="flex h-[26px] w-[26px] items-center justify-center rounded-full bg-white/10"><LogIn size={14} /></span>}
         {/* compact on phones so it never hides content */}
         <FlaskConical size={14} className="hidden text-coral sm:block" />

@@ -19,9 +19,9 @@ export function SaveButton({ id, className, locale }: { id: string; className?: 
         e.stopPropagation();
         toggleSaved(id);
       }}
-      className={cn("flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-sm backdrop-blur transition-transform duration-np hover:scale-105", className)}
+      className={cn("flex h-11 w-11 items-center justify-center rounded-full bg-white/90 shadow-sm backdrop-blur transition-transform duration-np hover:scale-105", className)}
     >
-      <Heart size={17} className={on ? "fill-coral text-coral" : "text-navy"} />
+      <Heart size={18} aria-hidden className={on ? "fill-coral text-coral" : "text-navy"} />
     </button>
   );
 }
@@ -42,7 +42,8 @@ export function CompareButton({ id, locale, dark }: { id: string; locale: Locale
         }
       }}
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold transition-colors duration-np",
+        // after: invisible 44 px hit area around the compact pill (tap target) without changing the card layout
+        "relative inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold transition-colors duration-np after:absolute after:-inset-x-1 after:-inset-y-2.5 after:content-['']",
         on ? "border-navy bg-navy text-ivory" : dark ? "border-white/20 text-ivory" : "border-line bg-white text-ink/70 hover:border-navy/40",
       )}
     >

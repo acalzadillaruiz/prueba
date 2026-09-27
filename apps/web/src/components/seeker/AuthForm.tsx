@@ -15,7 +15,7 @@ import { PropertyArt } from "@/components/art/PropertyArt";
 import { photo } from "@/lib/photos";
 import { Avatar, Button, Field, inputCls } from "@/components/ui";
 import { DEMO_ENABLED, DEMO_LOGINS } from "@/lib/demo";
-import { api } from "@/lib/api";
+import { api, ApiClientError } from "@/lib/api";
 import { useApp } from "@/lib/store";
 import { tx } from "@/lib/i18n";
 
@@ -66,6 +66,14 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
   const rawNext = sp.get("next");
   // Same-origin paths only: "/x" is fine, "//evil.com" and "/\\evil.com" are not.
   const next = rawNext && /^\/(?![\/\\])/.test(rawNext) ? rawNext : null;
+  // Switching between sign-in and sign-up keeps where the user was going and the invitation.
+  const carry = (() => {
+    const p = new URLSearchParams();
+    if (next) p.set("next", next);
+    if (invite) p.set("invite", invite);
+    const q = p.toString();
+    return q ? `?${q}` : "";
+  })();
 
   const { refresh } = useApp();
   const finish = async (home: string) => {
@@ -82,11 +90,23 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
       const r = await signIn("credentials", { email, password, redirect: false });
       if (r?.error) throw new Error(tx(locale, "Email o contraseña incorrectos.", "Wrong email or password."));
       // Existing account opening an invite link from the login screen: join the agency now.
-      if (mode === "login" && inv && invite) await api(`invitations/${encodeURIComponent(invite)}`, { method: "POST" });
+      if (mode === "login" && inv && invite)
+        await api(`invitations/${encodeURIComponent(invite)}`, { method: "POST" }).catch((e3: unknown) => {
+          const code = e3 instanceof ApiClientError ? e3.code : "";
+          throw new Error(
+            code === "CONFLICT"
+              ? tx(locale, "Entraste, pero tu cuenta ya pertenece a una agencia: no se pudo aceptar la invitación.", "You’re signed in, but your account already belongs to an agency, so the invitation couldn’t be accepted.")
+              : code === "FORBIDDEN"
+                ? tx(locale, "Entraste, pero la invitación es para otro email.", "You’re signed in, but the invitation is for another email.")
+                : (e3 as Error).message,
+          );
+        });
       const me = await api<{ user: { role: string } }>("me").catch(() => null);
       finish(homeFor(me?.user.role ?? "SEEKER"));
     } catch (e2) {
-      setErr((e2 as Error).message);
+      // "Ya existe un registro igual" says nothing to someone signing up: name the email and point to sign-in.
+      const taken = mode === "register" && e2 instanceof ApiClientError && e2.code === "CONFLICT";
+      setErr(taken ? tx(locale, "Ya existe una cuenta con este email. Entra con tu contraseña.", "An account with this email already exists. Sign in with your password.") : (e2 as Error).message);
     } finally {
       setBusy(null);
     }
@@ -102,7 +122,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
             <div className="mt-4 rounded-np border border-coral/40 bg-[#F26B4D0D] p-3 text-sm" role="status">
               {tx(locale, `${inv.agencyName} te invita a su equipo como ${inv.role}.`, `${inv.agencyName} invited you to their team as ${inv.role}.`)}{" "}
               {mode === "register" ? (
-                <Link className="font-semibold text-coral" href={`/${locale}/login?invite=${encodeURIComponent(invite ?? "")}`}>{tx(locale, "¿Ya tienes cuenta? Entra", "Have an account? Sign in")}</Link>
+                <Link className="font-semibold text-coral" href={`/${locale}/login${carry}`}>{tx(locale, "¿Ya tienes cuenta? Entra", "Have an account? Sign in")}</Link>
               ) : null}
             </div>
           )}
@@ -146,9 +166,9 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
           </form>
           <p className="mt-5 text-center text-sm text-ink/60">
             {mode === "login" ? (
-              <>{tx(locale, "¿No tienes cuenta?", "No account?")} <Link className="font-semibold text-coral" href={`/${locale}/register`}>{tx(locale, "Regístrate", "Sign up")}</Link></>
+              <>{tx(locale, "¿No tienes cuenta?", "No account?")} <Link className="font-semibold text-coral" href={`/${locale}/register${carry}`}>{tx(locale, "Regístrate", "Sign up")}</Link></>
             ) : (
-              <>{tx(locale, "¿Ya tienes cuenta?", "Have an account?")} <Link className="font-semibold text-coral" href={`/${locale}/login`}>{tx(locale, "Entra", "Sign in")}</Link></>
+              <>{tx(locale, "¿Ya tienes cuenta?", "Have an account?")} <Link className="font-semibold text-coral" href={`/${locale}/login${carry}`}>{tx(locale, "Entra", "Sign in")}</Link></>
             )}
           </p>
           {mode === "login" && DEMO_ENABLED && (

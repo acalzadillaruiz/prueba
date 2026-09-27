@@ -1,5 +1,4 @@
-"use client";
-
+// No state or handlers: rendered on the server in the listing page (no hydration cost); client parents can use it too.
 import { Info, Sparkles } from "lucide-react";
 import type { Listing, Locale } from "@/types/domain";
 import { compactMoney, money, num, priceSuffix, tx } from "@/lib/i18n";
@@ -43,7 +42,8 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
       </div>
       <div className={cn("mt-2 flex justify-between text-xs", muted)}>
         <span>{money(e.low, locale)}</span>
-        <span className={cn("font-semibold", Math.abs(diff) <= 4 ? "text-ok" : diff > 0 ? "text-warn" : "text-ok")}>{verdict}</span>
+        {/* AA contrast on both surfaces: brand ok/warn are too dark on navy / too light on white respectively */}
+        <span className={cn("font-semibold", Math.abs(diff) > 4 && diff > 0 ? (dark ? "text-warn" : "text-[#8F5E1C]") : dark ? "text-[#5FBF8F]" : "text-ok")}>{verdict}</span>
         <span>{money(e.high, locale)}</span>
       </div>
       {showComparables && e.comparables.length > 0 && (

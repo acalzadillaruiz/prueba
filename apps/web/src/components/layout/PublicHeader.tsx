@@ -66,7 +66,7 @@ export function PublicHeader({ locale, variant = "light" }: { locale: Locale; va
       )}
     >
       <div className="mx-auto flex h-16 max-w-[1400px] items-center gap-6 px-4 md:px-6">
-        <Link href={`/${locale}`} aria-label="New Place">
+        <Link href={`/${locale}`} aria-label="New Place" className="flex min-h-11 items-center">
           <Logo tone={dark ? "ivory" : "navy"} />
         </Link>
         <nav className="hidden items-center gap-1 lg:flex">
@@ -86,20 +86,27 @@ export function PublicHeader({ locale, variant = "light" }: { locale: Locale; va
         <div className="ml-auto flex items-center gap-2">
           <Link
             href={switchHref}
+            // full navigation (below): prefetching the other language's RSC payload would only waste bandwidth
+            prefetch={false}
             onClick={(e) => {
               // use the live query (filters may have changed since render)
               e.preventDefault();
               window.location.assign(pathname.replace(/^\/(es|en)/, `/${other}`) + window.location.search);
             }}
-            hrefLang={other} lang={other} aria-label={other === "en" ? "English" : "Español"} className={cn("flex min-h-10 min-w-10 items-center justify-center rounded-full px-2.5 font-display text-sm font-semibold", dark ? "text-ivory/80 hover:bg-white/10" : "text-ink/70 hover:bg-black/5")}>
+            hrefLang={other} lang={other} aria-label={other === "en" ? "English" : "Español"} className={cn("flex min-h-11 min-w-11 items-center justify-center rounded-full px-2 font-display text-sm font-semibold", dark ? "text-ivory/80 hover:bg-white/10" : "text-ink/70 hover:bg-black/5")}>
             {other.toUpperCase()}
           </Link>
-          <button onClick={toggleTheme} className={cn("rounded-full p-2", variant !== "light" ? "hover:bg-white/10" : "hover:bg-black/5")} aria-label={isDark ? "Light mode" : "Dark mode"} title={isDark ? "Light" : "Dark"}>
-            {isDark ? <Sun size={18} /> : <Moon size={18} />}
+          <button
+            onClick={toggleTheme}
+            className={cn("flex h-11 w-11 items-center justify-center rounded-full", variant !== "light" ? "hover:bg-white/10" : "hover:bg-black/5")}
+            aria-label={isDark ? (locale === "es" ? "Modo claro" : "Light mode") : locale === "es" ? "Modo oscuro" : "Dark mode"}
+            aria-pressed={isDark}
+          >
+            {isDark ? <Sun size={18} aria-hidden /> : <Moon size={18} aria-hidden />}
           </button>
-          <Link href={`/${locale}/saved`} className={cn("relative hidden rounded-full p-2 sm:block", dark ? "hover:bg-white/10" : "hover:bg-black/5")} aria-label={t("saved")}>
-            <Heart size={20} />
-            {saved.length > 0 && <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-coral-cta px-1 text-[10px] font-bold text-white">{saved.length}</span>}
+          <Link href={`/${locale}/saved`} className={cn("relative hidden h-11 w-11 items-center justify-center rounded-full sm:flex", dark ? "hover:bg-white/10" : "hover:bg-black/5")} aria-label={t("saved")}>
+            <Heart size={20} aria-hidden />
+            {saved.length > 0 && <span className="absolute right-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-coral-cta px-1 text-xs font-bold leading-none text-white">{saved.length}</span>}
           </Link>
           <Button href={`/${locale}/owner/new`} variant={dark ? "dark-outline" : "outline"} size="sm" className="hidden md:inline-flex">
             <Plus size={15} /> {t("publish")}
@@ -113,11 +120,11 @@ export function PublicHeader({ locale, variant = "light" }: { locale: Locale; va
               <span className="hidden font-display text-sm xl:inline">{u.name.split(" ")[0]}</span>
             </Link>
           ) : (
-            <Button href={`/${locale}/login`} size="sm">{t("signIn")}</Button>
+            <Button href={`/${locale}/login`} size="sm" className="h-11 md:h-8">{t("signIn")}</Button>
           )}
           <button
             onClick={() => setMenuOpen(true)}
-            className={cn("flex h-10 w-10 items-center justify-center rounded-full lg:hidden", dark ? "hover:bg-white/10" : "hover:bg-black/5")}
+            className={cn("flex h-11 w-11 items-center justify-center rounded-full lg:hidden", dark ? "hover:bg-white/10" : "hover:bg-black/5")}
             aria-label={t("menu")}
             aria-expanded={menuOpen}
             aria-controls="np-mobile-menu"

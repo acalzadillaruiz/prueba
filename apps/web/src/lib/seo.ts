@@ -19,12 +19,18 @@ export function alternates(locale: Locale, path: string): Metadata["alternates"]
 
 type PageMetaOpts = { index?: boolean; description?: string };
 
+/** Shared Open Graph fields: a page-level `openGraph` replaces the layout's whole object (no deep merge). */
+export const ogBase = (locale: Locale) => ({ type: "website" as const, siteName: "New Place", locale: locale === "es" ? "es_VE" : "en_US" });
+export const OG_IMAGE = { url: "/icons/og.png", width: 1200, height: 630, alt: "New Place" };
+
 export function pageMeta(locale: Locale, title: string, path: string, opts: PageMetaOpts = {}): Metadata {
+  const description = opts.description ? { description: opts.description } : {};
   return {
     title,
-    ...(opts.description ? { description: opts.description } : {}),
+    ...description,
     alternates: alternates(locale, path),
-    openGraph: { title, url: `/${locale}${path}`, ...(opts.description ? { description: opts.description } : {}) },
+    openGraph: { ...ogBase(locale), title, url: `/${locale}${path}`, ...description, images: [OG_IMAGE] },
+    twitter: { card: "summary_large_image", title, ...description, images: [OG_IMAGE.url] },
     ...(opts.index === false ? { robots: { index: false, follow: false } } : {}),
   };
 }

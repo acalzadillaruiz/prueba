@@ -28,6 +28,8 @@ const nextConfig = {
   eslint: { ignoreDuringBuilds: true },
   devIndicators: false,
   poweredByHeader: false,
+  // The CSS (~12 KB gzip) goes inline in the HTML: no render-blocking stylesheet round trip before first paint.
+  experimental: { inlineCss: true },
   images: {
     formats: ["image/avif", "image/webp"],
     remotePatterns: [{ protocol: "https", hostname: "*.public.blob.vercel-storage.com" }],

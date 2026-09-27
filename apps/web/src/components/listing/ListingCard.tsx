@@ -73,7 +73,7 @@ export function MapPreviewCard({ l, locale }: { l: Listing; locale: Locale }) {
     <Link href={`/${locale}/listing/${l.slug}`} className="block overflow-hidden rounded-np bg-white shadow-np ring-1 ring-black/5">
       <div className="relative aspect-[16/9]">
         <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="h-full w-full" />
-        <SaveButton id={l.id} locale={locale} className="absolute right-2 top-2 h-8 w-8" />
+        <SaveButton id={l.id} locale={locale} className="absolute right-2 top-2" />
       </div>
       <div className="p-3">
         <div className="font-display text-lg font-semibold text-navy">

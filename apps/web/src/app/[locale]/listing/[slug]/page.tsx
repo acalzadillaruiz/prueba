@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import type { Locale } from "@/types/domain";
 import { listingBySlug } from "@/server/listings";
 import { money, priceSuffix, tx } from "@/lib/i18n";
-import { alternates } from "@/lib/seo";
+import { alternates, ogBase } from "@/lib/seo";
 import { ListingView, isPublicListing } from "./ListingView";
 
 // Public listing pages are rendered once and cached (ISR); edits show up within a minute, and moderation /
@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: L
     title,
     description,
     alternates: alternates(locale, path),
-    openGraph: { type: "website", title, description, url: `/${locale}${path}`, locale: locale === "es" ? "es_VE" : "en_US" },
+    openGraph: { ...ogBase(locale), title, description, url: `/${locale}${path}` },
     twitter: { card: "summary_large_image", title, description },
     ...(hidden ? { robots: { index: false, follow: false } } : {}),
   };

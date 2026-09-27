@@ -54,9 +54,11 @@ export function HeroSearch({ locale }: { locale: Locale }) {
         {tabs.map(([k, v]) => (
           <button
             key={k}
+            type="button"
             onClick={() => setTab(k)}
+            aria-pressed={tab === k}
             className={cn(
-              "rounded-full px-4 py-1.5 font-display text-sm transition-colors duration-np",
+              "min-h-11 rounded-full px-4 font-display text-sm transition-colors duration-np",
               tab === k ? (k === "LUX" ? "bg-gold text-navy" : "bg-ivory text-navy") : k === "LUX" ? "border border-gold/50 text-gold hover:bg-gold/10" : "border border-white/20 text-ivory/85 hover:bg-white/10",
             )}
           >

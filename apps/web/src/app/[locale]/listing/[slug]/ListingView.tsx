@@ -98,8 +98,8 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
     <PublicPage locale={locale} header={dark ? "dark" : "light"}>
       <div className={cn(dark && "bg-navy text-ivory")}>
         <div className={cn("mx-auto max-w-[1280px] px-4 pt-4 md:px-6", dark && "max-w-none px-0 md:px-0")}>
-          <nav className={cn("mb-3 flex items-center gap-1 text-sm", dark ? "mx-auto max-w-[1280px] px-4 text-mist md:px-6" : "text-ink/65")}>
-            <Link href={`/${locale}/search?type=${l.listingType.startsWith("COMMERCIAL") ? "COMMERCIAL" : l.listingType}`}>{lbl(TYPE_LABEL[l.listingType], locale)}</Link>
+          <nav aria-label={tx(locale, "Ruta de navegación", "Breadcrumb")} className={cn("mb-3 flex items-center gap-1 text-sm", dark ? "mx-auto max-w-[1280px] px-4 text-mist md:px-6" : "text-ink/65")}>
+            <Link className="inline-flex min-h-11 items-center underline-offset-2 hover:underline" href={`/${locale}/search?type=${l.listingType.startsWith("COMMERCIAL") ? "COMMERCIAL" : l.listingType}`}>{lbl(TYPE_LABEL[l.listingType], locale)}</Link>
             <ChevronRight size={14} /> <span>{l.city}</span> <ChevronRight size={14} /> <span>{l.zone}</span>
           </nav>
           {!isPublic && (
@@ -132,8 +132,8 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
               <Freshness iso={l.updatedAt} locale={locale} className={dark ? "text-mist" : "text-ink/65"} />
               <div className="ml-auto flex items-center gap-2">
                 <CompareButton id={l.id} locale={locale} dark={dark} />
-                <ShareButton locale={locale} title={tx(locale, l.title_es, l.title_en)} className={cn("inline-flex min-h-9 items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold", dark ? "border-white/20" : "border-line bg-white")} />
-                <SaveButton id={l.id} locale={locale} className="h-8 w-8 border border-line" />
+                <ShareButton locale={locale} title={tx(locale, l.title_es, l.title_en)} className={cn("inline-flex min-h-11 items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold", dark ? "border-white/20" : "border-line bg-white")} />
+                <SaveButton id={l.id} locale={locale} className="border border-line" />
               </div>
             </div>
             <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
@@ -231,7 +231,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
             )}
           </div>
 
-          <aside className="lg:sticky lg:top-20 lg:self-start">
+          <aside id="contact" className="scroll-mt-20 lg:sticky lg:top-20 lg:self-start">
             <ContactPanel l={l} locale={locale} dark={dark} />
           </aside>
         </div>

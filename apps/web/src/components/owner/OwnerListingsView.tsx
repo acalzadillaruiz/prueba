@@ -17,7 +17,8 @@ import { cn } from "@/lib/cn";
 import { TimeAgo } from "./TimeAgo";
 import { listingHref } from "@/lib/listing-href";
 
-type Thread = { id: string; subject: string | null; listingId: string | null; participants: { id: string; name: string; hue: number }[]; messages: Message[] };
+type Thread = { id: string; subject: string | null; listingId: string | null; leadId?: string | null; participants: { id: string; name: string; hue: number }[]; messages: Message[] };
+type OwnerLead = { id: string; listingId: string; name: string; email: string; phone: string | null; message: string; createdAt: string };
 type Mandate = { id: string; status: "REQUESTED" | "ASSIGNED" | "ACTIVE" | "CANCELLED"; listingId: string | null; agencyName: string; agentName: string | null; createdAt: string };
 
 const MANDATE_LABEL: Record<Mandate["status"], [string, string]> = {
@@ -34,11 +35,14 @@ const OFFER_LABEL: Record<Offer["status"], [string, string]> = {
 };
 const MAX_PRICE = 1_000_000_000;
 
-export function OwnerListingsView({ locale, listings, offers, threads, mandates }: { locale: Locale; listings: Listing[]; offers: Offer[]; threads: Thread[]; mandates: Mandate[] }) {
+export function OwnerListingsView({ locale, listings, offers, threads, mandates, leads = [] }: { locale: Locale; listings: Listing[]; offers: Offer[]; threads: Thread[]; mandates: Mandate[]; leads?: OwnerLead[] }) {
   const { user } = useApp();
   const router = useRouter();
   const [active, setActive] = useState(threads[0]?.id ?? null);
   const [draft, setDraft] = useState("");
+  const [sending, setSending] = useState(false);
+  const [chatErr, setChatErr] = useState<string | null>(null);
+  const [confirmSold, setConfirmSold] = useState<string | null>(null);
   const [editing, setEditing] = useState<string | null>(null);
   const [price, setPrice] = useState("");
   const [priceErr, setPriceErr] = useState<string | null>(null);
@@ -48,6 +52,9 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates 
   const live = useQuery({ queryKey: ["threads"], queryFn: () => api<{ threads: Thread[] }>("threads"), initialData: { threads }, refetchInterval: 15_000 });
   const thread = live.data.threads.find((t) => t.id === active) ?? live.data.threads[0];
   const other = thread?.participants.find((p) => p.id !== user?.id);
+  // An anonymous visitor's enquiry has a thread with nobody else in it: show who wrote and how to reach them.
+  const threadLead = thread?.leadId ? leads.find((ld) => ld.id === thread.leadId) : undefined;
+  const otherName = other?.name || threadLead?.name || "—";
 
   const stageIdx = { REQUESTED: 0, ASSIGNED: 1, ACTIVE: 2, CANCELLED: -1 };
   const [error, setError] = useState<string | null>(null);
@@ -136,6 +143,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates 
 
           {listings.map((l) => {
             const lo = offers.filter((o) => o.listingId === l.id);
+            const ll = leads.filter((ld) => ld.listingId === l.id);
             const isMandate = mandates.some((m) => m.listingId === l.id);
             return (
               <Card key={l.id} className="overflow-hidden">
@@ -214,11 +222,40 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates 
                         <Button size="sm" variant="outline" disabled={busy === `photos-${l.id}`} onClick={() => { setUploadFor(l.id); fileRef.current?.click(); }}>
                           {busy === `photos-${l.id}` ? <Loader2 size={13} className="animate-spin" /> : <ImagePlus size={13} />} {tx(locale, "Subir fotos", "Upload photos")}
                         </Button>
-                        {(l.status === "ACTIVE" || l.status === "UNDER_OFFER") && (
-                          <Button size="sm" variant="outline" onClick={() => act(() => api(`listings/${l.id}`, { method: "PATCH", json: { status: l.listingType.includes("RENT") ? "RENTED" : "SOLD" } }), `sold-${l.id}`)}>
-                            {l.listingType.includes("RENT") ? tx(locale, "Marcar alquilado", "Mark rented") : tx(locale, "Marcar vendido", "Mark sold")}
-                          </Button>
-                        )}
+                        {(l.status === "ACTIVE" || l.status === "UNDER_OFFER") &&
+                          (confirmSold === l.id ? (
+                            // Taking a listing off the market is not undoable from here: ask first.
+                            <span className="flex flex-wrap items-center gap-2" role="group" aria-label={tx(locale, "Confirmar", "Confirm")}>
+                              <span className="text-sm font-semibold">{l.listingType.includes("RENT") ? tx(locale, "¿Marcar como alquilado? Saldrá del buscador.", "Mark as rented? It leaves search.") : tx(locale, "¿Marcar como vendido? Saldrá del buscador.", "Mark as sold? It leaves search.")}</span>
+                              <Button size="sm" disabled={busy === `sold-${l.id}`} onClick={() => act(() => api(`listings/${l.id}`, { method: "PATCH", json: { status: l.listingType.includes("RENT") ? "RENTED" : "SOLD" } }), `sold-${l.id}`).then(() => setConfirmSold(null))}>
+                                {busy === `sold-${l.id}` && <Loader2 size={13} className="animate-spin" />} {tx(locale, "Sí, confirmar", "Yes, confirm")}
+                              </Button>
+                              <Button size="sm" variant="ghost" onClick={() => setConfirmSold(null)}>{tx(locale, "Cancelar", "Cancel")}</Button>
+                            </span>
+                          ) : (
+                            <Button size="sm" variant="outline" onClick={() => setConfirmSold(l.id)}>
+                              {l.listingType.includes("RENT") ? tx(locale, "Marcar alquilado", "Mark rented") : tx(locale, "Marcar vendido", "Mark sold")}
+                            </Button>
+                          ))}
+                      </div>
+                    )}
+                    {ll.length > 0 && (
+                      <div className="mt-4 rounded-lg border border-line" data-testid="owner-leads">
+                        <div className="border-b border-line px-3 py-2 text-xs font-bold uppercase tracking-wide text-ink/65">{tx(locale, "Contactos recibidos", "Enquiries received")} · {ll.length}</div>
+                        <ul className="divide-y divide-line">
+                          {ll.slice(0, 5).map((ld) => (
+                            <li key={ld.id} className="px-3 py-2.5 text-sm">
+                              <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5">
+                                <span className="font-semibold">{ld.name}</span>
+                                <a href={`mailto:${ld.email}`} className="text-coral-hover underline">{ld.email}</a>
+                                {ld.phone && <a href={`tel:${ld.phone}`} className="text-coral-hover underline">{ld.phone}</a>}
+                                <TimeAgo iso={ld.createdAt} locale={locale} className="ml-auto text-xs text-ink/65" />
+                              </div>
+                              <p className="mt-0.5 line-clamp-2 text-ink/70">{ld.message}</p>
+                            </li>
+                          ))}
+                        </ul>
+                        {ll.length > 5 && <div className="border-t border-line px-3 py-2 text-[11px] text-ink/65">{tx(locale, `y ${ll.length - 5} más`, `and ${ll.length - 5} more`)}</div>}
                       </div>
                     )}
                     {lo.length > 0 && (
@@ -232,8 +269,8 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates 
                             <Badge tone={o.status === "ACCEPTED" ? "ok" : o.status === "REJECTED" ? "danger" : o.status === "COUNTERED" ? "warn" : "mist"} className="ml-auto">{tx(locale, ...OFFER_LABEL[o.status])}</Badge>
                             {o.status === "RECEIVED" && !isMandate && (
                               <span className="flex gap-1">
-                                <Button size="sm" variant="outline" onClick={() => act(() => api(`offers/${o.id}`, { method: "PATCH", json: { status: "ACCEPTED" } }), o.id)}>{tx(locale, "Aceptar", "Accept")}</Button>
-                                <Button size="sm" variant="ghost" onClick={() => act(() => api(`offers/${o.id}`, { method: "PATCH", json: { status: "REJECTED" } }), o.id)}>{tx(locale, "Rechazar", "Reject")}</Button>
+                                <Button size="sm" variant="outline" disabled={busy === o.id} onClick={() => act(() => api(`offers/${o.id}`, { method: "PATCH", json: { status: "ACCEPTED" } }), o.id)}>{tx(locale, "Aceptar", "Accept")}</Button>
+                                <Button size="sm" variant="ghost" disabled={busy === o.id} onClick={() => act(() => api(`offers/${o.id}`, { method: "PATCH", json: { status: "REJECTED" } }), o.id)}>{tx(locale, "Rechazar", "Reject")}</Button>
                               </span>
                             )}
                             {o.note && <div className="w-full text-xs text-ink/65">{o.note}</div>}
@@ -253,18 +290,25 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates 
           {thread ? (
             <>
               <div className="flex items-center gap-3 border-b border-line p-4">
-                <Avatar initials={(other?.name ?? "?").split(" ").map((p) => p[0]).slice(0, 2).join("")} hue={other?.hue ?? 200} size={40} />
+                <Avatar initials={otherName.split(" ").map((p) => p[0]).slice(0, 2).join("")} hue={other?.hue ?? 200} size={40} />
                 <div className="min-w-0 flex-1">
-                  <div className="font-display font-semibold">{other?.name ?? "—"}</div>
+                  <div className="font-display font-semibold">{otherName}</div>
                   <div className="truncate text-xs text-ink/65">{thread.subject}</div>
                 </div>
                 {live.data.threads.length > 1 && (
                   <select className="h-8 max-w-[140px] rounded-lg border border-line text-xs" value={thread.id} onChange={(e) => setActive(e.target.value)} aria-label={tx(locale, "Conversación", "Conversation")}>
-                    {live.data.threads.map((t) => <option key={t.id} value={t.id}>{t.subject ?? t.id}</option>)}
+                    {live.data.threads.map((t) => <option key={t.id} value={t.id}>{t.subject ?? (t.participants.filter((p) => p.id !== user?.id).map((p) => p.name).join(", ") || tx(locale, "Conversación", "Conversation"))}</option>)}
                   </select>
                 )}
               </div>
               <div className="flex-1 space-y-3 overflow-y-auto p-4 scrollbar-thin">
+                {threadLead && !other && (
+                  <div className="rounded-2xl rounded-bl-md bg-ivory px-3.5 py-2 text-sm">
+                    <div className="text-xs font-semibold text-ink/70">{threadLead.name} · {threadLead.email}{threadLead.phone ? ` · ${threadLead.phone}` : ""}</div>
+                    <div className="whitespace-pre-wrap">{threadLead.message}</div>
+                    <TimeAgo iso={threadLead.createdAt} locale={locale} className="mt-1 block text-[10px] text-ink/65" />
+                  </div>
+                )}
                 {thread.messages.map((m) => (
                   <div key={m.id} className={cn("max-w-[85%] rounded-2xl px-3.5 py-2 text-sm", m.mine ? "ml-auto rounded-br-md bg-navy text-ivory" : "rounded-bl-md bg-ivory")}>
                     {m.body}
@@ -272,20 +316,37 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates 
                   </div>
                 ))}
               </div>
+              {threadLead && !other ? (
+                <div className="border-t border-line p-3 text-center text-sm text-ink/65">
+                  {tx(locale, "Escribió sin cuenta: responde por email o teléfono.", "Sent without an account: reply by email or phone.")}{" "}
+                  <a href={`mailto:${threadLead.email}`} className="font-semibold text-coral-hover underline">{tx(locale, "Responder por email", "Reply by email")}</a>
+                </div>
+              ) : (
               <form
                 className="flex gap-2 border-t border-line p-3"
                 onSubmit={async (e) => {
                   e.preventDefault();
-                  if (!draft.trim()) return;
-                  const body = draft;
-                  setDraft("");
-                  await api(`threads/${thread.id}/messages`, { method: "POST", json: { body } });
-                  live.refetch();
+                  const body = draft.trim();
+                  if (!body || sending) return;
+                  setSending(true);
+                  setChatErr(null);
+                  try {
+                    await api(`threads/${thread.id}/messages`, { method: "POST", json: { body } });
+                    setDraft("");
+                    await live.refetch();
+                  } catch (err) {
+                    // Keep what was typed so it can be re-sent.
+                    setChatErr((err as Error).message);
+                  } finally {
+                    setSending(false);
+                  }
                 }}
               >
-                <input value={draft} onChange={(e) => setDraft(e.target.value)} className="h-10 flex-1 rounded-full border border-line px-4 text-sm focus:border-coral focus:outline-none" placeholder={tx(locale, "Escribe un mensaje…", "Write a message…")} aria-label={tx(locale, "Mensaje", "Message")} />
-                <button className="flex h-10 w-10 items-center justify-center rounded-full bg-coral-cta text-white" aria-label={tx(locale, "Enviar", "Send")}><Send size={16} /></button>
+                <input value={draft} onChange={(e) => setDraft(e.target.value)} maxLength={2000} className="h-10 min-w-0 flex-1 rounded-full border border-line px-4 text-sm focus:border-coral focus:outline-none" placeholder={tx(locale, "Escribe un mensaje…", "Write a message…")} aria-label={tx(locale, "Mensaje", "Message")} />
+                <button disabled={sending} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-coral-cta text-white disabled:opacity-60" aria-label={tx(locale, "Enviar", "Send")}>{sending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}</button>
               </form>
+              )}
+              {chatErr && <div role="alert" className="mx-3 mb-2 rounded-lg bg-[#B423181A] px-3 py-2 text-xs text-danger">{chatErr}</div>}
               <div className="pb-2 text-center text-[10px] text-ink/65">{tx(locale, "Inbox interno · se actualiza cada 15 s", "Internal inbox · refreshes every 15 s")}</div>
             </>
           ) : (

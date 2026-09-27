@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
 import { z } from "zod";
 import { prisma } from "@newplace/db";
-import { body, currentUser, handler, ok, requireUser } from "@/server/api";
+import { ApiError, body, currentUser, handler, ok, requireUser } from "@/server/api";
 import { bump } from "@/server/counters";
 
 export const GET = handler(async () => {
@@ -16,6 +16,8 @@ export const POST = handler(async (req: NextRequest) => {
   const u = requireUser(await currentUser());
   const { listingId, saved } = await body(req, Toggle);
   if (saved) {
+    // Unknown id → 404 (it used to surface as a foreign-key 500).
+    if (!(await prisma.listing.findUnique({ where: { id: listingId }, select: { id: true } }))) throw new ApiError("NOT_FOUND");
     const r = await prisma.savedListing.upsert({ where: { userId_listingId: { userId: u.id, listingId } }, create: { userId: u.id, listingId }, update: {} });
     if (r.createdAt.getTime() > Date.now() - 5000) await bump([listingId], ["saves"]);
   } else {

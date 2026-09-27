@@ -56,7 +56,8 @@ export default async function LuxuryPage({ params }: { params: Promise<{ locale:
           <div className="mt-16 rounded-np border border-gold/40 p-8 text-center">
             <div className="font-display text-2xl">{tx(locale, `${privateCount} ${privateCount === 1 ? "propiedad privada disponible" : "propiedades privadas disponibles"}`, `${privateCount} private listing${privateCount === 1 ? "" : "s"} available`)}</div>
             <p className="mx-auto mt-2 max-w-lg text-mist">{tx(locale, "Pide acceso a un agente Luxury. Te enviamos el enlace tras una precalificación breve.", "Ask a Luxury agent for access. We’ll send the link after a short pre-qualification.")}</p>
-            <button className="mt-5 rounded-np bg-gold px-5 py-2.5 font-display text-navy">{tx(locale, "Solicitar acceso", "Request access")}</button>
+            {/* Was a <button> with no action: it now opens the Luxury agent's contact form. */}
+            <Link href={`/${locale}/listing/${hero.slug}#contact`} className="mt-5 inline-flex min-h-11 items-center rounded-np bg-gold px-5 font-display text-navy hover:brightness-95">{tx(locale, "Solicitar acceso", "Request access")}</Link>
           </div>
         </div>
       </div>

@@ -42,11 +42,16 @@ type Draft = {
   copy: Copy;
   agency: string;
   luxury: boolean;
+  /** Luxury only: hidden from public search, reachable by link (brief §5). */
+  privateListing: boolean;
   extras: ExtrasDraft;
 };
 const DRAFT_KEY_BASE = "np-owner-draft-v1";
 const DEFAULT_PRICE: Record<string, number> = { SALE: 150000, LONG_RENT: 900, SHORT_RENT: 80, COMMERCIAL_SALE: 250000, COMMERCIAL_RENT: 1500 };
 const RESIDENTIAL_KINDS: Kind[] = ["apartment", "house", "penthouse", "townhouse", "studio", "villa", "chalet"];
+/** Bedrooms don't apply to these kinds; land has no bathrooms or parking either. */
+const NO_BEDS: Kind[] = ["land", "office", "retail", "warehouse"];
+const THIS_YEAR = new Date().getFullYear();
 const norm = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
 /** "Av. X, Piso 6, Altamira, Caracas" — skips parts already contained in what's written (no "Altamira, Altamira"). */
 function fullAddress(parts: (string | undefined | null)[]) {
@@ -78,6 +83,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
     copy: { title_es: "", title_en: "", body_es: "", body_en: "" },
     agency: agencies.find((a) => a.verified)?.id ?? agencies[0]?.id ?? "",
     luxury: false,
+    privateListing: false,
     extras: EMPTY_EXTRAS,
   });
   const set = (p: Partial<Draft>) => setD((x) => ({ ...x, ...p }));
@@ -97,6 +103,10 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
   const [done, setDone] = useState<{ slug: string; id: string; mode: Draft["mode"] } | null>(null);
   const [confirm, setConfirm] = useState(false);
   const [showExtrasErr, setShowExtrasErr] = useState(false);
+  const [showDetailsErr, setShowDetailsErr] = useState(false);
+  const [aiErr, setAiErr] = useState<string | null>(null);
+  const [fileNote, setFileNote] = useState<string | null>(null);
+  const [photoWarn, setPhotoWarn] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const previews = useMemo(() => files.map((f) => URL.createObjectURL(f)), [files]);
   useEffect(() => () => previews.forEach((u) => URL.revokeObjectURL(u)), [previews]);
@@ -126,6 +136,19 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
   const luxury = d.luxury && !listingType.startsWith("COMMERCIAL") && RESIDENTIAL_KINDS.includes(d.kind);
   const extras = validateExtras(locale, listingType, luxury, d.extras);
   const address = fullAddress([d.addr?.main, d.unit, d.addr?.zone, d.addr?.city]);
+  const hasBeds = !NO_BEDS.includes(d.kind);
+  const hasBaths = d.kind !== "land";
+  const beds = hasBeds ? d.beds : 0;
+  const baths = hasBaths ? d.baths : 0;
+  const parking = d.kind === "land" ? 0 : d.parking;
+  // Step 2 checks, with the same bounds the API enforces (a bad year used to fail only at publish with a generic error).
+  const detailsErr = {
+    m2: !Number.isInteger(d.m2) || d.m2 < 1 || d.m2 > 1_000_000 ? tx(locale, "Indica la superficie en m² (número entero mayor que 0).", "Enter the area in m² (whole number above 0).") : null,
+    year: !Number.isInteger(d.year) || d.year < 1800 || d.year > THIS_YEAR + 5 ? tx(locale, `Año entre 1800 y ${THIS_YEAR + 5}.`, `Year between 1800 and ${THIS_YEAR + 5}.`) : null,
+  };
+  const detailsOk = !detailsErr.m2 && !detailsErr.year;
+  const priceErr = !Number.isInteger(d.price) || d.price < 1 || d.price > 1_000_000_000 ? tx(locale, "Escribe un precio en USD mayor que 0, sin decimales.", "Enter a USD price above 0, no decimals.") : null;
+  const priceUnit = listingType === "SHORT_RENT" ? tx(locale, " / noche", " / night") : listingType.includes("RENT") ? tx(locale, " / mes", " / month") : "";
   // duplicate check once the address is known
   useEffect(() => {
     if (!d.addr) return setDup(null);
@@ -152,22 +175,25 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
     const t = setTimeout(() => {
       api<{ estimate: EstimateResult }>("ai/estimate", {
         method: "POST",
-        json: { kind: d.kind, zone: zone.name, listingType, areaM2: d.m2, beds: d.beds, baths: d.baths, parking: d.parking, yearBuilt: d.year, amenities: d.amen, lat: d.addr?.lat, lng: d.addr?.lng },
+        json: { kind: d.kind, zone: zone.name, listingType, areaM2: d.m2, beds, baths, parking, yearBuilt: d.year, amenities: d.amen, lat: d.addr?.lat, lng: d.addr?.lng },
       })
         .then((r) => setEstimate(r.estimate))
         .catch(() => {});
     }, 350);
     return () => clearTimeout(t);
-  }, [zone, listingType, d.kind, d.m2, d.beds, d.baths, d.parking, d.year, d.amen, d.addr]);
+  }, [zone, listingType, d.kind, d.m2, beds, baths, parking, d.year, d.amen, d.addr]);
 
   const writeAI = async () => {
     setWriting(true);
+    setAiErr(null);
     try {
       const r = await api<{ copy: Copy }>("ai/write-listing", {
         method: "POST",
-        json: { kind: d.kind, zone: zone?.name ?? "", city: zone?.city ?? "Caracas", areaM2: d.m2, beds: d.beds, baths: d.baths, parking: d.parking, amenities: d.amen },
+        json: { kind: d.kind, zone: d.addr?.zone ?? zone?.name ?? "", city: d.addr?.city ?? zone?.city ?? "Caracas", areaM2: d.m2, beds, baths, parking, amenities: d.amen },
       });
       set({ copy: r.copy });
+    } catch (e) {
+      setAiErr(`${tx(locale, "No se pudo redactar el texto", "Couldn’t write the text")}: ${(e as Error).message}`);
     } finally {
       setWriting(false);
     }
@@ -178,6 +204,11 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
   const publish = async () => {
     if (!requireLogin()) return;
     if (!d.addr) return setStep(1);
+    if (!detailsOk) {
+      setShowDetailsErr(true);
+      return setStep(2);
+    }
+    if (priceErr) return setStep(4);
     if (!extras.ok) {
       setShowExtrasErr(true);
       return setStep(2);
@@ -200,13 +231,14 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
           lat: d.addr.lat,
           lng: d.addr.lng,
           areaM2: d.m2,
-          beds: d.beds,
-          baths: d.baths,
-          parking: d.parking,
+          beds,
+          baths,
+          parking,
           yearBuilt: d.year,
           amenities: d.amen,
           priceAmount: d.price,
           luxury,
+          privateListing: luxury && d.privateListing,
           ...extras.payload,
           ...(d.copy.title_es ? d.copy : {}),
         },
@@ -216,8 +248,12 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
         const ordered = [files[cover], ...files.filter((_, i) => i !== cover)];
         const fd = new FormData();
         ordered.forEach((f) => fd.append("files", f));
-        const r = await fetch(`/api/v1/listings/${created.id}/photos`, { method: "POST", body: fd });
-        if (!r.ok) throw new Error((await r.json()).error?.message ?? "upload failed");
+        // The listing already exists: a failed upload must not leave the draft behind (republishing it would hit the duplicate check).
+        const r = await fetch(`/api/v1/listings/${created.id}/photos`, { method: "POST", body: fd }).catch(() => null);
+        if (!r?.ok) {
+          const msg = ((await r?.json().catch(() => null)) as { error?: { message?: string } } | null)?.error?.message;
+          setPhotoWarn(tx(locale, `El inmueble se creó, pero las fotos no se subieron${msg ? ` (${msg})` : ""}. Súbelas desde «Mis inmuebles».`, `The listing was created but the photos didn’t upload${msg ? ` (${msg})` : ""}. Add them from “My properties”.`));
+        }
       }
       sessionStorage.removeItem(DRAFT_KEY);
       setDone({ slug: created.slug, id: created.id, mode: d.mode });
@@ -259,6 +295,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
             ? tx(locale, "Pasó la revisión automática (sin duplicados) y ya aparece en el mapa.", "It passed automated checks (no duplicates) and is live on the map.")
             : tx(locale, `${agencies.find((a) => a.id === d.agency)?.name} asignará un agente. Estado: SOLICITADO.`, `${agencies.find((a) => a.id === d.agency)?.name} will assign an agent. Status: REQUESTED.`)}
         </p>
+        {photoWarn && <p role="alert" className="mt-4 rounded-lg bg-[#C9862A14] px-3 py-2 text-sm text-warn">{photoWarn}</p>}
         <div className="mt-6 flex flex-wrap justify-center gap-3">
           {done.mode === "AGENCY" ? (
             <Button href={`/${locale}/agency/listings/${done.id}/edit`}>{tx(locale, "Editar en el panel", "Edit in dashboard")}</Button>
@@ -270,17 +307,18 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
       </div>
     );
 
-  const canNext = step === 1 ? !!d.addr && !dup : step === 4 ? d.price > 0 : true;
+  const canNext = step === 1 ? !!d.addr && !dup : step === 4 ? !priceErr : true;
   const facts = [
-    d.kind !== "land" && d.beds > 0 && plural(d.beds, locale, ["habitación", "habitaciones"], ["bedroom", "bedrooms"]),
-    d.kind !== "land" && d.baths > 0 && plural(d.baths, locale, ["baño", "baños"], ["bathroom", "bathrooms"]),
+    beds > 0 && plural(beds, locale, ["habitación", "habitaciones"], ["bedroom", "bedrooms"]),
+    baths > 0 && plural(baths, locale, ["baño", "baños"], ["bathroom", "bathrooms"]),
     `${num(d.m2, locale)} m²`,
-    d.parking > 0 && plural(d.parking, locale, ["puesto", "puestos"], ["parking space", "parking spaces"]),
+    parking > 0 && plural(parking, locale, ["puesto", "puestos"], ["parking space", "parking spaces"]),
   ].filter(Boolean).join(" · ");
   const extrasSummary = [
     extras.payload.shortRent && `${tx(locale, "Mín.", "Min.")} ${plural(extras.payload.shortRent.minNights, locale, ["noche", "noches"], ["night", "nights"])} · ${plural(extras.payload.shortRent.maxGuests, locale, ["huésped", "huéspedes"], ["guest", "guests"])} · ${tx(locale, "limpieza", "cleaning")} ${money(extras.payload.shortRent.cleaningFee, locale)}`,
     extras.payload.commercial && `${extras.payload.commercial.ceilingHeight} m ${tx(locale, "altura libre", "clear height")} · ${extras.payload.commercial.zoning}${extras.payload.commercial.loadingDock ? ` · ${tx(locale, "andén de carga", "loading dock")}` : ""}${extras.payload.commercial.capRate !== undefined ? ` · cap rate ${extras.payload.commercial.capRate} %` : ""}`,
     luxury && tx(locale, "Lujo", "Luxury"),
+    luxury && d.privateListing && tx(locale, "privado (solo por enlace)", "private (link only)"),
   ].filter(Boolean).join(" · ");
 
   return (
@@ -393,11 +431,16 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
           <div className="np-in space-y-5">
             <h1 className="font-display text-3xl font-semibold">{tx(locale, "Cuéntanos cómo es", "Tell us about it")}</h1>
             <div className="grid gap-3 sm:grid-cols-2">
-              <Field label={tx(locale, "Superficie construida (m²)", "Built area (m²)")}><input className={inputCls} type="number" min={1} value={d.m2} onChange={(e) => set({ m2: Math.max(1, +e.target.value) })} /></Field>
-              <Field label={tx(locale, "Año de construcción", "Year built")}><input className={inputCls} type="number" value={d.year} onChange={(e) => set({ year: +e.target.value })} /></Field>
-              {stepper(tx(locale, "Habitaciones", "Bedrooms"), d.beds, (v) => set({ beds: v }))}
-              {stepper(tx(locale, "Baños", "Bathrooms"), d.baths, (v) => set({ baths: v }))}
-              {stepper(tx(locale, "Puestos", "Parking"), d.parking, (v) => set({ parking: v }))}
+              {/* Empty while typing is allowed (0); the step can't continue until the value is valid. */}
+              <Field label={d.kind === "land" ? tx(locale, "Superficie del terreno (m²)", "Plot area (m²)") : tx(locale, "Superficie construida (m²)", "Built area (m²)")} error={showDetailsErr ? detailsErr.m2 ?? undefined : undefined}>
+                <input className={inputCls} type="number" inputMode="numeric" min={1} step={1} value={d.m2 || ""} aria-invalid={showDetailsErr && !!detailsErr.m2} onChange={(e) => set({ m2: Math.max(0, Math.round(+e.target.value || 0)) })} />
+              </Field>
+              <Field label={tx(locale, "Año de construcción", "Year built")} error={showDetailsErr ? detailsErr.year ?? undefined : undefined}>
+                <input className={inputCls} type="number" inputMode="numeric" min={1800} max={THIS_YEAR + 5} value={d.year || ""} aria-invalid={showDetailsErr && !!detailsErr.year} onChange={(e) => set({ year: Math.max(0, Math.round(+e.target.value || 0)) })} />
+              </Field>
+              {hasBeds && stepper(tx(locale, "Habitaciones", "Bedrooms"), d.beds, (v) => set({ beds: v }))}
+              {hasBaths && stepper(tx(locale, "Baños", "Bathrooms"), d.baths, (v) => set({ baths: v }))}
+              {d.kind !== "land" && stepper(tx(locale, "Puestos", "Parking"), d.parking, (v) => set({ parking: v }))}
             </div>
             <div>
               <div className="mb-2 font-semibold">{tx(locale, "Amenidades", "Amenities")}</div>
@@ -419,6 +462,15 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               </label>
             )}
             <ListingTypeFields locale={locale} listingType={listingType} luxury={luxury} value={d.extras} onChange={(x) => set({ extras: x })} showErrors={showExtrasErr} />
+            {luxury && (
+              <label className="flex items-start gap-2 text-sm">
+                <input type="checkbox" checked={d.privateListing} onChange={(e) => set({ privateListing: e.target.checked })} className="mt-0.5 h-4 w-4 shrink-0 accent-[#F26B4D]" />
+                <span>
+                  <span className="font-semibold">{tx(locale, "Anuncio privado", "Private listing")}</span>
+                  <span className="block text-ink/65">{tx(locale, "No aparece en el buscador ni en el mapa; solo quien tenga el enlace puede verlo.", "Hidden from search and the map; only people with the link can see it.")}</span>
+                </span>
+              </label>
+            )}
           </div>
         )}
 
@@ -433,7 +485,9 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               className="hidden"
               data-testid="photo-input"
               onChange={(e) => {
-                const list = Array.from(e.target.files ?? []).filter((f) => f.size <= 12 * 1024 * 1024);
+                const all = Array.from(e.target.files ?? []);
+                const list = all.filter((f) => f.size <= 12 * 1024 * 1024);
+                setFileNote(all.length > list.length ? tx(locale, `${all.length - list.length} foto(s) superan 12 MB y no se añadieron.`, `${all.length - list.length} photo(s) exceed 12 MB and were skipped.`) : null);
                 setFiles((prev) => [...prev, ...list].slice(0, 30));
                 e.target.value = "";
               }}
@@ -443,7 +497,10 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               onDragOver={(e) => e.preventDefault()}
               onDrop={(e) => {
                 e.preventDefault();
-                setFiles((prev) => [...prev, ...Array.from(e.dataTransfer.files).filter((f) => f.type.startsWith("image/"))].slice(0, 30));
+                const all = Array.from(e.dataTransfer.files).filter((f) => ["image/jpeg", "image/png", "image/webp"].includes(f.type));
+                const list = all.filter((f) => f.size <= 12 * 1024 * 1024);
+                setFileNote(all.length > list.length ? tx(locale, `${all.length - list.length} foto(s) superan 12 MB y no se añadieron.`, `${all.length - list.length} photo(s) exceed 12 MB and were skipped.`) : null);
+                setFiles((prev) => [...prev, ...list].slice(0, 30));
               }}
               className="flex w-full flex-col items-center rounded-np border-2 border-dashed border-line bg-white py-10 hover:border-coral"
             >
@@ -451,6 +508,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               <span className="mt-2 font-display font-semibold">{tx(locale, "Arrastra tus fotos o haz clic", "Drag your photos or click")}</span>
               <span className="text-sm text-ink/65">JPG / PNG / WebP · {tx(locale, "máx. 12 MB c/u · ideal 8 a 20", "max 12 MB each · ideally 8 to 20")}</span>
             </button>
+            {fileNote && <p role="alert" className="text-sm font-semibold text-warn">{fileNote}</p>}
             {files.length > 0 && (
               <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
                 {previews.map((src, i) => (
@@ -491,7 +549,9 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                 <div className="mt-2 flex items-center gap-2 text-ink/65"><Loader2 size={16} className="animate-spin" /> {tx(locale, "Calculando…", "Calculating…")}</div>
               )}
               <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto]">
-                <Field label={tx(locale, "Tu precio (USD)", "Your price (USD)")}><input className={inputCls} type="number" min={1} value={d.price} onChange={(e) => set({ price: Math.max(0, +e.target.value) })} /></Field>
+                <Field label={tx(locale, `Tu precio (USD${priceUnit})`, `Your price (USD${priceUnit})`)} error={priceErr ?? undefined}>
+                  <input className={inputCls} type="number" inputMode="numeric" min={1} step={1} value={d.price || ""} aria-invalid={!!priceErr} onChange={(e) => set({ price: Math.max(0, Math.round(+e.target.value || 0)) })} />
+                </Field>
                 {estimate && (
                   <div className="self-end pb-2.5 text-sm">
                     {d.price > estimate.high ? <span className="font-semibold text-warn">{tx(locale, "Por encima del rango", "Above range")}</span> : d.price < estimate.low ? <span className="font-semibold text-ok">{tx(locale, "Por debajo: venta rápida", "Below: quick sale")}</span> : <span className="font-semibold text-ok">{tx(locale, "Dentro del rango ✓", "Within range ✓")}</span>}
@@ -526,6 +586,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                 value={lang === "es" ? d.copy.body_es : d.copy.body_en}
                 onChange={(e) => set({ copy: { ...d.copy, [lang === "es" ? "body_es" : "body_en"]: e.target.value } })}
               />
+              {aiErr && <div role="alert" className="mt-2 rounded-lg bg-[#B423181A] px-3 py-2 text-sm text-danger">{aiErr}</div>}
               <div className="mt-2 text-xs text-ink/65">{tx(locale, "Si lo dejas vacío, generamos un texto base al publicar.", "Leave empty and we’ll generate a base text on publish.")}</div>
             </div>
           </div>
@@ -552,7 +613,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                   <PropertyArt scene={d.kind === "house" ? "house-dusk" : "tower-day"} seed="wiz" className="aspect-[4/3] w-full" />
                 )}
                 <div className="p-5">
-                  <div className="font-display text-2xl font-semibold">{money(d.price, locale)}</div>
+                  <div className="font-display text-2xl font-semibold">{money(d.price, locale)}<span className="text-sm font-normal text-ink/65">{priceUnit}</span></div>
                   <div className="font-semibold">{(lang === "es" ? d.copy.title_es : d.copy.title_en) || tx(locale, "(título automático)", "(auto title)")}</div>
                   <div className="text-sm text-ink/65" data-testid="review-address">{address}</div>
                   <div className="mt-2 text-sm" data-testid="review-facts">{facts}</div>
@@ -582,7 +643,11 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
           {step < 5 ? (
             <Button
               onClick={() => {
-                if (step === 2 && !extras.ok) return setShowExtrasErr(true);
+                if (step === 2 && (!extras.ok || !detailsOk)) {
+                  setShowExtrasErr(true);
+                  setShowDetailsErr(true);
+                  return;
+                }
                 setStep(step + 1);
               }}
               disabled={!canNext}
@@ -607,7 +672,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
             )}
             <div className="p-4">
               <div className="text-xs font-semibold uppercase tracking-wide text-ink/65">{tx(locale, "Vista previa", "Preview")}</div>
-              <div className="font-display text-xl font-semibold">{money(d.price, locale)}</div>
+              <div className="font-display text-xl font-semibold">{money(d.price, locale)}<span className="text-sm font-normal text-ink/65">{priceUnit}</span></div>
               <div className="text-sm">{facts}</div>
               <div className="text-sm text-ink/65">{d.addr ? fullAddress([d.addr.zone, d.addr.city]) : tx(locale, "Dirección pendiente", "Address pending")}</div>
             </div>

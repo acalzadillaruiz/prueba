@@ -5,18 +5,15 @@ import { NoAgency } from "@/components/agency/NoAgency";
 import { dashboardStats } from "@/server/agency-stats";
 import { getLeads } from "@/server/data";
 import { agencyListings } from "@/server/listings";
-import { getAppAgency, getAppUser } from "@/server/session";
+import { getAppAgency, requireAgencyPage } from "@/server/session";
 
 export const dynamic = "force-dynamic";
 
 export default async function Page({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params;
-  const user = (await getAppUser())!;
-  if (!user.agencyId) return <NoAgency locale={locale} />;
-  if (user.role === "CAPTOR" || user.role === "PHOTOGRAPHER") {
-    const { redirect } = await import("next/navigation");
-    redirect(`/${locale}/agency/${user.role === "CAPTOR" ? "capture" : "media"}`);
-  }
+  const g = await requireAgencyPage(locale, "dashboard");
+  if (!g) return <NoAgency locale={locale} />;
+  const user = { ...g.user, agencyId: g.agencyId };
   const agentId = user.role === "AGENT" ? user.id : undefined;
   const [stats, listings, leads, tours, agency] = await Promise.all([
     dashboardStats(user.agencyId, agentId),

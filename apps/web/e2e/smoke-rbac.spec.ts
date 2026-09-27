@@ -1,3 +1,4 @@
+import { PrismaClient } from "@prisma/client";
 import { expect, test } from "@playwright/test";
 import { apiAs, demoLogin } from "./helpers";
 
@@ -7,7 +8,7 @@ test.describe("Smoke: login, mapa, crear inmueble · RBAC duro", () => {
     await page.getByLabel("Email").fill("seeker@gmail.com");
     await page.getByLabel("Contraseña", { exact: true }).fill("NewPlace!2026");
     await page.getByRole("button", { name: "Entrar", exact: true }).click();
-    await page.waitForURL(/\/es\/app/);
+    await page.waitForURL(/\/es\/agency/);
     await expect(page.getByText("Homebuyer Hub")).toBeVisible();
   });
 
@@ -64,6 +65,48 @@ test.describe("Smoke: login, mapa, crear inmueble · RBAC duro", () => {
     await page.context().clearCookies();
     await demoLogin(page, /Captador/);
     expect((await apiAs(page, "GET", "agency/invitations")).status).toBe(403);
+  });
+
+  test("reservas: el mismo horario no se puede reservar dos veces a la vez, ni en el pasado", async ({ page }) => {
+    await page.goto("/es");
+    const slots = await apiAs(page, "GET", "listings/wi3sg7/slots");
+    const free = slots.json.days.flatMap((d: { hours: { iso: string; available: boolean }[] }) => d.hours).filter((h: { available: boolean }) => h.available);
+    const iso = free[free.length - 1].iso;
+    const lead = (n: number) => ({ listingId: "wi3sg7", name: `Carrera ${n}`, email: `race${n}@test.dev`, message: "Quiero visitar", tourStart: iso });
+    const results = await Promise.all([1, 2, 3].map((n) => apiAs(page, "POST", "leads", lead(n))));
+    expect(results.filter((r) => r.status === 201)).toHaveLength(1);
+    expect(results.filter((r) => r.status === 409)).toHaveLength(2);
+    const past = await apiAs(page, "POST", "leads", { ...lead(4), tourStart: new Date(Date.now() - 864e5).toISOString() });
+    expect(past.status).toBe(422);
+  });
+
+  test("equipo: invitación → registro con el token → entra como miembro; el backoffice no puede degradar al dueño", async ({ page }) => {
+    await demoLogin(page, /Dueño de agencia/);
+    const email = `invite-${Date.now()}@test.dev`;
+    expect((await apiAs(page, "POST", "agency/invitations", { email, role: "CAPTOR" })).status).toBe(201);
+    expect((await apiAs(page, "POST", "agency/invitations", { email, role: "AGENT" })).status).toBe(201); // re-invite replaces
+    const list = await apiAs(page, "GET", "agency/invitations");
+    const mine = list.json.items.filter((i: { email: string }) => i.email === email);
+    expect(mine).toHaveLength(1);
+    expect(mine[0].token).toBeUndefined();
+    // the token only travels by email; read it straight from the database
+    const db = new PrismaClient({ datasourceUrl: process.env.DATABASE_URL ?? "postgresql://postgres:postgres@localhost:5432/newplace" });
+    const { token } = await db.invitation.findFirstOrThrow({ where: { email, acceptedAt: null } });
+    await db.$disconnect();
+    await page.context().clearCookies();
+    expect((await apiAs(page, "GET", `invitations/${token}`)).json.agencyName).toBe("Andes Prime");
+    expect((await apiAs(page, "POST", "auth/register", { name: "Nueva Agente", email, password: "NewPlace!2026", invite: token })).status).toBe(201);
+    expect((await apiAs(page, "POST", "auth/register", { name: "Otra", email: `x${email}`, password: "NewPlace!2026", invite: token })).status).toBe(422);
+    await page.goto("/es/login");
+    await page.getByLabel("Email").fill(email);
+    await page.getByLabel("Contraseña", { exact: true }).fill("NewPlace!2026");
+    await page.getByRole("button", { name: "Entrar", exact: true }).click();
+    await page.waitForURL(/\/es\/agency/);
+    const me = await apiAs(page, "GET", "me");
+    expect(me.json.role ?? me.json.user?.role).toBe("AGENT");
+    await page.context().clearCookies();
+    await demoLogin(page, /Backoffice/);
+    expect((await apiAs(page, "PATCH", "agency/members/u-owner", { role: "AGENT" })).status).toBe(403);
   });
 
   test("crear inmueble como agencia (queda pendiente de aprobación si lo crea un agente)", async ({ page }) => {

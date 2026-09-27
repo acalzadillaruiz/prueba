@@ -29,23 +29,26 @@ import { logout } from "@/lib/logout";
 import { LogOut } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useApp } from "@/lib/store";
+import { AGENCY_PAGE_PATH, AGENCY_PAGE_ROLES } from "@/lib/agency-pages";
 import { api } from "@/lib/api";
 import { tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 
 type Item = { href: string; icon: React.ElementType; label: string; roles?: Role[] };
 
-const AGENCY_NAV: Item[] = [
-  { href: "", icon: Gauge, label: "dashboard", roles: ["AGENCY_OWNER", "AGENT", "BACKOFFICE", "SUPERADMIN"] },
-  { href: "/leads", icon: Inbox, label: "leads", roles: ["AGENCY_OWNER", "AGENT", "BACKOFFICE", "SUPERADMIN"] },
-  { href: "/listings", icon: LayoutGrid, label: "listings" },
-  { href: "/calendar", icon: Calendar, label: "calendar", roles: ["AGENCY_OWNER", "AGENT", "BACKOFFICE", "PHOTOGRAPHER", "SUPERADMIN"] },
-  { href: "/capture", icon: Target, label: "capture", roles: ["AGENCY_OWNER", "CAPTOR", "BACKOFFICE", "SUPERADMIN"] },
-  { href: "/media", icon: Camera, label: "media", roles: ["AGENCY_OWNER", "PHOTOGRAPHER", "BACKOFFICE", "SUPERADMIN"] },
-  { href: "/team", icon: Users, label: "team", roles: ["AGENCY_OWNER", "BACKOFFICE", "SUPERADMIN"] },
-  { href: "/reports", icon: BarChart3, label: "reports", roles: ["AGENCY_OWNER", "BACKOFFICE", "SUPERADMIN"] },
-  { href: "/settings", icon: Settings, label: "settings", roles: ["AGENCY_OWNER", "SUPERADMIN"] },
-];
+const AGENCY_NAV: Item[] = (
+  [
+    ["dashboard", Gauge, "dashboard"],
+    ["leads", Inbox, "leads"],
+    ["listings", LayoutGrid, "listings"],
+    ["calendar", Calendar, "calendar"],
+    ["capture", Target, "capture"],
+    ["media", Camera, "media"],
+    ["team", Users, "team"],
+    ["reports", BarChart3, "reports"],
+    ["settings", Settings, "settings"],
+  ] as const
+).map(([page, icon, label]) => ({ href: AGENCY_PAGE_PATH[page], icon, label, roles: AGENCY_PAGE_ROLES[page] }));
 
 const PLATFORM_NAV: Item[] = [
   { href: "", icon: Gauge, label: "globalMetrics" },

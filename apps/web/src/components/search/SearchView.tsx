@@ -66,12 +66,15 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
   };
 
   const shapeParam = shape?.type === "poly" ? `&poly=${shape.pts.map((p) => `${p.lat.toFixed(5)},${p.lng.toFixed(5)}`).join(";")}` : shape?.type === "radius" ? `&radius=${shape.center.lat.toFixed(5)},${shape.center.lng.toFixed(5)},${shape.km}` : "";
-  const qs = `${sp.toString()}&sort=${sort}${shapeParam}`;
+  // The page defaults to "Comprar"; the API must get the same default or other types leak into the results.
+  const base = new URLSearchParams(sp.toString());
+  if (!base.get("type")) base.set("type", "SALE");
+  const qs = `${base.toString()}&sort=${sort}${shapeParam}`;
   const query = useQuery({
     queryKey: ["search", qs],
     queryFn: () => api<{ items: Listing[]; total: number }>(`/api/v1/listings?${qs}`),
     placeholderData: keepPreviousData,
-    initialData: qs === `${sp.toString()}&sort=new` ? initial : undefined,
+    initialData: qs === `${base.toString()}&sort=new` ? initial : undefined,
   });
   const results = query.data?.items ?? [];
   const createAlert = async () => {

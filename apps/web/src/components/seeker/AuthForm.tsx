@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema } from "@newplace/config";
@@ -20,6 +20,14 @@ import { tx } from "@/lib/i18n";
 
 const GOOGLE = process.env.NEXT_PUBLIC_GOOGLE_AUTH === "true";
 
+/** Landing page after sign-in, by role. */
+function homeFor(role: string) {
+  if (role === "SUPERADMIN") return "/platform";
+  if (["AGENCY_OWNER", "AGENT", "BACKOFFICE", "CAPTOR", "PHOTOGRAPHER"].includes(role)) return "/agency";
+  if (role === "OWNER_PRIVATE") return "/owner/listings";
+  return "/app";
+}
+
 function GoogleG() {
   return (
     <svg viewBox="0 0 48 48" width="18" height="18" aria-hidden>
@@ -36,12 +44,24 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
   const [agency, setAgency] = useState(false);
   const schema = mode === "login" ? registerSchema.pick({ email: true, password: true }) : agency ? registerSchema.required({ agencyName: true }) : registerSchema;
   type FormValues = { name?: string; email: string; password: string; agencyName?: string };
-  const { register, handleSubmit, formState } = useForm<FormValues>({ resolver: zodResolver(schema as never), mode: "onTouched" });
+  // shouldUnregister: when "¿Eres agencia?" is unticked the hidden agencyName leaves the form (it used to block submit silently).
+  const { register, handleSubmit, formState, setValue } = useForm<FormValues>({ resolver: zodResolver(schema as never), mode: "onTouched", shouldUnregister: true });
   const errs = formState.errors;
   const [busy, setBusy] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const router = useRouter();
   const sp = useSearchParams();
+  const invite = sp.get("invite");
+  const [inv, setInv] = useState<{ agencyName: string; role: string; email: string } | null>(null);
+  useEffect(() => {
+    if (!invite) return;
+    api<{ agencyName: string; role: string; email: string }>(`invitations/${encodeURIComponent(invite)}`)
+      .then((d) => {
+        setInv(d);
+        setValue("email", d.email);
+      })
+      .catch(() => setErr(tx(locale, "La invitación no es válida o ya se usó.", "This invitation is invalid or was already used.")));
+  }, [invite, locale, setValue]);
   const rawNext = sp.get("next");
   // Same-origin paths only: "/x" is fine, "//evil.com" and "/\\evil.com" are not.
   const next = rawNext && /^\/(?![\/\\])/.test(rawNext) ? rawNext : null;
@@ -55,10 +75,13 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
     setErr(null);
     setBusy("form");
     try {
-      if (mode === "register") await api("auth/register", { method: "POST", json: { name, email, password, ...(agency ? { agencyName } : {}) } });
+      if (mode === "register") await api("auth/register", { method: "POST", json: { name, email, password, ...(agency && !inv ? { agencyName } : {}), ...(inv && invite ? { invite } : {}) } });
       const r = await signIn("credentials", { email, password, redirect: false });
       if (r?.error) throw new Error(tx(locale, "Email o contraseña incorrectos.", "Wrong email or password."));
-      finish(mode === "register" && agency ? "/agency" : "/app");
+      // Existing account opening an invite link from the login screen: join the agency now.
+      if (mode === "login" && inv && invite) await api(`invitations/${encodeURIComponent(invite)}`, { method: "POST" });
+      const me = await api<{ user: { role: string } }>("me").catch(() => null);
+      finish(homeFor(me?.user.role ?? "SEEKER"));
     } catch (e2) {
       setErr((e2 as Error).message);
     } finally {
@@ -72,6 +95,14 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
         <Link href={`/${locale}`}><Logo /></Link>
         <div className="mx-auto my-auto w-full max-w-md py-10">
           <h1 className="font-display text-3xl font-semibold">{mode === "login" ? tx(locale, "Entra a New Place", "Sign in to New Place") : tx(locale, "Crea tu cuenta", "Create your account")}</h1>
+          {inv && (
+            <div className="mt-4 rounded-np border border-coral/40 bg-[#F26B4D0D] p-3 text-sm" role="status">
+              {tx(locale, `${inv.agencyName} te invita a su equipo como ${inv.role}.`, `${inv.agencyName} invited you to their team as ${inv.role}.`)}{" "}
+              {mode === "register" ? (
+                <Link className="font-semibold text-coral" href={`/${locale}/login?invite=${encodeURIComponent(invite ?? "")}`}>{tx(locale, "¿Ya tienes cuenta? Entra", "Have an account? Sign in")}</Link>
+              ) : null}
+            </div>
+          )}
           <p className="mt-1 text-ink/60">{mode === "login" ? tx(locale, "Guarda, compara y agenda visitas.", "Save, compare and book tours.") : tx(locale, "Gratis. Sin tarjeta.", "Free. No card needed.")}</p>
           <button
             type="button"
@@ -87,14 +118,14 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
             {mode === "register" && (
               <Field label={tx(locale, "Nombre completo", "Full name")} error={fieldError(errs.name, locale, "name")}><input className={inputCls} {...register("name")} aria-invalid={!!errs.name} autoComplete="name" /></Field>
             )}
-            <Field label="Email" error={fieldError(errs.email, locale, "email")}><input className={inputCls} type="email" {...register("email")} aria-invalid={!!errs.email} autoComplete="email" placeholder="tu@gmail.com" /></Field>
+            <Field label="Email" error={fieldError(errs.email, locale, "email")}><input className={inputCls} type="email" readOnly={!!inv} {...register("email")} aria-invalid={!!errs.email} autoComplete="email" placeholder="tu@gmail.com" /></Field>
             <Field label={tx(locale, "Contraseña", "Password")} error={fieldError(errs.password, locale, "password")} hint={(mode === "register" ? tx(locale, "Mínimo 8 caracteres.", "At least 8 characters.") : undefined)}>
               <div className="relative">
                 <input className={inputCls} type={show ? "text" : "password"} {...register("password")} aria-invalid={!!errs.password} autoComplete={mode === "login" ? "current-password" : "new-password"} />
                 <button type="button" onClick={() => setShow(!show)} className="absolute right-1 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center text-ink/65" aria-label={tx(locale, "Mostrar contraseña", "Show password")}>{show ? <EyeOff size={18} /> : <Eye size={18} />}</button>
               </div>
             </Field>
-            {mode === "register" && (
+            {mode === "register" && !inv && (
               <label className="flex cursor-pointer items-start gap-3 rounded-np border border-line bg-white p-3.5">
                 <input type="checkbox" checked={agency} onChange={(e) => setAgency(e.target.checked)} className="mt-1 accent-[#F26B4D]" />
                 <span>
@@ -103,7 +134,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
                 </span>
               </label>
             )}
-            {agency && <Field label={tx(locale, "Nombre de la agencia", "Agency name")} error={fieldError(errs.agencyName, locale, "agencyName")}><input className={inputCls} {...register("agencyName")} placeholder="Andes Prime" /></Field>}
+            {agency && !inv && <Field label={tx(locale, "Nombre de la agencia", "Agency name")} error={fieldError(errs.agencyName, locale, "agencyName")}><input className={inputCls} {...register("agencyName")} placeholder="Andes Prime" /></Field>}
             {err && <div className="rounded-lg bg-[#B423181A] px-3 py-2 text-sm text-danger" role="alert">{err}</div>}
             <Button className="w-full" size="lg" disabled={!!busy}>
               {busy === "form" && <Loader2 size={16} className="animate-spin" />}

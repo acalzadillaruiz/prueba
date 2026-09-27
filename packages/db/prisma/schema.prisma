@@ -311,6 +311,8 @@ model Listing {
   amenities      String[]
   status         ListingStatus @default(DRAFT)
   review         ReviewStatus  @default(APPROVED)
+  /// Status to restore when a moderation takedown is lifted
+  statusBeforeTakedown ListingStatus?
   takedownReason String?
   publishedAt    DateTime?
   createdAt      DateTime      @default(now())
@@ -620,6 +622,8 @@ model CommissionEntry {
   id        String   @id @default(cuid())
   agencyId  String
   listingId String
+  /// One commission per won lead (re-winning a lead updates it instead of adding another)
+  leadId    String?  @unique
   agentId   String
   amount    Int
   agentPart Int

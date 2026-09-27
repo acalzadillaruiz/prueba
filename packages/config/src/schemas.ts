@@ -12,6 +12,8 @@ export const registerSchema = z.object({
   password: z.string().min(8).max(100),
   agencyName: z.string().trim().min(2).max(80).optional(),
   agencyCity: z.string().max(60).optional(),
+  /** Team invitation token from the email link (/register?invite=…) */
+  invite: z.string().max(100).optional(),
 });
 
 export const leadSchema = z.object({

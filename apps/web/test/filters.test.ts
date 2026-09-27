@@ -16,3 +16,17 @@ describe("filtersFromParams", () => {
     expect(f.bbox).toBeUndefined();
   });
 });
+
+describe("filtersFromParams hardening", () => {
+  it("drops unknown enums and maps friendly aliases", () => {
+    expect(filtersFromParams(new URLSearchParams("type=nonsense")).type).toBeUndefined();
+    expect(filtersFromParams(new URLSearchParams("type=rent")).type).toBe("LONG_RENT");
+    expect(filtersFromParams(new URLSearchParams("sort=DROP TABLE")).sort).toBe("new");
+  });
+  it("rejects negative or non-numeric numbers", () => {
+    const f = filtersFromParams(new URLSearchParams("take=-1&max=abc&beds=2"));
+    expect(f.take).toBeUndefined();
+    expect(f.max).toBeUndefined();
+    expect(f.beds).toBe(2);
+  });
+});

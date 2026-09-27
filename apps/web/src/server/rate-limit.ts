@@ -26,7 +26,8 @@ export function clientIp(req: Request): string {
   return req.headers.get("x-forwarded-for")?.split(",")[0].trim() || req.headers.get("x-real-ip") || "local";
 }
 
-/** Throws RATE_LIMIT (429) when exceeded. */
+/** Throws RATE_LIMIT (429) when exceeded. Per-IP limits apply in production only (dev and e2e share one IP). */
 export async function limit(req: Request, name: string, max: number, windowSec: number) {
+  if (process.env.NODE_ENV !== "production" && process.env.RATE_LIMIT !== "on") return;
   if (!(await hit(`${name}:${clientIp(req)}`, max, windowSec))) throw new ApiError("RATE_LIMIT");
 }

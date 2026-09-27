@@ -2,14 +2,15 @@ import type { Locale } from "@/types/domain";
 import { prisma } from "@newplace/db";
 import { ReportsView } from "@/components/agency/Reports";
 import { NoAgency } from "@/components/agency/NoAgency";
-import { getAppUser } from "@/server/session";
+import { requireAgencyPage } from "@/server/session";
 
 export const dynamic = "force-dynamic";
 
 export default async function Page({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params;
-  const user = (await getAppUser())!;
-  if (!user.agencyId) return <NoAgency locale={locale} />;
+  const g = await requireAgencyPage(locale, "reports");
+  if (!g) return <NoAgency locale={locale} />;
+  const user = { ...g.user, agencyId: g.agencyId };
   const agencyId = user.agencyId;
   const since = new Date(Date.now() - 30 * 864e5);
   const [entries, leads30, bySource, listings] = await Promise.all([

@@ -3,14 +3,15 @@ import { prisma } from "@newplace/db";
 import { TeamView } from "@/components/agency/Team";
 import { NoAgency } from "@/components/agency/NoAgency";
 import { getUsers } from "@/server/data";
-import { getAppUser } from "@/server/session";
+import { requireAgencyPage } from "@/server/session";
 
 export const dynamic = "force-dynamic";
 
 export default async function Page({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params;
-  const user = (await getAppUser())!;
-  if (!user.agencyId) return <NoAgency locale={locale} />;
+  const g = await requireAgencyPage(locale, "team");
+  if (!g) return <NoAgency locale={locale} />;
+  const user = { ...g.user, agencyId: g.agencyId };
   const [members, counts, invites] = await Promise.all([
     getUsers({ memberships: { some: { agencyId: user.agencyId } } }),
     prisma.listing.groupBy({ by: ["agentId"], where: { agencyId: user.agencyId }, _count: true }),

@@ -3,15 +3,16 @@ import { prisma } from "@newplace/db";
 import { CalendarView, type CalEvent } from "@/components/agency/Calendar";
 import { NoAgency } from "@/components/agency/NoAgency";
 import { getSlots } from "@/server/data";
-import { getAppUser } from "@/server/session";
+import { requireAgencyPage } from "@/server/session";
 
 export const dynamic = "force-dynamic";
 
 export default async function Page({ params, searchParams }: { params: Promise<{ locale: Locale }>; searchParams: Promise<{ w?: string }> }) {
   const { locale } = await params;
   const week = Number((await searchParams).w ?? 0) || 0;
-  const user = (await getAppUser())!;
-  if (!user.agencyId) return <NoAgency locale={locale} />;
+  const g = await requireAgencyPage(locale, "calendar");
+  if (!g) return <NoAgency locale={locale} />;
+  const user = { ...g.user, agencyId: g.agencyId };
   // Monday 00:00 America/Caracas of the requested week
   const nowLocal = new Date(Date.now() - 4 * 3600e3);
   const dow = (nowLocal.getUTCDay() + 6) % 7;

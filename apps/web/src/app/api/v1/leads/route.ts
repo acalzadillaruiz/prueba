@@ -6,6 +6,8 @@ import { aiProvider } from "@/server/ai";
 import { leadToDomain, queueEmail } from "@/server/data";
 import { isManager } from "@/server/access";
 import { limit } from "@/server/rate-limit";
+import { publicWhere } from "@/server/listings";
+import { assertBookableSlot, lockAgentAndCheck } from "@/server/tours";
 
 const Create = leadSchema;
 
@@ -14,18 +16,21 @@ export const POST = handler(async (req: NextRequest) => {
   await limit(req, "lead", 10, 10 * 60);
   const u = await currentUser();
   const b = await body(req, Create);
-  const l = await prisma.listing.findUnique({ where: { id: b.listingId }, include: { agent: true, owner: true } });
+  // Only published listings take enquiries; tours only while the property is still available.
+  const l = await prisma.listing.findFirst({ where: { AND: [{ id: b.listingId }, publicWhere()] }, include: { agent: true, owner: true } });
   if (!l) throw new ApiError("NOT_FOUND");
-  if (b.tourStart) {
+  const tourStart = b.tourStart ? new Date(b.tourStart) : null;
+  if (tourStart) {
     if (!l.agentId) throw new ApiError("VALIDATION", { tourStart: "listing has no agent calendar" });
-    const start = new Date(b.tourStart);
-    const clash = await prisma.tour.findFirst({ where: { agentId: l.agentId, status: { in: ["REQUESTED", "CONFIRMED"] }, start: { gte: new Date(start.getTime() - 59 * 60000), lte: new Date(start.getTime() + 59 * 60000) } } });
-    if (clash) throw new ApiError("CONFLICT", { tourStart: "slot taken" });
+    if (!["ACTIVE", "COMING_SOON", "UNDER_OFFER"].includes(l.status)) throw new ApiError("VALIDATION", { tourStart: "listing not available" });
+    await assertBookableSlot(l.agentId, tourStart);
   }
   const source = b.tourStart ? "TOUR_REQUEST" : "LISTING_FORM";
   const provider = await aiProvider();
   const score = await provider.leadScore({ createdMinutesAgo: 0, budget: b.budget, listingPrice: l.priceAmount, source, messages: 1, hasPhone: !!b.phone, toursRequested: b.tourStart ? 1 : 0 });
-  const lead = await prisma.lead.create({
+  const lead = await prisma.$transaction(async (tx) => {
+    if (tourStart && l.agentId) await lockAgentAndCheck(tx, l.agentId, tourStart);
+    const created = await tx.lead.create({
     data: {
       listingId: l.id,
       agencyId: l.agencyId,
@@ -43,9 +48,10 @@ export const POST = handler(async (req: NextRequest) => {
       reason: score.reason,
       events: { create: { type: "CREATED", data: { source, provider: provider.id }, actorId: u?.id } },
     },
+    });
+    if (tourStart && l.agentId) await tx.tour.create({ data: { listingId: l.id, leadId: created.id, agentId: l.agentId, seekerUserId: u?.id, seekerName: b.name, start: tourStart, virtual: !!b.virtual } });
+    return created;
   });
-  if (b.tourStart && l.agentId)
-    await prisma.tour.create({ data: { listingId: l.id, leadId: lead.id, agentId: l.agentId, seekerUserId: u?.id, seekerName: b.name, start: new Date(b.tourStart), virtual: !!b.virtual } });
   const participants = [l.agentId ?? l.ownerUserId, u?.id].filter((x): x is string => !!x);
   const thread = await prisma.messageThread.create({ data: { leadId: lead.id, listingId: l.id, subject: l.titleEs, participants: { create: [...new Set(participants)].map((userId) => ({ userId })) } } });
   if (u) await prisma.message.create({ data: { threadId: thread.id, senderId: u.id, body: b.message } });

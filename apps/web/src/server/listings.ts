@@ -18,7 +18,8 @@ export type ListingRow = Prisma.ListingGetPayload<{ include: typeof listingInclu
 export const PUBLIC_STATUSES: ListingStatus[] = ["COMING_SOON", "ACTIVE", "UNDER_OFFER", "SOLD", "RENTED"];
 
 export function publicWhere(): Prisma.ListingWhereInput {
-  return { status: { in: PUBLIC_STATUSES }, review: "APPROVED", privateListing: false };
+  // Listings of a suspended agency disappear from every public surface.
+  return { status: { in: PUBLIC_STATUSES }, review: "APPROVED", privateListing: false, OR: [{ agencyId: null }, { agency: { status: { not: "SUSPENDED" } } }] };
 }
 
 export function toDomain(r: ListingRow): Listing {
@@ -81,7 +82,7 @@ export function toDomain(r: ListingRow): Listing {
     privateListing: r.privateListing,
     shortRent: (r.shortRent ?? undefined) as Listing["shortRent"],
     commercial: (r.commercial ?? undefined) as Listing["commercial"],
-    fingerprint: r.fingerprint,
+    fingerprint: "", // internal duplicate key: never sent to browsers
     agency: r.agency ? { ...r.agency, phone: r.agency.phone ?? "", whatsapp: r.agency.whatsapp ?? "" } : undefined,
     agent: r.agent
       ? { id: r.agent.id, name: r.agent.name ?? "", hue: r.agent.hue, verified: !!r.agent.memberships[0]?.verified, phone: r.agent.phone ?? undefined }
@@ -114,8 +115,23 @@ export interface SearchFilters {
   take?: number;
 }
 
+const TYPES = ["SALE", "LONG_RENT", "SHORT_RENT", "COMMERCIAL_SALE", "COMMERCIAL_RENT", "COMMERCIAL"];
+const SORTS = ["new", "price-asc", "price-desc", "ppm"];
+const PUBS = ["24h", "7d"];
+/** Friendly aliases people type or share: ?type=rent, ?type=venta… */
+const TYPE_ALIASES: Record<string, string> = { BUY: "SALE", VENTA: "SALE", RENT: "LONG_RENT", ALQUILER: "LONG_RENT", VACATION: "SHORT_RENT", VACACIONAL: "SHORT_RENT", COMERCIAL: "COMMERCIAL" };
+
+/** Parses URL filters defensively: unknown enums are dropped, numbers must be finite and ≥ 0 (malformed URLs never reach Prisma). */
 export function filtersFromParams(sp: URLSearchParams): SearchFilters {
-  const num = (k: string) => (sp.get(k) ? Number(sp.get(k)) : undefined);
+  const num = (k: string) => {
+    const v = Number(sp.get(k));
+    return sp.get(k) && Number.isFinite(v) && v >= 0 ? v : undefined;
+  };
+  const oneOf = <T extends string>(k: string, allowed: string[]) => {
+    const v = sp.get(k);
+    return v && allowed.includes(v) ? (v as T) : undefined;
+  };
+  const rawType = sp.get("type")?.toUpperCase();
   const poly = sp.get("poly");
   const radius = sp.get("radius");
   let shape: Shape = null;
@@ -128,7 +144,7 @@ export function filtersFromParams(sp: URLSearchParams): SearchFilters {
   }
   const bbox = sp.get("bbox")?.split(",").map(Number);
   return {
-    type: sp.get("type") ?? undefined,
+    type: rawType && TYPES.includes(TYPE_ALIASES[rawType] ?? rawType) ? (TYPE_ALIASES[rawType] ?? rawType) : undefined,
     zone: sp.get("zone") ?? undefined,
     city: sp.get("city") ?? undefined,
     max: num("max"),
@@ -141,11 +157,11 @@ export function filtersFromParams(sp: URLSearchParams): SearchFilters {
     furnished: sp.get("furnished") === "1",
     pets: sp.get("pets") === "1",
     verified: sp.get("verified") === "1",
-    pub: (sp.get("pub") as SearchFilters["pub"]) ?? undefined,
+    pub: oneOf<NonNullable<SearchFilters["pub"]>>("pub", PUBS),
     amenities: (sp.get("am") ?? "").split(",").filter(Boolean),
     bbox: bbox?.length === 4 && bbox.every(Number.isFinite) ? (bbox as SearchFilters["bbox"]) : undefined,
     shape,
-    sort: (sp.get("sort") as SearchFilters["sort"]) ?? "new",
+    sort: oneOf<NonNullable<SearchFilters["sort"]>>("sort", SORTS) ?? "new",
     cursor: sp.get("cursor") ?? undefined,
     take: num("take"),
   };
@@ -183,7 +199,7 @@ export async function searchListings(f: SearchFilters): Promise<{ items: Listing
   const where = whereFromFilters(f);
   const orderBy: Prisma.ListingOrderByWithRelationInput[] =
     f.sort === "price-asc" ? [{ priceAmount: "asc" }] : f.sort === "price-desc" ? [{ priceAmount: "desc" }] : [{ publishedAt: "desc" }];
-  const take = Math.min(f.take ?? 500, 500);
+  const take = Math.max(1, Math.min(Math.floor(f.take ?? 500), 500));
   const rows = await prisma.listing.findMany({ where, include: listingInclude, orderBy: [...orderBy, { id: "asc" }], take: take + 1, ...(f.cursor ? { cursor: { id: f.cursor }, skip: 1 } : {}) });
   let items = rows.slice(0, take).map(toDomain);
   if (f.shape) items = items.filter((l) => inShape(l, f.shape!));

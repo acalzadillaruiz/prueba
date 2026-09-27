@@ -21,9 +21,11 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
   const qc = useQueryClient();
   const agent = l.agent;
   const agency = l.agency;
-  const slots = useQuery({ queryKey: ["slots", l.id], queryFn: () => api<Slots>(`listings/${l.id}/slots`), enabled: !!l.agentId, refetchInterval: 15_000 });
+  // Tours only while the property is available and has an agent calendar.
+  const bookable = !!l.agentId && ["ACTIVE", "COMING_SOON", "UNDER_OFFER"].includes(l.status);
+  const slots = useQuery({ queryKey: ["slots", l.id], queryFn: () => api<Slots>(`listings/${l.id}/slots`), enabled: bookable, refetchInterval: 15_000 });
   const days = slots.data?.days ?? [];
-  const [mode, setMode] = useState<"tour" | "msg">(l.agentId ? "tour" : "msg");
+  const [mode, setMode] = useState<"tour" | "msg">(bookable ? "tour" : "msg");
   const [day, setDay] = useState(0);
   const [iso, setIso] = useState<string | null>(null);
   const [virtual, setVirtual] = useState(false);
@@ -54,7 +56,9 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
       setDone(mode === "tour" && chosen ? fmt(chosen, { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }) : "");
       qc.invalidateQueries({ queryKey: ["slots", l.id] });
     } catch (e) {
-      setErr(e instanceof ApiClientError && e.code === "CONFLICT" ? tx(locale, "Ese horario acaba de ocuparse. Elige otro.", "That slot was just taken. Pick another.") : (e as Error).message);
+      const conflict = e instanceof ApiClientError && e.code === "CONFLICT";
+      if (conflict) setIso(null);
+      setErr(conflict ? tx(locale, "Ese horario acaba de ocuparse. Elige otro.", "That slot was just taken. Pick another.") : (e as Error).message);
       qc.invalidateQueries({ queryKey: ["slots", l.id] });
     } finally {
       setBusy(false);
@@ -102,8 +106,8 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
         </div>
       )}
       <div className="p-4">
-        <div className={cn("mb-4 grid rounded-full p-1", l.agentId ? "grid-cols-2" : "grid-cols-1", dark ? "bg-white/5" : "bg-ivory")}>
-          {l.agentId && (
+        <div className={cn("mb-4 grid rounded-full p-1", bookable ? "grid-cols-2" : "grid-cols-1", dark ? "bg-white/5" : "bg-ivory")}>
+          {bookable && (
             <button onClick={() => setMode("tour")} className={cn("flex items-center justify-center gap-1.5 rounded-full py-1.5 font-display text-sm", mode === "tour" && (dark ? "bg-ivory text-navy" : "bg-navy text-ivory"))}>
               <CalendarCheck size={15} /> {tx(locale, "Pedir visita", "Book a tour")}
             </button>
@@ -167,7 +171,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
           {busy && <Loader2 size={16} className="animate-spin" />}
           {mode === "tour" ? tx(locale, "Solicitar visita", "Request tour") : tx(locale, "Enviar mensaje", "Send message")}
         </Button>
-        <p className={cn("mt-2 text-center text-xs", muted)}>{tx(locale, "Horarios reales de la agenda del agente. Sin costo.", "Real slots from the agent’s calendar. Free.")}</p>
+        {bookable && mode === "tour" && <p className={cn("mt-2 text-center text-xs", muted)}>{tx(locale, "Horarios reales de la agenda del agente. Sin costo.", "Real slots from the agent’s calendar. Free.")}</p>}
       </div>
     </div>
   );

@@ -21,7 +21,7 @@ function sniff(b: Buffer): string | null {
 
 async function refreshQuality(id: string) {
   const l = await prisma.listing.findUniqueOrThrow({ where: { id }, include: { _count: { select: { photos: true } } } });
-  await prisma.listing.update({ where: { id }, data: { quality: qualityOf({ photos: l._count.photos, titleEn: l.titleEn, bodyEn: l.bodyEn, lat: l.lat, hasFloorplan: l.hasFloorplan, hasVirtualTour: l.hasVirtualTour }) } });
+  await prisma.listing.update({ where: { id }, data: { quality: qualityOf({ photos: l._count.photos || l.scenes.length, titleEn: l.titleEn, bodyEn: l.bodyEn, lat: l.lat, hasFloorplan: l.hasFloorplan, hasVirtualTour: l.hasVirtualTour }) } });
 }
 
 /** Bulk upload (multipart field "files"). Order follows upload order; first photo becomes cover if none. */

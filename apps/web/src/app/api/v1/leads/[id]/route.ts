@@ -4,6 +4,7 @@ import { prisma } from "@newplace/db";
 import { body, currentUser, handler, ok, requireUser } from "@/server/api";
 import { leadForUser } from "@/server/access";
 import { leadToDomain } from "@/server/data";
+import { commissionAmount } from "@/lib/commission";
 
 type Ctx = { params: Promise<{ id: string }> };
 
@@ -24,9 +25,13 @@ export const PATCH = handler(async (req: NextRequest, { params }: Ctx) => {
       const l = await prisma.listing.findUniqueOrThrow({ where: { id: lead.listingId }, include: { agency: { include: { commission: true } } } });
       const rule = l.agency?.commission;
       if (l.agencyId && rule && lead.agentId) {
-        const amount = l.listingType.includes("RENT") ? Math.round(l.priceAmount * rule.rentMonths) : Math.round((l.priceAmount * rule.salePct) / 100);
-        await prisma.commissionEntry.create({ data: { agencyId: l.agencyId, listingId: l.id, agentId: lead.agentId, amount, agentPart: Math.round((amount * rule.agentSplitPct) / 100) } });
+        const amount = commissionAmount(l.listingType, l.priceAmount, rule);
+        const data = { agencyId: l.agencyId, listingId: l.id, agentId: lead.agentId, amount, agentPart: Math.round((amount * rule.agentSplitPct) / 100) };
+        // One entry per lead: WON → LOST → WON never counts twice.
+        await prisma.commissionEntry.upsert({ where: { leadId: id }, create: { ...data, leadId: id }, update: data });
       }
+    } else if (lead.stage === "WON") {
+      await prisma.commissionEntry.deleteMany({ where: { leadId: id } });
     }
   }
   return ok(leadToDomain(updated));

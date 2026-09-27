@@ -16,7 +16,9 @@ export const PATCH = handler(async (req: NextRequest, { params }: Ctx) => {
   if (!l) throw new ApiError("NOT_FOUND");
   const r = await prisma.listing.update({
     where: { id },
-    data: b.takedown ? { status: "WITHDRAWN", takedownReason: b.reason ?? "Moderación" } : { status: "ACTIVE", takedownReason: null },
+    data: b.takedown
+      ? { status: "WITHDRAWN", takedownReason: b.reason ?? "Moderación", statusBeforeTakedown: l.takedownReason ? l.statusBeforeTakedown : l.status }
+      : { status: l.statusBeforeTakedown ?? "ACTIVE", takedownReason: null, statusBeforeTakedown: null },
   });
   await audit(u.id, b.takedown ? "listing.takedown" : "listing.restore", l.titleEs, b);
   return ok({ id: r.id, status: r.status });

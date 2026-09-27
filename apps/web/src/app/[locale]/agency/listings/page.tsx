@@ -3,14 +3,15 @@ import { prisma } from "@newplace/db";
 import { ListingsTable } from "@/components/agency/ListingsTable";
 import { NoAgency } from "@/components/agency/NoAgency";
 import { agencyListings } from "@/server/listings";
-import { getAppUser } from "@/server/session";
+import { requireAgencyPage } from "@/server/session";
 
 export const dynamic = "force-dynamic";
 
 export default async function Page({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params;
-  const user = (await getAppUser())!;
-  if (!user.agencyId) return <NoAgency locale={locale} />;
+  const g = await requireAgencyPage(locale, "listings");
+  if (!g) return <NoAgency locale={locale} />;
+  const user = { ...g.user, agencyId: g.agencyId };
   const [listings, agents] = await Promise.all([
     agencyListings(user.agencyId, { agentId: user.role === "AGENT" ? user.id : undefined }),
     prisma.agencyMember.findMany({ where: { agencyId: user.agencyId, role: "AGENT" }, include: { user: { select: { id: true, name: true, hue: true } } } }),

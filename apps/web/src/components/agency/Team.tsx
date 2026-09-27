@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, Mail, Send, ShieldCheck, ShieldQuestion } from "lucide-react";
+import { Loader2, Mail, Send, ShieldCheck, ShieldQuestion, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type { Role } from "@newplace/config";
 import type { Locale, User } from "@/types/domain";
 import { AdminShell } from "@/components/layout/AdminShell";
@@ -18,6 +19,8 @@ export function TeamView({ locale, members, listingsByAgent, invites: initialInv
   const router = useRouter();
   const { user } = useApp();
   const manager = user?.role === "AGENCY_OWNER" || user?.role === "BACKOFFICE";
+  const isOwner = user?.role === "AGENCY_OWNER" || user?.role === "SUPERADMIN";
+  const tr = useTranslations("roles");
   const [invites, setInvites] = useState(initialInvites);
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<Role>("AGENT");
@@ -48,8 +51,8 @@ export function TeamView({ locale, members, listingsByAgent, invites: initialInv
                 <tr key={u.id} className="border-t border-navy-line">
                   <td className="px-4 py-3"><div className="flex items-center gap-3"><Avatar initials={u.initials} hue={u.hue} size={34} /><div><div className="font-semibold">{u.name}</div><div className="text-xs text-mist">{u.email}</div></div></div></td>
                   <td className="px-3">
-                    <select value={u.role} disabled={!manager || u.id === user?.id || busy === u.id} onChange={(e) => patch(u.id, { role: e.target.value })} className="h-8 rounded-md border border-navy-line bg-navy-2 px-2 text-xs" aria-label={tx(locale, "Rol", "Role")}>
-                      {ROLE_OPTS.map((r) => <option key={r} value={r}>{r}</option>)}
+                    <select value={u.role} disabled={!manager || u.id === user?.id || busy === u.id || (u.role === "AGENCY_OWNER" && !isOwner)} onChange={(e) => patch(u.id, { role: e.target.value })} className="h-8 rounded-md border border-navy-line bg-navy-2 px-2 text-xs" aria-label={tx(locale, "Rol", "Role")}>
+                      {ROLE_OPTS.filter((r) => isOwner || r !== "AGENCY_OWNER" || u.role === "AGENCY_OWNER").map((r) => <option key={r} value={r}>{tr(r)}</option>)}
                     </select>
                   </td>
                   <td className="px-3">
@@ -95,7 +98,7 @@ export function TeamView({ locale, members, listingsByAgent, invites: initialInv
               <div className="font-display text-lg font-semibold">{tx(locale, "Invitar por email", "Invite by email")}</div>
               <input className={darkInputCls + " mt-3"} type="email" required placeholder="nombre@agencia.ve" value={email} onChange={(e) => setEmail(e.target.value)} aria-label="Email" />
               <select className={darkInputCls + " mt-2"} value={role} onChange={(e) => setRole(e.target.value as Role)} aria-label={tx(locale, "Rol", "Role")}>
-                {ROLE_OPTS.filter((r) => r !== "AGENCY_OWNER").map((r) => <option key={r}>{r}</option>)}
+                {ROLE_OPTS.filter((r) => r !== "AGENCY_OWNER").map((r) => <option key={r} value={r}>{tr(r)}</option>)}
               </select>
               <Button className="mt-3 w-full" disabled={busy === "invite"}>{busy === "invite" ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />} {tx(locale, "Enviar invitación", "Send invite")}</Button>
             </form>
@@ -104,7 +107,27 @@ export function TeamView({ locale, members, listingsByAgent, invites: initialInv
             <div className="font-display font-semibold">{tx(locale, "Invitaciones pendientes", "Pending invites")}</div>
             {invites.length === 0 && <div className="mt-2 text-sm text-mist">—</div>}
             {invites.map((i) => (
-              <div key={i.id} className="np-in mt-3 flex items-center gap-2 text-sm"><Mail size={15} className="text-coral" /><span className="flex-1 truncate">{i.email}</span><Badge tone="dark">{i.role}</Badge></div>
+              <div key={i.id} className="np-in mt-3 flex items-center gap-2 text-sm">
+                <Mail size={15} className="text-coral" />
+                <span className="flex-1 truncate">{i.email}</span>
+                <Badge tone="dark">{tr(i.role)}</Badge>
+                {manager && (
+                  <button
+                    className="flex h-9 w-9 items-center justify-center rounded-full text-mist hover:bg-white/10 hover:text-ivory"
+                    aria-label={tx(locale, `Revocar invitación a ${i.email}`, `Revoke invite to ${i.email}`)}
+                    onClick={async () => {
+                      try {
+                        await api(`agency/invitations?id=${i.id}`, { method: "DELETE" });
+                        setInvites(invites.filter((x) => x.id !== i.id));
+                      } catch (e2) {
+                        setErr((e2 as Error).message);
+                      }
+                    }}
+                  >
+                    <X size={15} />
+                  </button>
+                )}
+              </div>
             ))}
           </div>
         </div>

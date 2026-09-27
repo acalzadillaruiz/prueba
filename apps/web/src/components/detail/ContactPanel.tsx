@@ -36,6 +36,15 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
     mode: "onTouched",
   });
   const errs = form.formState.errors;
+  // Every invalid field at once (not only the first), in the order they appear in the form.
+  const fieldErrors = (
+    [
+      ["name", errs.name && `${tx(locale, "Nombre", "Name")}: ${fieldError(errs.name, locale, "text")}`],
+      ["email", errs.email && fieldError(errs.email, locale, "email")],
+      ["phone", errs.phone && tx(locale, "El teléfono admite hasta 30 caracteres.", "Phone allows up to 30 characters.")],
+      ["message", errs.message && `${tx(locale, "Mensaje", "Message")}: ${fieldError(errs.message, locale, "text")}`],
+    ] as const
+  ).filter((e): e is readonly [string, string] => !!e[1]);
   const email = form.watch("email");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -156,17 +165,21 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
           </>
         )}
         <div className="mt-3 space-y-2">
-          <input className={field} placeholder={tx(locale, "Nombre", "Name")} {...form.register("name")} aria-invalid={!!errs.name} aria-label={tx(locale, "Nombre", "Name")} />
+          <input className={field} placeholder={tx(locale, "Nombre", "Name")} {...form.register("name")} aria-invalid={!!errs.name} aria-describedby={errs.name ? "cp-err-name" : undefined} aria-label={tx(locale, "Nombre", "Name")} />
           <div className="grid grid-cols-2 gap-2">
-            <input className={field} type="email" placeholder="Email" {...form.register("email")} aria-invalid={!!errs.email} aria-label="Email" />
-            <input className={field} placeholder={tx(locale, "Teléfono", "Phone")} {...form.register("phone")} aria-label={tx(locale, "Teléfono", "Phone")} />
+            <input className={field} type="email" placeholder="Email" {...form.register("email")} aria-invalid={!!errs.email} aria-describedby={errs.email ? "cp-err-email" : undefined} aria-label="Email" />
+            <input className={field} type="tel" placeholder={tx(locale, "Teléfono", "Phone")} {...form.register("phone")} aria-invalid={!!errs.phone} aria-describedby={errs.phone ? "cp-err-phone" : undefined} aria-label={tx(locale, "Teléfono", "Phone")} />
           </div>
-          <textarea className={cn(field, "h-20 py-2")} {...form.register("message")} aria-invalid={!!errs.message} aria-label={tx(locale, "Mensaje", "Message")} />
-          {(errs.name || errs.email || errs.message) && (
-            <div className="text-xs font-semibold text-danger" role="alert">{fieldError(errs.email, locale, "email") ?? fieldError(errs.name ?? errs.message, locale, "text")}</div>
+          <textarea className={cn(field, "h-20 py-2")} {...form.register("message")} aria-invalid={!!errs.message} aria-describedby={errs.message ? "cp-err-message" : undefined} aria-label={tx(locale, "Mensaje", "Message")} />
+          {fieldErrors.length > 0 && (
+            <ul className="space-y-0.5 text-xs font-semibold text-danger" role="alert">
+              {fieldErrors.map(([k, msg]) => (
+                <li key={k} id={`cp-err-${k}`}>{msg}</li>
+              ))}
+            </ul>
           )}
         </div>
-        {err && <div className="mt-2 rounded-lg bg-[#B423181A] px-3 py-2 text-sm text-danger">{err}</div>}
+        {err && <div role="alert" className="mt-2 rounded-lg bg-[#B423181A] px-3 py-2 text-sm text-danger">{err}</div>}
         <Button className="mt-3 w-full" size="lg" onClick={form.handleSubmit(submit)} disabled={busy || (mode === "tour" && !chosen)} variant={dark ? "gold" : "coral"}>
           {busy && <Loader2 size={16} className="animate-spin" />}
           {mode === "tour" ? tx(locale, "Solicitar visita", "Request tour") : tx(locale, "Enviar mensaje", "Send message")}

@@ -43,3 +43,20 @@ export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LeadInput = z.infer<typeof leadSchema>;
 export type CaptureInput = z.input<typeof captureSchema>;
+
+/** Homebuyer Hub pre-qualification (mock) persisted in User.prequal. */
+export const prequalSchema = z.object({
+  price: z.number().int().min(10_000).max(10_000_000),
+  downPct: z.number().min(0).max(100),
+  years: z.number().int().min(1).max(40),
+  ratePct: z.number().min(0).max(50),
+});
+
+/** Offer made by a seeker from the Hub (same bounds the API enforces). */
+export const offerSchema = z.object({
+  amount: z.number().int().positive().max(1_000_000_000),
+  note: z.string().trim().max(500).optional(),
+});
+
+export type PrequalInput = z.infer<typeof prequalSchema>;
+export type OfferInput = z.infer<typeof offerSchema>;

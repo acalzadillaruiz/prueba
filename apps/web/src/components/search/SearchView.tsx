@@ -30,6 +30,29 @@ const PRICE_STEPS: Record<string, number[]> = {
   COMMERCIAL: [2000, 5000, 200000, 500000, 1000000],
 };
 
+const MIN_M2_STEPS = [50, 80, 100, 150, 200, 300];
+const SORTS = ["new", "price-asc", "price-desc", "ppm"] as const;
+type Sort = (typeof SORTS)[number];
+
+/** URL ⇄ drawn shape, in the exact format the API parses (`poly=lat,lng;lat,lng;…`, `radius=lat,lng,km`). */
+export function shapeToParams(shape: Shape): { poly: string | null; radius: string | null } {
+  if (shape?.type === "poly") return { poly: shape.pts.map((p) => `${p.lat.toFixed(5)},${p.lng.toFixed(5)}`).join(";"), radius: null };
+  if (shape?.type === "radius") return { poly: null, radius: `${shape.center.lat.toFixed(5)},${shape.center.lng.toFixed(5)},${+shape.km.toFixed(3)}` };
+  return { poly: null, radius: null };
+}
+
+export function shapeFromParams(poly: string | null, radius: string | null): Shape {
+  if (poly) {
+    const pts = poly.split(";").map((p) => p.split(",").map(Number)).filter((p) => p.length === 2 && p.every(Number.isFinite)).map(([lat, lng]) => ({ lat, lng }));
+    return pts.length >= 3 ? { type: "poly", pts } : null;
+  }
+  if (radius) {
+    const [lat, lng, km] = radius.split(",").map(Number);
+    return [lat, lng, km].every(Number.isFinite) && km > 0 ? { type: "radius", center: { lat, lng }, km } : null;
+  }
+  return null;
+}
+
 const FILTER_AMENITIES: Amenity[] = ["pool", "generator", "waterTank", "security", "gym", "terrace", "view", "garden", "elevator", "ac"];
 
 export function SearchView({ locale, initial, zones }: { locale: Locale; initial: { items: Listing[]; total: number }; zones: string[] }) {
@@ -37,19 +60,31 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
   const router = useRouter();
   const { requireLogin } = useApp();
   const [savingAlert, setSavingAlert] = useState(false);
-  const [shape, setShape] = useState<Shape>(null);
+  const [alertError, setAlertError] = useState<string | null>(null);
   const [sel, setSel] = useState<string | null>(null);
   const [hover, setHover] = useState<string | null>(null);
   const [moreOpen, setMoreOpen] = useState(false);
   const [mobileList, setMobileList] = useState(false);
   const [alertSaved, setAlertSaved] = useState(false);
   const [nl, setNl] = useState(sp.get("q") ?? "");
-  const [sort, setSort] = useState<"new" | "price-asc" | "price-desc" | "ppm">("new");
 
   const type = sp.get("type") ?? "SALE";
   const zone = sp.get("zone");
-  const max = sp.get("max") ? Number(sp.get("max")) : undefined;
-  const beds = sp.get("beds") ? Number(sp.get("beds")) : undefined;
+  const numParam = (k: string) => {
+    const v = Number(sp.get(k));
+    return sp.get(k) && Number.isFinite(v) && v > 0 ? v : undefined;
+  };
+  const max = numParam("max");
+  const min = numParam("min");
+  const beds = numParam("beds");
+  const baths = numParam("baths");
+  const minM2 = numParam("m2");
+  const sortParam = sp.get("sort");
+  const sort: Sort = SORTS.includes(sortParam as Sort) ? (sortParam as Sort) : "new";
+  const polyParam = sp.get("poly");
+  const radiusParam = sp.get("radius");
+  // Sort and the drawn area live in the URL, so reload / share restores them (and the map redraws the shape).
+  const shape = useMemo(() => shapeFromParams(polyParam, radiusParam), [polyParam, radiusParam]);
   const pub = sp.get("pub");
   const lux = sp.get("lux") === "1";
   const kind = sp.get("kind");
@@ -63,32 +98,60 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
     for (const [k, v] of Object.entries(patch)) { if (v === null) p.delete(k); else p.set(k, v); }
     router.replace(`/${locale}/search?${p.toString()}`, { scroll: false });
     setAlertSaved(false);
+    setAlertError(null);
   };
+  const setShape = (s: Shape) => set(shapeToParams(s));
 
-  const shapeParam = shape?.type === "poly" ? `&poly=${shape.pts.map((p) => `${p.lat.toFixed(5)},${p.lng.toFixed(5)}`).join(";")}` : shape?.type === "radius" ? `&radius=${shape.center.lat.toFixed(5)},${shape.center.lng.toFixed(5)},${shape.km}` : "";
   // The page defaults to "Comprar"; the API must get the same default or other types leak into the results.
   const base = new URLSearchParams(sp.toString());
   if (!base.get("type")) base.set("type", "SALE");
-  const qs = `${base.toString()}&sort=${sort}${shapeParam}`;
+  const qs = base.toString();
+  // The server rendered `initial` for the URL we landed on (sort and shape included).
+  const [initialQs] = useState(qs);
   const query = useQuery({
     queryKey: ["search", qs],
     queryFn: () => api<{ items: Listing[]; total: number }>(`/api/v1/listings?${qs}`),
     placeholderData: keepPreviousData,
-    initialData: qs === `${base.toString()}&sort=new` ? initial : undefined,
+    initialData: qs === initialQs ? initial : undefined,
   });
   const results = query.data?.items ?? [];
   const createAlert = async () => {
+    if (alertSaved || savingAlert) return;
     if (!requireLogin()) return;
     setSavingAlert(true);
+    setAlertError(null);
     try {
-      const name = [tx(locale, TYPES.find((t) => t[0] === type)?.[1] ?? "", TYPES.find((t) => t[0] === type)?.[2] ?? ""), zone, beds ? `${beds}+ ${tx(locale, "hab", "bd")}` : "", max ? `< ${max.toLocaleString("es-VE")}` : "", shape ? tx(locale, "zona dibujada", "drawn area") : ""].filter(Boolean).join(" · ");
-      await api("me/searches", { method: "POST", json: { name, query: sp.toString(), frequency: "INSTANT", ...(shape?.type === "poly" ? { polygon: shape.pts } : {}) } });
+      const name = [
+        tx(locale, TYPES.find((t) => t[0] === type)?.[1] ?? "", TYPES.find((t) => t[0] === type)?.[2] ?? ""),
+        zone,
+        beds ? `${beds}+ ${tx(locale, "hab", "bd")}` : "",
+        baths ? `${baths}+ ${tx(locale, "baños", "ba")}` : "",
+        minM2 ? `≥ ${minM2} m²` : "",
+        min ? `> ${min.toLocaleString("es-VE")}` : "",
+        max ? `< ${max.toLocaleString("es-VE")}` : "",
+        shape ? (shape.type === "radius" ? tx(locale, `radio ${shape.km} km`, `${shape.km} km radius`) : tx(locale, "zona dibujada", "drawn area")) : "",
+      ]
+        .filter(Boolean)
+        .join(" · ")
+        .slice(0, 120);
+      // The query keeps every filter (poly/radius included: a radius has no column of its own); the polygon also goes to its column for alert matching.
+      const alertQuery = new URLSearchParams(base);
+      alertQuery.delete("sort");
+      await api("me/searches", { method: "POST", json: { name, query: alertQuery.toString(), frequency: "INSTANT", ...(shape?.type === "poly" ? { polygon: shape.pts } : {}) } });
       setAlertSaved(true);
+    } catch (e) {
+      setAlertError((e as Error).message);
     } finally {
       setSavingAlert(false);
     }
   };
 
+  // Map remounts when filters change, but not when only the drawn shape or the sort change (keeps zoom/pan).
+  const filtersKey = (() => {
+    const p = new URLSearchParams(sp.toString());
+    ["poly", "radius", "sort"].forEach((k) => p.delete(k));
+    return p.toString();
+  })();
   const [regionPick, setRegionPick] = useState<"caracas" | "venezuela" | null>(null);
   const autoRegion = results.length > 0 && results.every((l) => l.city !== "Caracas") ? "venezuela" : "caracas";
   const region = regionPick ?? autoRegion;
@@ -102,11 +165,15 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
     const scale = Math.max(1.7, Math.min(5, Math.min(0.185 / (dLng * 1.8 || 0.01), 0.14 / (dLat * 2.2 || 0.01))));
     return { focus: { lat: (Math.max(...lats) + Math.min(...lats)) / 2, lng: (Math.max(...lngs) + Math.min(...lngs)) / 2 }, scale };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [region, sp.toString()]);
+  }, [region, filtersKey]);
   const activeChips: [string, string, Record<string, string | null>][] = [];
   if (zone) activeChips.push(["zone", zone, { zone: null }]);
+  if (min) activeChips.push(["min", `≥ ${money(min, locale)}`, { min: null }]);
   if (max) activeChips.push(["max", `≤ ${money(max, locale)}`, { max: null }]);
   if (beds) activeChips.push(["beds", `${beds}+ ${tx(locale, "hab", "bd")}`, { beds: null }]);
+  if (baths) activeChips.push(["baths", `${baths}+ ${tx(locale, "baños", "ba")}`, { baths: null }]);
+  if (minM2) activeChips.push(["m2", `≥ ${num(minM2, locale)} m²`, { m2: null }]);
+  if (shape) activeChips.push(["shape", shape.type === "radius" ? tx(locale, `Radio ${shape.km} km`, `${shape.km} km radius`) : tx(locale, "Zona dibujada", "Drawn area"), { poly: null, radius: null }]);
   if (kind) activeChips.push(["kind", kind === "penthouse" ? tx(locale, "Ático / PH", "Penthouse") : kind, { kind: null }]);
   if (lux) activeChips.push(["lux", "Luxury", { lux: null }]);
   if (pub) activeChips.push(["pub", pub === "24h" ? tx(locale, "Últimas 24 h", "Last 24 h") : tx(locale, "Últimos 7 días", "Last 7 days"), { pub: null }]);

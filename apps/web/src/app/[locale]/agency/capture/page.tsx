@@ -12,8 +12,14 @@ export default async function Page({ params }: { params: Promise<{ locale: Local
   const g = await requireAgencyPage(locale, "capture");
   if (!g) return <NoAgency locale={locale} />;
   const user = { ...g.user, agencyId: g.agencyId };
-  const [rows, zones] = await Promise.all([getCaptures(user.agencyId), getZones()]);
+  const [rows, zones, links] = await Promise.all([
+    getCaptures(user.agencyId),
+    getZones(),
+    prisma.captureLead.findMany({ where: { agencyId: user.agencyId, listingId: { not: null } }, select: { id: true, listingId: true } }),
+  ]);
+  const listingOf = new Map(links.map((c) => [c.id, c.listingId ?? undefined]));
   const dupIds = rows.map((r) => r.duplicateOf).filter(Boolean) as string[];
   const titles = await prisma.listing.findMany({ where: { id: { in: dupIds } }, select: { id: true, titleEs: true, titleEn: true } });
-  return <CaptureView locale={locale} rows={rows} zones={zones} titles={Object.fromEntries(titles.map((t) => [t.id, locale === "es" ? t.titleEs : t.titleEn]))} />;
+  const canConvert = ["AGENCY_OWNER", "BACKOFFICE", "SUPERADMIN"].includes(user.role);
+  return <CaptureView locale={locale} canConvert={canConvert} rows={rows.map((r) => ({ ...r, listingId: listingOf.get(r.id) }))} zones={zones} titles={Object.fromEntries(titles.map((t) => [t.id, locale === "es" ? t.titleEs : t.titleEn]))} />;
 }

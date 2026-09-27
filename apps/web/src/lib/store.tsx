@@ -49,7 +49,9 @@ export function AppStateProvider({ children, user, agency, savedIds }: { childre
   const requireLogin = useCallback(() => {
     if (user) return true;
     const locale = pathname.split("/")[1] || "es";
-    router.push(`/${locale}/login?next=${encodeURIComponent(pathname)}`);
+    // Keep the full query (filters, sort, drawn area) so the user lands back on the same search after login.
+    const search = typeof window !== "undefined" ? window.location.search : "";
+    router.push(`/${locale}/login?next=${encodeURIComponent(pathname + search)}`);
     return false;
   }, [user, pathname, router]);
 

@@ -2,21 +2,91 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Camera, Check, Film, LayoutPanelTop, Loader2, Star, UploadCloud } from "lucide-react";
+import { ArrowLeft, ArrowRight, Camera, Check, Film, LayoutPanelTop, Loader2, Plus, Star, UploadCloud } from "lucide-react";
 import type { Listing, Locale, MediaJob } from "@/types/domain";
 import { AdminShell } from "@/components/layout/AdminShell";
 import { listingPhoto } from "@/lib/photos";
 import { PropertyArt } from "@/components/art/PropertyArt";
-import { Badge, Button, EmptyState } from "@/components/ui";
+import { Badge, Button, EmptyState, Field, darkInputCls } from "@/components/ui";
 import { api } from "@/lib/api";
 import { dateTime, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
+import { caracasInputToIso, isoToCaracasInput } from "@/lib/caracas-time";
 
 const TONE: Record<MediaJob["status"], string> = { SCHEDULED: "bg-white/10 text-mist", SHOOTING: "bg-[#F26B4D33] text-coral", UPLOADING: "bg-[#C9862A33] text-[#F2B866]", DELIVERED: "bg-[#2F6F4E40] text-[#7FD3A8]" };
-const NEXT: Record<MediaJob["status"], MediaJob["status"] | null> = { SCHEDULED: "SHOOTING", SHOOTING: "UPLOADING", UPLOADING: "DELIVERED", DELIVERED: null };
+const ORDER: MediaJob["status"][] = ["SCHEDULED", "SHOOTING", "UPLOADING", "DELIVERED"];
+const STATUS: Record<MediaJob["status"], [string, string]> = {
+  SCHEDULED: ["Programada", "Scheduled"],
+  SHOOTING: ["En sesión", "Shooting"],
+  UPLOADING: ["Subiendo fotos", "Uploading"],
+  DELIVERED: ["Entregada", "Delivered"],
+};
+const step = (s: MediaJob["status"], d: 1 | -1) => ORDER[ORDER.indexOf(s) + d] ?? null;
 
-export function MediaView({ locale, jobs, listings }: { locale: Locale; jobs: MediaJob[]; listings: Listing[] }) {
+type Manage = { photographers: { id: string; name: string }[]; listings: { id: string; title: string; address: string }[] } | null;
+
+function NewJob({ locale, manage, onDone }: { locale: Locale; manage: NonNullable<Manage>; onDone: () => void }) {
   const router = useRouter();
+  const tomorrow = isoToCaracasInput(Date.now() + 864e5).slice(0, 11) + "10:00";
+  const [f, setF] = useState({ listingId: manage.listings[0]?.id ?? "", photographerId: manage.photographers[0]?.id ?? "", date: tomorrow });
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  return (
+    <form
+      className="np-in mb-6 rounded-np border border-navy-line bg-navy-card p-4"
+      onSubmit={async (e) => {
+        e.preventDefault();
+        setErr(null);
+        const date = caracasInputToIso(f.date);
+        if (!date) return setErr(tx(locale, "Indica una fecha y hora válidas.", "Enter a valid date and time."));
+        setBusy(true);
+        try {
+          await api("media", { method: "POST", json: { ...f, date } });
+          onDone();
+          router.refresh();
+        } catch (e2) {
+          setErr((e2 as Error).message);
+        } finally {
+          setBusy(false);
+        }
+      }}
+    >
+      <div className="font-display text-lg font-semibold">{tx(locale, "Nueva sesión de fotos", "New photo shoot")}</div>
+      {!manage.photographers.length ? (
+        <p className="mt-2 text-sm text-mist">{tx(locale, "Tu agencia no tiene fotógrafos. Invita a uno desde «Equipo».", "Your agency has no photographers. Invite one from “Team”.")}</p>
+      ) : !manage.listings.length ? (
+        <p className="mt-2 text-sm text-mist">{tx(locale, "No hay inmuebles disponibles para fotografiar.", "There are no listings available to shoot.")}</p>
+      ) : (
+        <div className="mt-3 grid gap-3 md:grid-cols-[2fr_1fr_1fr_auto] md:items-end">
+          <Field dark label={tx(locale, "Inmueble", "Listing")}>
+            <select required className={darkInputCls} value={f.listingId} onChange={(e) => setF({ ...f, listingId: e.target.value })}>
+              {manage.listings.map((l) => <option key={l.id} value={l.id}>{l.title} · {l.address}</option>)}
+            </select>
+          </Field>
+          <Field dark label={tx(locale, "Fotógrafo", "Photographer")}>
+            <select required className={darkInputCls} value={f.photographerId} onChange={(e) => setF({ ...f, photographerId: e.target.value })}>
+              {manage.photographers.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+            </select>
+          </Field>
+          <Field dark label={tx(locale, "Fecha y hora (Caracas)", "Date & time (Caracas)")}>
+            <input required type="datetime-local" className={darkInputCls} value={f.date} onChange={(e) => setF({ ...f, date: e.target.value })} />
+          </Field>
+          <Button disabled={busy}>{busy ? <Loader2 size={15} className="animate-spin" /> : <Plus size={15} />} {tx(locale, "Asignar", "Assign")}</Button>
+        </div>
+      )}
+      {err && <div role="alert" className="mt-3 rounded-lg bg-[#B4231833] px-3 py-2 text-sm text-[#FF8A7A]">{err}</div>}
+    </form>
+  );
+}
+
+export function MediaView({ locale, jobs, listings, names = {}, manage = null }: { locale: Locale; jobs: MediaJob[]; listings: Listing[]; names?: Record<string, string>; manage?: Manage }) {
+  const router = useRouter();
+  const [creating, setCreating] = useState(false);
+  const statusLabel = (st: MediaJob["status"]) => tx(locale, STATUS[st][0], STATUS[st][1]);
+  const newButton = manage ? (
+    <Button size="sm" onClick={() => setCreating(!creating)} aria-expanded={creating}><Plus size={15} /> {tx(locale, "Nueva sesión", "New shoot")}</Button>
+  ) : undefined;
+  const newForm = manage && creating ? <NewJob locale={locale} manage={manage} onDone={() => setCreating(false)} /> : null;
   const byId = new Map(listings.map((l) => [l.id, l]));
   const [sel, setSel] = useState(jobs.find((j) => j.status !== "DELIVERED")?.id ?? jobs[0]?.id);
   const [busy, setBusy] = useState<string | null>(null);
@@ -49,8 +119,9 @@ export function MediaView({ locale, jobs, listings }: { locale: Locale; jobs: Me
 
   if (!jobs.length)
     return (
-      <AdminShell locale={locale} area="agency" title={tx(locale, "Trabajos de fotografía", "Media jobs")}>
-        <EmptyState dark icon={<Camera size={20} />} title={tx(locale, "Sin trabajos asignados", "No jobs assigned")} body={tx(locale, "Cuando el backoffice te asigne una sesión aparecerá aquí.", "When backoffice assigns a shoot it will show up here.")} />
+      <AdminShell locale={locale} area="agency" title={tx(locale, "Trabajos de fotografía", "Media jobs")} actions={newButton}>
+        {newForm}
+        <EmptyState dark icon={<Camera size={20} />} title={tx(locale, "Sin trabajos asignados", "No jobs assigned")} body={manage ? tx(locale, "Crea una sesión con «Nueva sesión» y asígnala a un fotógrafo.", "Create a shoot with “New shoot” and assign it to a photographer.") : tx(locale, "Cuando el backoffice te asigne una sesión aparecerá aquí.", "When backoffice assigns a shoot it will show up here.")} />
       </AdminShell>
     );
 
@@ -64,7 +135,8 @@ export function MediaView({ locale, jobs, listings }: { locale: Locale; jobs: Me
     : [];
 
   return (
-    <AdminShell locale={locale} area="agency" title={tx(locale, "Trabajos de fotografía", "Media jobs")}>
+    <AdminShell locale={locale} area="agency" title={tx(locale, "Trabajos de fotografía", "Media jobs")} actions={newButton}>
+      {newForm}
       <input ref={fileRef} type="file" multiple accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(e) => { upload(Array.from(e.target.files ?? [])); e.target.value = ""; }} />
       <div className="grid gap-6 [&>*]:min-w-0 xl:grid-cols-[340px_1fr]">
         <div className="space-y-3">
@@ -77,7 +149,8 @@ export function MediaView({ locale, jobs, listings }: { locale: Locale; jobs: Me
                 <div className="min-w-0 flex-1">
                   <div className="line-clamp-1 font-semibold">{tx(locale, jl.title_es, jl.title_en)}</div>
                   <div className="text-xs capitalize text-mist">{dateTime(j.date, locale)}</div>
-                  <span className={cn("mt-1 inline-block rounded-full px-2 py-0.5 text-[10px] font-bold", TONE[j.status])}>{j.status}</span>
+                  {manage && names[j.photographerId] && <div className="truncate text-xs text-mist">{names[j.photographerId]}</div>}
+                  <span className={cn("mt-1 inline-block rounded-full px-2 py-0.5 text-[10px] font-bold", TONE[j.status])}>{statusLabel(j.status)}</span>
                 </div>
               </button>
             );
@@ -90,10 +163,15 @@ export function MediaView({ locale, jobs, listings }: { locale: Locale; jobs: Me
                 <div className="font-display text-xl font-semibold">{tx(locale, l.title_es, l.title_en)}</div>
                 <div className="text-sm text-mist">{l.address} · {l.zone}</div>
               </div>
-              <div className="flex gap-2">
-                {NEXT[job.status] && (
-                  <Button size="sm" variant="dark-outline" disabled={!!busy} onClick={() => run("status", () => api(`media/${job.id}`, { method: "PATCH", json: { status: NEXT[job.status] } }))}>
-                    → {NEXT[job.status]}
+              <div className="flex flex-wrap gap-2">
+                {step(job.status, -1) && (
+                  <Button size="sm" variant="dark-ghost" disabled={!!busy} onClick={() => run("status", () => api(`media/${job.id}`, { method: "PATCH", json: { status: step(job.status, -1) } }))} aria-label={tx(locale, `Volver a «${statusLabel(step(job.status, -1)!)}»`, `Back to “${statusLabel(step(job.status, -1)!)}”`)}>
+                    <ArrowLeft size={14} /> {statusLabel(step(job.status, -1)!)}
+                  </Button>
+                )}
+                {step(job.status, 1) && (
+                  <Button size="sm" variant="dark-outline" disabled={!!busy} onClick={() => run("status", () => api(`media/${job.id}`, { method: "PATCH", json: { status: step(job.status, 1) } }))} aria-label={tx(locale, `Avanzar a «${statusLabel(step(job.status, 1)!)}»`, `Move to “${statusLabel(step(job.status, 1)!)}”`)}>
+                    {statusLabel(step(job.status, 1)!)} <ArrowRight size={14} />
                   </Button>
                 )}
                 <Button size="sm" onClick={() => fileRef.current?.click()} disabled={busy === "upload"}>
@@ -101,7 +179,30 @@ export function MediaView({ locale, jobs, listings }: { locale: Locale; jobs: Me
                 </Button>
               </div>
             </div>
-            {err && <div className="mt-3 rounded-lg bg-[#B4231833] px-3 py-2 text-sm text-[#FF8A7A]">{err}</div>}
+            {manage && (
+              <div className="mt-4 grid gap-3 rounded-lg border border-navy-line p-3 sm:grid-cols-2">
+                <Field dark label={tx(locale, "Fotógrafo asignado", "Assigned photographer")}>
+                  <select className={darkInputCls} disabled={busy === "assign"} value={job.photographerId} onChange={(e) => run("assign", () => api(`media/${job.id}`, { method: "PATCH", json: { photographerId: e.target.value } }))}>
+                    {!manage.photographers.some((p) => p.id === job.photographerId) && <option value={job.photographerId}>{names[job.photographerId] ?? "—"}</option>}
+                    {manage.photographers.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                  </select>
+                </Field>
+                <Field dark label={tx(locale, "Fecha y hora (Caracas)", "Date & time (Caracas)")}>
+                  <input
+                    key={job.id + job.date}
+                    type="datetime-local"
+                    className={darkInputCls}
+                    disabled={busy === "date"}
+                    defaultValue={isoToCaracasInput(job.date)}
+                    onBlur={(e) => {
+                      const iso = caracasInputToIso(e.target.value);
+                      if (iso && iso !== new Date(job.date).toISOString()) run("date", () => api(`media/${job.id}`, { method: "PATCH", json: { date: iso } }));
+                    }}
+                  />
+                </Field>
+              </div>
+            )}
+            {err && <div role="alert" className="mt-3 rounded-lg bg-[#B4231833] px-3 py-2 text-sm text-[#FF8A7A]">{err}</div>}
             <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
               {items.map(([ok, t, I], i) => (
                 <button
@@ -132,7 +233,7 @@ export function MediaView({ locale, jobs, listings }: { locale: Locale; jobs: Me
             )}
             <div className="mt-4 flex items-center justify-between text-xs text-mist">
               <span>{tx(locale, "El orden y la portada se ajustan en «Editar inmueble» · StorageProvider: Local (dev) / S3 (prod)", "Order and cover are set in “Edit listing” · StorageProvider: Local (dev) / S3 (prod)")}</span>
-              <Badge tone="dark">{job.status}</Badge>
+              <Badge tone="dark">{statusLabel(job.status)}</Badge>
             </div>
           </div>
         )}

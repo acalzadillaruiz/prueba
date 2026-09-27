@@ -159,7 +159,7 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
               <Field dark label={tx(locale, "Precio (USD)", "Price (USD)")}><input className={darkInputCls} type="number" min={1} disabled={!canEdit} value={f.priceAmount} onChange={(e) => { setF({ ...f, priceAmount: +e.target.value }); dirty(); }} /></Field>
               <Field dark label={tx(locale, "Estado", "Status")}>
                 <select className={darkInputCls} disabled={!canEdit} value={f.status} onChange={(e) => { setF({ ...f, status: e.target.value as ListingStatus }); dirty(); }}>
-                  {STATUSES.map((s) => <option key={s} value={s}>{s} · {lbl(STATUS_LABEL[s], locale)}</option>)}
+                  {STATUSES.map((s) => <option key={s} value={s}>{lbl(STATUS_LABEL[s], locale)}</option>)}
                 </select>
               </Field>
               <Field dark label={tx(locale, "Visibilidad", "Visibility")}>

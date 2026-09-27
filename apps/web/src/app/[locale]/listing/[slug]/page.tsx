@@ -11,7 +11,7 @@ import { DetailMap } from "@/components/detail/DetailMap";
 import { ListingCard } from "@/components/listing/ListingCard";
 import { CompareButton, Freshness, SaveButton, ShareButton, StatusBadge } from "@/components/listing/bits";
 import { prisma } from "@newplace/db";
-import { listingBySlug, listingInclude, publicWhere, toDomain } from "@/server/listings";
+import { listingBySlug, listingInclude, publicWhere, toCard, toDomain } from "@/server/listings";
 import { getFx } from "@/server/data";
 import { getAppUser } from "@/server/session";
 import { AMENITY_LABEL, TYPE_LABEL, lbl, money, num, priceSuffix, tx, plural } from "@/lib/i18n";
@@ -80,14 +80,14 @@ export default async function ListingPage({ params }: { params: Promise<{ locale
     prisma.listing.findMany({ where: { id: { not: l.id }, zone: l.zone, status: { in: ["SOLD", "RENTED"] } }, include: listingInclude, take: 3, orderBy: { updatedAt: "desc" } }),
   ]);
   const zone = zoneRow ?? { salePpm: Math.round(l.priceAmount / l.areaM2), rentPpm: 0, activeListings: 0, daysOnMarket: 0 };
-  const all = [...similarRows.map(toDomain), ...nearbyRows.map(toDomain)];
-  const similar = similarRows.map(toDomain).sort((a, b) => Math.abs(a.priceAmount - l.priceAmount) - Math.abs(b.priceAmount - l.priceAmount)).slice(0, 4);
-  const nearby = nearbyRows.map(toDomain);
+  const all = [...similarRows.map((r) => toCard(toDomain(r))), ...nearbyRows.map((r) => toCard(toDomain(r)))];
+  const similar = similarRows.map((r) => toCard(toDomain(r))).sort((a, b) => Math.abs(a.priceAmount - l.priceAmount) - Math.abs(b.priceAmount - l.priceAmount)).slice(0, 4);
+  const nearby = nearbyRows.map((r) => toCard(toDomain(r)));
   void all;
   const ves = fx.find((f) => f.code === "VES")?.perUsd ?? 0;
   const eur = fx.find((f) => f.code === "EUR")?.perUsd ?? 0;
   const dark = l.luxury;
-  const soldNearby = soldRows.map(toDomain).map((o) => ({ t: `${tx(locale, o.title_es, o.title_en)} · ${o.areaM2} m²`, p: o.priceAmount, d: tx(locale, o.status === "SOLD" ? "Vendido" : "Alquilado", o.status === "SOLD" ? "Sold" : "Rented") }));
+  const soldNearby = soldRows.map((r) => toCard(toDomain(r))).map((o) => ({ t: `${tx(locale, o.title_es, o.title_en)} · ${o.areaM2} m²`, p: o.priceAmount, d: tx(locale, o.status === "SOLD" ? "Vendido" : "Alquilado", o.status === "SOLD" ? "Sold" : "Rented") }));
   const H = ({ children }: { children: React.ReactNode }) => <h3 className="mb-4 font-display text-xl font-semibold">{children}</h3>;
   const sec = cn("border-t py-8", dark ? "border-navy-line" : "border-line");
 

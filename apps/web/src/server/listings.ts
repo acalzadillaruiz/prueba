@@ -22,6 +22,25 @@ export function publicWhere(): Prisma.ListingWhereInput {
   return { status: { in: PUBLIC_STATUSES }, review: "APPROVED", privateListing: false, OR: [{ agencyId: null }, { agency: { status: { not: "SUSPENDED" } } }] };
 }
 
+/**
+ * Card projection for lists, maps and grids: same Listing shape, without the heavy fields cards never render
+ * (descriptions, full price history, estimate comparables, internal stats). Cuts the HTML/RSC payload of
+ * home, search and luxury by ~3–4×.
+ */
+export function toCard(l: Listing): Listing {
+  const drop = l.priceHistory.filter((p) => p.kind === "DROP").slice(-1);
+  return {
+    ...l,
+    body_es: "",
+    body_en: "",
+    priceHistory: drop,
+    estimate: { ...l.estimate, comparables: [] },
+    photos: l.photos?.slice(0, 5),
+    agent: l.agent ? { ...l.agent, phone: undefined } : undefined,
+    agency: l.agency ? { ...l.agency, phone: "", whatsapp: "" } : undefined,
+  };
+}
+
 export function toDomain(r: ListingRow): Listing {
   const est = r.estimates[0];
   const estimate: EstimateResult = est
@@ -202,7 +221,7 @@ export async function searchListings(f: SearchFilters): Promise<{ items: Listing
     f.sort === "price-asc" ? [{ priceAmount: "asc" }] : f.sort === "price-desc" ? [{ priceAmount: "desc" }] : [{ publishedAt: "desc" }];
   const take = Math.max(1, Math.min(Math.floor(f.take ?? 500), 500));
   const rows = await prisma.listing.findMany({ where, include: listingInclude, orderBy: [...orderBy, { id: "asc" }], take: take + 1, ...(f.cursor ? { cursor: { id: f.cursor }, skip: 1 } : {}) });
-  let items = rows.slice(0, take).map(toDomain);
+  let items = rows.slice(0, take).map((r) => toCard(toDomain(r)));
   if (f.shape) items = items.filter((l) => inShape(l, f.shape!));
   if (f.sort === "ppm") items.sort((a, b) => a.priceAmount / a.areaM2 - b.priceAmount / b.areaM2);
   const total = f.shape ? items.length : await prisma.listing.count({ where });
@@ -211,7 +230,7 @@ export async function searchListings(f: SearchFilters): Promise<{ items: Listing
 
 export async function publicListings(): Promise<Listing[]> {
   const rows = await prisma.listing.findMany({ where: publicWhere(), include: listingInclude, orderBy: { publishedAt: "desc" } });
-  return rows.map(toDomain);
+  return rows.map((r) => toCard(toDomain(r)));
 }
 
 export async function listingBySlug(slug: string): Promise<Listing | null> {

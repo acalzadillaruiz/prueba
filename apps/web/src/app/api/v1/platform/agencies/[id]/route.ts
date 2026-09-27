@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "@newplace/db";
 import { ApiError, body, currentUser, handler, ok, requireUser } from "@/server/api";
 import { audit } from "@/server/data";
+import { revalidateAllListings } from "@/server/revalidate";
 
 type Ctx = { params: Promise<{ id: string }> };
 
@@ -14,6 +15,7 @@ export const PATCH = handler(async (req: NextRequest, { params }: Ctx) => {
   const b = await body(req, z.object({ plan: z.enum(["FREE", "PRO", "ENTERPRISE"]).optional(), verified: z.boolean().optional(), status: z.enum(["ACTIVE", "SUSPENDED", "TRIAL"]).optional() }));
   if (!(await prisma.agency.findUnique({ where: { id }, select: { id: true } }))) throw new ApiError("NOT_FOUND");
   const a = await prisma.agency.update({ where: { id }, data: b });
+  if (b.status || b.verified !== undefined) revalidateAllListings();
   await audit(user.id, "agency.flags", a.name, b);
   return ok(a);
 });

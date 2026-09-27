@@ -66,7 +66,7 @@ export function PublicHeader({ locale, variant = "light" }: { locale: Locale; va
       )}
     >
       <div className="mx-auto flex h-16 max-w-[1400px] items-center gap-6 px-4 md:px-6">
-        <Link href={`/${locale}`} aria-label="New Place" className="flex min-h-11 items-center">
+        <Link href={`/${locale}`} aria-label="New Place" className="flex min-h-11 shrink-0 items-center whitespace-nowrap">
           <Logo tone={dark ? "ivory" : "navy"} />
         </Link>
         <nav className="hidden items-center gap-1 lg:flex">

@@ -12,6 +12,7 @@ export function queryToParams(q: ReturnType<typeof heuristicSearchParse>, raw: s
   const p = new URLSearchParams();
   if (q.listingType) p.set("type", q.listingType);
   if (q.zone) p.set("zone", q.zone);
+  if (q.minPrice) p.set("min", String(q.minPrice));
   if (q.maxPrice) p.set("max", String(q.maxPrice));
   if (q.minBeds) p.set("beds", String(q.minBeds));
   if (q.luxury) p.set("lux", "1");

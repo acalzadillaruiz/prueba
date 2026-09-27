@@ -182,7 +182,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
   if (verified) activeChips.push(["verified", tx(locale, "Agencia verificada", "Verified agency"), { verified: null }]);
   amen.forEach((a) => activeChips.push([a, lbl(AMENITY_LABEL[a], locale), { am: amen.filter((x) => x !== a).join(",") || null }]));
 
-  const pill = "flex h-9 shrink-0 items-center gap-1.5 rounded-full border px-3.5 font-display text-sm transition-colors duration-np";
+  const pill = "flex h-11 md:h-9 shrink-0 items-center gap-1.5 rounded-full border px-3.5 font-display text-sm transition-colors duration-np";
 
   return (
     <div className="flex h-[calc(100vh-64px)] flex-col">
@@ -198,7 +198,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
               if (!q.listingType) p.set("type", type);
               router.replace(`/${locale}/search?${p.toString()}`);
             }}
-            className="flex h-9 min-w-[220px] shrink-0 items-center gap-2 rounded-full border border-line bg-white px-3 md:flex-1 xl:max-w-[300px]"
+            className="flex h-11 md:h-9 min-w-[220px] shrink-0 items-center gap-2 rounded-full border border-line bg-white px-3 md:flex-1 xl:max-w-[300px]"
           >
             <Sparkles size={15} className="shrink-0 text-coral" />
             <input
@@ -215,7 +215,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
                 key={k}
                 onClick={() => set({ type: k, max: null, min: null })}
                 aria-pressed={type === k}
-                className={cn("rounded-full px-3 py-1 font-display text-sm", type === k ? "bg-navy text-ivory" : "text-ink/70 hover:text-ink")}
+                className={cn("min-h-11 rounded-full px-3 py-1 font-display text-sm md:min-h-0", type === k ? "bg-navy text-ivory" : "text-ink/70 hover:text-ink")}
               >
                 {tx(locale, es, en)}
               </button>
@@ -323,7 +323,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
                   {FILTER_AMENITIES.map((a) => {
                     const on = amen.includes(a);
                     return (
-                      <button key={a} onClick={() => set({ am: (on ? amen.filter((x) => x !== a) : [...amen, a]).join(",") || null })} className={cn(pill, "h-8 text-[13px]", on ? "border-navy bg-navy text-ivory" : "border-line")}>
+                      <button key={a} onClick={() => set({ am: (on ? amen.filter((x) => x !== a) : [...amen, a]).join(",") || null })} className={cn(pill, "md:h-8 text-[13px]", on ? "border-navy bg-navy text-ivory" : "border-line")}>
                         {lbl(AMENITY_LABEL[a], locale)}
                       </button>
                     );
@@ -362,7 +362,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
           />
           <div className="absolute bottom-8 right-3 z-10 flex overflow-hidden rounded-full border border-white/10 bg-navy/90 p-0.5 font-display text-xs text-ivory shadow-np">
             {(["caracas", "venezuela"] as const).map((r) => (
-              <button key={r} onClick={() => setRegionPick(r)} className={cn("rounded-full px-3 py-1.5", region === r ? "bg-ivory text-navy" : "text-ivory/80")}>
+              <button key={r} onClick={() => setRegionPick(r)} className={cn("min-h-11 rounded-full px-3 py-1.5 md:min-h-0", region === r ? "bg-ivory text-navy" : "text-ivory/80")}>
                 {r === "caracas" ? "Caracas" : "Venezuela"}
               </button>
             ))}
@@ -379,7 +379,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
                 </div>
                 <div className="text-xs text-ink/65">{tx(locale, "Precios en USD · actualizados en tiempo real", "Prices in USD · updated in real time")}</div>
               </div>
-              <select value={sort} onChange={(e) => set({ sort: e.target.value === "new" ? null : e.target.value })} aria-label={tx(locale, "Ordenar por", "Sort by")} className="h-8 rounded-lg border border-line bg-white px-2 text-sm">
+              <select value={sort} onChange={(e) => set({ sort: e.target.value === "new" ? null : e.target.value })} aria-label={tx(locale, "Ordenar por", "Sort by")} className="h-11 rounded-lg border border-line bg-white px-2 text-sm md:h-8">
                 <option value="new">{tx(locale, "Más nuevos", "Newest")}</option>
                 <option value="price-asc">{tx(locale, "Precio ↑", "Price ↑")}</option>
                 <option value="price-desc">{tx(locale, "Precio ↓", "Price ↓")}</option>

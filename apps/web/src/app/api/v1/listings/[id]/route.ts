@@ -46,11 +46,11 @@ const Patch = z.object({
   baths: z.number().int().min(0).max(30).optional(),
   parking: z.number().int().min(0).max(50).optional(),
   areaM2: z.number().int().positive().max(1_000_000).optional(),
-  amenities: z.array(z.string()).optional(),
+  amenities: z.array(z.string().max(60)).max(50).optional(),
   privateListing: z.boolean().optional(),
   hasFloorplan: z.boolean().optional(),
   hasVirtualTour: z.boolean().optional(),
-  virtualTourUrl: z.string().url().nullable().optional(),
+  virtualTourUrl: z.string().url().max(500).refine((v) => v.startsWith("https://"), "https only").nullable().optional(),
   /** SHORT_RENT only; null clears */
   shortRent: shortRentSchema.nullable().optional(),
   /** COMMERCIAL_* only; null clears */

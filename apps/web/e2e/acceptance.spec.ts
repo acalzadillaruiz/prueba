@@ -76,7 +76,7 @@ test.describe.serial("Criterios de aceptación §15", () => {
   test("6 · dueño de agencia ve el dashboard con datos", async ({ page }) => {
     await demoLogin(page, /Dueño de agencia/);
     await page.goto("/es/agency");
-    await expect(page.getByText("Inmuebles activos")).toBeVisible();
+    await expect(page.locator("main").getByText("Inmuebles activos").first()).toBeVisible();
     await expect(page.getByText("Ranking de agentes")).toBeVisible();
     await expect(page.getByText("Valentina Rojas").first()).toBeVisible();
   });

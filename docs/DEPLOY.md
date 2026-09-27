@@ -50,6 +50,9 @@ Contraseña de todos los usuarios de ejemplo: `NewPlace!2026`.
 | Anti-spam distribuido (Upstash Redis) | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` | Se usa Postgres (funciona, algo más lento) |
 | Monitoreo de errores (Sentry) | `SENTRY_DSN`, `NEXT_PUBLIC_SENTRY_DSN` | Errores solo en los logs de Vercel |
 | Dominio propio | `APP_URL=https://tudominio.com` | Se usa el dominio de Vercel para canonical/sitemap |
+| IP real detrás de otro proxy (no Vercel) | `TRUSTED_IP_HEADER=x-real-ip` (la cabecera que pone tu proxy) | En Vercel se usa su cabecera; fuera de Vercel los límites por IP no confían en `X-Forwarded-For` |
+
+> `APP_URL` debe estar definida también en **build** (Vercel la aplica a ambos por defecto): las páginas públicas se generan estáticamente (ISR) y sus enlaces canónicos se escriben en ese momento.
 
 ## Calidad continua
 El repositorio incluye `.github/workflows/ci.yml`: en cada push ejecuta lint, tipos, pruebas unitarias, build, pruebas de principio a fin y Lighthouse con notas mínimas (rendimiento 85, accesibilidad/buenas prácticas/SEO 95).

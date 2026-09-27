@@ -27,23 +27,23 @@ export const GET = handler(async (req: NextRequest) => {
 
 const CreateSchema = z.object({
   mode: z.enum(["FSBO", "AGENCY", "MANDATE"]).default("FSBO"),
-  agencyId: z.string().optional(),
+  agencyId: z.string().max(64).optional(),
   listingType: z.enum(["SALE", "LONG_RENT", "SHORT_RENT", "COMMERCIAL_SALE", "COMMERCIAL_RENT"]),
   kind: z.enum(["apartment", "penthouse", "house", "townhouse", "studio", "office", "retail", "warehouse", "land", "villa", "chalet"]),
   address: z.string().min(5).max(200),
-  zone: z.string().min(2),
-  city: z.string().min(2),
-  state: z.string().default(""),
+  zone: z.string().min(2).max(80),
+  city: z.string().min(2).max(80),
+  state: z.string().max(80).default(""),
   countryCode: z.string().length(2).default("VE"),
   lat: z.number().min(-90).max(90),
   lng: z.number().min(-180).max(180),
   areaM2: z.number().int().positive().max(1_000_000),
-  plotM2: z.number().int().positive().optional(),
+  plotM2: z.number().int().positive().max(100_000_000).optional(),
   beds: z.number().int().min(0).max(30).default(0),
   baths: z.number().int().min(0).max(30).default(0),
   parking: z.number().int().min(0).max(50).default(0),
   yearBuilt: z.number().int().min(1800).max(2100).default(new Date().getFullYear()),
-  amenities: z.array(z.string()).default([]),
+  amenities: z.array(z.string().max(60)).max(50).default([]),
   priceAmount: z.number().int().positive().max(1_000_000_000),
   title_es: z.string().max(120).optional(),
   title_en: z.string().max(120).optional(),
@@ -51,7 +51,7 @@ const CreateSchema = z.object({
   body_en: z.string().max(4000).optional(),
   luxury: z.boolean().default(false),
   privateListing: z.boolean().default(false),
-  agentId: z.string().optional(),
+  agentId: z.string().max(64).optional(),
   publish: z.boolean().default(true),
   /** SHORT_RENT only */
   shortRent: shortRentSchema.optional(),
@@ -89,6 +89,11 @@ export const POST = handler(async (req: NextRequest) => {
   // (PATCH /mandates/:id links agencyId on assignment and publishes on ACTIVE).
   const agencyId = b.mode === "AGENCY" ? (u.role === "SUPERADMIN" ? b.agencyId : u.agencyId) : null;
   const agentId = b.mode === "AGENCY" ? (u.role === "AGENT" ? u.id : b.agentId ?? null) : null;
+  if (agentId && agentId !== u.id) {
+    // Assigning someone else: they must be an AGENT of the listing's agency (otherwise leads would leak across agencies).
+    const member = agencyId ? await prisma.agencyMember.findFirst({ where: { userId: agentId, agencyId, role: "AGENT" } }) : null;
+    if (!member) throw new ApiError("VALIDATION", { agentId: "not an agent of this agency" });
+  }
   const category = b.luxury ? "LUXURY" : b.kind === "land" ? "LAND" : b.listingType.startsWith("COMMERCIAL") ? "COMMERCIAL" : "RESIDENTIAL";
   const fp = fingerprintOf(b.lat, b.lng, b.areaM2, b.address);
   const slug = await uniqueSlug(`${slugify(b.zone)}-${b.beds ? `${b.beds}h` : b.kind}-${b.areaM2}m-${Math.random().toString(36).slice(2, 8)}`);

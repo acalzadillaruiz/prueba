@@ -28,15 +28,15 @@ export const leadSchema = z.object({
 });
 
 export const captureSchema = z.object({
-  address: z.string().trim().min(5),
-  zone: z.string().min(2),
-  ownerName: z.string().trim().min(2),
-  phone: z.string().trim().min(6),
-  kind: z.string().default("apartment"),
-  areaM2: z.number().int().positive(),
-  askingPrice: z.number().int().positive(),
-  lat: z.number().optional(),
-  lng: z.number().optional(),
+  address: z.string().trim().min(5).max(200),
+  zone: z.string().min(2).max(80),
+  ownerName: z.string().trim().min(2).max(120),
+  phone: z.string().trim().min(6).max(30),
+  kind: z.string().max(30).default("apartment"),
+  areaM2: z.number().int().positive().max(1_000_000),
+  askingPrice: z.number().int().positive().max(1_000_000_000),
+  lat: z.number().min(-90).max(90).optional(),
+  lng: z.number().min(-180).max(180).optional(),
 });
 
 export type LoginInput = z.infer<typeof loginSchema>;

@@ -65,8 +65,8 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
       .catch(() => setErr(tx(locale, "La invitación no es válida o ya se usó.", "This invitation is invalid or was already used.")));
   }, [invite, locale, setValue]);
   const rawNext = sp.get("next");
-  // Same-origin paths only: "/x" is fine, "//evil.com" and "/\\evil.com" are not.
-  const next = rawNext && /^\/(?![\/\\])/.test(rawNext) ? rawNext : null;
+  // Same-origin paths only: "/x" is fine, "//evil.com" and "/\\evil.com" and "/\tevil.com" are not.
+  const next = rawNext && /^\/(?![\/\\])[^\s\\]*$/.test(rawNext) ? rawNext : null;
   // Switching between sign-in and sign-up keeps where the user was going and the invitation.
   const carry = (() => {
     const p = new URLSearchParams();

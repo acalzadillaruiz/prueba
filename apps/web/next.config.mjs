@@ -57,7 +57,8 @@ const nextConfig = {
     ].join("; ");
     return [
       {
-        source: "/:path*",
+        // Everything but user uploads, which get their own locked-down policy below.
+        source: "/((?!uploads/).*)",
         headers: [
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "X-Frame-Options", value: "DENY" },
@@ -65,6 +66,15 @@ const nextConfig = {
           { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(self), payment=()" },
           { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains" },
           { key: "Content-Security-Policy", value: csp },
+        ],
+      },
+      {
+        // Uploaded files are served as inert documents: an uploaded SVG/HTML can never run script on our origin.
+        source: "/uploads/:path*",
+        headers: [
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Content-Security-Policy", value: "default-src 'none'; img-src 'self'; style-src 'unsafe-inline'; sandbox" },
+          { key: "Cross-Origin-Resource-Policy", value: "same-origin" },
         ],
       },
     ];

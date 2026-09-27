@@ -85,7 +85,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
 
   const box = dark ? "border-navy-line bg-navy-card text-ivory" : "border-line bg-white";
   const muted = dark ? "text-mist" : "text-ink/65";
-  const field = cn(inputCls, "h-10", dark && "border-navy-line bg-navy-2 text-ivory");
+  const field = cn(inputCls, "h-11", dark && "border-navy-line bg-navy-2 text-ivory");
 
   if (done !== null)
     return (
@@ -126,11 +126,11 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
       <div className="p-4">
         <div className={cn("mb-4 grid rounded-full p-1", bookable ? "grid-cols-2" : "grid-cols-1", dark ? "bg-white/5" : "bg-ivory")}>
           {bookable && (
-            <button onClick={() => setMode("tour")} className={cn("flex items-center justify-center gap-1.5 rounded-full py-1.5 font-display text-sm", mode === "tour" && (dark ? "bg-ivory text-navy" : "bg-navy text-ivory"))}>
+            <button onClick={() => setMode("tour")} className={cn("flex min-h-11 items-center justify-center gap-1.5 rounded-full py-1.5 font-display text-sm", mode === "tour" && (dark ? "bg-ivory text-navy" : "bg-navy text-ivory"))}>
               <CalendarCheck size={15} /> {tx(locale, "Pedir visita", "Book a tour")}
             </button>
           )}
-          <button onClick={() => setMode("msg")} className={cn("flex items-center justify-center gap-1.5 rounded-full py-1.5 font-display text-sm", mode === "msg" && (dark ? "bg-ivory text-navy" : "bg-navy text-ivory"))}>
+          <button onClick={() => setMode("msg")} className={cn("flex min-h-11 items-center justify-center gap-1.5 rounded-full py-1.5 font-display text-sm", mode === "msg" && (dark ? "bg-ivory text-navy" : "bg-navy text-ivory"))}>
             <MessageSquare size={15} /> {tx(locale, "Mensaje", "Message")}
           </button>
         </div>
@@ -167,7 +167,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
                     setIso(h.iso);
                   }}
                   className={cn(
-                    "rounded-lg border py-1.5 text-sm font-semibold disabled:cursor-not-allowed disabled:line-through disabled:opacity-40",
+                    "min-h-11 rounded-lg border py-1.5 text-sm font-semibold disabled:cursor-not-allowed disabled:line-through disabled:opacity-40",
                     chosen === h.iso ? "border-navy bg-navy text-ivory" : dark ? "border-navy-line" : "border-line",
                   )}
                 >

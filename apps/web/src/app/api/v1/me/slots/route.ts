@@ -9,7 +9,7 @@ export const GET = handler(async () => {
   return ok({ days: await getSlots(u.id) });
 });
 
-const Put = z.object({ days: z.array(z.object({ day: z.number().int().min(0).max(6), hours: z.array(z.number().int().min(6).max(21)) })) });
+const Put = z.object({ days: z.array(z.object({ day: z.number().int().min(0).max(6), hours: z.array(z.number().int().min(6).max(21)).max(16) })).max(7).refine((d) => new Set(d.map((x) => x.day)).size === d.length, "duplicate day") });
 
 export const PUT = handler(async (req: NextRequest) => {
   const u = requireUser(await currentUser());

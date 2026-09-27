@@ -74,8 +74,14 @@ export function Freshness({ iso, locale, className }: { iso: string; locale: Loc
   const minutes = Math.round((Date.now() - Date.parse(iso)) / 60000);
   return (
     <span className={cn("inline-flex items-center gap-1.5 text-xs", className)}>
-      <span className={cn("relative h-2 w-2 rounded-full", minutes < 60 ? "np-pulse bg-coral" : "bg-mist")} />
-      {tx(locale, "Actualizado", "Updated")} {ago(iso, locale)}
+      {/* Relative time differs between the cached server HTML and the browser: not a hydration error. */}
+      <span className={cn("relative h-2 w-2 rounded-full", minutes < 60 ? "np-pulse bg-coral" : "bg-mist")} suppressHydrationWarning />
+      <span>
+        {tx(locale, "Actualizado", "Updated")}{" "}
+        <time dateTime={iso} suppressHydrationWarning>
+          {ago(iso, locale)}
+        </time>
+      </span>
     </span>
   );
 }

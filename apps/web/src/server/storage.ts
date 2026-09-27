@@ -1,6 +1,6 @@
 import "server-only";
 import { mkdir, readFile, unlink, writeFile } from "node:fs/promises";
-import { dirname, join, normalize } from "node:path";
+import { dirname, resolve, sep } from "node:path";
 
 /** Brief §3: StorageProvider (Local | Vercel Blob | S3). Local writes to UPLOAD_DIR and is served by /uploads/[...path]. */
 export interface StorageProvider {
@@ -9,18 +9,29 @@ export interface StorageProvider {
   remove(key: string): Promise<void>;
 }
 
-export const UPLOAD_DIR = process.env.UPLOAD_DIR ?? join(process.cwd(), "../../uploads");
+export const UPLOAD_DIR = resolve(process.env.UPLOAD_DIR ?? resolve(process.cwd(), "../../uploads"));
+
+/** Absolute path of `key` inside UPLOAD_DIR; throws for anything that would escape it (`..`, absolute paths, NUL). */
+export function uploadPath(key: string): string {
+  const file = resolve(UPLOAD_DIR, `.${sep}${key}`);
+  if (key.includes("\0") || !file.startsWith(UPLOAD_DIR + sep)) throw new Error("invalid upload key");
+  return file;
+}
 
 class LocalStorage implements StorageProvider {
   id = "local";
   async put(key: string, data: Buffer) {
-    const file = join(UPLOAD_DIR, normalize(key).replace(/^(\.\.[/\\])+/, ""));
+    const file = uploadPath(key);
     await mkdir(dirname(file), { recursive: true });
     await writeFile(file, data);
     return `/uploads/${key}`;
   }
   async remove(key: string) {
-    await unlink(join(UPLOAD_DIR, normalize(key))).catch(() => {});
+    try {
+      await unlink(uploadPath(key));
+    } catch {
+      // already gone, or not a key of ours
+    }
   }
 }
 
@@ -62,6 +73,5 @@ function pick(): StorageProvider {
 export const storage: StorageProvider = pick();
 
 export async function readLocal(key: string) {
-  const safe = normalize(key).replace(/^(\.\.[/\\])+/, "");
-  return readFile(join(UPLOAD_DIR, safe));
+  return readFile(uploadPath(key));
 }

@@ -98,7 +98,7 @@ export function PlatformHome({ locale, data }: { locale: Locale; data: PlatformH
           {data.audit.map((a, i) => (
             <div key={i} className="flex items-center gap-3 border-t border-navy-line py-2 text-sm first:border-0">
               <span className="w-20 shrink-0 text-xs text-mist">{ago(a.at, locale)}</span>
-              <span className="shrink-0 font-semibold">{a.actor}</span>
+              <span className="shrink-0 font-semibold">{a.actor || tx(locale, "Sistema", "System")}</span>
               <span className="shrink-0 rounded bg-white/5 px-1.5 text-xs text-coral">{auditLabel(a.action, locale)}</span>
               <span className="flex-1 truncate text-mist">{a.target}</span>
             </div>
@@ -250,7 +250,7 @@ export function PlatformModeration({ locale, reports, listings }: { locale: Loca
   // Take-downs are confirmed with a reason (shown to the agency and stored in the audit log).
   const [confirming, setConfirming] = useState<string | null>(null);
   const [reason, setReason] = useState("");
-  const rows = listings.filter((l) => (l.title_es + l.zone + (l.agency?.name ?? "")).toLowerCase().includes(q.toLowerCase())).slice(0, 40);
+  const rows = listings.filter((l) => (l.title_es + " " + l.title_en + " " + l.zone + " " + (l.agency?.name ?? "")).toLowerCase().includes(q.toLowerCase())).slice(0, 40);
   return (
     <AdminShell locale={locale} area="platform" title={tx(locale, "Moderación", "Moderation")}>
       {err && <div role="alert" className="mb-4 rounded-lg bg-[#B4231833] px-3 py-2 text-sm text-[#FF8A7A]">{err}</div>}
@@ -274,12 +274,31 @@ export function PlatformModeration({ locale, reports, listings }: { locale: Loca
               <div className="mt-0.5 text-sm text-mist">{tx(locale, m.reason.es, m.reason.en)} · {m.agency} · {ago(m.at, locale)}</div>
               <div className="mt-2 flex gap-2">
                 <Button size="sm" variant="dark-outline" disabled={busy === m.id} onClick={() => run(m.id, () => api(`platform/moderation/${m.id}`, { method: "PATCH", json: { resolved: true } }))}>{tx(locale, "Descartar", "Dismiss")}</Button>
-                {m.listingId && (
-                  <Button size="sm" disabled={busy === m.id} onClick={() => run(m.id, async () => { await api(`platform/listings/${m.listingId}`, { method: "PATCH", json: { takedown: true, reason: m.reason.es } }); await api(`platform/moderation/${m.id}`, { method: "PATCH", json: { resolved: true } }); })}>
+                {m.listingId && confirming !== `report-${m.id}` && (
+                  <Button size="sm" disabled={busy === m.id} onClick={() => { setReason(tx(locale, m.reason.es, m.reason.en)); setConfirming(`report-${m.id}`); }}>
                     <Ban size={13} /> {tx(locale, "Retirar", "Take down")}
                   </Button>
                 )}
               </div>
+              {m.listingId && confirming === `report-${m.id}` && (
+                <form
+                  className="np-in mt-2 flex flex-wrap items-center gap-2 rounded-lg bg-[#B4231814] p-2.5"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    setConfirming(null);
+                    const why = reason.trim() || m.reason.es;
+                    void run(m.id, async () => {
+                      await api(`platform/listings/${m.listingId}`, { method: "PATCH", json: { takedown: true, reason: why } });
+                      await api(`platform/moderation/${m.id}`, { method: "PATCH", json: { resolved: true } });
+                    });
+                  }}
+                >
+                  <label className="sr-only" htmlFor={`report-reason-${m.id}`}>{tx(locale, "Motivo de la retirada", "Take-down reason")}</label>
+                  <input id={`report-reason-${m.id}`} autoFocus value={reason} onChange={(e) => setReason(e.target.value)} maxLength={200} className={darkInputCls + " h-9 min-w-0 flex-1"} />
+                  <Button size="sm" type="submit">{tx(locale, "Confirmar retirada", "Confirm take-down")}</Button>
+                  <Button size="sm" type="button" variant="dark-ghost" onClick={() => setConfirming(null)}>{tx(locale, "Cancelar", "Cancel")}</Button>
+                </form>
+              )}
             </div>
           ))}
         </div>
@@ -289,7 +308,8 @@ export function PlatformModeration({ locale, reports, listings }: { locale: Loca
             <input value={q} onChange={(e) => setQ(e.target.value)} className={darkInputCls + " ml-auto h-9 w-56"} placeholder={tx(locale, "Buscar…", "Search…")} aria-label={tx(locale, "Buscar", "Search")} />
           </div>
           {rows.map((l) => {
-            const down = l.status === "WITHDRAWN";
+            // Only a platform take-down can be restored here; a listing the agency withdrew itself stays the agency's call.
+            const down = !!l.takedownReason;
             return (
               <div key={l.id} data-listing={l.id} className="border-t border-navy-line first:border-0">
               <div className={cn("flex items-center gap-3 px-4 py-2.5", down && "bg-[#B4231814]")}>
@@ -389,7 +409,11 @@ export function PlatformAI({ locale, settings, fx, counts }: { locale: Locale; s
               </tbody>
             </table>
             <div className="mt-3 flex items-center gap-3">
-              <Button size="sm" disabled={busy === "fx"} onClick={() => run("fx", () => api("platform/fx", { method: "PUT", json: { rates: rates.map((r) => ({ code: r.code, perUsd: r.perUsd })) } }))}>{busy === "fx" && <Loader2 size={13} className="animate-spin" />} {tx(locale, "Guardar tasas", "Save rates")}</Button>
+              <Button size="sm" disabled={busy === "fx"} onClick={() => run("fx", async () => {
+                const r = await api<{ rates: { code: string; perUsd: number; updatedAt: string; source: string }[] }>("platform/fx", { method: "PUT", json: { rates: rates.map((x) => ({ code: x.code, perUsd: x.perUsd })) } });
+                // Show the saved values and their new timestamp/source (local state doesn't follow router.refresh).
+                setRates(rates.map((x) => r.rates.find((y) => y.code === x.code) ?? x));
+              })}>{busy === "fx" && <Loader2 size={13} className="animate-spin" />} {tx(locale, "Guardar tasas", "Save rates")}</Button>
               <span className="text-xs text-mist">{tx(locale, "Solo para mostrar conversiones. No hay pagos en v1.", "Display conversions only. No payments in v1.")}</span>
             </div>
           </div>

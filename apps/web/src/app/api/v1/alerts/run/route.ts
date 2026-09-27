@@ -1,7 +1,11 @@
+import { createHash, timingSafeEqual } from "node:crypto";
 import type { NextRequest } from "next/server";
 import { prisma } from "@newplace/db";
 import { ApiError, currentUser, handler, ok } from "@/server/api";
 import { queueEmail } from "@/server/data";
+
+/** Constant-time comparison (hashes first so lengths never differ). */
+const sameSecret = (a: string, b: string) => timingSafeEqual(createHash("sha256").update(a).digest(), createHash("sha256").update(b).digest());
 
 /**
  * Daily / weekly alert digests → email_outbox. Call from a cron (e.g. every hour):
@@ -10,7 +14,7 @@ import { queueEmail } from "@/server/data";
  */
 export const POST = handler(async (req: NextRequest) => {
   const bearer = req.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
-  const cronOk = !!process.env.CRON_SECRET && bearer === process.env.CRON_SECRET;
+  const cronOk = !!process.env.CRON_SECRET && !!bearer && sameSecret(bearer, process.env.CRON_SECRET);
   if (!cronOk) {
     const u = await currentUser();
     if (u?.role !== "SUPERADMIN") throw new ApiError("FORBIDDEN");

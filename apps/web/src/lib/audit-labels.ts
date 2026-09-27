@@ -38,6 +38,7 @@ const ACTIONS: Record<string, [string, string]> = {
   "team.invite": ["Invitación enviada", "Invitation sent"],
   "team.invite.accept": ["Invitación aceptada", "Invitation accepted"],
   "team.invite.revoke": ["Invitación revocada", "Invitation revoked"],
+  "tour.status": ["Estado de visita", "Tour status"],
   "tenant.impersonate": ["Entró como agencia", "Impersonated agency"],
   "tenant.impersonate.exit": ["Salió de la agencia", "Stopped impersonating"],
   "user.role": ["Rol de usuario cambiado", "User role changed"],
@@ -61,6 +62,7 @@ export const AUDIT_PREFIXES: Record<string, [string, string]> = {
   seed: ["Datos", "Data"],
   team: ["Invitaciones", "Invitations"],
   tenant: ["Impersonación", "Impersonation"],
+  tour: ["Visitas", "Tours"],
   user: ["Usuarios", "Users"],
 };
 
@@ -83,6 +85,7 @@ const VALUES: Record<string, [string, string]> = {
   PENDING: ["Pendiente", "Pending"], CAPTURED: ["Captado", "Captured"], REJECTED: ["Rechazado", "Rejected"], DUPLICATE: ["Duplicado", "Duplicate"],
   SCHEDULED: ["Programada", "Scheduled"], SHOOTING: ["En sesión", "Shooting"], UPLOADING: ["Subiendo fotos", "Uploading"], DELIVERED: ["Entregada", "Delivered"],
   SUPERADMIN: ["Superadmin", "Superadmin"], AGENCY_OWNER: ["Dueño de agencia", "Agency owner"], AGENT: ["Agente", "Agent"], CAPTOR: ["Captador", "Captor"], PHOTOGRAPHER: ["Fotógrafo", "Photographer"], BACKOFFICE: ["Backoffice", "Backoffice"], OWNER_PRIVATE: ["Propietario", "Owner"], SEEKER: ["Buscador", "Seeker"],
+  REQUESTED: ["Solicitado", "Requested"], ASSIGNED: ["Asignado", "Assigned"], CANCELLED: ["Cancelado", "Cancelled"], CONFIRMED: ["Confirmada", "Confirmed"], DONE: ["Realizada", "Done"],
   ACTIVE: ["Activa", "Active"], TRIAL: ["En prueba", "Trial"], SUSPENDED: ["Suspendida", "Suspended"],
 };
 

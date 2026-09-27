@@ -21,14 +21,18 @@ export function SwUpdate({ locale }: { locale: Locale }) {
         });
       });
     };
-    navigator.serviceWorker.getRegistration().then((r) => {
-      if (!r) return;
+    // `ready` (not getRegistration) so a first visit, where the worker registers after load, is tracked too.
+    navigator.serviceWorker.ready.then((r) => {
       reg = r;
       track(r);
     });
+    // Reload only when an updated worker replaces the one already serving this page (accepted here or in another
+    // tab). On a first visit the new worker claims the page (clientsClaim) and fires "controllerchange" as well:
+    // reloading then would load every first page twice.
+    const hadController = !!navigator.serviceWorker.controller;
     let reloaded = false;
     const onChange = () => {
-      if (reloaded) return;
+      if (reloaded || !hadController) return;
       reloaded = true;
       window.location.reload();
     };

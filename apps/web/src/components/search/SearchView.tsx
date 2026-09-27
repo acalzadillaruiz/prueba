@@ -53,6 +53,13 @@ export function shapeFromParams(poly: string | null, radius: string | null): Sha
   return null;
 }
 
+const KIND_CHIP: Record<string, [string, string]> = {
+  penthouse: ["Ático / PH", "Penthouse"],
+  house: ["Casa", "House"],
+  apartment: ["Apartamento", "Apartment"],
+  land: ["Terreno", "Land"],
+};
+
 const FILTER_AMENITIES: Amenity[] = ["pool", "generator", "waterTank", "security", "gym", "terrace", "view", "garden", "elevator", "ac"];
 
 export function SearchView({ locale, initial, zones }: { locale: Locale; initial: { items: Listing[]; total: number }; zones: string[] }) {
@@ -127,8 +134,8 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
         beds ? `${beds}+ ${tx(locale, "hab", "bd")}` : "",
         baths ? `${baths}+ ${tx(locale, "baños", "ba")}` : "",
         minM2 ? `≥ ${minM2} m²` : "",
-        min ? `> ${min.toLocaleString("es-VE")}` : "",
-        max ? `< ${max.toLocaleString("es-VE")}` : "",
+        min ? `≥ ${num(min, locale)}` : "",
+        max ? `≤ ${num(max, locale)}` : "",
         shape ? (shape.type === "radius" ? tx(locale, `radio ${shape.km} km`, `${shape.km} km radius`) : tx(locale, "zona dibujada", "drawn area")) : "",
       ]
         .filter(Boolean)
@@ -174,7 +181,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
   if (baths) activeChips.push(["baths", `${baths}+ ${tx(locale, "baños", "ba")}`, { baths: null }]);
   if (minM2) activeChips.push(["m2", `≥ ${num(minM2, locale)} m²`, { m2: null }]);
   if (shape) activeChips.push(["shape", shape.type === "radius" ? tx(locale, `Radio ${shape.km} km`, `${shape.km} km radius`) : tx(locale, "Zona dibujada", "Drawn area"), { poly: null, radius: null }]);
-  if (kind) activeChips.push(["kind", kind === "penthouse" ? tx(locale, "Ático / PH", "Penthouse") : kind, { kind: null }]);
+  if (kind) activeChips.push(["kind", KIND_CHIP[kind] ? tx(locale, ...KIND_CHIP[kind]) : kind, { kind: null }]);
   if (lux) activeChips.push(["lux", "Luxury", { lux: null }]);
   if (pub) activeChips.push(["pub", pub === "24h" ? tx(locale, "Últimas 24 h", "Last 24 h") : tx(locale, "Últimos 7 días", "Last 7 days"), { pub: null }]);
   if (furnished) activeChips.push(["furnished", tx(locale, "Amoblado", "Furnished"), { furnished: null }]);
@@ -194,6 +201,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
               e.preventDefault();
               const q = heuristicSearchParse(nl);
               const p = queryToParams(q, nl);
+              if (q.minPrice && (!q.maxPrice || q.minPrice < q.maxPrice)) p.set("min", String(q.minPrice));
               if (!q.listingType) p.set("type", type);
               router.replace(`/${locale}/search?${p.toString()}`);
             }}
@@ -250,7 +258,8 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
           </select>
           <select value={zone ?? ""} onChange={(e) => set({ zone: e.target.value || null })} className={cn(pill, "appearance-none border-line bg-white", zone && "border-navy")} aria-label={tx(locale, "Zona", "Area")}>
             <option value="">{tx(locale, "Todas las zonas", "All areas")}</option>
-            {zones.map((z) => (
+            {/* A zone that came from the URL or the NL parser (e.g. a city) stays selectable and visible. */}
+            {(zone && !zones.includes(zone) ? [zone, ...zones] : zones).map((z) => (
               <option key={z} value={z}>{z}</option>
             ))}
           </select>

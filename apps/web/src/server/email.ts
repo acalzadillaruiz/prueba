@@ -12,7 +12,9 @@ const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&
 
 function html(subject: string, body: string) {
   // `body` may be a relative app link (e.g. an invitation) or plain text.
-  const link = body.startsWith("/") && APP_URL ? `${APP_URL}${body}` : null;
+  // Only a clean same-app path becomes a button: free text that merely starts with "/" (e.g. an agent's reply)
+  // stays text, and `//host`, `/\\host` or whitespace tricks can never turn it into a link to another site.
+  const link = /^\/(es|en)\/[^\s\\]*$/.test(body) && !body.startsWith("//") && APP_URL ? `${APP_URL}${body}` : null;
   return `<!doctype html><html><body style="margin:0;background:#F7F4EF;font-family:system-ui,sans-serif;color:#111827">
 <div style="max-width:560px;margin:0 auto;padding:32px 24px">
 <div style="font-weight:700;font-size:20px;color:#0B1220">New Place</div>

@@ -17,9 +17,12 @@ export default async function Page({ params }: { params: Promise<{ locale: Local
   const canView = user.role === "SUPERADMIN" || sameAgency;
   if (!canView) notFound();
   const canEdit = user.role === "SUPERADMIN" || (sameAgency && (manager || (user.role === "AGENT" && l.agentId === user.id)));
+  // Same rules as the API (server/access.ts "photos" mode) and the RBAC matrix (commission.view: agents only their own).
+  const canPhotos = canEdit || (sameAgency && user.role === "PHOTOGRAPHER");
+  const showCommission = canEdit;
   const [photos, rule] = await Promise.all([
     prisma.listingPhoto.findMany({ where: { listingId: id }, orderBy: [{ isCover: "desc" }, { order: "asc" }] }),
     l.agencyId ? prisma.commissionRule.findUnique({ where: { agencyId: l.agencyId } }) : null,
   ]);
-  return <ListingEditor l={l} locale={locale} photos={photos.map((p) => ({ id: p.id, url: p.url, isCover: p.isCover }))} commission={{ pct: rule?.salePct ?? 5, split: rule?.agentSplitPct ?? 50, rentMonths: rule?.rentMonths ?? 1 }} canEdit={canEdit} />;
+  return <ListingEditor l={l} locale={locale} photos={photos.map((p) => ({ id: p.id, url: p.url, isCover: p.isCover }))} commission={{ pct: rule?.salePct ?? 5, split: rule?.agentSplitPct ?? 50, rentMonths: rule?.rentMonths ?? 1 }} canEdit={canEdit} canPhotos={canPhotos} showCommission={showCommission} />;
 }

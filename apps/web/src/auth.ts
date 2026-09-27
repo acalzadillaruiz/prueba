@@ -8,7 +8,7 @@ import { prisma } from "@newplace/db";
 import type { Role } from "@newplace/config";
 import { authConfig } from "./auth.config";
 import { isDemoEmail } from "./lib/demo";
-import { hit, peek, reset } from "./server/rate-limit";
+import { allowed, hit, reset } from "./server/rate-limit";
 
 const DEMO = process.env.DEMO_AUTH === "true";
 
@@ -20,29 +20,36 @@ async function profile(userId: string) {
   return { id: u.id, name: u.name, email: u.email, image: u.image, role: (m?.role ?? u.role) as Role, agencyId: m?.agencyId ?? null, hue: u.hue };
 }
 
-const creds = z.object({ email: z.string().email(), password: z.string().min(8) });
+const creds = z.object({ email: z.string().email().max(254), password: z.string().min(8).max(200) });
+
+/** An unknown email still pays one bcrypt comparison, so response time does not reveal which accounts exist. */
+let dummyHash: Promise<string> | null = null;
+const dummy = () => (dummyHash ??= bcrypt.hash(`no-account-${Math.random()}`, 10));
 
 export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
   ...authConfig,
   adapter: PrismaAdapter(prisma),
   providers: [
-    ...(process.env.AUTH_GOOGLE_ID ? [Google({ allowDangerousEmailAccountLinking: true })] : []),
+    // No automatic linking by email: sign-up never verifies the address, so linking would let whoever registered
+    // victim@gmail.com with a password first take over the victim's later Google sign-in (account pre-hijacking).
+    ...(process.env.AUTH_GOOGLE_ID ? [Google] : []),
     Credentials({
       id: "credentials",
       name: "Email",
       credentials: { email: {}, password: {} },
-      async authorize(raw) {
+      async authorize(raw, request) {
         const p = creds.safeParse(raw);
         if (!p.success) return null;
         const email = p.data.email.toLowerCase();
-        // Brute-force protection: max 10 failed attempts per account every 15 minutes.
+        // Password spraying (one password against many accounts): max 50 attempts per IP every 15 minutes.
+        if (!(await allowed(request, "login-ip", 50, 15 * 60))) return null;
+        // Brute-force protection: max 10 attempts per account every 15 minutes. Counted atomically BEFORE the
+        // password check so parallel guesses cannot all slip past a read-then-increment; success clears it.
         const key = `login-fail:${email}`;
-        if ((await peek(key)) >= 10) return null;
+        if (!(await hit(key, 10, 15 * 60))) return null;
         const u = await prisma.user.findUnique({ where: { email } });
-        if (!u?.passwordHash || !(await bcrypt.compare(p.data.password, u.passwordHash))) {
-          await hit(key, 10, 15 * 60);
-          return null;
-        }
+        const valid = await bcrypt.compare(p.data.password, u?.passwordHash ?? (await dummy()));
+        if (!u?.passwordHash || !valid) return null;
         await reset(key);
         return profile(u.id);
       },

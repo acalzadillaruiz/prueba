@@ -10,10 +10,11 @@ export function BarChart({ data, height = 180, format = (v: number) => String(v)
   const H = height;
   const pad = { l: 28, r: 6, t: 12, b: 22 };
   const bw = (W - pad.l - pad.r) / data.length;
-  const ticks = [0, 0.5, 1].map((f) => Math.round(max * f));
+  // Deduplicated: with a max of 1 the mid tick rounds to 1 too (duplicate React keys, overlapping labels).
+  const ticks = [...new Set([0, 0.5, 1].map((f) => Math.round(max * f)))];
   return (
     <div className="relative">
-      <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img">
+      <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label={data.map((d) => `${d.label}: ${format(d.value)}`).join(", ")}>
         {ticks.map((t) => {
           const y = H - pad.b - (t / max) * (H - pad.t - pad.b);
           return (

@@ -19,7 +19,8 @@ const TONE: Record<CaptureLead["result"], string> = {
 };
 type Row = CaptureLead & { listingId?: string };
 type ListingType = keyof typeof TYPE_LABEL;
-type Dup = { id: string; slug: string; title: string; zone: string; areaM2: number; fingerprint: string } | null;
+const KINDS: [string, string, string][] = [["apartment", "Apartamento", "Apartment"], ["penthouse", "Penthouse", "Penthouse"], ["house", "Casa", "House"], ["townhouse", "Townhouse", "Townhouse"], ["studio", "Estudio", "Studio"], ["villa", "Villa", "Villa"], ["chalet", "Chalet", "Chalet"], ["office", "Oficina", "Office"], ["retail", "Local", "Retail"], ["warehouse", "Galpón", "Warehouse"], ["land", "Terreno", "Land"]];
+type Dup ={ id: string; slug: string; title: string; zone: string; areaM2: number; fingerprint: string } | null;
 
 export function CaptureView({ locale, rows: initialRows, zones, titles, canConvert = false }: { locale: Locale; rows: Row[]; zones: Zone[]; titles: Record<string, string>; canConvert?: boolean }) {
   const router = useRouter();
@@ -45,6 +46,7 @@ export function CaptureView({ locale, rows: initialRows, zones, titles, canConve
           setDup(r.duplicate);
           setFp(r.fingerprint);
         })
+        .catch(() => setDup(null))
         .finally(() => setChecking(false));
     }, 400);
     return () => clearTimeout(t);
@@ -143,6 +145,9 @@ export function CaptureView({ locale, rows: initialRows, zones, titles, canConve
                 )}
                 </Fragment>
               ))}
+              {rows.length === 0 && (
+                <tr><td colSpan={6} className="px-4 py-10 text-center text-mist">{tx(locale, "La cola está vacía. Registra la primera captación con el formulario.", "The queue is empty. Log the first capture with the form.")}</td></tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -170,6 +175,11 @@ export function CaptureView({ locale, rows: initialRows, zones, titles, canConve
             <Field dark label={tx(locale, "Zona", "Area")}>
               <select className={darkInputCls} value={f.zone} onChange={(e) => setF({ ...f, zone: e.target.value })}>
                 {zones.map((z) => <option key={z.slug}>{z.name}</option>)}
+              </select>
+            </Field>
+            <Field dark label={tx(locale, "Tipo de inmueble", "Property type")}>
+              <select className={darkInputCls} value={f.kind} onChange={(e) => setF({ ...f, kind: e.target.value })}>
+                {KINDS.map(([k, es, en]) => <option key={k} value={k}>{tx(locale, es, en)}</option>)}
               </select>
             </Field>
             <div className="grid grid-cols-2 gap-2">

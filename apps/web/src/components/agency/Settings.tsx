@@ -11,11 +11,11 @@ import { useApp } from "@/lib/store";
 import { api } from "@/lib/api";
 import { money, tx } from "@/lib/i18n";
 
-export function SettingsView({ locale, agency, rule }: { locale: Locale; agency: Agency; rule: { salePct: number; agentSplitPct: number; rentMonths: number; captorPct: number } }) {
+export function SettingsView({ locale, agency, rule, logoUrl = "" }: { locale: Locale; agency: Agency; logoUrl?: string; rule: { salePct: number; agentSplitPct: number; rentMonths: number; captorPct: number } }) {
   const router = useRouter();
   const { user } = useApp();
   const owner = user?.role === "AGENCY_OWNER" || user?.role === "SUPERADMIN";
-  const [b, setB] = useState({ name: agency.name, color: agency.color, phone: agency.phone, whatsapp: agency.whatsapp });
+  const [b, setB] = useState({ name: agency.name, color: agency.color, phone: agency.phone, whatsapp: agency.whatsapp, logoUrl });
   const [r, setR] = useState(rule);
   const [busy, setBusy] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -25,7 +25,7 @@ export function SettingsView({ locale, agency, rule }: { locale: Locale; agency:
     setBusy(true);
     setErr(null);
     try {
-      await api("agency", { method: "PATCH", json: b });
+      await api("agency", { method: "PATCH", json: { ...b, logoUrl: b.logoUrl.trim() || null } });
       await api("agency/commission", { method: "PUT", json: r });
       setSaved(true);
       router.refresh();
@@ -43,7 +43,7 @@ export function SettingsView({ locale, agency, rule }: { locale: Locale; agency:
       title={tx(locale, "Ajustes de la agencia", "Agency settings")}
       actions={owner ? <Button size="sm" onClick={save} disabled={busy}>{busy ? <Loader2 size={14} className="animate-spin" /> : saved ? <Check size={14} /> : <Save size={14} />} {saved ? tx(locale, "Guardado", "Saved") : tx(locale, "Guardar", "Save")}</Button> : undefined}
     >
-      {err && <div className="mb-4 rounded-lg bg-[#B4231833] px-3 py-2 text-sm text-[#FF8A7A]">{err}</div>}
+      {err && <div role="alert" className="mb-4 rounded-lg bg-[#B4231833] px-3 py-2 text-sm text-[#FF8A7A]">{err}</div>}
       <div className="grid gap-6 [&>*]:min-w-0 xl:grid-cols-2">
         <div className="rounded-np border border-navy-line bg-navy-card p-5">
           <div className="font-display text-lg font-semibold">{tx(locale, "Marca de agencia (white-label light)", "Agency branding (light white-label)")}</div>
@@ -57,11 +57,21 @@ export function SettingsView({ locale, agency, rule }: { locale: Locale; agency:
             </Field>
             <Field dark label={tx(locale, "Teléfono", "Phone")}><input className={darkInputCls} disabled={!owner} value={b.phone} onChange={(e) => { setB({ ...b, phone: e.target.value }); dirty(); }} /></Field>
             <Field dark label="WhatsApp" hint={tx(locale, "Solo se muestra el número. Sin API.", "Number shown only. No API.")}><input className={darkInputCls} disabled={!owner} value={b.whatsapp} onChange={(e) => { setB({ ...b, whatsapp: e.target.value }); dirty(); }} /></Field>
+            <div className="sm:col-span-2">
+              <Field dark label={tx(locale, "Logo (URL https)", "Logo (https URL)")} hint={tx(locale, "Opcional. Imagen cuadrada; si falta se usan las iniciales.", "Optional. Square image; initials are used when empty.")}>
+                <input className={darkInputCls} type="url" inputMode="url" placeholder="https://…" disabled={!owner} value={b.logoUrl} onChange={(e) => { setB({ ...b, logoUrl: e.target.value }); dirty(); }} />
+              </Field>
+            </div>
           </div>
           <div className="mt-5 rounded-lg bg-ivory p-4 text-ink">
             <div className="text-xs font-semibold uppercase tracking-wide text-ink/65">{tx(locale, "Vista previa en ficha pública", "Public listing preview")}</div>
             <div className="mt-2 flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-lg font-display font-bold text-navy" style={{ background: b.color }}>{agency.initials}</span>
+              {/^https:\/\/|^\/uploads\//.test(b.logoUrl.trim()) ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={b.logoUrl.trim()} alt="" className="h-10 w-10 rounded-lg bg-white object-contain" />
+              ) : (
+                <span className="flex h-10 w-10 items-center justify-center rounded-lg font-display font-bold text-navy" style={{ background: b.color }}>{agency.initials}</span>
+              )}
               <div className="flex-1"><div className="font-display font-semibold">{b.name}</div><div className="text-sm text-ink/65">{b.whatsapp}</div></div>
               <span className="rounded-np px-3 py-2 font-display text-sm text-white" style={{ background: b.color }}>{tx(locale, "Contactar", "Contact")}</span>
             </div>

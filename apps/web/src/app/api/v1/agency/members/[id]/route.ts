@@ -14,7 +14,7 @@ export const PATCH = handler(async (req: NextRequest, { params }: Ctx) => {
   if (!isManager(u) && u.role !== "SUPERADMIN") throw new ApiError("FORBIDDEN");
   const b = await body(req, z.object({ role: z.enum(["AGENCY_OWNER", "AGENT", "CAPTOR", "PHOTOGRAPHER", "BACKOFFICE"]).optional(), verified: z.boolean().optional() }));
   if (b.role === "AGENCY_OWNER" && u.role === "BACKOFFICE") throw new ApiError("FORBIDDEN");
-  const m = await prisma.agencyMember.findFirst({ where: { userId: id, agencyId: u.agencyId ?? "" } });
+  const m = await prisma.agencyMember.findFirst({ where: { userId: id, agencyId: u.agencyId ?? "" }, include: { user: { select: { email: true } } } });
   if (!m) throw new ApiError("NOT_FOUND");
   if (b.role && b.role !== m.role) {
     // Only an owner (or the platform) can change an owner's role, nobody changes their own, and an agency always keeps one owner.
@@ -27,6 +27,6 @@ export const PATCH = handler(async (req: NextRequest, { params }: Ctx) => {
   }
   const r = await prisma.agencyMember.update({ where: { id: m.id }, data: b });
   if (b.role) await prisma.user.update({ where: { id }, data: { role: b.role } });
-  await audit(u.id, "member.update", id, b);
+  await audit(u.id, "member.update", m.user.email, { ...b, ...(b.role && b.role !== m.role ? { from: m.role, to: b.role } : {}) });
   return ok(r);
 });

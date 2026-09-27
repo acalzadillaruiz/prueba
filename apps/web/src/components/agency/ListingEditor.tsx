@@ -15,13 +15,15 @@ import { cn } from "@/lib/cn";
 import { commissionAmount } from "@/lib/commission";
 import { ListingTypeFields, extrasFrom, validateExtras, type ExtrasDraft } from "@/components/owner/ListingTypeFields";
 import { listingHref } from "@/lib/listing-href";
+import { useApp } from "@/lib/store";
 
 const STATUSES: ListingStatus[] = ["DRAFT", "COMING_SOON", "ACTIVE", "UNDER_OFFER", "SOLD", "RENTED", "WITHDRAWN", "EXPIRED"];
 const AMENITIES: Amenity[] = ["pool", "gym", "security", "generator", "waterTank", "view", "terrace", "elevator", "garden", "bbq", "furnished", "pets", "ac", "wifi", "loadingDock"];
 type Photo = { id: string; url: string; isCover: boolean };
 
-export function ListingEditor({ l, locale, photos: initialPhotos, commission, canEdit }: { l: Listing; locale: Locale; photos: Photo[]; commission: { pct: number; split: number; rentMonths: number }; canEdit: boolean }) {
+export function ListingEditor({ l, locale, photos: initialPhotos, commission, canEdit, canPhotos = canEdit, showCommission = canEdit }: { l: Listing; locale: Locale; photos: Photo[]; commission: { pct: number; split: number; rentMonths: number }; canEdit: boolean; canPhotos?: boolean; showCommission?: boolean }) {
   const router = useRouter();
+  const { user } = useApp();
   const [lang, setLang] = useState<Locale>("es");
   const [copy, setCopy] = useState({ title_es: l.title_es, title_en: l.title_en, body_es: l.body_es, body_en: l.body_en });
   const [f, setF] = useState({ status: l.status, priceAmount: l.priceAmount, privateListing: !!l.privateListing, beds: l.beds, baths: l.baths, areaM2: l.areaM2, parking: l.parking, amenities: l.amenities, hasFloorplan: l.hasFloorplan, hasVirtualTour: l.hasVirtualTour });
@@ -71,12 +73,16 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
       setBusy(null);
     }
   };
-  const photoOp = async (json: object) => {
+  const photoOp = async (json: object, rollback?: Photo[]) => {
     setBusy("photos");
+    setErr(null);
     try {
       const r = await api<{ photos: Photo[] }>(`listings/${l.id}/photos`, { method: "PATCH", json });
       setPhotos(r.photos);
       router.refresh();
+    } catch (e) {
+      if (rollback) setPhotos(rollback);
+      setErr((e as Error).message);
     } finally {
       setBusy(null);
     }
@@ -103,15 +109,19 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
     if (j < 0 || j >= photos.length) return;
     const next = [...photos];
     [next[i], next[j]] = [next[j], next[i]];
+    const prev = photos;
     setPhotos(next);
-    photoOp({ order: next.map((p) => p.id) });
+    photoOp({ order: next.map((p) => p.id) }, prev);
   };
   const writeAI = async () => {
     setWriting(true);
+    setErr(null);
     try {
       const r = await api<{ copy: typeof copy }>("ai/write-listing", { method: "POST", json: { kind: l.kind, zone: l.zone, city: l.city, areaM2: f.areaM2, beds: f.beds, baths: f.baths, parking: f.parking, amenities: f.amenities } });
       setCopy(r.copy);
       dirty();
+    } catch (e) {
+      setErr((e as Error).message);
     } finally {
       setWriting(false);
     }
@@ -154,6 +164,7 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
     >
       {err && <div className="mb-4 rounded-lg bg-[#B4231833] px-3 py-2 text-sm text-[#FF8A7A]" role="alert">{err}</div>}
       {l.review === "PENDING" && <div className="mb-4 rounded-lg bg-[#C9862A33] px-3 py-2 text-sm text-[#F2B866]">{tx(locale, "Pendiente de aprobación del backoffice. No es visible al público todavía.", "Pending backoffice approval. Not public yet.")}</div>}
+      {l.review === "REJECTED" && <div className="mb-4 rounded-lg bg-[#B4231833] px-3 py-2 text-sm text-[#FF8A7A]">{tx(locale, "Rechazado por el backoffice: no es visible al público.", "Rejected by backoffice: not public.")}{user?.role === "AGENT" && canEdit ? ` ${tx(locale, "Corrígelo y guarda para reenviarlo a revisión.", "Fix it and save to resubmit it for review.")}` : ""}</div>}
       <div className="grid gap-6 [&>*]:min-w-0 xl:grid-cols-[1fr_420px]">
         <div className="space-y-6">
           <div className={section}>
@@ -240,11 +251,13 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
             <input ref={fileRef} type="file" multiple accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(e) => { upload(Array.from(e.target.files ?? [])); e.target.value = ""; }} />
             <div className="mb-4 flex items-center justify-between">
               <span className="font-display text-lg font-semibold">{tx(locale, "Fotos", "Photos")} · {nPhotos}</span>
-              <Button size="sm" variant="dark-outline" onClick={() => fileRef.current?.click()} disabled={busy === "photos"}>
-                {busy === "photos" ? <Loader2 size={14} className="animate-spin" /> : <ImagePlus size={14} />} {tx(locale, "Subir", "Upload")}
-              </Button>
+              {canPhotos && (
+                <Button size="sm" variant="dark-outline" onClick={() => fileRef.current?.click()} disabled={busy === "photos"}>
+                  {busy === "photos" ? <Loader2 size={14} className="animate-spin" /> : <ImagePlus size={14} />} {tx(locale, "Subir", "Upload")}
+                </Button>
+              )}
             </div>
-            {nPhotos === 0 ? (
+            {photos.length === 0 ? (
               <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">
                 {l.scenes.slice(0, 5).map((s, i) => (
                   <div key={i} className="relative overflow-hidden rounded-lg opacity-60">
@@ -259,14 +272,14 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
                   <div key={p.id} className={cn("group relative overflow-hidden rounded-lg ring-2", p.isCover ? "ring-coral" : "ring-transparent")}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={p.url} alt="" className="aspect-[4/3] w-full object-cover" />
-                    <div className="absolute inset-x-1 top-1 flex justify-between transition-opacity [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 [@media(hover:hover)]:group-focus-within:opacity-100">
-                      <button onClick={() => move(i, -1)} className="rounded bg-navy/80 p-0.5" aria-label="←"><ArrowLeft size={12} /></button>
+                    {canPhotos && <div className="absolute inset-x-1 top-1 flex justify-between transition-opacity [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 [@media(hover:hover)]:group-focus-within:opacity-100">
+                      <button onClick={() => move(i, -1)} className="rounded bg-navy/80 p-0.5" aria-label={tx(locale, "Mover antes", "Move earlier")}><ArrowLeft size={12} /></button>
                       <button onClick={() => photoOp({ remove: p.id })} className="rounded bg-navy/80 p-0.5 text-[#FF8A7A]" aria-label={tx(locale, "Eliminar", "Delete")}><Trash2 size={12} /></button>
-                      <button onClick={() => move(i, 1)} className="rounded bg-navy/80 p-0.5" aria-label="→"><ArrowRight size={12} /></button>
-                    </div>
+                      <button onClick={() => move(i, 1)} className="rounded bg-navy/80 p-0.5" aria-label={tx(locale, "Mover después", "Move later")}><ArrowRight size={12} /></button>
+                    </div>}
                     {p.isCover ? (
                       <span className="absolute bottom-1 left-1 rounded-full bg-coral-cta px-1.5 text-[10px] font-bold text-white"><Star size={9} className="inline" /> {tx(locale, "Portada", "Cover")}</span>
-                    ) : (
+                    ) : canPhotos && (
                       <button onClick={() => photoOp({ cover: p.id })} className="absolute bottom-1 left-1 rounded-full bg-white/90 px-1.5 text-[10px] font-bold text-navy [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 [@media(hover:hover)]:group-focus-within:opacity-100">{tx(locale, "Portada", "Cover")}</button>
                     )}
                   </div>
@@ -298,11 +311,11 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
             </ul>
           </div>
           <EstimateCard l={{ ...l, priceAmount: f.priceAmount }} locale={locale} dark />
-          <div className={section}>
+          {showCommission && <div className={section}>
             <div className="font-display text-lg font-semibold">{tx(locale, "Comisión estimada", "Estimated commission")}</div>
             <div className="mt-2 font-display text-3xl font-semibold">{money(commissionValue, locale)}</div>
             <div className="text-sm text-mist">{l.listingType === "SHORT_RENT" ? tx(locale, `${commission.pct} % de 30 noches`, `${commission.pct} % of 30 nights`) : l.listingType.includes("RENT") ? tx(locale, `${commission.rentMonths} ${commission.rentMonths === 1 ? "mes" : "meses"} de canon`, `${commission.rentMonths} month${commission.rentMonths === 1 ? "" : "s"} of rent`) : `${commission.pct} %`} · {tx(locale, "agente", "agent")} {commission.split} % = {money((commissionValue * commission.split) / 100, locale)}</div>
-          </div>
+          </div>}
           <div className={section}>
             <div className="mb-3 font-display text-lg font-semibold">{tx(locale, "Rendimiento", "Performance")}</div>
             <div className="grid grid-cols-2 gap-3 text-sm">

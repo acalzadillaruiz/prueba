@@ -25,7 +25,7 @@ export function AgencyDashboard({ locale, stats, listings, newLeads, tours, agen
       locale={locale}
       area="agency"
       title={isAgent ? tx(locale, "Mi rendimiento", "My performance") : `${tx(locale, "Panel", "Dashboard")} · ${agencyName}`}
-      actions={<Button size="sm" variant="dark-outline" href={`/${locale}/agency/reports`}><Download size={14} /> CSV</Button>}
+      actions={isAgent ? undefined : <Button size="sm" variant="dark-outline" href={`/${locale}/agency/reports`}><Download size={14} /> CSV</Button>}
     >
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
         <Stat dark label={tx(locale, "Inmuebles activos", "Active listings")} value={stats.activeListings} delta={stats.activeDelta ? sign(stats.activeDelta) : undefined} hint={tx(locale, "nuevos en 30 días", "new in 30 days")} />
@@ -88,7 +88,8 @@ export function AgencyDashboard({ locale, stats, listings, newLeads, tours, agen
           </div>
         </Card>
         <Card dark className="p-5">
-          <div className="mb-3 font-display text-lg font-semibold">{tx(locale, "Ranking de agentes", "Agent ranking")}</div>
+          <div className="mb-3 font-display text-lg font-semibold">{isAgent ? tx(locale, "Mis resultados", "My results") : tx(locale, "Ranking de agentes", "Agent ranking")}</div>
+          {stats.ranking.length === 0 && <div className="text-sm text-mist">{tx(locale, "Aún no hay agentes en el equipo.", "No agents on the team yet.")}</div>}
           <div className="space-y-3">
             {stats.ranking.map(({ id, name, hue, leads: n, won, respMin, gmv }, i) => (
               <div key={id} className="flex items-center gap-3">
@@ -111,6 +112,7 @@ export function AgencyDashboard({ locale, stats, listings, newLeads, tours, agen
             <div className="flex items-center gap-2 font-display text-lg font-semibold"><AlarmClock size={18} className="text-coral" /> {tx(locale, "Leads sin responder", "Unanswered leads")}</div>
             <Link href={`/${locale}/agency/leads`} className="text-sm text-coral">Inbox <ArrowUpRight size={13} className="inline" /></Link>
           </div>
+          {newLeads.length === 0 && <div className="text-sm text-mist">{tx(locale, "Todos los leads tienen respuesta.", "Every lead has been answered.")}</div>}
           {newLeads.slice(0, 4).map((ld) => {
             const mins = Math.round((Date.now() - Date.parse(ld.createdAt)) / 60000);
             const l = byId.get(ld.listingId);

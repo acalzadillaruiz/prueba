@@ -93,6 +93,8 @@ export const PATCH = handler(async (req: NextRequest, { params }: Ctx) => {
     data.agentId = b.agentId;
   }
   if (b.review) data.review = b.review;
+  // An agent editing a listing the backoffice rejected sends it back to review (resubmission).
+  else if (u.role === "AGENT" && cur.review === "REJECTED") data.review = "PENDING";
   const statusChanged = !!b.status && b.status !== cur.status;
   if (b.status) {
     data.status = b.status;
@@ -107,7 +109,7 @@ export const PATCH = handler(async (req: NextRequest, { params }: Ctx) => {
   const fresh = await refreshQuality(id);
   if (b.review === "APPROVED" || (b.status === "ACTIVE" && cur.status !== "ACTIVE")) await notifySavedSearches(id, "new");
   else if (priceChanged && b.priceAmount! < cur.priceAmount) await notifySavedSearches(id, "price");
-  await audit(u.id, b.review ? `listing.review.${b.review.toLowerCase()}` : b.agentId !== undefined ? "listing.assign" : "listing.update", fresh.titleEs, b);
+  await audit(u.id, b.review ? `listing.review.${b.review.toLowerCase()}` : data.review === "PENDING" ? "listing.review.pending" : b.agentId !== undefined ? "listing.assign" : "listing.update", fresh.titleEs, b);
   revalidateListing(fresh.slug);
   return ok({ ...(await listingById(id)), brochurePdf: fresh.brochurePdf });
 });

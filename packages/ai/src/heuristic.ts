@@ -74,7 +74,9 @@ export function heuristicEstimate(input: EstimateInput): EstimateResult {
   };
 }
 
+// Later entries win, so the city ("Caracas") goes first and neighbourhoods inside it override it.
 const ZONE_ALIASES = [
+  "Caracas",
   "Los Palos Grandes",
   "Altamira",
   "La Castellana",
@@ -92,6 +94,12 @@ const ZONE_ALIASES = [
   "Valencia",
   "Maracaibo",
   "Barquisimeto",
+  "Pampatar",
+  "Playa El Agua",
+  "Choroní",
+  "Los Roques",
+  "El Viñedo",
+  "Tierra Negra",
 ];
 
 /** Short names people type → the city/zone name used in listings. */
@@ -101,35 +109,54 @@ function norm(s: string): string {
   return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 }
 
+/** "180 mil" / "250k" / "1,2 millones" / "250.000" → number. */
+function amount(raw: string, unit: string | undefined): number {
+  let n = parseFloat(raw.replace(/[.,](?=\d{3}\b)/g, "").replace(",", "."));
+  const u = unit ?? "";
+  if (u === "mil" || u === "k") n *= 1000;
+  else if (u === "m" || u.startsWith("millon")) n *= 1_000_000;
+  return Math.round(n);
+}
+
+const NUM_WORDS: Record<string, number> = { un: 1, una: 1, uno: 1, one: 1, dos: 2, two: 2, tres: 3, three: 3, cuatro: 4, four: 4, cinco: 5, five: 5 };
+
 export function heuristicSearchParse(nl: string): SearchQuery {
   const t = norm(nl);
   const q: SearchQuery = { keywords: [] };
-  if (/alquil|rent|arriendo/.test(t)) q.listingType = "LONG_RENT";
-  if (/vacacion|noche|night|airbnb|temporada/.test(t)) q.listingType = "SHORT_RENT";
-  if (/local|oficina|office|galpon|warehouse|comercial|commercial/.test(t)) q.listingType = "COMMERCIAL";
-  if (/compr|venta|buy|sale/.test(t) && !q.listingType) q.listingType = "SALE";
+  // Word boundaries: "parent"/"current" are not "rent", "Petare" is not "pet", "Island" is not "land".
+  if (/alquil|\brent(al|s|ing)?\b|\bfor rent\b|arriendo/.test(t)) q.listingType = "LONG_RENT";
+  if (/vacacion|\bnoches?\b|\bnights?\b|airbnb|temporada/.test(t)) q.listingType = "SHORT_RENT";
+  if (/\blocal(es)?\b|oficina|\boffices?\b|galpon|warehouse|comercial|commercial/.test(t)) q.listingType = "COMMERCIAL";
+  if (/compr|\bventa\b|\bbuy\b|\bfor sale\b|\bsale\b/.test(t) && !q.listingType) q.listingType = "SALE";
   if (/lujo|luxury|exclusiv/.test(t)) q.luxury = true;
   for (const z of ZONE_ALIASES) if (t.includes(norm(z))) q.zone = ZONE_CANONICAL[z] ?? z;
 
-  const money = t.match(/(menos de|under|max(?:imo)?|hasta|below)\s*\$?\s*([\d.,]+)\s*(mil|k|m|millon(?:es)?)?/);
-  if (money) {
-    let n = parseFloat(money[2].replace(/[.,](?=\d{3}\b)/g, "").replace(",", "."));
-    const unit = money[3] ?? "";
-    if (unit === "mil" || unit === "k") n *= 1000;
-    else if (unit === "m" || unit.startsWith("millon")) n *= 1_000_000;
-    q.maxPrice = Math.round(n);
+  // An amount is never an area ("100 m²") nor a room count ("2 habitaciones").
+  const num = "([\\d.,]+)(?![\\d.,]*\\s*(?:m2|m²|mts?\\b|metros|sq|hab|cuarto|dormitorio|bed|br\\b|bd\\b|bano|bath|noche|night|huesped|guest))";
+  const unit = "\\s*(mil|k|m|millon(?:es)?)?\\b";
+  const cur = "\\s*(?:usd|us\\$|\\$)?\\s*";
+  const max = t.match(new RegExp(`(menos de|por debajo de|under|below|less than|max(?:imo)?|hasta|up to)${cur}${num}${unit}`));
+  if (max) q.maxPrice = amount(max[2], max[3]);
+  const min = t.match(new RegExp(`(mas de|desde|minimo|over|above|more than|at least|from)${cur}${num}${unit}`));
+  if (min) q.minPrice = amount(min[2], min[3]);
+  const range = t.match(new RegExp(`entre${cur}${num}${unit}\\s*y${cur}${num}${unit}|between${cur}${num}${unit}\\s*and${cur}${num}${unit}`));
+  if (range) {
+    const [a, au, b, bu] = range[1] ? [range[1], range[2], range[3], range[4]] : [range[5], range[6], range[7], range[8]];
+    // "entre 100 y 200 mil": the unit written once applies to both ends.
+    q.minPrice = amount(a, au ?? bu);
+    q.maxPrice = amount(b, bu);
   }
-  const beds = t.match(/(\d)\s*-?\s*(hab|habitaciones|habitacion|cuartos|dormitorios|beds?|bedrooms?|br)\b/);
-  if (beds) q.minBeds = parseInt(beds[1], 10);
+  const beds = t.match(/\b(\d{1,2}|un|una|uno|one|dos|two|tres|three|cuatro|four|cinco|five)\s*\+?\s*-?\s*(o mas\s*|or more\s*)?(hab|habitaciones|habitacion|cuartos|cuarto|dormitorios|dormitorio|beds?|bedrooms?|bd|br)\b/);
+  if (beds) q.minBeds = NUM_WORDS[beds[1]] ?? parseInt(beds[1], 10);
 
   const kinds: [RegExp, string][] = [
-    [/atico|penthouse|ph\b/, "penthouse"],
-    [/casa|house|quinta/, "house"],
-    [/apartamento|apto|apartment|flat/, "apartment"],
-    [/terreno|land|lote/, "land"],
+    [/atico|penthouse|\bph\b/, "penthouse"],
+    [/\bcasas?\b|\bhouses?\b|townhouse|quinta/, "house"],
+    [/apartamento|\bapto\b|apartment|\bflat\b/, "apartment"],
+    [/terreno|\bland\b|\blotes?\b|\bplots?\b/, "land"],
   ];
   for (const [re, k] of kinds) if (re.test(t)) { q.propertyKind = k; break; }
-  for (const [re, k] of [[/luz|light|luminos/, "light"], [/vista|view/, "view"], [/piscina|pool/, "pool"], [/terraza|terrace/, "terrace"], [/mascota|pet/, "pets"]] as [RegExp, string][])
+  for (const [re, k] of [[/\bluz\b|\blight\b|luminos|\bbright\b/, "light"], [/\bvistas?\b|\bviews?\b/, "view"], [/piscina|\bpool\b/, "pool"], [/terraza|terrace/, "terrace"], [/mascota|\bpets?\b|pet[- ]friendly/, "pets"]] as [RegExp, string][])
     if (re.test(t)) q.keywords.push(k);
   return q;
 }

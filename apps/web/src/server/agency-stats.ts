@@ -27,7 +27,7 @@ export async function dashboardStats(agencyId: string, agentId?: string): Promis
     prisma.lead.findMany({ where: { ...scope, createdAt: { gte: since30 } }, select: { id: true, stage: true, createdAt: true, firstResponseAt: true, agentId: true, budget: true } }),
     prisma.lead.count({ where: { ...scope, createdAt: { gte: new Date(now - 14 * DAY), lt: new Date(now - 7 * DAY) } } }),
     prisma.tour.findMany({ where: { listing: { agencyId }, ...(agentId ? { agentId } : {}), leadId: { not: null } }, select: { leadId: true, start: true } }),
-    prisma.agencyMember.findMany({ where: { agencyId, role: "AGENT" }, include: { user: { select: { id: true, name: true, hue: true } } } }),
+    prisma.agencyMember.findMany({ where: { agencyId, role: "AGENT", ...(agentId ? { userId: agentId } : {}) }, include: { user: { select: { id: true, name: true, hue: true } } } }),
   ]);
   const leads7d = leads30.filter((l) => l.createdAt.getTime() >= now - 7 * DAY).length;
   // Day buckets in America/Caracas (UTC-4), matching the labels the chart prints.
@@ -48,7 +48,7 @@ export async function dashboardStats(agencyId: string, agentId?: string): Promis
   // SLA over every lead old enough to judge: unanswered leads past 15 min count as breached (not ignored).
   const judged = leads30.filter((l) => l.firstResponseAt || now - l.createdAt.getTime() > 15 * 60000);
   const sla = judged.length ? Math.round((judged.filter((l) => l.firstResponseAt && l.firstResponseAt.getTime() - l.createdAt.getTime() <= 15 * 60000).length / judged.length) * 100) : null;
-  const won = await prisma.commissionEntry.findMany({ where: { agencyId }, include: { listing: { select: { priceAmount: true } } } });
+  const won = await prisma.commissionEntry.findMany({ where: { agencyId, ...(agentId ? { agentId } : {}) }, include: { listing: { select: { priceAmount: true } } } });
   const ranking = members
     .map((m) => {
       const mine = leads30.filter((l) => l.agentId === m.userId);

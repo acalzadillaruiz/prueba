@@ -143,7 +143,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
                   <span className={cn("text-lg font-normal", dark ? "text-mist" : "text-ink/65")}>{priceSuffix(l, locale)}</span>
                 </div>
                 <div className={cn("mt-1 text-sm", dark ? "text-mist" : "text-ink/65")}>
-                  ≈ Bs. {num(Math.round(l.priceAmount * ves), locale)} · € {num(Math.round(l.priceAmount * eur), locale)} <span className="opacity-70">({tx(locale, "tasa referencial", "reference rate")})</span>
+                  ≈ Bs. {num(Math.round(l.priceAmount * ves), locale)} · € {num(Math.round(l.priceAmount * eur), locale)} <span>({tx(locale, "tasa referencial", "reference rate")})</span>
                 </div>
               </div>
               <div className={cn("text-right text-sm", dark ? "text-mist" : "text-ink/60")}>

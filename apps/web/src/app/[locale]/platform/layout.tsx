@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { PrivateState } from "@/components/layout/PrivateState";
+import { getAppUser } from "@/server/session";
 
 export const dynamic = "force-dynamic";
 
@@ -9,6 +11,11 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return { title: locale === "en" ? "Platform console" : "Consola de plataforma", robots: { index: false, follow: false } };
 }
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default async function Layout({ children, params }: { children: React.ReactNode; params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  // Middleware gates /platform with the JWT role; re-check the live DB role (a token can outlive a demotion or suspension).
+  const user = await getAppUser();
+  if (!user) redirect(`/${locale}/login?next=/${locale}/platform`);
+  if (user.role !== "SUPERADMIN") redirect(`/${locale}?denied=platform`);
   return <PrivateState>{children}</PrivateState>;
 }

@@ -21,6 +21,9 @@ export const PATCH = handler(async (req: NextRequest, { params }: Ctx) => {
   const assignedAgent = u.role === "AGENT" && m.agentId === u.id && m.agencyId === u.agencyId;
   if (b.status === "CANCELLED" && m.ownerUserId !== u.id && !manager) throw new ApiError("FORBIDDEN");
   if ((b.agentId || b.status === "ACTIVE") && !manager && !(b.status === "ACTIVE" && !b.agentId && assignedAgent)) throw new ApiError("FORBIDDEN");
+  // Lifecycle guard: closed mandates (ACTIVE / CANCELLED) are not reopened or reassigned from here.
+  if (m.status === "ACTIVE" || m.status === "CANCELLED") throw new ApiError("CONFLICT", { status: m.status });
+  if (b.status === "ACTIVE" && !b.agentId && !m.agentId) throw new ApiError("VALIDATION", { agentId: "assign an agent first" });
   if (b.agentId) {
     // Same check as listings/[id] assign: the agent must be an AGENT member of the mandate's agency.
     const member = await prisma.agencyMember.findFirst({ where: { userId: b.agentId, agencyId: m.agencyId, role: "AGENT" } });
@@ -46,6 +49,7 @@ export const PATCH = handler(async (req: NextRequest, { params }: Ctx) => {
   }
   if (b.status === "CANCELLED") data.status = "CANCELLED";
   const r = await prisma.mandate.update({ where: { id }, data });
-  await audit(u.id, "mandate.update", id, b);
+  const title = m.listingId ? (await prisma.listing.findUnique({ where: { id: m.listingId }, select: { titleEs: true } }))?.titleEs : null;
+  await audit(u.id, "mandate.update", title ?? id, { ...b, ...(data.status ? { from: m.status, to: data.status } : {}) });
   return ok(r);
 });

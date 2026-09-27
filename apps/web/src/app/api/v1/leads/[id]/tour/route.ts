@@ -25,7 +25,13 @@ export const POST = handler(async (req: NextRequest, { params }: Ctx) => {
       : await tx.tour.create({ data: { listingId: lead.listingId, leadId: id, agentId, seekerUserId: lead.seekerUserId, seekerName: lead.name, start: s, status: "CONFIRMED" } });
     return { tour, existing };
   });
-  await prisma.lead.update({ where: { id }, data: { stage: "TOUR", toursRequested: { increment: existing ? 0 : 1 }, ...(!lead.firstResponseAt ? { firstResponseAt: new Date() } : {}) } });
+  // A tour moves NEW/CONTACTED leads forward to TOUR; a lead already at OFFER/WON (or LOST) keeps its stage.
+  const advance = lead.stage === "NEW" || lead.stage === "CONTACTED";
+  await prisma.lead.update({ where: { id }, data: { ...(advance ? { stage: "TOUR" } : {}), toursRequested: { increment: existing ? 0 : 1 }, ...(!lead.firstResponseAt ? { firstResponseAt: new Date() } : {}) } });
+  if (advance) {
+    await prisma.leadEvent.create({ data: { leadId: id, type: "STAGE", data: { from: lead.stage, to: "TOUR" }, actorId: u.id } });
+    await audit(u.id, "lead.stage", lead.name, { from: lead.stage, to: "TOUR" });
+  }
   await prisma.leadEvent.create({ data: { leadId: id, type: "TOUR", data: { start }, actorId: u.id } });
   await audit(u.id, "lead.tour", lead.name, { start });
   await queueEmail(lead.email, `Visita confirmada · ${s.toLocaleString("es-VE", { timeZone: "America/Caracas", weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}`, "TOUR");

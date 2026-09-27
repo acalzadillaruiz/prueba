@@ -7,14 +7,14 @@ import { audit, queueEmail } from "@/server/data";
 
 export const GET = handler(async () => {
   const u = requireUser(await currentUser());
-  if (!isManager(u)) throw new ApiError("FORBIDDEN");
+  if (!isManager(u) && u.role !== "SUPERADMIN") throw new ApiError("FORBIDDEN");
   const items = await prisma.invitation.findMany({ where: { agencyId: requireAgency(u), acceptedAt: null }, orderBy: { createdAt: "desc" }, select: { id: true, email: true, role: true, createdAt: true } });
   return ok({ items });
 });
 
 export const POST = handler(async (req: NextRequest) => {
   const u = requireUser(await currentUser());
-  if (!isManager(u)) throw new ApiError("FORBIDDEN");
+  if (!isManager(u) && u.role !== "SUPERADMIN") throw new ApiError("FORBIDDEN");
   const agencyId = requireAgency(u);
   const b = await body(req, z.object({ email: z.string().email(), role: z.enum(["AGENT", "CAPTOR", "PHOTOGRAPHER", "BACKOFFICE"]) }));
   const email = b.email.toLowerCase();
@@ -33,10 +33,11 @@ export const POST = handler(async (req: NextRequest) => {
 /** Revoke a pending invite (?id=). */
 export const DELETE = handler(async (req: NextRequest) => {
   const u = requireUser(await currentUser());
-  if (!isManager(u)) throw new ApiError("FORBIDDEN");
+  if (!isManager(u) && u.role !== "SUPERADMIN") throw new ApiError("FORBIDDEN");
   const id = req.nextUrl.searchParams.get("id") ?? "";
+  const inv = await prisma.invitation.findFirst({ where: { id, agencyId: requireAgency(u), acceptedAt: null }, select: { email: true } });
   const r = await prisma.invitation.deleteMany({ where: { id, agencyId: requireAgency(u), acceptedAt: null } });
-  if (!r.count) throw new ApiError("NOT_FOUND");
-  await audit(u.id, "team.invite.revoke", id);
+  if (!inv || !r.count) throw new ApiError("NOT_FOUND");
+  await audit(u.id, "team.invite.revoke", inv.email);
   return ok({ ok: true });
 });

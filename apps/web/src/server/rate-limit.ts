@@ -62,18 +62,36 @@ export async function reset(key: string) {
 }
 
 /**
+ * Headers that carry the client IP and are only trustworthy when the platform in front of us overwrites them.
+ * On Vercel the edge sets `x-vercel-forwarded-for` / `x-real-ip`; anywhere else a client can send them itself
+ * (sending a random `x-vercel-forwarded-for` per request used to bypass every per-IP limit), so they are ignored
+ * unless the operator names the header its own proxy sets: TRUSTED_IP_HEADER=x-real-ip | cf-connecting-ip | …
+ */
+function trustedIpHeaders(): string[] {
+  const custom = process.env.TRUSTED_IP_HEADER?.trim().toLowerCase();
+  if (custom) return [custom];
+  return process.env.VERCEL ? ["x-vercel-forwarded-for", "x-real-ip"] : [];
+}
+
+/**
  * Client IP for rate-limit keys. The first X-Forwarded-For entry is whatever the client sent, so it is never
- * trusted: prefer the platform header (Vercel sets/overwrites it), then X-Real-IP (set by our proxy), then the
- * LAST X-Forwarded-For hop — the one appended by the proxy in front of us.
+ * trusted: use a trusted platform/proxy header (see above), else the LAST X-Forwarded-For hop — the one appended
+ * by the proxy in front of us (Next.js itself only fills X-Forwarded-For with the socket address when absent).
  */
 export function clientIp(req: Request): string {
   const first = (v: string | null) => v?.split(",")[0]?.trim() || null;
-  const vercel = first(req.headers.get("x-vercel-forwarded-for"));
-  if (vercel) return vercel;
-  const real = req.headers.get("x-real-ip")?.trim();
-  if (real) return real;
+  for (const h of trustedIpHeaders()) {
+    const v = first(req.headers.get(h));
+    if (v) return v;
+  }
   const hops = (req.headers.get("x-forwarded-for") ?? "").split(",").map((h) => h.trim()).filter(Boolean);
   return hops.at(-1) ?? "local";
+}
+
+/** Like `limit` but returns false instead of throwing (Auth.js `authorize` must return null, not throw). */
+export async function allowed(req: Request, name: string, max: number, windowSec: number): Promise<boolean> {
+  if (process.env.NODE_ENV !== "production" && process.env.RATE_LIMIT !== "on") return true;
+  return hit(`${name}:${clientIp(req)}`, max, windowSec);
 }
 
 /** Throws RATE_LIMIT (429) when exceeded. Per-IP limits apply in production only (dev and e2e share one IP). */

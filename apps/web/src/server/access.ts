@@ -49,7 +49,12 @@ export function requireAgency(u: SessionUser) {
 export async function leadForUser(id: string, u: SessionUser) {
   const lead = await prisma.lead.findUnique({ where: { id } });
   if (!lead) throw new ApiError("NOT_FOUND");
-  const ok = u.role === "SUPERADMIN" || (isManager(u) && lead.agencyId === u.agencyId) || lead.agentId === u.id;
+  // The assigned agent only while they work for the lead's agency: `agentId` alone is not proof of tenancy
+  // (an agent who changed agency, or a foreign user id stored as agent, must not read the buyer's PII).
+  const ok =
+    u.role === "SUPERADMIN" ||
+    (isManager(u) && !!lead.agencyId && lead.agencyId === u.agencyId) ||
+    (lead.agentId === u.id && !!lead.agencyId && lead.agencyId === u.agencyId);
   if (!ok) throw new ApiError("FORBIDDEN");
   return lead;
 }

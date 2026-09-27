@@ -18,7 +18,8 @@ type Invite = { id: string; email: string; role: Role; createdAt: string };
 export function TeamView({ locale, members, listingsByAgent, invites: initialInvites }: { locale: Locale; members: User[]; listingsByAgent: Record<string, number>; invites: Invite[] }) {
   const router = useRouter();
   const { user } = useApp();
-  const manager = user?.role === "AGENCY_OWNER" || user?.role === "BACKOFFICE";
+  // Superadmin impersonating the agency manages it like its owner (the API allows it too).
+  const manager = user?.role === "AGENCY_OWNER" || user?.role === "BACKOFFICE" || user?.role === "SUPERADMIN";
   const isOwner = user?.role === "AGENCY_OWNER" || user?.role === "SUPERADMIN";
   const tr = useTranslations("roles");
   const [invites, setInvites] = useState(initialInvites);
@@ -28,6 +29,7 @@ export function TeamView({ locale, members, listingsByAgent, invites: initialInv
   const [err, setErr] = useState<string | null>(null);
   const patch = async (id: string, json: object) => {
     setBusy(id);
+    setErr(null);
     try {
       await api(`agency/members/${id}`, { method: "PATCH", json });
       router.refresh();
@@ -39,7 +41,7 @@ export function TeamView({ locale, members, listingsByAgent, invites: initialInv
   };
   return (
     <AdminShell locale={locale} area="agency" title={tx(locale, "Equipo", "Team")}>
-      {err && <div className="mb-4 rounded-lg bg-[#B4231833] px-3 py-2 text-sm text-[#FF8A7A]">{err}</div>}
+      {err && <div role="alert" className="mb-4 rounded-lg bg-[#B4231833] px-3 py-2 text-sm text-[#FF8A7A]">{err}</div>}
       <div className="grid gap-6 [&>*]:min-w-0 xl:grid-cols-[1fr_360px]">
         <div className="overflow-x-auto rounded-np border border-navy-line bg-navy-card">
           <table className="w-full min-w-[720px] text-sm">
@@ -58,7 +60,7 @@ export function TeamView({ locale, members, listingsByAgent, invites: initialInv
                   <td className="px-3">
                     {u.role === "AGENT" ? (
                       u.verified ? (
-                        <Badge className="bg-[#2F6F4E40] text-[#7FD3A8]"><ShieldCheck size={12} /> VERIFIED</Badge>
+                        <Badge className="bg-[#2F6F4E40] text-[#7FD3A8]"><ShieldCheck size={12} /> {tx(locale, "Verificado", "Verified")}</Badge>
                       ) : (
                         <span className="flex items-center gap-2">
                           <Badge className="bg-[#C9862A33] text-[#F2B866]"><ShieldQuestion size={12} /> {tx(locale, "Documento en revisión", "Document in review")}</Badge>
@@ -70,7 +72,7 @@ export function TeamView({ locale, members, listingsByAgent, invites: initialInv
                     )}
                   </td>
                   <td className="px-3 text-right">{listingsByAgent[u.id] ?? "—"}</td>
-                  <td className="px-3 text-xs text-mist">{ago(u.lastSeen, locale)}</td>
+                  <td className="px-3 text-xs text-mist" suppressHydrationWarning>{ago(u.lastSeen, locale)}</td>
                 </tr>
               ))}
             </tbody>
@@ -86,7 +88,8 @@ export function TeamView({ locale, members, listingsByAgent, invites: initialInv
                 setBusy("invite");
                 try {
                   const inv = await api<Invite>("agency/invitations", { method: "POST", json: { email, role } });
-                  setInvites([inv, ...invites]);
+                  // A re-invite replaces the pending one server-side: mirror that instead of listing it twice.
+                  setInvites([inv, ...invites.filter((x) => x.email !== inv.email)]);
                   setEmail("");
                 } catch (e2) {
                   setErr((e2 as Error).message);

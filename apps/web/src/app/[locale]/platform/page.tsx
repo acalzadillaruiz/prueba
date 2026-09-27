@@ -6,5 +6,5 @@ export const dynamic = "force-dynamic";
 
 export default async function Page({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params;
-  return <PlatformHome locale={locale} data={await platformHome()} />;
+  return <PlatformHome locale={locale} data={await platformHome(locale)} />;
 }

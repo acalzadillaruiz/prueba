@@ -195,7 +195,9 @@ export function LeadsInbox({ locale, initial, listings, agents }: { locale: Loca
       const text =
         sel.nextAction === "SEND_SIMILARS"
           ? tx(locale, "Te comparto 3 inmuebles similares dentro de tu presupuesto. ¿Te gustaría visitarlos?", "Here are 3 similar homes within your budget. Want to see them?")
-          : tx(locale, `¡Hola ${sel.name.split(" ")[0]}! Soy de la agencia. ¿Te llamo ahora para resolver tus dudas?`, `Hi ${sel.name.split(" ")[0]}! This is your agent. Can I call you now?`);
+          : sel.nextAction === "NURSE"
+            ? tx(locale, `¡Hola ${sel.name.split(" ")[0]}! Te comparto la guía de la zona y el PlaceEstimate del inmueble. Cuando quieras, coordinamos una visita.`, `Hi ${sel.name.split(" ")[0]}! Here is the area guide and the home’s PlaceEstimate. Whenever you like, we can set up a tour.`)
+            : tx(locale, `¡Hola ${sel.name.split(" ")[0]}! Soy de la agencia. ¿Te llamo ahora para resolver tus dudas?`, `Hi ${sel.name.split(" ")[0]}! This is your agent. Can I call you now?`);
       await api(`leads/${sel.id}/messages`, { method: "POST", json: { body: text } });
     });
   };
@@ -374,7 +376,8 @@ export function LeadsInbox({ locale, initial, listings, agents }: { locale: Loca
                   if (!draft.trim()) return;
                   const body = draft;
                   setDraft("");
-                  run("msg", () => api(`leads/${sel.id}/messages`, { method: "POST", json: { body } }));
+                  // On failure the reply is put back in the box (the error shows above) instead of being lost.
+                  run("msg", () => api(`leads/${sel.id}/messages`, { method: "POST", json: { body } }).catch((e) => { setDraft(body); throw e; }));
                 }}
               >
                 <input value={draft} onChange={(e) => setDraft(e.target.value)} className="h-10 flex-1 rounded-full border border-navy-line bg-navy-2 px-4 text-sm focus:border-coral focus:outline-none" placeholder={tx(locale, "Responder… (se envía también por email)", "Reply… (also sent by email)")} aria-label={tx(locale, "Respuesta", "Reply")} />

@@ -147,6 +147,10 @@ export function NightMap({
     return () => ro.disconnect();
   }, [B]);
 
+  // Map labels keep a fixed on-screen size (CSS px) whatever the zoom or map size: the text is laid out at its
+  // font size and scaled by (svg units per px) / zoom, so it stays legible on a 390 px phone instead of ~5 px.
+  const labelAt = (x: number, y: number) => `translate(${x} ${y}) scale(${k / view.s})`;
+
   const toSvg = (e: React.PointerEvent | React.WheelEvent | React.MouseEvent) => {
     const r = svgRef.current!.getBoundingClientRect();
     const scale = Math.max(B.W / r.width, B.H / r.height);
@@ -293,7 +297,7 @@ export function NightMap({
               {(() => {
                 const c = P(10.531, -66.89);
                 return (
-                  <text x={c.x} y={c.y} textAnchor="middle" fontSize={11} letterSpacing={3} fill={pal.label2} fontFamily="var(--font-display)" style={{ fontSize: 11 / Math.sqrt(view.s) * 1.2 }}>
+                  <text transform={labelAt(c.x, c.y)} textAnchor="middle" fontSize={12} letterSpacing={2} fill={pal.label2} fontFamily="var(--font-display)">
                     PARQUE NACIONAL EL ÁVILA
                   </text>
                 );
@@ -330,14 +334,13 @@ export function NightMap({
                 return (
                   <text
                     key={lb.t}
-                    x={c.x}
-                    y={c.y}
+                    transform={labelAt(c.x, c.y)}
                     textAnchor="middle"
                     fill={lb.big ? pal.label2 : pal.label}
                     fontFamily="var(--font-display)"
                     fontWeight={lb.big ? 600 : 500}
-                    letterSpacing={lb.big ? 4 : 1.2}
-                    style={{ fontSize: (lb.big ? 16 : 8.5) / view.s + (lb.big ? 0 : 1.2) }}
+                    letterSpacing={lb.big ? 3 : 0.5}
+                    fontSize={lb.big ? 15 : 12}
                   >
                     {lb.t}
                   </text>
@@ -346,7 +349,7 @@ export function NightMap({
               {(() => {
                 const c = P(10.4852, -66.884);
                 return (
-                  <text x={c.x} y={c.y} fill={pal.label2} fontStyle="italic" fontFamily="var(--font-body)" style={{ fontSize: 8 / view.s + 1 }}>
+                  <text transform={labelAt(c.x, c.y)} fill={pal.label2} fontStyle="italic" fontFamily="var(--font-body)" fontSize={12}>
                     Río Guaire
                   </text>
                 );

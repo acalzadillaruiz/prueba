@@ -21,5 +21,5 @@ export default async function Page({ params }: { params: Promise<{ locale: Local
   const dupIds = rows.map((r) => r.duplicateOf).filter(Boolean) as string[];
   const titles = await prisma.listing.findMany({ where: { id: { in: dupIds } }, select: { id: true, titleEs: true, titleEn: true } });
   const canConvert = ["AGENCY_OWNER", "BACKOFFICE", "SUPERADMIN"].includes(user.role);
-  return <CaptureView locale={locale} canConvert={canConvert} rows={rows.map((r) => ({ ...r, listingId: listingOf.get(r.id) }))} zones={zones} titles={Object.fromEntries(titles.map((t) => [t.id, locale === "es" ? t.titleEs : t.titleEn]))} />;
+  return <CaptureView locale={locale} canConvert={canConvert} rows={rows.map((r) => ({ ...r, listingId: listingOf.get(r.id) }))} zones={zones} titles={Object.fromEntries(titles.map((t) => [t.id, locale === "es" ? t.titleEs : t.titleEn || t.titleEs]))} />;
 }

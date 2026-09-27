@@ -1,11 +1,13 @@
 import "server-only";
 import { prisma } from "@newplace/db";
 import { aiKeyConfigured } from "./ai";
-import { getAgencies, getAudit, getSetting } from "./data";
+import { getAgencies, getSetting } from "./data";
+import { auditPage } from "./audit-log";
 
 const DAY = 864e5;
 
-export async function platformHome() {
+export async function platformHome(locale: "es" | "en" = "es") {
+  const t = (es: string, en: string) => (locale === "en" ? en : es);
   const now = Date.now();
   const [agencies, counts, users, active, leads7d, leadsPrev, responded, leads12w, outbox, aiSetting] = await Promise.all([
     getAgencies(),
@@ -36,13 +38,14 @@ export async function platformHome() {
     firstResponseMin: resp.length ? Math.round(resp[Math.floor(resp.length / 2)]) : null,
     weekly,
     health: [
-      { k: "PostgreSQL", v: `${listingCount} listings · ${users} users`, ok: true },
-      { k: "AI", v: aiSetting === "openai-compatible" ? (aiKeyConfigured() ? `openai-compatible · ${process.env.AI_MODEL}` : "openai-compatible (sin key → heuristic)") : "heuristic", ok: aiSetting === "heuristic" || aiKeyConfigured() },
-      { k: "Google Maps", v: process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY ? "API key OK" : "sin key → mapa ilustrado", ok: !!process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY },
+      { k: "PostgreSQL", v: `${listingCount} listings · ${users} ${t("usuarios", "users")}`, ok: true },
+      { k: t("IA", "AI"), v: aiSetting === "openai-compatible" ? (aiKeyConfigured() ? `openai-compatible · ${process.env.AI_MODEL}` : t("openai-compatible (sin key → heuristic)", "openai-compatible (no key → heuristic)")) : "heuristic", ok: aiSetting === "heuristic" || aiKeyConfigured() },
+      { k: "Google Maps", v: process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY ? "API key OK" : t("sin key → mapa ilustrado", "no key → illustrated map"), ok: !!process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY },
       { k: "Auth", v: ["Credentials", process.env.AUTH_GOOGLE_ID ? "Google" : null, process.env.DEMO_AUTH === "true" ? "DEMO" : null].filter(Boolean).join(" + "), ok: true },
       { k: "Email outbox", v: `${outbox} · SMTP off (v1)`, ok: true },
       { k: "Storage", v: process.env.STORAGE === "s3" ? "S3" : "Local /uploads", ok: true },
     ],
-    audit: await getAudit(10),
+    // Same resolver as /platform/audit: targets stored as ids show as names; actor "" = system.
+    audit: (await auditPage({ take: 10 })).items,
   };
 }

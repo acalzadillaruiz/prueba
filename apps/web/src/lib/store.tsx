@@ -85,12 +85,15 @@ export function AppStateProvider({ children, user: initialUser, agency: initialA
 
   const requireLogin = useCallback(() => {
     if (user) return true;
+    // Session still loading (public pages fetch it after first paint): a signed-in user must not be bounced to the
+    // login screen for clicking early. Do nothing; the next click has the session.
+    if (!ready) return false;
     const locale = pathname.split("/")[1] || "es";
     // Keep the full query (filters, sort, drawn area) so the user lands back on the same search after login.
     const search = typeof window !== "undefined" ? window.location.search : "";
     router.push(`/${locale}/login?next=${encodeURIComponent(pathname + search)}`);
     return false;
-  }, [user, pathname, router]);
+  }, [user, ready, pathname, router]);
 
   const toggleSaved = useCallback(
     (id: string) => {

@@ -242,7 +242,9 @@ test.describe("Cliente · regresiones de la revisión", () => {
   test("«Guardar búsqueda» nombra la alerta con todos los filtros activos", async ({ page }) => {
     await signIn(page, "seeker@gmail.com");
     const km = (1 + Math.random() * 3).toFixed(3);
+    const session = page.waitForResponse("**/api/v1/me/session");
     await page.goto(`/es/search?type=LONG_RENT&pub=7d&furnished=1&radius=10.49000,-66.85000,${km}`);
+    await session;
     await expect(async () => {
       // Click only while it still offers to save (a slow response turns it into "Alerta creada").
       const save = page.getByRole("button", { name: "Guardar búsqueda" });
@@ -277,5 +279,28 @@ test.describe("Cliente · regresiones de la revisión", () => {
     await dayButtons.first().click();
     await expect(page.getByText("Este día ya no tiene horarios libres. Elige otro día.")).toBeVisible();
     await expect(page.getByRole("button", { name: "Solicitar visita" })).toBeDisabled();
+  });
+  test("sesión aún cargando: pulsar «Guardar búsqueda» no manda al login a un usuario ya autenticado", async ({ page }) => {
+    await signIn(page, "seeker@gmail.com");
+    let release!: () => void;
+    const gate = new Promise<void>((r) => (release = r));
+    await page.route("**/api/v1/me/session", async (route) => {
+      await gate;
+      await route.continue();
+    });
+    await page.goto("/es/search?type=SALE&beds=4");
+    const save = page.getByRole("button", { name: "Guardar búsqueda" });
+    // Hydrated (the NL box reacts) but the session is still pending.
+    await expect(async () => {
+      await page.getByRole("textbox", { name: "Búsqueda en lenguaje natural" }).fill("x");
+      await expect(page.getByRole("textbox", { name: "Búsqueda en lenguaje natural" })).toHaveValue("x", { timeout: 1000 });
+    }).toPass();
+    await save.click();
+    await page.waitForTimeout(1500);
+    expect(new URL(page.url()).pathname).toBe("/es/search");
+    release();
+    await expect(page.getByRole("link", { name: /Daniel/ })).toBeVisible();
+    await save.click();
+    await expect(page.getByRole("button", { name: "Alerta creada" }).first()).toBeVisible();
   });
 });

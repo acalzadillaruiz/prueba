@@ -80,7 +80,7 @@ export function AgencyDashboard({ locale, stats, listings, newLeads, tours, agen
                     <td className="text-right">{l.stats.saves}</td>
                     <td className="text-right font-semibold">{l.stats.leads}</td>
                     <td className="text-right">{Math.floor(l.stats.avgTimeSec / 60)}:{String(l.stats.avgTimeSec % 60).padStart(2, "0")}</td>
-                    <td className="pl-4 text-right text-mist">{l.stats.impressions ? `${((l.stats.leads / l.stats.impressions) * 1000).toFixed(1)} ‰` : "—"}</td>
+                    <td className="pl-4 text-right text-mist">{l.stats.impressions ? `${new Intl.NumberFormat(locale === "es" ? "es-VE" : "en-US", { maximumFractionDigits: 1 }).format((l.stats.leads / l.stats.impressions) * 1000)} ‰` : "—"}</td>
                   </tr>
                 ))}
               </tbody>
@@ -131,7 +131,7 @@ export function AgencyDashboard({ locale, stats, listings, newLeads, tours, agen
             const a = { initials: t.agentName.split(" ").map((p) => p[0]).slice(0, 2).join(""), hue: t.agentHue };
             return (
               <div key={t.id} className="flex items-center gap-3 border-t border-navy-line py-2.5 text-sm">
-                <span className="w-32 font-display capitalize">{dateTime(t.start, locale)}</span>
+                <span className="w-32 font-display inline-block first-letter:uppercase">{dateTime(t.start, locale)}</span>
                 <span className="line-clamp-1 flex-1">{t.seekerName} · <span className="text-mist">{l?.zone}</span></span>
                 <Avatar initials={a.initials} hue={a.hue} size={22} />
                 <Badge className={t.status === "CONFIRMED" ? "bg-[#2F6F4E40] text-[#7FD3A8]" : "bg-[#C9862A33] text-[#F2B866]"}>{t.status === "CONFIRMED" ? "OK" : tx(locale, "Pend.", "Pend.")}</Badge>

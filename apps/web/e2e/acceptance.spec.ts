@@ -88,6 +88,8 @@ test.describe.serial("Criterios de aceptación §15", () => {
     expect(before.json.items.map((l: { id: string }) => l.id)).toContain(id);
     await page.goto("/es/platform/moderation");
     await page.locator(`[data-listing="${id}"]`).getByRole("button", { name: /Apagar/ }).click();
+    await page.locator(`[data-listing="${id}"]`).getByLabel("Motivo de la retirada").fill("Prueba E2E: fotos duplicadas");
+    await page.locator(`[data-listing="${id}"]`).getByRole("button", { name: /Confirmar retirada/ }).click();
     await expect(page.locator(`[data-listing="${id}"]`).getByRole("button", { name: /Restaurar/ })).toBeVisible();
     const after = await apiAs(page, "GET", "listings?type=SALE&zone=Chacao&beds=2&max=250000");
     expect(after.json.items.map((l: { id: string }) => l.id)).not.toContain(id);

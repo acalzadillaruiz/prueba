@@ -95,7 +95,7 @@ export function SavedView({ locale, all }: { locale: Locale; all: Listing[] }) {
                   <tr key={a} className="border-t border-line">
                     <td className="px-4 py-2 text-ink/60">{lbl(AMENITY_LABEL[a], locale)}</td>
                     {cmp.map((l) => (
-                      <td key={l.id} className="px-4 py-2">{l.amenities.includes(a) ? <Check size={16} className="text-ok" /> : <Minus size={16} className="text-ink/25" />}</td>
+                      <td key={l.id} className="px-4 py-2">{l.amenities.includes(a) ? <Check size={16} className="text-ok" /> : <Minus size={16} className="text-ink/50" aria-label={tx(locale, "No", "No")} />}</td>
                     ))}
                   </tr>
                 ))}

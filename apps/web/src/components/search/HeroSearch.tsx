@@ -79,7 +79,7 @@ export function HeroSearch({ locale }: { locale: Locale }) {
           placeholder={tx(locale, "Zona, dirección o escribe: «ático con luz en Los Palos Grandes por menos de 180 mil»", "Area, address or type: “3-bed in Chacao under 250k”")}
           aria-label={tx(locale, "Buscar", "Search")}
         />
-        <button className="flex h-11 items-center gap-2 rounded-xl bg-coral-cta px-5 font-display font-medium text-white transition-colors duration-np hover:bg-coral-cta-hover">
+        <button aria-label={tx(locale, "Buscar", "Search")} className="flex h-11 items-center gap-2 rounded-xl bg-coral-cta px-5 font-display font-medium text-white transition-colors duration-np hover:bg-coral-cta-hover">
           <Search size={17} /> <span className="hidden sm:inline">{tx(locale, "Buscar", "Search")}</span>
         </button>
       </form>

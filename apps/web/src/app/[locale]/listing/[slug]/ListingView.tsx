@@ -15,6 +15,7 @@ import { getFx } from "@/server/data";
 import { AMENITY_LABEL, TYPE_LABEL, lbl, money, num, priceSuffix, tx, plural } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import { ViewBeacon } from "@/components/detail/ViewBeacon";
+import { zoneStats } from "@/server/zone-stats";
 import { SITE_URL } from "@/lib/seo";
 
 function jsonLd(l: Listing, locale: Locale) {
@@ -74,13 +75,14 @@ function Facts({ l, locale, dark }: { l: Listing; locale: Locale; dark?: boolean
 export async function ListingView({ locale, l }: { locale: Locale; l: Listing }) {
   const isPublic = isPublicListing(l);
   const [zoneRow, fx, similarRows, nearbyRows, soldRows] = await Promise.all([
-    prisma.zone.findUnique({ where: { name: l.zone } }),
+    zoneStats(l.zone),
     getFx(),
     prisma.listing.findMany({ where: { AND: [publicWhere(), { id: { not: l.id }, listingType: l.listingType }, { OR: [{ city: l.city }, { luxury: l.luxury }] }] }, include: listingInclude, take: 24 }),
     prisma.listing.findMany({ where: { AND: [publicWhere(), { id: { not: l.id }, city: l.city }] }, include: listingInclude, take: 12 }),
     prisma.listing.findMany({ where: { id: { not: l.id }, zone: l.zone, status: { in: ["SOLD", "RENTED"] } }, include: listingInclude, take: 3, orderBy: { updatedAt: "desc" } }),
   ]);
-  const zone = zoneRow ?? { salePpm: Math.round(l.priceAmount / l.areaM2), rentPpm: 0, activeListings: 0, daysOnMarket: 0 };
+  const zone = zoneRow;
+  const usd1 = (n: number) => new Intl.NumberFormat(locale === "es" ? "es-VE" : "en-US", { style: "currency", currency: "USD", maximumFractionDigits: 1 }).format(n).replace(/[\u00a0\u202f]/g, " ");
   const all = [...similarRows.map((r) => toCard(toDomain(r))), ...nearbyRows.map((r) => toCard(toDomain(r)))];
   const similar = similarRows.map((r) => toCard(toDomain(r))).sort((a, b) => Math.abs(a.priceAmount - l.priceAmount) - Math.abs(b.priceAmount - l.priceAmount)).slice(0, 4);
   const nearby = nearbyRows.map((r) => toCard(toDomain(r)));
@@ -196,11 +198,12 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
               </div>
               <div>
                 <H>{tx(locale, `Informe de zona · ${l.zone}`, `Area report · ${l.zone}`)}</H>
+                <p className={cn("-mt-2 mb-3 text-xs", dark ? "text-mist" : "text-ink/65")}>{zone.live ? tx(locale, "Calculado con los anuncios publicados en New Place.", "Computed from listings published on New Place.") : tx(locale, "Pocos anuncios en la zona: valores de referencia.", "Few listings in this area: reference values.")}</p>
                 <div className="grid grid-cols-2 gap-3">
                   {[
                     [money(zone.salePpm, locale), tx(locale, "USD/m² venta", "USD/m² sale")],
-                    [`${zone.rentPpm} $`, tx(locale, "USD/m² alquiler/mes", "USD/m² rent/mo")],
-                    [zone.activeListings, tx(locale, "ofertas activas", "active listings")],
+                    [usd1(zone.rentPpm), tx(locale, "USD/m² alquiler/mes", "USD/m² rent/mo")],
+                    [num(zone.activeListings, locale), tx(locale, "en oferta en New Place", "available on New Place")],
                     [zone.daysOnMarket, tx(locale, "días en mercado (mediana)", "median days on market")],
                   ].map(([v, t]) => (
                     <div key={String(t)} className={cn("rounded-np border p-3", dark ? "border-navy-line" : "border-line bg-white")}>

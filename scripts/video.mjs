@@ -235,7 +235,9 @@ async function admin() {
   await realClick(page.getByRole("button", { name: /Impersonar/ }).first(), { after: 1800 });
   await caption("Moderación: apagamos un anuncio de Chacao…");
   await realClick(page.getByRole("link", { name: /Moderación/ }).first(), { after: 1200 });
-  await realClick(page.locator('[data-listing="19if9a"]').getByRole("button", { name: /Apagar/ }), { after: 1800 });
+  await realClick(page.locator('[data-listing="19if9a"]').getByRole("button", { name: /Apagar/ }), { after: 600 });
+  await type(page.locator('[data-listing="19if9a"]').getByLabel("Motivo de la retirada"), "Fotos duplicadas de otro anuncio", 35);
+  await realClick(page.locator('[data-listing="19if9a"]').getByRole("button", { name: /Confirmar retirada/ }), { after: 1800 });
   await caption("…y desaparece de la búsqueda pública (ahora 2 resultados en Chacao).");
   await go("/es/search?type=SALE&zone=Chacao&beds=2&max=250000", 2800);
   await caption("Cambio de proveedor de IA en caliente y tasas FX de referencia.");

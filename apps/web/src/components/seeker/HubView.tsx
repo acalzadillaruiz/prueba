@@ -255,7 +255,7 @@ function TourRow({ t, l, locale, past }: { t: HubTour; l: Listing | undefined; l
         <div className="mt-0.5 flex items-center gap-1.5 text-sm"><Avatar initials={initials} hue={t.agentHue} size={18} /> {t.agentName}</div>
       </div>
       <div className="w-full sm:w-auto sm:text-right">
-        <div className={cn("font-display font-semibold capitalize", past && "text-ink/65")}>{dateTime(t.start, locale)}</div>
+        <div className={cn("font-display font-semibold first-letter:uppercase", past && "text-ink/65")}>{dateTime(t.start, locale)}</div>
         <Badge tone={status.tone}>{status.label}</Badge>
       </div>
     </div>

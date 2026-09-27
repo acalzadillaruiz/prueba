@@ -86,7 +86,7 @@ function TourPicker({ locale, listingId, agentId, busy, onPropose, onClose }: { 
         <div className="mt-2 max-h-40 space-y-2 overflow-y-auto scrollbar-thin">
           {days.map((d) => (
             <div key={d.date}>
-              <div className="text-[11px] capitalize text-mist">{dateTime(d.date, locale, { weekday: "long", day: "numeric", month: "short" })}</div>
+              <div className="text-[11px] first-letter:uppercase text-mist">{dateTime(d.date, locale, { weekday: "long", day: "numeric", month: "short" })}</div>
               <div className="mt-1 flex flex-wrap gap-1.5">
                 {d.hours.map((h) => (
                   <button key={h.iso} type="button" aria-pressed={pick === h.iso} onClick={() => { setPick(h.iso); setCustom(""); setErr(null); }} className={cn("rounded-md border px-2 py-1 text-xs", pick === h.iso ? "border-coral bg-coral-cta text-white" : "border-navy-line hover:border-coral")}>

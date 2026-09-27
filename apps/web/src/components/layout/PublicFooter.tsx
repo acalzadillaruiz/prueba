@@ -12,7 +12,7 @@ export async function PublicFooter({ locale }: { locale: Locale }) {
       <div className="mb-3 font-display text-sm font-semibold text-ivory">{title}</div>
       <ul className="space-y-2 text-sm text-mist">
         {links.map(([label, h]) => (
-          <li key={label}><Link href={h} className="hover:text-ivory">{label}</Link></li>
+          <li key={label}><Link href={h} className="inline-flex min-h-11 items-center hover:text-ivory md:min-h-0 md:py-1">{label}</Link></li>
         ))}
       </ul>
     </div>

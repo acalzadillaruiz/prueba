@@ -9,7 +9,7 @@ import { MapView as NightMap } from "@/components/map/MapView";
 import { ListingCard, MapPreviewCard } from "@/components/listing/ListingCard";
 import { EmptyState } from "@/components/ui";
 import type { Shape } from "@/lib/geo";
-import { AMENITY_LABEL, lbl, money, num, tx } from "@/lib/i18n";
+import { AMENITY_LABEL, lbl, money, num, tx, plural } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import { useApp } from "@/lib/store";
 import { api } from "@/lib/api";
@@ -365,7 +365,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
             <div className="flex items-center justify-between gap-2">
               <div>
                 <div className="font-display text-lg font-semibold">
-                  {num(query.data?.total ?? results.length, locale)} {tx(locale, "resultados", "results")}{query.isFetching && <Loader2 size={15} className="ml-2 inline animate-spin text-ink/65" />}
+                  {plural(query.data?.total ?? results.length, locale, ["resultado", "resultados"], ["result", "results"])}{query.isFetching && <Loader2 size={15} className="ml-2 inline animate-spin text-ink/65" />}
                   {shape && <span className="ml-2 rounded-full bg-coral/10 bg-[#F26B4D1A] px-2 py-0.5 text-xs text-coral-hover">{tx(locale, "en tu zona dibujada", "in your drawn area")}</span>}
                 </div>
                 <div className="text-xs text-ink/65">{tx(locale, "Precios en USD · actualizados en tiempo real", "Prices in USD · updated in real time")}</div>

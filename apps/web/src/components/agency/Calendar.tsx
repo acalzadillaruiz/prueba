@@ -81,7 +81,7 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
             <div className="flex items-center gap-3 border-b border-navy-line px-4 py-3">
               <Link href={`?w=${week - 1}`} className="rounded-lg p-1.5 hover:bg-white/5" aria-label={tx(locale, "Semana anterior", "Previous week")}><ChevronLeft size={18} /></Link>
               <Link href={`?w=${week + 1}`} className="rounded-lg p-1.5 hover:bg-white/5" aria-label={tx(locale, "Semana siguiente", "Next week")}><ChevronRight size={18} /></Link>
-              <span className="font-display text-lg font-semibold capitalize">{fmt(days[0], { day: "numeric", month: "short" })} – {fmt(days[6], { day: "numeric", month: "short", year: "numeric" })}</span>
+              <span className="font-display text-lg font-semibold inline-block first-letter:uppercase">{fmt(days[0], { day: "numeric", month: "short" })} – {fmt(days[6], { day: "numeric", month: "short", year: "numeric" })}</span>
               {week !== 0 && <Link href="?w=0" className="text-sm text-coral">{tx(locale, "Hoy", "Today")}</Link>}
               <div className="ml-auto flex gap-3 text-xs text-mist">
                 <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-sm bg-coral" /> {tx(locale, "Visita", "Tour")}</span>
@@ -93,7 +93,7 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
             <div className="grid grid-cols-[56px_repeat(7,1fr)]">
               <div />
               {days.map((d, i) => (
-                <div key={i} className={cn("border-l border-navy-line py-2 text-center font-display text-sm capitalize", i === todayIdx && "text-coral")}>{fmt(d, { weekday: "short", day: "numeric" })}</div>
+                <div key={i} className={cn("border-l border-navy-line py-2 text-center font-display text-sm first-letter:uppercase", i === todayIdx && "text-coral")}>{fmt(d, { weekday: "short", day: "numeric" })}</div>
               ))}
             </div>
             <div className="relative">
@@ -145,7 +145,7 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
                 <div className="font-display text-lg font-semibold">{sel.title}</div>
                 <button onClick={() => setSel(null)} aria-label={tx(locale, "Cerrar", "Close")}><X size={16} /></button>
               </div>
-              <div className="text-sm capitalize text-mist">{fmt(new Date(sel.start), { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" })}</div>
+              <div className="text-sm first-letter:uppercase text-mist">{fmt(new Date(sel.start), { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" })}</div>
               <div className="mt-1 text-sm">{sel.sub} · {sel.agentName}</div>
               {sel.tourId && sel.kind !== "done" && sel.kind !== "cancelled" && (
                 <div className="mt-3 flex flex-wrap gap-2">

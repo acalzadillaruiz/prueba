@@ -88,7 +88,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
       <div className={cn("np-in rounded-np border p-5", box)} data-testid="lead-done">
         <CheckCircle2 className="text-ok" size={30} />
         <div className="mt-3 font-display text-xl font-semibold">{mode === "tour" && done ? tx(locale, "Visita solicitada", "Tour requested") : tx(locale, "Mensaje enviado", "Message sent")}</div>
-        {done && <div className="mt-1 font-display capitalize text-coral">{done}</div>}
+        {done && <div className="mt-1 font-display first-letter:uppercase text-coral">{done}</div>}
         <p className={cn("mt-2 text-sm", muted)}>
           {tx(locale, `${agent?.name.split(" ")[0] ?? "El agente"} suele responder en menos de 15 minutos. Te enviamos la confirmación a ${email}.`, `${agent?.name.split(" ")[0] ?? "The agent"} usually replies within 15 minutes. Confirmation sent to ${email}.`)}
         </p>
@@ -142,7 +142,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
                     setDay(i);
                     setIso(null);
                   }}
-                  className={cn("min-w-[62px] rounded-xl border px-2 py-2 text-center font-display text-sm capitalize", day === i ? "border-coral bg-coral-cta text-white" : dark ? "border-navy-line" : "border-line")}
+                  className={cn("min-w-[62px] rounded-xl border px-2 py-2 text-center font-display text-sm first-letter:uppercase", day === i ? "border-coral bg-coral-cta text-white" : dark ? "border-navy-line" : "border-line")}
                 >
                   {fmt(d.date, { weekday: "short", day: "numeric" })}
                 </button>

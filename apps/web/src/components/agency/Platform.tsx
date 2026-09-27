@@ -247,6 +247,9 @@ export function PlatformUsers({ locale, users, providers }: { locale: Locale; us
 export function PlatformModeration({ locale, reports, listings }: { locale: Locale; reports: { id: string; title: string; reason: { es: string; en: string }; reporter: string; agency: string; at: string; severity: "high" | "medium" | "low"; listingId: string | null }[]; listings: Listing[] }) {
   const { busy, err, run } = useRun();
   const [q, setQ] = useState("");
+  // Take-downs are confirmed with a reason (shown to the agency and stored in the audit log).
+  const [confirming, setConfirming] = useState<string | null>(null);
+  const [reason, setReason] = useState("");
   const rows = listings.filter((l) => (l.title_es + l.zone + (l.agency?.name ?? "")).toLowerCase().includes(q.toLowerCase())).slice(0, 40);
   return (
     <AdminShell locale={locale} area="platform" title={tx(locale, "Moderación", "Moderation")}>
@@ -288,16 +291,46 @@ export function PlatformModeration({ locale, reports, listings }: { locale: Loca
           {rows.map((l) => {
             const down = l.status === "WITHDRAWN";
             return (
-              <div key={l.id} data-listing={l.id} className={cn("flex items-center gap-3 border-t border-navy-line px-4 py-2.5 first:border-0", down && "bg-[#B4231814]")}>
+              <div key={l.id} data-listing={l.id} className="border-t border-navy-line first:border-0">
+              <div className={cn("flex items-center gap-3 px-4 py-2.5", down && "bg-[#B4231814]")}>
                 <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className={cn("h-11 w-14 shrink-0 rounded-md", down && "opacity-40 grayscale")} />
                 <div className="min-w-0 flex-1">
                   <div className={cn("truncate font-semibold", down && "text-mist line-through")}>{tx(locale, l.title_es, l.title_en)}</div>
                   <div className="text-xs text-mist">{l.agency?.name ?? tx(locale, "Particular", "Private owner")} · {l.zone} · {money(l.priceAmount, locale)}</div>
                 </div>
                 <StatusBadge status={l.status} locale={locale} />
-                <Button size="sm" variant={down ? "dark-outline" : "coral"} disabled={busy === l.id} onClick={() => run(l.id, () => api(`platform/listings/${l.id}`, { method: "PATCH", json: { takedown: !down, reason: "Moderación" } }))}>
-                  {busy === l.id ? <Loader2 size={13} className="animate-spin" /> : down ? <RotateCcw size={13} /> : <Ban size={13} />} {down ? tx(locale, "Restaurar", "Restore") : tx(locale, "Apagar", "Take down")}
-                </Button>
+                {confirming === l.id ? null : (
+                  <Button
+                    size="sm"
+                    variant={down ? "dark-outline" : "coral"}
+                    disabled={busy === l.id}
+                    onClick={() => {
+                      if (down) void run(l.id, () => api(`platform/listings/${l.id}`, { method: "PATCH", json: { takedown: false } }));
+                      else {
+                        setReason("");
+                        setConfirming(l.id);
+                      }
+                    }}
+                  >
+                    {busy === l.id ? <Loader2 size={13} className="animate-spin" /> : down ? <RotateCcw size={13} /> : <Ban size={13} />} {down ? tx(locale, "Restaurar", "Restore") : tx(locale, "Apagar", "Take down")}
+                  </Button>
+                )}
+              </div>
+              {confirming === l.id && (
+                <form
+                  className="np-in flex flex-wrap items-center gap-2 border-t border-navy-line bg-[#B4231814] px-4 py-2.5"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    setConfirming(null);
+                    void run(l.id, () => api(`platform/listings/${l.id}`, { method: "PATCH", json: { takedown: true, reason: reason.trim() || tx(locale, "Moderación", "Moderation") } }));
+                  }}
+                >
+                  <label className="sr-only" htmlFor={`reason-${l.id}`}>{tx(locale, "Motivo de la retirada", "Take-down reason")}</label>
+                  <input id={`reason-${l.id}`} autoFocus value={reason} onChange={(e) => setReason(e.target.value)} maxLength={200} placeholder={tx(locale, "Motivo (lo verá la agencia)", "Reason (the agency will see it)")} className={darkInputCls + " h-9 min-w-0 flex-1"} />
+                  <Button size="sm" type="submit">{tx(locale, "Confirmar retirada", "Confirm take-down")}</Button>
+                  <Button size="sm" type="button" variant="dark-ghost" onClick={() => setConfirming(null)}>{tx(locale, "Cancelar", "Cancel")}</Button>
+                </form>
+              )}
               </div>
             );
           })}

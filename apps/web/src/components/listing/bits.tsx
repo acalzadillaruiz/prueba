@@ -53,9 +53,9 @@ export function CompareButton({ id, locale, dark }: { id: string; locale: Locale
 
 const STATUS_TONE: Record<ListingStatus, string> = {
   DRAFT: "bg-black/60 text-white",
-  COMING_SOON: "bg-[#6B7FA3] text-white",
+  COMING_SOON: "bg-[#4F6285] text-white",
   ACTIVE: "bg-ok text-white",
-  UNDER_OFFER: "bg-warn text-white",
+  UNDER_OFFER: "bg-[#8F5E1C] text-white",
   SOLD: "bg-navy text-ivory",
   RENTED: "bg-navy text-ivory",
   WITHDRAWN: "bg-danger text-white",

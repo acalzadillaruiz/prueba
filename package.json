@@ -24,9 +24,19 @@
   },
   "devDependencies": {
     "lighthouse": "^12.8.2",
-    "playwright": "^1.56.1",
-    "sharp": "^0.34.5",
+    "playwright": "1.56.1",
+    "sharp": "^0.35.5",
     "tsx": "^4.23.15",
     "vitest": "^3.2.7"
+  },
+  "overrides": {
+    "postcss": "^8.5.23",
+    "browserslist": "^4.28.7",
+    "deepmerge-ts": "^8.0.0",
+    "@playwright/test": "1.56.1",
+    "playwright": "1.56.1"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.3"
   }
 }

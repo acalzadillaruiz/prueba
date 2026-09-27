@@ -148,7 +148,7 @@ export function MediaView({ locale, jobs, listings, names = {}, manage = null }:
                 <PropertyArt scene={jl.scenes[0]} seed={jl.id} photo={listingPhoto(jl, 0)} className="h-14 w-20 shrink-0 rounded-md" />
                 <div className="min-w-0 flex-1">
                   <div className="line-clamp-1 font-semibold">{tx(locale, jl.title_es, jl.title_en)}</div>
-                  <div className="text-xs capitalize text-mist">{dateTime(j.date, locale)}</div>
+                  <div className="text-xs first-letter:uppercase text-mist">{dateTime(j.date, locale)}</div>
                   {manage && names[j.photographerId] && <div className="truncate text-xs text-mist">{names[j.photographerId]}</div>}
                   <span className={cn("mt-1 inline-block rounded-full px-2 py-0.5 text-[10px] font-bold", TONE[j.status])}>{statusLabel(j.status)}</span>
                 </div>

@@ -139,8 +139,8 @@ async function cliente() {
   await realClick(page.locator("main button").first(), { after: 1000 });
   for (let i = 0; i < 3; i++) await realClick(page.locator('[role="dialog"] button:has(svg.lucide-chevron-right)'), { after: 700 });
   await realClick(page.locator('[role="dialog"] button', { hasText: "Plano" }), { after: 1500 });
-  await page.keyboard.press("Escape");
-  await realClick(page.locator('[role="dialog"] button[aria-label="Cerrar"]'), { after: 800 });
+  await page.keyboard.press("Escape"); // Escape closes the lightbox
+  await wait(800);
   await caption("PlaceEstimate: valor estimado, rango, confianza y los comparables usados.");
   await scrollBy(900, 14);
   await wait(2500);
@@ -174,7 +174,7 @@ async function cliente() {
   await caption("Alertas de búsqueda y correos enviados (email_outbox).");
   await go("/es/alerts", 2500);
   await caption("Todo es bilingüe: /es ↔ /en sin romper rutas.");
-  await realClick(page.getByRole("link", { name: "EN", exact: true }), { after: 2500 });
+  await realClick(page.getByRole("link", { name: "English" }), { after: 2500 });
   await go("/en" + LPG.slice(3), 2500);
   await caption("Fin del recorrido del cliente · New Place — Un nuevo lugar.", 2500);
 }
@@ -189,7 +189,7 @@ async function admin() {
   await caption("Entramos como agente (modo demo «Entrar como…»).");
   await demoLogin("Agente", "/agency/leads");
   await caption("Bandeja de leads: SLA de 15 min, score IA 0-100 y siguiente mejor acción.", 2500);
-  await realClick(page.locator("main button", { hasText: "Daniel Ortega" }).first(), { after: 1500 });
+  await realClick(page.locator("main button", { hasText: "Gabriela Torres" }).first(), { after: 1500 });
   await moveTo(page.getByText(/Score IA/), { pause: 1800 });
   await caption("Un clic en la acción sugerida: propone la visita y mueve el lead de etapa.");
   await realClick(page.getByRole("button", { name: /Proponer visita/ }).first(), { after: 2400 });

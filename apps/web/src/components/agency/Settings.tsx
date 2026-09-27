@@ -59,13 +59,13 @@ export function SettingsView({ locale, agency, rule }: { locale: Locale; agency:
             <Field dark label="WhatsApp" hint={tx(locale, "Solo se muestra el número. Sin API.", "Number shown only. No API.")}><input className={darkInputCls} disabled={!owner} value={b.whatsapp} onChange={(e) => { setB({ ...b, whatsapp: e.target.value }); dirty(); }} /></Field>
           </div>
           <div className="mt-5 rounded-lg bg-ivory p-4 text-ink">
-            <div className="text-xs font-semibold uppercase tracking-wide text-ink/45">{tx(locale, "Vista previa en ficha pública", "Public listing preview")}</div>
+            <div className="text-xs font-semibold uppercase tracking-wide text-ink/65">{tx(locale, "Vista previa en ficha pública", "Public listing preview")}</div>
             <div className="mt-2 flex items-center gap-3">
               <span className="flex h-10 w-10 items-center justify-center rounded-lg font-display font-bold text-navy" style={{ background: b.color }}>{agency.initials}</span>
-              <div className="flex-1"><div className="font-display font-semibold">{b.name}</div><div className="text-sm text-ink/55">{b.whatsapp}</div></div>
+              <div className="flex-1"><div className="font-display font-semibold">{b.name}</div><div className="text-sm text-ink/65">{b.whatsapp}</div></div>
               <span className="rounded-np px-3 py-2 font-display text-sm text-white" style={{ background: b.color }}>{tx(locale, "Contactar", "Contact")}</span>
             </div>
-            <div className="mt-3 flex items-center justify-between border-t border-line pt-2 text-xs text-ink/50"><span>Listed on New Place</span><Logo size="sm" /></div>
+            <div className="mt-3 flex items-center justify-between border-t border-line pt-2 text-xs text-ink/65"><span>Listed on New Place</span><Logo size="sm" /></div>
           </div>
         </div>
         <div className="space-y-6">

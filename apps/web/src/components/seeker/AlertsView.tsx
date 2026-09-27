@@ -26,7 +26,7 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
               <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#F26B4D1A] text-coral">{s.polygon ? <MapPin size={20} /> : <Bell size={20} />}</span>
               <div className="min-w-0 flex-1">
                 <div className="font-display font-semibold">{s.name}</div>
-                <div className="text-sm text-ink/55">
+                <div className="text-sm text-ink/65">
                   {freq[s.frequency]} · {s.lastSentAt ? `${tx(locale, "último envío", "last sent")} ${ago(s.lastSentAt, locale)}` : tx(locale, "sin envíos aún", "nothing sent yet")}
                 </div>
               </div>
@@ -66,16 +66,16 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
       <aside>
         <Card className="p-5">
           <div className="flex items-center gap-2 font-display text-lg font-semibold"><Mail size={18} className="text-coral" /> {tx(locale, "Enviados", "Sent")}</div>
-          <p className="mt-1 text-xs text-ink/50">{tx(locale, "Bandeja email_outbox (sin SMTP en v1)", "email_outbox table (no SMTP in v1)")}</p>
+          <p className="mt-1 text-xs text-ink/65">{tx(locale, "Bandeja email_outbox (sin SMTP en v1)", "email_outbox table (no SMTP in v1)")}</p>
           <ul className="mt-4 divide-y divide-line">
             {emails.map((e) => (
               <li key={e.id} className="py-3">
                 <div className="flex items-center justify-between gap-2">
                   <Badge tone={e.kind === "ALERT" ? "coral" : e.kind === "TOUR" ? "ok" : "mist"}>{e.kind}</Badge>
-                  <span className="text-xs text-ink/50">{ago(e.at, locale)}</span>
+                  <span className="text-xs text-ink/65">{ago(e.at, locale)}</span>
                 </div>
                 <div className="mt-1.5 text-sm font-semibold">{e.subject}</div>
-                <div className="text-xs text-ink/50">{e.to} · {e.status}</div>
+                <div className="text-xs text-ink/65">{e.to} · {e.status}</div>
               </li>
             ))}
           </ul>

@@ -31,7 +31,7 @@ export function ReportsView({ locale, data }: { locale: Locale; data: ReportData
       area="agency"
       title={tx(locale, "Informes", "Reports")}
       actions={
-        <a href="/api/v1/agency/report" download className="inline-flex h-8 items-center gap-2 rounded-np bg-coral px-3 font-display text-sm font-medium text-white hover:bg-coral-hover">
+        <a href="/api/v1/agency/report" download className="inline-flex h-8 items-center gap-2 rounded-np bg-coral-cta px-3 font-display text-sm font-medium text-white hover:bg-coral-cta-hover">
           <Download size={15} /> {tx(locale, "Exportar CSV", "Export CSV")}
         </a>
       }

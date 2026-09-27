@@ -123,7 +123,7 @@ export function MediaView({ locale, jobs, listings }: { locale: Locale; jobs: Me
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={src} alt="" className="aspect-[4/3] w-full object-cover" />
                     <span className="absolute left-1 top-1 rounded bg-navy/80 px-1 text-[10px] font-bold">{i + 1}</span>
-                    {i === 0 && <span className="absolute bottom-1 left-1 rounded-full bg-coral px-1.5 text-[10px] font-bold text-white">{tx(locale, "Portada", "Cover")}</span>}
+                    {i === 0 && <span className="absolute bottom-1 left-1 rounded-full bg-coral-cta px-1.5 text-[10px] font-bold text-white">{tx(locale, "Portada", "Cover")}</span>}
                   </div>
                 ))}
               </div>

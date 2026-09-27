@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { signIn, signOut } from "next-auth/react";
+import { signIn } from "next-auth/react";
+import { logout } from "@/lib/logout";
 import { FlaskConical, Loader2, LogIn, LogOut } from "lucide-react";
 import type { Locale } from "@/types/domain";
 import { useApp } from "@/lib/store";
@@ -43,7 +44,7 @@ export function DemoBar({ locale }: { locale: Locale }) {
             </button>
           ))}
           {user && (
-            <button className="flex w-full items-center gap-2.5 border-t border-navy-line px-3 py-2 text-left text-sm text-mist hover:bg-white/5" onClick={async () => { await signOut({ redirect: false }); setOpen(false); router.push(`/${locale}`); router.refresh(); }}>
+            <button className="flex w-full items-center gap-2.5 border-t border-navy-line px-3 py-2 text-left text-sm text-mist hover:bg-white/5" onClick={() => logout(locale)}>
               <LogOut size={15} /> {tx(locale, "Cerrar sesión", "Sign out")}
             </button>
           )}

@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 
 type BtnVariant = "coral" | "navy" | "ghost" | "outline" | "dark-ghost" | "dark-outline" | "gold";
 const BTN: Record<BtnVariant, string> = {
-  coral: "bg-coral text-white hover:bg-coral-hover shadow-sm",
+  coral: "bg-coral-cta text-white hover:bg-coral-cta-hover shadow-sm",
   navy: "bg-navy text-ivory hover:bg-navy-2",
   gold: "bg-gold text-navy hover:brightness-95",
   ghost: "text-ink hover:bg-black/5",
@@ -80,14 +80,14 @@ export function Field({ label, children, hint, dark, error }: { label: string; c
       {error ? (
         <span role="alert" className={cn("mt-1 block text-xs font-semibold", dark ? "text-[#FF8A7A]" : "text-danger")}>{error}</span>
       ) : (
-        hint && <span className={cn("mt-1 block text-xs", dark ? "text-mist" : "text-ink/50")}>{hint}</span>
+        hint && <span className={cn("mt-1 block text-xs", dark ? "text-mist" : "text-ink/65")}>{hint}</span>
       )}
     </label>
   );
 }
 
 export const inputCls =
-  "h-11 w-full rounded-np border border-line bg-white px-3.5 text-[15px] text-ink placeholder:text-ink/40 transition-colors duration-np focus:border-coral focus:outline-none";
+  "h-11 w-full rounded-np border border-line bg-white px-3.5 text-[15px] text-ink placeholder:text-ink/65 transition-colors duration-np focus:border-coral focus:outline-none";
 export const darkInputCls =
   "h-10 w-full rounded-np border border-navy-line bg-navy-2 px-3 text-sm text-ivory placeholder:text-mist/60 focus:border-coral focus:outline-none";
 
@@ -95,12 +95,12 @@ export function Stat({ label, value, delta, dark, hint }: { label: string; value
   const up = delta?.startsWith("+");
   return (
     <div className={cn("rounded-np p-4", dark ? "border border-navy-line bg-navy-card" : "border border-line bg-white")}>
-      <div className={cn("text-xs font-semibold uppercase tracking-wide", dark ? "text-mist" : "text-ink/50")}>{label}</div>
+      <div className={cn("text-xs font-semibold uppercase tracking-wide", dark ? "text-mist" : "text-ink/65")}>{label}</div>
       <div className="mt-1.5 flex items-baseline gap-2">
         <span className="font-display text-2xl font-semibold">{value}</span>
         {delta && <span className={cn("text-xs font-semibold", up ? "text-[#5FBF8F]" : "text-coral")}>{delta}</span>}
       </div>
-      {hint && <div className={cn("mt-1 text-xs", dark ? "text-mist/80" : "text-ink/50")}>{hint}</div>}
+      {hint && <div className={cn("mt-1 text-xs", dark ? "text-mist/80" : "text-ink/65")}>{hint}</div>}
     </div>
   );
 }

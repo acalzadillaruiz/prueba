@@ -3,8 +3,15 @@ import { prisma } from "@newplace/db";
 import { PublicPage } from "@/components/layout/PublicPage";
 import { AccountView } from "@/components/seeker/AccountView";
 import { getAppUser } from "@/server/session";
+import { pageMeta } from "@/lib/seo";
+import { tx } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }) {
+  const { locale } = await params;
+  return pageMeta(locale, tx(locale, "Mi cuenta", "My account"), "/account", { index: false });
+}
 
 export default async function Account({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params;

@@ -71,11 +71,11 @@ export function HeroSearch({ locale }: { locale: Locale }) {
         <input
           value={text}
           onChange={(e) => setText(e.target.value)}
-          className="h-11 min-w-0 flex-1 bg-transparent text-[16px] text-ink placeholder:text-ink/45 focus:outline-none"
+          className="h-11 min-w-0 flex-1 bg-transparent text-[16px] text-ink placeholder:text-ink/65 focus:outline-none"
           placeholder={tx(locale, "Zona, dirección o escribe: «ático con luz en Los Palos Grandes por menos de 180 mil»", "Area, address or type: “3-bed in Chacao under 250k”")}
           aria-label={tx(locale, "Buscar", "Search")}
         />
-        <button className="flex h-11 items-center gap-2 rounded-xl bg-coral px-5 font-display font-medium text-white transition-colors duration-np hover:bg-coral-hover">
+        <button className="flex h-11 items-center gap-2 rounded-xl bg-coral-cta px-5 font-display font-medium text-white transition-colors duration-np hover:bg-coral-cta-hover">
           <Search size={17} /> <span className="hidden sm:inline">{tx(locale, "Buscar", "Search")}</span>
         </button>
       </form>

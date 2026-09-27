@@ -1,6 +1,7 @@
 "use client";
 
-import { Heart, Scale } from "lucide-react";
+import { useState } from "react";
+import { Check, Heart, Scale, Share2 } from "lucide-react";
 import type { ListingStatus, Locale } from "@/types/domain";
 import { useApp } from "@/lib/store";
 import { cn } from "@/lib/cn";
@@ -71,5 +72,27 @@ export function Freshness({ iso, locale, className }: { iso: string; locale: Loc
       <span className={cn("relative h-2 w-2 rounded-full", minutes < 60 ? "np-pulse bg-coral" : "bg-mist")} />
       {tx(locale, "Actualizado", "Updated")} {ago(iso, locale)}
     </span>
+  );
+}
+
+/** Web Share API on phones; copies the link elsewhere. */
+export function ShareButton({ locale, title, className }: { locale: Locale; title: string; className?: string }) {
+  const [copied, setCopied] = useState(false);
+  const share = async () => {
+    const url = window.location.href;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title, url });
+        return;
+      }
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {}
+  };
+  return (
+    <button type="button" onClick={share} className={className} aria-live="polite">
+      {copied ? <Check size={13} aria-hidden /> : <Share2 size={13} aria-hidden />} {copied ? tx(locale, "Enlace copiado", "Link copied") : tx(locale, "Compartir", "Share")}
+    </button>
   );
 }

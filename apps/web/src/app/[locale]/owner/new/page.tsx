@@ -11,7 +11,9 @@ export default async function OwnerNew({ params }: { params: Promise<{ locale: L
   return (
     <div className="np-public min-h-screen">
       <PublicHeader locale={locale} />
-      <OwnerWizard locale={locale} zones={zones} agencies={agencies.filter((a) => a.status !== "SUSPENDED")} fxVes={fx.find((f) => f.code === "VES")?.perUsd ?? 0} />
+      <main id="main">
+        <OwnerWizard locale={locale} zones={zones} agencies={agencies.filter((a) => a.status !== "SUSPENDED")} fxVes={fx.find((f) => f.code === "VES")?.perUsd ?? 0} />
+      </main>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { Bath, BedDouble, Calendar, Car, ChevronRight, Clock, Eye, Heart, Maximize2, Ruler, Share2, Users } from "lucide-react";
+import { Bath, BedDouble, Calendar, Car, ChevronRight, Clock, Eye, Heart, Maximize2, Ruler, Users } from "lucide-react";
 import type { Listing, Locale } from "@/types/domain";
 import { PublicPage } from "@/components/layout/PublicPage";
 import { Gallery } from "@/components/detail/Gallery";
@@ -9,20 +9,33 @@ import { ContactPanel } from "@/components/detail/ContactPanel";
 import { BilingualBody, PriceHistory } from "@/components/detail/Bits";
 import { DetailMap } from "@/components/detail/DetailMap";
 import { ListingCard } from "@/components/listing/ListingCard";
-import { CompareButton, Freshness, SaveButton, StatusBadge } from "@/components/listing/bits";
+import { CompareButton, Freshness, SaveButton, ShareButton, StatusBadge } from "@/components/listing/bits";
 import { prisma } from "@newplace/db";
 import { listingBySlug, listingInclude, publicWhere, toDomain } from "@/server/listings";
 import { getFx } from "@/server/data";
 import { getAppUser } from "@/server/session";
 import { AMENITY_LABEL, TYPE_LABEL, lbl, money, num, priceSuffix, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
+import { alternates } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: Locale; slug: string }> }) {
   const { locale, slug } = await params;
   const l = await listingBySlug(slug);
-  return l ? { title: tx(locale, l.title_es, l.title_en), description: tx(locale, l.body_es, l.body_en).slice(0, 160) } : {};
+  if (!l) notFound();
+  const title = tx(locale, l.title_es, l.title_en);
+  const description = `${money(l.priceAmount, locale, l.priceCurrency)}${priceSuffix(l, locale)} · ${l.zone}, ${l.city} · ${tx(locale, l.body_es, l.body_en)}`.slice(0, 180);
+  const path = `/listing/${l.slug}`;
+  const hidden = !["COMING_SOON", "ACTIVE", "UNDER_OFFER", "SOLD", "RENTED"].includes(l.status) || l.review !== "APPROVED";
+  return {
+    title,
+    description,
+    alternates: alternates(locale, path),
+    openGraph: { type: "website", title, description, url: `/${locale}${path}`, locale: locale === "es" ? "es_VE" : "en_US" },
+    twitter: { card: "summary_large_image", title, description },
+    ...(hidden ? { robots: { index: false, follow: false } } : {}),
+  };
 }
 
 function Facts({ l, locale, dark }: { l: Listing; locale: Locale; dark?: boolean }) {
@@ -42,7 +55,7 @@ function Facts({ l, locale, dark }: { l: Listing; locale: Locale; dark?: boolean
           <Icon size={20} className={dark ? "text-gold" : "text-coral"} />
           <div>
             <div className="font-display text-lg font-semibold leading-none">{v}</div>
-            <div className={cn("text-xs", dark ? "text-mist" : "text-ink/55")}>{t}</div>
+            <div className={cn("text-xs", dark ? "text-mist" : "text-ink/65")}>{t}</div>
           </div>
         </div>
       ))}
@@ -82,7 +95,7 @@ export default async function ListingPage({ params }: { params: Promise<{ locale
     <PublicPage locale={locale} header={dark ? "dark" : "light"}>
       <div className={cn(dark && "bg-navy text-ivory")}>
         <div className={cn("mx-auto max-w-[1280px] px-4 pt-4 md:px-6", dark && "max-w-none px-0 md:px-0")}>
-          <nav className={cn("mb-3 flex items-center gap-1 text-sm", dark ? "mx-auto max-w-[1280px] px-4 text-mist md:px-6" : "text-ink/55")}>
+          <nav className={cn("mb-3 flex items-center gap-1 text-sm", dark ? "mx-auto max-w-[1280px] px-4 text-mist md:px-6" : "text-ink/65")}>
             <Link href={`/${locale}/search?type=${l.listingType.startsWith("COMMERCIAL") ? "COMMERCIAL" : l.listingType}`}>{lbl(TYPE_LABEL[l.listingType], locale)}</Link>
             <ChevronRight size={14} /> <span>{l.city}</span> <ChevronRight size={14} /> <span>{l.zone}</span>
           </nav>
@@ -95,15 +108,15 @@ export default async function ListingPage({ params }: { params: Promise<{ locale
           <Gallery l={l} locale={locale} luxury={dark} />
         </div>
 
-        <div className="mx-auto grid max-w-[1280px] gap-10 px-4 pt-6 md:px-6 lg:grid-cols-[1fr_380px]">
+        <div className="mx-auto grid max-w-[1280px] gap-10 px-4 pt-6 md:px-6 grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1fr)_380px]">
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <StatusBadge status={l.status} locale={locale} />
               {dark && <span className="rounded-full border border-gold px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-gold">Luxury collection</span>}
-              <Freshness iso={l.updatedAt} locale={locale} className={dark ? "text-mist" : "text-ink/55"} />
+              <Freshness iso={l.updatedAt} locale={locale} className={dark ? "text-mist" : "text-ink/65"} />
               <div className="ml-auto flex items-center gap-2">
                 <CompareButton id={l.id} locale={locale} dark={dark} />
-                <button className={cn("inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold", dark ? "border-white/20" : "border-line bg-white")}><Share2 size={13} /> {tx(locale, "Compartir", "Share")}</button>
+                <ShareButton locale={locale} title={tx(locale, l.title_es, l.title_en)} className={cn("inline-flex min-h-9 items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold", dark ? "border-white/20" : "border-line bg-white")} />
                 <SaveButton id={l.id} locale={locale} className="h-8 w-8 border border-line" />
               </div>
             </div>
@@ -111,9 +124,9 @@ export default async function ListingPage({ params }: { params: Promise<{ locale
               <div>
                 <div className="font-display text-4xl font-bold">
                   {money(l.priceAmount, locale)}
-                  <span className={cn("text-lg font-normal", dark ? "text-mist" : "text-ink/50")}>{priceSuffix(l, locale)}</span>
+                  <span className={cn("text-lg font-normal", dark ? "text-mist" : "text-ink/65")}>{priceSuffix(l, locale)}</span>
                 </div>
-                <div className={cn("mt-1 text-sm", dark ? "text-mist" : "text-ink/55")}>
+                <div className={cn("mt-1 text-sm", dark ? "text-mist" : "text-ink/65")}>
                   ≈ Bs. {num(Math.round(l.priceAmount * ves), locale)} · € {num(Math.round(l.priceAmount * eur), locale)} <span className="opacity-70">({tx(locale, "tasa referencial", "reference rate")})</span>
                 </div>
               </div>
@@ -124,7 +137,7 @@ export default async function ListingPage({ params }: { params: Promise<{ locale
             </div>
             <h1 className="mt-4 font-display text-2xl font-semibold md:text-3xl">{tx(locale, l.title_es, l.title_en)}</h1>
             <div className="mt-5"><Facts l={l} locale={locale} dark={dark} /></div>
-            <div className={cn("mt-5 flex flex-wrap gap-4 text-sm", dark ? "text-mist" : "text-ink/55")}>
+            <div className={cn("mt-5 flex flex-wrap gap-4 text-sm", dark ? "text-mist" : "text-ink/65")}>
               <span className="inline-flex items-center gap-1.5"><Eye size={15} /> {num(l.stats.impressions, locale)} {tx(locale, "vistas", "views")}</span>
               <span className="inline-flex items-center gap-1.5"><Heart size={15} /> {l.stats.saves} {tx(locale, "lo guardaron", "saves")}</span>
               <span className="inline-flex items-center gap-1.5"><Clock size={15} /> {l.daysOnMarket} {tx(locale, "días publicado", "days on New Place")}</span>
@@ -156,7 +169,7 @@ export default async function ListingPage({ params }: { params: Promise<{ locale
             <div className={sec}>
               <H>{tx(locale, "Ubicación", "Location")}</H>
               <DetailMap l={l} locale={locale} nearby={nearby} />
-              <p className={cn("mt-2 text-xs", dark ? "text-mist" : "text-ink/50")}>
+              <p className={cn("mt-2 text-xs", dark ? "text-mist" : "text-ink/65")}>
                 {tx(locale, "Colegios y trayectos se muestran solo cuando hay datos verificados para la zona.", "Schools and commute times appear only when verified data exists for the area.")}
               </p>
             </div>
@@ -177,7 +190,7 @@ export default async function ListingPage({ params }: { params: Promise<{ locale
                   ].map(([v, t]) => (
                     <div key={String(t)} className={cn("rounded-np border p-3", dark ? "border-navy-line" : "border-line bg-white")}>
                       <div className="font-display text-xl font-semibold">{v}</div>
-                      <div className={cn("text-xs", dark ? "text-mist" : "text-ink/55")}>{t}</div>
+                      <div className={cn("text-xs", dark ? "text-mist" : "text-ink/65")}>{t}</div>
                     </div>
                   ))}
                 </div>
@@ -191,7 +204,7 @@ export default async function ListingPage({ params }: { params: Promise<{ locale
                   {soldNearby.map((s) => (
                     <div key={s.t} className="flex items-center justify-between px-4 py-3 text-sm">
                       <span className="font-semibold">{s.t}</span>
-                      <span className={dark ? "text-mist" : "text-ink/55"}>{s.d}</span>
+                      <span className={dark ? "text-mist" : "text-ink/65"}>{s.d}</span>
                       <span className="font-display">{money(s.p, locale)}</span>
                     </div>
                   ))}

@@ -12,7 +12,9 @@ export default async function NewAgencyListing({ params }: { params: Promise<{ l
   return (
     <div className="np-public min-h-screen">
       <PublicHeader locale={locale} />
-      <OwnerWizard locale={locale} zones={zones} agencies={agencies} fxVes={fx.find((f) => f.code === "VES")?.perUsd ?? 0} staff />
+      <main id="main">
+        <OwnerWizard locale={locale} zones={zones} agencies={agencies} fxVes={fx.find((f) => f.code === "VES")?.perUsd ?? 0} staff />
+      </main>
     </div>
   );
 }

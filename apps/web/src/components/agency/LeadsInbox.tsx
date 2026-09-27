@@ -120,7 +120,7 @@ export function LeadsInbox({ locale, initial, listings, agents }: { locale: Loca
         {[["ALL", "Todos", "All"] as const, ...STAGES].map(([k, es, en]) => {
           const n = k === "ALL" ? leads.length : leads.filter((l) => l.stage === k).length;
           return (
-            <button key={k} onClick={() => setStage(k)} className={cn("flex items-center gap-2 rounded-full border px-3.5 py-1.5 font-display text-sm", stage === k ? "border-coral bg-coral text-white" : "border-navy-line text-ivory/80 hover:bg-white/5")}>
+            <button key={k} onClick={() => setStage(k)} className={cn("flex items-center gap-2 rounded-full border px-3.5 py-1.5 font-display text-sm", stage === k ? "border-coral bg-coral-cta text-white" : "border-navy-line text-ivory/80 hover:bg-white/5")}>
               {tx(locale, es, en)} <span className={cn("rounded-full px-1.5 text-xs", stage === k ? "bg-white/25" : "bg-white/10")}>{n}</span>
             </button>
           );
@@ -141,7 +141,7 @@ export function LeadsInbox({ locale, initial, listings, agents }: { locale: Loca
                   <div className="flex items-center gap-2">
                     <span className="truncate font-semibold">{l.name}</span>
                     {l.priority && <Star size={13} className="fill-gold text-gold" />}
-                    {minsAgo(l.createdAt) < 60 && l.stage === "NEW" && <Badge className="bg-coral text-white">{tx(locale, "Nuevo", "New")}</Badge>}
+                    {minsAgo(l.createdAt) < 60 && l.stage === "NEW" && <Badge className="bg-coral-cta text-white">{tx(locale, "Nuevo", "New")}</Badge>}
                   </div>
                   <div className="truncate text-xs text-mist">{lst ? tx(locale, lst.title_es, lst.title_en) : ""}</div>
                   <div className="mt-1 truncate text-sm text-ivory/70">{l.message}</div>
@@ -230,7 +230,7 @@ export function LeadsInbox({ locale, initial, listings, agents }: { locale: Loca
               <div className="max-h-80 space-y-3 overflow-y-auto p-4 scrollbar-thin">
                 <div className="max-w-[80%] rounded-2xl rounded-bl-md bg-white/[.06] px-3.5 py-2 text-sm">{sel.message}<div className="mt-1 text-[10px] text-mist">{ago(sel.createdAt, locale)}</div></div>
                 {(detail.data?.messages ?? []).filter((m) => m.body !== sel.message).map((m) => (
-                  <div key={m.id} className={cn("max-w-[80%] rounded-2xl px-3.5 py-2 text-sm", m.mine ? "np-in ml-auto rounded-br-md bg-coral text-white" : "rounded-bl-md bg-white/[.06]")}>
+                  <div key={m.id} className={cn("max-w-[80%] rounded-2xl px-3.5 py-2 text-sm", m.mine ? "np-in ml-auto rounded-br-md bg-coral-cta text-white" : "rounded-bl-md bg-white/[.06]")}>
                     {m.body}
                     <div className={cn("mt-1 text-[10px]", m.mine ? "text-white/70" : "text-mist")}>{ago(m.at, locale)} · {m.from}</div>
                   </div>
@@ -247,7 +247,7 @@ export function LeadsInbox({ locale, initial, listings, agents }: { locale: Loca
                 }}
               >
                 <input value={draft} onChange={(e) => setDraft(e.target.value)} className="h-10 flex-1 rounded-full border border-navy-line bg-navy-2 px-4 text-sm focus:border-coral focus:outline-none" placeholder={tx(locale, "Responder… (se envía también por email)", "Reply… (also sent by email)")} aria-label={tx(locale, "Respuesta", "Reply")} />
-                <button className="flex h-10 w-10 items-center justify-center rounded-full bg-coral text-white" aria-label={tx(locale, "Enviar", "Send")}><Send size={16} /></button>
+                <button className="flex h-10 w-10 items-center justify-center rounded-full bg-coral-cta text-white" aria-label={tx(locale, "Enviar", "Send")}><Send size={16} /></button>
               </form>
             </div>
           </div>

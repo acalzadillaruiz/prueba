@@ -92,7 +92,7 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
                       onClick={() => setSel(e)}
                       className={cn(
                         "pointer-events-auto absolute overflow-hidden rounded-md px-2 py-1 text-left text-xs",
-                        e.kind === "tour" && "bg-coral text-white",
+                        e.kind === "tour" && "bg-coral-cta text-white",
                         e.kind === "req" && "border border-dashed border-gold bg-[#D4AF771f] text-gold",
                         (e.kind === "done" || e.kind === "cancelled") && "bg-white/10 text-mist line-through",
                         e.kind === "media" && "bg-[#3E5A6B] text-ivory",
@@ -141,7 +141,7 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
                       {[9, 10, 11, 14, 15, 16, 17].map((h) => {
                         const on = s.hours.includes(h);
                         return (
-                          <button key={h} onClick={() => saveSlots(mySlots.map((x) => (x.day === s.day ? { ...x, hours: on ? x.hours.filter((y) => y !== h) : [...x.hours, h].sort((a, b) => a - b) } : x)))} className={cn("rounded-md px-2 py-1 text-xs font-semibold", on ? "bg-coral text-white" : "bg-white/5 text-mist")}>
+                          <button key={h} onClick={() => saveSlots(mySlots.map((x) => (x.day === s.day ? { ...x, hours: on ? x.hours.filter((y) => y !== h) : [...x.hours, h].sort((a, b) => a - b) } : x)))} className={cn("rounded-md px-2 py-1 text-xs font-semibold", on ? "bg-coral-cta text-white" : "bg-white/5 text-mist")}>
                             {h}h
                           </button>
                         );

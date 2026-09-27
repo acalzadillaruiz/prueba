@@ -463,7 +463,7 @@ export function NightMap({
               <button
                 className={cn(
                   "flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-display text-sm shadow-np backdrop-blur transition-colors duration-np",
-                  mode === "draw" ? "border-coral bg-coral text-white" : "border-white/10 bg-navy/90 text-ivory hover:bg-navy",
+                  mode === "draw" ? "border-coral bg-coral-cta text-white" : "border-white/10 bg-navy/90 text-ivory hover:bg-navy",
                 )}
                 onClick={(e) => {
                   e.stopPropagation();
@@ -476,7 +476,7 @@ export function NightMap({
               <button
                 className={cn(
                   "flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-display text-sm shadow-np backdrop-blur",
-                  mode === "radius" ? "border-coral bg-coral text-white" : "border-white/10 bg-navy/90 text-ivory hover:bg-navy",
+                  mode === "radius" ? "border-coral bg-coral-cta text-white" : "border-white/10 bg-navy/90 text-ivory hover:bg-navy",
                 )}
                 onClick={(e) => {
                   e.stopPropagation();

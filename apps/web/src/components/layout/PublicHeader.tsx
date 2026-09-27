@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Heart, Menu, Moon, Plus, Sun } from "lucide-react";
+import { usePathname, useSearchParams } from "next/navigation";
+import { Heart, LogIn, Menu, Moon, Plus, Sun, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { Locale } from "@/types/domain";
 import { Logo } from "@/components/brand/Logo";
@@ -13,6 +13,19 @@ import { cn } from "@/lib/cn";
 
 export function PublicHeader({ locale, variant = "light" }: { locale: Locale; variant?: "light" | "dark" | "transparent" }) {
   const pathname = usePathname();
+  const search = useSearchParams();
+  const [menuOpen, setMenuOpen] = useState(false);
+  useEffect(() => setMenuOpen(false), [pathname, search]);
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMenuOpen(false);
+    document.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen]);
   const { saved, user: u } = useApp();
   const t = useTranslations("nav");
   const [isDark, setDarkState] = useState(false);
@@ -26,7 +39,8 @@ export function PublicHeader({ locale, variant = "light" }: { locale: Locale; va
     setDarkState(next);
   };
   const other = locale === "es" ? "en" : "es";
-  const switchHref = pathname.replace(/^\/(es|en)/, `/${other}`);
+  const qs = search.toString();
+  const switchHref = pathname.replace(/^\/(es|en)/, `/${other}`) + (qs ? `?${qs}` : "");
   const dark = variant !== "light";
   const nav = [
     { href: `/${locale}/search?type=SALE`, label: t("buy") },
@@ -37,7 +51,10 @@ export function PublicHeader({ locale, variant = "light" }: { locale: Locale; va
   ];
   const home = u?.role === "SUPERADMIN" ? "/platform" : ["AGENT", "AGENCY_OWNER", "CAPTOR", "PHOTOGRAPHER", "BACKOFFICE"].includes(u?.role ?? "") ? "/agency" : u?.role === "OWNER_PRIVATE" ? "/owner/listings" : "/app";
   return (
+    <>
+    <a href="#main" className="sr-only-focusable fixed left-3 top-3 z-[70] rounded-np bg-navy px-4 py-2 font-display text-ivory">{locale === "es" ? "Saltar al contenido" : "Skip to content"}</a>
     <header
+      style={{ paddingTop: "env(safe-area-inset-top)" }}
       className={cn(
         "sticky top-0 z-40 border-b",
         variant === "light" && "border-line bg-ivory/90 backdrop-blur",
@@ -64,7 +81,7 @@ export function PublicHeader({ locale, variant = "light" }: { locale: Locale; va
           ))}
         </nav>
         <div className="ml-auto flex items-center gap-2">
-          <Link href={switchHref} className={cn("rounded-full px-2.5 py-1 font-display text-sm font-semibold", dark ? "text-ivory/80 hover:bg-white/10" : "text-ink/70 hover:bg-black/5")}>
+          <Link href={switchHref} hrefLang={other} lang={other} aria-label={other === "en" ? "English" : "Español"} className={cn("flex min-h-10 min-w-10 items-center justify-center rounded-full px-2.5 font-display text-sm font-semibold", dark ? "text-ivory/80 hover:bg-white/10" : "text-ink/70 hover:bg-black/5")}>
             {other.toUpperCase()}
           </Link>
           <button onClick={toggleTheme} className={cn("rounded-full p-2", variant !== "light" ? "hover:bg-white/10" : "hover:bg-black/5")} aria-label={isDark ? "Light mode" : "Dark mode"} title={isDark ? "Light" : "Dark"}>
@@ -72,7 +89,7 @@ export function PublicHeader({ locale, variant = "light" }: { locale: Locale; va
           </button>
           <Link href={`/${locale}/saved`} className={cn("relative hidden rounded-full p-2 sm:block", dark ? "hover:bg-white/10" : "hover:bg-black/5")} aria-label={t("saved")}>
             <Heart size={20} />
-            {saved.length > 0 && <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-coral px-1 text-[10px] font-bold text-white">{saved.length}</span>}
+            {saved.length > 0 && <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-coral-cta px-1 text-[10px] font-bold text-white">{saved.length}</span>}
           </Link>
           <Button href={`/${locale}/owner/new`} variant={dark ? "dark-outline" : "outline"} size="sm" className="hidden md:inline-flex">
             <Plus size={15} /> {t("publish")}
@@ -85,9 +102,56 @@ export function PublicHeader({ locale, variant = "light" }: { locale: Locale; va
           ) : (
             <Button href={`/${locale}/login`} size="sm">{t("signIn")}</Button>
           )}
-          <button className="rounded-full p-2 lg:hidden" aria-label={t("menu")}><Menu size={20} /></button>
+          <button
+            onClick={() => setMenuOpen(true)}
+            className={cn("flex h-10 w-10 items-center justify-center rounded-full lg:hidden", dark ? "hover:bg-white/10" : "hover:bg-black/5")}
+            aria-label={t("menu")}
+            aria-expanded={menuOpen}
+            aria-controls="np-mobile-menu"
+          >
+            <Menu size={20} />
+          </button>
         </div>
       </div>
     </header>
+    {menuOpen && (
+      <div className="fixed inset-0 z-[65] lg:hidden" role="dialog" aria-modal="true" aria-label={t("menu")} id="np-mobile-menu">
+        <button className="absolute inset-0 bg-navy/60" aria-label={locale === "es" ? "Cerrar menú" : "Close menu"} onClick={() => setMenuOpen(false)} />
+        <div className="np-in absolute inset-y-0 right-0 flex w-[min(320px,86vw)] flex-col bg-navy text-ivory shadow-np" style={{ paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}>
+          <div className="flex h-16 items-center justify-between px-4">
+            <Logo tone="ivory" />
+            <button autoFocus onClick={() => setMenuOpen(false)} className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-white/10" aria-label={locale === "es" ? "Cerrar menú" : "Close menu"}>
+              <X size={20} />
+            </button>
+          </div>
+          <nav className="flex flex-col px-2">
+            {nav.map((n) => (
+              <Link key={n.href} href={n.href} className={cn("flex min-h-12 items-center rounded-lg px-3 font-display text-lg", n.gold ? "text-gold" : "text-ivory hover:bg-white/5")}>
+                {n.label}
+              </Link>
+            ))}
+            <Link href={`/${locale}/saved`} className="flex min-h-12 items-center gap-2 rounded-lg px-3 font-display text-lg hover:bg-white/5">
+              <Heart size={18} /> {t("saved")} {saved.length > 0 && <span className="text-sm text-mist">({saved.length})</span>}
+            </Link>
+            <Link href={`/${locale}/owner/new`} className="flex min-h-12 items-center gap-2 rounded-lg px-3 font-display text-lg hover:bg-white/5">
+              <Plus size={18} /> {t("publish")}
+            </Link>
+          </nav>
+          <div className="mt-auto border-t border-navy-line p-4">
+            {u ? (
+              <Link href={`/${locale}${home}`} className="flex min-h-12 items-center gap-3 rounded-lg px-2 hover:bg-white/5">
+                <Avatar initials={u.initials} hue={u.hue} size={32} />
+                <span className="font-display">{u.name}</span>
+              </Link>
+            ) : (
+              <Link href={`/${locale}/login`} className="flex min-h-12 items-center justify-center gap-2 rounded-np bg-coral-cta font-display font-semibold text-white">
+                <LogIn size={18} /> {t("signIn")}
+              </Link>
+            )}
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   );
 }

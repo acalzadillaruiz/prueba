@@ -26,4 +26,4 @@ export default auth((req) => {
   return intl(req);
 });
 
-export const config = { matcher: ["/((?!api|uploads|photos|icons|_next|_vercel|sw.js|swe-worker|manifest.webmanifest|.*\\..*).*)"] };
+export const config = { matcher: ["/((?!api|uploads|photos|icons|_next|_vercel|sw.js|swe-worker|offline|robots.txt|sitemap.xml|manifest.webmanifest|.*\\..*).*)"] };

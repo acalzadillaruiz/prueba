@@ -144,10 +144,10 @@ export function GoogleMapView(props: MapViewProps) {
           </div>
           {onShape && (
             <div className="absolute left-3 top-3 z-10 flex flex-wrap gap-2">
-              <button className={cn("flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-display text-sm shadow-np", mode === "draw" ? "border-coral bg-coral text-white" : "border-white/10 bg-navy/90 text-ivory")} onClick={() => { setDraft([]); setMode(mode === "draw" ? "pan" : "draw"); }}>
+              <button className={cn("flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-display text-sm shadow-np", mode === "draw" ? "border-coral bg-coral-cta text-white" : "border-white/10 bg-navy/90 text-ivory")} onClick={() => { setDraft([]); setMode(mode === "draw" ? "pan" : "draw"); }}>
                 <PenLine size={14} /> {mode === "draw" ? tx(locale, "Toca para dibujar…", "Tap to draw…") : tx(locale, "Dibujar zona", "Draw area")}
               </button>
-              <button className={cn("flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-display text-sm shadow-np", mode === "radius" ? "border-coral bg-coral text-white" : "border-white/10 bg-navy/90 text-ivory")} onClick={() => setMode(mode === "radius" ? "pan" : "radius")}>
+              <button className={cn("flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-display text-sm shadow-np", mode === "radius" ? "border-coral bg-coral-cta text-white" : "border-white/10 bg-navy/90 text-ivory")} onClick={() => setMode(mode === "radius" ? "pan" : "radius")}>
                 <CircleIcon size={14} /> {tx(locale, "Radio 1,2 km", "1.2 km radius")}
               </button>
               {mode === "draw" && draft.length >= 3 && (

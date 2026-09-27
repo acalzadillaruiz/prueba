@@ -6,7 +6,7 @@ export function PublicPage({ locale, children, footer = true, header = "light" }
   return (
     <div className="np-public min-h-screen">
       <PublicHeader locale={locale} variant={header} />
-      <main>{children}</main>
+      <main id="main">{children}</main>
       {footer && <PublicFooter locale={locale} />}
     </div>
   );

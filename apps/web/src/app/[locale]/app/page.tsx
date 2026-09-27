@@ -5,8 +5,15 @@ import { HubView } from "@/components/seeker/HubView";
 import { getLeads, getThreadsFor } from "@/server/data";
 import { listingsByIds } from "@/server/listings";
 import { getAppUser } from "@/server/session";
+import { pageMeta } from "@/lib/seo";
+import { tx } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }) {
+  const { locale } = await params;
+  return pageMeta(locale, tx(locale, "Mi Hub", "My Hub"), "/app", { index: false });
+}
 
 export default async function Hub({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params;

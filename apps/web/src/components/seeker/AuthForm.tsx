@@ -68,7 +68,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
 
   return (
     <div className="np-public grid min-h-screen lg:grid-cols-2">
-      <div className="flex flex-col px-6 py-8 md:px-16">
+      <main id="main" className="flex flex-col px-6 py-8 md:px-16">
         <Link href={`/${locale}`}><Logo /></Link>
         <div className="mx-auto my-auto w-full max-w-md py-10">
           <h1 className="font-display text-3xl font-semibold">{mode === "login" ? tx(locale, "Entra a New Place", "Sign in to New Place") : tx(locale, "Crea tu cuenta", "Create your account")}</h1>
@@ -82,7 +82,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
           >
             <GoogleG /> {tx(locale, "Continuar con Google", "Continue with Google")}
           </button>
-          <div className="my-6 flex items-center gap-3 text-xs text-ink/40"><span className="h-px flex-1 bg-line" />{tx(locale, "o con tu correo", "or with email")}<span className="h-px flex-1 bg-line" /></div>
+          <div className="my-6 flex items-center gap-3 text-xs text-ink/65"><span className="h-px flex-1 bg-line" />{tx(locale, "o con tu correo", "or with email")}<span className="h-px flex-1 bg-line" /></div>
           <form className="space-y-4" onSubmit={handleSubmit(submit)} noValidate>
             {mode === "register" && (
               <Field label={tx(locale, "Nombre completo", "Full name")} error={fieldError(errs.name, locale, "name")}><input className={inputCls} {...register("name")} aria-invalid={!!errs.name} autoComplete="name" /></Field>
@@ -91,7 +91,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
             <Field label={tx(locale, "Contraseña", "Password")} error={fieldError(errs.password, locale, "password")} hint={(mode === "register" ? tx(locale, "Mínimo 8 caracteres.", "At least 8 characters.") : undefined)}>
               <div className="relative">
                 <input className={inputCls} type={show ? "text" : "password"} {...register("password")} aria-invalid={!!errs.password} autoComplete={mode === "login" ? "current-password" : "new-password"} />
-                <button type="button" onClick={() => setShow(!show)} className="absolute right-3 top-1/2 -translate-y-1/2 text-ink/50" aria-label={tx(locale, "Mostrar contraseña", "Show password")}>{show ? <EyeOff size={18} /> : <Eye size={18} />}</button>
+                <button type="button" onClick={() => setShow(!show)} className="absolute right-1 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center text-ink/65" aria-label={tx(locale, "Mostrar contraseña", "Show password")}>{show ? <EyeOff size={18} /> : <Eye size={18} />}</button>
               </div>
             </Field>
             {mode === "register" && (
@@ -99,7 +99,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
                 <input type="checkbox" checked={agency} onChange={(e) => setAgency(e.target.checked)} className="mt-1 accent-[#F26B4D]" />
                 <span>
                   <span className="flex items-center gap-1.5 font-display font-semibold"><Building2 size={16} /> {tx(locale, "¿Eres agencia?", "Are you an agency?")}</span>
-                  <span className="text-sm text-ink/55">{tx(locale, "Crea tu inmobiliaria y empieza con el plan Free.", "Set up your agency on the Free plan.")}</span>
+                  <span className="text-sm text-ink/65">{tx(locale, "Crea tu inmobiliaria y empieza con el plan Free.", "Set up your agency on the Free plan.")}</span>
                 </span>
               </label>
             )}
@@ -140,7 +140,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
             </div>
           )}
         </div>
-      </div>
+      </main>
       <div className="relative hidden overflow-hidden bg-navy lg:block">
         <PropertyArt scene="terrace" seed="auth2" photo={photo("auth")} className="absolute inset-0 h-full w-full opacity-90" />
         <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/30 to-transparent" />

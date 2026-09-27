@@ -51,11 +51,11 @@ export function HubView({ locale, data }: { locale: Locale; data: HubData }) {
       <div className="flex flex-wrap items-center gap-4">
         <Avatar initials={me.initials} hue={me.hue} size={56} />
         <div>
-          <div className="text-sm text-ink/55">Homebuyer Hub</div>
+          <div className="text-sm text-ink/65">Homebuyer Hub</div>
           <h1 className="font-display text-3xl font-semibold">{tx(locale, `Hola, ${me.name.split(" ")[0]}`, `Hi, ${me.name.split(" ")[0]}`)}</h1>
         </div>
         <div className="ml-auto w-full max-w-xs">
-          <div className="mb-1 flex justify-between text-sm"><span className="font-semibold">{tx(locale, "Tu avance", "Your progress")}</span><span className="text-ink/55">{doneCount}/5</span></div>
+          <div className="mb-1 flex justify-between text-sm"><span className="font-semibold">{tx(locale, "Tu avance", "Your progress")}</span><span className="text-ink/65">{doneCount}/5</span></div>
           <Progress value={(doneCount / 5) * 100} />
         </div>
       </div>
@@ -67,10 +67,10 @@ export function HubView({ locale, data }: { locale: Locale; data: HubData }) {
           <ol className="mt-4 space-y-3">
             {steps.map((s, i) => (
               <li key={i} className="flex items-start gap-3">
-                <span className={cn("mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold", s.done ? "bg-ok text-white" : "border-2 border-line text-ink/40")}>{s.done ? <Check size={14} /> : i + 1}</span>
+                <span className={cn("mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold", s.done ? "bg-ok text-white" : "border-2 border-line text-ink/65")}>{s.done ? <Check size={14} /> : i + 1}</span>
                 <div>
-                  <div className={cn("font-semibold", s.done && "text-ink/50 line-through")}>{s.t}</div>
-                  <div className="text-sm text-ink/55">{s.d}</div>
+                  <div className={cn("font-semibold", s.done && "text-ink/65 line-through")}>{s.t}</div>
+                  <div className="text-sm text-ink/65">{s.d}</div>
                 </div>
               </li>
             ))}
@@ -123,7 +123,7 @@ export function HubView({ locale, data }: { locale: Locale; data: HubData }) {
         {/* preapproval mock */}
         <Card className="p-5">
           <div className="flex items-center gap-2 font-display text-lg font-semibold"><CircleDollarSign size={18} className="text-coral" /> {tx(locale, "Precalificación (simulada)", "Pre-qualification (mock)")}</div>
-          <p className="mt-1 text-xs text-ink/50">{tx(locale, "Referencial. New Place no origina créditos.", "For reference. New Place does not originate loans.")}</p>
+          <p className="mt-1 text-xs text-ink/65">{tx(locale, "Referencial. New Place no origina créditos.", "For reference. New Place does not originate loans.")}</p>
           <div className="mt-4 space-y-4 text-sm">
             <label className="block"><div className="flex justify-between"><span>{tx(locale, "Precio", "Price")}</span><b>{money(price, locale)}</b></div><input type="range" min={50000} max={500000} step={5000} value={price} onChange={(e) => setPrice(+e.target.value)} className="w-full accent-[#F26B4D]" /></label>
             <label className="block"><div className="flex justify-between"><span>{tx(locale, "Inicial", "Down payment")}</span><b>{down} %</b></div><input type="range" min={10} max={70} value={down} onChange={(e) => setDown(+e.target.value)} className="w-full accent-[#F26B4D]" /></label>
@@ -158,7 +158,7 @@ export function HubView({ locale, data }: { locale: Locale; data: HubData }) {
                   <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="h-12 w-16 shrink-0 rounded-md" />
                   <div className="min-w-0">
                     <div className="line-clamp-1 text-sm font-semibold">{tx(locale, l.title_es, l.title_en)}</div>
-                    <div className="text-sm text-ink/55">{money(l.priceAmount, locale)} · {l.zone}</div>
+                    <div className="text-sm text-ink/65">{money(l.priceAmount, locale)} · {l.zone}</div>
                   </div>
                 </Link>
               );
@@ -186,12 +186,12 @@ export function HubView({ locale, data }: { locale: Locale; data: HubData }) {
               <div className="mt-3 flex items-start gap-3">
                 <Avatar initials={data.lastMessage.from.split(" ").map((p) => p[0]).slice(0, 2).join("")} hue={340} size={34} />
                 <div className="text-sm">
-                  <div className="font-semibold">{data.lastMessage.from} <span className="font-normal text-ink/50">· {ago(data.lastMessage.at, locale)}</span></div>
+                  <div className="font-semibold">{data.lastMessage.from} <span className="font-normal text-ink/65">· {ago(data.lastMessage.at, locale)}</span></div>
                   <div className="text-ink/65">{data.lastMessage.body}</div>
                 </div>
               </div>
             ) : (
-              <p className="mt-3 text-sm text-ink/55">{tx(locale, "Aún no tienes mensajes. Escribe desde cualquier ficha.", "No messages yet. Write from any listing.")}</p>
+              <p className="mt-3 text-sm text-ink/65">{tx(locale, "Aún no tienes mensajes. Escribe desde cualquier ficha.", "No messages yet. Write from any listing.")}</p>
             )}
             <div className="mt-3 flex gap-2">
               <Button size="sm" variant="outline"><Video size={14} /> {tx(locale, "Videollamada", "Video call")}</Button>

@@ -6,6 +6,12 @@ import { PropertyArt } from "@/components/art/PropertyArt";
 import { publicListings } from "@/server/listings";
 import { prisma } from "@newplace/db";
 import { money, num, tx } from "@/lib/i18n";
+import { pageMeta } from "@/lib/seo";
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }) {
+  const { locale } = await params;
+  return pageMeta(locale, tx(locale, "Colección Luxury", "Luxury collection"), "/luxury", { description: tx(locale, "Residencias exclusivas verificadas en Venezuela.", "Verified luxury homes in Venezuela.") });
+}
 
 export default async function LuxuryPage({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params;

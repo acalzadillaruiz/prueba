@@ -182,7 +182,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
           </button>
           <button
             onClick={createAlert}
-            className={cn(pill, "ml-auto", alertSaved ? "border-ok bg-ok text-white" : "border-coral bg-coral text-white hover:bg-coral-hover")}
+            className={cn(pill, "ml-auto", alertSaved ? "border-ok bg-ok text-white" : "border-coral bg-coral-cta text-white hover:bg-coral-cta-hover")}
           >
             {alertSaved ? <Check size={15} /> : savingAlert ? <Loader2 size={15} className="animate-spin" /> : <Bell size={15} />} {alertSaved ? tx(locale, "Alerta creada", "Alert saved") : tx(locale, "Guardar búsqueda", "Save search")}
           </button>
@@ -191,7 +191,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
           <div className="np-in absolute inset-x-0 top-full border-b border-line bg-white px-5 py-4 shadow-np">
             <div className="grid gap-6 md:grid-cols-4">
               <div>
-                <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink/50">{tx(locale, "Publicado", "Published")}</div>
+                <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink/65">{tx(locale, "Publicado", "Published")}</div>
                 <div className="flex gap-2">
                   {[["24h", "24 h"], ["7d", tx(locale, "7 días", "7 days")]].map(([k, v]) => (
                     <button key={k} onClick={() => set({ pub: pub === k ? null : k })} className={cn(pill, pub === k ? "border-navy bg-navy text-ivory" : "border-line")}>{v}</button>
@@ -199,7 +199,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
                 </div>
               </div>
               <div>
-                <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink/50">{tx(locale, "Condiciones", "Conditions")}</div>
+                <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink/65">{tx(locale, "Condiciones", "Conditions")}</div>
                 <div className="flex flex-wrap gap-2">
                   <button onClick={() => set({ furnished: furnished ? null : "1" })} className={cn(pill, furnished ? "border-navy bg-navy text-ivory" : "border-line")}>{tx(locale, "Amoblado", "Furnished")}</button>
                   <button onClick={() => set({ pets: pets ? null : "1" })} className={cn(pill, pets ? "border-navy bg-navy text-ivory" : "border-line")}>{tx(locale, "Mascotas", "Pets")}</button>
@@ -207,7 +207,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
                 </div>
               </div>
               <div className="md:col-span-2">
-                <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink/50">{tx(locale, "Amenidades", "Amenities")}</div>
+                <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink/65">{tx(locale, "Amenidades", "Amenities")}</div>
                 <div className="flex flex-wrap gap-2">
                   {FILTER_AMENITIES.map((a) => {
                     const on = amen.includes(a);
@@ -256,10 +256,10 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
             <div className="flex items-center justify-between gap-2">
               <div>
                 <div className="font-display text-lg font-semibold">
-                  {num(query.data?.total ?? results.length, locale)} {tx(locale, "resultados", "results")}{query.isFetching && <Loader2 size={15} className="ml-2 inline animate-spin text-ink/40" />}
+                  {num(query.data?.total ?? results.length, locale)} {tx(locale, "resultados", "results")}{query.isFetching && <Loader2 size={15} className="ml-2 inline animate-spin text-ink/65" />}
                   {shape && <span className="ml-2 rounded-full bg-coral/10 bg-[#F26B4D1A] px-2 py-0.5 text-xs text-coral-hover">{tx(locale, "en tu zona dibujada", "in your drawn area")}</span>}
                 </div>
-                <div className="text-xs text-ink/50">{tx(locale, "Precios en USD · actualizados en tiempo real", "Prices in USD · updated in real time")}</div>
+                <div className="text-xs text-ink/65">{tx(locale, "Precios en USD · actualizados en tiempo real", "Prices in USD · updated in real time")}</div>
               </div>
               <select value={sort} onChange={(e) => setSort(e.target.value as typeof sort)} className="h-8 rounded-lg border border-line bg-white px-2 text-sm">
                 <option value="new">{tx(locale, "Más nuevos", "Newest")}</option>
@@ -291,7 +291,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
                 icon={<BellRing size={20} />}
                 title={tx(locale, "Nada por aquí… todavía", "Nothing here… yet")}
                 body={tx(locale, "Guarda la búsqueda y te avisamos en cuanto aparezca algo que encaje.", "Save this search and we’ll tell you as soon as something matches.")}
-                cta={<button onClick={createAlert} className="rounded-np bg-coral px-4 py-2 font-display text-white">{tx(locale, "Crear alerta", "Create alert")}</button>}
+                cta={<button onClick={createAlert} className="rounded-np bg-coral-cta px-4 py-2 font-display text-white">{tx(locale, "Crear alerta", "Create alert")}</button>}
               />
             </div>
           )}

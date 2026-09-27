@@ -49,7 +49,7 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
       <section className="mx-auto max-w-[1400px] px-4 pt-14 md:px-6">
         <SectionTitle action={<Link href={`/${locale}/search?pub=24h`} className="inline-flex items-center gap-1 font-display text-sm text-coral">{tx(locale, "Ver todos", "See all")} <ArrowRight size={15} /></Link>}>
           {tx(locale, "Nuevos hoy", "New today")}
-          <span className="ml-3 align-middle text-sm font-normal text-ink/50">{tx(locale, "ordenados por publicación", "sorted by published date")}</span>
+          <span className="ml-3 align-middle text-sm font-normal text-ink/65">{tx(locale, "ordenados por publicación", "sorted by published date")}</span>
         </SectionTitle>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {fresh.map((l) => (
@@ -66,12 +66,12 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
             <Link key={z.slug} href={`/${locale}/search?type=SALE&zone=${encodeURIComponent(z.name)}`} className="rounded-np border border-line bg-white p-4 transition-shadow duration-np hover:shadow-np">
               <div className="flex items-center justify-between">
                 <span className="font-display font-semibold">{z.name}</span>
-                <span className={z.trend12m > 5 ? "text-xs font-semibold text-ok" : "text-xs font-semibold text-ink/50"}>+{z.trend12m}% 12m</span>
+                <span className={z.trend12m > 5 ? "text-xs font-semibold text-ok" : "text-xs font-semibold text-ink/65"}>+{z.trend12m}% 12m</span>
               </div>
               <div className="mt-3 grid grid-cols-3 gap-2 text-center">
-                <div><div className="font-display text-lg font-semibold">{money(z.salePpm, locale)}</div><div className="text-[11px] text-ink/50">USD/m²</div></div>
-                <div><div className="font-display text-lg font-semibold">{z.activeListings}</div><div className="text-[11px] text-ink/50">{tx(locale, "activos", "active")}</div></div>
-                <div><div className="font-display text-lg font-semibold">{z.daysOnMarket}</div><div className="text-[11px] text-ink/50">{tx(locale, "días", "days")}</div></div>
+                <div><div className="font-display text-lg font-semibold">{money(z.salePpm, locale)}</div><div className="text-[11px] text-ink/65">USD/m²</div></div>
+                <div><div className="font-display text-lg font-semibold">{z.activeListings}</div><div className="text-[11px] text-ink/65">{tx(locale, "activos", "active")}</div></div>
+                <div><div className="font-display text-lg font-semibold">{z.daysOnMarket}</div><div className="text-[11px] text-ink/65">{tx(locale, "días", "days")}</div></div>
               </div>
             </Link>
           ))}

@@ -20,7 +20,7 @@ export function ListingCard({ l, locale, compact, className, showCompare }: { l:
         <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="h-full w-full transition-transform duration-500 group-hover:scale-[1.03]" label={tx(locale, l.title_es, l.title_en)} />
         <div className="absolute left-2.5 top-2.5 flex flex-wrap gap-1.5">
           {l.status !== "ACTIVE" && <StatusBadge status={l.status} locale={locale} />}
-          {fresh && l.status === "ACTIVE" && <span className="rounded-full bg-coral px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-white">{tx(locale, "Nuevo hoy", "New today")}</span>}
+          {fresh && l.status === "ACTIVE" && <span className="rounded-full bg-coral-cta px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-white">{tx(locale, "Nuevo hoy", "New today")}</span>}
           {l.luxury && <span className="rounded-full bg-navy px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-gold">Luxury</span>}
           {drop && <span className="rounded-full bg-white/90 px-2 py-0.5 text-[11px] font-bold text-ok">↓ {tx(locale, "Bajó", "Reduced")}</span>}
         </div>
@@ -31,9 +31,9 @@ export function ListingCard({ l, locale, compact, className, showCompare }: { l:
         <div className="flex items-baseline justify-between gap-2">
           <div className="font-display text-xl font-semibold text-navy">
             {money(l.priceAmount, locale)}
-            <span className="text-sm font-normal text-ink/50">{priceSuffix(l, locale)}</span>
+            <span className="text-sm font-normal text-ink/65">{priceSuffix(l, locale)}</span>
           </div>
-          <span className="text-xs font-semibold text-ink/50">{lbl(TYPE_LABEL[l.listingType], locale)}</span>
+          <span className="text-xs font-semibold text-ink/65">{lbl(TYPE_LABEL[l.listingType], locale)}</span>
         </div>
         <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-ink/70">
           {l.beds > 0 && (
@@ -78,7 +78,7 @@ export function MapPreviewCard({ l, locale }: { l: Listing; locale: Locale }) {
       <div className="p-3">
         <div className="font-display text-lg font-semibold text-navy">
           {money(l.priceAmount, locale)}
-          <span className="text-xs font-normal text-ink/50">{priceSuffix(l, locale)}</span>
+          <span className="text-xs font-normal text-ink/65">{priceSuffix(l, locale)}</span>
         </div>
         <div className="text-sm text-ink/70">
           {l.beds > 0 && `${l.beds} ${tx(locale, "hab", "bd")} · `}

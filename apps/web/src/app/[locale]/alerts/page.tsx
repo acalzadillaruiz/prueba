@@ -4,8 +4,15 @@ import { PublicPage } from "@/components/layout/PublicPage";
 import { AlertsView } from "@/components/seeker/AlertsView";
 import { getEmails } from "@/server/data";
 import { getAppUser } from "@/server/session";
+import { pageMeta } from "@/lib/seo";
+import { tx } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }) {
+  const { locale } = await params;
+  return pageMeta(locale, tx(locale, "Alertas de búsqueda", "Search alerts"), "/alerts", { index: false });
+}
 
 export default async function AlertsPage({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params;

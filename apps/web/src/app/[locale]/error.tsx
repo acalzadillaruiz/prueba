@@ -12,8 +12,8 @@ export default function ErrorPage({ error, reset }: { error: Error & { digest?: 
       <Logo />
       <h1 className="font-display text-3xl font-semibold">{t("error")}</h1>
       <p className="max-w-sm text-ink/60">{t("errorBody")}</p>
-      {error.digest && <code className="text-xs text-ink/40">{error.digest}</code>}
-      <button onClick={reset} className="rounded-np bg-coral px-5 py-2.5 font-display text-white hover:bg-coral-hover">{t("retry")}</button>
+      {error.digest && <code className="text-xs text-ink/65">{error.digest}</code>}
+      <button onClick={reset} className="rounded-np bg-coral-cta px-5 py-2.5 font-display text-white hover:bg-coral-cta-hover">{t("retry")}</button>
     </div>
   );
 }

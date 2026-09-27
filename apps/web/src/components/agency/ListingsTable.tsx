@@ -39,7 +39,7 @@ export function ListingsTable({ locale, listings, agents }: { locale: Locale; li
     <AdminShell locale={locale} area="agency" title={tx(locale, "Inmuebles", "Listings")} actions={user?.role !== "PHOTOGRAPHER" && user?.role !== "CAPTOR" ? <Button size="sm" href={`/${locale}/agency/listings/new`}><Plus size={15} /> {tx(locale, "Nuevo inmueble", "New listing")}</Button> : undefined}>
       <div className="mb-4 flex flex-wrap items-center gap-2">
         {tabs.map(([k, t]) => (
-          <button key={k} onClick={() => setStatus(k)} className={cn("rounded-full border px-3.5 py-1.5 font-display text-sm", status === k ? "border-coral bg-coral text-white" : "border-navy-line text-ivory/80 hover:bg-white/5")}>
+          <button key={k} onClick={() => setStatus(k)} className={cn("rounded-full border px-3.5 py-1.5 font-display text-sm", status === k ? "border-coral bg-coral-cta text-white" : "border-navy-line text-ivory/80 hover:bg-white/5")}>
             {t} {k === "REVIEW" && <span className="ml-1 rounded-full bg-white/20 px-1.5 text-xs">{review.length}</span>}
           </button>
         ))}

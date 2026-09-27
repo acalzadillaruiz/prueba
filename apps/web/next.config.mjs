@@ -3,11 +3,20 @@ import createNextIntlPlugin from "next-intl/plugin";
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
+const revision = Date.now().toString(36);
+
 const withSerwist = withSerwistInit({
   swSrc: "src/app/sw.ts",
   swDest: "public/sw.js",
-  cacheOnNavigation: true,
-  reloadOnOnline: true,
+  // No full-page reload when the connection comes back (it would wipe half-filled forms); React Query refetches instead.
+  cacheOnNavigation: false,
+  reloadOnOnline: false,
+  additionalPrecacheEntries: [
+    { url: "/offline/es", revision },
+    { url: "/offline/en", revision },
+  ],
+  // Keep the first-visit precache small: no legacy .woff, non-latin font subsets or back-office route chunks.
+  exclude: [/\.map$/, /^manifest.*\.js$/, /\.woff$/, /(cyrillic|greek|vietnamese)/, /icon-1024/, /app\/\[locale\]\/(agency|platform)\//, /app\/(api|robots\.txt|sitemap\.xml|uploads)\//, /opengraph-image/],
   disable: process.env.NODE_ENV !== "production",
 });
 

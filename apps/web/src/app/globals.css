@@ -30,6 +30,9 @@
   --np-navy-2-rgb: 17 24 39;
   --np-coral-rgb: 242 107 77;
   --np-coral-hover-rgb: 226 85 56;
+  /* Accessible coral for white-text CTAs and coral text on light surfaces (≥4.5:1, WCAG AA) */
+  --np-coral-cta-rgb: 194 69 42;
+  --np-coral-cta-hover-rgb: 169 58 34;
   --np-ivory-rgb: 247 244 239;
   --np-mist-rgb: 138 164 181;
   --np-gold-rgb: 212 175 119;
@@ -71,6 +74,12 @@ html.dark .np-public .text-navy { color: #F7F4EF; }
 html.dark .np-public .bg-black\/5, html.dark .np-public .hover\:bg-black\/5:hover { background-color: rgb(255 255 255 / .06); }
 html.dark .np-public .bg-black\/10 { background-color: rgb(255 255 255 / .12); }
 html.dark .np-public :is(input, select, textarea) { color-scheme: dark; }
+
+/* Coral text on light public surfaces uses the AA-contrast shade; navy sections and dark mode keep brand coral. */
+html:not(.dark) .np-public .text-coral { color: rgb(var(--np-coral-cta-rgb)); }
+html:not(.dark) .np-public :is(.bg-navy, .bg-navy-2, .bg-navy-card) .text-coral { color: rgb(var(--np-coral-rgb)); }
+
+.sr-only-focusable:not(:focus) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
 .scrollbar-thin::-webkit-scrollbar-thumb { background: #8AA4B566; border-radius: 6px; }

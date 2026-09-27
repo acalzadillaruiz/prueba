@@ -1,3 +1,6 @@
+"use client";
+
+import { useId } from "react";
 import type { Scene } from "@/types/domain";
 
 /**
@@ -571,11 +574,13 @@ export function PropertyArt({
   /** AI-generated photo URL. When present it replaces the illustration. */
   photo?: string;
 }) {
+  // Unique per instance: two illustrations of the same listing on one page must not share gradient ids.
+  const uid = useId().replace(/[^a-zA-Z0-9]/g, "");
   if (photo)
     // eslint-disable-next-line @next/next/no-img-element
     return <img src={photo} alt={label ?? scene} loading="lazy" decoding="async" className={`${className ?? ""} object-cover`} />;
   const n = hashStr(seed + scene);
-  const id = `pa${n.toString(36)}`;
+  const id = `pa${n.toString(36)}${uid}`;
   let content: React.ReactNode;
   switch (scene) {
     case "tower-dusk":

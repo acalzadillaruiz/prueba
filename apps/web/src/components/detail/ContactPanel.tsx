@@ -62,7 +62,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
   };
 
   const box = dark ? "border-navy-line bg-navy-card text-ivory" : "border-line bg-white";
-  const muted = dark ? "text-mist" : "text-ink/55";
+  const muted = dark ? "text-mist" : "text-ink/65";
   const field = cn(inputCls, "h-10", dark && "border-navy-line bg-navy-2 text-ivory");
 
   if (done !== null)
@@ -124,7 +124,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
                     setDay(i);
                     setIso(null);
                   }}
-                  className={cn("min-w-[62px] rounded-xl border px-2 py-2 text-center font-display text-sm capitalize", day === i ? "border-coral bg-coral text-white" : dark ? "border-navy-line" : "border-line")}
+                  className={cn("min-w-[62px] rounded-xl border px-2 py-2 text-center font-display text-sm capitalize", day === i ? "border-coral bg-coral-cta text-white" : dark ? "border-navy-line" : "border-line")}
                 >
                   {fmt(d.date, { weekday: "short", day: "numeric" })}
                 </button>
@@ -145,8 +145,8 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
                 </button>
               ))}
             </div>
-            <label className={cn("mt-3 flex items-center gap-2 text-sm", muted)}>
-              <input type="checkbox" checked={virtual} onChange={(e) => setVirtual(e.target.checked)} className="accent-[#F26B4D]" />
+            <label className={cn("mt-3 flex min-h-11 cursor-pointer items-center gap-2 text-sm", muted)}>
+              <input type="checkbox" checked={virtual} onChange={(e) => setVirtual(e.target.checked)} className="h-5 w-5 accent-[#C2452A]" />
               <Video size={14} /> {tx(locale, "Prefiero visita por videollamada", "I prefer a video tour")}
             </label>
           </>

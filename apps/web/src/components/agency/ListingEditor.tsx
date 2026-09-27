@@ -176,7 +176,7 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
               {AMENITIES.map((a) => {
                 const on = f.amenities.includes(a);
                 return (
-                  <button key={a} disabled={!canEdit} onClick={() => { setF({ ...f, amenities: on ? f.amenities.filter((x) => x !== a) : [...f.amenities, a] }); dirty(); }} className={cn("rounded-full px-3 py-1 text-xs font-semibold", on ? "bg-coral text-white" : "bg-white/10 text-mist")}>
+                  <button key={a} disabled={!canEdit} onClick={() => { setF({ ...f, amenities: on ? f.amenities.filter((x) => x !== a) : [...f.amenities, a] }); dirty(); }} className={cn("rounded-full px-3 py-1 text-xs font-semibold", on ? "bg-coral-cta text-white" : "bg-white/10 text-mist")}>
                     {lbl(AMENITY_LABEL[a], locale)}
                   </button>
                 );
@@ -217,7 +217,7 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
                       <button onClick={() => move(i, 1)} className="rounded bg-navy/80 p-0.5" aria-label="→"><ArrowRight size={12} /></button>
                     </div>
                     {p.isCover ? (
-                      <span className="absolute bottom-1 left-1 rounded-full bg-coral px-1.5 text-[10px] font-bold text-white"><Star size={9} className="inline" /> {tx(locale, "Portada", "Cover")}</span>
+                      <span className="absolute bottom-1 left-1 rounded-full bg-coral-cta px-1.5 text-[10px] font-bold text-white"><Star size={9} className="inline" /> {tx(locale, "Portada", "Cover")}</span>
                     ) : (
                       <button onClick={() => photoOp({ cover: p.id })} className="absolute bottom-1 left-1 rounded-full bg-white/90 px-1.5 text-[10px] font-bold text-navy opacity-0 group-hover:opacity-100">{tx(locale, "Portada", "Cover")}</button>
                     )}

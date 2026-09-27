@@ -25,7 +25,7 @@ import type { Locale } from "@/types/domain";
 import { Logo } from "@/components/brand/Logo";
 import { Avatar } from "@/components/ui";
 import { useQuery } from "@tanstack/react-query";
-import { signOut } from "next-auth/react";
+import { logout } from "@/lib/logout";
 import { LogOut } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useApp } from "@/lib/store";
@@ -102,7 +102,7 @@ export function AdminShell({ locale, area, children, title, actions }: { locale:
               >
                 <i.icon size={17} className={active ? "text-coral" : ""} />
                 <span className="flex-1">{t(i.label)}</span>
-                {(badges[i.href] ?? 0) > 0 && <span className="rounded-full bg-coral px-1.5 text-[11px] font-bold text-white">{badges[i.href]}</span>}
+                {(badges[i.href] ?? 0) > 0 && <span className="rounded-full bg-coral-cta px-1.5 text-[11px] font-bold text-white">{badges[i.href]}</span>}
               </Link>
             );
           })}
@@ -112,7 +112,7 @@ export function AdminShell({ locale, area, children, title, actions }: { locale:
           {area === "agency" && u.role === "SUPERADMIN" && (
             <Link href={`/${locale}/platform`} className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-ivory/60 hover:bg-white/5"><ClipboardList size={16} /> Platform</Link>
           )}
-          <button onClick={async () => { await signOut({ redirect: false }); window.location.href = `/${locale}`; }} className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-ivory/60 hover:bg-white/5">
+          <button onClick={() => logout(locale)} className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-ivory/60 hover:bg-white/5">
             <LogOut size={16} /> {tx(locale, "Cerrar sesión", "Sign out")}
           </button>
         </div>
@@ -142,7 +142,7 @@ export function AdminShell({ locale, area, children, title, actions }: { locale:
             const href = base + i.href;
             const active = i.href === "" ? pathname === href : pathname.startsWith(href);
             return (
-              <Link key={i.href} href={href} className={cn("flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm", active ? "bg-coral text-white" : "text-ivory/75")}>
+              <Link key={i.href} href={href} className={cn("flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm", active ? "bg-coral-cta text-white" : "text-ivory/75")}>
                 <i.icon size={15} /> {t(i.label)}
               </Link>
             );

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signOut } from "next-auth/react";
+import { logout } from "@/lib/logout";
 import { BadgeCheck, Check, Globe, Loader2, Lock, LogOut } from "lucide-react";
 import type { Locale } from "@/types/domain";
 import { Avatar, Badge, Button, Card, Field, inputCls } from "@/components/ui";
@@ -69,7 +69,7 @@ export function AccountView({ locale, data }: { locale: Locale; data: AccountDat
           <Globe size={20} className="text-coral" />
           <div className="flex-1">
             <div className="font-semibold">{tx(locale, "Idioma", "Language")}</div>
-            <div className="text-sm text-ink/55">{tx(locale, "Precios en USD con referencia en VES y EUR.", "Prices in USD with VES and EUR reference.")}</div>
+            <div className="text-sm text-ink/65">{tx(locale, "Precios en USD con referencia en VES y EUR.", "Prices in USD with VES and EUR reference.")}</div>
           </div>
           <select className="h-10 rounded-lg border border-line bg-white px-3" value={f.locale} onChange={(e) => setF({ ...f, locale: e.target.value as "es" | "en" })} aria-label={tx(locale, "Idioma", "Language")}>
             <option value="es">Español</option>
@@ -80,7 +80,7 @@ export function AccountView({ locale, data }: { locale: Locale; data: AccountDat
           <Lock size={20} className="text-coral" />
           <div className="flex-1">
             <div className="font-semibold">{tx(locale, "Inicio de sesión", "Sign-in")}</div>
-            <div className="text-sm text-ink/55">
+            <div className="text-sm text-ink/65">
               {[data.providers.includes("google") && "Google", data.hasPassword && tx(locale, "email y contraseña", "email & password")].filter(Boolean).join(" · ") || "—"}
             </div>
           </div>
@@ -88,7 +88,7 @@ export function AccountView({ locale, data }: { locale: Locale; data: AccountDat
       </Card>
       {err && <div className="mt-4 rounded-lg bg-[#B423181A] px-3 py-2 text-sm text-danger">{err}</div>}
       <div className="mt-6 flex justify-between">
-        <Button variant="ghost" onClick={async () => { await signOut({ redirect: false }); window.location.href = `/${locale}`; }}>
+        <Button variant="ghost" onClick={() => logout(locale)}>
           <LogOut size={16} /> {tx(locale, "Cerrar sesión", "Sign out")}
         </Button>
         <Button onClick={save} disabled={busy}>

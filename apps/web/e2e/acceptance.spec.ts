@@ -102,7 +102,11 @@ test.describe.serial("Criterios de aceptación §15", () => {
     expect(m.name).toBe("New Place");
     expect(m.display).toBe("standalone");
     expect(m.theme_color).toBe("#0B1220");
-    expect(m.start_url).toBe("/es");
+    expect(m.id).toBe("/");
+    // start_url lets the middleware pick the visitor's language (/es or /en)
+    const start = await request.get(m.start_url);
+    expect(start.ok()).toBeTruthy();
+    expect(new URL(start.url()).pathname).toMatch(/^\/(es|en)$/);
     for (const icon of m.icons) expect((await request.get(icon.src)).ok()).toBeTruthy();
   });
 

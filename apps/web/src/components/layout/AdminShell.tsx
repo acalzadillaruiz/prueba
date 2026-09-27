@@ -14,7 +14,7 @@ import {
   Home,
   Inbox,
   LayoutGrid,
-  Search,
+ 
   Settings,
   ShieldAlert,
   Target,
@@ -123,15 +123,15 @@ export function AdminShell({ locale, area, children, title, actions }: { locale:
       <div className="lg:pl-60">
         <header className="sticky top-0 z-20 flex h-16 items-center gap-4 border-b border-navy-line bg-navy-2/90 px-4 backdrop-blur md:px-6">
           <h1 className="font-display text-lg font-semibold md:text-xl">{title}</h1>
-          <div className="relative ml-auto hidden w-72 md:block">
-            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-mist" />
-            <input className="h-9 w-full rounded-lg border border-navy-line bg-navy pl-9 pr-3 text-sm placeholder:text-mist/60 focus:border-coral focus:outline-none" placeholder={t("search")} aria-label={t("search")} />
-          </div>
+          <div className="ml-auto" />
           {actions}
-          <button className="relative rounded-lg p-2 text-ivory/80 hover:bg-white/5" aria-label={t("notifications")}>
-            <Bell size={18} />
-            <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-coral" />
-          </button>
+          {canLeads && (
+            // Bell = new leads waiting (real count, polled); opens the inbox.
+            <Link href={`${base}/leads`} className="relative flex h-10 w-10 items-center justify-center rounded-lg text-ivory/80 hover:bg-white/5" aria-label={`${t("notifications")}: ${newLeads.data?.items.length ?? 0}`}>
+              <Bell size={18} />
+              {(newLeads.data?.items.length ?? 0) > 0 && <span className="absolute right-1.5 top-1.5 min-w-4 rounded-full bg-coral-cta px-1 text-center text-[10px] font-bold leading-4 text-white">{newLeads.data?.items.length}</span>}
+            </Link>
+          )}
           <div className="flex items-center gap-2.5">
             <Avatar initials={u.initials} hue={u.hue} size={32} />
             <div className="hidden leading-tight xl:block">
@@ -150,6 +150,8 @@ export function AdminShell({ locale, area, children, title, actions }: { locale:
               </Link>
             );
           })}
+          <Link href={`/${locale}`} className="flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm text-ivory/60"><Home size={15} /> {t("publicSite")}</Link>
+          <button onClick={() => logout(locale)} className="flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm text-ivory/60"><LogOut size={15} /> {tx(locale, "Salir", "Sign out")}</button>
         </nav>
         {area === "agency" && u.role === "SUPERADMIN" && (
           <div className="flex items-center gap-3 border-b border-coral/40 bg-[#F26B4D1a] px-4 py-2 text-sm md:px-6">
@@ -157,7 +159,7 @@ export function AdminShell({ locale, area, children, title, actions }: { locale:
             <Link href={`/${locale}/platform/agencies`} className="ml-auto font-semibold text-coral">Platform →</Link>
           </div>
         )}
-        <main className="p-4 md:p-6">{children}</main>
+        <main id="main" className="min-w-0 p-4 md:p-6">{children}</main>
       </div>
     </div>
   );

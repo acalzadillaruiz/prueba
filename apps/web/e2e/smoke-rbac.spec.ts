@@ -8,7 +8,7 @@ test.describe("Smoke: login, mapa, crear inmueble · RBAC duro", () => {
     await page.getByLabel("Email").fill("seeker@gmail.com");
     await page.getByLabel("Contraseña", { exact: true }).fill("NewPlace!2026");
     await page.getByRole("button", { name: "Entrar", exact: true }).click();
-    await page.waitForURL(/\/es\/agency/);
+    await page.waitForURL(/\/es\/app/);
     await expect(page.getByText("Homebuyer Hub")).toBeVisible();
   });
 
@@ -118,9 +118,10 @@ test.describe("Smoke: login, mapa, crear inmueble · RBAC duro", () => {
       address: `Calle E2E ${Date.now()}, La Castellana`,
       zone: "La Castellana",
       city: "Caracas",
-      lat: 10.4991 + Math.random() / 1000,
-      lng: -66.8581,
-      areaM2: 77,
+      // unique per run so the duplicate detector never matches a listing from a previous run
+      lat: 10.49 + Math.random() / 50,
+      lng: -66.86 + Math.random() / 50,
+      areaM2: 60 + Math.floor(Math.random() * 90),
       beds: 2,
       baths: 1,
       parking: 1,

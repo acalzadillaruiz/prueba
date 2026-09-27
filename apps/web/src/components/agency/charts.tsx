@@ -57,11 +57,11 @@ export function Funnel({ steps }: { steps: { label: string; value: number }[] })
         <div key={s.label} className="grid grid-cols-[110px_1fr_70px] items-center gap-3 text-sm">
           <span className="text-ivory/80">{s.label}</span>
           <div className="h-6 rounded bg-white/5">
-            <div className="h-full rounded bg-coral" style={{ width: `${(s.value / max) * 100}%`, opacity: 1 - i * 0.12 }} />
+            <div className="h-full rounded bg-coral" style={{ width: `${max > 0 ? (s.value / max) * 100 : 0}%`, opacity: 1 - i * 0.12 }} />
           </div>
           <span className="text-right font-display font-semibold">
             {s.value}
-            {i > 0 && <span className="ml-1 text-xs font-normal text-mist">{Math.round((s.value / steps[i - 1].value) * 100)}%</span>}
+            {i > 0 && steps[i - 1].value > 0 && <span className="ml-1 text-xs font-normal text-mist">{Math.round((s.value / steps[i - 1].value) * 100)}%</span>}
           </span>
         </div>
       ))}

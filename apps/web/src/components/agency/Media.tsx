@@ -66,7 +66,7 @@ export function MediaView({ locale, jobs, listings }: { locale: Locale; jobs: Me
   return (
     <AdminShell locale={locale} area="agency" title={tx(locale, "Trabajos de fotografía", "Media jobs")}>
       <input ref={fileRef} type="file" multiple accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(e) => { upload(Array.from(e.target.files ?? [])); e.target.value = ""; }} />
-      <div className="grid gap-6 xl:grid-cols-[340px_1fr]">
+      <div className="grid gap-6 [&>*]:min-w-0 xl:grid-cols-[340px_1fr]">
         <div className="space-y-3">
           {jobs.map((j) => {
             const jl = byId.get(j.listingId);

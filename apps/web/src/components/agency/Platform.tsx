@@ -57,7 +57,7 @@ export function PlatformHome({ locale, data }: { locale: Locale; data: PlatformH
         <Stat dark label={tx(locale, "Leads (7 d)", "Leads (7 d)")} value={data.leads7d} delta={`${delta >= 0 ? "+" : ""}${delta}%`} />
         <Stat dark label={tx(locale, "Tiempo 1ª respuesta", "First response")} value={data.firstResponseMin === null ? "—" : `${data.firstResponseMin} min`} hint={tx(locale, "mediana plataforma", "platform median")} />
       </div>
-      <div className="mt-6 grid gap-6 xl:grid-cols-3">
+      <div className="mt-6 grid gap-6 [&>*]:min-w-0 xl:grid-cols-3">
         <div className="rounded-np border border-navy-line bg-navy-card p-5 xl:col-span-2">
           <div className="mb-3 flex items-center justify-between"><span className="font-display text-lg font-semibold">{tx(locale, "Leads por semana (plataforma)", "Weekly leads (platform)")}</span><span className="text-xs text-mist">12 {tx(locale, "semanas", "weeks")}</span></div>
           <BarChart data={data.weekly} height={220} />
@@ -73,7 +73,7 @@ export function PlatformHome({ locale, data }: { locale: Locale; data: PlatformH
           ))}
         </div>
       </div>
-      <div className="mt-6 grid gap-6 xl:grid-cols-2">
+      <div className="mt-6 grid gap-6 [&>*]:min-w-0 xl:grid-cols-2">
         <div className="rounded-np border border-navy-line bg-navy-card p-5">
           <div className="mb-3 font-display text-lg font-semibold">{tx(locale, "Agencias", "Agencies")}</div>
           {data.agencies.map((a) => (
@@ -205,7 +205,7 @@ export function PlatformModeration({ locale, reports, listings }: { locale: Loca
   return (
     <AdminShell locale={locale} area="platform" title={tx(locale, "Moderación", "Moderation")}>
       {err && <div className="mb-4 rounded-lg bg-[#B4231833] px-3 py-2 text-sm text-[#FF8A7A]">{err}</div>}
-      <div className="grid gap-6 xl:grid-cols-[1fr_1.3fr]">
+      <div className="grid gap-6 [&>*]:min-w-0 xl:grid-cols-[1fr_1.3fr]">
         <div className="rounded-np border border-navy-line bg-navy-card p-5">
           <div className="mb-3 flex items-center gap-2 font-display text-lg font-semibold"><ShieldAlert size={18} className="text-coral" /> {tx(locale, "Reportes", "Reports")} · {reports.length}</div>
           {reports.length === 0 && <div className="text-sm text-mist">{tx(locale, "Sin reportes pendientes.", "No pending reports.")}</div>}
@@ -213,7 +213,14 @@ export function PlatformModeration({ locale, reports, listings }: { locale: Loca
             <div key={m.id} className="border-t border-navy-line py-3 first:border-0">
               <div className="flex items-center gap-2">
                 <span className={cn("h-2 w-2 rounded-full", m.severity === "high" ? "bg-danger" : m.severity === "medium" ? "bg-warn" : "bg-mist")} />
-                <span className="font-semibold">{m.title}</span>
+                {(() => {
+                  const target = listings.find((x) => x.id === m.listingId);
+                  return target ? (
+                    <a href={`/${locale}/listing/${target.slug}`} target="_blank" rel="noreferrer" className="font-semibold underline decoration-white/30 hover:text-coral">{m.title}</a>
+                  ) : (
+                    <span className="font-semibold">{m.title}</span>
+                  );
+                })()}
               </div>
               <div className="mt-0.5 text-sm text-mist">{tx(locale, m.reason.es, m.reason.en)} · {m.agency} · {ago(m.at, locale)}</div>
               <div className="mt-2 flex gap-2">
@@ -261,7 +268,7 @@ export function PlatformAI({ locale, settings, fx, counts }: { locale: Locale; s
   return (
     <AdminShell locale={locale} area="platform" title={tx(locale, "IA · Tasas FX · Seed", "AI · FX rates · Seed")}>
       {err && <div className="mb-4 rounded-lg bg-[#B4231833] px-3 py-2 text-sm text-[#FF8A7A]">{err}</div>}
-      <div className="grid gap-6 xl:grid-cols-2">
+      <div className="grid gap-6 [&>*]:min-w-0 xl:grid-cols-2">
         <div className="rounded-np border border-navy-line bg-navy-card p-5">
           <div className="flex items-center gap-2 font-display text-lg font-semibold"><Bot size={18} className="text-coral" /> {tx(locale, "Proveedor de IA", "AI provider")}</div>
           <p className="mt-1 text-sm text-mist">{tx(locale, "Una sola interfaz AIProvider para las 4 funciones. Cambia en caliente.", "One AIProvider interface for all 4 features. Hot-swappable.")}</p>

@@ -21,5 +21,5 @@ export default async function Page({ params }: { params: Promise<{ locale: Local
     prisma.listingPhoto.findMany({ where: { listingId: id }, orderBy: [{ isCover: "desc" }, { order: "asc" }] }),
     l.agencyId ? prisma.commissionRule.findUnique({ where: { agencyId: l.agencyId } }) : null,
   ]);
-  return <ListingEditor l={l} locale={locale} photos={photos.map((p) => ({ id: p.id, url: p.url, isCover: p.isCover }))} commission={{ pct: rule?.salePct ?? 5, split: rule?.agentSplitPct ?? 50 }} canEdit={canEdit} />;
+  return <ListingEditor l={l} locale={locale} photos={photos.map((p) => ({ id: p.id, url: p.url, isCover: p.isCover }))} commission={{ pct: rule?.salePct ?? 5, split: rule?.agentSplitPct ?? 50, rentMonths: rule?.rentMonths ?? 1 }} canEdit={canEdit} />;
 }

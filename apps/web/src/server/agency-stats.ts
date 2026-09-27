@@ -30,11 +30,13 @@ export async function dashboardStats(agencyId: string, agentId?: string): Promis
     prisma.agencyMember.findMany({ where: { agencyId, role: "AGENT" }, include: { user: { select: { id: true, name: true, hue: true } } } }),
   ]);
   const leads7d = leads30.filter((l) => l.createdAt.getTime() >= now - 7 * DAY).length;
+  // Day buckets in America/Caracas (UTC-4), matching the labels the chart prints.
+  const TZ = -4 * 3600e3;
+  const todayLocal = Math.floor((now + TZ) / DAY) * DAY - TZ;
   const perDay = Array.from({ length: 14 }, (_, i) => {
-    const start = new Date(now - (13 - i) * DAY);
-    start.setHours(0, 0, 0, 0);
-    const end = start.getTime() + DAY;
-    return { date: start.toISOString(), value: leads30.filter((l) => l.createdAt.getTime() >= start.getTime() && l.createdAt.getTime() < end).length };
+    const start = todayLocal - (13 - i) * DAY;
+    const end = start + DAY;
+    return { date: new Date(start + 12 * 3600e3).toISOString(), value: leads30.filter((l) => l.createdAt.getTime() >= start && l.createdAt.getTime() < end).length };
   });
   const order = ["NEW", "CONTACTED", "TOUR", "OFFER", "WON"] as const;
   const reached = (stage: (typeof order)[number]) => leads30.filter((l) => l.stage !== "LOST" && order.indexOf(l.stage as (typeof order)[number]) >= order.indexOf(stage)).length;
@@ -43,8 +45,9 @@ export async function dashboardStats(agencyId: string, agentId?: string): Promis
   for (const t of tours) if (t.leadId && (!firstTour.has(t.leadId) || t.start.getTime() < firstTour.get(t.leadId)!)) firstTour.set(t.leadId, t.start.getTime());
   const allLeads = await prisma.lead.findMany({ where: { id: { in: [...firstTour.keys()] } }, select: { id: true, createdAt: true } });
   const gaps = allLeads.map((l) => (firstTour.get(l.id)! - l.createdAt.getTime()) / DAY).filter((g) => g >= 0);
-  const responded = leads30.filter((l) => l.firstResponseAt);
-  const sla = responded.length ? Math.round((responded.filter((l) => l.firstResponseAt!.getTime() - l.createdAt.getTime() <= 15 * 60000).length / responded.length) * 100) : null;
+  // SLA over every lead old enough to judge: unanswered leads past 15 min count as breached (not ignored).
+  const judged = leads30.filter((l) => l.firstResponseAt || now - l.createdAt.getTime() > 15 * 60000);
+  const sla = judged.length ? Math.round((judged.filter((l) => l.firstResponseAt && l.firstResponseAt.getTime() - l.createdAt.getTime() <= 15 * 60000).length / judged.length) * 100) : null;
   const won = await prisma.commissionEntry.findMany({ where: { agencyId }, include: { listing: { select: { priceAmount: true } } } });
   const ranking = members
     .map((m) => {

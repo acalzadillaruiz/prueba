@@ -7,7 +7,7 @@ import { AdminShell } from "@/components/layout/AdminShell";
 import { listingPhoto } from "@/lib/photos";
 import { PropertyArt } from "@/components/art/PropertyArt";
 import { Avatar, Badge, Button, Card, Stat } from "@/components/ui";
-import { BarChart, Funnel, Spark } from "./charts";
+import { BarChart, Funnel } from "./charts";
 import { useApp } from "@/lib/store";
 import type { Lead, Listing, Tour } from "@/types/domain";
 import type { DashboardStats } from "@/server/agency-stats";
@@ -35,7 +35,7 @@ export function AgencyDashboard({ locale, stats, listings, newLeads, tours, agen
         <Stat dark label={tx(locale, "SLA 15 min cumplido", "15-min SLA met")} value={stats.slaPct === null ? "—" : `${stats.slaPct} %`} hint={tx(locale, "primera respuesta", "first response")} />
       </div>
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-3">
+      <div className="mt-6 grid gap-6 [&>*]:min-w-0 xl:grid-cols-3">
         <Card dark className="p-5 xl:col-span-2">
           <div className="mb-3 flex items-center justify-between">
             <div className="font-display text-lg font-semibold">{tx(locale, "Leads por día", "Leads per day")}</div>
@@ -49,7 +49,7 @@ export function AgencyDashboard({ locale, stats, listings, newLeads, tours, agen
         </Card>
       </div>
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-3">
+      <div className="mt-6 grid gap-6 [&>*]:min-w-0 xl:grid-cols-3">
         <Card dark className="p-5 xl:col-span-2">
           <div className="mb-3 flex items-center justify-between">
             <div className="font-display text-lg font-semibold">{tx(locale, "Rendimiento por anuncio", "Performance by listing")}</div>
@@ -64,11 +64,11 @@ export function AgencyDashboard({ locale, stats, listings, newLeads, tours, agen
                   <th className="pb-2 text-right font-semibold"><Heart size={13} className="inline" /> Saves</th>
                   <th className="pb-2 text-right font-semibold">Leads</th>
                   <th className="pb-2 text-right font-semibold"><Timer size={13} className="inline" /> {tx(locale, "Tiempo", "Time")}</th>
-                  <th className="pb-2 pl-4 font-semibold">{tx(locale, "Tendencia", "Trend")}</th>
+                  <th className="pb-2 pl-4 text-right font-semibold" title={tx(locale, "Leads por cada 1.000 impresiones", "Leads per 1,000 impressions")}>{tx(locale, "Conversión", "Conversion")}</th>
                 </tr>
               </thead>
               <tbody>
-                {top.map((l, i) => (
+                {top.map((l) => (
                   <tr key={l.id} className="border-t border-navy-line">
                     <td className="py-2.5">
                       <Link href={`/${locale}/agency/listings/${l.id}/edit`} className="flex items-center gap-3 hover:text-coral">
@@ -80,7 +80,7 @@ export function AgencyDashboard({ locale, stats, listings, newLeads, tours, agen
                     <td className="text-right">{l.stats.saves}</td>
                     <td className="text-right font-semibold">{l.stats.leads}</td>
                     <td className="text-right">{Math.floor(l.stats.avgTimeSec / 60)}:{String(l.stats.avgTimeSec % 60).padStart(2, "0")}</td>
-                    <td className="pl-4"><Spark values={[3, 5, 4, 6, 5, 7, 8].map((v) => v + ((i * 7 + v) % 4))} className="h-6 w-24" /></td>
+                    <td className="pl-4 text-right text-mist">{l.stats.impressions ? `${((l.stats.leads / l.stats.impressions) * 1000).toFixed(1)} ‰` : "—"}</td>
                   </tr>
                 ))}
               </tbody>
@@ -105,7 +105,7 @@ export function AgencyDashboard({ locale, stats, listings, newLeads, tours, agen
         </Card>
       </div>
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-2">
+      <div className="mt-6 grid gap-6 [&>*]:min-w-0 xl:grid-cols-2">
         <Card dark className="p-5">
           <div className="mb-3 flex items-center justify-between">
             <div className="flex items-center gap-2 font-display text-lg font-semibold"><AlarmClock size={18} className="text-coral" /> {tx(locale, "Leads sin responder", "Unanswered leads")}</div>

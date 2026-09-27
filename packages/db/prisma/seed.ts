@@ -197,7 +197,7 @@ async function main() {
   const actorByName = (n: string) => USERS.find((u) => u.name === n)?.id;
   for (const a of AUDIT) await prisma.auditLog.create({ data: { actorId: actorByName(a.actor), action: a.action, target: a.target, createdAt: d(a.at) } });
   for (const m of MODERATION_QUEUE)
-    await prisma.moderationReport.create({ data: { title: m.title, reasonEs: m.reason.es, reasonEn: m.reason.en, reporter: m.reporter, agency: m.agency, severity: m.severity, createdAt: d(m.at) } });
+    await prisma.moderationReport.create({ data: { listingId: m.listingId, title: m.title, reasonEs: m.reason.es, reasonEn: m.reason.en, reporter: m.reporter, agency: m.agency, severity: m.severity, createdAt: d(m.at) } });
   await prisma.platformSetting.create({ data: { key: "aiProvider", value: "heuristic" } });
 
   const counts = await Promise.all([prisma.listing.count(), prisma.user.count(), prisma.lead.count(), prisma.tour.count(), prisma.agency.count()]);

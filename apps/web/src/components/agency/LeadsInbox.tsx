@@ -48,7 +48,7 @@ function ScoreRing({ score }: { score: number }) {
 
 function Sla({ lead, locale }: { lead: Lead; locale: Locale }) {
   const m = minsAgo(lead.createdAt);
-  if (lead.stage !== "NEW") return lead.firstResponseMin ? <span className="text-[11px] text-mist">{tx(locale, "resp.", "resp.")} {lead.firstResponseMin} min</span> : null;
+  if (lead.stage !== "NEW") return lead.firstResponseMin != null ? <span className="text-[11px] text-mist">{tx(locale, "resp.", "resp.")} {lead.firstResponseMin} min</span> : null;
   const left = 15 - m;
   const pct = Math.max(0, Math.min(100, (m / 15) * 100));
   return (
@@ -62,7 +62,21 @@ function Sla({ lead, locale }: { lead: Lead; locale: Locale }) {
 type ScoredLead = Lead & { score?: number | null; nextAction?: string | null; reason?: string | null; priority?: boolean };
 type Detail = { lead: ScoredLead; events: { type: string; data: unknown; at: string }[]; messages: { id: string; from: string; body: string; at: string; mine: boolean }[] };
 
+const stageLabel = (locale: Locale, st: string) => {
+  const s = STAGES.find(([k]) => k === st);
+  return s ? (locale === "es" ? s[1] : s[2]) : st;
+};
+
+const SOURCE_LABEL: Record<string, Record<Locale, string>> = {
+  TOUR_REQUEST: { es: "Pidió visita", en: "Tour request" },
+  LISTING_FORM: { es: "Formulario de la ficha", en: "Listing form" },
+  WHATSAPP_NOTE: { es: "WhatsApp", en: "WhatsApp" },
+  REFERRAL: { es: "Referido", en: "Referral" },
+  ALERT: { es: "Alerta de búsqueda", en: "Search alert" },
+};
+
 export function LeadsInbox({ locale, initial, listings, agents }: { locale: Locale; initial: ScoredLead[]; listings: Listing[]; agents: Record<string, string> }) {
+  const stageName = (st: string) => stageLabel(locale, st);
   const qc = useQueryClient();
   const router = useRouter();
   const byId = useMemo(() => new Map(listings.map((l) => [l.id, l])), [listings]);
@@ -85,11 +99,15 @@ export function LeadsInbox({ locale, initial, listings, agents }: { locale: Loca
     qc.invalidateQueries({ queryKey: ["lead", sel?.id] });
     router.refresh();
   };
+  const [error, setError] = useState<string | null>(null);
   const run = async (key: string, fn: () => Promise<unknown>) => {
     setBusy(key);
+    setError(null);
     try {
       await fn();
       refresh();
+    } catch (e) {
+      setError((e as Error).message);
     } finally {
       setBusy(null);
     }
@@ -126,13 +144,20 @@ export function LeadsInbox({ locale, initial, listings, agents }: { locale: Loca
           );
         })}
       </div>
-      <div className="grid gap-4 xl:grid-cols-[420px_1fr]">
+      {error && <div className="mb-3 rounded-lg bg-[#B423181A] px-3 py-2 text-sm text-danger" role="alert">{error}</div>}
+      <div className="grid gap-4 [&>*]:min-w-0 xl:grid-cols-[420px_1fr]">
         <div className="overflow-hidden rounded-np border border-navy-line bg-navy-card">
           {visible.map((l) => {
             const lst = byId.get(l.listingId);
             const score = l.score ?? 0;
             return (
-              <button key={l.id} onClick={() => setSelId(l.id)} className={cn("flex w-full items-start gap-3 border-b border-navy-line px-4 py-3 text-left transition-colors duration-np", sel?.id === l.id ? "bg-white/[.06]" : "hover:bg-white/[.03]")}>
+              <button
+                key={l.id}
+                onClick={() => {
+                  setSelId(l.id);
+                  // On phones/tablets the detail sits under the list: bring it into view.
+                  if (window.innerWidth < 1280) requestAnimationFrame(() => document.getElementById("lead-detail")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+                }} className={cn("flex w-full items-start gap-3 border-b border-navy-line px-4 py-3 text-left transition-colors duration-np", sel?.id === l.id ? "bg-white/[.06]" : "hover:bg-white/[.03]")}>
                 <div className="relative">
                   <Avatar initials={l.name.split(" ").map((p) => p[0]).slice(0, 2).join("")} hue={(l.name.length * 37) % 360} size={38} />
                   {l.stage === "NEW" && <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-navy-card bg-coral" />}
@@ -157,7 +182,7 @@ export function LeadsInbox({ locale, initial, listings, agents }: { locale: Loca
         </div>
 
         {sel ? (
-          <div className="np-in space-y-4" key={sel.id}>
+          <div className="np-in scroll-mt-28 space-y-4" key={sel.id} id="lead-detail">
             <div className="rounded-np border border-navy-line bg-navy-card p-5">
               <div className="flex flex-wrap items-start gap-4">
                 <Avatar initials={sel.name.split(" ").map((p) => p[0]).slice(0, 2).join("")} hue={(sel.name.length * 37) % 360} size={52} />
@@ -165,7 +190,7 @@ export function LeadsInbox({ locale, initial, listings, agents }: { locale: Loca
                   <div className="font-display text-xl font-semibold">{sel.name}</div>
                   <div className="text-sm text-mist">{sel.email}{sel.phone && ` · ${sel.phone}`}</div>
                   <div className="mt-2 flex flex-wrap gap-2 text-xs">
-                    <Badge tone="dark">{sel.source.replace("_", " ")}</Badge>
+                    <Badge tone="dark">{SOURCE_LABEL[sel.source]?.[locale] ?? sel.source}</Badge>
                     {sel.budget && <Badge tone="dark">{tx(locale, "Presupuesto", "Budget")} {money(sel.budget, locale)}</Badge>}
                     <Badge tone="dark"><Clock size={11} /> {ago(sel.createdAt, locale)}</Badge>
                     {sel.agentId && agents[sel.agentId] && <Badge tone="dark">{agents[sel.agentId]}</Badge>}
@@ -217,7 +242,7 @@ export function LeadsInbox({ locale, initial, listings, agents }: { locale: Loca
                   {(detail.data?.events ?? []).map((e, i) => (
                     <li key={i} className="relative">
                       <span className={cn("absolute -left-[21px] top-1.5 h-2 w-2 rounded-full", i === 0 ? "bg-coral" : "bg-mist")} />
-                      {e.type === "CREATED" ? tx(locale, "Lead creado", "Lead created") : e.type === "STAGE" ? `${tx(locale, "Etapa", "Stage")}: ${(e.data as { from: string; to: string }).from} → ${(e.data as { to: string }).to}` : e.type === "TOUR" ? tx(locale, "Visita agendada", "Tour booked") : tx(locale, "Mensaje enviado", "Message sent")}{" "}
+                      {e.type === "CREATED" ? tx(locale, "Lead creado", "Lead created") : e.type === "STAGE" ? `${tx(locale, "Etapa", "Stage")}: ${stageName((e.data as { from: string }).from)} → ${stageName((e.data as { to: string }).to)}` : e.type === "TOUR" ? tx(locale, "Visita agendada", "Tour booked") : tx(locale, "Mensaje enviado", "Message sent")}{" "}
                       <span className="text-mist">· {ago(e.at, locale)}</span>
                     </li>
                   ))}

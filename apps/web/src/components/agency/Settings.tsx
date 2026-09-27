@@ -44,7 +44,7 @@ export function SettingsView({ locale, agency, rule }: { locale: Locale; agency:
       actions={owner ? <Button size="sm" onClick={save} disabled={busy}>{busy ? <Loader2 size={14} className="animate-spin" /> : saved ? <Check size={14} /> : <Save size={14} />} {saved ? tx(locale, "Guardado", "Saved") : tx(locale, "Guardar", "Save")}</Button> : undefined}
     >
       {err && <div className="mb-4 rounded-lg bg-[#B4231833] px-3 py-2 text-sm text-[#FF8A7A]">{err}</div>}
-      <div className="grid gap-6 xl:grid-cols-2">
+      <div className="grid gap-6 [&>*]:min-w-0 xl:grid-cols-2">
         <div className="rounded-np border border-navy-line bg-navy-card p-5">
           <div className="font-display text-lg font-semibold">{tx(locale, "Marca de agencia (white-label light)", "Agency branding (light white-label)")}</div>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">

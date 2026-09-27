@@ -2,7 +2,7 @@ import type { NextRequest } from "next/server";
 import { z } from "zod";
 import { prisma } from "@newplace/db";
 import { body, currentUser, handler, ok, requireUser } from "@/server/api";
-import { queueEmail } from "@/server/data";
+import { audit, queueEmail } from "@/server/data";
 import { leadForUser } from "@/server/access";
 import { assertFutureTour, lockAgentAndCheck } from "@/server/tours";
 
@@ -27,6 +27,7 @@ export const POST = handler(async (req: NextRequest, { params }: Ctx) => {
   });
   await prisma.lead.update({ where: { id }, data: { stage: "TOUR", toursRequested: { increment: existing ? 0 : 1 }, ...(!lead.firstResponseAt ? { firstResponseAt: new Date() } : {}) } });
   await prisma.leadEvent.create({ data: { leadId: id, type: "TOUR", data: { start }, actorId: u.id } });
+  await audit(u.id, "lead.tour", lead.name, { start });
   await queueEmail(lead.email, `Visita confirmada · ${s.toLocaleString("es-VE", { timeZone: "America/Caracas", weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}`, "TOUR");
   return ok({ id: tour.id, start: tour.start.toISOString(), status: tour.status });
 });

@@ -3,7 +3,7 @@ import { z } from "zod";
 import { prisma } from "@newplace/db";
 import { body, currentUser, handler, ok, requireUser } from "@/server/api";
 import { leadForUser } from "@/server/access";
-import { leadToDomain } from "@/server/data";
+import { audit, leadToDomain } from "@/server/data";
 import { commissionAmount } from "@/lib/commission";
 
 type Ctx = { params: Promise<{ id: string }> };
@@ -21,6 +21,7 @@ export const PATCH = handler(async (req: NextRequest, { params }: Ctx) => {
   });
   if (b.stage && b.stage !== lead.stage) {
     await prisma.leadEvent.create({ data: { leadId: id, type: "STAGE", data: { from: lead.stage, to: b.stage }, actorId: u.id } });
+    await audit(u.id, "lead.stage", lead.name, { from: lead.stage, to: b.stage });
     if (b.stage === "WON") {
       const l = await prisma.listing.findUniqueOrThrow({ where: { id: lead.listingId }, include: { agency: { include: { commission: true } } } });
       const rule = l.agency?.commission;

@@ -6,6 +6,7 @@ import { requireAgency } from "@/server/access";
 import { ApiError } from "@/server/api";
 import { getCaptures } from "@/server/data";
 import { findDuplicate, fingerprintOf } from "@/server/listing-service";
+import { audit } from "@/server/data";
 
 export const GET = handler(async () => {
   const u = requireUser(await currentUser());
@@ -25,5 +26,6 @@ export const POST = handler(async (req: NextRequest) => {
   const c = await prisma.captureLead.create({
     data: { ...b, agencyId, captorId: u.id, fingerprint: fingerprintOf(b.lat ?? 0, b.lng ?? 0, b.areaM2, b.address), result: dup ? "DUPLICATE" : "PENDING", duplicateOfId: dup?.id },
   });
+  await audit(u.id, "capture.create", b.address, { duplicate: !!dup });
   return ok(c, 201);
 });

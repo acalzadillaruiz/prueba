@@ -52,7 +52,7 @@ export function CaptureView({ locale, rows: initialRows, zones, titles }: { loca
 
   return (
     <AdminShell locale={locale} area="agency" title={tx(locale, "Cola de captación", "Capture queue")}>
-      <div className="grid gap-6 xl:grid-cols-[1fr_380px]">
+      <div className="grid gap-6 [&>*]:min-w-0 xl:grid-cols-[1fr_380px]">
         <div className="overflow-x-auto rounded-np border border-navy-line bg-navy-card">
           <table className="w-full min-w-[720px] text-sm">
             <thead className="border-b border-navy-line text-left text-xs uppercase tracking-wide text-mist">

@@ -106,7 +106,7 @@ export const AUDIT = [
 ];
 
 export const MODERATION_QUEUE = [
-  { id: "mod-1", title: "Apartamento 'económico' con fotos repetidas", reason: { es: "Fotos duplicadas de otro anuncio", en: "Photos duplicated from another listing" }, reporter: "Sistema · fingerprint", agency: "Orinoco Commercial", at: minutesAgo(25), severity: "high" as const },
-  { id: "mod-2", title: "Local en Las Mercedes — precio 1 USD", reason: { es: "Precio no realista", en: "Unrealistic price" }, reporter: "Usuario #u-8812", agency: "Particular", at: minutesAgo(140), severity: "medium" as const },
-  { id: "mod-3", title: "Casa en El Hatillo", reason: { es: "Teléfono en la descripción", en: "Phone number in description" }, reporter: "Sistema · reglas", agency: "Caracas Night Realty", at: minutesAgo(400), severity: "low" as const },
+  { id: "mod-1", listingId: "12q6lh", title: "Oficina 'económica' en Las Mercedes con fotos repetidas", reason: { es: "Fotos duplicadas de otro anuncio", en: "Photos duplicated from another listing" }, reporter: "Sistema · fingerprint", agency: "Orinoco Comercial", at: minutesAgo(25), severity: "high" as const },
+  { id: "mod-2", listingId: "blh349", title: "Local en Las Mercedes — precio sospechoso", reason: { es: "Precio no realista", en: "Unrealistic price" }, reporter: "Usuario #u-8812", agency: "Caracas Night Realty", at: minutesAgo(140), severity: "medium" as const },
+  { id: "mod-3", listingId: "1g0xf0", title: "Casa en El Hatillo", reason: { es: "Teléfono en la descripción", en: "Phone number in description" }, reporter: "Sistema · reglas", agency: "Particular", at: minutesAgo(400), severity: "low" as const },
 ];

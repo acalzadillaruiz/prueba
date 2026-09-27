@@ -22,19 +22,25 @@ export function ListingsTable({ locale, listings, agents }: { locale: Locale; li
   const manager = user?.role === "AGENCY_OWNER" || user?.role === "BACKOFFICE" || user?.role === "SUPERADMIN";
   const [status, setStatus] = useState<ListingStatus | "ALL" | "REVIEW">("ALL");
   const [busy, setBusy] = useState<string | null>(null);
-  const mine = listings;
+  const [q, setQ] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const norm = (x: string) => x.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  const mine = q ? listings.filter((l) => norm(`${l.title_es} ${l.zone} ${l.city} ${l.address} ${l.agent?.name ?? ""}`).includes(norm(q))) : listings;
   const patch = async (id: string, json: object) => {
     setBusy(id);
+    setError(null);
     try {
       await api(`listings/${id}`, { method: "PATCH", json });
       router.refresh();
+    } catch (e) {
+      setError((e as Error).message);
     } finally {
       setBusy(null);
     }
   };
   const review = mine.filter((l) => l.review === "PENDING").map((l) => l.id);
   const rows = mine.filter((l) => status === "ALL" || (status === "REVIEW" ? review.includes(l.id) : l.status === status));
-  const tabs: [typeof status, string][] = [["ALL", tx(locale, "Todos", "All")], ["REVIEW", tx(locale, "Por aprobar", "To approve")], ["ACTIVE", lbl(STATUS_LABEL.ACTIVE, locale)], ["UNDER_OFFER", lbl(STATUS_LABEL.UNDER_OFFER, locale)], ["COMING_SOON", lbl(STATUS_LABEL.COMING_SOON, locale)], ["SOLD", lbl(STATUS_LABEL.SOLD, locale)], ["DRAFT", lbl(STATUS_LABEL.DRAFT, locale)]];
+  const tabs: [typeof status, string][] = [["ALL", tx(locale, "Todos", "All")], ["REVIEW", tx(locale, "Por aprobar", "To approve")], ["ACTIVE", lbl(STATUS_LABEL.ACTIVE, locale)], ["UNDER_OFFER", lbl(STATUS_LABEL.UNDER_OFFER, locale)], ["COMING_SOON", lbl(STATUS_LABEL.COMING_SOON, locale)], ["SOLD", lbl(STATUS_LABEL.SOLD, locale)], ["RENTED", lbl(STATUS_LABEL.RENTED, locale)], ["WITHDRAWN", lbl(STATUS_LABEL.WITHDRAWN, locale)], ["DRAFT", lbl(STATUS_LABEL.DRAFT, locale)]];
   return (
     <AdminShell locale={locale} area="agency" title={tx(locale, "Inmuebles", "Listings")} actions={user?.role !== "PHOTOGRAPHER" && user?.role !== "CAPTOR" ? <Button size="sm" href={`/${locale}/agency/listings/new`}><Plus size={15} /> {tx(locale, "Nuevo inmueble", "New listing")}</Button> : undefined}>
       <div className="mb-4 flex flex-wrap items-center gap-2">
@@ -43,8 +49,12 @@ export function ListingsTable({ locale, listings, agents }: { locale: Locale; li
             {t} {k === "REVIEW" && <span className="ml-1 rounded-full bg-white/20 px-1.5 text-xs">{review.length}</span>}
           </button>
         ))}
-        <Button size="sm" variant="dark-ghost" className="ml-auto"><Filter size={14} /> {tx(locale, "Filtros", "Filters")}</Button>
+        <label className="relative ml-auto w-full sm:w-64">
+          <Filter size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-mist" aria-hidden />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={tx(locale, "Buscar título, zona, agente…", "Search title, area, agent…")} aria-label={tx(locale, "Buscar inmuebles", "Search listings")} className="h-9 w-full rounded-lg border border-navy-line bg-navy pl-9 pr-3 text-sm placeholder:text-mist/60 focus:border-coral focus:outline-none" />
+        </label>
       </div>
+      {error && <div className="mb-3 rounded-lg bg-[#B423181A] px-3 py-2 text-sm text-danger" role="alert">{error}</div>}
       <div className="overflow-x-auto rounded-np border border-navy-line bg-navy-card">
         <table className="w-full min-w-[1000px] text-sm">
           <thead className="border-b border-navy-line text-left text-xs uppercase tracking-wide text-mist">
@@ -102,6 +112,11 @@ export function ListingsTable({ locale, listings, agents }: { locale: Locale; li
                 </tr>
               );
             })}
+            {rows.length === 0 && (
+              <tr>
+                <td colSpan={9} className="px-4 py-10 text-center text-mist">{tx(locale, "No hay inmuebles con este filtro.", "No listings match this filter.")}</td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

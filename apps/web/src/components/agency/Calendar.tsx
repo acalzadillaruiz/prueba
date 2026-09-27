@@ -13,7 +13,6 @@ import { cn } from "@/lib/cn";
 
 export type CalEvent = { id: string; start: string; title: string; sub: string; kind: "tour" | "req" | "done" | "media" | "cancelled"; agentName: string; tourId?: string };
 
-const HOURS = Array.from({ length: 12 }, (_, i) => 8 + i);
 const TZ = -4; // America/Caracas
 
 export function CalendarView({ locale, weekStart, week, events, slots, canEditSlots }: { locale: Locale; weekStart: string; week: number; events: CalEvent[]; slots: { day: number; hours: number[] }[]; canEditSlots: boolean }) {
@@ -28,26 +27,55 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
   const dayIdx = (ms: number) => Math.floor((ms - start) / 864e5);
   const weekday = (i: number) => (new Date(start + i * 864e5 + TZ * 3600e3).getUTCDay() + 6) % 7; // Monday = 0
   const todayIdx = dayIdx(Date.now());
+  // Visible hours: 08–20 by default, stretched to include any event outside that range (nothing is ever hidden).
+  const inWeek = events.filter((e) => {
+    const di = dayIdx(Date.parse(e.start));
+    return di >= 0 && di <= 6;
+  });
+  const firstH = Math.min(8, ...inWeek.map((e) => Math.floor(localHour(Date.parse(e.start)))));
+  const lastH = Math.max(19, ...inWeek.map((e) => Math.floor(localHour(Date.parse(e.start)))));
+  const HOURS = Array.from({ length: lastH - firstH + 1 }, (_, i) => firstH + i);
+  // Side-by-side columns for events that share a day and hour.
+  const lane = new Map<string, { col: number; cols: number }>();
+  const groups = new Map<string, CalEvent[]>();
+  for (const e of inWeek) {
+    const ms = Date.parse(e.start);
+    const k = `${dayIdx(ms)}-${Math.floor(localHour(ms))}`;
+    groups.set(k, [...(groups.get(k) ?? []), e]);
+  }
+  for (const g of groups.values()) g.forEach((e, n) => lane.set(e.id, { col: n, cols: g.length }));
 
+  const [error, setError] = useState<string | null>(null);
   const saveSlots = async (next: typeof mySlots) => {
+    const prev = mySlots;
     setMySlots(next);
     setSaving(true);
+    setError(null);
     try {
       await api("me/slots", { method: "PUT", json: { days: next } });
+    } catch (e) {
+      setMySlots(prev); // roll back the optimistic toggle
+      setError((e as Error).message);
     } finally {
       setSaving(false);
     }
   };
   const setTour = async (status: "CONFIRMED" | "DONE" | "CANCELLED") => {
     if (!sel?.tourId) return;
-    await api(`tours/${sel.tourId}`, { method: "PATCH", json: { status } });
-    setSel(null);
-    router.refresh();
+    setError(null);
+    try {
+      await api(`tours/${sel.tourId}`, { method: "PATCH", json: { status } });
+      setSel(null);
+      router.refresh();
+    } catch (e) {
+      setError((e as Error).message);
+    }
   };
 
   return (
     <AdminShell locale={locale} area="agency" title={tx(locale, "Calendario", "Calendar")}>
-      <div className="grid gap-6 xl:grid-cols-[1fr_300px]">
+      {error && <div className="mb-3 rounded-lg bg-[#B423181A] px-3 py-2 text-sm text-danger" role="alert">{error}</div>}
+      <div className="grid gap-6 [&>*]:min-w-0 xl:grid-cols-[1fr_300px]">
         <div className="overflow-x-auto rounded-np border border-navy-line bg-navy-card">
           <div className="min-w-[760px]">
             <div className="flex items-center gap-3 border-b border-navy-line px-4 py-3">
@@ -85,7 +113,8 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
                   const ms = Date.parse(e.start);
                   const di = dayIdx(ms);
                   const hr = localHour(ms);
-                  if (di < 0 || di > 6 || hr < 8 || hr >= 20) return null;
+                  if (di < 0 || di > 6) return null;
+                  const { col, cols } = lane.get(e.id) ?? { col: 0, cols: 1 };
                   return (
                     <button
                       key={e.id}
@@ -97,7 +126,8 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
                         (e.kind === "done" || e.kind === "cancelled") && "bg-white/10 text-mist line-through",
                         e.kind === "media" && "bg-[#3E5A6B] text-ivory",
                       )}
-                      style={{ left: `calc(${(di / 7) * 100}% + 3px)`, width: `calc(${100 / 7}% - 6px)`, top: (hr - 8) * 56 + 3, height: 50 }}
+                      style={{ left: `calc(${(di / 7) * 100}% + ${(col / cols) * (100 / 7)}% + 3px)`, width: `calc(${100 / 7 / cols}% - 6px)`, top: (hr - firstH) * 56 + 3, height: 50 }}
+                      title={`${e.title} · ${e.sub}`}
                     >
                       <div className="flex items-center gap-1 font-semibold">{e.kind === "media" && <Camera size={11} />}{e.title}</div>
                       <div className="truncate opacity-80">{e.sub} · {e.agentName.split(" ")[0]}</div>
@@ -154,7 +184,7 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
           )}
           <div className="rounded-np border border-navy-line bg-navy-card p-4 text-sm">
             <div className="font-display text-lg font-semibold">{tx(locale, "Esta semana", "This week")}</div>
-            <div className="mt-2 text-mist">{events.filter((e) => e.kind === "tour" || e.kind === "req").length} {tx(locale, "visitas", "tours")} · {events.filter((e) => e.kind === "media").length} {tx(locale, "sesiones de fotos", "photo shoots")}</div>
+            <div className="mt-2 text-mist">{inWeek.filter((e) => e.kind === "tour" || e.kind === "req").length} {tx(locale, "visitas", "tours")} · {inWeek.filter((e) => e.kind === "media").length} {tx(locale, "sesiones de fotos", "photo shoots")}</div>
           </div>
         </div>
       </div>

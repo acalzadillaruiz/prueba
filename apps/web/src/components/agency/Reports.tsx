@@ -42,7 +42,7 @@ export function ReportsView({ locale, data }: { locale: Locale; data: ReportData
         <Stat dark label={tx(locale, "Leads (30 d)", "Leads (30 d)")} value={num(data.leads30, locale)} />
         <Stat dark label={tx(locale, "Días en mercado (mediana)", "Median days on market")} value={data.medianDom ?? "—"} hint={tx(locale, "inmuebles activos", "active listings")} />
       </div>
-      <div className="mt-6 grid gap-6 xl:grid-cols-2">
+      <div className="mt-6 grid gap-6 [&>*]:min-w-0 xl:grid-cols-2">
         <div className="rounded-np border border-navy-line bg-navy-card p-5">
           <div className="mb-3 font-display text-lg font-semibold">{tx(locale, "Leads por origen (30 d)", "Leads by source (30 d)")}</div>
           {data.bySource.length ? <BarChart data={data.bySource.map((s) => ({ label: tx(locale, SOURCE[s.source]?.[0] ?? s.source, SOURCE[s.source]?.[1] ?? s.source), value: s.count }))} height={220} /> : <div className="text-sm text-mist">—</div>}

@@ -40,7 +40,7 @@ export function TeamView({ locale, members, listingsByAgent, invites: initialInv
   return (
     <AdminShell locale={locale} area="agency" title={tx(locale, "Equipo", "Team")}>
       {err && <div className="mb-4 rounded-lg bg-[#B4231833] px-3 py-2 text-sm text-[#FF8A7A]">{err}</div>}
-      <div className="grid gap-6 xl:grid-cols-[1fr_360px]">
+      <div className="grid gap-6 [&>*]:min-w-0 xl:grid-cols-[1fr_360px]">
         <div className="overflow-x-auto rounded-np border border-navy-line bg-navy-card">
           <table className="w-full min-w-[720px] text-sm">
             <thead className="border-b border-navy-line text-left text-xs uppercase tracking-wide text-mist">

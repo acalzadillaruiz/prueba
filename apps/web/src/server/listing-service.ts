@@ -77,7 +77,9 @@ export async function notifySavedSearches(listingId: string, reason: "new" | "pr
     const f = filtersFromParams(new URLSearchParams(s.query));
     const hit = await prisma.listing.count({ where: { AND: [whereFromFilters(f), { id: l.id }] } });
     const poly = s.polygon as { lat: number; lng: number }[] | null;
-    if (!hit || (poly && poly.length >= 3 && !inShape(l, { type: "poly", pts: poly }))) continue;
+    // Shape: the polygon column, or a polygon/radius stored inside the query string.
+    const shape = poly && poly.length >= 3 ? ({ type: "poly", pts: poly } as const) : f.shape;
+    if (!hit || (shape && !inShape(l, shape))) continue;
     n++;
     await prisma.savedSearch.update({ where: { id: s.id }, data: { newCount: { increment: 1 }, ...(s.frequency === "INSTANT" ? { lastSentAt: new Date() } : {}) } });
     if (s.frequency === "INSTANT")

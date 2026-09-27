@@ -37,13 +37,12 @@
   "include": [
     "**/*.ts",
     "**/*.tsx",
-    ".next-prod/types/**/*.ts",
     ".next/types/**/*.ts",
-    "next-env.d.ts",
-    ".next-client-e2e/types/**/*.ts"
+    "next-env.d.ts"
   ],
   "exclude": [
     "node_modules",
+    ".next-*",
     "public/sw.js"
   ]
 }

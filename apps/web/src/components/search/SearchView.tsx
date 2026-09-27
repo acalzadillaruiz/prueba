@@ -128,16 +128,8 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
     setSavingAlert(true);
     setAlertError(null);
     try {
-      const name = [
-        tx(locale, TYPES.find((t) => t[0] === type)?.[1] ?? "", TYPES.find((t) => t[0] === type)?.[2] ?? ""),
-        zone,
-        beds ? `${beds}+ ${tx(locale, "hab", "bd")}` : "",
-        baths ? `${baths}+ ${tx(locale, "baños", "ba")}` : "",
-        minM2 ? `≥ ${minM2} m²` : "",
-        min ? `≥ ${num(min, locale)}` : "",
-        max ? `≤ ${num(max, locale)}` : "",
-        shape ? (shape.type === "radius" ? tx(locale, `radio ${shape.km} km`, `${shape.km} km radius`) : tx(locale, "zona dibujada", "drawn area")) : "",
-      ]
+      // Named after every active filter (same labels as the chips), so two different alerts never look identical.
+      const name = [tx(locale, TYPES.find((t) => t[0] === type)?.[1] ?? "", TYPES.find((t) => t[0] === type)?.[2] ?? ""), ...activeChips.map(([, label]) => label)]
         .filter(Boolean)
         .join(" · ")
         .slice(0, 120);
@@ -180,7 +172,8 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
   if (beds) activeChips.push(["beds", `${beds}+ ${tx(locale, "hab", "bd")}`, { beds: null }]);
   if (baths) activeChips.push(["baths", `${baths}+ ${tx(locale, "baños", "ba")}`, { baths: null }]);
   if (minM2) activeChips.push(["m2", `≥ ${num(minM2, locale)} m²`, { m2: null }]);
-  if (shape) activeChips.push(["shape", shape.type === "radius" ? tx(locale, `Radio ${shape.km} km`, `${shape.km} km radius`) : tx(locale, "Zona dibujada", "Drawn area"), { poly: null, radius: null }]);
+  const kmLabel = shape?.type === "radius" ? shape.km.toLocaleString(locale === "es" ? "es-VE" : "en-US", { maximumFractionDigits: 1 }) : "";
+  if (shape) activeChips.push(["shape", shape.type === "radius" ? tx(locale, `Radio ${kmLabel} km`, `${kmLabel} km radius`) : tx(locale, "Zona dibujada", "Drawn area"), { poly: null, radius: null }]);
   if (kind) activeChips.push(["kind", KIND_CHIP[kind] ? tx(locale, ...KIND_CHIP[kind]) : kind, { kind: null }]);
   if (lux) activeChips.push(["lux", "Luxury", { lux: null }]);
   if (pub) activeChips.push(["pub", pub === "24h" ? tx(locale, "Últimas 24 h", "Last 24 h") : tx(locale, "Últimos 7 días", "Last 7 days"), { pub: null }]);
@@ -337,6 +330,13 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
                   })}
                 </div>
               </div>
+            </div>
+            {/* The panel covers the map/list (full width on mobile): give it an explicit way out. */}
+            <div className="mt-5 flex justify-end border-t border-line pt-4">
+              <button onClick={() => setMoreOpen(false)} className="rounded-np bg-navy px-4 py-2 font-display text-sm text-ivory">
+                {query.isFetching ? <Loader2 size={14} className="mr-1.5 inline animate-spin" /> : null}
+                {tx(locale, `Ver ${plural(query.data?.total ?? results.length, locale, ["resultado", "resultados"], ["result", "results"])}`, `Show ${plural(query.data?.total ?? results.length, locale, ["resultado", "resultados"], ["result", "results"])}`)}
+              </button>
             </div>
           </div>
         )}

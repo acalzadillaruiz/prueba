@@ -7,6 +7,7 @@ import { EstimateCard } from "@/components/detail/Estimate";
 import { ContactPanel } from "@/components/detail/ContactPanel";
 import { BilingualBody, PriceHistory } from "@/components/detail/Bits";
 import { DetailMap } from "@/components/detail/DetailMap";
+import { mapListing } from "@/components/map/mapListing";
 import { ListingCard } from "@/components/listing/ListingCard";
 import { CompareButton, Freshness, SaveButton, ShareButton, StatusBadge } from "@/components/listing/bits";
 import { prisma } from "@newplace/db";
@@ -185,7 +186,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
 
             <div className={sec}>
               <H>{tx(locale, "Ubicación", "Location")}</H>
-              <DetailMap l={l} locale={locale} nearby={nearby} />
+              <DetailMap l={mapListing(l)} locale={locale} nearby={nearby.map(mapListing)} />
               <p className={cn("mt-2 text-xs", dark ? "text-mist" : "text-ink/65")}>
                 {tx(locale, "Colegios y trayectos se muestran solo cuando hay datos verificados para la zona.", "Schools and commute times appear only when verified data exists for the area.")}
               </p>

@@ -12,7 +12,8 @@ const BTN: Record<BtnVariant, string> = {
   "dark-ghost": "text-ivory/80 hover:bg-white/5 hover:text-ivory",
   "dark-outline": "border border-navy-line text-ivory hover:bg-white/5",
 };
-const SIZE = { sm: "h-8 px-3 text-sm", md: "h-10 px-4 text-[15px]", lg: "h-12 px-6 text-base" };
+// md is 44 px tall on touch-sized screens (tap target), 40 px from md up.
+const SIZE = { sm: "h-8 px-3 text-sm", md: "h-11 px-4 text-[15px] md:h-10", lg: "h-12 px-6 text-base" };
 
 export function Button({
   children,

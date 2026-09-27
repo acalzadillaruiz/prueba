@@ -37,7 +37,7 @@ export function SavedView({ locale, all }: { locale: Locale; all: Listing[] }) {
     [tx(locale, "Baños", "Baths"), (l) => l.baths, (l) => l.baths, "max"],
     [tx(locale, "Puestos", "Parking"), (l) => l.parking, (l) => l.parking, "max"],
     [tx(locale, "Año", "Year"), (l) => l.yearBuilt, (l) => l.yearBuilt, "max"],
-    [tx(locale, "Zona", "Area"), (l) => `${l.zone}, ${l.city}`],
+    [tx(locale, "Zona", "Location"), (l) => `${l.zone}, ${l.city}`],
     [tx(locale, "Operación", "Type"), (l) => lbl(TYPE_LABEL[l.listingType], locale)],
     [tx(locale, "Agencia", "Agency"), (l) => l.agency?.name ?? tx(locale, "Dueño directo", "By owner")],
     [tx(locale, "Días publicado", "Days listed"), (l) => l.daysOnMarket, (l) => l.daysOnMarket, "min"],

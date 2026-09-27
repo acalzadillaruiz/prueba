@@ -4,6 +4,7 @@ import type { Locale } from "@/types/domain";
 import { PublicPage } from "@/components/layout/PublicPage";
 import { HeroSearch } from "@/components/search/HeroSearch";
 import { HomeMap } from "@/components/search/HomeMap";
+import { mapListing } from "@/components/map/mapListing";
 import { ListingCard } from "@/components/listing/ListingCard";
 import { listingPhoto } from "@/lib/photos";
 import { PropertyArt } from "@/components/art/PropertyArt";
@@ -20,7 +21,7 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
   const [all, ZONES] = await Promise.all([publicListings(), getZones()]);
   const fresh = [...all].filter((l) => l.status === "ACTIVE" || l.status === "COMING_SOON").sort((a, b) => b.publishedAt.localeCompare(a.publishedAt)).slice(0, 8);
   const lux = all.filter((l) => l.luxury).slice(0, 3);
-  const caracas = all.filter((l) => l.city === "Caracas");
+  const caracas = all.filter((l) => l.city === "Caracas").map(mapListing);
   const zones = ZONES.filter((z) => z.city === "Caracas").slice(0, 8);
   const verifiedCount = all.length;
   return (
@@ -50,7 +51,7 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
 
       {/* NUEVOS HOY */}
       <section className="mx-auto max-w-[1400px] px-4 pt-14 md:px-6">
-        <SectionTitle action={<Link href={`/${locale}/search?pub=24h`} className="inline-flex items-center gap-1 font-display text-sm text-coral">{tx(locale, "Ver todos", "See all")} <ArrowRight size={15} /></Link>}>
+        <SectionTitle action={<Link href={`/${locale}/search?pub=24h`} className="inline-flex min-h-11 shrink-0 items-center gap-1 font-display text-sm text-coral">{tx(locale, "Ver todos", "See all")} <ArrowRight size={15} /></Link>}>
           {tx(locale, "Nuevos hoy", "New today")}
           <span className="ml-3 align-middle text-sm font-normal text-ink/65">{tx(locale, "ordenados por publicación", "sorted by published date")}</span>
         </SectionTitle>

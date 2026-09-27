@@ -469,7 +469,7 @@ export function NightMap({
             <div className="absolute left-3 top-3 z-10 flex flex-wrap gap-2">
               <button
                 className={cn(
-                  "flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-display text-sm shadow-np backdrop-blur transition-colors duration-np",
+                  "flex min-h-11 items-center gap-1.5 rounded-full border px-3 font-display text-sm shadow-np backdrop-blur transition-colors duration-np",
                   mode === "draw" ? "border-coral bg-coral-cta text-white" : "border-white/10 bg-navy/90 text-ivory hover:bg-navy",
                 )}
                 onClick={(e) => {
@@ -482,7 +482,7 @@ export function NightMap({
               </button>
               <button
                 className={cn(
-                  "flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-display text-sm shadow-np backdrop-blur",
+                  "flex min-h-11 items-center gap-1.5 rounded-full border px-3 font-display text-sm shadow-np backdrop-blur",
                   mode === "radius" ? "border-coral bg-coral-cta text-white" : "border-white/10 bg-navy/90 text-ivory hover:bg-navy",
                 )}
                 onClick={(e) => {
@@ -493,13 +493,13 @@ export function NightMap({
                 <Circle size={14} /> {tx(locale, "Radio 1,2 km", "1.2 km radius")}
               </button>
               {mode === "draw" && draft.length >= 3 && (
-                <button className="rounded-full bg-ivory px-3 py-1.5 font-display text-sm text-navy shadow-np" onClick={(e) => { e.stopPropagation(); closePoly(); }}>
+                <button className="min-h-11 rounded-full bg-ivory px-3 font-display text-sm text-navy shadow-np" onClick={(e) => { e.stopPropagation(); closePoly(); }}>
                   {tx(locale, "Cerrar zona", "Close area")} ({draft.length})
                 </button>
               )}
               {shape && (
                 <button
-                  className="flex items-center gap-1 rounded-full bg-ivory px-3 py-1.5 font-display text-sm text-navy shadow-np"
+                  className="flex min-h-11 items-center gap-1 rounded-full bg-ivory px-3 font-display text-sm text-navy shadow-np"
                   onClick={(e) => {
                     e.stopPropagation();
                     onShape(null);

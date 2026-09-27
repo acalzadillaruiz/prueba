@@ -96,11 +96,11 @@ export function PlatformHome({ locale, data }: { locale: Locale; data: PlatformH
             <Link href={`/${locale}/platform/audit`} className="text-sm font-semibold text-coral hover:underline">{tx(locale, "Ver todo", "View all")} →</Link>
           </div>
           {data.audit.map((a, i) => (
-            <div key={i} className="flex items-center gap-3 border-t border-navy-line py-2 text-sm first:border-0">
+            <div key={i} className="flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-navy-line py-2 text-sm first:border-0 sm:flex-nowrap">
               <span className="w-20 shrink-0 text-xs text-mist">{ago(a.at, locale)}</span>
               <span className="shrink-0 font-semibold">{a.actor || tx(locale, "Sistema", "System")}</span>
               <span className="shrink-0 rounded bg-white/5 px-1.5 text-xs text-coral">{auditLabel(a.action, locale)}</span>
-              <span className="flex-1 truncate text-mist">{a.target}</span>
+              <span className="min-w-0 flex-1 basis-full truncate text-mist sm:basis-auto">{a.target}</span>
             </div>
           ))}
         </div>
@@ -312,9 +312,9 @@ export function PlatformModeration({ locale, reports, listings }: { locale: Loca
             const down = !!l.takedownReason;
             return (
               <div key={l.id} data-listing={l.id} className="border-t border-navy-line first:border-0">
-              <div className={cn("flex items-center gap-3 px-4 py-2.5", down && "bg-[#B4231814]")}>
+              <div className={cn("flex flex-wrap items-center gap-3 px-4 py-2.5", down && "bg-[#B4231814]")}>
                 <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className={cn("h-11 w-14 shrink-0 rounded-md", down && "opacity-40 grayscale")} />
-                <div className="min-w-0 flex-1">
+                <div className="min-w-0 flex-1 basis-48">
                   <div className={cn("truncate font-semibold", down && "text-mist line-through")}>{tx(locale, l.title_es, l.title_en)}</div>
                   <div className="text-xs text-mist">{l.agency?.name ?? tx(locale, "Particular", "Private owner")} · {l.zone} · {money(l.priceAmount, locale)}</div>
                 </div>

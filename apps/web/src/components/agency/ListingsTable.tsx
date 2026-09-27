@@ -119,7 +119,7 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
                       </div>
                     </Link>
                   </td>
-                  <td className="px-3">{inReview ? <span className="rounded-full bg-[#C9862A33] px-2 py-0.5 text-[11px] font-bold uppercase text-[#F2B866]">{tx(locale, "En revisión", "In review")}</span> : l.review === "REJECTED" ? <span className="rounded-full bg-[#B4231833] px-2 py-0.5 text-[11px] font-bold uppercase text-[#FF8A7A]">{tx(locale, "Rechazado", "Rejected")}</span> : <StatusBadge status={l.status} locale={locale} />}</td>
+                  <td className="whitespace-nowrap px-3">{inReview ? <span className="whitespace-nowrap rounded-full bg-[#C9862A33] px-2 py-0.5 text-[11px] font-bold uppercase text-[#F2B866]">{tx(locale, "En revisión", "In review")}</span> : l.review === "REJECTED" ? <span className="rounded-full bg-[#B4231833] px-2 py-0.5 text-[11px] font-bold uppercase text-[#FF8A7A]">{tx(locale, "Rechazado", "Rejected")}</span> : <StatusBadge status={l.status} locale={locale} />}</td>
                   <td className="px-3 text-right font-display">{money(l.priceAmount, locale)}<span className="text-xs text-mist">{priceSuffix(l, locale)}</span></td>
                   <td className="px-3">
                     <select value={l.agentId ?? ""} disabled={!manager || busy === l.id} onChange={(e) => patch(l.id, { agentId: e.target.value || null })} className="h-8 rounded-md border border-navy-line bg-navy-2 px-2 text-xs" aria-label={tx(locale, "Agente", "Agent")}>

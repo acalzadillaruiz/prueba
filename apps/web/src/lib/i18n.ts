@@ -1,7 +1,17 @@
+import esMessages from "../../../../packages/config/messages/es.json";
+import enMessages from "../../../../packages/config/messages/en.json";
 import type { Amenity, Listing, ListingStatus, ListingType, Locale } from "@/types/domain";
 
 export const LOCALES: Locale[] = ["es", "en"];
 export const isLocale = (s: string): s is Locale => s === "es" || s === "en";
+
+/**
+ * Plain (no ICU placeholders) catalog strings for public client components, read straight from the next-intl
+ * catalogs: the public pages then don't ship next-intl's client formatter (intl-messageformat, ~12 KB gzip).
+ */
+type Catalog = typeof esMessages;
+const CATALOGS: Record<Locale, Catalog> = { es: esMessages, en: enMessages as Catalog };
+export const msg = <N extends keyof Catalog>(l: Locale, ns: N) => (key: keyof Catalog[N]) => String((CATALOGS[l] ?? CATALOGS.es)[ns][key]);
 
 /** Inline bilingual helper for the prototype. The production build uses next-intl message catalogs. */
 export const tx = (l: Locale, es: string, en: string) => (l === "es" ? es : en);

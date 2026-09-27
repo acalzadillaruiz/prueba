@@ -29,10 +29,12 @@ export function SwUpdate({ locale }: { locale: Locale }) {
     // Reload only when an updated worker replaces the one already serving this page (accepted here or in another
     // tab). On a first visit the new worker claims the page (clientsClaim) and fires "controllerchange" as well:
     // reloading then would load every first page twice.
-    const hadController = !!navigator.serviceWorker.controller;
+    let previous = navigator.serviceWorker.controller;
     let reloaded = false;
     const onChange = () => {
-      if (reloaded || !hadController) return;
+      const replaced = previous !== null;
+      previous = navigator.serviceWorker.controller;
+      if (reloaded || !replaced) return;
       reloaded = true;
       window.location.reload();
     };

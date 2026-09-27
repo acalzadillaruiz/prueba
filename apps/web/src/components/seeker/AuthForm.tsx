@@ -20,6 +20,7 @@ import { useApp } from "@/lib/store";
 import { tx } from "@/lib/i18n";
 
 const GOOGLE = process.env.NEXT_PUBLIC_GOOGLE_AUTH === "true";
+const ROLE_LABEL: Record<string, [string, string]> = { AGENT: ["agente", "an agent"], CAPTOR: ["captador", "a captor"], PHOTOGRAPHER: ["fotógrafo", "a photographer"], BACKOFFICE: ["backoffice", "backoffice"] };
 
 /** Landing page after sign-in, by role. */
 function homeFor(role: string) {
@@ -120,7 +121,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
           <h1 className="font-display text-3xl font-semibold">{mode === "login" ? tx(locale, "Entra a New Place", "Sign in to New Place") : tx(locale, "Crea tu cuenta", "Create your account")}</h1>
           {inv && (
             <div className="mt-4 rounded-np border border-coral/40 bg-[#F26B4D0D] p-3 text-sm" role="status">
-              {tx(locale, `${inv.agencyName} te invita a su equipo como ${inv.role}.`, `${inv.agencyName} invited you to their team as ${inv.role}.`)}{" "}
+              {tx(locale, `${inv.agencyName} te invita a su equipo como ${ROLE_LABEL[inv.role]?.[0] ?? inv.role}.`, `${inv.agencyName} invited you to their team as ${ROLE_LABEL[inv.role]?.[1] ?? inv.role}.`)}{" "}
               {mode === "register" ? (
                 <Link className="font-semibold text-coral" href={`/${locale}/login${carry}`}>{tx(locale, "¿Ya tienes cuenta? Entra", "Have an account? Sign in")}</Link>
               ) : null}

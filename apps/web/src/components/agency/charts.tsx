@@ -32,7 +32,7 @@ export function BarChart({ data, height = 180, format = (v: number) => String(v)
           return (
             <g key={i} onMouseEnter={() => setHover(i)} onMouseLeave={() => setHover(null)}>
               <rect x={pad.l + i * bw} y={pad.t} width={bw} height={H - pad.t - pad.b} fill="transparent" />
-              <path d={`M${x} ${H - pad.b} V${y + 4} q0 -4 4 -4 h${w - 8} q4 0 4 4 V${H - pad.b} Z`} fill="#F26B4D" opacity={hover === null || hover === i ? 1 : 0.45} />
+              {d.value > 0 && <path d={`M${x} ${H - pad.b} V${Math.min(y + 4, H - pad.b)} q0 -4 4 -4 h${w - 8} q4 0 4 4 V${H - pad.b} Z`} fill="#F26B4D" opacity={hover === null || hover === i ? 1 : 0.45} />}
               {(i % Math.ceil(data.length / 8) === 0 || i === data.length - 1) && (
                 <text x={x + w / 2} y={H - 6} textAnchor="middle" fontSize={10} fill="#8AA4B5">{d.label}</text>
               )}

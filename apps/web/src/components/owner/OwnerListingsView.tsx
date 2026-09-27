@@ -114,7 +114,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
         }}
       />
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_400px]">
+      <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_400px]">
         <div className="space-y-6">
           {mandates.map((m) => (
             <Card key={m.id} className="p-5">
@@ -296,8 +296,12 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
                   <div className="truncate text-xs text-ink/65">{thread.subject}</div>
                 </div>
                 {live.data.threads.length > 1 && (
-                  <select className="h-8 max-w-[140px] rounded-lg border border-line text-xs" value={thread.id} onChange={(e) => setActive(e.target.value)} aria-label={tx(locale, "Conversación", "Conversation")}>
-                    {live.data.threads.map((t) => <option key={t.id} value={t.id}>{t.subject ?? (t.participants.filter((p) => p.id !== user?.id).map((p) => p.name).join(", ") || tx(locale, "Conversación", "Conversation"))}</option>)}
+                  <select className="h-8 max-w-[160px] rounded-lg border border-line text-xs" value={thread.id} onChange={(e) => setActive(e.target.value)} aria-label={tx(locale, "Conversación", "Conversation")}>
+                    {live.data.threads.map((t) => {
+                      // Several buyers write about the same listing: name who is on the other side, then the subject.
+                      const who = t.participants.filter((p) => p.id !== user?.id).map((p) => p.name).join(", ") || leads.find((ld) => ld.id === t.leadId)?.name;
+                      return <option key={t.id} value={t.id}>{[who, t.subject].filter(Boolean).join(" · ") || tx(locale, "Conversación", "Conversation")}</option>;
+                    })}
                   </select>
                 )}
               </div>

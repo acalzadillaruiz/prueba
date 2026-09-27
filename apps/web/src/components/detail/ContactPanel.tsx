@@ -26,7 +26,10 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
   const slots = useQuery({ queryKey: ["slots", l.id], queryFn: () => api<Slots>(`listings/${l.id}/slots`), enabled: bookable, refetchInterval: 15_000 });
   const days = slots.data?.days ?? [];
   const [mode, setMode] = useState<"tour" | "msg">(bookable ? "tour" : "msg");
-  const [day, setDay] = useState(0);
+  // Open on the first day that still has a free slot (a fully booked "today" used to leave the button disabled with no hint).
+  const [dayPick, setDay] = useState<number | null>(null);
+  const firstOpenDay = days.findIndex((d) => d.hours.some((h) => h.available));
+  const day = dayPick ?? Math.max(0, firstOpenDay);
   const [iso, setIso] = useState<string | null>(null);
   const [virtual, setVirtual] = useState(false);
   type F = { name: string; email: string; phone?: string; message: string };
@@ -38,7 +41,8 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
   // The session arrives after first paint on cached pages: pre-fill whatever the visitor hasn't typed yet.
   useEffect(() => {
     if (!user) return;
-    for (const [k, v] of [["name", user.name], ["email", user.email], ["phone", user.phone ?? ""]] as const) if (!form.getValues(k) && v) form.setValue(k, v);
+    // Re-validate a field that already shows an error (sent before the session arrived) so a stale "too short" disappears.
+    for (const [k, v] of [["name", user.name], ["email", user.email], ["phone", user.phone ?? ""]] as const) if (!form.getValues(k) && v) form.setValue(k, v, { shouldValidate: !!form.getFieldState(k).error });
   }, [user, form]);
   const errs = form.formState.errors;
   // Every invalid field at once (not only the first), in the order they appear in the form.
@@ -94,7 +98,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
         </p>
         <div className="mt-4 flex gap-2">
           {user && <Button href={`/${locale}/app`} size="sm">{tx(locale, "Ver en mi Hub", "Open my Hub")}</Button>}
-          <Button size="sm" variant={dark ? "dark-outline" : "outline"} onClick={() => { setDone(null); setIso(null); }}>{tx(locale, "Nueva solicitud", "New request")}</Button>
+          <Button size="sm" variant={dark ? "dark-outline" : "outline"} onClick={() => { setDone(null); setIso(null); setDay(null); }}>{tx(locale, "Nueva solicitud", "New request")}</Button>
         </div>
       </div>
     );
@@ -148,12 +152,20 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
                 </button>
               ))}
             </div>
+            {days.length > 0 && !days[day]?.hours.some((h) => h.available) && (
+              <div className={cn("mt-3 text-sm", muted)} role="status">
+                {firstOpenDay === -1 ? tx(locale, "No quedan horarios libres esta semana. Envía un mensaje y te propondrán uno.", "No free slots left this week. Send a message and they’ll propose one.") : tx(locale, "Este día ya no tiene horarios libres. Elige otro día.", "No free slots left on this day. Pick another day.")}
+              </div>
+            )}
             <div className="mt-3 grid grid-cols-3 gap-2">
               {days[day]?.hours.map((h) => (
                 <button
                   key={h.iso}
                   disabled={!h.available}
-                  onClick={() => setIso(h.iso)}
+                  onClick={() => {
+                    setDay(day); // pin the day shown, so a refresh of the calendar can't move the view away from the chosen slot
+                    setIso(h.iso);
+                  }}
                   className={cn(
                     "rounded-lg border py-1.5 text-sm font-semibold disabled:cursor-not-allowed disabled:line-through disabled:opacity-40",
                     chosen === h.iso ? "border-navy bg-navy text-ivory" : dark ? "border-navy-line" : "border-line",

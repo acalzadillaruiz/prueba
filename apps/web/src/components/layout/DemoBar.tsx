@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
-import { logout } from "@/lib/logout";
 import { FlaskConical, Loader2, LogIn, LogOut } from "lucide-react";
 import type { Locale } from "@/types/domain";
 import { useApp } from "@/lib/store";
@@ -25,6 +23,8 @@ export function DemoBar({ locale }: { locale: Locale }) {
   if (!DEMO_ENABLED || hidden) return null;
   const go = async (email: string, home: string) => {
     setBusy(email);
+    // Loaded on demand: next-auth/react stays out of every public page bundle.
+    const { signIn } = await import("next-auth/react");
     await signIn("demo", { email, redirect: false });
     await refresh();
     setOpen(false);
@@ -48,7 +48,7 @@ export function DemoBar({ locale }: { locale: Locale }) {
             </button>
           ))}
           {user && (
-            <button className="flex w-full items-center gap-2.5 border-t border-navy-line px-3 py-2 text-left text-sm text-mist hover:bg-white/5" onClick={() => logout(locale)}>
+            <button className="flex w-full items-center gap-2.5 border-t border-navy-line px-3 py-2 text-left text-sm text-mist hover:bg-white/5" onClick={() => import("@/lib/logout").then((m) => m.logout(locale))}>
               <LogOut size={15} /> {tx(locale, "Cerrar sesión", "Sign out")}
             </button>
           )}

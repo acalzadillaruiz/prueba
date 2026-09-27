@@ -184,7 +184,7 @@ test.describe("Revisión admin: regresiones", () => {
     await page.getByRole("textbox", { name: "Motivo de la retirada" }).fill("Fotos engañosas (E2E)");
     await page.getByRole("button", { name: "Confirmar retirada" }).click();
     await expect.poll(async () => (await db.listing.findUniqueOrThrow({ where: { id: reported } })).takedownReason).toBe("Fotos engañosas (E2E)");
-    expect((await db.moderationReport.findUniqueOrThrow({ where: { id: rep.id } })).resolved).toBe(true);
+    await expect.poll(async () => (await db.moderationReport.findUniqueOrThrow({ where: { id: rep.id } })).resolved).toBe(true);
   });
 
   test("plataforma: una agencia con nombre repetido → 409 (no 500); agencia inexistente → 404", async ({ page }) => {

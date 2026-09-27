@@ -1,11 +1,14 @@
 "use client";
 
 import { useEffect } from "react";
-import { useTranslations } from "next-intl";
+import { useParams } from "next/navigation";
+import { isLocale, msg } from "@/lib/i18n";
 import { Logo } from "@/components/brand/Logo";
 
 export default function ErrorPage({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
-  const t = useTranslations("common");
+  // Catalog strings without next-intl client hooks: this boundary ships with every page.
+  const lang = useParams<{ locale?: string }>()?.locale ?? "es";
+  const t = msg(isLocale(lang) ? lang : "es", "common");
   useEffect(() => {
     console.error(error);
     if (process.env.NEXT_PUBLIC_SENTRY_DSN) import("@sentry/nextjs").then((S) => S.captureException(error));

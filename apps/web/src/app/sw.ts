@@ -54,6 +54,11 @@ const serwist: Serwist = new Serwist({
   runtimeCaching: [
     { matcher: ({ url }) => url.pathname.startsWith("/api/auth"), handler: new NetworkOnly() },
     {
+      // Anything a private page loads (photos of unpublished listings in the back-office, avatars…) is never stored.
+      matcher: ({ request, sameOrigin }) => sameOrigin && request.mode !== "navigate" && !!request.referrer && PRIVATE_PAGE.test(new URL(request.referrer).pathname),
+      handler: new NetworkOnly(),
+    },
+    {
       matcher: ({ url, request, sameOrigin }) => sameOrigin && request.method === "GET" && PUBLIC_API.test(url.pathname),
       handler: new NetworkFirst({ cacheName: "np-api", networkTimeoutSeconds: 6, plugins: [okOnly, publicListingOnly, new ExpirationPlugin({ maxEntries: 120, maxAgeSeconds: 24 * 3600 })] }),
     },

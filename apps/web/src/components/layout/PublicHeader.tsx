@@ -7,9 +7,9 @@ import { useEffect, useState } from "react";
 import type { Locale } from "@/types/domain";
 import { Logo } from "@/components/brand/Logo";
 import { Avatar, Button } from "@/components/ui";
-import { useTranslations } from "next-intl";
 import { useApp } from "@/lib/store";
 import { cn } from "@/lib/cn";
+import { msg } from "@/lib/i18n";
 
 export function PublicHeader({ locale, variant = "light" }: { locale: Locale; variant?: "light" | "dark" | "transparent" }) {
   const pathname = usePathname();
@@ -31,7 +31,7 @@ export function PublicHeader({ locale, variant = "light" }: { locale: Locale; va
     };
   }, [menuOpen]);
   const { saved, user: u, ready } = useApp();
-  const t = useTranslations("nav");
+  const t = msg(locale, "nav");
   const [isDark, setDarkState] = useState(false);
   useEffect(() => setDarkState(document.documentElement.classList.contains("dark")), []);
   const toggleTheme = () => {

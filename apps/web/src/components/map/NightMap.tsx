@@ -365,7 +365,7 @@ export function NightMap({
                 return (
                   <g key={c.t}>
                     <circle cx={p.x} cy={p.y} r={3 / view.s} fill={pal.label} />
-                    <text x={p.x + 7 / view.s} y={p.y - 6 / view.s} fill={pal.label} fontFamily="var(--font-display)" style={{ fontSize: 13 / view.s }}>
+                    <text transform={labelAt(p.x + (5 * k) / view.s, p.y - (4 * k) / view.s)} fill={pal.label} fontFamily="var(--font-display)" fontSize={13}>
                       {c.t}
                     </text>
                   </g>
@@ -374,7 +374,7 @@ export function NightMap({
               {(() => {
                 const p = P(12.1, -61.5);
                 return (
-                  <text x={p.x} y={p.y} fill={pal.label2} letterSpacing={3} fontFamily="var(--font-display)" style={{ fontSize: 14 / view.s }}>
+                  <text transform={labelAt(p.x, p.y)} fill={pal.label2} letterSpacing={3} fontFamily="var(--font-display)" fontSize={14}>
                     MAR CARIBE
                   </text>
                 );
@@ -450,16 +450,16 @@ export function NightMap({
         <>
           <div className="absolute right-3 top-3 z-10 flex flex-col gap-2">
             <div className="flex flex-col overflow-hidden rounded-xl border border-white/10 bg-navy/90 text-ivory shadow-np backdrop-blur">
-              <button aria-label="Zoom in" className="p-2.5 hover:bg-white/10" onClick={() => zoom(1.4)}>
+              <button aria-label={tx(locale, "Acercar", "Zoom in")} className="flex h-11 w-11 items-center justify-center hover:bg-white/10" onClick={() => zoom(1.4)}>
                 <Plus size={16} />
               </button>
-              <button aria-label="Zoom out" className="border-t border-white/10 p-2.5 hover:bg-white/10" onClick={() => zoom(1 / 1.4)}>
+              <button aria-label={tx(locale, "Alejar", "Zoom out")} className="flex h-11 w-11 items-center justify-center border-t border-white/10 hover:bg-white/10" onClick={() => zoom(1 / 1.4)}>
                 <Minus size={16} />
               </button>
             </div>
             <button
               aria-label={tx(locale, "Cambiar estilo de mapa", "Toggle map style")}
-              className="rounded-xl border border-white/10 bg-navy/90 p-2.5 text-ivory shadow-np backdrop-blur hover:bg-white/10"
+              className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-navy/90 text-ivory shadow-np backdrop-blur hover:bg-white/10"
               onClick={() => setTheme((t) => (t === "night" ? "light" : "night"))}
             >
               {theme === "night" ? <Sun size={16} /> : <Moon size={16} />}
@@ -510,7 +510,7 @@ export function NightMap({
               )}
             </div>
           )}
-          <div className="pointer-events-none absolute bottom-2 left-3 z-10 text-[10px] text-mist/70">
+          <div className="pointer-events-none absolute bottom-2 left-3 z-10 text-xs text-mist">
             {tx(locale, "Mapa ilustrativo · Google Maps en producción", "Illustrative map · Google Maps in production")}
           </div>
         </>

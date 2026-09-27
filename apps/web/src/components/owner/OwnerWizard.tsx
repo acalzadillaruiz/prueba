@@ -94,7 +94,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
   const [dupError, setDupError] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const [cover, setCover] = useState(0);
-  const [dup, setDup] = useState<{ title: string; slug: string } | null>(null);
+  const [dup, setDup] = useState<{ title: string | null; slug: string | null } | null>(null);
   const [checking, setChecking] = useState(false);
   const [estimate, setEstimate] = useState<EstimateResult | null>(null);
   const [writing, setWriting] = useState(false);
@@ -155,7 +155,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
     if (!d.addr) return setDup(null);
     setChecking(true);
     const t = setTimeout(() => {
-      api<{ duplicate: { title: string; slug: string } | null }>("capture/check", { method: "POST", json: { address: `${d.addr!.main} ${d.unit}`.trim(), areaM2: d.m2, lat: d.addr!.lat, lng: d.addr!.lng } })
+      api<{ duplicate: { title: string | null; slug: string | null } | null }>("capture/check", { method: "POST", json: { address: `${d.addr!.main} ${d.unit}`.trim(), areaM2: d.m2, lat: d.addr!.lat, lng: d.addr!.lng } })
         .then((r) => {
           setDup(r.duplicate);
           setDupError(false);
@@ -418,7 +418,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                 {dup ? (
                   <span>
                     · {tx(locale, "Ya existe:", "Already listed:")}{" "}
-                    <Link className="font-semibold text-coral underline" href={`/${locale}/listing/${dup.slug}`}>{dup.title}</Link>
+                    {dup.slug ? <Link className="font-semibold text-coral underline" href={`/${locale}/listing/${dup.slug}`}>{dup.title}</Link> : tx(locale, "un inmueble en revisión o no público.", "a listing under review or not public.")}
                   </span>
                 ) : dupError ? (
                   <span className="text-ink/65">· {tx(locale, "No pudimos verificar duplicados ahora; lo revisaremos al publicar.", "Couldn’t check for duplicates now; we’ll check again when you publish.")}</span>
@@ -603,7 +603,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                 <AlertTriangle size={18} className="text-warn" />
                 <span>
                   {tx(locale, "Con estos datos ya existe un anuncio:", "A listing with these details already exists:")}{" "}
-                  <Link className="font-semibold text-coral underline" href={`/${locale}/listing/${dup.slug}`}>{dup.title}</Link>
+                  {dup.slug ? <Link className="font-semibold text-coral underline" href={`/${locale}/listing/${dup.slug}`}>{dup.title}</Link> : tx(locale, "un inmueble en revisión o no público.", "a listing under review or not public.")}
                 </span>
               </div>
             )}

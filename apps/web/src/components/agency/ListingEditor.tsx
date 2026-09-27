@@ -159,7 +159,7 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
       title={tx(locale, "Editar inmueble", "Edit listing")}
       actions={
         <div className="flex gap-2">
-          <Button size="sm" variant="dark-outline" href={listingHref(locale, l)}><Eye size={14} /> {tx(locale, "Ver ficha", "View")}</Button>
+          <Button size="sm" variant="dark-outline" href={listingHref(locale, l)}><Eye size={14} /> <span className="sr-only sm:not-sr-only">{tx(locale, "Ver ficha", "View")}</span></Button>
           {canEdit && (
             <Button size="sm" onClick={save} disabled={busy === "save"}>
               {busy === "save" ? <Loader2 size={14} className="animate-spin" /> : saved ? <Check size={14} /> : <Save size={14} />} {saved ? tx(locale, "Guardado", "Saved") : tx(locale, "Guardar", "Save")}

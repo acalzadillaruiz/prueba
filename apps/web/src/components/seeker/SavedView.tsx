@@ -20,8 +20,8 @@ export function SavedView({ locale, all }: { locale: Locale; all: Listing[] }) {
   const items = saved.map((id) => all.find((l) => l.id === id)).filter(Boolean) as Listing[];
   // Keep a light copy on the device so "Guardados" works offline (the offline screen lists them).
   useEffect(() => {
-    storeSavedOffline(items.map((l) => ({ slug: l.slug, title_es: l.title_es, title_en: l.title_en, price: `${money(l.priceAmount, locale)}${priceSuffix(l, locale)}`, zone: l.zone, city: l.city })));
-  }, [items, locale]);
+    storeSavedOffline(items.map((l) => ({ slug: l.slug, title_es: l.title_es, title_en: l.title_en, price: `${money(l.priceAmount, "es")}${priceSuffix(l, "es")}`, price_en: `${money(l.priceAmount, "en")}${priceSuffix(l, "en")}`, zone: l.zone, city: l.city })));
+  }, [items]);
   // Compared listings don't have to be saved: fetch the ones we don't already have.
   const missing = compare.filter((id) => !all.some((l) => l.id === id));
   const extra = useQuery({ queryKey: ["compare", missing.join(",")], queryFn: () => api<{ items: Listing[] }>(`listings?ids=${missing.join(",")}`), enabled: missing.length > 0 });

@@ -27,6 +27,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: L
     alternates: alternates(locale, path),
     openGraph: { ...ogBase(locale), title, description, url: `/${locale}${path}` },
     twitter: { card: "summary_large_image", title, description },
+    // "Solo con enlace": reachable by its link but never indexed.
+    ...(l.privateListing ? { robots: { index: false, follow: false } } : {}),
   };
 }
 

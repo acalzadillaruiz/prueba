@@ -20,7 +20,7 @@ export const POST = handler(async (req: NextRequest) => {
   const u = await currentUser();
   const b = await body(req, Create);
   // Only published listings take enquiries; tours only while the property is still available.
-  const l = await prisma.listing.findFirst({ where: { AND: [{ id: b.listingId }, publicWhere()] }, include: { agent: true, owner: true } });
+  const l = await prisma.listing.findFirst({ where: { AND: [{ id: b.listingId }, publicWhere({ byLink: true })] }, include: { agent: true, owner: true } });
   if (!l) throw new ApiError("NOT_FOUND");
   const tourStart = b.tourStart ? new Date(b.tourStart) : null;
   if (tourStart) {

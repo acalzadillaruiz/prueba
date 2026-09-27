@@ -2,18 +2,21 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import type { Locale } from "@/types/domain";
 import { Logo } from "@/components/brand/Logo";
+import { FooterAccountLink } from "./FooterAccountLink";
 
 export async function PublicFooter({ locale }: { locale: Locale }) {
   const t = await getTranslations({ locale, namespace: "footer" });
   const nav = await getTranslations({ locale, namespace: "nav" });
   const brand = await getTranslations({ locale, namespace: "brand" });
-  const col = (title: string, links: [string, string][]) => (
+  const linkCls = "inline-flex min-h-11 min-w-11 items-center hover:text-ivory md:min-h-0 md:min-w-0 md:py-1";
+  const col = (title: string, links: [string, string][], extra?: React.ReactNode) => (
     <div>
       <div className="mb-3 font-display text-sm font-semibold text-ivory">{title}</div>
       <ul className="space-y-2 text-sm text-mist">
         {links.map(([label, h]) => (
-          <li key={label}><Link href={h} className="inline-flex min-h-11 min-w-11 items-center hover:text-ivory md:min-h-0 md:min-w-0 md:py-1">{label}</Link></li>
+          <li key={label}><Link href={h} className={linkCls}>{label}</Link></li>
         ))}
+        {extra && <li>{extra}</li>}
       </ul>
     </div>
   );
@@ -27,7 +30,7 @@ export async function PublicFooter({ locale }: { locale: Locale }) {
         </div>
         {col(t("search"), [[nav("buy"), `/${locale}/search?type=SALE`], [nav("rent"), `/${locale}/search?type=LONG_RENT`], [nav("vacation"), `/${locale}/search?type=SHORT_RENT`], [nav("luxury"), `/${locale}/luxury`]])}
         {col(t("owners"), [[t("listFree"), `/${locale}/owner/new`], [t("hireAgency"), `/${locale}/owner/new`], [t("myProperties"), `/${locale}/owner/listings`]])}
-        {col(t("agencies"), [[t("forAgencies"), `/${locale}/register`], [nav("signIn"), `/${locale}/login`]])}
+        {col(t("agencies"), [[t("forAgencies"), `/${locale}/register`]], <FooterAccountLink locale={locale} signIn={nav("signIn")} className={linkCls} />)}
       </div>
       <div className="border-t border-navy-line">
         <div className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-2 px-4 py-4 text-xs text-mist md:px-6">

@@ -6,6 +6,7 @@ import bcrypt from "bcryptjs";
 import { existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { heuristicLeadScore } from "@newplace/ai";
+import { listingQuality } from "@newplace/config";
 import { PrismaClient, type Prisma } from "@prisma/client";
 import { AGENCIES, NOW, USERS } from "./seed-data/people";
 import { LISTINGS } from "./seed-data/listings";
@@ -126,6 +127,13 @@ async function main() {
       const mine = files.filter((f) => f.startsWith(`${l.id}-`)).sort((a, b) => Number(a.split("-")[1].split(".")[0]) - Number(b.split("-")[1].split(".")[0]));
       if (mine.length) await prisma.listingPhoto.createMany({ data: mine.map((f, i) => ({ listingId: l.id, url: `/photos/${f}`, order: i, isCover: i === 0, scene: l.scenes[i] })) });
     }
+  }
+  // Quality follows the one official formula (only real photos count), same as the app's refreshQuality.
+  for (const l of LISTINGS) {
+    const photos = await prisma.listingPhoto.count({ where: { listingId: l.id } });
+    const row = await prisma.listing.findUniqueOrThrow({ where: { id: l.id }, select: { titleEn: true, bodyEn: true, lat: true, hasFloorplan: true, hasVirtualTour: true } });
+    const quality = listingQuality({ photos, titleEn: row.titleEn, bodyEn: row.bodyEn, located: !!row.lat, hasFloorplan: row.hasFloorplan, hasVirtualTour: row.hasVirtualTour });
+    await prisma.$executeRaw`UPDATE "Listing" SET "quality" = ${quality} WHERE "id" = ${l.id}`;
   }
   // two listings pending review so backoffice has something to approve
   await prisma.listing.updateMany({ where: { id: { in: [LISTINGS[12].id, LISTINGS[20].id] } }, data: { review: "PENDING" } });

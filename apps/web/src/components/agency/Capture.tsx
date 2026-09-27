@@ -20,7 +20,7 @@ const TONE: Record<CaptureLead["result"], string> = {
 type Row = CaptureLead & { listingId?: string };
 type ListingType = keyof typeof TYPE_LABEL;
 const KINDS: [string, string, string][] = [["apartment", "Apartamento", "Apartment"], ["penthouse", "Penthouse", "Penthouse"], ["house", "Casa", "House"], ["townhouse", "Townhouse", "Townhouse"], ["studio", "Estudio", "Studio"], ["villa", "Villa", "Villa"], ["chalet", "Chalet", "Chalet"], ["office", "Oficina", "Office"], ["retail", "Local", "Retail"], ["warehouse", "Galpón", "Warehouse"], ["land", "Terreno", "Land"]];
-type Dup ={ id: string; slug: string; title: string; zone: string; areaM2: number; fingerprint: string } | null;
+type Dup = { id?: string; slug: string | null; title: string | null; zone?: string; areaM2?: number; fingerprint?: string } | null;
 
 export function CaptureView({ locale, rows: initialRows, zones, titles, canConvert = false }: { locale: Locale; rows: Row[]; zones: Zone[]; titles: Record<string, string>; canConvert?: boolean }) {
   const router = useRouter();
@@ -194,7 +194,7 @@ export function CaptureView({ locale, rows: initialRows, zones, titles, canConve
           {f.address.length >= 6 && (
             <div className={cn("np-in mt-4 rounded-lg border p-3 text-sm", dup ? "border-[#C9862A80] bg-[#C9862A1a]" : "border-[#2F6F4E80] bg-[#2F6F4E1a]")}>
               <div className="flex items-center gap-2 font-semibold">{checking ? <Loader2 size={16} className="animate-spin" /> : dup ? <AlertTriangle size={16} className="text-[#F2B866]" /> : <CheckCircle2 size={16} className="text-[#7FD3A8]" />}{dup ? tx(locale, "Posible duplicado", "Possible duplicate") : tx(locale, "Sin duplicados", "No duplicates")}</div>
-              <div className="mt-1 text-xs text-mist">{dup ? `${dup.title} · ${dup.zone} · ${dup.areaM2} m²` : tx(locale, "Fingerprint: lat/lng + m² + hash de dirección", "Fingerprint: lat/lng + m² + address hash")}</div>
+              <div className="mt-1 text-xs text-mist">{dup ? (dup.zone ? `${dup.title} · ${dup.zone} · ${dup.areaM2} m²` : dup.title ?? tx(locale, "Ya existe en otra agencia (no público)", "Already listed by another agency (not public)")) : tx(locale, "Fingerprint: lat/lng + m² + hash de dirección", "Fingerprint: lat/lng + m² + address hash")}</div>
               <div className="mt-1 font-mono text-[10px] text-mist/80">{dup?.fingerprint ?? fp}</div>
             </div>
           )}

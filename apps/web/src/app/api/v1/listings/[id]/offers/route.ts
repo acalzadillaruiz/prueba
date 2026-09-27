@@ -22,7 +22,7 @@ export const POST = handler(async (req: NextRequest, { params }: Ctx) => {
   const u = requireUser(await currentUser());
   const b = await body(req, offerSchema);
   await limit(req, "offer", 10, 60 * 60);
-  const l = await prisma.listing.findFirst({ where: { AND: [{ id }, publicWhere()] }, include: { owner: true, agent: true } });
+  const l = await prisma.listing.findFirst({ where: { AND: [{ id }, publicWhere({ byLink: true })] }, include: { owner: true, agent: true } });
   if (!l) throw new ApiError("NOT_FOUND");
   if (!["ACTIVE", "COMING_SOON", "UNDER_OFFER"].includes(l.status)) throw new ApiError("VALIDATION", { listing: "not available" });
   const [lead, tour] = await Promise.all([

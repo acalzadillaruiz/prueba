@@ -1,5 +1,5 @@
 /** Minimal cards of the user's saved homes, kept on the device so they can be browsed offline. */
-export type OfflineCard = { slug: string; title_es: string; title_en: string; price: string; zone: string; city: string };
+export type OfflineCard = { slug: string; title_es: string; title_en: string; price: string; price_en?: string; zone: string; city: string };
 const KEY = "np-saved-offline-v1";
 
 export function storeSavedOffline(cards: OfflineCard[]) {

@@ -78,6 +78,16 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
         const p = await profile(params.user.id as string);
         if (p) params.user = p;
       }
+      // A server-side session refresh (e.g. after joining an agency) re-reads role/agency from the DB.
+      // Superadmins keep the edge path: their update() switches the impersonated tenant.
+      if (params.trigger === "update" && params.token.uid && params.token.role !== "SUPERADMIN") {
+        const p = await profile(params.token.uid as string);
+        if (p) {
+          params.token.role = p.role;
+          params.token.agencyId = p.agencyId;
+        }
+        return params.token;
+      }
       return authConfig.callbacks.jwt(params);
     },
   },

@@ -11,7 +11,7 @@ import { mapListing } from "@/components/map/mapListing";
 import { ListingCard } from "@/components/listing/ListingCard";
 import { CompareButton, Freshness, SaveButton, ShareButton, StatusBadge } from "@/components/listing/bits";
 import { prisma } from "@newplace/db";
-import { listingInclude, publicWhere, toCard, toDomain } from "@/server/listings";
+import { PUBLIC_STATUSES, listingInclude, publicWhere, toCard, toDomain } from "@/server/listings";
 import { getFx } from "@/server/data";
 import { AMENITY_LABEL, TYPE_LABEL, lbl, money, num, priceSuffix, tx, plural } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
@@ -42,7 +42,7 @@ function jsonLd(l: Listing, locale: Locale) {
 
 /** Published and approved: visible to everyone (the rest only through the authenticated preview). */
 export function isPublicListing(l: Pick<Listing, "status" | "review" | "privateListing">) {
-  return ["COMING_SOON", "ACTIVE", "UNDER_OFFER", "SOLD", "RENTED"].includes(l.status) && l.review === "APPROVED";
+  return PUBLIC_STATUSES.includes(l.status) && l.review === "APPROVED";
 }
 
 function Facts({ l, locale, dark }: { l: Listing; locale: Locale; dark?: boolean }) {
@@ -81,14 +81,12 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
     getFx(),
     prisma.listing.findMany({ where: { AND: [publicWhere(), { id: { not: l.id }, listingType: l.listingType }, { OR: [{ city: l.city }, { luxury: l.luxury }] }] }, include: listingInclude, take: 24 }),
     prisma.listing.findMany({ where: { AND: [publicWhere(), { id: { not: l.id }, city: l.city }] }, include: listingInclude, take: 12 }),
-    prisma.listing.findMany({ where: { id: { not: l.id }, zone: l.zone, status: { in: ["SOLD", "RENTED"] } }, include: listingInclude, take: 3, orderBy: { updatedAt: "desc" } }),
+    prisma.listing.findMany({ where: { AND: [publicWhere(), { id: { not: l.id }, zone: l.zone, status: { in: ["SOLD", "RENTED"] } }] }, include: listingInclude, take: 3, orderBy: { updatedAt: "desc" } }),
   ]);
   const zone = zoneRow;
   const usd1 = (n: number) => new Intl.NumberFormat(locale === "es" ? "es-VE" : "en-US", { style: "currency", currency: "USD", maximumFractionDigits: 1 }).format(n).replace(/[\u00a0\u202f]/g, " ");
-  const all = [...similarRows.map((r) => toCard(toDomain(r))), ...nearbyRows.map((r) => toCard(toDomain(r)))];
   const similar = similarRows.map((r) => toCard(toDomain(r))).sort((a, b) => Math.abs(a.priceAmount - l.priceAmount) - Math.abs(b.priceAmount - l.priceAmount)).slice(0, 4);
   const nearby = nearbyRows.map((r) => toCard(toDomain(r)));
-  void all;
   const ves = fx.find((f) => f.code === "VES")?.perUsd ?? 0;
   const eur = fx.find((f) => f.code === "EUR")?.perUsd ?? 0;
   const dark = l.luxury;

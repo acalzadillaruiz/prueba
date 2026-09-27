@@ -110,9 +110,15 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
   const verified = sp.get("verified") === "1";
   const amen = (sp.get("am") ?? "").split(",").filter(Boolean) as Amenity[];
 
+  // Quick successive changes must stack: start from the last URL we asked for, not the (not yet updated) search params.
+  const pending = useRef<string | null>(null);
+  useEffect(() => {
+    pending.current = null;
+  }, [sp]);
   const set = (patch: Record<string, string | null>) => {
-    const p = new URLSearchParams(sp.toString());
+    const p = new URLSearchParams(pending.current ?? sp.toString());
     for (const [k, v] of Object.entries(patch)) { if (v === null) p.delete(k); else p.set(k, v); }
+    pending.current = p.toString();
     router.replace(`/${locale}/search?${p.toString()}`, { scroll: false });
     setAlertSaved(false);
     setAlertError(null);

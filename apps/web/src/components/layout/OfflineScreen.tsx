@@ -39,7 +39,7 @@ export function OfflineScreen({ locale }: { locale: Locale }) {
                     <span className="block truncate font-semibold">{locale === "en" ? c.title_en || c.title_es : c.title_es}</span>
                     <span className="block text-xs text-mist">{c.zone}, {c.city}</span>
                   </span>
-                  <span className="shrink-0 font-display text-sm">{c.price}</span>
+                  <span className="shrink-0 font-display text-sm">{locale === "en" && c.price_en ? c.price_en : c.price}</span>
                 </a>
               </li>
             ))}

@@ -3,6 +3,7 @@ import { prisma } from "@newplace/db";
 import { ApiError, currentUser, handler, ok, requireUser } from "@/server/api";
 import { audit } from "@/server/data";
 import { limit } from "@/server/rate-limit";
+import { unstable_update } from "@/auth";
 
 type Ctx = { params: Promise<{ token: string }> };
 
@@ -31,5 +32,7 @@ export const POST = handler(async (_req: NextRequest, { params }: Ctx) => {
     prisma.invitation.update({ where: { id: inv.id }, data: { acceptedAt: new Date() } }),
   ]);
   await audit(u.id, "team.invite.accept", inv.email, { agencyId: inv.agencyId, role: inv.role });
+  // Refresh the session cookie so the new role applies now (middleware reads it from the JWT).
+  await unstable_update({}).catch(() => {});
   return ok({ agencyId: inv.agencyId, role: inv.role });
 });

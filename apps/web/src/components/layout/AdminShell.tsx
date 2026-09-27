@@ -122,8 +122,8 @@ export function AdminShell({ locale, area, children, title, actions }: { locale:
         </div>
       </aside>
       <div className="lg:pl-60">
-        <header className="sticky top-0 z-20 flex h-16 items-center gap-4 border-b border-navy-line bg-navy-2/90 px-4 backdrop-blur md:px-6">
-          <h1 className="font-display text-lg font-semibold md:text-xl">{title}</h1>
+        <header className="sticky top-0 z-20 flex h-16 items-center gap-2 border-b md:gap-4 border-navy-line bg-navy-2/90 px-4 backdrop-blur md:px-6">
+          <h1 className="min-w-0 truncate font-display text-lg font-semibold md:text-xl">{title}</h1>
           <div className="ml-auto" />
           {actions}
           {canLeads && (
@@ -133,7 +133,7 @@ export function AdminShell({ locale, area, children, title, actions }: { locale:
               {(newLeads.data?.items.length ?? 0) > 0 && <span className="absolute right-1.5 top-1.5 min-w-4 rounded-full bg-coral-cta px-1 text-center text-[10px] font-bold leading-4 text-white">{newLeads.data?.items.length}</span>}
             </Link>
           )}
-          <div className="flex items-center gap-2.5">
+          <div className="flex shrink-0 items-center gap-2.5">
             <Avatar initials={u.initials} hue={u.hue} size={32} />
             <div className="hidden leading-tight xl:block">
               <div className="text-sm font-semibold">{u.name}</div>

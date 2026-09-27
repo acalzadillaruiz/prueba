@@ -26,12 +26,12 @@ export async function listingForUser(id: string, u: SessionUser, mode: Mode) {
 }
 
 /**
- * Read gate for listing sub-resources (photos, slots…): public listings are open to anyone; hidden ones
+ * Read gate for listing sub-resources (photos, slots…): public and link-only private listings are open to anyone; hidden ones
  * (draft, in review, private, withdrawn/taken down, suspended agency) only to users who may `view` them.
  * Everyone else gets 404 so hidden listings do not even reveal that they exist.
  */
 export async function visibleListingId(id: string, u: SessionUser | null): Promise<string> {
-  const pub = await prisma.listing.findFirst({ where: { AND: [{ id }, publicWhere()] }, select: { id: true } });
+  const pub = await prisma.listing.findFirst({ where: { AND: [{ id }, publicWhere({ byLink: true })] }, select: { id: true } });
   if (pub) return pub.id;
   if (!u) throw new ApiError("NOT_FOUND");
   try {

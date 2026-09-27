@@ -97,6 +97,8 @@ export function handler<C>(fn: (req: NextRequest, ctx: C) => Promise<Response>) 
     } catch (e) {
       if (e instanceof ApiError) return fail(e.code, loc, e.details);
       if (e instanceof ZodError) return fail("VALIDATION", loc, e.flatten().fieldErrors);
+      // Prisma "record to update/delete not found" (e.g. an unknown id in the URL) is a 404, not a 500.
+      if ((e as { code?: unknown })?.code === "P2025") return fail("NOT_FOUND", loc);
       console.error("[api]", e);
       return fail("INTERNAL", loc);
     }

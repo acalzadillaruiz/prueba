@@ -2,6 +2,7 @@ import "server-only";
 import { prisma, type Prisma } from "@newplace/db";
 import type { Role } from "@newplace/config";
 import type { Agency, CaptureLead, EmailOutbox, Kind, Lead, MediaJob, Message, Offer, Tour, User, Zone } from "@/types/domain";
+import { deliver } from "./email";
 
 const initials = (name?: string | null) =>
   (name ?? "?")
@@ -181,6 +182,9 @@ export async function audit(actorId: string | null, action: string, target: stri
 }
 
 export async function queueEmail(to: string, subject: string, kind: "ALERT" | "TOUR" | "INVITE" | "VERIFY" | "LEAD", body = "") {
-  // v1: no SMTP. Emails are written to email_outbox and marked SENT (visible in /alerts → "Enviados").
-  await prisma.emailOutbox.create({ data: { to, subject, kind, body, status: "SENT", sentAt: new Date() } });
+  // Every email is recorded in email_outbox (visible in /alerts → "Enviados" and the platform console);
+  // real delivery happens through Resend when configured (src/server/email.ts).
+  const row = await prisma.emailOutbox.create({ data: { to, subject, kind, body, status: "QUEUED" } });
+  const d = await deliver(to, subject, body);
+  await prisma.emailOutbox.update({ where: { id: row.id }, data: { status: d.status, sentAt: d.status === "SENT" ? new Date() : null } });
 }

@@ -236,5 +236,5 @@ export interface EmailOutbox {
   subject: string;
   at: string;
   kind: "ALERT" | "TOUR" | "INVITE" | "VERIFY";
-  status: "QUEUED" | "SENT";
+  status: "QUEUED" | "SENT" | "FAILED";
 }

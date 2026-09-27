@@ -47,12 +47,12 @@ export function Gallery({ l, locale, luxury }: { l: Listing; locale: Locale; lux
     <>
       {luxury ? (
         <button onClick={() => show(0)} className="relative block h-[72vh] max-h-[760px] w-full overflow-hidden">
-          <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="h-full w-full" />
+          <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} sizes="100vw" priority className="h-full w-full" />
         </button>
       ) : (
         <div className="grid h-[300px] grid-cols-4 grid-rows-2 gap-2 overflow-hidden rounded-np md:h-[460px]">
           <button onClick={() => show(0)} className={cn("col-span-4 row-span-2 overflow-hidden", total > 1 && "md:col-span-2")} aria-label={tx(locale, `Ver foto 1 de ${total}`, `View photo 1 of ${total}`)}>
-            <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="h-full w-full transition-transform duration-500 hover:scale-[1.02]" />
+            <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} sizes="(max-width: 768px) 100vw, 50vw" priority className="h-full w-full transition-transform duration-500 hover:scale-[1.02]" />
           </button>
           {shots.slice(1, 5).map((s, n, arr) => (
             <button key={n} onClick={() => show(n + 1)} className={cn("relative hidden overflow-hidden md:block", arr.length === 1 && "col-span-2 row-span-2", arr.length === 2 && "col-span-2", arr.length === 3 && n === 2 && "col-span-2")} aria-label={tx(locale, `Ver foto ${n + 2} de ${total}`, `View photo ${n + 2} of ${total}`)}>

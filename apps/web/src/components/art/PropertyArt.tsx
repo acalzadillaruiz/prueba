@@ -1,6 +1,7 @@
 "use client";
 
 import { useId } from "react";
+import Image from "next/image";
 import type { Scene } from "@/types/domain";
 
 /**
@@ -566,6 +567,8 @@ export function PropertyArt({
   className,
   label,
   photo,
+  sizes = "(max-width: 768px) 100vw, 33vw",
+  priority = false,
 }: {
   scene: Scene;
   seed?: string;
@@ -573,12 +576,16 @@ export function PropertyArt({
   label?: string;
   /** AI-generated photo URL. When present it replaces the illustration. */
   photo?: string;
+  /** Responsive hint for next/image (defaults to a card-sized image). */
+  sizes?: string;
+  /** Above-the-fold hero/cover: load eagerly with high priority (LCP). */
+  priority?: boolean;
 }) {
   // Unique per instance: two illustrations of the same listing on one page must not share gradient ids.
   const uid = useId().replace(/[^a-zA-Z0-9]/g, "");
   if (photo)
-    // eslint-disable-next-line @next/next/no-img-element
-    return <img src={photo} alt={label ?? scene} loading="lazy" decoding="async" className={`${className ?? ""} object-cover`} />;
+    // next/image: AVIF/WebP, responsive srcset and lazy loading (eager + high priority for the LCP image).
+    return <Image src={photo} alt={label ?? scene} width={1200} height={800} sizes={sizes} priority={priority} className={`${className ?? ""} object-cover`} />;
   const n = hashStr(seed + scene);
   const id = `pa${n.toString(36)}${uid}`;
   let content: React.ReactNode;

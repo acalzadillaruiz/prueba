@@ -23,6 +23,7 @@
     "@newplace/ai": "*",
     "@newplace/config": "*",
     "@newplace/db": "^0.1.0",
+    "@sentry/nextjs": "^10.75.3",
     "@serwist/next": "^9.5.12",
     "@tanstack/react-query": "^5.104.0",
     "@vercel/blob": "^2.8.0",

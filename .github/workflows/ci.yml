@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: newplace
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/newplace
+      AUTH_SECRET: ci-only-secret-not-for-production-0123456789
+      AUTH_TRUST_HOST: "true"
+      DEMO_AUTH: "true"
+      NEXT_PUBLIC_DEMO_AUTH: "true"
+      NEXT_PUBLIC_APP_URL: http://localhost:3001
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run db:setup
+      - run: npm run lint
+      - run: npm run typecheck -w apps/web
+      - run: npm test
+      - run: npm run build
+      - name: End-to-end (Playwright)
+        run: npm run e2e
+      - name: Lighthouse (mobile, thresholds)
+        run: |
+          npm run db:seed
+          (cd apps/web && npx next start -p 3001 &)
+          for i in $(seq 60); do curl -sf -o /dev/null http://localhost:3001/es && break; sleep 1; done
+          BASE=http://localhost:3001 node scripts/lighthouse.mjs
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: reports
+          path: |
+            apps/web/test-results
+            .lighthouse

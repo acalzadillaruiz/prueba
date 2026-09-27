@@ -132,6 +132,7 @@ enum EmailKind {
 enum EmailStatus {
   QUEUED
   SENT
+  FAILED
 }
 
 // ───────────────────────── Auth.js

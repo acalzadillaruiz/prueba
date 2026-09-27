@@ -19,7 +19,8 @@
     "db:reset": "npm run migrate:deploy -w packages/db && npm run db:seed",
     "lint": "npm run lint -w apps/web",
     "e2e": "npm run e2e -w apps/web",
-    "db:setup": "TSX_TSCONFIG_PATH=apps/web/tsconfig.json tsx packages/db/prisma/setup.ts"
+    "db:setup": "TSX_TSCONFIG_PATH=apps/web/tsconfig.json tsx packages/db/prisma/setup.ts",
+    "lighthouse": "node scripts/lighthouse.mjs"
   },
   "devDependencies": {
     "lighthouse": "^12.8.2",

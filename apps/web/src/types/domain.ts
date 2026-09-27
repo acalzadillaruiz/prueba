@@ -117,10 +117,13 @@ export interface Listing {
   hasFloorplan: boolean;
   hasVideo: boolean;
   hasVirtualTour: boolean;
+  /** External 360° tour (https only, validated by the listing API). */
+  virtualTourUrl?: string | null;
   estimate: EstimateResult;
   priceHistory: PriceEvent[];
   daysOnMarket: number;
-  stats: { impressions: number; saves: number; leads: number; avgTimeSec: number; interactions: number };
+  /** avgTimeSec: measured average dwell time on the public page, null until a visit has been measured. */
+  stats: { impressions: number; saves: number; leads: number; avgTimeSec: number | null; interactions: number };
   quality: number;
   privateListing?: boolean;
   shortRent?: { minNights: number; maxGuests: number; cleaningFee: number };
@@ -238,5 +241,5 @@ export interface EmailOutbox {
   subject: string;
   at: string;
   kind: "ALERT" | "TOUR" | "INVITE" | "VERIFY";
-  status: "QUEUED" | "SENT" | "FAILED";
+  status: "QUEUED" | "SENT" | "SIMULATED" | "FAILED";
 }

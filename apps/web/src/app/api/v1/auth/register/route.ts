@@ -5,6 +5,8 @@ import { prisma } from "@newplace/db";
 import { ApiError, body, handler, ok } from "@/server/api";
 import { audit, queueEmail } from "@/server/data";
 import { limit } from "@/server/rate-limit";
+import { requestLocale } from "@/server/email-locale";
+import { verifyPath } from "@/server/email-verify";
 
 const Reg = registerSchema;
 
@@ -18,7 +20,9 @@ export const POST = handler(async (req: NextRequest) => {
   const inv = b.invite ? await prisma.invitation.findUnique({ where: { token: b.invite }, include: { agency: { select: { status: true } } } }) : null;
   if (b.invite && (!inv || inv.acceptedAt || inv.email !== email || inv.agency.status === "SUSPENDED" || Date.now() - inv.createdAt.getTime() > 14 * 864e5)) throw new ApiError("VALIDATION", { invite: "invalid or for another email" });
   const role = inv ? inv.role : b.agencyName ? "AGENCY_OWNER" : "SEEKER";
-  const user = await prisma.user.create({ data: { name: b.name, email, passwordHash: await bcrypt.hash(b.password, 10), role, hue: Math.floor(Math.random() * 360) } });
+  // The account keeps the language it signed up in: transactional emails use it (item: localized subjects).
+  const loc = requestLocale(req);
+  const user = await prisma.user.create({ data: { name: b.name, email, passwordHash: await bcrypt.hash(b.password, 10), role, locale: loc, hue: Math.floor(Math.random() * 360) } });
   if (inv) {
     await prisma.agencyMember.create({ data: { userId: user.id, agencyId: inv.agencyId, role: inv.role } });
     await prisma.invitation.update({ where: { id: inv.id }, data: { acceptedAt: new Date() } });
@@ -31,6 +35,7 @@ export const POST = handler(async (req: NextRequest) => {
     await prisma.agency.create({ data: { name: b.agencyName, slug, city: b.agencyCity ?? "Caracas", initials, members: { create: { userId: user.id, role: "AGENCY_OWNER", verified: false } }, commission: { create: {} } } });
     await audit(user.id, "agency.create", b.agencyName);
   }
-  await queueEmail(email, "Verifica tu correo en New Place", "VERIFY");
+  // Signed 48 h link (HMAC with AUTH_SECRET) → GET /api/v1/auth/verify sets emailVerified.
+  await queueEmail(email, loc === "en" ? "Verify your email on New Place" : "Verifica tu correo en New Place", "VERIFY", verifyPath(user.id, email));
   return ok({ id: user.id, email }, 201);
 });

@@ -73,6 +73,15 @@ html.dark .np-public :is(input, select, textarea) { color-scheme: dark; }
 html:not(.dark) .np-public .text-coral { color: rgb(var(--np-coral-cta-rgb)); }
 html:not(.dark) .np-public :is(.bg-navy, .bg-navy-2, .bg-navy-card) .text-coral { color: rgb(var(--np-coral-rgb)); }
 
+/* Listing detail on phones: keep the demo pill above the sticky "Request a tour" bar. */
+@media (max-width: 767px) {
+  body:has([data-sticky-cta="shown"]) [data-demobar] { bottom: calc(5rem + env(safe-area-inset-bottom)); }
+}
+/* Search on phones/tablets: keep it above the peeking results sheet. */
+@media (max-width: 1023px) {
+  body:has([data-search-sheet="peek"]) [data-demobar] { bottom: 150px; }
+}
+
 .sr-only-focusable:not(:focus) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }

@@ -62,7 +62,6 @@ export const MEDIA_JOBS: MediaJob[] = [
 export const OFFERS: Offer[] = [
   { id: "of-1", listingId: L(7), bidder: "Comprador verificado #A-218", amount: 58000, createdAt: minutesAgo(60 * 5), status: "RECEIVED", note: "Pago de contado, firma en 30 días." },
   { id: "of-2", listingId: L(7), bidder: "Comprador verificado #A-221", amount: 60500, createdAt: minutesAgo(60 * 28), status: "COUNTERED", note: "Contraoferta enviada: 61.500 USD." },
-  { id: "of-3", listingId: L(45), bidder: "Comprador verificado #B-102", amount: 102000, createdAt: minutesAgo(60 * 74), status: "RECEIVED", note: "Requiere crédito parcial." },
 ];
 
 export const OWNER_THREAD: Message[] = [
@@ -70,7 +69,7 @@ export const OWNER_THREAD: Message[] = [
   { id: "m2", from: "Isabel Contreras", body: "Hola Valentina, gracias. ¿Cuándo pueden venir a hacer las fotos?", at: minutesAgo(60 * 49), mine: true },
   { id: "m3", from: "Valentina Rojas", body: "Miguel, nuestro fotógrafo, puede ir el lunes 10:00. Incluye plano y video.", at: minutesAgo(60 * 48) },
   { id: "m4", from: "Valentina Rojas", body: "Te comparto el PlaceEstimate: 104.000–118.000 USD. Tu precio está bien posicionado.", at: minutesAgo(60 * 3) },
-  { id: "m5", from: "Isabel Contreras", body: "Perfecto. Recibí una oferta de 102.000, ¿la revisamos?", at: minutesAgo(42), mine: true },
+  { id: "m5", from: "Isabel Contreras", body: "Perfecto. En cuanto estén las fotos, ¿lo publicamos?", at: minutesAgo(42), mine: true },
 ];
 
 export const LEAD_THREAD: Message[] = [
@@ -78,11 +77,11 @@ export const LEAD_THREAD: Message[] = [
 ];
 
 export const EMAILS: EmailOutbox[] = [
-  { id: "em-1", to: "seeker@gmail.com", subject: "3 nuevos en Chacao · 2+ hab · < 250.000 USD", at: minutesAgo(30), kind: "ALERT", status: "SENT" },
-  { id: "em-2", to: "seeker@gmail.com", subject: "Visita confirmada: Torre Alba, hoy 16:00", at: minutesAgo(60 * 3), kind: "TOUR", status: "SENT" },
-  { id: "em-3", to: "seeker@gmail.com", subject: "Bajó de precio: Ático luminoso en Los Palos Grandes (-4 %)", at: minutesAgo(60 * 20), kind: "ALERT", status: "SENT" },
-  { id: "em-4", to: "seeker@gmail.com", subject: "Nuevos hoy en Altamira · alquiler", at: minutesAgo(60 * 26), kind: "ALERT", status: "SENT" },
-  { id: "em-5", to: "seeker@gmail.com", subject: "Verifica tu correo en New Place", at: minutesAgo(60 * 24 * 30), kind: "VERIFY", status: "SENT" },
+  { id: "em-1", to: "seeker@gmail.com", subject: "3 nuevos en Chacao · 2+ hab · < 250.000 USD", at: minutesAgo(30), kind: "ALERT", status: "SIMULATED" },
+  { id: "em-2", to: "seeker@gmail.com", subject: "Visita confirmada: Torre Alba, hoy 16:00", at: minutesAgo(60 * 3), kind: "TOUR", status: "SIMULATED" },
+  { id: "em-3", to: "seeker@gmail.com", subject: "Bajó de precio: Ático luminoso en Los Palos Grandes (-4 %)", at: minutesAgo(60 * 20), kind: "ALERT", status: "SIMULATED" },
+  { id: "em-4", to: "seeker@gmail.com", subject: "Nuevos hoy en Altamira · alquiler", at: minutesAgo(60 * 26), kind: "ALERT", status: "SIMULATED" },
+  { id: "em-5", to: "seeker@gmail.com", subject: "Verifica tu correo en New Place", at: minutesAgo(60 * 24 * 30), kind: "VERIFY", status: "SIMULATED" },
 ];
 
 export const SAVED_SEARCHES = [

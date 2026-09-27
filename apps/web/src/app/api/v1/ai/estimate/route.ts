@@ -3,9 +3,10 @@ import { z } from "zod";
 import { body, handler, ok } from "@/server/api";
 import { estimateFor } from "@/server/estimate";
 import { limit } from "@/server/rate-limit";
+import { propertyKindSchema } from "@newplace/config";
 
 const Input = z.object({
-  kind: z.enum(["apartment", "penthouse", "house", "townhouse", "studio", "office", "retail", "warehouse", "land", "villa", "chalet"]).default("apartment"),
+  kind: propertyKindSchema.default("apartment"),
   // Public endpoint: every field bounded like the listings API (no megabyte arrays / absurd numbers into the provider).
   zone: z.string().min(1).max(80),
   listingType: z.enum(["SALE", "LONG_RENT", "SHORT_RENT", "COMMERCIAL_SALE", "COMMERCIAL_RENT"]).default("SALE"),

@@ -7,12 +7,13 @@
 ## 10 minutos a localhost:3000 / 10 minutes to localhost:3000
 ```bash
 cp .env.example apps/web/.env.local   # rellena AUTH_SECRET (openssl rand -base64 32)
+                                      # demo local: DEMO_AUTH=true y NEXT_PUBLIC_DEMO_AUTH=true (vienen en false)
 npm install
 npm run db:up        # Postgres 16 local (o: docker compose up -d)
-npm run db:reset     # prisma db push + seed
+npm run db:reset     # prisma migrate deploy + seed
 npm run dev          # http://localhost:3000/es
 ```
-Contraseña de todos los usuarios seed / password for every seed user: **`NewPlace!2026`**. Con `DEMO_AUTH=true`, `/es/login` muestra «Entrar como…» para cada rol.
+Contraseña de todos los usuarios seed / password for every seed user: **`NewPlace!2026`**. «Entrar como…» en `/es/login` (un clic por rol) solo aparece con `DEMO_AUTH=true` y `NEXT_PUBLIC_DEMO_AUTH=true` en `apps/web/.env.local` (desactivado por defecto; los tests e2e y los scripts de capturas lo necesitan). Sin ellos, entra con email + contraseña.
 
 | Rol | Email |
 |---|---|

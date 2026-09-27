@@ -133,6 +133,8 @@ enum EmailStatus {
   QUEUED
   SENT
   FAILED
+  /// No email provider configured: recorded in the outbox, never delivered
+  SIMULATED
 }
 
 // ───────────────────────── Auth.js
@@ -340,7 +342,10 @@ model Listing {
   views          Int           @default(0)
   saves          Int           @default(0)
   leadsCount     Int           @default(0)
-  avgTimeSec     Int           @default(60)
+  /// Running average of measured dwell time on the public page (seconds); meaningless while dwellCount = 0
+  avgTimeSec     Int           @default(0)
+  /// Number of measured visits behind avgTimeSec (0 → the UI shows "—")
+  dwellCount     Int           @default(0)
   interactions   Int           @default(0)
 
   agency         Agency?       @relation(fields: [agencyId], references: [id])

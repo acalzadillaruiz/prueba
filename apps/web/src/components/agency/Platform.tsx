@@ -232,7 +232,8 @@ export function PlatformUsers({ locale, users, providers }: { locale: Locale; us
                 </td>
                 <td className="px-3 text-mist">{u.agencyName ?? "—"}</td>
                 <td className="px-3 text-xs text-mist">{providers[u.id]?.join(" · ") || "—"}</td>
-                <td className="px-3 text-xs text-mist">{u.suspended ? tx(locale, "Suspendido", "Suspended") : ago(u.lastSeen, locale)}</td>
+                {/* Relative time depends on "now": server and client may differ by a minute → no hydration error (#418). */}
+                <td className="px-3 text-xs text-mist" suppressHydrationWarning>{u.suspended ? tx(locale, "Suspendido", "Suspended") : ago(u.lastSeen, locale)}</td>
                 <td className="px-3">
                   {u.id !== me?.id && (
                     <button disabled={busy === u.id} onClick={() => {
@@ -326,7 +327,7 @@ export function PlatformModeration({ locale, reports, listings }: { locale: Loca
                   <div className={cn("truncate font-semibold", down && "text-mist line-through")}>{tx(locale, l.title_es, l.title_en)}</div>
                   <div className="text-xs text-mist">{l.agency?.name ?? tx(locale, "Particular", "Private owner")} · {l.zone} · {money(l.priceAmount, locale)}</div>
                 </div>
-                <StatusBadge status={l.status} locale={locale} />
+                <StatusBadge status={l.status} review={l.review} locale={locale} />
                 {confirming === l.id ? null : (
                   <Button
                     size="sm"

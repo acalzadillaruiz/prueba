@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Camera, Check, ChevronLeft, ChevronRight, Loader2, X } from "lucide-react";
@@ -27,6 +27,16 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
   const dayIdx = (ms: number) => Math.floor((ms - start) / 864e5);
   const weekday = (i: number) => (new Date(start + i * 864e5 + TZ * 3600e3).getUTCDay() + 6) % 7; // Monday = 0
   const todayIdx = dayIdx(Date.now());
+  // Phones: the week grid scrolls sideways and opens on Monday — bring today's column into view on mount.
+  const scroller = useRef<HTMLDivElement>(null);
+  const todayCol = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const box = scroller.current;
+    const col = todayCol.current;
+    if (!box || !col || box.scrollWidth <= box.clientWidth) return;
+    const left = col.getBoundingClientRect().left - box.getBoundingClientRect().left + box.scrollLeft;
+    box.scrollLeft = Math.max(0, left - (box.clientWidth - col.offsetWidth) / 2);
+  }, [weekStart]);
   // Visible hours: 08–20 by default, stretched to include any event outside that range (nothing is ever hidden).
   const inWeek = events.filter((e) => {
     const di = dayIdx(Date.parse(e.start));
@@ -76,7 +86,7 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
     <AdminShell locale={locale} area="agency" title={tx(locale, "Calendario", "Calendar")}>
       {error && <div className="mb-3 rounded-lg bg-[#B423181A] px-3 py-2 text-sm text-danger" role="alert">{error}</div>}
       <div className="grid gap-6 [&>*]:min-w-0 xl:grid-cols-[1fr_300px]">
-        <div className="overflow-x-auto rounded-np border border-navy-line bg-navy-card">
+        <div ref={scroller} className="overflow-x-auto rounded-np border border-navy-line bg-navy-card">
           <div className="min-w-[760px]">
             <div className="flex items-center gap-3 border-b border-navy-line px-4 py-3">
               <Link href={`?w=${week - 1}`} className="rounded-lg p-1.5 hover:bg-white/5" aria-label={tx(locale, "Semana anterior", "Previous week")}><ChevronLeft size={18} /></Link>
@@ -93,7 +103,7 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
             <div className="grid grid-cols-[56px_repeat(7,1fr)]">
               <div />
               {days.map((d, i) => (
-                <div key={i} className={cn("border-l border-navy-line py-2 text-center font-display text-sm first-letter:uppercase", i === todayIdx && "text-coral")}>{fmt(d, { weekday: "short", day: "numeric" })}</div>
+                <div key={i} ref={i === todayIdx ? todayCol : undefined} className={cn("border-l border-navy-line py-2 text-center font-display text-sm first-letter:uppercase", i === todayIdx && "text-coral")}>{fmt(d, { weekday: "short", day: "numeric" })}</div>
               ))}
             </div>
             <div className="relative">

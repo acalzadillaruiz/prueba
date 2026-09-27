@@ -89,7 +89,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
 
   if (done !== null)
     return (
-      <div className={cn("np-in rounded-np border p-5", box)} data-testid="lead-done">
+      <div id="contact-panel" tabIndex={-1} className={cn("np-in rounded-np border p-5", box)} data-testid="lead-done">
         <CheckCircle2 className="text-ok" size={30} />
         <div className="mt-3 font-display text-xl font-semibold">{mode === "tour" && done ? tx(locale, "Visita solicitada", "Tour requested") : tx(locale, "Mensaje enviado", "Message sent")}</div>
         {done && <div className="mt-1 font-display first-letter:uppercase text-coral">{done}</div>}
@@ -104,7 +104,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
     );
 
   return (
-    <div className={cn("rounded-np border shadow-np", box)}>
+    <div id="contact-panel" tabIndex={-1} className={cn("rounded-np border shadow-np", box)}>
       {agent && (
         <div className={cn("flex items-center gap-3 border-b p-4", dark ? "border-navy-line" : "border-line")}>
           <Avatar initials={agent.name.split(" ").map((p) => p[0]).slice(0, 2).join("")} hue={agent.hue} size={46} />

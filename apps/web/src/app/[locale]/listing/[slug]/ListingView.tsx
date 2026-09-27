@@ -16,6 +16,7 @@ import { getFx } from "@/server/data";
 import { AMENITY_LABEL, TYPE_LABEL, lbl, money, num, priceSuffix, tx, plural } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import { ViewBeacon } from "@/components/detail/ViewBeacon";
+import { StickyContactBar } from "@/components/detail/StickyContactBar";
 import { zoneStats } from "@/server/zone-stats";
 import { SITE_URL } from "@/lib/seo";
 
@@ -97,7 +98,8 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
 
   return (
     <PublicPage locale={locale} header={dark ? "dark" : "light"}>
-      <div className={cn(dark && "bg-navy text-ivory")}>
+      {/* Bottom padding on phones: the sticky contact bar never hides the last section. */}
+      <div className={cn("pb-24 md:pb-0", dark && "bg-navy text-ivory")}>
         <div className={cn("mx-auto max-w-[1280px] px-4 pt-4 md:px-6", dark && "max-w-none px-0 md:px-0")}>
           <nav aria-label={tx(locale, "Ruta de navegación", "Breadcrumb")} className={cn("mb-3 flex items-center gap-1 text-sm", dark ? "mx-auto max-w-[1280px] px-4 text-mist md:px-6" : "text-ink/65")}>
             <Link className="inline-flex min-h-11 items-center underline-offset-2 hover:underline" href={`/${locale}/search?type=${l.listingType.startsWith("COMMERCIAL") ? "COMMERCIAL" : l.listingType}`}>{lbl(TYPE_LABEL[l.listingType], locale)}</Link>
@@ -235,6 +237,13 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
           <aside id="contact" className="scroll-mt-20 lg:sticky lg:top-20 lg:self-start">
             <ContactPanel l={l} locale={locale} dark={dark} />
           </aside>
+          <StickyContactBar
+            locale={locale}
+            price={money(l.priceAmount, locale)}
+            suffix={priceSuffix(l, locale)}
+            tour={!!l.agentId && ["ACTIVE", "COMING_SOON", "UNDER_OFFER"].includes(l.status)}
+            dark={dark}
+          />
         </div>
 
         <div className="mx-auto max-w-[1280px] px-4 pb-16 pt-6 md:px-6">

@@ -11,7 +11,7 @@ import { BarChart, Funnel } from "./charts";
 import { useApp } from "@/lib/store";
 import type { Lead, Listing, Tour } from "@/types/domain";
 import type { DashboardStats } from "@/server/agency-stats";
-import { dateTime, money, num, tx } from "@/lib/i18n";
+import { dateTime, dwell, money, num, tx } from "@/lib/i18n";
 
 export function AgencyDashboard({ locale, stats, listings, newLeads, tours, agencyName }: { locale: Locale; stats: DashboardStats; listings: Listing[]; newLeads: Lead[]; tours: (Tour & { agentName: string; agentHue: number })[]; agencyName: string }) {
   const { user } = useApp();
@@ -79,7 +79,7 @@ export function AgencyDashboard({ locale, stats, listings, newLeads, tours, agen
                     <td className="text-right">{num(l.stats.impressions, locale)}</td>
                     <td className="text-right">{l.stats.saves}</td>
                     <td className="text-right font-semibold">{l.stats.leads}</td>
-                    <td className="text-right">{Math.floor(l.stats.avgTimeSec / 60)}:{String(l.stats.avgTimeSec % 60).padStart(2, "0")}</td>
+                    <td className="text-right">{dwell(l.stats.avgTimeSec)}</td>
                     <td className="pl-4 text-right text-mist">{l.stats.impressions ? `${new Intl.NumberFormat(locale === "es" ? "es-VE" : "en-US", { maximumFractionDigits: 1 }).format((l.stats.leads / l.stats.impressions) * 1000)} ‰` : "—"}</td>
                   </tr>
                 ))}

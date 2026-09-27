@@ -8,7 +8,7 @@ import { prisma } from "@newplace/db";
 import type { Role } from "@newplace/config";
 import { authConfig } from "./auth.config";
 import { isDemoEmail } from "./lib/demo";
-import { allowed, hit, reset } from "./server/rate-limit";
+import { allowed, loginAttempt, reset } from "./server/rate-limit";
 
 const DEMO = process.env.DEMO_AUTH === "true";
 
@@ -43,14 +43,13 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
         const email = p.data.email.toLowerCase();
         // Password spraying (one password against many accounts): max 50 attempts per IP every 15 minutes.
         if (!(await allowed(request, "login-ip", 50, 15 * 60))) return null;
-        // Brute-force protection: max 10 attempts per account every 15 minutes. Counted atomically BEFORE the
-        // password check so parallel guesses cannot all slip past a read-then-increment; success clears it.
-        const key = `login-fail:${email}`;
-        if (!(await hit(key, 10, 15 * 60))) return null;
+        // Brute-force protection per account+IP (10) with a global per-account ceiling (50), see loginAttempt().
+        const attempt = await loginAttempt(request, email);
+        if (!attempt.ok) return null;
         const u = await prisma.user.findUnique({ where: { email } });
         const valid = await bcrypt.compare(p.data.password, u?.passwordHash ?? (await dummy()));
         if (!u?.passwordHash || !valid) return null;
-        await reset(key);
+        await Promise.all(attempt.keys.map(reset));
         return profile(u.id);
       },
     }),

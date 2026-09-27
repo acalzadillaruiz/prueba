@@ -15,6 +15,7 @@ import { api, ApiClientError } from "@/lib/api";
 import { AMENITY_LABEL, lbl, money, num, plural, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import { EMPTY_EXTRAS, ListingTypeFields, validateExtras, type ExtrasDraft } from "./ListingTypeFields";
+import { listingQuality } from "@newplace/config";
 
 const STEPS: [string, string][] = [
   ["Tipo", "Type"],
@@ -199,7 +200,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
     }
   };
 
-  const quality = Math.min(100, (files.length >= 8 ? 35 : files.length * 4) + (d.copy.title_en && d.copy.body_en ? 20 : 0) + (d.addr ? 20 : 0));
+  const quality = listingQuality({ photos: files.length, titleEn: d.copy.title_en, bodyEn: d.copy.body_en, located: !!d.addr });
 
   const publish = async () => {
     if (!requireLogin()) return;

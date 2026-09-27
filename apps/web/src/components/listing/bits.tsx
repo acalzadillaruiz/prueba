@@ -63,7 +63,18 @@ const STATUS_TONE: Record<ListingStatus, string> = {
   EXPIRED: "bg-black/50 text-white",
 };
 
-export function StatusBadge({ status, locale, className }: { status: ListingStatus; locale: Locale; className?: string }) {
+/**
+ * Listing status pill. Pass `review` where staff/owners see it: a published status still waiting for moderation
+ * (PENDING) or rejected isn't live, so it reads "En revisión" / "Rechazado" instead of "Activo".
+ */
+export function StatusBadge({ status, locale, className, review }: { status: ListingStatus; locale: Locale; className?: string; review?: "PENDING" | "APPROVED" | "REJECTED" }) {
+  if (review && review !== "APPROVED" && status !== "DRAFT" && status !== "WITHDRAWN") {
+    return (
+      <span className={cn("inline-flex items-center whitespace-nowrap rounded-full px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide", review === "PENDING" ? "bg-[#8F5E1C] text-white" : "bg-danger text-white", className)}>
+        {review === "PENDING" ? tx(locale, "En revisión", "In review") : tx(locale, "Rechazado", "Rejected")}
+      </span>
+    );
+  }
   return (
     <span className={cn("inline-flex items-center whitespace-nowrap rounded-full px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide", STATUS_TONE[status], className)}>
       {lbl(STATUS_LABEL[status], locale)}

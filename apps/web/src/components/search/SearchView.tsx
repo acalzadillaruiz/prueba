@@ -1,8 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Bell, BellRing, Check, Loader2, ChevronDown, List, Map as MapIcon, SlidersHorizontal, Sparkles, X } from "lucide-react";
+import { Bell, BellRing, Check, Loader2, ChevronDown, SlidersHorizontal, Sparkles, X } from "lucide-react";
 import { heuristicSearchParse } from "@newplace/ai";
 import type { Amenity, Listing, Locale } from "@/types/domain";
 import { MapView as NightMap } from "@/components/map/MapView";
@@ -71,7 +71,17 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
   const [sel, setSel] = useState<string | null>(null);
   const [hover, setHover] = useState<string | null>(null);
   const [moreOpen, setMoreOpen] = useState(false);
+  // Phones: results live in a bottom sheet over the map — "peek" (count + sort) or expanded (full list).
   const [mobileList, setMobileList] = useState(false);
+  const [desktop, setDesktop] = useState(false);
+  const swipe = useRef<number | null>(null);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const on = () => setDesktop(mq.matches);
+    on();
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, []);
   const [alertSaved, setAlertSaved] = useState(false);
   const [nl, setNl] = useState(sp.get("q") ?? "");
 
@@ -344,7 +354,8 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
 
       <div className="relative flex min-h-0 flex-1">
         {/* map 60% */}
-        <div className={cn("relative min-h-0 flex-1 lg:basis-[60%]", mobileList && "hidden lg:block")}>
+        {/* Phones: the map stops just under the peeking sheet so its preview card and controls stay visible. */}
+        <div className="relative mb-[116px] min-h-0 flex-1 lg:mb-0 lg:basis-[60%]">
           <NightMap
             key={region + filtersKey}
             region={region}
@@ -369,7 +380,34 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
           </div>
         </div>
         {/* list 40% */}
-        <div className={cn("min-h-0 overflow-y-auto border-l border-line bg-ivory scrollbar-thin lg:block lg:basis-[40%]", mobileList ? "block flex-1" : "hidden")}>
+        <div
+          data-search-sheet={mobileList ? "open" : "peek"}
+          className={cn(
+            "absolute inset-x-0 bottom-0 z-20 flex flex-col overflow-hidden rounded-t-2xl bg-ivory shadow-[0_-10px_30px_rgba(11,18,32,.28)] transition-[height] duration-300 ease-np",
+            mobileList ? "h-[88%]" : "h-[132px]",
+            "lg:static lg:z-auto lg:h-auto lg:basis-[40%] lg:rounded-none lg:border-l lg:border-line lg:shadow-none lg:transition-none",
+          )}
+        >
+          <button
+            type="button"
+            onClick={() => setMobileList((m) => !m)}
+            onTouchStart={(e) => (swipe.current = e.touches[0].clientY)}
+            onTouchEnd={(e) => {
+              if (swipe.current === null) return;
+              const dy = e.changedTouches[0].clientY - swipe.current;
+              swipe.current = null;
+              if (Math.abs(dy) < 24) return; // a tap: onClick toggles
+              e.preventDefault();
+              setMobileList(dy < 0);
+            }}
+            aria-expanded={mobileList}
+            aria-controls="search-results"
+            aria-label={mobileList ? tx(locale, "Ocultar lista y ver el mapa", "Hide list and show the map") : `${tx(locale, "Ver lista", "Show list")} · ${plural(query.data?.total ?? results.length, locale, ["resultado", "resultados"], ["result", "results"])}`}
+            className="flex h-7 w-full shrink-0 touch-none items-center justify-center lg:hidden"
+          >
+            <span className="h-1.5 w-12 rounded-full bg-ink/25" aria-hidden />
+          </button>
+          <div className={cn("min-h-0 flex-1 scrollbar-thin lg:overflow-y-auto", mobileList ? "overflow-y-auto" : "overflow-hidden")}>
           <div className="sticky top-0 z-10 border-b border-line bg-ivory/95 px-4 py-3 backdrop-blur">
             <div className="flex items-center justify-between gap-2">
               <div>
@@ -396,6 +434,8 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
               </div>
             )}
           </div>
+          {/* Collapsed sheet on phones: the cards are off-screen, keep them out of the tab order. */}
+          <div id="search-results" inert={!desktop && !mobileList ? true : undefined}>
           <div className="grid gap-4 p-4 sm:grid-cols-2">
             {results.map((l) => (
               <div key={l.id} onMouseEnter={() => setHover(l.id)} onMouseLeave={() => setHover(null)}>
@@ -417,14 +457,9 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
               />
             </div>
           )}
+          </div>
+          </div>
         </div>
-        <button
-          onClick={() => setMobileList((m) => !m)}
-          className="absolute bottom-20 left-1/2 z-20 flex -translate-x-1/2 items-center gap-2 rounded-full bg-navy px-5 py-2.5 font-display text-sm text-ivory shadow-np lg:hidden"
-        >
-          {mobileList ? <MapIcon size={16} /> : <List size={16} />}
-          {mobileList ? tx(locale, "Ver mapa", "Map") : `${tx(locale, "Ver lista", "List")} · ${results.length}`}
-        </button>
       </div>
     </div>
   );

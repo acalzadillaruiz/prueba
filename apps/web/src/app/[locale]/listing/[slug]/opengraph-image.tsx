@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og";
-import { listingBySlug } from "@/server/listings";
+import { listingBySlug, servedPublicly } from "@/server/listings";
 import { money, tx } from "@/lib/i18n";
 import type { Locale } from "@/types/domain";
 
@@ -7,10 +7,11 @@ export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 export const alt = "New Place";
 
-/** Share preview (WhatsApp, social): brand card with title, price and zone. */
+/** Share preview (WhatsApp, social): brand card with title, price and zone. Hidden listings get the plain brand card. */
 export default async function OgImage({ params }: { params: Promise<{ locale: Locale; slug: string }> }) {
   const { locale, slug } = await params;
-  const l = await listingBySlug(slug);
+  const found = await listingBySlug(slug);
+  const l = found && (await servedPublicly(found)) ? found : null;
   const title = l ? tx(locale, l.title_es, l.title_en) : "New Place";
   const price = l ? money(l.priceAmount, locale, l.priceCurrency) : "";
   const where = l ? `${l.zone} · ${l.city}` : "";

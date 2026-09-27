@@ -6,14 +6,18 @@
 - **Los Roques** es un listing *demo* (marcado así en la ficha).
 - **PlaceEstimate** se calcula con el proveedor de IA activo y se guarda como snapshot por listing; con proveedor externo se valida el JSON y, si falla, se usa el heurístico.
 - **SLA de leads:** 15 min desde la creación; barra verde → ámbar → rojo; `firstResponseAt` se fija con la primera respuesta.
-- **Calidad de ficha:** fotos ≥ 8 (35) + bilingüe (20) + geo (20) + plano (15) + tour virtual (10).
+- **Calidad de ficha:** fotos ≥ 8 (35, 4 por foto) + bilingüe (20) + geo (20) + plano (15) + tour virtual (10). Solo cuentan fotos reales subidas (las ilustraciones de marca no); una única función `listingQuality` en `packages/config` la usan el servidor y el asistente.
 - **Moderación:** los listings creados por agentes quedan `PENDING` hasta que el dueño/backoffice los aprueba; el superadmin puede retirarlos con motivo (desaparecen de la búsqueda al instante).
+- **Publicación inmediata vs. revisión (confianza):** el brief §15.5 exige que «owner particular publica FSBO», así que un propietario **establecido** (email verificado o cuenta con ≥ 7 días) publica al instante. Van a revisión (`review=PENDING`, invisibles porque `publicWhere` exige `APPROVED`) los anuncios FSBO de cuentas nuevas sin email verificado y los de agencias **no verificadas** por la plataforma (`Agency.verified=false`); los aprueba el superadmin (`PATCH /api/v1/listings/:id { review: "APPROVED" }`) — o, para agencias, su propio backoffice una vez verificada. El propietario ve «En revisión» en /owner/listings. Las cuentas seed tienen el email verificado, así que la demo y los e2e publican al instante.
+- **Verificación de email:** el registro encola un enlace firmado (HMAC-SHA256 con `AUTH_SECRET`, 48 h, ligado al email) a `/api/v1/auth/verify`, que fija `emailVerified` y lleva a `/{locale}/account?verified=1`.
 - **Anti-duplicados:** huella = dirección normalizada + m² + habitaciones; al publicar se avisa si ya existe.
 - **Comisión:** % por agencia + split del agente (Andes Prime: 5 % / 50 %).
 - **Sesiones JWT** (no de base de datos) para que el middleware edge pueda comprobar el rol sin consultar Postgres.
 - **Zona horaria:** agenda y slots en America/Caracas (UTC-4); semana empieza en lunes.
 - **Datos seed** con fechas relativas a la ejecución para que dashboards, SLA y agenda siempre tengan datos «de hoy».
 - **Comisión vacacional:** % de venta aplicado a 30 noches (una mensualidad equivalente).
-- **Límites de uso:** por IP en producción (contacto 10/10 min, registro 5/h, IA pública 30–60/min, ofertas 10/h); el bloqueo de login por cuenta (10 fallos/15 min) aplica siempre. Se guardan en Postgres para que valgan entre instancias serverless.
+- **Límites de uso:** por IP en producción (contacto 10/10 min, registro 5/h, IA pública 30–60/min, ofertas 10/h); el bloqueo de login aplica siempre: 10 fallos por cuenta **e IP** y un techo global de 50 por cuenta cada 15 min (un tercero no puede bloquear a la víctima con 10 intentos). Se guardan en Postgres para que valgan entre instancias serverless. La IP solo sale de cabeceras fiables (Vercel, `TRUSTED_IP_HEADER`, `TRUSTED_PROXY_HOPS`); si no hay ninguna, un cubo compartido (docs/DEPLOY.md).
+- **Tiempo medio en ficha:** media móvil real (`avgTimeSec` sobre `dwellCount` visitas, 1–1800 s) que envía la ficha al salir (`sendBeacon` → `POST /api/v1/listings/:id/dwell`); sin visitas medidas se muestra «—».
+- **Emails sin proveedor:** si no hay `RESEND_API_KEY`/`EMAIL_FROM` el outbox los marca `SIMULATED` (no `SENT`). Los asuntos van en el idioma del destinatario (`User.locale`, que se fija al registrarse; si no tiene cuenta, el idioma con el que navega).
 - **Búsqueda:** muestra solo lo disponible (próximamente, activo, en oferta); vendidos/alquilados siguen accesibles por enlace y como «vendidos cerca».
 - **Service worker:** solo cachea contenido público; las áreas privadas y la API de usuario van siempre a red, y al cerrar sesión se borran las cachés.

@@ -13,7 +13,8 @@ export interface ReportData {
   leads30: number;
   medianDom: number | null;
   bySource: { source: string; count: number }[];
-  byZone: { zone: string; active: number; leads: number; ppm: number | null; dom: number | null }[];
+  /** salePpm: USD/m² of SALE listings · rentPpm: USD/m²/month of LONG_RENT listings (short rents excluded). */
+  byZone: { zone: string; active: number; leads: number; salePpm: number | null; rentPpm: number | null; dom: number | null }[];
 }
 
 const SOURCE: Record<string, [string, string]> = {
@@ -50,19 +51,21 @@ export function ReportsView({ locale, data }: { locale: Locale; data: ReportData
         <div className="overflow-x-auto rounded-np border border-navy-line bg-navy-card p-5">
           <div className="mb-3 font-display text-lg font-semibold">{tx(locale, "Por zona", "By area")}</div>
           <table className="w-full text-sm">
-            <thead className="text-left text-xs uppercase tracking-wide text-mist"><tr><th className="pb-2">{tx(locale, "Zona", "Area")}</th><th className="pb-2 text-right">{tx(locale, "Activos", "Active")}</th><th className="pb-2 text-right">Leads</th><th className="pb-2 text-right">USD/m²</th><th className="pb-2 text-right">{tx(locale, "Días", "Days")}</th></tr></thead>
+            <thead className="text-left text-xs uppercase tracking-wide text-mist"><tr><th className="pb-2">{tx(locale, "Zona", "Area")}</th><th className="pb-2 text-right">{tx(locale, "Activos", "Active")}</th><th className="pb-2 text-right">Leads</th><th className="pb-2 text-right" title={tx(locale, "Media de venta", "Sale average")}>{tx(locale, "Venta USD/m²", "Sale USD/m²")}</th><th className="pb-2 text-right" title={tx(locale, "Alquiler de larga estancia", "Long-term rent")}>{tx(locale, "Alquiler USD/m²/mes", "Rent USD/m²/mo")}</th><th className="pb-2 text-right">{tx(locale, "Días", "Days")}</th></tr></thead>
             <tbody>
               {data.byZone.map((z) => (
                 <tr key={z.zone} className="border-t border-navy-line">
                   <td className="py-2 font-semibold">{z.zone}</td>
                   <td className="text-right">{z.active}</td>
                   <td className="text-right">{z.leads}</td>
-                  <td className="text-right">{z.ppm ? num(z.ppm, locale) : "—"}</td>
+                  <td className="text-right">{z.salePpm != null ? num(Math.round(z.salePpm), locale) : "—"}</td>
+                  <td className="text-right">{z.rentPpm != null ? num(z.rentPpm, locale) : "—"}</td>
                   <td className="text-right text-xs text-mist">{z.dom ?? "—"}</td>
                 </tr>
               ))}
             </tbody>
           </table>
+          <p className="mt-3 text-xs text-mist">{tx(locale, "Vacacional (precio por noche) y comercial no se promedian por m².", "Vacation rentals (nightly price) and commercial listings are not averaged per m².")}</p>
         </div>
       </div>
       <div className="mt-6 flex items-center gap-3 rounded-np border border-dashed border-navy-line p-4 text-sm text-mist">

@@ -84,29 +84,20 @@ Cuatro revisores automáticos recorrieron la PWA en producción (`localhost:3001
 - Tras el login, cada rol llega a su panel.
 
 ## Pendiente (mejoras, no bloquean el uso)
-- Captación: botón «Convertir en inmueble» (hoy solo se marca como Captado o Rechazado).
-- Fotografía: crear y asignar sesiones desde la app.
-- Superadmin:
-  - Cambiar el rol de usuarios desde la interfaz.
-  - Página de auditoría completa (hoy muestra las últimas 10 entradas).
-- Leads:
-  - Reasignar a otro agente.
-  - Proponer visita en cualquier momento, no solo cuando la IA lo sugiere.
-  - Buscador en la bandeja.
-- Buscador:
-  - Filtros de baños, m² y precio mínimo en la interfaz (la API ya los soporta).
-  - Guardar en el URL el orden y la zona dibujada.
-- Hub del comprador:
-  - Responder mensajes.
-  - Hacer ofertas.
-  - Guardar la precalificación.
-- Rendimiento:
-  - Aligerar el HTML de la home, que manda anuncios completos.
-  - Hacer estáticas las páginas públicas, que hoy leen la sesión en el layout.
-- Envío real de emails (Resend/SES) y notificaciones push (fase 2).
-- Antes de tener datos reales en producción:
-  - Pasar de `prisma db push` a migraciones (`prisma migrate`).
-  - Actualizar dependencias con avisos de `npm audit` (`next`, `sharp`).
+Ya implementado desde la versión anterior de esta lista (se retira de aquí): «Convertir en inmueble» desde captación,
+crear y asignar sesiones de fotos, cambio de rol y auditoría completa en superadmin, reasignar leads y proponer
+visita en cualquier momento, buscador de la bandeja, filtros de baños/m²/precio mínimo, orden y polígono/radio en
+el URL (`sort`, `poly`, `radius`), responder mensajes/ofertas/precalificación en el Hub, fichas ligeras en listas,
+páginas públicas estáticas (ISR), envío real de emails con Resend (sin proveedor quedan como `SIMULATED`) y
+esquema versionado con migraciones (`prisma migrate deploy`, carpeta `packages/db/prisma/migrations`; ya no se usa
+`db push`).
+
+Sigue pendiente:
+- Notificaciones push (fase 2; `src/lib/push.ts` es un no-op).
+- Almacenamiento S3 (`STORAGE=s3` es un stub; en Vercel se usa Blob y en local `/uploads`).
+- Superadmin: botón «Aprobar» para anuncios FSBO / de agencias no verificadas en revisión en `/platform/moderation`
+  (la API ya lo permite: `PATCH /api/v1/listings/:id { review: "APPROVED" }`).
+- Revisar periódicamente los avisos de `npm audit`.
 
 ## Pruebas
 - Vitest: 17 pruebas (IA, RBAC, schemas, geo, filtros incluidos los URLs mal formados).

@@ -42,7 +42,7 @@ export async function platformHome(locale: "es" | "en" = "es") {
       { k: t("IA", "AI"), v: aiSetting === "openai-compatible" ? (aiKeyConfigured() ? `openai-compatible · ${process.env.AI_MODEL}` : t("openai-compatible (sin key → heuristic)", "openai-compatible (no key → heuristic)")) : "heuristic", ok: aiSetting === "heuristic" || aiKeyConfigured() },
       { k: "Google Maps", v: process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY ? "API key OK" : t("sin key → mapa ilustrado", "no key → illustrated map"), ok: !!process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY },
       { k: "Auth", v: ["Credentials", process.env.AUTH_GOOGLE_ID ? "Google" : null, process.env.DEMO_AUTH === "true" ? "DEMO" : null].filter(Boolean).join(" + "), ok: true },
-      { k: "Email outbox", v: `${outbox} · SMTP off (v1)`, ok: true },
+      { k: "Email outbox", v: `${outbox} · ${process.env.RESEND_API_KEY && process.env.EMAIL_FROM ? "Resend" : t("sin proveedor → SIMULATED", "no provider → SIMULATED")}`, ok: !!(process.env.RESEND_API_KEY && process.env.EMAIL_FROM) },
       { k: "Storage", v: process.env.STORAGE === "s3" ? "S3" : "Local /uploads", ok: true },
     ],
     // Same resolver as /platform/audit: targets stored as ids show as names; actor "" = system.

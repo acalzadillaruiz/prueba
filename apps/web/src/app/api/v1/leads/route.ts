@@ -10,6 +10,7 @@ import { limit } from "@/server/rate-limit";
 import { publicWhere } from "@/server/listings";
 import { assertBookableSlot, lockAgentAndCheck } from "@/server/tours";
 import { bump } from "@/server/counters";
+import { recipientLocale, requestLocale, tourWhen, type Loc } from "@/server/email-locale";
 
 const Create = leadSchema;
 
@@ -58,10 +59,20 @@ export const POST = handler(async (req: NextRequest) => {
   const thread = await prisma.messageThread.create({ data: { leadId: lead.id, listingId: l.id, subject: l.titleEs, participants: { create: [...new Set(participants)].map((userId) => ({ userId })) } } });
   if (u) await prisma.message.create({ data: { threadId: thread.id, senderId: u.id, body: b.message } });
   await bump([l.id], ["leadsCount", "interactions"]);
-  const when = b.tourStart ? new Date(b.tourStart).toLocaleString("es-VE", { timeZone: "America/Caracas", weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "";
-  await queueEmail(b.email, b.tourStart ? `Visita solicitada: ${l.titleEs} · ${when}` : `Mensaje enviado: ${l.titleEs}`, "TOUR");
+  // Subjects in each recipient's language: the seeker's saved locale (or the language they're browsing in), the staff's.
+  const seekerLoc = await recipientLocale(b.email, requestLocale(req));
+  const title = (loc: Loc) => (loc === "en" && l.titleEn ? l.titleEn : l.titleEs);
+  const when = tourStart ? tourWhen(tourStart, seekerLoc) : "";
+  await queueEmail(
+    b.email,
+    tourStart ? (seekerLoc === "en" ? `Tour requested: ${title("en")} · ${when}` : `Visita solicitada: ${title("es")} · ${when}`) : seekerLoc === "en" ? `Message sent: ${title("en")}` : `Mensaje enviado: ${title("es")}`,
+    "TOUR",
+  );
   const staff = l.agent?.email ?? l.owner?.email;
-  if (staff) await queueEmail(staff, `Nuevo lead (${score.score}/100): ${b.name} · ${l.titleEs}`, "LEAD");
+  if (staff) {
+    const staffLoc = await recipientLocale(staff);
+    await queueEmail(staff, staffLoc === "en" ? `New lead (${score.score}/100): ${b.name} · ${title("en")}` : `Nuevo lead (${score.score}/100): ${b.name} · ${title("es")}`, "LEAD");
+  }
   return ok(leadToDomain(lead), 201);
 });
 

@@ -108,7 +108,9 @@ async function main() {
         saves: l.stats.saves,
         // Lead counter = the leads actually seeded for this listing (the inbox and this stat must agree).
         leadsCount: LEADS.filter((x) => x.listingId === l.id).length,
-        avgTimeSec: l.stats.avgTimeSec,
+        // Measured dwell time: a running average over `dwellCount` visits (ViewBeacon → POST …/view with dwell).
+        avgTimeSec: l.stats.avgTimeSec ?? 0,
+        dwellCount: Math.round(l.stats.impressions * 0.35 * 0.6),
         interactions: l.stats.interactions,
         priceHistory: { create: l.priceHistory.map((p) => ({ amount: p.amount, kind: p.kind, date: d(p.date) })) },
         estimates: { create: { mid: l.estimate.mid, low: l.estimate.low, high: l.estimate.high, confidence: l.estimate.confidence, comparables: l.estimate.comparables as unknown as Prisma.InputJsonValue, method: l.estimate.method } },
@@ -176,6 +178,12 @@ async function main() {
   // owner mandate + thread with the agent
   const mandateListing = LISTINGS.find((l) => l.ownerUserId === "u-priv" && l.city === "Barquisimeto")!;
   await prisma.mandate.create({ data: { ownerUserId: "u-priv", agencyId: "ag-andes", agentId: "u-agent", listingId: mandateListing.id, status: "ASSIGNED", createdAt: d(new Date(NOW.getTime() - 3 * 864e5).toISOString()) } });
+  // Mandate lifecycle REQUESTED → ASSIGNED → ACTIVE (same as PATCH /mandates/:id): while ASSIGNED the listing is linked
+  // to the agency and agent but stays a private DRAFT pending review, with no public activity yet.
+  await prisma.listing.update({
+    where: { id: mandateListing.id },
+    data: { status: "DRAFT", review: "PENDING", privateListing: true, publishedAt: null, agencyId: "ag-andes", agentId: "u-agent", impressions: 0, views: 0, saves: 0, interactions: 0, avgTimeSec: 0, dwellCount: 0, updatedAt: d(new Date(NOW.getTime() - 3 * 60 * 60e3).toISOString()) },
+  });
   const ownerThread = await prisma.messageThread.create({
     data: { listingId: mandateListing.id, subject: "Encargo · Casa en Barquisimeto", participants: { create: [{ userId: "u-priv" }, { userId: "u-agent" }] } },
   });
@@ -194,7 +202,7 @@ async function main() {
   await prisma.commissionEntry.create({ data: { agencyId: "ag-andes", listingId: wonListing.id, agentId: won.agentId, amount: Math.round(wonListing.priceAmount * 0.05), agentPart: Math.round(wonListing.priceAmount * 0.025) } });
 
   for (const f of FX_RATES) await prisma.fxRate.create({ data: { code: f.code, perUsd: f.perUsd, source: f.source } });
-  for (const e of EMAILS) await prisma.emailOutbox.create({ data: { to: e.to, subject: e.subject, kind: e.kind, status: e.status, createdAt: d(e.at), sentAt: d(e.at) } });
+  for (const e of EMAILS) await prisma.emailOutbox.create({ data: { to: e.to, subject: e.subject, kind: e.kind, status: e.status, createdAt: d(e.at), sentAt: e.status === "SENT" ? d(e.at) : null } });
   const actorByName = (n: string) => USERS.find((u) => u.name === n)?.id;
   for (const a of AUDIT) await prisma.auditLog.create({ data: { actorId: actorByName(a.actor), action: a.action, target: a.target, createdAt: d(a.at) } });
   for (const m of MODERATION_QUEUE)

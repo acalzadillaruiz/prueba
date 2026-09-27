@@ -5,11 +5,11 @@ import { ApiError, body, currentUser, handler, ok, requireUser } from "@/server/
 import { isManager } from "@/server/access";
 import { aiProvider } from "@/server/ai";
 import { audit } from "@/server/data";
+import { PROPERTY_KINDS } from "@newplace/config";
 import { findDuplicate, fingerprintOf, qualityOf, scenesFor, slugify, snapshotEstimate, uniqueSlug } from "@/server/listing-service";
 
 type Ctx = { params: Promise<{ id: string }> };
 
-const KINDS = ["apartment", "penthouse", "house", "townhouse", "studio", "office", "retail", "warehouse", "land", "villa", "chalet"] as const;
 const Convert = z.object({ listingType: z.enum(["SALE", "LONG_RENT", "SHORT_RENT", "COMMERCIAL_SALE", "COMMERCIAL_RENT"]).default("SALE") });
 
 /** "Convertir en inmueble": a PENDING capture becomes a DRAFT listing of the same agency (managers only). */
@@ -31,7 +31,7 @@ export const POST = handler(async (req: NextRequest, { params }: Ctx) => {
   const dup = await findDuplicate(lat, lng, c.areaM2, c.address);
   if (dup) throw new ApiError("CONFLICT", { duplicateOf: { id: dup.id, slug: dup.slug, title: dup.titleEs } });
 
-  const kind = (KINDS as readonly string[]).includes(c.kind) ? c.kind : "apartment";
+  const kind = (PROPERTY_KINDS as readonly string[]).includes(c.kind) ? c.kind : "apartment";
   const copy = await (await aiProvider()).writeListing({ kind, zone: zone.name, city: zone.city, areaM2: c.areaM2, beds: 0, baths: 0, parking: 0, amenities: [] });
   const category = kind === "land" ? "LAND" : b.listingType.startsWith("COMMERCIAL") ? "COMMERCIAL" : "RESIDENTIAL";
   const fp = fingerprintOf(lat, lng, c.areaM2, c.address);

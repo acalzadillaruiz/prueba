@@ -2,15 +2,26 @@ import type { Metadata } from "next";
 import type { Locale } from "@/types/domain";
 
 /**
- * Canonical origin. Server-only APP_URL is read at runtime (not inlined at build), then Vercel's production
- * domain, then the public build-time URL.
+ * Canonical origin, first match wins: APP_URL (server-only, read at runtime and at build) → NEXT_PUBLIC_APP_URL →
+ * Vercel's production domain → the deployment's own Vercel URL → localhost. Static pages (sitemap, robots, ISR
+ * canonicals) bake this in at build time, so a production build without any of them warns loudly.
  */
-export const SITE_URL = (
-  process.env.APP_URL ||
-  (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "") ||
-  process.env.NEXT_PUBLIC_APP_URL ||
-  "http://localhost:3000"
-).replace(/\/$/, "");
+export function resolveSiteUrl(env: Record<string, string | undefined> = process.env): { url: string; fallback: boolean } {
+  const url =
+    env.APP_URL ||
+    env.NEXT_PUBLIC_APP_URL ||
+    (env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${env.VERCEL_PROJECT_PRODUCTION_URL}` : "") ||
+    (env.VERCEL_URL ? `https://${env.VERCEL_URL}` : "");
+  return { url: (url || "http://localhost:3000").replace(/\/$/, ""), fallback: !url };
+}
+
+const site = resolveSiteUrl();
+if (site.fallback && process.env.NODE_ENV === "production" && typeof window === "undefined") {
+  console.warn(
+    "[seo] APP_URL is not set (nor NEXT_PUBLIC_APP_URL / VERCEL_*): sitemap, robots and canonical URLs will point to http://localhost:3000. Set APP_URL at build and runtime.",
+  );
+}
+export const SITE_URL = site.url;
 
 /** Canonical + hreflang for a locale-independent path ("/search?type=SALE", "/luxury", ""). */
 export function alternates(locale: Locale, path: string): Metadata["alternates"] {

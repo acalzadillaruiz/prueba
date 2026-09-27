@@ -16,7 +16,7 @@ export default async function Page({ params }: { params: Promise<{ locale: Local
   const canManage = ["AGENCY_OWNER", "BACKOFFICE", "SUPERADMIN"].includes(user.role);
   const jobs = await getMediaJobs(user.role === "PHOTOGRAPHER" ? { photographerId: user.id } : { agencyId: user.agencyId });
   const [listings, members, options] = await Promise.all([
-    listingsByIds([...new Set(jobs.map((j) => j.listingId))]),
+    listingsByIds([...new Set(jobs.map((j) => j.listingId))], { publicOnly: false }),
     prisma.agencyMember.findMany({ where: { agencyId: user.agencyId }, include: { user: { select: { id: true, name: true, email: true, suspended: true } } } }),
     canManage
       ? prisma.listing.findMany({ where: { agencyId: user.agencyId, status: { notIn: ["SOLD", "RENTED", "WITHDRAWN", "EXPIRED"] } }, select: { id: true, titleEs: true, titleEn: true, address: true }, orderBy: { updatedAt: "desc" } })

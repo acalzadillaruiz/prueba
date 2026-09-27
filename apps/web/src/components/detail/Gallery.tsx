@@ -1,22 +1,32 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Box, Camera, ChevronLeft, ChevronRight, Film, LayoutPanelTop, MapPinned, X } from "lucide-react";
+import { Box, Camera, ChevronLeft, ChevronRight, ExternalLink, LayoutPanelTop, MapPinned, X } from "lucide-react";
 import type { Listing, Locale } from "@/types/domain";
 import { listingPhoto } from "@/lib/photos";
 import { Floorplan, PropertyArt } from "@/components/art/PropertyArt";
 import { tx } from "@/lib/i18n";
+import { GOOGLE_MAPS_KEY } from "@/components/map/config";
 import { cn } from "@/lib/cn";
 
-type Tab = "photos" | "plan" | "video" | "tour" | "street";
+type Tab = "photos" | "plan" | "street";
+
+/** Only https links are opened (the API validates the same on write). */
+const safeTour = (u?: string | null) => (u && /^https:\/\//i.test(u) ? u : null);
 
 export function Gallery({ l, locale, luxury }: { l: Listing; locale: Locale; luxury?: boolean }) {
   const [open, setOpen] = useState(false);
   const [i, setI] = useState(0);
   const opener = useRef<HTMLElement | null>(null);
   // Real uploaded photos replace the illustrations entirely (no mixing, no empty cells).
-  const shots = l.photos?.length ? l.photos.map((_, n) => l.scenes[n % l.scenes.length]) : l.scenes;
+  const illustrated = !l.photos?.length;
+  const shots = illustrated ? l.scenes : l.photos!.map((_, n) => l.scenes[n % l.scenes.length]);
   const total = shots.length;
+  // Without real photos the gallery shows brand illustrations: say so (never "6 fotos" for drawings).
+  const what = (n: number) => (illustrated ? tx(locale, `ilustración ${n} de ${total}`, `illustration ${n} of ${total}`) : tx(locale, `foto ${n} de ${total}`, `photo ${n} of ${total}`));
+  const What = (n: number) => what(n).replace(/^./, (c) => c.toUpperCase());
+  const view = (n: number) => tx(locale, `Ver ${what(n)}`, `View ${what(n)}`);
+  const tour = safeTour(l.virtualTourUrl);
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -40,30 +50,34 @@ export function Gallery({ l, locale, luxury }: { l: Listing; locale: Locale; lux
     setTab(t);
     setOpen(true);
   };
+  // Only media that really exists: no video player without a video, Street View only with a Maps key.
   const tabs: [Tab, React.ElementType, string, boolean][] = [
-    ["photos", Camera, `${total} ${tx(locale, "fotos", "photos")}`, true],
-    ["plan", LayoutPanelTop, tx(locale, "Plano", "Floor plan"), l.hasFloorplan],
-    ["video", Film, "Video", l.hasVideo],
-    ["tour", Box, tx(locale, "Tour 360°", "360° tour"), l.hasVirtualTour],
-    ["street", MapPinned, tx(locale, "Vista de calle", "Street view"), true],
+    ["photos", Camera, illustrated ? tx(locale, "Ilustraciones", "Illustrations") : `${total} ${tx(locale, "fotos", "photos")}`, true],
+    ["plan", LayoutPanelTop, tx(locale, "Plano orientativo", "Indicative floor plan"), l.hasFloorplan],
+    ["street", MapPinned, tx(locale, "Vista de calle", "Street view"), !!GOOGLE_MAPS_KEY],
   ];
+  const tag = illustrated && (
+    <span className="pointer-events-none absolute bottom-3 left-3 rounded-full bg-navy/80 px-2.5 py-1 font-display text-xs text-ivory">{tx(locale, "Ilustración · sin fotos reales aún", "Illustration · no real photos yet")}</span>
+  );
   return (
     <>
       {luxury ? (
-        <button onClick={() => show(0)} className="relative block h-[72vh] max-h-[760px] w-full overflow-hidden" aria-label={tx(locale, `Ver foto 1 de ${total}`, `View photo 1 of ${total}`)}>
+        <button onClick={() => show(0)} className="relative block h-[72vh] max-h-[760px] w-full overflow-hidden" aria-label={view(1)}>
           <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} sizes="100vw" priority className="h-full w-full" />
+          {tag}
         </button>
       ) : (
         <div className="grid h-[300px] grid-cols-4 grid-rows-2 gap-2 overflow-hidden rounded-np md:h-[460px]">
-          <button onClick={() => show(0)} className={cn("col-span-4 row-span-2 overflow-hidden", total > 1 && "md:col-span-2")} aria-label={tx(locale, `Ver foto 1 de ${total}`, `View photo 1 of ${total}`)}>
+          <button onClick={() => show(0)} className={cn("relative col-span-4 row-span-2 overflow-hidden", total > 1 && "md:col-span-2")} aria-label={view(1)}>
             <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} sizes="(max-width: 768px) 100vw, 50vw" priority className="h-full w-full transition-transform duration-500 hover:scale-[1.02]" />
+            {tag}
           </button>
           {shots.slice(1, 5).map((s, n, arr) => (
-            <button key={n} onClick={() => show(n + 1)} className={cn("relative hidden overflow-hidden md:block", arr.length === 1 && "col-span-2 row-span-2", arr.length === 2 && "col-span-2", arr.length === 3 && n === 2 && "col-span-2")} aria-label={tx(locale, `Ver foto ${n + 2} de ${total}`, `View photo ${n + 2} of ${total}`)}>
+            <button key={n} onClick={() => show(n + 1)} className={cn("relative hidden overflow-hidden md:block", arr.length === 1 && "col-span-2 row-span-2", arr.length === 2 && "col-span-2", arr.length === 3 && n === 2 && "col-span-2")} aria-label={view(n + 2)}>
               <PropertyArt scene={s} seed={l.id + n} photo={listingPhoto(l, n + 1)} className="h-full w-full transition-transform duration-500 hover:scale-[1.03]" />
               {n === 3 && total > 5 && (
                 <span className="absolute inset-0 flex items-center justify-center bg-navy/55 font-display text-lg text-ivory">
-                  +{total - 5} {tx(locale, "fotos", "photos")}
+                  +{total - 5} {illustrated ? tx(locale, "ilustraciones", "illustrations") : tx(locale, "fotos", "photos")}
                 </span>
               )}
             </button>
@@ -80,6 +94,18 @@ export function Gallery({ l, locale, luxury }: { l: Listing; locale: Locale; lux
             <Icon size={15} aria-hidden /> {label}
           </button>
         ))}
+        {tour && (
+          <a
+            href={tour}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={cn("inline-flex min-h-11 items-center gap-1.5 rounded-full border px-3 font-display text-sm transition-colors duration-np", luxury ? "border-gold/50 text-ivory hover:bg-white/5" : "border-line bg-white hover:border-navy/40")}
+          >
+            <Box size={15} aria-hidden /> {tx(locale, "Tour 360°", "360° tour")}
+            <ExternalLink size={13} aria-hidden />
+            <span className="sr-only">{tx(locale, "(se abre en una pestaña nueva)", "(opens in a new tab)")}</span>
+          </a>
+        )}
       </div>
 
       {open && (
@@ -97,33 +123,36 @@ export function Gallery({ l, locale, luxury }: { l: Listing; locale: Locale; lux
           <div className="relative flex min-h-0 flex-1 items-center justify-center px-4 md:px-16">
             {tab === "photos" && (
               <>
-                <PropertyArt scene={shots[i]} seed={i === 0 ? l.id : l.id + (i - 1)} photo={listingPhoto(l, i)} className="max-h-full w-full max-w-5xl rounded-np" />
+                <div className="relative max-h-full w-full max-w-5xl">
+                  <PropertyArt scene={shots[i]} seed={i === 0 ? l.id : l.id + (i - 1)} photo={listingPhoto(l, i)} className="max-h-full w-full rounded-np" />
+                  {tag}
+                </div>
                 <button onClick={() => setI((i - 1 + total) % total)} aria-label={tx(locale, "Foto anterior", "Previous photo")} className="absolute left-3 rounded-full bg-white/10 p-3 hover:bg-white/20"><ChevronLeft aria-hidden /></button>
                 <button onClick={() => setI((i + 1) % total)} aria-label={tx(locale, "Foto siguiente", "Next photo")} className="absolute right-3 rounded-full bg-white/10 p-3 hover:bg-white/20"><ChevronRight aria-hidden /></button>
-                <span className="sr-only" aria-live="polite">{tx(locale, `Foto ${i + 1} de ${total}`, `Photo ${i + 1} of ${total}`)}</span>
+                <span className="sr-only" aria-live="polite">{What(i + 1)}</span>
               </>
             )}
-            {tab === "plan" && <Floorplan seed={l.id} beds={l.beds} className="max-h-full w-full max-w-4xl rounded-np" />}
-            {(tab === "video" || tab === "tour") && (
-              <div className="relative w-full max-w-5xl">
-                <PropertyArt scene={l.scenes[1] ?? l.scenes[0]} seed={l.id + "v"} photo={listingPhoto(l, 1) ?? listingPhoto(l, 0)} className="w-full rounded-np opacity-60" />
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-                  <span className="flex h-20 w-20 items-center justify-center rounded-full bg-coral shadow-np">{tab === "video" ? <Film size={32} /> : <Box size={32} />}</span>
-                  <span className="font-display text-lg">{tab === "video" ? tx(locale, "Video del inmueble · 1:42", "Property video · 1:42") : tx(locale, "Tour virtual 360° (enlace externo)", "360° virtual tour (external link)")}</span>
-                </div>
-              </div>
+            {tab === "plan" && (
+              <figure className="w-full max-w-4xl">
+                <Floorplan seed={l.id} beds={l.beds} className="max-h-[70vh] w-full rounded-np" />
+                <figcaption className="mt-2 text-center text-sm text-mist">{tx(locale, "Plano orientativo: distribución aproximada, no a escala. Pide el plano definitivo al anunciante.", "Indicative floor plan: approximate layout, not to scale. Ask the lister for the final plan.")}</figcaption>
+              </figure>
             )}
-            {tab === "street" && (
-              <div className="relative w-full max-w-5xl">
-                <PropertyArt scene={l.kind === "house" || l.kind === "villa" ? "house-dusk" : "tower-day"} seed={l.id + "s"} photo={listingPhoto(l, 0)} className="w-full rounded-np" />
-                <span className="absolute left-3 top-3 rounded-full bg-navy/80 px-3 py-1 text-sm">Google Street View · {l.address}</span>
-              </div>
+            {tab === "street" && GOOGLE_MAPS_KEY && (
+              <iframe
+                title={tx(locale, `Vista de calle · ${l.address}`, `Street view · ${l.address}`)}
+                src={`https://www.google.com/maps/embed/v1/streetview?key=${encodeURIComponent(GOOGLE_MAPS_KEY)}&location=${l.lat},${l.lng}&fov=80`}
+                className="aspect-video max-h-full w-full max-w-5xl rounded-np border-0 bg-navy"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                allowFullScreen
+              />
             )}
           </div>
           {tab === "photos" && (
             <div className="no-scrollbar flex gap-2 overflow-x-auto px-4 py-3">
               {shots.map((s, n) => (
-                <button key={n} onClick={() => setI(n)} aria-label={tx(locale, `Foto ${n + 1} de ${total}`, `Photo ${n + 1} of ${total}`)} aria-current={n === i || undefined} className={cn("h-16 w-24 shrink-0 overflow-hidden rounded-lg ring-2", n === i ? "ring-coral" : "ring-transparent opacity-60")}>
+                <button key={n} onClick={() => setI(n)} aria-label={What(n + 1)} aria-current={n === i || undefined} className={cn("h-16 w-24 shrink-0 overflow-hidden rounded-lg ring-2", n === i ? "ring-coral" : "ring-transparent opacity-60")}>
                   <PropertyArt scene={s} seed={n === 0 ? l.id : l.id + (n - 1)} photo={listingPhoto(l, n)} className="h-full w-full" />
                 </button>
               ))}

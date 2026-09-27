@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { clientIp } from "@/server/rate-limit";
+import { UNTRUSTED_IP, clientIp } from "@/server/rate-limit";
 import { uploadPath, UPLOAD_DIR } from "@/server/storage";
 
 // Pure helpers: keep Auth.js / Prisma out of the unit test.
@@ -19,7 +19,8 @@ describe("clientIp: spoofable platform headers are only trusted where the platfo
     vi.stubEnv("VERCEL", "");
     vi.stubEnv("TRUSTED_IP_HEADER", "");
     const base = clientIp(req({ "x-forwarded-for": "203.0.113.50" }));
-    expect(base).toBe("203.0.113.50");
+    // Exposed directly (no trusted header / proxy hops): X-Forwarded-For is client-controlled → shared bucket.
+    expect(base).toBe(UNTRUSTED_IP);
     expect(clientIp(req({ "x-vercel-forwarded-for": "1.2.3.4", "x-forwarded-for": "203.0.113.50" }))).toBe(base);
     expect(clientIp(req({ "x-real-ip": "5.6.7.8", "x-forwarded-for": "203.0.113.50" }))).toBe(base);
   });

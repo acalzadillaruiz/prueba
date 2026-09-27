@@ -27,11 +27,15 @@ export function SavedView({ locale, all }: { locale: Locale; all: Listing[] }) {
   const extra = useQuery({ queryKey: ["compare", missing.join(",")], queryFn: () => api<{ items: Listing[] }>(`listings?ids=${missing.join(",")}`), enabled: missing.length > 0 });
   const pool = [...all, ...(extra.data?.items ?? [])];
   const cmp = compare.map((id) => pool.find((l) => l.id === id)).filter(Boolean) as Listing[];
+  // A sale price, a monthly rent and a nightly rate are different units: only pick a "best" price among like units.
+  const sameUnit = new Set(cmp.map((l) => l.pricePeriod ?? "sale")).size <= 1;
+  const unit = (l: Listing) => <span className="text-xs font-normal text-ink/65">{priceSuffix(l, locale)}</span>;
+  const ppm = (l: Listing) => (l.areaM2 > 0 ? l.priceAmount / l.areaM2 : NaN);
   const rows: [string, (l: Listing) => React.ReactNode, ((l: Listing) => number)?, ("min" | "max")?][] = [
-    [tx(locale, "Precio", "Price"), (l) => <span className="font-display text-lg font-semibold">{money(l.priceAmount, locale)}<span className="text-xs font-normal text-ink/65">{priceSuffix(l, locale)}</span></span>, (l) => l.priceAmount, "min"],
-    ["PlaceEstimate", (l) => money(l.estimate.mid, locale)],
+    [tx(locale, "Precio", "Price"), (l) => <span className="font-display text-lg font-semibold">{money(l.priceAmount, locale)}{unit(l)}</span>, sameUnit ? (l) => l.priceAmount : undefined, "min"],
+    ["PlaceEstimate", (l) => <>{money(l.estimate.mid, locale)}{unit(l)}</>],
     [tx(locale, "Vs. estimación", "Vs. estimate"), (l) => { const d = ((l.priceAmount - l.estimate.mid) / l.estimate.mid) * 100; return <span className={d <= 0 ? "font-semibold text-ok" : "font-semibold text-warn"}>{d > 0 ? "+" : ""}{d.toFixed(0)} %</span>; }, (l) => (l.priceAmount - l.estimate.mid) / l.estimate.mid, "min"],
-    ["USD/m²", (l) => num(Math.round(l.priceAmount / l.areaM2), locale), (l) => l.priceAmount / l.areaM2, "min"],
+    [tx(locale, "Precio por m²", "Price per m²"), (l) => (Number.isFinite(ppm(l)) ? <>{num(Math.round(ppm(l) * (l.pricePeriod ? 10 : 1)) / (l.pricePeriod ? 10 : 1), locale)} USD/m²{unit(l)}</> : "—"), sameUnit ? ppm : undefined, "min"],
     [tx(locale, "Superficie", "Area"), (l) => `${num(l.areaM2, locale)} m²`, (l) => l.areaM2, "max"],
     [tx(locale, "Habitaciones", "Bedrooms"), (l) => l.beds, (l) => l.beds, "max"],
     [tx(locale, "Baños", "Baths"), (l) => l.baths, (l) => l.baths, "max"],

@@ -3,8 +3,8 @@ import { z } from "zod";
 import { prisma } from "@newplace/db";
 import { ApiError, body, currentUser, handler, ok, requireUser } from "@/server/api";
 import { filtersFromParams, listingById, listingInclude, publicWhere, searchListings, toDomain } from "@/server/listings";
-import { brochurePdfSchema, commercialSchema, shortRentSchema } from "@newplace/config";
-import { draftCopy, findDuplicate, fingerprintOf, notifySavedSearches, refreshQuality, scenesFor, slugify, snapshotEstimate, uniqueSlug } from "@/server/listing-service";
+import { brochurePdfSchema, commercialSchema, propertyKindSchema, shortRentSchema } from "@newplace/config";
+import { draftCopy, findDuplicate, fingerprintOf, needsModeration, notifySavedSearches, refreshQuality, scenesFor, slugify, snapshotEstimate, uniqueSlug } from "@/server/listing-service";
 import { audit } from "@/server/data";
 import { isStaff } from "@/server/access";
 import { bump } from "@/server/counters";
@@ -29,7 +29,7 @@ const CreateSchema = z.object({
   mode: z.enum(["FSBO", "AGENCY", "MANDATE"]).default("FSBO"),
   agencyId: z.string().max(64).optional(),
   listingType: z.enum(["SALE", "LONG_RENT", "SHORT_RENT", "COMMERCIAL_SALE", "COMMERCIAL_RENT"]),
-  kind: z.enum(["apartment", "penthouse", "house", "townhouse", "studio", "office", "retail", "warehouse", "land", "villa", "chalet"]),
+  kind: propertyKindSchema,
   address: z.string().min(5).max(200),
   zone: z.string().min(2).max(80),
   city: z.string().min(2).max(80),
@@ -100,7 +100,7 @@ export const POST = handler(async (req: NextRequest) => {
   const fp = fingerprintOf(b.lat, b.lng, b.areaM2, b.address);
   const slug = await uniqueSlug(`${slugify(b.zone)}-${b.beds ? `${b.beds}h` : b.kind}-${b.areaM2}m-${Math.random().toString(36).slice(2, 8)}`);
   const status = b.mode === "MANDATE" || !b.publish ? "DRAFT" : "ACTIVE";
-  const review = (b.mode === "AGENCY" && u.role === "AGENT") || b.mode === "MANDATE" ? "PENDING" : "APPROVED";
+  const review = (b.mode === "AGENCY" && u.role === "AGENT") || b.mode === "MANDATE" || (u.role !== "SUPERADMIN" && (await needsModeration(b.mode, u.id, agencyId))) ? "PENDING" : "APPROVED";
   const titleEs = b.title_es ?? copy!.title_es;
   const bodyEs = b.body_es ?? copy!.body_es;
   const titleEn = b.title_en ?? copy?.title_en ?? "";

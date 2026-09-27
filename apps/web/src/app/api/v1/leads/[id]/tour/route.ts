@@ -4,6 +4,7 @@ import { prisma } from "@newplace/db";
 import { body, currentUser, handler, ok, requireUser } from "@/server/api";
 import { audit, queueEmail } from "@/server/data";
 import { leadForUser } from "@/server/access";
+import { recipientLocale, tourWhen } from "@/server/email-locale";
 import { assertFutureTour, lockAgentAndCheck } from "@/server/tours";
 
 type Ctx = { params: Promise<{ id: string }> };
@@ -34,6 +35,8 @@ export const POST = handler(async (req: NextRequest, { params }: Ctx) => {
   }
   await prisma.leadEvent.create({ data: { leadId: id, type: "TOUR", data: { start }, actorId: u.id } });
   await audit(u.id, "lead.tour", lead.name, { start });
-  await queueEmail(lead.email, `Visita confirmada · ${s.toLocaleString("es-VE", { timeZone: "America/Caracas", weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}`, "TOUR");
+  // The seeker's language (their account's locale when they have one), not the agent's who triggers this.
+  const loc = await recipientLocale(lead.email);
+  await queueEmail(lead.email, `${loc === "en" ? "Tour confirmed" : "Visita confirmada"} · ${tourWhen(s, loc)}`, "TOUR");
   return ok({ id: tour.id, start: tour.start.toISOString(), status: tour.status });
 });

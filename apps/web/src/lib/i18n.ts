@@ -1,6 +1,6 @@
 import esMessages from "../../../../packages/config/messages/es.json";
 import enMessages from "../../../../packages/config/messages/en.json";
-import type { Amenity, Listing, ListingStatus, ListingType, Locale } from "@/types/domain";
+import type { Amenity, EmailOutbox, Listing, ListingStatus, ListingType, Locale } from "@/types/domain";
 
 export const LOCALES: Locale[] = ["es", "en"];
 export const isLocale = (s: string): s is Locale => s === "es" || s === "en";
@@ -94,3 +94,17 @@ export function plural(n: number, locale: Locale, es: [string, string], en: [str
   const [one, many] = locale === "es" ? es : en;
   return `${n} ${n === 1 ? one : many}`;
 }
+
+/** Average dwell time as m:ss, or "—" when no visit has been measured yet. */
+export function dwell(sec: number | null | undefined): string {
+  if (sec == null) return "—";
+  return `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, "0")}`;
+}
+
+/** Outbox delivery states. SIMULATED = no email provider configured: recorded here, never actually sent. */
+export const EMAIL_STATUS_LABEL: Record<EmailOutbox["status"], [string, string]> = {
+  QUEUED: ["En cola", "Queued"],
+  SENT: ["Enviado", "Sent"],
+  SIMULATED: ["Simulado (sin proveedor)", "Simulated (no provider)"],
+  FAILED: ["Fallido", "Failed"],
+};

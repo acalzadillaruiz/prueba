@@ -20,3 +20,18 @@ export function inShape(p: LatLng, s: Shape): boolean {
   if (s.type === "poly") return s.pts.length < 3 || pointInPolygon(p, s.pts);
   return haversineKm(p, s.center) <= s.km;
 }
+
+/** Lat/lng bounding box enclosing a shape (south, west, north, east): a cheap indexed pre-filter before inShape. */
+export function shapeBounds(s: Shape): [number, number, number, number] | null {
+  if (!s) return null;
+  if (s.type === "poly") {
+    if (s.pts.length < 3) return null;
+    const lats = s.pts.map((p) => p.lat);
+    const lngs = s.pts.map((p) => p.lng);
+    return [Math.min(...lats), Math.min(...lngs), Math.max(...lats), Math.max(...lngs)];
+  }
+  // 1° latitude ≈ 111.32 km; longitude degrees shrink with cos(lat). Padded 1 % so the exact haversine test decides.
+  const dLat = (s.km / 111.32) * 1.01;
+  const dLng = (s.km / (111.32 * Math.max(0.01, Math.cos((s.center.lat * Math.PI) / 180)))) * 1.01;
+  return [s.center.lat - dLat, s.center.lng - dLng, s.center.lat + dLat, s.center.lng + dLng];
+}

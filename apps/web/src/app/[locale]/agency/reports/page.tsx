@@ -26,9 +26,14 @@ export default async function Page({ params }: { params: Promise<{ locale: Local
     .map((zone) => {
       const zs = listings.filter((l) => l.zone === zone);
       const za = zs.filter((l) => l.status === "ACTIVE" || l.status === "UNDER_OFFER");
-      const sales = zs.filter((l) => l.listingType === "SALE");
+      // Price per m² only makes sense per operation: sale (USD/m²) and long rent (USD/m²/month).
+      // Short rents (nightly prices) and commercial listings are left out instead of being averaged in.
+      const ppm = (type: string) => {
+        const rows = zs.filter((l) => l.listingType === type && l.areaM2 > 0);
+        return rows.length ? Math.round((rows.reduce((s, l) => s + l.priceAmount / l.areaM2, 0) / rows.length) * 10) / 10 : null;
+      };
       const zd = za.filter((l) => l.publishedAt).map((l) => (Date.now() - l.publishedAt!.getTime()) / 864e5);
-      return { zone, active: za.length, leads: zs.reduce((s, l) => s + l.leadsCount, 0), ppm: sales.length ? Math.round(sales.reduce((s, l) => s + l.priceAmount / l.areaM2, 0) / sales.length) : null, dom: zd.length ? Math.round(zd.reduce((a, b) => a + b, 0) / zd.length) : null };
+      return { zone, active: za.length, leads: zs.reduce((s, l) => s + l.leadsCount, 0), salePpm: ppm("SALE"), rentPpm: ppm("LONG_RENT"), dom: zd.length ? Math.round(zd.reduce((a, b) => a + b, 0) / zd.length) : null };
     })
     .sort((a, b) => b.leads - a.leads);
   return (

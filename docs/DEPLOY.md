@@ -50,9 +50,19 @@ Contraseña de todos los usuarios de ejemplo: `NewPlace!2026`.
 | Anti-spam distribuido (Upstash Redis) | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` | Se usa Postgres (funciona, algo más lento) |
 | Monitoreo de errores (Sentry) | `SENTRY_DSN`, `NEXT_PUBLIC_SENTRY_DSN` | Errores solo en los logs de Vercel |
 | Dominio propio | `APP_URL=https://tudominio.com` | Se usa el dominio de Vercel para canonical/sitemap |
-| IP real detrás de otro proxy (no Vercel) | `TRUSTED_IP_HEADER=x-real-ip` (la cabecera que pone tu proxy) | En Vercel se usa su cabecera; fuera de Vercel los límites por IP no confían en `X-Forwarded-For` |
+| IP real fuera de Vercel | `TRUSTED_IP_HEADER` o `TRUSTED_PROXY_HOPS` (ver abajo) | En Vercel se usa su cabecera; fuera de Vercel todos los clientes comparten un único cubo por IP (`direct`) |
 
-> `APP_URL` debe estar definida también en **build** (Vercel la aplica a ambos por defecto): las páginas públicas se generan estáticamente (ISR) y sus enlaces canónicos se escriben en ese momento.
+> `APP_URL` debe estar definida también en **build** (Vercel la aplica a ambos por defecto): las páginas públicas se generan estáticamente (ISR) y sus enlaces canónicos se escriben en ese momento. Si falta, se usa `NEXT_PUBLIC_APP_URL`, luego `VERCEL_PROJECT_PRODUCTION_URL` y luego `VERCEL_URL`; un build de producción sin ninguna avisa en consola (`[seo] APP_URL is not set…`) porque sitemap/robots/canonical apuntarían a `http://localhost:3000`.
+
+## Límites por IP y cabeceras de proxy
+Los límites anti-abuso (login, registro, leads, contadores de vistas…) se agrupan por IP del cliente, que solo se toma de datos fiables (`src/server/rate-limit.ts` → `clientIp`):
+
+1. **`TRUSTED_IP_HEADER`** — nombre de una cabecera que tu proxy **sobrescribe** siempre (`x-real-ip` en nginx con `proxy_set_header X-Real-IP $remote_addr;`, `cf-connecting-ip` en Cloudflare…).
+2. **Vercel** (variable `VERCEL` presente) — `x-vercel-forwarded-for` / `x-real-ip`, que pone su edge.
+3. **`TRUSTED_PROXY_HOPS=N`** — nº de proxies propios que **añaden** su entrada a `X-Forwarded-For`. Se usa la N-ésima entrada contando desde la **derecha** (con un nginx delante, `1` = la dirección que nginx vio). Las entradas a su izquierda las escribió el cliente y se ignoran.
+4. **Nada configurado** — se asume que la app está expuesta directamente: `X-Forwarded-For` lo controla el cliente (Next.js solo lo rellena si no viene), así que rotarlo no puede crear cubos nuevos. Todas las peticiones comparten el cubo `direct` y el servidor avisa una vez en consola. Siguen aplicando los límites por cuenta (login: 10 fallos por cuenta+IP y 50 por cuenta cada 15 min).
+
+No pongas `TRUSTED_PROXY_HOPS` si la app es accesible sin pasar por tu proxy: cualquiera podría inventar la entrada de la derecha.
 
 ## Calidad continua
 El repositorio incluye `.github/workflows/ci.yml`: en cada push ejecuta lint, tipos, pruebas unitarias, build, pruebas de principio a fin y Lighthouse con notas mínimas (rendimiento 85, accesibilidad/buenas prácticas/SEO 95).

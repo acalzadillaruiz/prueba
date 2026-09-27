@@ -2,7 +2,7 @@ import "server-only";
 import { prisma, type Prisma } from "@newplace/db";
 import type { EstimateResult } from "@newplace/ai";
 import type { Amenity, Kind, Listing, ListingStatus, ListingType, Scene } from "@/types/domain";
-import { inShape, type Shape } from "@/lib/geo";
+import { inShape, shapeBounds, type Shape } from "@/lib/geo";
 
 export const listingInclude = {
   photos: { orderBy: [{ isCover: "desc" }, { order: "asc" }] },
@@ -17,9 +17,29 @@ export type ListingRow = Prisma.ListingGetPayload<{ include: typeof listingInclu
 
 export const PUBLIC_STATUSES: ListingStatus[] = ["COMING_SOON", "ACTIVE", "UNDER_OFFER", "SOLD", "RENTED"];
 
-export function publicWhere(): Prisma.ListingWhereInput {
+/**
+ * What anonymous visitors may see. `byLink` also admits private (off-market) listings, which stay out of search
+ * and lists but are served to whoever has the link (brief §8: "no sale en search público salvo link").
+ */
+export function publicWhere(opts: { byLink?: boolean } = {}): Prisma.ListingWhereInput {
   // Listings of a suspended agency disappear from every public surface.
-  return { status: { in: PUBLIC_STATUSES }, review: "APPROVED", privateListing: false, OR: [{ agencyId: null }, { agency: { status: { not: "SUSPENDED" } } }] };
+  return {
+    status: { in: PUBLIC_STATUSES },
+    review: "APPROVED",
+    ...(opts.byLink ? {} : { privateListing: false }),
+    OR: [{ agencyId: null }, { agency: { status: { not: "SUSPENDED" } } }],
+  };
+}
+
+/**
+ * Single rule for the public detail page, its metadata and its share image: published + approved and not owned by
+ * a suspended agency (same rule as `publicWhere({ byLink: true })`). Hidden listings are only seen via /preview.
+ */
+export async function servedPublicly(l: Pick<Listing, "status" | "review" | "agencyId">): Promise<boolean> {
+  if (!PUBLIC_STATUSES.includes(l.status) || l.review !== "APPROVED") return false;
+  if (!l.agencyId) return true;
+  const agency = await prisma.agency.findUnique({ where: { id: l.agencyId }, select: { status: true } });
+  return agency?.status !== "SUSPENDED";
 }
 
 /**
@@ -93,10 +113,11 @@ export function toDomain(r: ListingRow): Listing {
     hasFloorplan: r.hasFloorplan,
     hasVideo: r.hasVideo,
     hasVirtualTour: r.hasVirtualTour,
+    virtualTourUrl: r.virtualTourUrl,
     estimate,
     priceHistory: r.priceHistory.map((p) => ({ date: p.date.toISOString(), amount: p.amount, kind: p.kind as Listing["priceHistory"][number]["kind"] })),
     daysOnMarket: Math.max(0, Math.round((Date.now() - Date.parse(publishedAt)) / 864e5)),
-    stats: { impressions: r.impressions, saves: r.saves, leads: r.leadsCount, avgTimeSec: r.avgTimeSec, interactions: r.interactions },
+    stats: { impressions: r.impressions, saves: r.saves, leads: r.leadsCount, avgTimeSec: r.dwellCount > 0 ? r.avgTimeSec : null, interactions: r.interactions },
     quality: r.quality,
     privateListing: r.privateListing,
     shortRent: (r.shortRent ?? undefined) as Listing["shortRent"],
@@ -213,6 +234,12 @@ export function whereFromFilters(f: SearchFilters): Prisma.ListingWhereInput {
     const [s, w, n, e] = f.bbox;
     and.push({ lat: { gte: s, lte: n }, lng: { gte: w, lte: e } });
   }
+  // Polygon / radius: their bounding box goes to the database; the exact inShape test runs on that subset.
+  const sb = shapeBounds(f.shape ?? null);
+  if (sb) {
+    const [s, w, n, e] = sb;
+    and.push({ lat: { gte: s, lte: n }, lng: { gte: w, lte: e } });
+  }
   return { AND: and };
 }
 
@@ -221,12 +248,32 @@ export async function searchListings(f: SearchFilters): Promise<{ items: Listing
   const orderBy: Prisma.ListingOrderByWithRelationInput[] =
     f.sort === "price-asc" ? [{ priceAmount: "asc" }] : f.sort === "price-desc" ? [{ priceAmount: "desc" }] : [{ publishedAt: "desc" }];
   const take = Math.max(1, Math.min(Math.floor(f.take ?? 500), 500));
+  if (f.shape) return searchInShape(f, where, [...orderBy, { id: "asc" }], take);
   const rows = await prisma.listing.findMany({ where, include: listingInclude, orderBy: [...orderBy, { id: "asc" }], take: take + 1, ...(f.cursor ? { cursor: { id: f.cursor }, skip: 1 } : {}) });
-  let items = rows.slice(0, take).map((r) => toCard(toDomain(r)));
-  if (f.shape) items = items.filter((l) => inShape(l, f.shape!));
+  const items = rows.slice(0, take).map((r) => toCard(toDomain(r)));
   if (f.sort === "ppm") items.sort((a, b) => a.priceAmount / a.areaM2 - b.priceAmount / b.areaM2);
-  const total = f.shape ? items.length : await prisma.listing.count({ where });
+  const total = await prisma.listing.count({ where });
   return { items, nextCursor: rows.length > take ? rows[take - 1].id : null, total };
+}
+
+/** Upper bound of candidates inside a shape's bounding box (public inventory is far below this). */
+const SHAPE_CANDIDATES = 5000;
+
+/**
+ * Polygon / radius search: candidates come from the database already limited to the shape's bounding box
+ * (whereFromFilters), the exact point-in-shape test runs on their coordinates, and only then is the result paginated
+ * — so every page is full, the cursor walks the exact set and `total` is the exact count.
+ */
+async function searchInShape(f: SearchFilters, where: Prisma.ListingWhereInput, orderBy: Prisma.ListingOrderByWithRelationInput[], take: number) {
+  const candidates = await prisma.listing.findMany({ where, select: { id: true, lat: true, lng: true }, orderBy, take: SHAPE_CANDIDATES });
+  const ids = candidates.filter((c) => inShape(c, f.shape!)).map((c) => c.id);
+  const start = f.cursor ? ids.indexOf(f.cursor) + 1 : 0;
+  const pageIds = ids.slice(start, start + take);
+  const rows = pageIds.length ? await prisma.listing.findMany({ where: { id: { in: pageIds } }, include: listingInclude }) : [];
+  const byId = new Map(rows.map((r) => [r.id, r]));
+  const items = pageIds.map((id) => byId.get(id)).filter((r): r is ListingRow => !!r).map((r) => toCard(toDomain(r)));
+  if (f.sort === "ppm") items.sort((a, b) => a.priceAmount / a.areaM2 - b.priceAmount / b.areaM2);
+  return { items, nextCursor: start + take < ids.length ? pageIds[pageIds.length - 1] : null, total: ids.length };
 }
 
 export async function publicListings(): Promise<Listing[]> {
@@ -244,9 +291,15 @@ export async function listingById(id: string): Promise<Listing | null> {
   return r ? toDomain(r) : null;
 }
 
-export async function listingsByIds(ids: string[]): Promise<Listing[]> {
+/**
+ * Listings by id, in the given order. Public surfaces (saved, buyer hub) only get what `publicWhere()` allows —
+ * a saved/contacted id of a pending, private or suspended listing must never render. Staff pages that already
+ * scoped the ids to their own agency pass `{ publicOnly: false }`.
+ */
+export async function listingsByIds(ids: string[], opts: { publicOnly?: boolean } = {}): Promise<Listing[]> {
   if (!ids.length) return [];
-  const rows = await prisma.listing.findMany({ where: { id: { in: ids } }, include: listingInclude });
+  const where: Prisma.ListingWhereInput = opts.publicOnly === false ? { id: { in: ids } } : { AND: [{ id: { in: ids } }, publicWhere({ byLink: true })] };
+  const rows = await prisma.listing.findMany({ where, include: listingInclude });
   const map = new Map(rows.map((r) => [r.id, toDomain(r)]));
   return ids.map((id) => map.get(id)).filter(Boolean) as Listing[];
 }

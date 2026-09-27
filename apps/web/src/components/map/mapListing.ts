@@ -1,6 +1,6 @@
 import type { Listing } from "@/types/domain";
 
-const MAP_FIELDS = ["id", "slug", "lat", "lng", "priceAmount", "priceCurrency", "pricePeriod", "luxury", "title_es", "title_en", "scenes", "photos", "beds", "baths", "areaM2", "status", "listingType"] as const;
+const MAP_FIELDS = ["id", "slug", "lat", "lng", "city", "zone", "priceAmount", "priceCurrency", "pricePeriod", "luxury", "title_es", "title_en", "scenes", "photos", "beds", "baths", "areaM2", "status", "listingType"] as const;
 
 /**
  * Only what the map pins and the map preview card read. Server pages pass map listings to client components,

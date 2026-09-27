@@ -5,6 +5,7 @@ const ACTIONS: Record<string, [string, string]> = {
   "agency.branding": ["Marca de agencia actualizada", "Agency branding updated"],
   "agency.create": ["Agencia creada", "Agency created"],
   "agency.flags": ["Agencia: estado o plan cambiado", "Agency: status or plan changed"],
+  "agency.update": ["Agencia editada (nombre / ciudad)", "Agency edited (name / city)"],
   "ai.provider": ["Proveedor de IA cambiado", "AI provider changed"],
   "capture.create": ["Captación registrada", "Capture logged"],
   "capture.duplicate": ["Captación duplicada", "Duplicate capture"],

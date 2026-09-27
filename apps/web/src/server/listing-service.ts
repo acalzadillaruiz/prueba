@@ -2,6 +2,7 @@ import "server-only";
 import { estimateFor } from "./estimate";
 import { prisma, type Prisma } from "@newplace/db";
 import { heuristicWriteListing } from "@newplace/ai";
+import { listingQuality } from "@newplace/config";
 import type { Scene } from "@/types/domain";
 import { queueEmail } from "./data";
 import { filtersFromParams, whereFromFilters } from "./listings";
@@ -35,14 +36,33 @@ export async function findDuplicate(lat: number, lng: number, areaM2: number, ad
 }
 
 export function qualityOf(l: { photos: number; titleEn?: string | null; bodyEn?: string | null; lat?: number | null; hasFloorplan: boolean; hasVirtualTour: boolean }) {
-  return (l.photos >= 8 ? 35 : l.photos * 4) + (l.titleEn && l.bodyEn ? 20 : 0) + (l.lat ? 20 : 0) + (l.hasFloorplan ? 15 : 0) + (l.hasVirtualTour ? 10 : 0);
+  return listingQuality({ photos: l.photos, titleEn: l.titleEn, bodyEn: l.bodyEn, located: !!l.lat, hasFloorplan: l.hasFloorplan, hasVirtualTour: l.hasVirtualTour });
 }
 
-/** Recomputes and stores the quality score from the listing as persisted (uploaded photos, or its illustrations while it has none). */
+/** Recomputes and stores the quality score from the listing as persisted (real uploaded photos only: brand illustrations don't count). */
 export async function refreshQuality(listingId: string) {
   const l = await prisma.listing.findUniqueOrThrow({ where: { id: listingId }, include: { _count: { select: { photos: true } } } });
-  const quality = qualityOf({ photos: l._count.photos || l.scenes.length, titleEn: l.titleEn, bodyEn: l.bodyEn, lat: l.lat, hasFloorplan: l.hasFloorplan, hasVirtualTour: l.hasVirtualTour });
+  const quality = qualityOf({ photos: l._count.photos, titleEn: l.titleEn, bodyEn: l.bodyEn, lat: l.lat, hasFloorplan: l.hasFloorplan, hasVirtualTour: l.hasVirtualTour });
   return prisma.listing.update({ where: { id: listingId }, data: { quality } });
+}
+
+/** A new private owner is "established" once the email is verified or the account is a week old (docs/DECISIONS.md). */
+const ESTABLISHED_AFTER_MS = 7 * 864e5;
+
+/**
+ * Trust gate for immediate publication: listings of an agency the platform hasn't verified, and FSBO listings of a
+ * brand-new owner whose email isn't verified, go to moderation (review PENDING → invisible until approved).
+ */
+export async function needsModeration(mode: "FSBO" | "AGENCY" | "MANDATE", userId: string, agencyId: string | null) {
+  if (mode === "AGENCY" && agencyId) {
+    const agency = await prisma.agency.findUnique({ where: { id: agencyId }, select: { verified: true } });
+    return !agency?.verified;
+  }
+  if (mode === "FSBO") {
+    const owner = await prisma.user.findUnique({ where: { id: userId }, select: { emailVerified: true, createdAt: true } });
+    return !owner?.emailVerified && Date.now() - (owner?.createdAt.getTime() ?? Date.now()) < ESTABLISHED_AFTER_MS;
+  }
+  return false;
 }
 
 export function scenesFor(kind: string, luxury: boolean): Scene[] {

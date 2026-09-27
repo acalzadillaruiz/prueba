@@ -10,7 +10,7 @@ import { EstimateCard } from "@/components/detail/Estimate";
 import { PriceHistory } from "@/components/detail/Bits";
 import { Button, Field, darkInputCls } from "@/components/ui";
 import { api } from "@/lib/api";
-import { AMENITY_LABEL, STATUS_LABEL, lbl, money, num, tx } from "@/lib/i18n";
+import { AMENITY_LABEL, STATUS_LABEL, dwell, lbl, money, num, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import { commissionAmount } from "@/lib/commission";
 import { ListingTypeFields, extrasFrom, validateExtras, type ExtrasDraft } from "@/components/owner/ListingTypeFields";
@@ -27,6 +27,8 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
   const [lang, setLang] = useState<Locale>("es");
   const [copy, setCopy] = useState({ title_es: l.title_es, title_en: l.title_en, body_es: l.body_es, body_en: l.body_en });
   const [f, setF] = useState({ status: l.status, priceAmount: l.priceAmount, privateListing: !!l.privateListing, beds: l.beds, baths: l.baths, areaM2: l.areaM2, parking: l.parking, amenities: l.amenities, hasFloorplan: l.hasFloorplan, hasVirtualTour: l.hasVirtualTour });
+  const [tourUrl, setTourUrl] = useState(l.virtualTourUrl ?? "");
+  const tourUrlBad = f.hasVirtualTour && !!tourUrl.trim() && !/^https:\/\/[^\s]+\.[^\s]+$/i.test(tourUrl.trim());
   const [extras, setExtras] = useState<ExtrasDraft>(() => extrasFrom(l));
   const [showExtrasErr, setShowExtrasErr] = useState(false);
   const [photos, setPhotos] = useState<Photo[]>(initialPhotos);
@@ -50,6 +52,10 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
   }, [l.id, l.luxury]);
 
   const save = async () => {
+    if (tourUrlBad) {
+      setErr(tx(locale, "El enlace del tour virtual debe empezar por https://", "The virtual tour link must start with https://"));
+      return;
+    }
     if (!extrasCheck.ok) {
       setShowExtrasErr(true);
       setErr(tx(locale, "Revisa los campos marcados antes de guardar.", "Check the highlighted fields before saving."));
@@ -64,7 +70,7 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
         ...(l.listingType.startsWith("COMMERCIAL") ? { commercial: p.commercial } : {}),
         ...(l.luxury ? { brochurePdf: p.brochurePdf ?? null } : {}),
       };
-      await api(`listings/${l.id}`, { method: "PATCH", json: { ...copy, ...f, ...typeFields } });
+      await api(`listings/${l.id}`, { method: "PATCH", json: { ...copy, ...f, ...typeFields, virtualTourUrl: (f.hasVirtualTour && tourUrl.trim()) || null } });
       setSaved(true);
       router.refresh();
     } catch (e) {
@@ -227,6 +233,28 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
               <label className="flex items-center gap-2"><input type="checkbox" disabled={!canEdit} checked={f.hasFloorplan} onChange={(e) => { setF({ ...f, hasFloorplan: e.target.checked }); dirty(); }} className="accent-[#F26B4D]" /> {tx(locale, "Tiene plano", "Has floor plan")}</label>
               <label className="flex items-center gap-2"><input type="checkbox" disabled={!canEdit} checked={f.hasVirtualTour} onChange={(e) => { setF({ ...f, hasVirtualTour: e.target.checked }); dirty(); }} className="accent-[#F26B4D]" /> {tx(locale, "Tour virtual", "Virtual tour")}</label>
             </div>
+            {f.hasVirtualTour && (
+              <div className="mt-3 max-w-md">
+                <Field
+                  dark
+                  label={tx(locale, "Enlace del tour 360° (https)", "360° tour link (https)")}
+                  error={tourUrlBad ? tx(locale, "Debe ser un enlace https:// completo.", "Must be a full https:// link.") : undefined}
+                  hint={tx(locale, "Se abre en una pestaña nueva desde la ficha pública (Matterport, Kuula…).", "Opens in a new tab from the public listing (Matterport, Kuula…).")}
+                >
+                  <input
+                    className={darkInputCls}
+                    type="url"
+                    inputMode="url"
+                    placeholder="https://"
+                    maxLength={500}
+                    disabled={!canEdit}
+                    value={tourUrl}
+                    aria-invalid={tourUrlBad}
+                    onChange={(e) => { setTourUrl(e.target.value); dirty(); }}
+                  />
+                </Field>
+              </div>
+            )}
           </div>
 
           {(l.listingType === "SHORT_RENT" || l.listingType.startsWith("COMMERCIAL") || l.luxury) && (
@@ -319,7 +347,7 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
           <div className={section}>
             <div className="mb-3 font-display text-lg font-semibold">{tx(locale, "Rendimiento", "Performance")}</div>
             <div className="grid grid-cols-2 gap-3 text-sm">
-              {[[tx(locale, "Impresiones", "Impressions"), num2(l.stats.impressions, locale)], ["Saves", l.stats.saves], ["Leads", l.stats.leads], [tx(locale, "Tiempo medio", "Avg. time"), `${Math.floor(l.stats.avgTimeSec / 60)}:${String(l.stats.avgTimeSec % 60).padStart(2, "0")}`], [tx(locale, "Interacciones", "Interactions"), l.stats.interactions], [tx(locale, "Días en mercado", "Days on market"), l.daysOnMarket]].map(([t, v]) => (
+              {[[tx(locale, "Impresiones", "Impressions"), num2(l.stats.impressions, locale)], ["Saves", l.stats.saves], ["Leads", l.stats.leads], [tx(locale, "Tiempo medio", "Avg. time"), dwell(l.stats.avgTimeSec)], [tx(locale, "Interacciones", "Interactions"), l.stats.interactions], [tx(locale, "Días en mercado", "Days on market"), l.daysOnMarket]].map(([t, v]) => (
                 <div key={String(t)} className="rounded-lg bg-white/5 p-3"><div className="text-xs text-mist">{t}</div><div className="font-display text-lg font-semibold">{v}</div></div>
               ))}
             </div>

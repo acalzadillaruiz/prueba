@@ -3,16 +3,16 @@
 ## Arranque
 ```bash
 node -v                 # 20+ (probado con 22)
-cp .env.example apps/web/.env.local && $EDITOR apps/web/.env.local
+cp .env.example apps/web/.env.local && $EDITOR apps/web/.env.local   # AUTH_SECRET; para la demo: DEMO_AUTH=true y NEXT_PUBLIC_DEMO_AUTH=true
 npm install
 npm run db:up           # Postgres local (scripts/db-local.sh) · alternativa: docker compose up -d
-npm run db:reset        # prisma db push + seed (borra y recrea todos los datos)
+npm run db:reset        # prisma migrate deploy + seed (borra y recrea todos los datos)
 npm run dev             # http://localhost:3000/es
 ```
 Producción: `npm run build && npm start` (Serwist genera `public/sw.js` en el build).
 
 ## Usuarios
-Todos con contraseña `NewPlace!2026`. Con `DEMO_AUTH=true` el login muestra «Entrar como…». **Desactivar `DEMO_AUTH` en producción.**
+Todos con contraseña `NewPlace!2026`. Con `DEMO_AUTH=true` y `NEXT_PUBLIC_DEMO_AUTH=true` (en `.env.example` vienen en `false`) el login muestra «Entrar como…»; `npm run e2e`, `scripts/capture.mjs` y `scripts/video.mjs` lo necesitan. **Desactivar `DEMO_AUTH` en producción.**
 
 ## Tareas habituales
 - Volver al estado inicial: `npm run db:seed` (los tests E2E crean datos).

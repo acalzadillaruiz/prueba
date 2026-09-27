@@ -1,0 +1,6 @@
+-- AlterEnum
+ALTER TYPE "EmailStatus" ADD VALUE IF NOT EXISTS 'SIMULATED';
+
+-- AlterTable
+ALTER TABLE "Listing" ALTER COLUMN "avgTimeSec" SET DEFAULT 0,
+ADD COLUMN     "dwellCount" INTEGER NOT NULL DEFAULT 0;

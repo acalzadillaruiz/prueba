@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 import { Circle, Minus, Moon, PenLine, Plus, Sun, X } from "lucide-react";
 import type { Listing, Locale } from "@/types/domain";
 import type { LatLng, Shape } from "@/lib/geo";
-import { compactMoney, tx } from "@/lib/i18n";
+import { compactMoney, plural, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import { VE_RINGS } from "./venezuela";
 
@@ -229,6 +229,26 @@ export function NightMap({
     return [...groups.values(), ...solo.map((p) => ({ ...p, items: [p.l] }))];
   }, [listings, view, P, region, k, selectedId]);
 
+  // Screen-space boxes of pins and clusters: zone labels that collide with one are faded so "CH[3]AO" never happens.
+  const blockers = useMemo(
+    () =>
+      pins.map((g) => {
+        if (g.items.length > 1) return { x0: g.x - 22 * k, x1: g.x + 22 * k, y0: g.y - 22 * k, y1: g.y + 22 * k };
+        const hw = (pinWidth(pinLabel(g.items[0], locale)) / 2) * k * 1.15;
+        return { x0: g.x - hw, x1: g.x + hw, y0: g.y - 38 * k, y1: g.y + 2 * k };
+      }),
+    [pins, k, locale],
+  );
+  /** Opacity for a map label at (x, y) map units, laid out at `fs` px with the given anchor. */
+  const labelOpacity = (x: number, y: number, text: string, fs: number, anchor: "middle" | "start" = "middle", spacing = 0) => {
+    const sx = x * view.s + view.x;
+    const sy = y * view.s + view.y;
+    const w = text.length * (fs * 0.62 + spacing) * k;
+    const x0 = anchor === "middle" ? sx - w / 2 : sx;
+    const box = { x0, x1: x0 + w, y0: sy - fs * k, y1: sy + fs * 0.25 * k };
+    return blockers.some((b) => b.x0 < box.x1 && b.x1 > box.x0 && b.y0 < box.y1 && b.y1 > box.y0) ? 0.12 : 1;
+  };
+
   const selected = listings.find((l) => l.id === selectedId);
   const selPt = selected ? { x: P(selected.lat, selected.lng).x * view.s + view.x, y: P(selected.lat, selected.lng).y * view.s + view.y } : null;
 
@@ -341,6 +361,8 @@ export function NightMap({
                     fontWeight={lb.big ? 600 : 500}
                     letterSpacing={lb.big ? 3 : 0.5}
                     fontSize={lb.big ? 15 : 12}
+                    opacity={labelOpacity(c.x, c.y, lb.t, lb.big ? 15 : 12, "middle", lb.big ? 3 : 0.5)}
+                    style={{ transition: "opacity 180ms ease-out" }}
                   >
                     {lb.t}
                   </text>
@@ -365,7 +387,7 @@ export function NightMap({
                 return (
                   <g key={c.t}>
                     <circle cx={p.x} cy={p.y} r={3 / view.s} fill={pal.label} />
-                    <text transform={labelAt(p.x + (5 * k) / view.s, p.y - (4 * k) / view.s)} fill={pal.label} fontFamily="var(--font-display)" fontSize={13}>
+                    <text transform={labelAt(p.x + (5 * k) / view.s, p.y - (4 * k) / view.s)} fill={pal.label} fontFamily="var(--font-display)" fontSize={13} opacity={labelOpacity(p.x + (5 * k) / view.s, p.y - (4 * k) / view.s, c.t, 13, "start")} style={{ transition: "opacity 180ms ease-out" }}>
                       {c.t}
                     </text>
                   </g>
@@ -397,12 +419,24 @@ export function NightMap({
             <g
               key={`c-${g.items[0].id}`}
               transform={`translate(${g.x} ${g.y}) scale(${k})`}
-              className="cursor-pointer"
+              className="group cursor-pointer focus-visible:outline-none"
+              role="button"
+              tabIndex={0}
+              aria-label={`${plural(g.items.length, locale, ["inmueble", "inmuebles"], ["listing", "listings"])} · ${tx(locale, "acercar", "zoom in")}`}
               onClick={(e) => {
                 e.stopPropagation();
                 zoom(2.2, g.x, g.y);
               }}
+              onKeyDown={(e) => {
+                if (e.key !== "Enter" && e.key !== " ") return;
+                e.preventDefault();
+                zoom(2.2, g.x, g.y);
+              }}
             >
+              <g className="opacity-0 group-focus-visible:opacity-100">
+                <circle r={25} fill="none" stroke="#0B1220" strokeWidth={4.5} />
+                <circle r={25} fill="none" stroke="#F7F4EF" strokeWidth={2} />
+              </g>
               <circle r={22} fill="#F26B4D" opacity={0.18} />
               <circle r={15} fill="#F26B4D" stroke="#0B1220" strokeWidth={2} />
               <text textAnchor="middle" dy={4.5} fontSize={12.5} fontWeight={700} fill="#fff" fontFamily="var(--font-display)">
@@ -519,20 +553,36 @@ export function NightMap({
   );
 }
 
+const pinLabel = (l: Listing, locale: Locale) => compactMoney(l.priceAmount, locale) + (l.pricePeriod === "night" ? tx(locale, "/n", "/nt") : l.pricePeriod === "month" ? tx(locale, "/m", "/mo") : "");
+const pinWidth = (label: string) => label.length * 7.4 + 18;
+
 function PricePin({ l, x, y, active, locale, onClick, k }: { l: Listing; x: number; y: number; active: boolean; locale: Locale; onClick: () => void; k: number }) {
-  const label = compactMoney(l.priceAmount, locale) + (l.pricePeriod === "night" ? tx(locale, "/n", "/nt") : l.pricePeriod === "month" ? tx(locale, "/m", "/mo") : "");
-  const w = label.length * 7.4 + 18;
+  const label = pinLabel(l, locale);
+  const w = pinWidth(label);
   const gold = l.luxury;
+  const period = l.pricePeriod === "night" ? tx(locale, " por noche", " per night") : l.pricePeriod === "month" ? tx(locale, " al mes", " per month") : "";
   return (
     <g
       transform={`translate(${x} ${y}) scale(${k})`}
-      className="cursor-pointer"
+      className="group cursor-pointer focus-visible:outline-none"
+      role="button"
+      tabIndex={0}
+      aria-label={`${compactMoney(l.priceAmount, locale)}${period}${l.zone ? ` · ${l.zone}` : ""}`}
       onClick={(e) => {
         e.stopPropagation();
         onClick();
       }}
+      onKeyDown={(e) => {
+        if (e.key !== "Enter" && e.key !== " ") return;
+        e.preventDefault();
+        onClick();
+      }}
       style={{ transition: "transform 180ms ease-out" }}
     >
+      <g className="opacity-0 group-focus-visible:opacity-100">
+        <rect x={-w / 2 - 5} y={-38} width={w + 10} height={35} rx={17.5} fill="none" stroke="#0B1220" strokeWidth={4.5} />
+        <rect x={-w / 2 - 5} y={-38} width={w + 10} height={35} rx={17.5} fill="none" stroke="#F7F4EF" strokeWidth={2} />
+      </g>
       <g transform={active ? "scale(1.15)" : undefined}>
         <path d={`M0 0 L-6 -9 L6 -9 Z`} fill={active ? "#F7F4EF" : gold ? "#D4AF77" : "#F26B4D"} />
         <rect x={-w / 2} y={-33} width={w} height={25} rx={12.5} fill={active ? "#F7F4EF" : gold ? "#D4AF77" : "#F26B4D"} stroke="#0B1220" strokeWidth={1.5} />

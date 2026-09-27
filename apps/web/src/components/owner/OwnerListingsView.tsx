@@ -151,7 +151,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
                   <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="aspect-[4/3] h-full w-full" />
                   <div className="p-5">
                     <div className="flex flex-wrap items-center gap-2">
-                      <StatusBadge status={l.status} locale={locale} />
+                      <StatusBadge status={l.status} review={l.review} locale={locale} />
                       <span className="text-xs font-semibold text-ink/65">{isMandate ? tx(locale, "Encargo", "Mandate") : "FSBO"}</span>
                       <span className="text-xs text-ink/65">· {l.photos?.length ?? 0} {tx(locale, "fotos", "photos")} · {tx(locale, "calidad", "quality")} {l.quality}</span>
                     </div>

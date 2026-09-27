@@ -25,7 +25,8 @@ export function ListingCard({ l, locale, compact, className, showCompare }: { l:
           {drop && <span className="rounded-full bg-white/90 px-2 py-0.5 text-[11px] font-bold text-ok">↓ {tx(locale, "Bajó", "Reduced")}</span>}
         </div>
         <SaveButton id={l.id} locale={locale} className="absolute right-2.5 top-2.5" />
-        <span className="absolute bottom-2.5 right-2.5 rounded-md bg-navy/80 px-1.5 py-0.5 text-[11px] font-semibold text-ivory">1/{l.scenes.length}</span>
+        {/* Photo counter only for real photos; illustration-only listings say so instead of "1/8". */}
+        <span className="absolute bottom-2.5 right-2.5 rounded-md bg-navy/80 px-1.5 py-0.5 text-[11px] font-semibold text-ivory">{l.photos?.length ? `1/${l.scenes.length}` : tx(locale, "Ilustración", "Illustration")}</span>
       </div>
       <div className={cn("p-3.5", compact && "p-3")}>
         <div className="flex items-baseline justify-between gap-2">

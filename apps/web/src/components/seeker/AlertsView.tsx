@@ -7,7 +7,7 @@ import { Bell, Mail, MapPin, Pencil, Trash2 } from "lucide-react";
 import type { EmailOutbox, Locale } from "@/types/domain";
 import { Badge, Button, Card, EmptyState } from "@/components/ui";
 import { api } from "@/lib/api";
-import { ago, tx } from "@/lib/i18n";
+import { EMAIL_STATUS_LABEL, ago, lbl, tx } from "@/lib/i18n";
 
 type Search = { id: string; name: string; query: string; polygon: unknown; frequency: "INSTANT" | "DAILY" | "WEEKLY"; newCount: number; lastSentAt: string | null };
 
@@ -95,7 +95,7 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
       <aside>
         <Card className="p-5">
           <div className="flex items-center gap-2 font-display text-lg font-semibold"><Mail size={18} className="text-coral" /> {tx(locale, "Enviados", "Sent")}</div>
-          <p className="mt-1 text-xs text-ink/65">{tx(locale, "Bandeja email_outbox (sin SMTP en v1)", "email_outbox table (no SMTP in v1)")}</p>
+          <p className="mt-1 text-xs text-ink/65">{tx(locale, "Correos de tu cuenta («Simulado» = sin proveedor de email configurado)", "Your account’s emails (“Simulated” = no email provider configured)")}</p>
           <ul className="mt-4 divide-y divide-line">
             {emails.map((e) => (
               <li key={e.id} className="py-3">
@@ -104,7 +104,7 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
                   <span className="text-xs text-ink/65">{ago(e.at, locale)}</span>
                 </div>
                 <div className="mt-1.5 text-sm font-semibold">{e.subject}</div>
-                <div className="text-xs text-ink/65">{e.to} · {e.status}</div>
+                <div className="text-xs text-ink/65">{e.to} · {EMAIL_STATUS_LABEL[e.status as keyof typeof EMAIL_STATUS_LABEL] ? lbl(EMAIL_STATUS_LABEL[e.status as keyof typeof EMAIL_STATUS_LABEL], locale) : e.status}</div>
               </li>
             ))}
           </ul>

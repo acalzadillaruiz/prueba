@@ -101,7 +101,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
   const [lang, setLang] = useState<Locale>(locale);
   const [busy, setBusy] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
-  const [done, setDone] = useState<{ slug: string; id: string; mode: Draft["mode"] } | null>(null);
+  const [done, setDone] = useState<{ slug: string; id: string; mode: Draft["mode"]; pending?: boolean } | null>(null);
   const [confirm, setConfirm] = useState(false);
   const [showExtrasErr, setShowExtrasErr] = useState(false);
   const [showDetailsErr, setShowDetailsErr] = useState(false);
@@ -217,7 +217,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
     setErr(null);
     setBusy("create");
     try {
-      const created = await api<{ id: string; slug: string }>("listings", {
+      const created = await api<{ id: string; slug: string; review?: string }>("listings", {
         method: "POST",
         json: {
           mode: d.mode,
@@ -257,7 +257,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
         }
       }
       sessionStorage.removeItem(DRAFT_KEY);
-      setDone({ slug: created.slug, id: created.id, mode: d.mode });
+      setDone({ slug: created.slug, id: created.id, mode: d.mode, pending: created.review === "PENDING" });
       router.refresh();
     } catch (e) {
       if (e instanceof ApiClientError && e.code === "CONFLICT") {
@@ -286,12 +286,14 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
     return (
       <div className="mx-auto max-w-xl px-4 py-20 text-center" data-testid="owner-published">
         <CheckCircle2 size={56} className="mx-auto text-ok" />
-        <h1 className="mt-4 font-display text-3xl font-semibold">{done.mode === "AGENCY" ? tx(locale, "Inmueble creado", "Listing created") : done.mode === "FSBO" ? tx(locale, `¡Publicado en ${d.addr?.zone}!`, `Live in ${d.addr?.zone}!`) : tx(locale, "Encargo enviado", "Request sent")}</h1>
+        <h1 className="mt-4 font-display text-3xl font-semibold">{done.mode === "AGENCY" ? tx(locale, "Inmueble creado", "Listing created") : done.mode === "FSBO" ? (done.pending ? tx(locale, "Enviado a revisión", "Sent for review") : tx(locale, `¡Publicado en ${d.addr?.zone}!`, `Live in ${d.addr?.zone}!`)) : tx(locale, "Encargo enviado", "Request sent")}</h1>
         <p className="mt-2 text-ink/60">
           {done.mode === "AGENCY"
             ? user?.role === "AGENT"
               ? tx(locale, "Quedó pendiente de aprobación del backoffice.", "It’s pending backoffice approval.")
               : tx(locale, "Publicado y visible en el mapa.", "Published and visible on the map.")
+            : done.mode === "FSBO" && done.pending
+            ? tx(locale, "Como tu cuenta es nueva, el equipo de New Place revisará el anuncio antes de publicarlo. Te avisaremos por email.", "As your account is new, the New Place team will review the listing before it goes live. We’ll email you.")
             : done.mode === "FSBO"
             ? tx(locale, "Pasó la revisión automática (sin duplicados) y ya aparece en el mapa.", "It passed automated checks (no duplicates) and is live on the map.")
             : tx(locale, `${agencies.find((a) => a.id === d.agency)?.name} asignará un agente. Estado: SOLICITADO.`, `${agencies.find((a) => a.id === d.agency)?.name} will assign an agent. Status: REQUESTED.`)}
@@ -303,7 +305,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
           ) : (
             <Button href={`/${locale}/owner/listings`}>{tx(locale, "Ver mis inmuebles", "My properties")}</Button>
           )}
-          {done.mode === "FSBO" && <Button href={`/${locale}/listing/${done.slug}`} variant="outline">{tx(locale, "Ver la ficha", "View listing")}</Button>}
+          {done.mode === "FSBO" && !done.pending && <Button href={`/${locale}/listing/${done.slug}`} variant="outline">{tx(locale, "Ver la ficha", "View listing")}</Button>}
         </div>
       </div>
     );

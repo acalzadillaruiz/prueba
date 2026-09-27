@@ -133,8 +133,8 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
     }
   };
 
-  // Same rule as the server: uploaded photos, or the listing's illustrations while it has none.
-  const nPhotos = photos.length || l.scenes.length;
+  // Same rule as the server (listingQuality in @newplace/config): only real uploaded photos count.
+  const nPhotos = photos.length;
   const checks: [boolean, string, number][] = [
     [nPhotos >= 8, tx(locale, `Fotos ≥ 8 (${nPhotos})`, `Photos ≥ 8 (${nPhotos})`), 35],
     [!!copy.title_en && !!copy.body_en, tx(locale, "Bilingüe ES/EN", "Bilingual ES/EN"), 20],
@@ -292,7 +292,7 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
                     <PropertyArt scene={s} seed={i === 0 ? l.id : l.id + (i - 1)} className="aspect-[4/3] w-full" />
                   </div>
                 ))}
-                <p className="col-span-full text-xs text-mist">{tx(locale, "Ilustraciones de marca mientras no haya fotos reales. Sube al menos 8 para +35 de calidad.", "Brand illustrations until real photos are uploaded. Upload at least 8 for +35 quality.")}</p>
+                <p className="col-span-full text-xs text-mist">{tx(locale, "Se muestran ilustraciones de marca mientras no haya fotos reales; no cuentan para la calidad. Sube al menos 8 fotos para +35.", "Brand illustrations are shown until real photos are uploaded; they don’t count towards quality. Upload at least 8 photos for +35.")}</p>
               </div>
             ) : (
               <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">

@@ -328,6 +328,11 @@ export function PlatformModeration({ locale, reports, listings }: { locale: Loca
                   <div className="text-xs text-mist">{l.agency?.name ?? tx(locale, "Particular", "Private owner")} · {l.zone} · {money(l.priceAmount, locale)}</div>
                 </div>
                 <StatusBadge status={l.status} review={l.review} locale={locale} />
+                {l.review === "PENDING" && !down && (
+                  <Button size="sm" variant="dark-outline" disabled={busy === l.id} onClick={() => void run(l.id, () => api(`listings/${l.id}`, { method: "PATCH", json: { review: "APPROVED" } }))}>
+                    {tx(locale, "Aprobar", "Approve")}
+                  </Button>
+                )}
                 {confirming === l.id ? null : (
                   <Button
                     size="sm"

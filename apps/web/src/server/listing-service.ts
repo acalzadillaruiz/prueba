@@ -38,6 +38,13 @@ export function qualityOf(l: { photos: number; titleEn?: string | null; bodyEn?:
   return (l.photos >= 8 ? 35 : l.photos * 4) + (l.titleEn && l.bodyEn ? 20 : 0) + (l.lat ? 20 : 0) + (l.hasFloorplan ? 15 : 0) + (l.hasVirtualTour ? 10 : 0);
 }
 
+/** Recomputes and stores the quality score from the listing as persisted (uploaded photos, or its illustrations while it has none). */
+export async function refreshQuality(listingId: string) {
+  const l = await prisma.listing.findUniqueOrThrow({ where: { id: listingId }, include: { _count: { select: { photos: true } } } });
+  const quality = qualityOf({ photos: l._count.photos || l.scenes.length, titleEn: l.titleEn, bodyEn: l.bodyEn, lat: l.lat, hasFloorplan: l.hasFloorplan, hasVirtualTour: l.hasVirtualTour });
+  return prisma.listing.update({ where: { id: listingId }, data: { quality } });
+}
+
 export function scenesFor(kind: string, luxury: boolean): Scene[] {
   if (kind === "land") return ["land", "chalet", "land"];
   if (kind === "warehouse") return ["warehouse", "office", "lobby"];

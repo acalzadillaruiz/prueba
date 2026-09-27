@@ -12,8 +12,9 @@ import { MapView } from "@/components/map/MapView";
 import { Button, Field, Progress, inputCls } from "@/components/ui";
 import { useApp } from "@/lib/store";
 import { api, ApiClientError } from "@/lib/api";
-import { AMENITY_LABEL, lbl, money, num, tx } from "@/lib/i18n";
+import { AMENITY_LABEL, lbl, money, num, plural, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
+import { EMPTY_EXTRAS, ListingTypeFields, validateExtras, type ExtrasDraft } from "./ListingTypeFields";
 
 const STEPS: [string, string][] = [
   ["Tipo", "Type"],
@@ -40,9 +41,22 @@ type Draft = {
   price: number;
   copy: Copy;
   agency: string;
+  luxury: boolean;
+  extras: ExtrasDraft;
 };
 const DRAFT_KEY_BASE = "np-owner-draft-v1";
 const DEFAULT_PRICE: Record<string, number> = { SALE: 150000, LONG_RENT: 900, SHORT_RENT: 80, COMMERCIAL_SALE: 250000, COMMERCIAL_RENT: 1500 };
+const RESIDENTIAL_KINDS: Kind[] = ["apartment", "house", "penthouse", "townhouse", "studio", "villa", "chalet"];
+const norm = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+/** "Av. X, Piso 6, Altamira, Caracas" — skips parts already contained in what's written (no "Altamira, Altamira"). */
+function fullAddress(parts: (string | undefined | null)[]) {
+  const out: string[] = [];
+  for (const p of parts) {
+    const v = (p ?? "").trim();
+    if (v && !norm(out.join(" ")).includes(norm(v))) out.push(v);
+  }
+  return out.join(", ");
+}
 
 export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: { locale: Locale; zones: Zone[]; agencies: Agency[]; fxVes: number; staff?: boolean }) {
   const router = useRouter();
@@ -63,6 +77,8 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
     price: 150000,
     copy: { title_es: "", title_en: "", body_es: "", body_en: "" },
     agency: agencies.find((a) => a.verified)?.id ?? agencies[0]?.id ?? "",
+    luxury: false,
+    extras: EMPTY_EXTRAS,
   });
   const set = (p: Partial<Draft>) => setD((x) => ({ ...x, ...p }));
   /** Switching operation swaps an untouched default price (a sale's 150.000 must not become 150.000/month). */
@@ -79,7 +95,8 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
   const [busy, setBusy] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [done, setDone] = useState<{ slug: string; id: string; mode: Draft["mode"] } | null>(null);
-  const [confirm, setConfirm] = useState(true);
+  const [confirm, setConfirm] = useState(false);
+  const [showExtrasErr, setShowExtrasErr] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const previews = useMemo(() => files.map((f) => URL.createObjectURL(f)), [files]);
   useEffect(() => () => previews.forEach((u) => URL.revokeObjectURL(u)), [previews]);
@@ -90,8 +107,9 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
     try {
       const raw = sessionStorage.getItem(DRAFT_KEY);
       if (raw) {
-        const saved = JSON.parse(raw) as { d: Draft; step: number };
-        setD(saved.d);
+        const saved = JSON.parse(raw) as { d: Partial<Draft>; step: number };
+        // Drafts saved by an older version may lack newer fields: keep the defaults for those.
+        setD((x) => ({ ...x, ...saved.d, extras: { ...x.extras, ...saved.d.extras } }));
         setStep(saved.step);
       }
     } catch {}
@@ -104,7 +122,10 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
 
   const zone = zones.find((z) => z.name === d.addr?.zone) ?? zones.find((z) => z.name === "Altamira") ?? zones[0];
   const listingType = d.op === "COMMERCIAL" ? "COMMERCIAL_SALE" : d.op;
-
+  // Luxury is a flag on residential listings (brief §5); not offered for commercial operations or land.
+  const luxury = d.luxury && !listingType.startsWith("COMMERCIAL") && RESIDENTIAL_KINDS.includes(d.kind);
+  const extras = validateExtras(locale, listingType, luxury, d.extras);
+  const address = fullAddress([d.addr?.main, d.unit, d.addr?.zone, d.addr?.city]);
   // duplicate check once the address is known
   useEffect(() => {
     if (!d.addr) return setDup(null);
@@ -157,6 +178,10 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
   const publish = async () => {
     if (!requireLogin()) return;
     if (!d.addr) return setStep(1);
+    if (!extras.ok) {
+      setShowExtrasErr(true);
+      return setStep(2);
+    }
     setErr(null);
     setBusy("create");
     try {
@@ -181,6 +206,8 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
           yearBuilt: d.year,
           amenities: d.amen,
           priceAmount: d.price,
+          luxury,
+          ...extras.payload,
           ...(d.copy.title_es ? d.copy : {}),
         },
       });
@@ -244,6 +271,17 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
     );
 
   const canNext = step === 1 ? !!d.addr && !dup : step === 4 ? d.price > 0 : true;
+  const facts = [
+    d.kind !== "land" && d.beds > 0 && plural(d.beds, locale, ["habitación", "habitaciones"], ["bedroom", "bedrooms"]),
+    d.kind !== "land" && d.baths > 0 && plural(d.baths, locale, ["baño", "baños"], ["bathroom", "bathrooms"]),
+    `${num(d.m2, locale)} m²`,
+    d.parking > 0 && plural(d.parking, locale, ["puesto", "puestos"], ["parking space", "parking spaces"]),
+  ].filter(Boolean).join(" · ");
+  const extrasSummary = [
+    extras.payload.shortRent && `${tx(locale, "Mín.", "Min.")} ${plural(extras.payload.shortRent.minNights, locale, ["noche", "noches"], ["night", "nights"])} · ${plural(extras.payload.shortRent.maxGuests, locale, ["huésped", "huéspedes"], ["guest", "guests"])} · ${tx(locale, "limpieza", "cleaning")} ${money(extras.payload.shortRent.cleaningFee, locale)}`,
+    extras.payload.commercial && `${extras.payload.commercial.ceilingHeight} m ${tx(locale, "altura libre", "clear height")} · ${extras.payload.commercial.zoning}${extras.payload.commercial.loadingDock ? ` · ${tx(locale, "andén de carga", "loading dock")}` : ""}${extras.payload.commercial.capRate !== undefined ? ` · cap rate ${extras.payload.commercial.capRate} %` : ""}`,
+    luxury && tx(locale, "Lujo", "Luxury"),
+  ].filter(Boolean).join(" · ");
 
   return (
     <div className="mx-auto grid max-w-[1200px] gap-8 px-4 py-8 md:px-6 lg:grid-cols-[1fr_340px]">
@@ -374,6 +412,13 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                 })}
               </div>
             </div>
+            {!listingType.startsWith("COMMERCIAL") && RESIDENTIAL_KINDS.includes(d.kind) && (
+              <label className="flex items-center gap-2 text-sm font-semibold">
+                <input type="checkbox" checked={d.luxury} onChange={(e) => set({ luxury: e.target.checked })} className="h-4 w-4 accent-[#F26B4D]" />
+                {tx(locale, "Inmueble de lujo", "Luxury property")}
+              </label>
+            )}
+            <ListingTypeFields locale={locale} listingType={listingType} luxury={luxury} value={d.extras} onChange={(x) => set({ extras: x })} showErrors={showExtrasErr} />
           </div>
         )}
 
@@ -509,8 +554,9 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                 <div className="p-5">
                   <div className="font-display text-2xl font-semibold">{money(d.price, locale)}</div>
                   <div className="font-semibold">{(lang === "es" ? d.copy.title_es : d.copy.title_en) || tx(locale, "(título automático)", "(auto title)")}</div>
-                  <div className="text-sm text-ink/65">{d.addr?.main}, {d.addr?.zone}, {d.addr?.city}</div>
-                  <div className="mt-2 text-sm">{d.beds} {tx(locale, "hab", "bd")} · {d.baths} {tx(locale, "baños", "ba")} · {d.m2} m² · {d.parking} {tx(locale, "puestos", "parking")}</div>
+                  <div className="text-sm text-ink/65" data-testid="review-address">{address}</div>
+                  <div className="mt-2 text-sm" data-testid="review-facts">{facts}</div>
+                  {extrasSummary && <div className="mt-1 text-sm text-ink/65">{extrasSummary}</div>}
                   <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#F26B4D14] px-2.5 py-1 text-xs font-bold text-coral-hover">{d.mode === "AGENCY" ? tx(locale, "Inventario de la agencia", "Agency inventory") : d.mode === "FSBO" ? tx(locale, "Publicación directa (FSBO)", "For sale by owner") : tx(locale, "Encargo a agencia", "Agency mandate")}</div>
                 </div>
               </div>
@@ -524,7 +570,8 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                 ))}
               </ul>
             </div>
-            <label className="flex items-start gap-2 text-sm text-ink/65"><input type="checkbox" aria-label="confirm" checked={confirm} onChange={(e) => setConfirm(e.target.checked)} className="mt-1 accent-[#F26B4D]" /> {tx(locale, "Confirmo que soy el propietario o tengo autorización para publicar.", "I confirm I’m the owner or authorised to list.")}</label>
+            <label className="flex items-start gap-2 text-sm text-ink/65"><input type="checkbox" checked={confirm} onChange={(e) => setConfirm(e.target.checked)} className="mt-1 h-4 w-4 shrink-0 accent-[#F26B4D]" /> {tx(locale, "Confirmo que soy el propietario o tengo autorización para publicar.", "I confirm I’m the owner or authorised to list.")}</label>
+            {!confirm && <p className="text-xs text-ink/65">{tx(locale, "Marca la confirmación para poder publicar.", "Tick the confirmation to publish.")}</p>}
             {!user && <p className="rounded-lg bg-[#F26B4D0D] px-3 py-2 text-sm">{tx(locale, "Te pediremos iniciar sesión para publicar. Tu borrador se conserva.", "We’ll ask you to sign in to publish. Your draft is kept.")}</p>}
             {err && <div className="rounded-lg bg-[#B423181A] px-3 py-2 text-sm text-danger" role="alert">{err}</div>}
           </div>
@@ -533,7 +580,13 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
         <div className="mt-8 flex items-center justify-between border-t border-line pt-5">
           <Button variant="ghost" onClick={() => setStep(Math.max(0, step - 1))} disabled={step === 0}><ArrowLeft size={16} /> {tx(locale, "Atrás", "Back")}</Button>
           {step < 5 ? (
-            <Button onClick={() => setStep(step + 1)} disabled={!canNext}>{tx(locale, "Continuar", "Continue")} <ArrowRight size={16} /></Button>
+            <Button
+              onClick={() => {
+                if (step === 2 && !extras.ok) return setShowExtrasErr(true);
+                setStep(step + 1);
+              }}
+              disabled={!canNext}
+            >{tx(locale, "Continuar", "Continue")} <ArrowRight size={16} /></Button>
           ) : (
             <Button size="lg" onClick={publish} disabled={!!busy || !confirm || !d.addr}>
               {busy && <Loader2 size={16} className="animate-spin" />}
@@ -555,8 +608,8 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
             <div className="p-4">
               <div className="text-xs font-semibold uppercase tracking-wide text-ink/65">{tx(locale, "Vista previa", "Preview")}</div>
               <div className="font-display text-xl font-semibold">{money(d.price, locale)}</div>
-              <div className="text-sm">{d.beds} {tx(locale, "hab", "bd")} · {d.baths} {tx(locale, "baños", "ba")} · {d.m2} m²</div>
-              <div className="text-sm text-ink/65">{d.addr ? `${d.addr.zone}, ${d.addr.city}` : tx(locale, "Dirección pendiente", "Address pending")}</div>
+              <div className="text-sm">{facts}</div>
+              <div className="text-sm text-ink/65">{d.addr ? fullAddress([d.addr.zone, d.addr.city]) : tx(locale, "Dirección pendiente", "Address pending")}</div>
             </div>
           </div>
           <div className="rounded-np bg-navy p-4 text-ivory">

@@ -3,9 +3,11 @@ import { z } from "zod";
 import { prisma } from "@newplace/db";
 import { ApiError, body, currentUser, handler, ok, requireUser } from "@/server/api";
 import { filtersFromParams, listingById, listingInclude, publicWhere, searchListings, toDomain } from "@/server/listings";
-import { draftCopy, findDuplicate, fingerprintOf, notifySavedSearches, qualityOf, scenesFor, slugify, snapshotEstimate, uniqueSlug } from "@/server/listing-service";
+import { brochurePdfSchema, commercialSchema, shortRentSchema } from "@newplace/config";
+import { draftCopy, findDuplicate, fingerprintOf, notifySavedSearches, refreshQuality, scenesFor, slugify, snapshotEstimate, uniqueSlug } from "@/server/listing-service";
 import { audit } from "@/server/data";
 import { isStaff } from "@/server/access";
+import { bump } from "@/server/counters";
 
 export const GET = handler(async (req: NextRequest) => {
   // ?ids=a,b,c → those published listings in that order (comparator for listings that aren't saved)
@@ -19,7 +21,7 @@ export const GET = handler(async (req: NextRequest) => {
   const f = filtersFromParams(req.nextUrl.searchParams);
   const res = await searchListings(f);
   // impressions (Rightmove-style performance stats)
-  if (res.items.length) prisma.listing.updateMany({ where: { id: { in: res.items.slice(0, 40).map((l) => l.id) } }, data: { impressions: { increment: 1 } } }).catch(() => {});
+  if (res.items.length) bump(res.items.slice(0, 40).map((l) => l.id), ["impressions"]).catch(() => {});
   return ok(res);
 });
 
@@ -42,7 +44,7 @@ const CreateSchema = z.object({
   parking: z.number().int().min(0).max(50).default(0),
   yearBuilt: z.number().int().min(1800).max(2100).default(new Date().getFullYear()),
   amenities: z.array(z.string()).default([]),
-  priceAmount: z.number().int().positive(),
+  priceAmount: z.number().int().positive().max(1_000_000_000),
   title_es: z.string().max(120).optional(),
   title_en: z.string().max(120).optional(),
   body_es: z.string().max(4000).optional(),
@@ -51,6 +53,12 @@ const CreateSchema = z.object({
   privateListing: z.boolean().default(false),
   agentId: z.string().optional(),
   publish: z.boolean().default(true),
+  /** SHORT_RENT only */
+  shortRent: shortRentSchema.optional(),
+  /** COMMERCIAL_SALE / COMMERCIAL_RENT only */
+  commercial: commercialSchema.optional(),
+  /** luxury only */
+  brochurePdf: brochurePdfSchema.optional(),
 });
 
 export const POST = handler(async (req: NextRequest) => {
@@ -58,7 +66,17 @@ export const POST = handler(async (req: NextRequest) => {
   const b = await body(req, CreateSchema);
   if (b.mode === "FSBO" && u.role !== "OWNER_PRIVATE" && u.role !== "SEEKER" && u.role !== "SUPERADMIN") throw new ApiError("FORBIDDEN");
   if (b.mode === "AGENCY" && !(isStaff(u) && u.role !== "CAPTOR" && u.role !== "PHOTOGRAPHER") && u.role !== "SUPERADMIN") throw new ApiError("FORBIDDEN");
+  if (b.mode === "MANDATE" && u.role !== "OWNER_PRIVATE" && u.role !== "SEEKER" && u.role !== "SUPERADMIN") throw new ApiError("FORBIDDEN");
   if (b.mode === "MANDATE" && !b.agencyId) throw new ApiError("VALIDATION", { agencyId: "required" });
+  // The agency named by the client must exist and be operating (a suspended agency can't take mandates or publish).
+  if (b.agencyId && (b.mode === "MANDATE" || (b.mode === "AGENCY" && u.role === "SUPERADMIN"))) {
+    const agency = await prisma.agency.findUnique({ where: { id: b.agencyId }, select: { status: true } });
+    if (!agency || agency.status === "SUSPENDED") throw new ApiError("VALIDATION", { agencyId: "unknown or suspended agency" });
+  }
+  // Type-specific fields only where they apply (brief §5).
+  if (b.shortRent && b.listingType !== "SHORT_RENT") throw new ApiError("VALIDATION", { shortRent: "only for SHORT_RENT" });
+  if (b.commercial && !b.listingType.startsWith("COMMERCIAL")) throw new ApiError("VALIDATION", { commercial: "only for commercial listings" });
+  if (b.brochurePdf && !b.luxury) throw new ApiError("VALIDATION", { brochurePdf: "only for luxury listings" });
 
   const dup = await findDuplicate(b.lat, b.lng, b.areaM2, b.address);
   if (dup) throw new ApiError("CONFLICT", { duplicateOf: { id: dup.id, slug: dup.slug, title: dup.titleEs } });
@@ -67,13 +85,15 @@ export const POST = handler(async (req: NextRequest) => {
   if (u.role === "SEEKER" && b.mode !== "AGENCY") await prisma.user.update({ where: { id: u.id }, data: { role: "OWNER_PRIVATE" } });
 
   const copy = b.title_es && b.body_es ? null : draftCopy(b);
-  const agencyId = b.mode === "AGENCY" ? (u.role === "SUPERADMIN" ? b.agencyId : u.agencyId) : b.mode === "MANDATE" ? b.agencyId : null;
+  // A mandate is only a request: the listing stays the owner's (no agency, not public) until the agency accepts it
+  // (PATCH /mandates/:id links agencyId on assignment and publishes on ACTIVE).
+  const agencyId = b.mode === "AGENCY" ? (u.role === "SUPERADMIN" ? b.agencyId : u.agencyId) : null;
   const agentId = b.mode === "AGENCY" ? (u.role === "AGENT" ? u.id : b.agentId ?? null) : null;
   const category = b.luxury ? "LUXURY" : b.kind === "land" ? "LAND" : b.listingType.startsWith("COMMERCIAL") ? "COMMERCIAL" : "RESIDENTIAL";
   const fp = fingerprintOf(b.lat, b.lng, b.areaM2, b.address);
   const slug = await uniqueSlug(`${slugify(b.zone)}-${b.beds ? `${b.beds}h` : b.kind}-${b.areaM2}m-${Math.random().toString(36).slice(2, 8)}`);
   const status = b.mode === "MANDATE" || !b.publish ? "DRAFT" : "ACTIVE";
-  const review = b.mode === "AGENCY" && u.role === "AGENT" ? "PENDING" : "APPROVED";
+  const review = (b.mode === "AGENCY" && u.role === "AGENT") || b.mode === "MANDATE" ? "PENDING" : "APPROVED";
   const titleEs = b.title_es ?? copy!.title_es;
   const bodyEs = b.body_es ?? copy!.body_es;
   const titleEn = b.title_en ?? copy?.title_en ?? "";
@@ -115,13 +135,16 @@ export const POST = handler(async (req: NextRequest) => {
       agentId,
       ownerUserId: b.mode === "AGENCY" ? null : u.id,
       scenes: scenesFor(b.kind, b.luxury),
-      privateListing: b.privateListing,
+      privateListing: b.mode === "MANDATE" ? true : b.privateListing,
+      shortRent: b.shortRent,
+      commercial: b.commercial,
+      brochurePdf: b.brochurePdf,
       fingerprint: fp,
       priceHistory: { create: { amount: b.priceAmount, kind: "LISTED" } },
       fingerprints: { create: { fingerprint: fp } },
     },
   });
-  await prisma.listing.update({ where: { id: listing.id }, data: { quality: qualityOf({ photos: 0, titleEn, bodyEn, lat: b.lat, hasFloorplan: false, hasVirtualTour: false }) } });
+  await refreshQuality(listing.id);
   await snapshotEstimate(listing.id);
   if (b.mode === "MANDATE") await prisma.mandate.create({ data: { ownerUserId: u.id, agencyId: b.agencyId!, listingId: listing.id, status: "REQUESTED" } });
   if (status === "ACTIVE" && review === "APPROVED") await notifySavedSearches(listing.id, "new");

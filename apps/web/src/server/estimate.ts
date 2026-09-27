@@ -2,6 +2,7 @@ import "server-only";
 import { prisma, type Prisma } from "@newplace/db";
 import { CLASS_FACTOR, kindClass, kindsOfClass, type EstimateResult } from "@newplace/ai";
 import { aiProvider } from "./ai";
+import { publicWhere } from "./listings";
 
 export type EstimateArgs = {
   kind: string;
@@ -27,14 +28,17 @@ export async function estimateFor(a: EstimateArgs): Promise<{ provider: string; 
   const cls = kindClass(a.kind);
   const pool = await prisma.listing.findMany({
     where: {
+      // Comparables are shown to anyone requesting an estimate: only publicly visible listings (published,
+      // APPROVED, not private, agency not suspended, not taken down) may ever feed the pool.
+      AND: [publicWhere(), { takedownReason: null }],
       ...(a.excludeId ? { id: { not: a.excludeId } } : {}),
       city: a.city ?? zone?.city ?? "Caracas",
       listingType: { in: types as Prisma.EnumListingTypeFilter["in"] },
       kind: { in: kindsOfClass(cls) },
       ...(cls === "residential" ? { luxury: a.luxury } : {}),
-      status: { in: ["ACTIVE", "UNDER_OFFER", "SOLD", "RENTED"] },
+      status: { in: ["ACTIVE", "UNDER_OFFER", "SOLD", "RENTED"] }, // ⊂ PUBLIC_STATUSES (no COMING_SOON)
     },
-    select: { id: true, titleEs: true, zone: true, areaM2: true, priceAmount: true, lat: true, lng: true },
+    select: { id: true, titleEs: true, titleEn: true, zone: true, areaM2: true, priceAmount: true, lat: true, lng: true },
     take: 60,
   });
   const base = zone ? (group === "sale" ? zone.salePpm : group === "short" ? zone.rentPpm * 0.075 : zone.rentPpm) : 1000;
@@ -52,7 +56,7 @@ export async function estimateFor(a: EstimateArgs): Promise<{ provider: string; 
     luxury: a.luxury,
     lat: a.lat ?? zone?.lat ?? 10.48,
     lng: a.lng ?? zone?.lng ?? -66.9,
-    pool: pool.map((p) => ({ id: p.id, title: p.titleEs, zone: p.zone, areaM2: p.areaM2, priceAmount: p.priceAmount, lat: p.lat, lng: p.lng })),
+    pool: pool.map((p) => ({ id: p.id, title: p.titleEs, title_en: p.titleEn ?? undefined, zone: p.zone, areaM2: p.areaM2, priceAmount: p.priceAmount, lat: p.lat, lng: p.lng })),
   });
   return { provider: provider.id, estimate, poolSize: pool.length };
 }

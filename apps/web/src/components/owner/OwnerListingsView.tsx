@@ -12,11 +12,27 @@ import { StatusBadge } from "@/components/listing/bits";
 import { Avatar, Badge, Button, Card, EmptyState } from "@/components/ui";
 import { useApp } from "@/lib/store";
 import { api } from "@/lib/api";
-import { ago, money, num, priceSuffix, tx } from "@/lib/i18n";
+import { money, num, priceSuffix, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
+import { TimeAgo } from "./TimeAgo";
+import { listingHref } from "@/lib/listing-href";
 
 type Thread = { id: string; subject: string | null; listingId: string | null; participants: { id: string; name: string; hue: number }[]; messages: Message[] };
 type Mandate = { id: string; status: "REQUESTED" | "ASSIGNED" | "ACTIVE" | "CANCELLED"; listingId: string | null; agencyName: string; agentName: string | null; createdAt: string };
+
+const MANDATE_LABEL: Record<Mandate["status"], [string, string]> = {
+  REQUESTED: ["Solicitado", "Requested"],
+  ASSIGNED: ["Agente asignado", "Agent assigned"],
+  ACTIVE: ["Publicado", "Live"],
+  CANCELLED: ["Cancelado", "Cancelled"],
+};
+const OFFER_LABEL: Record<Offer["status"], [string, string]> = {
+  RECEIVED: ["Recibida", "Received"],
+  COUNTERED: ["Contraofertada", "Countered"],
+  ACCEPTED: ["Aceptada", "Accepted"],
+  REJECTED: ["Rechazada", "Rejected"],
+};
+const MAX_PRICE = 1_000_000_000;
 
 export function OwnerListingsView({ locale, listings, offers, threads, mandates }: { locale: Locale; listings: Listing[]; offers: Offer[]; threads: Thread[]; mandates: Mandate[] }) {
   const { user } = useApp();
@@ -24,7 +40,8 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates 
   const [active, setActive] = useState(threads[0]?.id ?? null);
   const [draft, setDraft] = useState("");
   const [editing, setEditing] = useState<string | null>(null);
-  const [price, setPrice] = useState(0);
+  const [price, setPrice] = useState("");
+  const [priceErr, setPriceErr] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploadFor, setUploadFor] = useState<string | null>(null);
@@ -45,6 +62,16 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates 
     } finally {
       setBusy(null);
     }
+  };
+
+  const priceError = (raw: string, current: number) => {
+    const n = Number(raw);
+    if (raw.trim() === "" || Number.isNaN(n)) return tx(locale, "Escribe el nuevo precio en USD.", "Enter the new price in USD.");
+    if (!Number.isInteger(n)) return tx(locale, "El precio debe ser un número entero, sin decimales.", "The price must be a whole number, no decimals.");
+    if (n <= 0) return tx(locale, "El precio debe ser mayor que 0.", "The price must be greater than 0.");
+    if (n > MAX_PRICE) return tx(locale, `El precio no puede superar ${money(MAX_PRICE, locale)}.`, `The price can’t exceed ${money(MAX_PRICE, locale)}.`);
+    if (n === current) return tx(locale, "Es el mismo precio actual.", "That’s the current price.");
+    return null;
   };
 
   return (
@@ -86,19 +113,19 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates 
             <Card key={m.id} className="p-5">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="font-display text-lg font-semibold">{tx(locale, `Encargo a ${m.agencyName}`, `Mandate with ${m.agencyName}`)}</div>
-                <Badge tone={m.status === "ACTIVE" ? "ok" : m.status === "CANCELLED" ? "danger" : "warn"}>{m.status}</Badge>
+                <Badge tone={m.status === "ACTIVE" ? "ok" : m.status === "CANCELLED" ? "danger" : "warn"}>{tx(locale, ...MANDATE_LABEL[m.status])}</Badge>
               </div>
               <div className="mt-1 text-sm text-ink/65">{listings.find((l) => l.id === m.listingId)?.[locale === "es" ? "title_es" : "title_en"]}</div>
               <ol className="mt-5 grid grid-cols-3 gap-2">
                 {[
-                  [tx(locale, "Solicitado", "Requested"), ago(m.createdAt, locale)],
+                  [tx(locale, "Solicitado", "Requested"), <TimeAgo key="t" iso={m.createdAt} locale={locale} />],
                   [tx(locale, "Agente asignado", "Agent assigned"), m.agentName ?? "—"],
                   [tx(locale, "Publicado", "Live"), tx(locale, "Tras sesión de fotos", "After photo shoot")],
                 ].map(([t, d], i) => (
                   <li key={i}>
                     <div className={cn("h-1.5 rounded-full", i <= stageIdx[m.status] ? "bg-coral" : "bg-black/10")} />
                     <div className="mt-2 flex items-center gap-1.5 font-display text-sm font-semibold">{i <= stageIdx[m.status] ? <Check size={14} className="text-ok" /> : <span className="h-3 w-3 rounded-full border-2 border-black/20" />}{t}</div>
-                    <div className="text-xs text-ink/65">{d}</div>
+                    <div className="text-xs text-ink/65">{d as React.ReactNode}</div>
                   </li>
                 ))}
               </ol>
@@ -120,15 +147,52 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates 
                       <span className="text-xs font-semibold text-ink/65">{isMandate ? tx(locale, "Encargo", "Mandate") : "FSBO"}</span>
                       <span className="text-xs text-ink/65">· {l.photos?.length ?? 0} {tx(locale, "fotos", "photos")} · {tx(locale, "calidad", "quality")} {l.quality}</span>
                     </div>
-                    <Link href={`/${locale}/listing/${l.slug}`} className="mt-1 block font-display text-lg font-semibold hover:text-coral">{tx(locale, l.title_es, l.title_en)}</Link>
+                    <Link href={listingHref(locale, l)} className="mt-1 block font-display text-lg font-semibold hover:text-coral">{tx(locale, l.title_es, l.title_en)}</Link>
                     {editing === l.id ? (
-                      <div className="mt-2 flex items-center gap-2">
-                        <input type="number" className="h-9 w-40 rounded-lg border border-line px-2" value={price} onChange={(e) => setPrice(+e.target.value)} aria-label={tx(locale, "Precio", "Price")} />
-                        <Button size="sm" disabled={busy === `price-${l.id}`} onClick={() => act(() => api(`listings/${l.id}`, { method: "PATCH", json: { priceAmount: price } }), `price-${l.id}`).then(() => setEditing(null))}>
-                          {busy === `price-${l.id}` ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />} {tx(locale, "Guardar", "Save")}
-                        </Button>
-                        <Button size="sm" variant="ghost" onClick={() => setEditing(null)}>{tx(locale, "Cancelar", "Cancel")}</Button>
-                      </div>
+                      <form
+                        className="mt-2"
+                        noValidate
+                        onSubmit={async (e) => {
+                          e.preventDefault();
+                          const msg = priceError(price, l.priceAmount);
+                          setPriceErr(msg);
+                          if (msg) return;
+                          setBusy(`price-${l.id}`);
+                          try {
+                            await api(`listings/${l.id}`, { method: "PATCH", json: { priceAmount: Number(price) } });
+                            setEditing(null);
+                            router.refresh();
+                          } catch (err) {
+                            setPriceErr((err as Error).message);
+                          } finally {
+                            setBusy(null);
+                          }
+                        }}
+                      >
+                        <div className="flex flex-wrap items-center gap-2">
+                          <input
+                            type="number"
+                            inputMode="numeric"
+                            min={1}
+                            max={MAX_PRICE}
+                            step={1}
+                            className={cn("h-9 w-40 max-w-full rounded-lg border px-2", priceErr ? "border-danger" : "border-line")}
+                            value={price}
+                            onChange={(e) => {
+                              setPrice(e.target.value);
+                              setPriceErr(null);
+                            }}
+                            aria-label={tx(locale, `Nuevo precio (USD${priceSuffix(l, locale)})`, `New price (USD${priceSuffix(l, locale)})`)}
+                            aria-invalid={!!priceErr}
+                            aria-describedby={priceErr ? `price-err-${l.id}` : undefined}
+                          />
+                          <Button size="sm" type="submit" disabled={busy === `price-${l.id}`}>
+                            {busy === `price-${l.id}` ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />} {tx(locale, "Guardar", "Save")}
+                          </Button>
+                          <Button size="sm" type="button" variant="ghost" onClick={() => { setEditing(null); setPriceErr(null); }}>{tx(locale, "Cancelar", "Cancel")}</Button>
+                        </div>
+                        {priceErr && <p id={`price-err-${l.id}`} role="alert" className="mt-1 text-xs font-semibold text-danger">{priceErr}</p>}
+                      </form>
                     ) : (
                       <div className="text-sm text-ink/65">{l.zone}, {l.city} · {money(l.priceAmount, locale)}{priceSuffix(l, locale)}</div>
                     )}
@@ -146,7 +210,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates 
                     </div>
                     {!isMandate && (
                       <div className="mt-3 flex flex-wrap gap-2">
-                        <Button size="sm" variant="outline" onClick={() => { setEditing(l.id); setPrice(l.priceAmount); }}><Pencil size={13} /> {tx(locale, "Cambiar precio", "Change price")}</Button>
+                        <Button size="sm" variant="outline" onClick={() => { setEditing(l.id); setPrice(String(l.priceAmount)); setPriceErr(null); }}><Pencil size={13} /> {tx(locale, "Cambiar precio", "Change price")}</Button>
                         <Button size="sm" variant="outline" disabled={busy === `photos-${l.id}`} onClick={() => { setUploadFor(l.id); fileRef.current?.click(); }}>
                           {busy === `photos-${l.id}` ? <Loader2 size={13} className="animate-spin" /> : <ImagePlus size={13} />} {tx(locale, "Subir fotos", "Upload photos")}
                         </Button>
@@ -164,8 +228,8 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates 
                           <div key={o.id} className="flex flex-wrap items-center gap-3 px-3 py-2.5 text-sm">
                             <span className="font-display text-base font-semibold">{money(o.amount, locale)}</span>
                             <span className="text-ink/65">{o.bidder}</span>
-                            <span className="text-ink/65">{ago(o.createdAt, locale)}</span>
-                            <Badge tone={o.status === "ACCEPTED" ? "ok" : o.status === "REJECTED" ? "danger" : o.status === "COUNTERED" ? "warn" : "mist"} className="ml-auto">{o.status}</Badge>
+                            <TimeAgo iso={o.createdAt} locale={locale} className="text-ink/65" />
+                            <Badge tone={o.status === "ACCEPTED" ? "ok" : o.status === "REJECTED" ? "danger" : o.status === "COUNTERED" ? "warn" : "mist"} className="ml-auto">{tx(locale, ...OFFER_LABEL[o.status])}</Badge>
                             {o.status === "RECEIVED" && !isMandate && (
                               <span className="flex gap-1">
                                 <Button size="sm" variant="outline" onClick={() => act(() => api(`offers/${o.id}`, { method: "PATCH", json: { status: "ACCEPTED" } }), o.id)}>{tx(locale, "Aceptar", "Accept")}</Button>
@@ -204,7 +268,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates 
                 {thread.messages.map((m) => (
                   <div key={m.id} className={cn("max-w-[85%] rounded-2xl px-3.5 py-2 text-sm", m.mine ? "ml-auto rounded-br-md bg-navy text-ivory" : "rounded-bl-md bg-ivory")}>
                     {m.body}
-                    <div className={cn("mt-1 text-[10px]", m.mine ? "text-mist" : "text-ink/65")}>{ago(m.at, locale)}</div>
+                    <TimeAgo iso={m.at} locale={locale} className={cn("mt-1 block text-[10px]", m.mine ? "text-mist" : "text-ink/65")} />
                   </div>
                 ))}
               </div>

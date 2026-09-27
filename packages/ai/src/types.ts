@@ -2,7 +2,10 @@ export type Locale = "es" | "en";
 
 export interface Comparable {
   id: string;
+  /** Spanish title (the listing's title_es) */
   title: string;
+  /** English title, when known — the /en pages show it instead of `title` */
+  title_en?: string;
   zone: string;
   areaM2: number;
   priceAmount: number;

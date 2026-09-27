@@ -7,6 +7,7 @@ import { z } from "zod";
 import { prisma } from "@newplace/db";
 import type { Role } from "@newplace/config";
 import { authConfig } from "./auth.config";
+import { isDemoEmail } from "./lib/demo";
 import { hit, peek, reset } from "./server/rate-limit";
 
 const DEMO = process.env.DEMO_AUTH === "true";
@@ -53,7 +54,9 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
             name: "Demo",
             credentials: { email: {} },
             async authorize(raw) {
-              const email = String((raw as { email?: string })?.email ?? "").toLowerCase();
+              const email = String((raw as { email?: string })?.email ?? "").trim().toLowerCase();
+              // Password-less login only for the fixed seeded demo accounts, never for arbitrary/registered users.
+              if (!isDemoEmail(email)) return null;
               const u = await prisma.user.findUnique({ where: { email } });
               return u ? profile(u.id) : null;
             },

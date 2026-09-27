@@ -106,7 +106,8 @@ async function main() {
         impressions: l.stats.impressions,
         views: Math.round(l.stats.impressions * 0.35),
         saves: l.stats.saves,
-        leadsCount: l.stats.leads,
+        // Lead counter = the leads actually seeded for this listing (the inbox and this stat must agree).
+        leadsCount: LEADS.filter((x) => x.listingId === l.id).length,
         avgTimeSec: l.stats.avgTimeSec,
         interactions: l.stats.interactions,
         priceHistory: { create: l.priceHistory.map((p) => ({ amount: p.amount, kind: p.kind, date: d(p.date) })) },

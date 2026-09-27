@@ -12,7 +12,7 @@ const AGENCY_ROLES = ["AGENCY_OWNER", "AGENT", "CAPTOR", "PHOTOGRAPHER", "BACKOF
 
 export default auth((req) => {
   const { pathname, search } = req.nextUrl;
-  const m = pathname.match(/^\/(es|en)\/(agency|platform|owner|app|account|saved|alerts)(\/|$)/);
+  const m = pathname.match(/^\/(es|en)\/(agency|platform|owner|app|account|saved|alerts|preview)(\/|$)/);
   // locale detection / prefixing (Accept-Language + NEXT_LOCALE cookie)
   if (!m) return intl(req);
   const [, locale, area] = m;

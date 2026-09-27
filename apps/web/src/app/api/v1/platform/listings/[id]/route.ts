@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "@newplace/db";
 import { ApiError, body, currentUser, handler, ok, requireUser } from "@/server/api";
 import { audit } from "@/server/data";
+import { revalidateListing } from "@/server/revalidate";
 
 type Ctx = { params: Promise<{ id: string }> };
 
@@ -21,5 +22,6 @@ export const PATCH = handler(async (req: NextRequest, { params }: Ctx) => {
       : { status: l.statusBeforeTakedown ?? "ACTIVE", takedownReason: null, statusBeforeTakedown: null },
   });
   await audit(u.id, b.takedown ? "listing.takedown" : "listing.restore", l.titleEs, b);
+  revalidateListing(l.slug);
   return ok({ id: r.id, status: r.status });
 });

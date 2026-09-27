@@ -11,6 +11,7 @@ export async function logout(locale: string) {
       await Promise.all(keys.filter((k) => !k.includes("precache")).map((k) => caches.delete(k)));
     }
     localStorage.removeItem("np-compare-v1");
+    localStorage.removeItem("np-saved-offline-v1");
     sessionStorage.clear();
   } catch {}
   window.location.href = `/${locale}`;

@@ -67,7 +67,7 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
                   return (
                     <tr key={c.id} className={cn("border-t", dark ? "border-navy-line" : "border-line")}>
                       <td className="px-3 py-2">
-                        <div className="max-w-[180px] truncate font-semibold">{c.title}</div>
+                        <div className="max-w-[180px] truncate font-semibold">{(locale === "en" && (c as { title_en?: string }).title_en) || c.title}</div>
                         <div className={cn("text-xs", muted)}>{c.zone}</div>
                       </td>
                       <td className="px-3 py-2 text-right">{num(c.areaM2, locale)}</td>

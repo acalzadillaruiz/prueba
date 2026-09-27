@@ -19,6 +19,7 @@ import type { AuditPage } from "@/server/audit-log";
 import { listingPhoto } from "@/lib/photos";
 import { ago, dateTime, money, num, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
+import { listingHref } from "@/lib/listing-href";
 
 function useRun() {
   const router = useRouter();
@@ -261,7 +262,7 @@ export function PlatformModeration({ locale, reports, listings }: { locale: Loca
                 {(() => {
                   const target = listings.find((x) => x.id === m.listingId);
                   return target ? (
-                    <a href={`/${locale}/listing/${target.slug}`} target="_blank" rel="noreferrer" className="font-semibold underline decoration-white/30 hover:text-coral">{m.title}</a>
+                    <a href={listingHref(locale, target)} target="_blank" rel="noreferrer" className="font-semibold underline decoration-white/30 hover:text-coral">{m.title}</a>
                   ) : (
                     <span className="font-semibold">{m.title}</span>
                   );

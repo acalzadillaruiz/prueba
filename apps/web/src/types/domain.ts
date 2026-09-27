@@ -125,6 +125,8 @@ export interface Listing {
   privateListing?: boolean;
   shortRent?: { minNights: number; maxGuests: number; cleaningFee: number };
   commercial?: { ceilingHeight: number; loadingDock: boolean; zoning: string; capRate?: number };
+  /** Luxury brochure (PDF URL). */
+  brochurePdf?: string | null;
   fingerprint: string;
 }
 

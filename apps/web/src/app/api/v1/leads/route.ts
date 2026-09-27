@@ -1,6 +1,7 @@
 import type { NextRequest } from "next/server";
 import { leadSchema } from "@newplace/config";
-import { prisma } from "@newplace/db";
+import { z } from "zod";
+import { LeadStage, prisma, type Prisma } from "@newplace/db";
 import { ApiError, body, currentUser, handler, ok, requireUser } from "@/server/api";
 import { aiProvider } from "@/server/ai";
 import { leadToDomain, queueEmail } from "@/server/data";
@@ -8,6 +9,7 @@ import { isManager } from "@/server/access";
 import { limit } from "@/server/rate-limit";
 import { publicWhere } from "@/server/listings";
 import { assertBookableSlot, lockAgentAndCheck } from "@/server/tours";
+import { bump } from "@/server/counters";
 
 const Create = leadSchema;
 
@@ -55,7 +57,7 @@ export const POST = handler(async (req: NextRequest) => {
   const participants = [l.agentId ?? l.ownerUserId, u?.id].filter((x): x is string => !!x);
   const thread = await prisma.messageThread.create({ data: { leadId: lead.id, listingId: l.id, subject: l.titleEs, participants: { create: [...new Set(participants)].map((userId) => ({ userId })) } } });
   if (u) await prisma.message.create({ data: { threadId: thread.id, senderId: u.id, body: b.message } });
-  await prisma.listing.update({ where: { id: l.id }, data: { leadsCount: { increment: 1 }, interactions: { increment: 1 } } });
+  await bump([l.id], ["leadsCount", "interactions"]);
   const when = b.tourStart ? new Date(b.tourStart).toLocaleString("es-VE", { timeZone: "America/Caracas", weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "";
   await queueEmail(b.email, b.tourStart ? `Visita solicitada: ${l.titleEs} · ${when}` : `Mensaje enviado: ${l.titleEs}`, "TOUR");
   const staff = l.agent?.email ?? l.owner?.email;
@@ -63,16 +65,20 @@ export const POST = handler(async (req: NextRequest) => {
   return ok(leadToDomain(lead), 201);
 });
 
+// Unknown stage → 422 VALIDATION (ZodError via handler), never a Prisma 500.
+const Query = z.object({ stage: z.enum(Object.values(LeadStage) as [LeadStage, ...LeadStage[]]).optional() });
+
 /** Agency inbox (polled every 15 s). Agents see their own leads; owner/backoffice the whole agency. */
 export const GET = handler(async (req: NextRequest) => {
   const u = requireUser(await currentUser());
-  const stage = req.nextUrl.searchParams.get("stage");
-  let where: Record<string, unknown>;
-  if (u.role === "SUPERADMIN") where = u.agencyId ? { agencyId: u.agencyId } : {};
-  else if (isManager(u)) where = { agencyId: u.agencyId };
-  else if (u.role === "AGENT") where = { agentId: u.id };
-  else if (u.role === "OWNER_PRIVATE") where = { listing: { ownerUserId: u.id } };
-  else where = { seekerUserId: u.id };
-  const rows = await prisma.lead.findMany({ where: { ...where, ...(stage ? { stage: stage as "NEW" } : {}) }, orderBy: { createdAt: "desc" }, take: 200 });
+  const q = Query.parse({ stage: req.nextUrl.searchParams.get("stage") || undefined });
+  let scope: Prisma.LeadWhereInput;
+  if (u.role === "SUPERADMIN") scope = u.agencyId ? { agencyId: u.agencyId } : {};
+  else if (isManager(u)) scope = { agencyId: u.agencyId };
+  else if (u.role === "AGENT") scope = { agentId: u.id };
+  else if (u.role === "OWNER_PRIVATE") scope = { listing: { ownerUserId: u.id } };
+  else scope = { seekerUserId: u.id };
+  const where: Prisma.LeadWhereInput = q.stage ? { ...scope, stage: q.stage } : scope;
+  const rows = await prisma.lead.findMany({ where, orderBy: { createdAt: "desc" }, take: 200 });
   return ok({ items: rows.map(leadToDomain), at: new Date().toISOString() });
 });

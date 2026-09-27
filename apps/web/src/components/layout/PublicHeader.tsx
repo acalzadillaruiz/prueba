@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { Heart, LogIn, Menu, Moon, Plus, Sun, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { Locale } from "@/types/domain";
@@ -13,9 +13,13 @@ import { cn } from "@/lib/cn";
 
 export function PublicHeader({ locale, variant = "light" }: { locale: Locale; variant?: "light" | "dark" | "transparent" }) {
   const pathname = usePathname();
-  const search = useSearchParams();
   const [menuOpen, setMenuOpen] = useState(false);
-  useEffect(() => setMenuOpen(false), [pathname, search]);
+  // Query string read in the browser (keeps the header static-renderable): used to keep filters on EN/ES switch.
+  const [qs, setQs] = useState("");
+  useEffect(() => {
+    setMenuOpen(false);
+    setQs(window.location.search.replace(/^\?/, ""));
+  }, [pathname]);
   useEffect(() => {
     if (!menuOpen) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMenuOpen(false);
@@ -26,7 +30,7 @@ export function PublicHeader({ locale, variant = "light" }: { locale: Locale; va
       document.body.style.overflow = "";
     };
   }, [menuOpen]);
-  const { saved, user: u } = useApp();
+  const { saved, user: u, ready } = useApp();
   const t = useTranslations("nav");
   const [isDark, setDarkState] = useState(false);
   useEffect(() => setDarkState(document.documentElement.classList.contains("dark")), []);
@@ -39,7 +43,6 @@ export function PublicHeader({ locale, variant = "light" }: { locale: Locale; va
     setDarkState(next);
   };
   const other = locale === "es" ? "en" : "es";
-  const qs = search.toString();
   const switchHref = pathname.replace(/^\/(es|en)/, `/${other}`) + (qs ? `?${qs}` : "");
   const dark = variant !== "light";
   const nav = [
@@ -81,7 +84,14 @@ export function PublicHeader({ locale, variant = "light" }: { locale: Locale; va
           ))}
         </nav>
         <div className="ml-auto flex items-center gap-2">
-          <Link href={switchHref} hrefLang={other} lang={other} aria-label={other === "en" ? "English" : "Español"} className={cn("flex min-h-10 min-w-10 items-center justify-center rounded-full px-2.5 font-display text-sm font-semibold", dark ? "text-ivory/80 hover:bg-white/10" : "text-ink/70 hover:bg-black/5")}>
+          <Link
+            href={switchHref}
+            onClick={(e) => {
+              // use the live query (filters may have changed since render)
+              e.preventDefault();
+              window.location.assign(pathname.replace(/^\/(es|en)/, `/${other}`) + window.location.search);
+            }}
+            hrefLang={other} lang={other} aria-label={other === "en" ? "English" : "Español"} className={cn("flex min-h-10 min-w-10 items-center justify-center rounded-full px-2.5 font-display text-sm font-semibold", dark ? "text-ivory/80 hover:bg-white/10" : "text-ink/70 hover:bg-black/5")}>
             {other.toUpperCase()}
           </Link>
           <button onClick={toggleTheme} className={cn("rounded-full p-2", variant !== "light" ? "hover:bg-white/10" : "hover:bg-black/5")} aria-label={isDark ? "Light mode" : "Dark mode"} title={isDark ? "Light" : "Dark"}>
@@ -94,7 +104,10 @@ export function PublicHeader({ locale, variant = "light" }: { locale: Locale; va
           <Button href={`/${locale}/owner/new`} variant={dark ? "dark-outline" : "outline"} size="sm" className="hidden md:inline-flex">
             <Plus size={15} /> {t("publish")}
           </Button>
-          {u ? (
+          {!ready ? (
+            // session still loading (public pages are cached without it): keep the slot's size, no flash
+            <span className="inline-block h-8 w-16 rounded-full bg-black/5" aria-hidden />
+          ) : u ? (
             <Link href={`/${locale}${home}`} className="flex items-center gap-2 rounded-full p-0.5 pr-2 hover:bg-black/5">
               <Avatar initials={u.initials} hue={u.hue} size={32} />
               <span className="hidden font-display text-sm xl:inline">{u.name.split(" ")[0]}</span>

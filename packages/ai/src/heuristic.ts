@@ -44,6 +44,7 @@ export function heuristicEstimate(input: EstimateInput): EstimateResult {
     .map((p) => ({
       id: p.id,
       title: p.title,
+      ...(p.title_en ? { title_en: p.title_en } : {}),
       zone: p.zone,
       areaM2: p.areaM2,
       priceAmount: p.priceAmount,
@@ -139,6 +140,12 @@ const KIND_LABEL: Record<string, { es: string; en: string }> = {
   house: { es: "Casa", en: "House" },
   office: { es: "Oficina", en: "Office" },
   land: { es: "Terreno", en: "Plot" },
+  townhouse: { es: "Townhouse", en: "Townhouse" },
+  studio: { es: "Estudio", en: "Studio" },
+  retail: { es: "Local comercial", en: "Retail unit" },
+  warehouse: { es: "Galpón", en: "Warehouse" },
+  villa: { es: "Villa", en: "Villa" },
+  chalet: { es: "Chalet", en: "Chalet" },
 };
 
 const AMENITY_COPY: Record<string, { es: string; en: string }> = {
@@ -151,6 +158,12 @@ const AMENITY_COPY: Record<string, { es: string; en: string }> = {
   terrace: { es: "terraza", en: "a terrace" },
   elevator: { es: "ascensor", en: "an elevator" },
   garden: { es: "jardín", en: "a garden" },
+  bbq: { es: "parrillera", en: "a BBQ area" },
+  furnished: { es: "mobiliario incluido", en: "furniture included" },
+  pets: { es: "admisión de mascotas", en: "a pet-friendly policy" },
+  ac: { es: "aire acondicionado", en: "air conditioning" },
+  wifi: { es: "Wi-Fi", en: "Wi-Fi" },
+  loadingDock: { es: "andén de carga", en: "a loading dock" },
 };
 
 export function heuristicWriteListing(b: ListingBrief) {
@@ -161,7 +174,7 @@ export function heuristicWriteListing(b: ListingBrief) {
   const list = (xs: string[], and: string) => (xs.length <= 1 ? xs.join("") : `${xs.slice(0, -1).join(", ")} ${and} ${xs[xs.length - 1]}`);
   const factsEs = list([b.beds ? n(b.beds, "habitación", "habitaciones") : "", b.baths ? n(b.baths, "baño", "baños") : "", b.parking ? n(b.parking, "puesto de estacionamiento", "puestos de estacionamiento") : ""].filter(Boolean), "y");
   const factsEn = list([b.beds ? n(b.beds, "bedroom", "bedrooms") : "", b.baths ? n(b.baths, "bathroom", "bathrooms") : "", b.parking ? n(b.parking, "parking space", "parking spaces") : ""].filter(Boolean), "and");
-  const amen = b.amenities.map((a) => AMENITY_COPY[a]).filter(Boolean).slice(0, 5);
+  const amen = b.amenities.map((a) => AMENITY_COPY[a]).filter(Boolean).slice(0, 6);
   const amenEs = list(amen.map((a) => a!.es), "y");
   const amenEn = list(amen.map((a) => a!.en), "and");
   return {

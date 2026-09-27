@@ -101,6 +101,7 @@ export function toDomain(r: ListingRow): Listing {
     privateListing: r.privateListing,
     shortRent: (r.shortRent ?? undefined) as Listing["shortRent"],
     commercial: (r.commercial ?? undefined) as Listing["commercial"],
+    brochurePdf: r.brochurePdf ?? null,
     fingerprint: "", // internal duplicate key: never sent to browsers
     agency: r.agency ? { ...r.agency, phone: r.agency.phone ?? "", whatsapp: r.agency.whatsapp ?? "" } : undefined,
     agent: r.agent

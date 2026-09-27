@@ -252,7 +252,7 @@ function build(): Listing[] {
       stats: {
         impressions: Math.round(800 + r() * 9000 + (s.lux ? 6000 : 0)),
         saves: Math.round(8 + r() * 140),
-        leads: Math.round(1 + r() * 22),
+        leads: 0, // seed.ts stores the real count of seeded leads (LEADS in ops.ts) as leadsCount
         avgTimeSec: Math.round(45 + r() * 160),
         interactions: Math.round(12 + r() * 9),
       },
@@ -274,7 +274,7 @@ function build(): Listing[] {
     const land = cls === "land";
     const pool = base
       .filter((o) => o.id !== l.id && group(o) === group(l) && o.city === l.city && kindClass(o.kind) === cls && (cls !== "residential" || o.luxury === l.luxury))
-      .map((o) => ({ id: o.id, title: o.title_es, zone: o.zone, areaM2: o.areaM2, priceAmount: o.priceAmount, lat: o.lat, lng: o.lng }));
+      .map((o) => ({ id: o.id, title: o.title_es, title_en: o.title_en, zone: o.zone, areaM2: o.areaM2, priceAmount: o.priceAmount, lat: o.lat, lng: o.lng }));
     const est = heuristicEstimate({
       zone: l.zone,
       zonePricePerM2: ppm,

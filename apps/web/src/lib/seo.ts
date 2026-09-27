@@ -1,7 +1,16 @@
 import type { Metadata } from "next";
 import type { Locale } from "@/types/domain";
 
-export const SITE_URL = (process.env.NEXT_PUBLIC_APP_URL || (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "http://localhost:3000")).replace(/\/$/, "");
+/**
+ * Canonical origin. Server-only APP_URL is read at runtime (not inlined at build), then Vercel's production
+ * domain, then the public build-time URL.
+ */
+export const SITE_URL = (
+  process.env.APP_URL ||
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "") ||
+  process.env.NEXT_PUBLIC_APP_URL ||
+  "http://localhost:3000"
+).replace(/\/$/, "");
 
 /** Canonical + hreflang for a locale-independent path ("/search?type=SALE", "/luxury", ""). */
 export function alternates(locale: Locale, path: string): Metadata["alternates"] {

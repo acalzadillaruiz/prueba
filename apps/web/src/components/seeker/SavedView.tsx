@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import { Check, Heart, Minus, Scale, X } from "lucide-react";
 import type { Listing, Locale } from "@/types/domain";
@@ -12,10 +13,15 @@ import { useApp } from "@/lib/store";
 import { api } from "@/lib/api";
 import { AMENITY_LABEL, TYPE_LABEL, lbl, money, num, priceSuffix, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
+import { storeSavedOffline } from "@/lib/offline-saved";
 
 export function SavedView({ locale, all }: { locale: Locale; all: Listing[] }) {
   const { saved, compare, toggleCompare } = useApp();
   const items = saved.map((id) => all.find((l) => l.id === id)).filter(Boolean) as Listing[];
+  // Keep a light copy on the device so "Guardados" works offline (the offline screen lists them).
+  useEffect(() => {
+    storeSavedOffline(items.map((l) => ({ slug: l.slug, title_es: l.title_es, title_en: l.title_en, price: `${money(l.priceAmount, locale)}${priceSuffix(l, locale)}`, zone: l.zone, city: l.city })));
+  }, [items, locale]);
   // Compared listings don't have to be saved: fetch the ones we don't already have.
   const missing = compare.filter((id) => !all.some((l) => l.id === id));
   const extra = useQuery({ queryKey: ["compare", missing.join(",")], queryFn: () => api<{ items: Listing[] }>(`listings?ids=${missing.join(",")}`), enabled: missing.length > 0 });

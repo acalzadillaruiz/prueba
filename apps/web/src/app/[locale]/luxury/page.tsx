@@ -13,6 +13,9 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: L
   return pageMeta(locale, tx(locale, "Colección Luxury", "Luxury collection"), "/luxury", { description: tx(locale, "Residencias exclusivas verificadas en Venezuela.", "Verified luxury homes in Venezuela.") });
 }
 
+// Static and cached (ISR): no session is read on public pages; data refreshes every 300 s and on listing changes.
+export const revalidate = 300;
+
 export default async function LuxuryPage({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params;
   const lux = (await publicListings()).filter((l) => l.luxury);

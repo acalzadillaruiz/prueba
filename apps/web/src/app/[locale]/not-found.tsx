@@ -3,6 +3,8 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { Logo } from "@/components/brand/Logo";
 import { Pin } from "@/components/brand/Logo";
 
+export const metadata = { title: "404", robots: { index: false, follow: false } };
+
 export default async function NotFound() {
   const locale = await getLocale();
   const t = await getTranslations("common");

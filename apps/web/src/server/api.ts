@@ -66,10 +66,32 @@ export async function body<S extends ZodTypeAny>(req: Request, schema: S): Promi
   return schema.parse(raw);
 }
 
+const SAFE_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
+
+/**
+ * CSRF defense-in-depth (on top of SameSite=Lax session cookies): a state-changing request whose `Origin`
+ * names another host is rejected. A missing Origin is allowed (server-to-server callers such as the cron
+ * with its Bearer secret, Playwright's APIRequestContext, curl); browsers always send it on cross-site writes.
+ */
+export function isCrossOrigin(req: Request): boolean {
+  if (SAFE_METHODS.has(req.method.toUpperCase())) return false;
+  const origin = req.headers.get("origin");
+  if (!origin) return false;
+  let originHost: string;
+  try {
+    originHost = new URL(origin).host; // "null" (sandboxed iframes, data: URLs) throws → cross-origin
+  } catch {
+    return true;
+  }
+  const host = req.headers.get("x-forwarded-host")?.split(",")[0]?.trim() || req.headers.get("host") || new URL(req.url).host;
+  return originHost.toLowerCase() !== host.toLowerCase();
+}
+
 /** Wraps a route handler: maps ApiError / ZodError / unknown errors to `{ error: { code, message } }`. */
 export function handler<C>(fn: (req: NextRequest, ctx: C) => Promise<Response>) {
   return async (req: NextRequest, ctx: C) => {
     const loc = locale(req);
+    if (isCrossOrigin(req)) return fail("FORBIDDEN", loc, { origin: "cross-origin request" });
     try {
       return await fn(req, ctx);
     } catch (e) {

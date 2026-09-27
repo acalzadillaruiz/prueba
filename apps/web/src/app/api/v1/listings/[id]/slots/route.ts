@@ -1,6 +1,7 @@
 import type { NextRequest } from "next/server";
 import { prisma } from "@newplace/db";
-import { ApiError, handler, ok } from "@/server/api";
+import { ApiError, currentUser, handler, ok } from "@/server/api";
+import { isManager, visibleListingId } from "@/server/access";
 
 type Ctx = { params: Promise<{ id: string }> };
 const TZ_OFFSET_H = -4; // America/Caracas (no DST)
@@ -8,6 +9,13 @@ const TZ_OFFSET_H = -4; // America/Caracas (no DST)
 /** Real availability for the next 7 days: agent weekly slots minus tours already booked. */
 export const GET = handler(async (req: NextRequest, { params }: Ctx) => {
   const { id } = await params;
+  // Hidden listings (draft, private, in review, taken down) → 404 unless the requester may view them —
+  // or works one of its leads (the leads inbox books tours for a reassigned lead with ?agent=).
+  const u = await currentUser();
+  await visibleListingId(id, u).catch(async (e) => {
+    const worksLead = u && (await prisma.lead.findFirst({ where: { listingId: id, OR: [{ agentId: u.id }, ...(isManager(u) && u.agencyId ? [{ agencyId: u.agencyId }] : [])] }, select: { id: true } }));
+    if (!worksLead) throw e;
+  });
   const l = await prisma.listing.findUnique({ where: { id }, select: { agentId: true, ownerUserId: true, agencyId: true } });
   if (!l) throw new ApiError("NOT_FOUND");
   // ?agent= another AGENT of the same agency (a reassigned lead is toured by its new agent).

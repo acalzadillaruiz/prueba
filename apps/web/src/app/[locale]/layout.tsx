@@ -1,13 +1,19 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import { NextIntlClientProvider } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
-import { prisma } from "@newplace/db";
 import { AppStateProvider } from "@/lib/store";
 import { isLocale } from "@/lib/i18n";
 import { DemoBar } from "@/components/layout/DemoBar";
 import { SwUpdate } from "@/components/layout/SwUpdate";
-import { getAppAgency, getAppUser } from "@/server/session";
+import { SITE_URL } from "@/lib/seo";
+import { fontVars } from "../fonts";
+import "../globals.css";
+
+export const viewport: Viewport = { themeColor: "#0B1220", width: "device-width", initialScale: 1, viewportFit: "cover" };
+
+/** Applies the saved theme before first paint (no flash). */
+const THEME_SCRIPT = "try{if(localStorage.getItem('np-theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}";
 
 export function generateStaticParams() {
   return [{ locale: "es" }, { locale: "en" }];
@@ -21,6 +27,12 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     ? "Compra, alquila y publica inmuebles verificados en Venezuela: mapa, estimación de precio con IA y visitas con la agenda real del agente."
     : "Buy, rent and list verified homes in Venezuela: map search, AI price estimates and tours booked on the agent’s real calendar.";
   return {
+    metadataBase: new URL(SITE_URL),
+    applicationName: "New Place",
+    manifest: "/manifest.webmanifest",
+    icons: { icon: [{ url: "/favicon.ico", sizes: "any" }, { url: "/icons/icon-192.png", type: "image/png" }], apple: "/icons/apple-touch-icon.png" },
+    appleWebApp: { capable: true, title: "New Place", statusBarStyle: "black-translucent" },
+    other: { "apple-mobile-web-app-capable": "yes" },
     title: { default: title, template: "%s · New Place" },
     description,
     alternates: { canonical: `/${locale}`, languages: { es: "/es", en: "/en", "x-default": "/es" } },
@@ -33,18 +45,22 @@ export default async function LocaleLayout({ children, params }: { children: Rea
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
   setRequestLocale(locale);
-  const user = await getAppUser();
-  const [agency, saved] = await Promise.all([
-    getAppAgency(user?.agencyId ?? null),
-    user ? prisma.savedListing.findMany({ where: { userId: user.id }, select: { listingId: true }, orderBy: { createdAt: "desc" } }) : Promise.resolve([]),
-  ]);
+  // No session read here: public pages stay static/cacheable and free of personal data. Private areas wrap
+  // themselves in <PrivateState> (server session); public pages load it in the browser.
   return (
-    <NextIntlClientProvider>
-    <AppStateProvider user={user} agency={agency} savedIds={saved.map((s) => s.listingId)}>
-      {children}
-      <DemoBar locale={locale} />
-      <SwUpdate locale={locale} />
-    </AppStateProvider>
-    </NextIntlClientProvider>
+    <html lang={locale} className={fontVars} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+      </head>
+      <body className="min-h-screen">
+        <NextIntlClientProvider>
+          <AppStateProvider>
+            {children}
+            <DemoBar locale={locale} />
+            <SwUpdate locale={locale} />
+          </AppStateProvider>
+        </NextIntlClientProvider>
+      </body>
+    </html>
   );
 }

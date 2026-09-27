@@ -34,6 +34,27 @@ const nextConfig = {
     minimumCacheTTL: 60 * 60 * 24 * 30,
   },
   async headers() {
+    const dev = process.env.NODE_ENV !== "production";
+    // Production over HTTPS only: a local `next start` on http://localhost would have its own assets upgraded.
+    const upgrade = !dev && !(process.env.NEXT_PUBLIC_APP_URL ?? "").startsWith("http://");
+    // Inline scripts: Next's RSC bootstrap + the pre-paint theme script (no nonce pipeline yet).
+    // Dev only: React Refresh needs eval and the HMR websocket.
+    const csp = [
+      "default-src 'self'",
+      `script-src 'self' 'unsafe-inline'${dev ? " 'unsafe-eval'" : ""} https://maps.googleapis.com https://maps.gstatic.com`,
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      "img-src 'self' data: blob: https:",
+      "font-src 'self' data: https://fonts.gstatic.com",
+      `connect-src 'self' https:${dev ? " ws: wss:" : ""}`,
+      "frame-src https://www.google.com",
+      "worker-src 'self' blob:",
+      "manifest-src 'self'",
+      "object-src 'none'",
+      "base-uri 'self'",
+      "form-action 'self' https://accounts.google.com",
+      "frame-ancestors 'none'",
+      ...(upgrade ? ["upgrade-insecure-requests"] : []),
+    ].join("; ");
     return [
       {
         source: "/:path*",
@@ -43,7 +64,7 @@ const nextConfig = {
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(self), payment=()" },
           { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains" },
-          { key: "Content-Security-Policy", value: "frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://accounts.google.com; object-src 'none'" },
+          { key: "Content-Security-Policy", value: csp },
         ],
       },
     ];

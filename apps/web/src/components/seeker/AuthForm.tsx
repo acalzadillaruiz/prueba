@@ -16,6 +16,7 @@ import { photo } from "@/lib/photos";
 import { Avatar, Button, Field, inputCls } from "@/components/ui";
 import { DEMO_ENABLED, DEMO_LOGINS } from "@/lib/demo";
 import { api } from "@/lib/api";
+import { useApp } from "@/lib/store";
 import { tx } from "@/lib/i18n";
 
 const GOOGLE = process.env.NEXT_PUBLIC_GOOGLE_AUTH === "true";
@@ -66,7 +67,9 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
   // Same-origin paths only: "/x" is fine, "//evil.com" and "/\\evil.com" are not.
   const next = rawNext && /^\/(?![\/\\])/.test(rawNext) ? rawNext : null;
 
-  const finish = (home: string) => {
+  const { refresh } = useApp();
+  const finish = async (home: string) => {
+    await refresh(); // public pages keep the session in client state
     router.push(next ?? `/${locale}${home}`);
     router.refresh();
   };

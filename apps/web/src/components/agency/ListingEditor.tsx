@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, Check, Eye, ImagePlus, Loader2, Save, Sparkles, Star, Trash2 } from "lucide-react";
 import type { Amenity, Listing, ListingStatus, Locale } from "@/types/domain";
@@ -13,6 +13,8 @@ import { api } from "@/lib/api";
 import { AMENITY_LABEL, STATUS_LABEL, lbl, money, num, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import { commissionAmount } from "@/lib/commission";
+import { ListingTypeFields, extrasFrom, validateExtras, type ExtrasDraft } from "@/components/owner/ListingTypeFields";
+import { listingHref } from "@/lib/listing-href";
 
 const STATUSES: ListingStatus[] = ["DRAFT", "COMING_SOON", "ACTIVE", "UNDER_OFFER", "SOLD", "RENTED", "WITHDRAWN", "EXPIRED"];
 const AMENITIES: Amenity[] = ["pool", "gym", "security", "generator", "waterTank", "view", "terrace", "elevator", "garden", "bbq", "furnished", "pets", "ac", "wifi", "loadingDock"];
@@ -23,6 +25,8 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
   const [lang, setLang] = useState<Locale>("es");
   const [copy, setCopy] = useState({ title_es: l.title_es, title_en: l.title_en, body_es: l.body_es, body_en: l.body_en });
   const [f, setF] = useState({ status: l.status, priceAmount: l.priceAmount, privateListing: !!l.privateListing, beds: l.beds, baths: l.baths, areaM2: l.areaM2, parking: l.parking, amenities: l.amenities, hasFloorplan: l.hasFloorplan, hasVirtualTour: l.hasVirtualTour });
+  const [extras, setExtras] = useState<ExtrasDraft>(() => extrasFrom(l));
+  const [showExtrasErr, setShowExtrasErr] = useState(false);
   const [photos, setPhotos] = useState<Photo[]>(initialPhotos);
   const [writing, setWriting] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
@@ -30,12 +34,35 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
   const [err, setErr] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const dirty = () => setSaved(false);
+  const extrasCheck = validateExtras(locale, l.listingType, l.luxury, extras);
+  // The brochure isn't part of the domain Listing: the listing API returns it alongside.
+  useEffect(() => {
+    if (!l.luxury) return;
+    let alive = true;
+    api<{ brochurePdf?: string | null }>(`listings/${l.id}`)
+      .then((r) => alive && r.brochurePdf && setExtras((x) => (x.brochurePdf ? x : { ...x, brochurePdf: r.brochurePdf! })))
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, [l.id, l.luxury]);
 
   const save = async () => {
+    if (!extrasCheck.ok) {
+      setShowExtrasErr(true);
+      setErr(tx(locale, "Revisa los campos marcados antes de guardar.", "Check the highlighted fields before saving."));
+      return;
+    }
     setBusy("save");
     setErr(null);
     try {
-      await api(`listings/${l.id}`, { method: "PATCH", json: { ...copy, ...f } });
+      const p = extrasCheck.payload;
+      const typeFields = {
+        ...(l.listingType === "SHORT_RENT" ? { shortRent: p.shortRent } : {}),
+        ...(l.listingType.startsWith("COMMERCIAL") ? { commercial: p.commercial } : {}),
+        ...(l.luxury ? { brochurePdf: p.brochurePdf ?? null } : {}),
+      };
+      await api(`listings/${l.id}`, { method: "PATCH", json: { ...copy, ...f, ...typeFields } });
       setSaved(true);
       router.refresh();
     } catch (e) {
@@ -105,7 +132,7 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
   const section = "rounded-np border border-navy-line bg-navy-card p-5";
   const num = (k: "beds" | "baths" | "areaM2" | "parking", label: string) => (
     <Field dark key={k} label={label}>
-      <input className={darkInputCls} type="number" min={0} value={f[k]} disabled={!canEdit} onChange={(e) => { setF({ ...f, [k]: Math.max(0, +e.target.value) }); dirty(); }} />
+      <input className={darkInputCls} type="number" min={0} max={k === "areaM2" ? 1_000_000 : k === "parking" ? 50 : 30} value={f[k]} disabled={!canEdit} onChange={(e) => { setF({ ...f, [k]: Math.max(0, +e.target.value) }); dirty(); }} />
     </Field>
   );
 
@@ -116,7 +143,7 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
       title={tx(locale, "Editar inmueble", "Edit listing")}
       actions={
         <div className="flex gap-2">
-          <Button size="sm" variant="dark-outline" href={`/${locale}/listing/${l.slug}`}><Eye size={14} /> {tx(locale, "Ver ficha", "View")}</Button>
+          <Button size="sm" variant="dark-outline" href={listingHref(locale, l)}><Eye size={14} /> {tx(locale, "Ver ficha", "View")}</Button>
           {canEdit && (
             <Button size="sm" onClick={save} disabled={busy === "save"}>
               {busy === "save" ? <Loader2 size={14} className="animate-spin" /> : saved ? <Check size={14} /> : <Save size={14} />} {saved ? tx(locale, "Guardado", "Saved") : tx(locale, "Guardar", "Save")}
@@ -125,7 +152,7 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
         </div>
       }
     >
-      {err && <div className="mb-4 rounded-lg bg-[#B4231833] px-3 py-2 text-sm text-[#FF8A7A]">{err}</div>}
+      {err && <div className="mb-4 rounded-lg bg-[#B4231833] px-3 py-2 text-sm text-[#FF8A7A]" role="alert">{err}</div>}
       {l.review === "PENDING" && <div className="mb-4 rounded-lg bg-[#C9862A33] px-3 py-2 text-sm text-[#F2B866]">{tx(locale, "Pendiente de aprobación del backoffice. No es visible al público todavía.", "Pending backoffice approval. Not public yet.")}</div>}
       <div className="grid gap-6 [&>*]:min-w-0 xl:grid-cols-[1fr_420px]">
         <div className="space-y-6">
@@ -190,6 +217,24 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
               <label className="flex items-center gap-2"><input type="checkbox" disabled={!canEdit} checked={f.hasVirtualTour} onChange={(e) => { setF({ ...f, hasVirtualTour: e.target.checked }); dirty(); }} className="accent-[#F26B4D]" /> {tx(locale, "Tour virtual", "Virtual tour")}</label>
             </div>
           </div>
+
+          {(l.listingType === "SHORT_RENT" || l.listingType.startsWith("COMMERCIAL") || l.luxury) && (
+            <div className={section}>
+              <ListingTypeFields
+                locale={locale}
+                listingType={l.listingType}
+                luxury={l.luxury}
+                value={extras}
+                onChange={(x) => {
+                  setExtras(x);
+                  dirty();
+                }}
+                showErrors={showExtrasErr}
+                disabled={!canEdit}
+                dark
+              />
+            </div>
+          )}
 
           <div className={section}>
             <input ref={fileRef} type="file" multiple accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(e) => { upload(Array.from(e.target.files ?? [])); e.target.value = ""; }} />

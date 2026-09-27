@@ -20,6 +20,10 @@ export interface AppUser {
 
 interface Ctx {
   user: AppUser | null;
+  /** false until the session is known (public pages load it in the browser). */
+  ready: boolean;
+  /** Re-read the session (after sign-in / demo switch on a public page). */
+  refresh: () => Promise<void>;
   agency: Agency | null;
   saved: string[];
   compare: string[];
@@ -32,14 +36,47 @@ interface Ctx {
 const AppCtx = createContext<Ctx | null>(null);
 const CMP = "np-compare-v1";
 
-export function AppStateProvider({ children, user, agency, savedIds }: { children: ReactNode; user: AppUser | null; agency: Agency | null; savedIds: string[] }) {
+type Session = { user: AppUser | null; agency: Agency | null; saved: string[] };
+
+/**
+ * Client state. Private areas pass the server-read session (`user` defined); public pages pass nothing and the
+ * session is fetched from /api/v1/me/session, so their HTML carries no personal data and can be cached.
+ */
+export function AppStateProvider({ children, user: initialUser, agency: initialAgency = null, savedIds = [] }: { children: ReactNode; user?: AppUser | null; agency?: Agency | null; savedIds?: string[] }) {
   const [client] = useState(() => new QueryClient({ defaultOptions: { queries: { staleTime: 10_000, refetchOnWindowFocus: false } } }));
+  const [user, setUser] = useState<AppUser | null>(initialUser ?? null);
+  const [agency, setAgency] = useState<Agency | null>(initialAgency);
+  const [ready, setReady] = useState(initialUser !== undefined);
   const [saved, setSaved] = useState(savedIds);
+  const refresh = useCallback(async () => {
+    try {
+      const r = await fetch("/api/v1/me/session", { credentials: "same-origin", cache: "no-store" });
+      if (r.ok) {
+        const s = (await r.json()) as Session;
+        setUser(s.user);
+        setAgency(s.agency);
+        setSaved(s.saved);
+      }
+    } catch {
+      // offline: keep what we have
+    } finally {
+      setReady(true);
+    }
+  }, []);
+  useEffect(() => {
+    if (initialUser === undefined) void refresh();
+  }, [initialUser, refresh]);
   const [compare, setCompare] = useState<string[]>([]);
   const router = useRouter();
   const pathname = usePathname();
 
-  useEffect(() => setSaved(savedIds), [savedIds]);
+  useEffect(() => {
+    if (initialUser !== undefined) {
+      setUser(initialUser);
+      setAgency(initialAgency);
+      setSaved(savedIds);
+    }
+  }, [initialUser, initialAgency, savedIds]);
   useEffect(() => {
     try {
       setCompare(JSON.parse(localStorage.getItem(CMP) ?? "[]"));
@@ -80,7 +117,7 @@ export function AppStateProvider({ children, user, agency, savedIds }: { childre
     [compare],
   );
 
-  const value = useMemo(() => ({ user, agency, saved, compare, toggleSaved, toggleCompare, requireLogin }), [user, agency, saved, compare, toggleSaved, toggleCompare, requireLogin]);
+  const value = useMemo(() => ({ user, ready, refresh, agency, saved, compare, toggleSaved, toggleCompare, requireLogin }), [user, ready, refresh, agency, saved, compare, toggleSaved, toggleCompare, requireLogin]);
   return (
     <QueryClientProvider client={client}>
       <AppCtx.Provider value={value}>{children}</AppCtx.Provider>

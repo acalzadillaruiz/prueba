@@ -12,6 +12,9 @@ import { publicListings } from "@/server/listings";
 import { getZones } from "@/server/data";
 import { money, num, tx } from "@/lib/i18n";
 
+// Static and cached (ISR): no session is read on public pages; data refreshes every 60 s and on listing changes.
+export const revalidate = 60;
+
 export default async function Home({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params;
   const [all, ZONES] = await Promise.all([publicListings(), getZones()]);

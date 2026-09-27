@@ -66,6 +66,7 @@ test.describe.serial("Criterios de aceptación §15", () => {
     await page.getByRole("button", { name: /Redactar con IA/ }).click();
     await expect(page.getByLabel("Título")).not.toHaveValue("");
     await page.getByRole("button", { name: "Continuar" }).click();
+    await page.getByRole("checkbox", { name: /Confirmo/ }).check();
     await page.getByRole("button", { name: "Publicar ahora" }).click();
     await expect(page.getByTestId("owner-published")).toBeVisible({ timeout: 30_000 });
     const res = await apiAs(page, "GET", "listings?type=SALE&zone=Altamira");

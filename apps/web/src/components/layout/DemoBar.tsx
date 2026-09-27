@@ -14,7 +14,7 @@ import { cn } from "@/lib/cn";
 
 /** DEMO_AUTH=true — "Entrar como…" for QA without Google console. Uses the real Auth.js "demo" provider. */
 export function DemoBar({ locale }: { locale: Locale }) {
-  const { user } = useApp();
+  const { user, refresh } = useApp();
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [hidden, setHidden] = useState(false);
@@ -26,6 +26,7 @@ export function DemoBar({ locale }: { locale: Locale }) {
   const go = async (email: string, home: string) => {
     setBusy(email);
     await signIn("demo", { email, redirect: false });
+    await refresh();
     setOpen(false);
     setBusy(null);
     router.push(`/${locale}${home}`);
@@ -53,10 +54,11 @@ export function DemoBar({ locale }: { locale: Locale }) {
           )}
         </div>
       )}
-      <button onClick={() => setOpen((o) => !o)} className="flex items-center gap-2 rounded-full border border-navy-line bg-navy/95 py-1.5 pl-1.5 pr-3.5 text-sm text-ivory shadow-np backdrop-blur">
+      <button onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label={tx(locale, "Modo demo: entrar como…", "Demo mode: sign in as…")} className="flex min-h-11 items-center gap-2 rounded-full border border-navy-line bg-navy/95 p-1.5 text-sm text-ivory opacity-80 shadow-np backdrop-blur transition-opacity hover:opacity-100 sm:pr-3.5 sm:opacity-100">
         {user ? <Avatar initials={user.initials} hue={user.hue} size={26} /> : <span className="flex h-[26px] w-[26px] items-center justify-center rounded-full bg-white/10"><LogIn size={14} /></span>}
-        <FlaskConical size={14} className="text-coral" />
-        <span className="font-display">Demo</span>
+        {/* compact on phones so it never hides content */}
+        <FlaskConical size={14} className="hidden text-coral sm:block" />
+        <span className="hidden font-display sm:inline">Demo</span>
       </button>
     </div>
   );

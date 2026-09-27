@@ -2,9 +2,10 @@ import type { NextRequest } from "next/server";
 import { z } from "zod";
 import { prisma } from "@newplace/db";
 import { ApiError, body, currentUser, handler, ok, requireUser } from "@/server/api";
-import { listingForUser } from "@/server/access";
+import { listingForUser, visibleListingId } from "@/server/access";
 import { storage } from "@/server/storage";
-import { qualityOf } from "@/server/listing-service";
+import { refreshQuality } from "@/server/listing-service";
+import { revalidateListing } from "@/server/revalidate";
 
 type Ctx = { params: Promise<{ id: string }> };
 const MAX = 12 * 1024 * 1024;
@@ -17,11 +18,6 @@ function sniff(b: Buffer): string | null {
   if (b.toString("ascii", 0, 4) === "RIFF" && b.toString("ascii", 8, 12) === "WEBP") return "image/webp";
   if (b.toString("ascii", 4, 8) === "ftyp" && /^avi[fs]$/.test(b.toString("ascii", 8, 12))) return "image/avif";
   return null;
-}
-
-async function refreshQuality(id: string) {
-  const l = await prisma.listing.findUniqueOrThrow({ where: { id }, include: { _count: { select: { photos: true } } } });
-  await prisma.listing.update({ where: { id }, data: { quality: qualityOf({ photos: l._count.photos || l.scenes.length, titleEn: l.titleEn, bodyEn: l.bodyEn, lat: l.lat, hasFloorplan: l.hasFloorplan, hasVirtualTour: l.hasVirtualTour }) } });
 }
 
 /** Bulk upload (multipart field "files"). Order follows upload order; first photo becomes cover if none. */
@@ -46,7 +42,7 @@ export const POST = handler(async (req: NextRequest, { params }: Ctx) => {
     const url = await storage.put(key, buf, type);
     created.push(await prisma.listingPhoto.create({ data: { listingId: id, url, order: order++, isCover: !hasCover && i === 0 } }));
   }
-  await refreshQuality(id);
+  revalidateListing((await refreshQuality(id))?.slug);
   return ok({ photos: created }, 201);
 });
 
@@ -60,11 +56,12 @@ export const PATCH = handler(async (req: NextRequest, { params }: Ctx) => {
   if (b.remove) await prisma.listingPhoto.deleteMany({ where: { id: b.remove, listingId: id } });
   if (b.order) await prisma.$transaction(b.order.map((pid, i) => prisma.listingPhoto.updateMany({ where: { id: pid, listingId: id }, data: { order: i } })));
   if (b.cover) await prisma.$transaction([prisma.listingPhoto.updateMany({ where: { listingId: id }, data: { isCover: false } }), prisma.listingPhoto.updateMany({ where: { id: b.cover, listingId: id }, data: { isCover: true } })]);
-  await refreshQuality(id);
+  revalidateListing((await refreshQuality(id))?.slug);
   return ok({ photos: await prisma.listingPhoto.findMany({ where: { listingId: id }, orderBy: [{ isCover: "desc" }, { order: "asc" }] }) });
 });
 
 export const GET = handler(async (_req: NextRequest, { params }: Ctx) => {
   const { id } = await params;
+  await visibleListingId(id, await currentUser());
   return ok({ photos: await prisma.listingPhoto.findMany({ where: { listingId: id }, orderBy: [{ isCover: "desc" }, { order: "asc" }] }) });
 });

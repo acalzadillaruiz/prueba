@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { leadSchema } from "@newplace/config";
@@ -35,6 +35,11 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
     defaultValues: { name: user?.name ?? "", email: user?.email ?? "", phone: user?.phone ?? "", message: tx(locale, "Hola, me interesa este inmueble. ¿Sigue disponible?", "Hi, I’m interested in this property. Is it still available?") },
     mode: "onTouched",
   });
+  // The session arrives after first paint on cached pages: pre-fill whatever the visitor hasn't typed yet.
+  useEffect(() => {
+    if (!user) return;
+    for (const [k, v] of [["name", user.name], ["email", user.email], ["phone", user.phone ?? ""]] as const) if (!form.getValues(k) && v) form.setValue(k, v);
+  }, [user, form]);
   const errs = form.formState.errors;
   // Every invalid field at once (not only the first), in the order they appear in the form.
   const fieldErrors = (

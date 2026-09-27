@@ -10,4 +10,9 @@ export const DEMO_LOGINS = [
   { email: "superadmin@newplace.app", label: { es: "Superadmin", en: "Superadmin" }, home: "/platform", initials: "ML", hue: 12 },
 ] as const;
 
+const DEMO_EMAILS: ReadonlySet<string> = new Set(DEMO_LOGINS.map((d) => d.email));
+
+/** The Auth.js "demo" provider only accepts these seeded accounts (exact, case-insensitive match). */
+export const isDemoEmail = (email: string) => DEMO_EMAILS.has(email.trim().toLowerCase());
+
 export const DEMO_ENABLED = process.env.NEXT_PUBLIC_DEMO_AUTH === "true";

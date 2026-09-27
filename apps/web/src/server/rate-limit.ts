@@ -61,8 +61,19 @@ export async function reset(key: string) {
   await prisma.rateLimit.deleteMany({ where: { key } });
 }
 
+/**
+ * Client IP for rate-limit keys. The first X-Forwarded-For entry is whatever the client sent, so it is never
+ * trusted: prefer the platform header (Vercel sets/overwrites it), then X-Real-IP (set by our proxy), then the
+ * LAST X-Forwarded-For hop — the one appended by the proxy in front of us.
+ */
 export function clientIp(req: Request): string {
-  return req.headers.get("x-forwarded-for")?.split(",")[0].trim() || req.headers.get("x-real-ip") || "local";
+  const first = (v: string | null) => v?.split(",")[0]?.trim() || null;
+  const vercel = first(req.headers.get("x-vercel-forwarded-for"));
+  if (vercel) return vercel;
+  const real = req.headers.get("x-real-ip")?.trim();
+  if (real) return real;
+  const hops = (req.headers.get("x-forwarded-for") ?? "").split(",").map((h) => h.trim()).filter(Boolean);
+  return hops.at(-1) ?? "local";
 }
 
 /** Throws RATE_LIMIT (429) when exceeded. Per-IP limits apply in production only (dev and e2e share one IP). */

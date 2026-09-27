@@ -7,6 +7,7 @@ import { z } from "zod";
 import { prisma } from "@newplace/db";
 import type { Role } from "@newplace/config";
 import { authConfig } from "./auth.config";
+import { hit, reset } from "./server/rate-limit";
 
 const DEMO = process.env.DEMO_AUTH === "true";
 
@@ -32,8 +33,17 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
       async authorize(raw) {
         const p = creds.safeParse(raw);
         if (!p.success) return null;
-        const u = await prisma.user.findUnique({ where: { email: p.data.email.toLowerCase() } });
-        if (!u?.passwordHash || !(await bcrypt.compare(p.data.password, u.passwordHash))) return null;
+        const email = p.data.email.toLowerCase();
+        // Brute-force protection: max 10 failed attempts per account every 15 minutes.
+        const key = `login-fail:${email}`;
+        const blocked = await prisma.rateLimit.findUnique({ where: { key } });
+        if (blocked && blocked.resetAt > new Date() && blocked.count >= 10) return null;
+        const u = await prisma.user.findUnique({ where: { email } });
+        if (!u?.passwordHash || !(await bcrypt.compare(p.data.password, u.passwordHash))) {
+          await hit(key, 10, 15 * 60);
+          return null;
+        }
+        await reset(key);
         return profile(u.id);
       },
     }),

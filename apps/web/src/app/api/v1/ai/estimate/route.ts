@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "@newplace/db";
 import { body, handler, ok } from "@/server/api";
 import { aiProvider } from "@/server/ai";
+import { limit } from "@/server/rate-limit";
 
 const Input = z.object({
   zone: z.string(),
@@ -20,6 +21,7 @@ const Input = z.object({
 
 /** Live PlaceEstimate for the owner wizard (no listing yet). */
 export const POST = handler(async (req: NextRequest) => {
+  await limit(req, "ai-estimate", 60, 60);
   const b = await body(req, Input);
   const zone = await prisma.zone.findUnique({ where: { name: b.zone } });
   const sale = b.listingType === "SALE" || b.listingType === "COMMERCIAL_SALE";

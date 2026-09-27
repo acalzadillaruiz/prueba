@@ -42,7 +42,9 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
   const [err, setErr] = useState<string | null>(null);
   const router = useRouter();
   const sp = useSearchParams();
-  const next = sp.get("next") && sp.get("next")!.startsWith("/") ? sp.get("next")! : null;
+  const rawNext = sp.get("next");
+  // Same-origin paths only: "/x" is fine, "//evil.com" and "/\\evil.com" are not.
+  const next = rawNext && /^\/(?![\/\\])/.test(rawNext) ? rawNext : null;
 
   const finish = (home: string) => {
     router.push(next ?? `/${locale}${home}`);

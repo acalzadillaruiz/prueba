@@ -4,11 +4,13 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@newplace/db";
 import { ApiError, body, handler, ok } from "@/server/api";
 import { audit, queueEmail } from "@/server/data";
+import { limit } from "@/server/rate-limit";
 
 const Reg = registerSchema;
 
 /** Email + password sign-up. "¿Eres agencia?" creates the Agency (TRIAL, FREE) with the user as AGENCY_OWNER. */
 export const POST = handler(async (req: NextRequest) => {
+  await limit(req, "register", 5, 60 * 60);
   const b = await body(req, Reg);
   const email = b.email.toLowerCase();
   if (await prisma.user.findUnique({ where: { email } })) throw new ApiError("CONFLICT", { email: "exists" });

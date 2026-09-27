@@ -16,9 +16,10 @@ export const authConfig = {
         token.agencyId = u.agencyId ?? null;
         token.hue = u.hue ?? 200;
       }
-      if (trigger === "update" && session?.agencyId !== undefined) {
-        token.agencyId = session.agencyId;
-        if (session.role) token.role = session.role;
+      // Only a superadmin may switch tenant (impersonation). The role is never taken from the client.
+      if (trigger === "update" && token.role === "SUPERADMIN" && session && "agencyId" in session) {
+        const next = (session as { agencyId?: unknown }).agencyId;
+        if (next === null || typeof next === "string") token.agencyId = next;
       }
       return token;
     },

@@ -10,6 +10,15 @@ type Ctx = { params: Promise<{ id: string }> };
 const MAX = 12 * 1024 * 1024;
 const TYPES = ["image/jpeg", "image/png", "image/webp", "image/avif"];
 
+/** Real type from the file's first bytes (the browser-sent MIME is not trusted). */
+function sniff(b: Buffer): string | null {
+  if (b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff) return "image/jpeg";
+  if (b.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))) return "image/png";
+  if (b.toString("ascii", 0, 4) === "RIFF" && b.toString("ascii", 8, 12) === "WEBP") return "image/webp";
+  if (b.toString("ascii", 4, 8) === "ftyp" && /^avi[fs]$/.test(b.toString("ascii", 8, 12))) return "image/avif";
+  return null;
+}
+
 async function refreshQuality(id: string) {
   const l = await prisma.listing.findUniqueOrThrow({ where: { id }, include: { _count: { select: { photos: true } } } });
   await prisma.listing.update({ where: { id }, data: { quality: qualityOf({ photos: l._count.photos, titleEn: l.titleEn, bodyEn: l.bodyEn, lat: l.lat, hasFloorplan: l.hasFloorplan, hasVirtualTour: l.hasVirtualTour }) } });
@@ -27,10 +36,14 @@ export const POST = handler(async (req: NextRequest, { params }: Ctx) => {
   const hasCover = (await prisma.listingPhoto.count({ where: { listingId: id, isCover: true } })) > 0;
   const created = [];
   for (const [i, f] of files.entries()) {
-    if (!TYPES.includes(f.type) || f.size > MAX) throw new ApiError("VALIDATION", { files: `${f.name}: JPG/PNG/WebP ≤ 12 MB` });
-    const ext = f.type.split("/")[1].replace("jpeg", "jpg");
+    const bad = () => new ApiError("VALIDATION", { files: `${f.name}: JPG/PNG/WebP ≤ 12 MB` });
+    if (f.size > MAX) throw bad();
+    const buf = Buffer.from(await f.arrayBuffer());
+    const type = sniff(buf);
+    if (!type || !TYPES.includes(type)) throw bad();
+    const ext = type.split("/")[1].replace("jpeg", "jpg");
     const key = `listings/${id}/${Date.now().toString(36)}-${i}.${ext}`;
-    const url = await storage.put(key, Buffer.from(await f.arrayBuffer()), f.type);
+    const url = await storage.put(key, buf, type);
     created.push(await prisma.listingPhoto.create({ data: { listingId: id, url, order: order++, isCover: !hasCover && i === 0 } }));
   }
   await refreshQuality(id);

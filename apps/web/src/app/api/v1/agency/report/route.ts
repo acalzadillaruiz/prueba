@@ -3,8 +3,10 @@ import { ApiError, currentUser, handler, requireUser } from "@/server/api";
 import { isManager, requireAgency } from "@/server/access";
 
 const esc = (v: unknown) => {
-  const s = String(v ?? "");
-  return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  let s = String(v ?? "");
+  // Neutralise spreadsheet formulas (CSV injection): =, +, -, @, tab, CR at the start of a text cell.
+  if (typeof v === "string" && /^[=+\-@\t\r]/.test(s)) s = `'${s}`;
+  return /[",\n']/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 };
 
 /** CSV export for the agency owner / backoffice. */

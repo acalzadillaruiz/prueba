@@ -5,11 +5,13 @@ import { ApiError, body, currentUser, handler, ok, requireUser } from "@/server/
 import { aiProvider } from "@/server/ai";
 import { leadToDomain, queueEmail } from "@/server/data";
 import { isManager } from "@/server/access";
+import { limit } from "@/server/rate-limit";
 
 const Create = leadSchema;
 
 /** Public: contact form / tour request from a listing. Creates Lead (+ Tour, thread, emails). */
 export const POST = handler(async (req: NextRequest) => {
+  await limit(req, "lead", 10, 10 * 60);
   const u = await currentUser();
   const b = await body(req, Create);
   const l = await prisma.listing.findUnique({ where: { id: b.listingId }, include: { agent: true, owner: true } });

@@ -7,7 +7,9 @@ import { audit, queueEmail } from "@/server/data";
 
 export const GET = handler(async () => {
   const u = requireUser(await currentUser());
-  return ok({ items: await prisma.invitation.findMany({ where: { agencyId: requireAgency(u), acceptedAt: null }, orderBy: { createdAt: "desc" } }) });
+  if (!isManager(u)) throw new ApiError("FORBIDDEN");
+  const items = await prisma.invitation.findMany({ where: { agencyId: requireAgency(u), acceptedAt: null }, orderBy: { createdAt: "desc" }, select: { id: true, email: true, role: true, createdAt: true } });
+  return ok({ items });
 });
 
 export const POST = handler(async (req: NextRequest) => {
@@ -20,5 +22,5 @@ export const POST = handler(async (req: NextRequest) => {
   const agency = await prisma.agency.findUniqueOrThrow({ where: { id: agencyId } });
   await queueEmail(b.email, `${agency.name} te invita a New Place (${b.role})`, "INVITE", `/es/register?invite=${token}`);
   await audit(u.id, "team.invite", b.email, { role: b.role });
-  return ok(inv, 201);
+  return ok({ id: inv.id, email: inv.email, role: inv.role, createdAt: inv.createdAt }, 201);
 });

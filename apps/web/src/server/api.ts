@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { ZodError, type ZodTypeAny, type z } from "zod";
 import { can, type Action, type Role } from "@newplace/config";
 import { auth } from "@/auth";
+import { liveIdentity } from "./identity";
 
 export type ErrorCode = "UNAUTHORIZED" | "FORBIDDEN" | "NOT_FOUND" | "VALIDATION" | "CONFLICT" | "RATE_LIMIT" | "INTERNAL";
 
@@ -38,7 +39,9 @@ export type SessionUser = { id: string; role: Role; agencyId: string | null; nam
 
 export async function currentUser(): Promise<SessionUser | null> {
   const s = await auth();
-  return s?.user ? { id: s.user.id, role: s.user.role, agencyId: s.user.agencyId, name: s.user.name, email: s.user.email } : null;
+  if (!s?.user?.id) return null;
+  const u = await liveIdentity(s.user.id, s.user.agencyId ?? null);
+  return u ? { id: u.id, role: u.role, agencyId: u.agencyId, name: u.name, email: u.email } : null;
 }
 
 export function requireUser(u: SessionUser | null): SessionUser {

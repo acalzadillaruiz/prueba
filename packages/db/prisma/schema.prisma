@@ -681,3 +681,10 @@ model ModerationReport {
   resolved  Boolean  @default(false)
   createdAt DateTime @default(now())
 }
+
+/// Fixed-window rate limiting shared by every server instance (login, leads, register, public AI).
+model RateLimit {
+  key     String   @id
+  count   Int      @default(0)
+  resetAt DateTime
+}

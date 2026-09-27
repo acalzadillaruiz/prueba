@@ -53,6 +53,19 @@ test.describe("Smoke: login, mapa, crear inmueble · RBAC duro", () => {
     expect(bad.json.error.message).toMatch(/Revisa/);
   });
 
+  test("seguridad: no se puede escalar a superadmin vía /api/auth/session ni ver tokens de invitación", async ({ page }) => {
+    await demoLogin(page, /Buscador/);
+    const { csrfToken } = await (await page.request.get("/api/auth/csrf")).json();
+    await page.request.post("/api/auth/session", { data: { csrfToken, data: { agencyId: "ag-night", role: "SUPERADMIN" } } });
+    const s = await (await page.request.get("/api/auth/session")).json();
+    expect(s.user.role).toBe("SEEKER");
+    expect(s.user.agencyId).toBeNull();
+    expect((await apiAs(page, "GET", "platform/settings")).status).toBe(403);
+    await page.context().clearCookies();
+    await demoLogin(page, /Captador/);
+    expect((await apiAs(page, "GET", "agency/invitations")).status).toBe(403);
+  });
+
   test("crear inmueble como agencia (queda pendiente de aprobación si lo crea un agente)", async ({ page }) => {
     await demoLogin(page, /Agente/);
     const res = await apiAs(page, "POST", "listings", {

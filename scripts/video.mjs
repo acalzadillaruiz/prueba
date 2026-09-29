@@ -106,7 +106,7 @@ async function cliente() {
   await moveTo(page.locator("h1"), { pause: 600 });
   await caption("Pines con precio agrupados en clusters. Clic en un pin → vista previa.");
   const map = page.locator('svg[role="application"]').first();
-  await click(page.getByRole("button", { name: "Zoom in" }).first(), { after: 600 });
+  await click(page.getByRole("button", { name: /^(Acercar|Zoom in)$/ }).first(), { after: 600 });
   const pin = map.locator("g.cursor-pointer:not(:has(circle))").nth(3);
   await realClick(pin, { after: 1800 });
   await caption("Búsqueda en lenguaje natural con IA (funciona sin API key).", 800);
@@ -273,7 +273,8 @@ async function propietario() {
   await realClick(page.getByRole("button", { name: /Redactar con IA/ }), { after: 1800 });
   await realClick(page.getByRole("button", { name: "EN" }).first(), { after: 1500 });
   await realClick(page.getByRole("button", { name: /Continuar/ }));
-  await caption("Revisión: calidad de ficha y publicar.", 1800);
+  await caption("Revisión: calidad de ficha, confirmar que eres el propietario y publicar.", 1800);
+  await realClick(page.getByRole("checkbox", { name: /Confirmo que soy el propietario/ }), { after: 500 });
   await realClick(page.getByRole("button", { name: /Publicar ahora/ }), { after: 600 });
   await page.getByTestId("owner-published").waitFor({ timeout: 30000 });
   await wait(2200);

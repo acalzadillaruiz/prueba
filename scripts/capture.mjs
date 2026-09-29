@@ -41,7 +41,7 @@ const SHOTS = [
   { id: "05-search-nl", section: "Público", title: "Búsqueda en lenguaje natural: «ático con luz en Los Palos Grandes por menos de 180 mil»", path: "/es/search?type=SALE&zone=Los+Palos+Grandes&max=180000&kind=penthouse&q=%C3%A1tico+con+luz+en+Los+Palos+Grandes+por+menos+de+180+mil" },
   { id: "06-search-polygon", section: "Público", title: "Dibujar zona en el mapa (polígono)", path: "/es/search?type=SALE", act: drawPolygon },
   { id: "07-search-filters", section: "Público", title: "Más filtros: publicado, amoblado, mascotas, agencia verificada, amenidades", path: "/es/search?type=LONG_RENT", act: async (p) => p.getByRole("button", { name: /Más filtros/ }).click() },
-  { id: "08-search-pin", section: "Público", title: "Clic en un pin → tarjeta de vista previa", path: "/es/search?type=SALE", act: async (p) => { await p.getByRole("button", { name: "Zoom in" }).click(); await p.waitForTimeout(300); await clickPin(p); } },
+  { id: "08-search-pin", section: "Público", title: "Clic en un pin → tarjeta de vista previa", path: "/es/search?type=SALE", act: async (p) => { await p.getByRole("button", { name: /^(Acercar|Zoom in)$/ }).click(); await p.waitForTimeout(300); await clickPin(p); } },
   { id: "09-listing", section: "Público", title: "Ficha: galería, PlaceEstimate + comparables, mapa, historial de precio, zona", path: `/es/listing/${LPG}`, full: true },
   { id: "10-listing-gallery", section: "Público", title: "Galería a pantalla completa (fotos, plano, video, tour 360°, calle)", path: `/es/listing/${LPG}`, act: async (p) => p.locator("main button").first().click() },
   { id: "11-listing-plan", section: "Público", title: "Plano del inmueble", path: `/es/listing/${LPG}`, act: async (p) => { await p.getByRole("button", { name: /Plano/ }).first().click(); } },
@@ -63,7 +63,7 @@ const SHOTS = [
   { id: "26-owner-step4", section: "Propietario particular", title: "Asistente 4/6 · fotos, orden y portada", path: "/es/owner/new", as: "priv", act: (p) => wizardTo(p, 3, { photo: PHOTO }) },
   { id: "27-owner-step5", section: "Propietario particular", title: "Asistente 5/6 · PlaceEstimate en vivo + «Redactar con IA»", path: "/es/owner/new", as: "priv", act: async (p) => { await wizardTo(p, 4, { photo: PHOTO }); await p.getByRole("button", { name: /Redactar con IA/ }).click(); await p.waitForTimeout(1200); } },
   { id: "28-owner-step6", section: "Propietario particular", title: "Asistente 6/6 · revisión y calidad de ficha", path: "/es/owner/new", as: "priv", act: (p) => wizardTo(p, 5, { photo: PHOTO }) },
-  { id: "29-owner-published", section: "Propietario particular", title: "Publicado en Altamira", path: "/es/owner/new", as: "priv", act: async (p) => { await wizardTo(p, 5, { photo: PHOTO, address: "Av. San Juan Bosco, Res. Capturas, Altamira" }); await p.getByRole("button", { name: /Publicar ahora/ }).click(); await p.getByTestId("owner-published").waitFor({ timeout: 30000 }); } },
+  { id: "29-owner-published", section: "Propietario particular", title: "Publicado en Altamira", path: "/es/owner/new", as: "priv", act: async (p) => { await wizardTo(p, 5, { photo: PHOTO, address: "Av. San Juan Bosco, Res. Capturas, Altamira" }); await p.getByRole("checkbox", { name: /Confirmo que soy el propietario/ }).check(); await p.getByRole("button", { name: /Publicar ahora/ }).click(); await p.getByTestId("owner-published").waitFor({ timeout: 30000 }); } },
   { id: "30-owner-listings", section: "Propietario particular", title: "Mis inmuebles: estado del encargo, ofertas y chat con el agente", path: "/es/owner/listings", full: true, as: "priv" },
   // ── Agencia
   { id: "31-agency-dashboard", section: "Agencia", title: "Panel del dueño de agencia", path: "/es/agency", full: true, as: "owner" },
@@ -112,7 +112,8 @@ for (const s of SHOTS) {
   await page.goto(url, { waitUntil: "networkidle" });
   await page.waitForTimeout(500);
   if (s.act) {
-    await s.act(page);
+    // One broken interaction must not abort the whole gallery: capture what is on screen and report it.
+    await s.act(page).catch((e) => errors.push(`act: ${e.message.split("\n")[0]}`));
     await page.waitForTimeout(700);
   }
   const file = `${s.id}.jpg`;

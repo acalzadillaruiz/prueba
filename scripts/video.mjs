@@ -135,7 +135,7 @@ async function cliente() {
   await realClick(page.getByRole("button", { name: /Cerrar zona/ }), { after: 2400 });
   await caption("Abrimos la ficha del ático en Los Palos Grandes.");
   await go(LPG, 1500);
-  await caption("Ficha bilingüe: galería, plano, video, tour 360° y vista de calle.", 1500);
+  await caption("Ficha bilingüe: galería a pantalla completa y plano orientativo.", 1500);
   await realClick(page.locator("main button").first(), { after: 1000 });
   for (let i = 0; i < 3; i++) await realClick(page.locator('[role="dialog"] button:has(svg.lucide-chevron-right)'), { after: 700 });
   await realClick(page.locator('[role="dialog"] button', { hasText: "Plano" }), { after: 1500 });

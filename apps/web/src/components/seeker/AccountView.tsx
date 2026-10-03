@@ -70,7 +70,7 @@ export function AccountView({ locale, data }: { locale: Locale; data: AccountDat
           <Avatar initials={data.initials} hue={data.hue} size={64} />
           <div>
             <div className="font-display text-xl font-semibold">{f.name}</div>
-            <div className="flex flex-wrap items-center gap-2 text-sm text-ink/60">
+            <div className="flex flex-wrap items-center gap-2 text-sm text-muted">
               {data.email}
               {data.verified ? <Badge tone="ok"><BadgeCheck size={12} /> {tx(locale, "Email verificado", "Email verified")}</Badge> : <Badge tone="warn">{tx(locale, "Email sin verificar", "Email not verified")}</Badge>}
             </div>
@@ -88,7 +88,7 @@ export function AccountView({ locale, data }: { locale: Locale; data: AccountDat
           <Globe size={20} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" />
           <div className="flex-1">
             <div className="font-semibold">{tx(locale, "Idioma", "Language")}</div>
-            <div className="text-sm text-ink/65">{tx(locale, "Precios en USD con referencia en VES y EUR.", "Prices in USD with VES and EUR reference.")}</div>
+            <div className="text-sm text-muted">{tx(locale, "Precios en USD con referencia en VES y EUR.", "Prices in USD with VES and EUR reference.")}</div>
           </div>
           <select className="h-10 rounded-lg border border-line bg-white px-3" value={f.locale} onChange={(e) => setF({ ...f, locale: e.target.value as "es" | "en" })} aria-label={tx(locale, "Idioma", "Language")}>
             <option value="es">Español</option>
@@ -99,7 +99,7 @@ export function AccountView({ locale, data }: { locale: Locale; data: AccountDat
           <Lock size={20} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" />
           <div className="flex-1">
             <div className="font-semibold">{tx(locale, "Inicio de sesión", "Sign-in")}</div>
-            <div className="text-sm text-ink/65">
+            <div className="text-sm text-muted">
               {[data.providers.includes("google") && "Google", data.hasPassword && tx(locale, "email y contraseña", "email & password")].filter(Boolean).join(" · ") || "—"}
             </div>
           </div>

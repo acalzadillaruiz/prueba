@@ -50,7 +50,7 @@ export function StickyContactBar({ locale, price, suffix, tour, dark, whatsapp, 
       <div className="flex items-center gap-2">
         <div className="min-w-0 flex-1 font-serif text-[24px] font-semibold leading-tight">
           {price}
-          <span className={cn("font-display text-sm font-normal", dark ? "text-mist" : "text-ink/60")}>{suffix}</span>
+          <span className={cn("font-display text-sm font-normal", dark ? "text-mist" : "text-muted")}>{suffix}</span>
         </div>
         {whatsapp ? (
           <>

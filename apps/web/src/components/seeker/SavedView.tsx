@@ -30,7 +30,7 @@ export function SavedView({ locale, all }: { locale: Locale; all: Listing[] }) {
   const cmp = compare.map((id) => pool.find((l) => l.id === id)).filter(Boolean) as Listing[];
   // A sale price, a monthly rent and a nightly rate are different units: only pick a "best" price among like units.
   const sameUnit = new Set(cmp.map((l) => l.pricePeriod ?? "sale")).size <= 1;
-  const unit = (l: Listing) => <span className="text-xs font-normal text-ink/65">{priceSuffix(l, locale)}</span>;
+  const unit = (l: Listing) => <span className="text-xs font-normal text-muted">{priceSuffix(l, locale)}</span>;
   const ppm = (l: Listing) => (l.areaM2 > 0 ? l.priceAmount / l.areaM2 : NaN);
   const rows: [string, (l: Listing) => React.ReactNode, ((l: Listing) => number)?, ("min" | "max")?][] = [
     [tx(locale, "Precio", "Price"), (l) => <span className="font-serif text-[24px] font-medium leading-tight">{money(l.priceAmount, locale)}{unit(l)}</span>, sameUnit ? (l) => l.priceAmount : undefined, "min"],
@@ -54,7 +54,7 @@ export function SavedView({ locale, all }: { locale: Locale; all: Listing[] }) {
         <div>
           <div className={k.eyebrow}>{tx(locale, "Su colección privada", "Your private collection")}</div>
           <h1 className="mt-1 font-serif text-[40px] font-medium leading-[1.05] md:text-[48px]">{tx(locale, "Guardados", "Saved homes")}</h1>
-          <p className="mt-1 text-ink/60">{tx(locale, `${items.length} inmuebles · selecciona hasta 3 para comparar`, `${items.length} homes · pick up to 3 to compare`)}</p>
+          <p className="mt-1 text-muted">{tx(locale, `${items.length} inmuebles · selecciona hasta 3 para comparar`, `${items.length} homes · pick up to 3 to compare`)}</p>
         </div>
         <Button href={`/${locale}/alerts`} variant="outline" className={k.outline}>{tx(locale, "Mis alertas", "My alerts")}</Button>
       </div>
@@ -88,7 +88,7 @@ export function SavedView({ locale, all }: { locale: Locale; all: Listing[] }) {
                   const target = val ? (best === "min" ? Math.min(...vals) : Math.max(...vals)) : null;
                   return (
                     <tr key={label} className="border-t border-line">
-                      <td className="px-4 py-2.5 font-semibold text-ink/60">{label}</td>
+                      <td className="px-4 py-2.5 font-semibold text-muted">{label}</td>
                       {cmp.map((l, i) => (
                         <td key={l.id} className={cn("px-4 py-2.5", val && cmp.length > 1 && vals[i] === target && "bg-[#2F6B4F0F]")}>
                           {render(l)} {val && cmp.length > 1 && vals[i] === target && <Check size={13} className="ml-1 inline text-ok" />}
@@ -99,9 +99,9 @@ export function SavedView({ locale, all }: { locale: Locale; all: Listing[] }) {
                 })}
                 {keyAmen.map((a) => (
                   <tr key={a} className="border-t border-line">
-                    <td className="px-4 py-2 text-ink/60">{lbl(AMENITY_LABEL[a], locale)}</td>
+                    <td className="px-4 py-2 text-muted">{lbl(AMENITY_LABEL[a], locale)}</td>
                     {cmp.map((l) => (
-                      <td key={l.id} className="px-4 py-2">{l.amenities.includes(a) ? <Check size={16} className="text-ok" /> : <Minus size={16} className="text-ink/50" aria-label={tx(locale, "No", "No")} />}</td>
+                      <td key={l.id} className="px-4 py-2">{l.amenities.includes(a) ? <Check size={16} className="text-ok" /> : <Minus size={16} className="text-muted" aria-label={tx(locale, "No", "No")} />}</td>
                     ))}
                   </tr>
                 ))}

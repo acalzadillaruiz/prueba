@@ -87,7 +87,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
         <div>
           <div className={k.eyebrow}>{tx(locale, "Vender con nosotros", "Sell with us")}</div>
           <h1 className="mt-1 font-serif text-[40px] font-medium leading-[1.05] md:text-[48px]">{tx(locale, "Mis inmuebles", "My properties")}</h1>
-          <p className="mt-1 text-ink/60">{user?.name} · {tx(locale, "propietario particular", "private owner")}</p>
+          <p className="mt-1 text-muted">{user?.name} · {tx(locale, "propietario particular", "private owner")}</p>
         </div>
         <Button href={`/${locale}/owner/new`}><Plus size={16} /> {tx(locale, "Publicar otro", "List another")}</Button>
       </div>
@@ -123,7 +123,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
                 <div className="font-serif text-[24px] font-medium leading-tight">{tx(locale, `Encargo a ${m.agencyName}`, `Mandate with ${m.agencyName}`)}</div>
                 <Badge tone={m.status === "ACTIVE" ? "ok" : m.status === "CANCELLED" ? "danger" : "warn"}>{tx(locale, ...MANDATE_LABEL[m.status])}</Badge>
               </div>
-              <div className="mt-1 text-sm text-ink/65">{listings.find((l) => l.id === m.listingId)?.[locale === "es" ? "title_es" : "title_en"]}</div>
+              <div className="mt-1 text-sm text-muted">{listings.find((l) => l.id === m.listingId)?.[locale === "es" ? "title_es" : "title_en"]}</div>
               <ol className="mt-5 grid grid-cols-3 gap-2">
                 {[
                   [tx(locale, "Solicitado", "Requested"), <TimeAgo key="t" iso={m.createdAt} locale={locale} />],
@@ -133,7 +133,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
                   <li key={i}>
                     <div className={cn("h-1.5 rounded-full", i <= stageIdx[m.status] ? "bg-navy dark:bg-ivory" : "bg-black/10")} />
                     <div className="mt-2 flex items-center gap-1.5 font-display text-sm font-semibold">{i <= stageIdx[m.status] ? <Check size={14} className="text-ok" /> : <span className="h-3 w-3 rounded-full border-2 border-black/20" />}{t}</div>
-                    <div className="text-xs text-ink/65">{d as React.ReactNode}</div>
+                    <div className="text-xs text-muted">{d as React.ReactNode}</div>
                   </li>
                 ))}
               </ol>
@@ -153,8 +153,8 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
                   <div className="p-5">
                     <div className="flex flex-wrap items-center gap-2">
                       <StatusPill status={l.status} review={l.review} locale={locale} />
-                      <span className="text-xs font-semibold text-ink/65">{isMandate ? tx(locale, "Encargo", "Mandate") : "FSBO"}</span>
-                      <span className="text-xs text-ink/65">· {l.photos?.length ?? 0} {tx(locale, "fotos", "photos")} · {tx(locale, "calidad", "quality")} {l.quality}</span>
+                      <span className="text-xs font-semibold text-muted">{isMandate ? tx(locale, "Encargo", "Mandate") : "FSBO"}</span>
+                      <span className="text-xs text-muted">· {l.photos?.length ?? 0} {tx(locale, "fotos", "photos")} · {tx(locale, "calidad", "quality")} {l.quality}</span>
                     </div>
                     <Link href={listingHref(locale, l)} className="mt-1 block font-serif text-[24px] font-medium leading-tight underline-offset-4 hover:underline">{tx(locale, l.title_es, l.title_en)}</Link>
                     {editing === l.id ? (
@@ -203,16 +203,16 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
                         {priceErr && <p id={`price-err-${l.id}`} role="alert" className="mt-1 text-xs font-semibold text-danger">{priceErr}</p>}
                       </form>
                     ) : (
-                      <div className="text-sm text-ink/65">{l.zone}, {l.city} · {money(l.priceAmount, locale)}{priceSuffix(l, locale)}</div>
+                      <div className="text-sm text-muted">{l.zone}, {l.city} · {money(l.priceAmount, locale)}{priceSuffix(l, locale)}</div>
                     )}
                     <div className="mt-3 grid grid-cols-4 gap-2 text-center">
                       {[[Eye, num(l.stats.impressions, locale), tx(locale, "vistas", "views")], [Heart, l.stats.saves, tx(locale, "guardados", "saves")], [Inbox, l.stats.leads, "leads"], [TrendingDown, `${Math.round(((l.priceAmount - l.estimate.mid) / l.estimate.mid) * 100)} %`, tx(locale, "vs estimado", "vs estimate")]].map(([I, v, t], i) => {
                         const Icon = I as React.ElementType;
                         return (
                           <div key={i} className="rounded-lg bg-ivory py-2">
-                            <Icon size={14} className="mx-auto text-ink/65" />
+                            <Icon size={14} className="mx-auto text-muted" />
                             <div className="font-display font-semibold">{v as string}</div>
-                            <div className="text-[11px] text-ink/65">{t as string}</div>
+                            <div className="text-[11px] text-muted">{t as string}</div>
                           </div>
                         );
                       })}
@@ -242,7 +242,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
                     )}
                     {ll.length > 0 && (
                       <div className="mt-4 rounded-lg border border-line" data-testid="owner-leads">
-                        <div className="border-b border-line px-3 py-2 text-xs font-bold uppercase tracking-wide text-ink/65">{tx(locale, "Contactos recibidos", "Enquiries received")} · {ll.length}</div>
+                        <div className="border-b border-line px-3 py-2 text-xs font-bold uppercase tracking-wide text-muted">{tx(locale, "Contactos recibidos", "Enquiries received")} · {ll.length}</div>
                         <ul className="divide-y divide-line">
                           {ll.slice(0, 5).map((ld) => (
                             <li key={ld.id} className="px-3 py-2.5 text-sm">
@@ -250,23 +250,23 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
                                 <span className="font-semibold">{ld.name}</span>
                                 <a href={`mailto:${ld.email}`} className="font-semibold text-navy underline decoration-navy/30 underline-offset-4">{ld.email}</a>
                                 {ld.phone && <a href={`tel:${ld.phone}`} className="font-semibold text-navy underline decoration-navy/30 underline-offset-4">{ld.phone}</a>}
-                                <TimeAgo iso={ld.createdAt} locale={locale} className="ml-auto text-xs text-ink/65" />
+                                <TimeAgo iso={ld.createdAt} locale={locale} className="ml-auto text-xs text-muted" />
                               </div>
                               <p className="mt-0.5 line-clamp-2 text-ink/70">{ld.message}</p>
                             </li>
                           ))}
                         </ul>
-                        {ll.length > 5 && <div className="border-t border-line px-3 py-2 text-[11px] text-ink/65">{tx(locale, `y ${ll.length - 5} más`, `and ${ll.length - 5} more`)}</div>}
+                        {ll.length > 5 && <div className="border-t border-line px-3 py-2 text-[11px] text-muted">{tx(locale, `y ${ll.length - 5} más`, `and ${ll.length - 5} more`)}</div>}
                       </div>
                     )}
                     {lo.length > 0 && (
                       <div className="mt-4 rounded-lg border border-line">
-                        <div className="border-b border-line px-3 py-2 text-xs font-bold uppercase tracking-wide text-ink/65">{tx(locale, "Ofertas recibidas", "Offers received")} · {lo.length}</div>
+                        <div className="border-b border-line px-3 py-2 text-xs font-bold uppercase tracking-wide text-muted">{tx(locale, "Ofertas recibidas", "Offers received")} · {lo.length}</div>
                         {lo.map((o) => (
                           <div key={o.id} className="flex flex-wrap items-center gap-3 px-3 py-2.5 text-sm">
                             <span className="font-display text-base font-semibold">{money(o.amount, locale)}</span>
-                            <span className="text-ink/65">{o.bidder}</span>
-                            <TimeAgo iso={o.createdAt} locale={locale} className="text-ink/65" />
+                            <span className="text-muted">{o.bidder}</span>
+                            <TimeAgo iso={o.createdAt} locale={locale} className="text-muted" />
                             <Badge tone={o.status === "ACCEPTED" ? "ok" : o.status === "REJECTED" ? "danger" : o.status === "COUNTERED" ? "warn" : "mist"} className="ml-auto">{tx(locale, ...OFFER_LABEL[o.status])}</Badge>
                             {o.status === "RECEIVED" && !isMandate && (
                               <span className="flex gap-1">
@@ -274,10 +274,10 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
                                 <Button size="sm" variant="ghost" disabled={busy === o.id} onClick={() => act(() => api(`offers/${o.id}`, { method: "PATCH", json: { status: "REJECTED" } }), o.id)}>{tx(locale, "Rechazar", "Reject")}</Button>
                               </span>
                             )}
-                            {o.note && <div className="w-full text-xs text-ink/65">{o.note}</div>}
+                            {o.note && <div className="w-full text-xs text-muted">{o.note}</div>}
                           </div>
                         ))}
-                        <div className="border-t border-line px-3 py-2 text-[11px] text-ink/65">{tx(locale, "Registro de ofertas. La firma se hace fuera de New Place en v1.", "Offer log. Signing happens outside New Place in v1.")}</div>
+                        <div className="border-t border-line px-3 py-2 text-[11px] text-muted">{tx(locale, "Registro de ofertas. La firma se hace fuera de New Place en v1.", "Offer log. Signing happens outside New Place in v1.")}</div>
                       </div>
                     )}
                   </div>
@@ -294,7 +294,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
                 <Avatar initials={otherName.split(" ").map((p) => p[0]).slice(0, 2).join("")} hue={other?.hue ?? 200} size={40} />
                 <div className="min-w-0 flex-1">
                   <div className="font-display font-semibold">{otherName}</div>
-                  <div className="truncate text-xs text-ink/65">{thread.subject}</div>
+                  <div className="truncate text-xs text-muted">{thread.subject}</div>
                 </div>
                 {live.data.threads.length > 1 && (
                   <select className="h-8 max-w-[160px] rounded-lg border border-line text-xs" value={thread.id} onChange={(e) => setActive(e.target.value)} aria-label={tx(locale, "Conversación", "Conversation")}>
@@ -311,18 +311,18 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
                   <div className="rounded-2xl rounded-bl-md bg-ivory px-3.5 py-2 text-sm">
                     <div className="text-xs font-semibold text-ink/70">{threadLead.name} · {threadLead.email}{threadLead.phone ? ` · ${threadLead.phone}` : ""}</div>
                     <div className="whitespace-pre-wrap">{threadLead.message}</div>
-                    <TimeAgo iso={threadLead.createdAt} locale={locale} className="mt-1 block text-[10px] text-ink/65" />
+                    <TimeAgo iso={threadLead.createdAt} locale={locale} className="mt-1 block text-[10px] text-muted" />
                   </div>
                 )}
                 {thread.messages.map((m) => (
                   <div key={m.id} className={cn("max-w-[85%] rounded-2xl px-3.5 py-2 text-sm", m.mine ? "ml-auto rounded-br-md bg-navy text-ivory" : "rounded-bl-md bg-ivory")}>
                     {m.body}
-                    <TimeAgo iso={m.at} locale={locale} className={cn("mt-1 block text-[10px]", m.mine ? "text-mist" : "text-ink/65")} />
+                    <TimeAgo iso={m.at} locale={locale} className={cn("mt-1 block text-[10px]", m.mine ? "text-mist" : "text-muted")} />
                   </div>
                 ))}
               </div>
               {threadLead && !other ? (
-                <div className="border-t border-line p-3 text-center text-sm text-ink/65">
+                <div className="border-t border-line p-3 text-center text-sm text-muted">
                   {tx(locale, "Escribió sin cuenta: responde por email o teléfono.", "Sent without an account: reply by email or phone.")}{" "}
                   <a href={`mailto:${threadLead.email}`} className="font-semibold font-semibold text-navy underline decoration-navy/30 underline-offset-4">{tx(locale, "Responder por email", "Reply by email")}</a>
                 </div>
@@ -352,10 +352,10 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
               </form>
               )}
               {chatErr && <div role="alert" className="mx-3 mb-2 rounded-lg bg-[#B3261E1A] px-3 py-2 text-xs text-danger">{chatErr}</div>}
-              <div className="pb-2 text-center text-[10px] text-ink/65">{tx(locale, "Inbox interno · se actualiza cada 15 s", "Internal inbox · refreshes every 15 s")}</div>
+              <div className="pb-2 text-center text-[10px] text-muted">{tx(locale, "Inbox interno · se actualiza cada 15 s", "Internal inbox · refreshes every 15 s")}</div>
             </>
           ) : (
-            <div className="m-auto p-6 text-center text-sm text-ink/65">{tx(locale, "Cuando un comprador o tu agente te escriba, verás la conversación aquí.", "When a buyer or your agent writes, the conversation shows up here.")}</div>
+            <div className="m-auto p-6 text-center text-sm text-muted">{tx(locale, "Cuando un comprador o tu agente te escriba, verás la conversación aquí.", "When a buyer or your agent writes, the conversation shows up here.")}</div>
           )}
         </Card>
       </div>

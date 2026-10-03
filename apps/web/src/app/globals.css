@@ -17,9 +17,9 @@
   --np-rosa: #F2DDD3;
   --np-mist: #A9B4C2;           /* muted text on navy */
   --np-gold: #B4935A;           /* fillets only; text uses --np-gold-text */
-  --np-gold-text: #8A6A35;
+  --np-gold-text: #735829;
   --np-ink: #162638;
-  --np-muted: #5E6673;
+  --np-muted: #535B66;
   --np-line: #DDD3C2;
   --np-ok: #2F6B4F;
   --np-warn: #8A5A00;
@@ -43,9 +43,9 @@
   --np-rosa-rgb: 242 221 211;
   --np-mist-rgb: 169 180 194;
   --np-gold-rgb: 180 147 90;
-  --np-gold-text-rgb: 138 106 53;
+  --np-gold-text-rgb: 115 88 41;
   --np-ink-rgb: 22 38 56;
-  --np-muted-rgb: 94 102 115;
+  --np-muted-rgb: 83 91 102;
   --np-line-rgb: 221 211 194;
   --np-ok-rgb: 47 107 79;
   --np-warn-rgb: 138 90 0;
@@ -70,6 +70,7 @@ h1, h2, h3 { text-wrap: balance; }
    so navy sections (hero, footer, trust strip) keep their Cal text. Committee dark panel:
    background #101C2B, surfaces #1E3048, text Cal, accent terracotta-light #E79A7F (6.8:1 on navy). */
 html.dark body { background: #101C2B; }
+html.dark { --np-muted-rgb: 169 180 194; }
 html.dark .np-public {
   --np-ink: #F8F5EF;
   --np-ink-rgb: 248 245 239;

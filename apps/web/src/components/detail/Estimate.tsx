@@ -13,7 +13,7 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
   const pos = at(l.priceAmount);
   const diff = ((l.priceAmount - e.mid) / e.mid) * 100;
   const verdict = Math.abs(diff) <= 4 ? tx(locale, "En línea con el mercado", "In line with the market") : diff > 0 ? tx(locale, `${diff.toFixed(0)} % sobre la estimación`, `${diff.toFixed(0)}% above estimate`) : tx(locale, `${Math.abs(diff).toFixed(0)} % bajo la estimación`, `${Math.abs(diff).toFixed(0)}% below estimate`);
-  const muted = dark ? "text-mist" : "text-ink/65";
+  const muted = dark ? "text-mist" : "text-muted";
   const conf = e.confidence >= 0.75 ? tx(locale, "Confianza alta", "High confidence") : e.confidence >= 0.5 ? tx(locale, "Confianza media", "Medium confidence") : tx(locale, "Confianza baja", "Low confidence");
   const inRange = l.priceAmount >= e.low && l.priceAmount <= e.high;
   return (
@@ -57,7 +57,7 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
           </div>
           <div className="overflow-x-auto rounded-lg border border-inherit">
             <table className="w-full whitespace-nowrap text-sm">
-              <thead className={cn("text-left text-xs", dark ? "bg-white/5 text-mist" : "bg-ivory text-ink/65")}>
+              <thead className={cn("text-left text-xs", dark ? "bg-white/5 text-mist" : "bg-ivory text-muted")}>
                 <tr>
                   <th className="px-3 py-2 font-semibold">{tx(locale, "Inmueble", "Property")}</th>
                   <th className="px-3 py-2 text-right font-semibold">m²</th>

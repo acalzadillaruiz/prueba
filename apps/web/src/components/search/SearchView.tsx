@@ -303,7 +303,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
           <div id="search-more-filters" className="np-in absolute inset-x-0 top-full max-h-[70vh] overflow-y-auto border-b border-line bg-white px-4 py-4 shadow-np md:px-5">
             <div className="mb-5 grid grid-cols-2 gap-3 sm:max-w-md">
               <label className="block">
-                <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-ink/65">{tx(locale, "Baños", "Bathrooms")}</span>
+                <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted">{tx(locale, "Baños", "Bathrooms")}</span>
                 <select value={baths ?? ""} onChange={(e) => set({ baths: e.target.value || null })} className={cn(pill, "w-full appearance-none border-line bg-white", baths && on)}>
                   <option value="">{tx(locale, "Cualquiera", "Any")}</option>
                   {[1, 2, 3, 4].map((b) => (
@@ -312,7 +312,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
                 </select>
               </label>
               <label className="block">
-                <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-ink/65">{tx(locale, "Superficie mínima", "Min. area")}</span>
+                <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted">{tx(locale, "Superficie mínima", "Min. area")}</span>
                 <select value={minM2 ?? ""} onChange={(e) => set({ m2: e.target.value || null })} className={cn(pill, "w-full appearance-none border-line bg-white", minM2 && on)}>
                   <option value="">{tx(locale, "Cualquiera", "Any")}</option>
                   {MIN_M2_STEPS.map((v) => (
@@ -323,7 +323,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
             </div>
             <div className="grid gap-6 md:grid-cols-4">
               <div>
-                <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink/65">{tx(locale, "Publicado", "Published")}</div>
+                <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">{tx(locale, "Publicado", "Published")}</div>
                 <div className="flex gap-2">
                   {[["24h", "24 h"], ["7d", tx(locale, "7 días", "7 days")]].map(([k, v]) => (
                     <button key={k} onClick={() => set({ pub: pub === k ? null : k })} className={cn(pill, pub === k ? on : "border-line")}>{v}</button>
@@ -331,7 +331,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
                 </div>
               </div>
               <div>
-                <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink/65">{tx(locale, "Condiciones", "Conditions")}</div>
+                <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">{tx(locale, "Condiciones", "Conditions")}</div>
                 <div className="flex flex-wrap gap-2">
                   <button onClick={() => set({ furnished: furnished ? null : "1" })} className={cn(pill, furnished ? on : "border-line")}>{tx(locale, "Amoblado", "Furnished")}</button>
                   <button onClick={() => set({ pets: pets ? null : "1" })} className={cn(pill, pets ? on : "border-line")}>{tx(locale, "Mascotas", "Pets")}</button>
@@ -339,7 +339,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
                 </div>
               </div>
               <div className="md:col-span-2">
-                <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink/65">{tx(locale, "Amenidades", "Amenities")}</div>
+                <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">{tx(locale, "Amenidades", "Amenities")}</div>
                 <div className="flex flex-wrap gap-2">
                   {FILTER_AMENITIES.map((a) => {
                     const sel = amen.includes(a);
@@ -423,10 +423,10 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
             <div className="flex items-center justify-between gap-2">
               <div>
                 <div className="font-serif text-[26px] leading-tight">
-                  {plural(query.data?.total ?? results.length, locale, ["resultado", "resultados"], ["result", "results"])}{query.isFetching && <Loader2 size={15} className="ml-2 inline animate-spin text-ink/65" />}
+                  {plural(query.data?.total ?? results.length, locale, ["resultado", "resultados"], ["result", "results"])}{query.isFetching && <Loader2 size={15} className="ml-2 inline animate-spin text-muted" />}
                   {shape && <span className="ml-2 inline-block rounded-full bg-[#A9C6D8] px-2.5 py-0.5 align-middle font-display text-xs font-semibold text-[#1F4A63]">{tx(locale, "en tu zona dibujada", "in your drawn area")}</span>}
                 </div>
-                <div className="text-sm text-ink/60">{tx(locale, "Precios en USD · actualizados en tiempo real", "Prices in USD · updated in real time")}</div>
+                <div className="text-sm text-muted">{tx(locale, "Precios en USD · actualizados en tiempo real", "Prices in USD · updated in real time")}</div>
               </div>
               <select value={sort} onChange={(e) => set({ sort: e.target.value === "new" ? null : e.target.value })} aria-label={tx(locale, "Ordenar por", "Sort by")} className="h-11 rounded-full border border-line bg-white px-3 text-sm md:h-9">
                 <option value="new">{tx(locale, "Más nuevos", "Newest")}</option>

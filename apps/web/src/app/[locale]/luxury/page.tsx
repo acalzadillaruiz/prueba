@@ -54,7 +54,7 @@ export default async function LuxuryPage({ params }: { params: Promise<{ locale:
       <section className="mx-auto max-w-[1320px] px-4 py-20 md:px-8 lg:py-28">
         <div className="mb-10 flex flex-wrap items-end justify-between gap-4 border-b border-line pb-6">
           <h2 className="text-[36px] leading-tight md:text-[48px]">{tx(locale, "La colección", "The collection")}</h2>
-          <p className="max-w-md text-[15px] text-ink/65">{tx(locale, "Cada residencia, con su asesor verificado y su valoración PlaceEstimate.", "Every residence comes with its verified advisor and its PlaceEstimate valuation.")}</p>
+          <p className="max-w-md text-[15px] text-muted">{tx(locale, "Cada residencia, con su asesor verificado y su valoración PlaceEstimate.", "Every residence comes with its verified advisor and its PlaceEstimate valuation.")}</p>
         </div>
         {!hero ? (
           <EmptyState monogram title={tx(locale, "La colección se está renovando", "The collection is being renewed")} body={tx(locale, "Pida acceso y le avisaremos de las nuevas residencias en privado.", "Request access and we’ll tell you privately about new residences.")} />
@@ -74,7 +74,7 @@ export default async function LuxuryPage({ params }: { params: Promise<{ locale:
                   <span className="font-serif text-[28px] leading-tight md:text-[32px]">{tx(locale, l.title_es, l.title_en)}</span>
                   <span className="font-serif text-[26px] font-semibold text-ink">{money(l.priceAmount, locale)}</span>
                 </div>
-                <div className="mt-1 text-[15px] text-ink/60">{l.zone}, {l.city} · {factsLine(l, locale).join(" · ")}</div>
+                <div className="mt-1 text-[15px] text-muted">{l.zone}, {l.city} · {factsLine(l, locale).join(" · ")}</div>
               </Link>
               );
             })}

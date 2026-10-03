@@ -148,7 +148,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
             <Field label={tx(locale, "Contraseña", "Password")} error={fieldError(errs.password, locale, "password")} hint={(mode === "register" ? tx(locale, "Mínimo 8 caracteres.", "At least 8 characters.") : undefined)}>
               <div className="relative">
                 <input className={inputCls} type={show ? "text" : "password"} {...register("password")} aria-invalid={!!errs.password} autoComplete={mode === "login" ? "current-password" : "new-password"} />
-                <button type="button" onClick={() => setShow(!show)} className="absolute right-1 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center text-ink/65" aria-label={tx(locale, "Mostrar contraseña", "Show password")}>{show ? <EyeOff size={18} /> : <Eye size={18} />}</button>
+                <button type="button" onClick={() => setShow(!show)} className="absolute right-1 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center text-muted" aria-label={tx(locale, "Mostrar contraseña", "Show password")}>{show ? <EyeOff size={18} /> : <Eye size={18} />}</button>
               </div>
             </Field>
             {mode === "register" && !inv && (
@@ -156,7 +156,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
                 <input type="checkbox" checked={agency} onChange={(e) => setAgency(e.target.checked)} className="mt-1 h-4 w-4 accent-navy" />
                 <span>
                   <span className="flex items-center gap-1.5 font-display font-semibold"><Building2 size={16} strokeWidth={1.7} /> {tx(locale, "¿Eres agencia?", "Are you an agency?")}</span>
-                  <span className="text-sm text-ink/65">{tx(locale, "Crea tu inmobiliaria y empieza con el plan Free.", "Set up your agency on the Free plan.")}</span>
+                  <span className="text-sm text-muted">{tx(locale, "Crea tu inmobiliaria y empieza con el plan Free.", "Set up your agency on the Free plan.")}</span>
                 </span>
               </label>
             )}

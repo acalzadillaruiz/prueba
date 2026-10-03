@@ -82,7 +82,7 @@ export function MobileTabBar({ locale }: { locale: Locale }) {
       <ul className="grid grid-cols-4">
         {items.map(({ href, label, Icon, active, badge }) => (
           <li key={label}>
-            <Link href={href} aria-current={active ? "page" : undefined} className={cn("relative flex h-16 flex-col items-center justify-center gap-1 font-display text-[13px]", active ? "text-ink" : "text-ink/60")}>
+            <Link href={href} aria-current={active ? "page" : undefined} className={cn("relative flex h-16 flex-col items-center justify-center gap-1 font-display text-[13px]", active ? "text-ink" : "text-muted")}>
               {active && <RoofGlyph className="absolute top-1.5 h-[6px] w-[18px]" />}
               <span className="relative">
                 <Icon size={21} strokeWidth={1.6} aria-hidden />

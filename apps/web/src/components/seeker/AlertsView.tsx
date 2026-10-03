@@ -54,7 +54,7 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
       <div>
         <div className={k.eyebrow}>{tx(locale, "Avisos a su medida", "Tailored notices")}</div>
         <h1 className="mt-1 font-serif text-[40px] font-medium leading-[1.05] md:text-[48px]">{tx(locale, "Alertas de búsqueda", "Search alerts")}</h1>
-        <p className="mt-1 text-ink/60">{tx(locale, "Te avisamos cuando entra algo nuevo o baja de precio.", "We’ll tell you when something new lands or drops in price.")}</p>
+        <p className="mt-1 text-muted">{tx(locale, "Te avisamos cuando entra algo nuevo o baja de precio.", "We’ll tell you when something new lands or drops in price.")}</p>
         {error && <div role="alert" className="mt-4 rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-sm text-danger">{error}</div>}
         <div className="mt-6 space-y-3">
           {items.map((s) => (
@@ -62,7 +62,7 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
               <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-egeo/40 text-navy dark:bg-white/10 dark:text-ivory">{s.polygon || /(^|&)(poly|radius)=/.test(s.query) ? <MapPin size={20} strokeWidth={1.6} /> : <Bell size={20} strokeWidth={1.6} />}</span>
               <div className="min-w-0 flex-1">
                 <div className="font-serif text-[22px] font-medium leading-tight">{s.name}</div>
-                <div className="text-sm text-ink/65">
+                <div className="text-sm text-muted">
                   {freq[s.frequency]} · {s.lastSentAt ? `${tx(locale, "último envío", "last sent")} ${ago(s.lastSentAt, locale)}` : tx(locale, "sin envíos aún", "nothing sent yet")}
                 </div>
               </div>
@@ -98,16 +98,16 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
       <aside>
         <Card className={cn(k.card, "border-0 p-5")}>
           <div className="flex items-center gap-2 font-serif text-[24px] font-medium leading-tight"><Mail size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Enviados", "Sent")}</div>
-          <p className="mt-1 text-xs text-ink/65">{tx(locale, "Correos de tu cuenta («Simulado» = sin proveedor de email configurado)", "Your account’s emails (“Simulated” = no email provider configured)")}</p>
+          <p className="mt-1 text-xs text-muted">{tx(locale, "Correos de tu cuenta («Simulado» = sin proveedor de email configurado)", "Your account’s emails (“Simulated” = no email provider configured)")}</p>
           <ul className="mt-4 divide-y divide-line">
             {emails.map((e) => (
               <li key={e.id} className="py-3">
                 <div className="flex items-center justify-between gap-2">
                   <Badge tone={e.kind === "TOUR" ? "ok" : "mist"} className={e.kind === "ALERT" ? "bg-[#E6EBF1] text-navy dark:bg-white/10" : undefined}>{e.kind}</Badge>
-                  <span className="text-xs text-ink/65">{ago(e.at, locale)}</span>
+                  <span className="text-xs text-muted">{ago(e.at, locale)}</span>
                 </div>
                 <div className="mt-1.5 text-sm font-semibold">{e.subject}</div>
-                <div className="text-xs text-ink/65">{e.to} · {EMAIL_STATUS_LABEL[e.status as keyof typeof EMAIL_STATUS_LABEL] ? lbl(EMAIL_STATUS_LABEL[e.status as keyof typeof EMAIL_STATUS_LABEL], locale) : e.status}</div>
+                <div className="text-xs text-muted">{e.to} · {EMAIL_STATUS_LABEL[e.status as keyof typeof EMAIL_STATUS_LABEL] ? lbl(EMAIL_STATUS_LABEL[e.status as keyof typeof EMAIL_STATUS_LABEL], locale) : e.status}</div>
               </li>
             ))}
           </ul>

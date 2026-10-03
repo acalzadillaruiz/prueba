@@ -55,7 +55,7 @@ export function PlacesSearch({ locale, zones, value, onPick }: { locale: Locale;
         <option value="VE">🇻🇪 Venezuela</option>
       </select>
       <div className="relative flex-1">
-        <Search size={17} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink/65" />
+        <Search size={17} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
         <input
           className={cn(inputCls, "pl-10")}
           value={q}
@@ -74,11 +74,11 @@ export function PlacesSearch({ locale, zones, value, onPick }: { locale: Locale;
                 <MapPin size={17} className="mt-0.5 text-coral" />
                 <span>
                   <span className="block font-semibold">{q.trim() || z.name}</span>
-                  <span className="text-sm text-ink/65">{z.name}, {z.city}, {z.state}, Venezuela</span>
+                  <span className="text-sm text-muted">{z.name}, {z.city}, {z.state}, Venezuela</span>
                 </span>
               </button>
             ))}
-            <div className="border-t border-line px-4 py-1.5 text-right text-[10px] text-ink/65">{tx(locale, "Geocodificador local · añade NEXT_PUBLIC_GOOGLE_MAPS_KEY para Google Places", "Local geocoder · set NEXT_PUBLIC_GOOGLE_MAPS_KEY for Google Places")}</div>
+            <div className="border-t border-line px-4 py-1.5 text-right text-[10px] text-muted">{tx(locale, "Geocodificador local · añade NEXT_PUBLIC_GOOGLE_MAPS_KEY para Google Places", "Local geocoder · set NEXT_PUBLIC_GOOGLE_MAPS_KEY for Google Places")}</div>
           </div>
         )}
       </div>

@@ -66,7 +66,8 @@ export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: bo
     <>
       {/* Main photo with the brand's arched top-left corner; four thumbnails on the right (desktop). */}
       <div className={cn("grid h-[320px] gap-3 sm:h-[420px] md:h-[540px] lg:h-[600px]", thumbs.length > 0 && "md:grid-cols-2")}>
-        <button onClick={() => show(0)} className="np-arch-tl relative block overflow-hidden bg-arena" aria-label={view(1)}>
+        <button onClick={() => show(0)} className="np-arch-tl relative block overflow-hidden bg-arena">
+          <span className="sr-only">{view(1)}</span>
           <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} sizes="(max-width: 768px) 100vw, 50vw" priority className="h-full w-full transition-transform duration-700 hover:scale-[1.02]" />
           {tag}
           <span className="absolute right-3 top-3 rounded-full bg-white/95 px-3.5 py-1.5 font-display text-[13px] font-semibold text-[#162638] md:hidden">{allLabel}</span>
@@ -81,8 +82,9 @@ export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: bo
                   "relative overflow-hidden rounded-2xl bg-arena",
                   arr.length === 3 && n === 2 && "col-span-2",
                 )}
-                aria-label={view(n + 2)}
+                aria-label={n === arr.length - 1 ? undefined : view(n + 2)}
               >
+                {n === arr.length - 1 && <span className="sr-only">{view(n + 2)}</span>}
                 <PropertyArt scene={sc} seed={l.id + n} photo={listingPhoto(l, n + 1)} className="h-full w-full transition-transform duration-700 hover:scale-[1.03]" />
                 {n === arr.length - 1 && (
                   <span className="absolute bottom-4 right-4 rounded-full bg-white/95 px-4 py-2 font-display text-[14px] font-semibold text-[#162638] shadow-sm">

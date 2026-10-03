@@ -109,7 +109,7 @@ export function HubOffers({ locale, offers: initial, offerable, listingById, onC
           {errors.form && <div role="alert" className="rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-sm text-danger sm:col-span-2">{errors.form}</div>}
         </form>
       ) : (
-        <p className="mt-3 text-sm text-ink/65">{tx(locale, "Para ofertar, primero escribe al agente o pide una visita desde la ficha del inmueble.", "To make an offer, first message the agent or book a tour from the listing.")}</p>
+        <p className="mt-3 text-sm text-muted">{tx(locale, "Para ofertar, primero escribe al agente o pide una visita desde la ficha del inmueble.", "To make an offer, first message the agent or book a tour from the listing.")}</p>
       )}
 
       <div className="mt-5">
@@ -128,7 +128,7 @@ export function HubOffers({ locale, offers: initial, offerable, listingById, onC
                     ) : (
                       <div className="line-clamp-1 font-semibold">{listingTitle(o.listingId)}</div>
                     )}
-                    <div className="text-sm text-ink/65">{ago(o.createdAt, locale)}{o.note ? ` · ${o.note}` : ""}</div>
+                    <div className="text-sm text-muted">{ago(o.createdAt, locale)}{o.note ? ` · ${o.note}` : ""}</div>
                   </div>
                   <div className="font-display font-semibold">{money(o.amount, locale)}</div>
                   <Badge tone={st.tone}>{tx(locale, st.es, st.en)}</Badge>

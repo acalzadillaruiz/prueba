@@ -85,13 +85,13 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
     }
   };
 
-  const muted = dark ? "text-mist" : "text-ink/65";
+  const muted = dark ? "text-mist" : "text-muted";
   const field = cn(inputCls, "h-12 rounded-xl border-[#DDD3C2]", dark && "border-navy-line bg-navy-2 text-ivory");
   const wa = whatsappHref(l, locale);
   const first = agent?.name.split(" ")[0] ?? agency?.name ?? "";
   const initials = (agent?.name ?? agency?.name ?? "NP").split(" ").map((p) => p[0]).slice(0, 2).join("");
   const box = dark ? "bg-navy-card text-ivory ring-navy-line" : "bg-white ring-black/[.04]";
-  const seg = (active: boolean) => cn("flex min-h-11 items-center justify-center gap-1.5 rounded-full border-2 font-display text-sm transition-colors duration-np", active ? "np-sel font-semibold" : "border-transparent text-ink/65 hover:text-ink");
+  const seg = (active: boolean) => cn("flex min-h-11 items-center justify-center gap-1.5 rounded-full border-2 font-display text-sm transition-colors duration-np", active ? "np-sel font-semibold" : "border-transparent text-muted hover:text-ink");
 
   if (done !== null)
     return (
@@ -158,14 +158,14 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
                     setIso(null);
                   }}
                   aria-pressed={day === i}
-                  aria-label={fmt(d.date, { weekday: "long", day: "numeric", month: "long" })}
                   data-month={fmt(d.date, { month: "short" }).replace(".", "")}
                   className={cn(
-                    "min-w-[62px] flex-1 rounded-xl border px-2 py-2.5 text-center font-display text-sm first-letter:uppercase after:mt-0.5 after:block after:text-[13px] after:text-ink/60 after:content-[attr(data-month)]",
+                    "min-w-[62px] flex-1 rounded-xl border px-2 py-2.5 text-center font-display text-sm first-letter:uppercase after:mt-0.5 after:block after:text-[13px] after:text-muted after:content-[attr(data-month)]",
                     day === i ? "np-sel border-2" : dark ? "border-navy-line" : "border-[#DDD3C2] hover:border-navy/50",
                   )}
                 >
                   <span className="block">{label.slice(0, cut)}</span> <span className="mt-0.5 block font-serif text-[24px] font-semibold leading-none">{label.slice(cut + 1)}</span>
+                  <span className="sr-only">{fmt(d.date, { weekday: "long", day: "numeric", month: "long" })}</span>
                 </button>
               );
             })}

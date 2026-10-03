@@ -123,7 +123,7 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
       <section id="explorar" className="mx-auto max-w-[1320px] px-4 pt-20 md:px-8 lg:pt-28">
         <div className="mb-8 grid items-end gap-4 md:grid-cols-[1fr_auto] lg:mb-10">
           <h2 className="text-[36px] leading-tight md:text-[48px]">{tx(locale, "Explore en el mapa", "Explore on the map")}</h2>
-          <p className="max-w-[380px] text-[15px] leading-relaxed text-ink/65 md:text-right">
+          <p className="max-w-[380px] text-[15px] leading-relaxed text-muted md:text-right">
             {tx(locale, "Precio por m² calculado con las propiedades publicadas en cada zona. Dibuje su zona ideal y reciba avisos.", "Price per m² computed from the properties listed in each area. Draw your ideal area and get alerts.")}
           </p>
         </div>
@@ -139,13 +139,13 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
                   <span className="flex min-w-0 flex-1 items-center justify-between gap-3 px-4 py-4 sm:px-5">
                     <span className="min-w-0">
                       <span className="block font-serif text-[22px] leading-tight sm:text-[25px]">{z.zone}</span>
-                      <span className="block text-sm text-ink/60">
+                      <span className="block text-sm text-muted">
                         {z.stats.activeListings > 0 ? plural(z.stats.activeListings, locale, ["propiedad", "propiedades"], ["property", "properties"]) : tx(locale, "Próximamente", "Coming soon")}
                       </span>
                     </span>
                     <span className="shrink-0 text-right">
                       <span className="block font-display text-[15px] font-semibold text-ink">{money(z.stats.salePpm, locale)}</span>
-                      <span className="block text-sm text-ink/55">{tx(locale, "por m²", "per m²")}</span>
+                      <span className="block text-sm text-muted">{tx(locale, "por m²", "per m²")}</span>
                     </span>
                   </span>
                 </Link>
@@ -176,7 +176,7 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
                 <span className="w-6 shrink-0 font-serif text-[28px] leading-none text-gold-text">{i + 1}</span>
                 <span>
                   <span className="block text-[15px] font-semibold text-ink">{title}</span>
-                  <span className="block text-sm text-ink/65">{body}</span>
+                  <span className="block text-sm text-muted">{body}</span>
                 </span>
               </li>
             ))}

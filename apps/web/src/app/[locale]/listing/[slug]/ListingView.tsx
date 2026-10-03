@@ -61,7 +61,7 @@ function Facts({ l, locale }: { l: Listing; locale: Locale }) {
     <dl className="flex flex-wrap gap-x-12 gap-y-5 border-y border-line py-6 lg:gap-x-14">
       {items.map(([v, t]) => (
         <div key={t} className="flex flex-col-reverse">
-          <dt className="mt-1 text-[13px] font-semibold uppercase tracking-[0.14em] text-ink/60">{t}</dt>
+          <dt className="mt-1 text-[13px] font-semibold uppercase tracking-[0.14em] text-muted">{t}</dt>
           <dd className="font-serif text-[30px] font-semibold leading-none text-ink">{v}</dd>
         </div>
       ))}
@@ -100,7 +100,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
       {/* Bottom padding on phones: the sticky contact bar never hides the last section. */}
       <div className="pb-28 md:pb-0">
         <div className="mx-auto max-w-[1320px] px-4 pt-5 md:px-8">
-          <nav aria-label={tx(locale, "Ruta de navegación", "Breadcrumb")} className="mb-3 flex flex-wrap items-center text-[15px] text-ink/65">
+          <nav aria-label={tx(locale, "Ruta de navegación", "Breadcrumb")} className="mb-3 flex flex-wrap items-center text-[15px] text-muted">
             <Link className="inline-flex min-h-11 items-center underline-offset-4 hover:text-ink hover:underline" href={`/${locale}/search?type=${searchType}`}>{lbl(TYPE_LABEL[l.listingType], locale)}</Link>
             {[l.state, l.city, l.zone].filter((x, i, a) => x && a.indexOf(x) === i).map((x) => (
               <span key={x}><span aria-hidden className="px-1.5">·</span>{x}</span>
@@ -142,18 +142,18 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
               </div>
             </div>
             <h1 className="mt-5 max-w-[760px] text-[38px] leading-[1.08] md:text-[52px]">{tx(locale, l.title_es, l.title_en)}</h1>
-            <p className="mt-2 text-[15px] text-ink/65">{l.address} · {l.zone}, {l.city}{l.state && l.state !== l.city ? `, ${l.state}` : ""}</p>
+            <p className="mt-2 text-[15px] text-muted">{l.address} · {l.zone}, {l.city}{l.state && l.state !== l.city ? `, ${l.state}` : ""}</p>
             <div className="mt-7 flex flex-wrap items-baseline gap-x-5 gap-y-1">
               <div className="font-serif text-[48px] font-semibold leading-none text-ink md:text-[58px]">
                 {money(l.priceAmount, locale)}
-                <span className="font-display text-lg font-normal text-ink/60">{priceSuffix(l, locale)}</span>
+                <span className="font-display text-lg font-normal text-muted">{priceSuffix(l, locale)}</span>
               </div>
-              <div className="text-[15px] text-ink/65">
+              <div className="text-[15px] text-muted">
                 {ppm ? `${money(ppm, locale)} / m² · ` : ""}≈ Bs. {num(Math.round(l.priceAmount * ves), locale)} · € {num(Math.round(l.priceAmount * eur), locale)} <span>({tx(locale, "tasa referencial", "reference rate")})</span>
               </div>
             </div>
             <div className="mt-8"><Facts l={l} locale={locale} /></div>
-            <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-ink/60">
+            <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted">
               <Freshness iso={l.updatedAt} locale={locale} />
               <span className="inline-flex items-center gap-1.5"><Eye size={15} aria-hidden /> {num(l.stats.impressions, locale)} {tx(locale, "vistas", "views")}</span>
               <span className="inline-flex items-center gap-1.5"><Heart size={15} aria-hidden /> {l.stats.saves} {tx(locale, "lo guardaron", "saves")}</span>
@@ -187,7 +187,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
             <div className={sec}>
               <H>{tx(locale, "Ubicación", "Location")}</H>
               <DetailMap l={mapListing(l)} locale={locale} nearby={nearby.map(mapListing)} />
-              <p className="mt-3 text-sm text-ink/60">
+              <p className="mt-3 text-sm text-muted">
                 {tx(locale, "Colegios y trayectos se muestran solo cuando hay datos verificados para la zona.", "Schools and commute times appear only when verified data exists for the area.")}
               </p>
             </div>
@@ -199,7 +199,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
               </div>
               <div>
                 <H>{tx(locale, `Informe de zona · ${l.zone}`, `Area report · ${l.zone}`)}</H>
-                <p className="-mt-3 mb-4 text-sm text-ink/60">{zone.live ? tx(locale, "Calculado con los anuncios publicados en New Place.", "Computed from listings published on New Place.") : tx(locale, "Pocos anuncios en la zona: valores de referencia.", "Few listings in this area: reference values.")}</p>
+                <p className="-mt-3 mb-4 text-sm text-muted">{zone.live ? tx(locale, "Calculado con los anuncios publicados en New Place.", "Computed from listings published on New Place.") : tx(locale, "Pocos anuncios en la zona: valores de referencia.", "Few listings in this area: reference values.")}</p>
                 <div className="grid grid-cols-2 gap-3">
                   {[
                     [money(zone.salePpm, locale), tx(locale, "USD/m² venta", "USD/m² sale")],
@@ -209,7 +209,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
                   ].map(([v, t]) => (
                     <div key={String(t)} className="rounded-xl border border-line bg-white p-4">
                       <div className="font-serif text-[26px] font-semibold leading-none">{v}</div>
-                      <div className="mt-1.5 text-sm text-ink/60">{t}</div>
+                      <div className="mt-1.5 text-sm text-muted">{t}</div>
                     </div>
                   ))}
                 </div>
@@ -223,7 +223,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
                   {soldNearby.map((s) => (
                     <div key={s.t} className="flex items-center justify-between gap-3 px-4 py-3 text-[15px]">
                       <span className="font-semibold">{s.t}</span>
-                      <span className="text-ink/60">{s.d}</span>
+                      <span className="text-muted">{s.d}</span>
                       <span className="font-serif text-lg font-semibold">{money(s.p, locale)}</span>
                     </div>
                   ))}

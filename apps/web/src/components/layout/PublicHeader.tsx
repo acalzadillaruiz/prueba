@@ -120,7 +120,7 @@ export function PublicHeader({ locale, variant = "light" }: { locale: Locale; va
           ))}
         </nav>
         <div className="ml-auto flex items-center gap-1.5">
-          <div className={cn("hidden items-center font-display text-[13px] font-semibold tracking-[0.16em] md:flex", dark ? "text-ivory/60" : "text-ink/55")}>
+          <div className={cn("hidden items-center font-display text-[13px] font-semibold tracking-[0.16em] md:flex", dark ? "text-ivory/60" : "text-muted")}>
             {(["es", "en"] as const).map((lng, i) => (
               <span key={lng} className="flex items-center">
                 {i > 0 && <span aria-hidden className="px-1">·</span>}

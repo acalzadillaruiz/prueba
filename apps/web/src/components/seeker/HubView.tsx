@@ -90,7 +90,7 @@ export function HubView({ locale, data }: { locale: Locale; data: HubData }) {
           <h1 className="mt-1 font-serif text-[40px] font-medium leading-[1.05] md:text-[48px]">{tx(locale, `Hola, ${me.name.split(" ")[0]}`, `Hi, ${me.name.split(" ")[0]}`)}</h1>
         </div>
         <div className="ml-auto w-full max-w-xs">
-          <div className="mb-1 flex justify-between text-sm"><span className="font-semibold">{tx(locale, "Tu avance", "Your progress")}</span><span className="text-ink/65">{doneCount}/5</span></div>
+          <div className="mb-1 flex justify-between text-sm"><span className="font-semibold">{tx(locale, "Tu avance", "Your progress")}</span><span className="text-muted">{doneCount}/5</span></div>
           <Progress value={(doneCount / 5) * 100} tone="ok" />
         </div>
       </div>
@@ -102,10 +102,10 @@ export function HubView({ locale, data }: { locale: Locale; data: HubData }) {
           <ol className="mt-4 space-y-3">
             {steps.map((s, i) => (
               <li key={i} className="flex items-start gap-3">
-                <span className={cn("mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold", s.done ? "bg-ok text-white" : "border-2 border-line text-ink/65")}>{s.done ? <Check size={14} /> : i + 1}</span>
+                <span className={cn("mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold", s.done ? "bg-ok text-white" : "border-2 border-line text-muted")}>{s.done ? <Check size={14} /> : i + 1}</span>
                 <div>
-                  <div className={cn("font-semibold", s.done && "text-ink/65 line-through")}>{s.t}</div>
-                  <div className="text-sm text-ink/65">{s.d}</div>
+                  <div className={cn("font-semibold", s.done && "text-muted line-through")}>{s.t}</div>
+                  <div className="text-sm text-muted">{s.d}</div>
                 </div>
               </li>
             ))}
@@ -127,7 +127,7 @@ export function HubView({ locale, data }: { locale: Locale; data: HubData }) {
                   <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="h-16 w-24 shrink-0 rounded-lg" />
                   <div className="min-w-0 flex-1">
                     <div className="line-clamp-1 font-semibold">{tx(locale, l.title_es, l.title_en)}</div>
-                    <div className="line-clamp-1 text-sm text-ink/60">{ld.message}</div>
+                    <div className="line-clamp-1 text-sm text-muted">{ld.message}</div>
                   </div>
                   <Badge tone={ld.stage === "NEW" ? "warn" : "ok"}>{ld.stage === "NEW" ? tx(locale, "Esperando respuesta", "Awaiting reply") : tx(locale, "En contacto", "In contact")}</Badge>
                 </div>
@@ -158,7 +158,7 @@ export function HubView({ locale, data }: { locale: Locale; data: HubData }) {
         {/* preapproval mock */}
         <Card className={cn(k.card, "border-0 p-5")}>
           <h2 className="flex items-center gap-2 font-serif text-[24px] font-medium leading-tight"><CircleDollarSign size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Precalificación (simulada)", "Pre-qualification (mock)")}</h2>
-          <p className="mt-1 text-xs text-ink/65">{tx(locale, "Referencial. New Place no origina créditos.", "For reference. New Place does not originate loans.")}</p>
+          <p className="mt-1 text-xs text-muted">{tx(locale, "Referencial. New Place no origina créditos.", "For reference. New Place does not originate loans.")}</p>
           <div className="mt-4 space-y-4 text-sm">
             <label className="block"><div className="flex justify-between"><span>{tx(locale, "Precio", "Price")}</span><b>{money(price, locale)}</b></div><input type="range" min={50000} max={500000} step={5000} value={price} onChange={(e) => setPrice(+e.target.value)} className="w-full accent-navy dark:accent-[#E79A7F]" aria-label={tx(locale, "Precio", "Price")} /></label>
             <label className="block"><div className="flex justify-between"><span>{tx(locale, "Inicial", "Down payment")}</span><b>{down} %</b></div><input type="range" min={10} max={70} value={down} onChange={(e) => setDown(+e.target.value)} className="w-full accent-navy dark:accent-[#E79A7F]" aria-label={tx(locale, "Inicial (%)", "Down payment (%)")} /></label>
@@ -198,7 +198,7 @@ export function HubView({ locale, data }: { locale: Locale; data: HubData }) {
               <Link href={`/${locale}/saved`} className={cn("text-sm", k.link)}>{tx(locale, "Ver todo", "See all")}</Link>
             </div>
             <div className="mt-4 space-y-3">
-              {saved.length === 0 && <p className="text-sm text-ink/65">{tx(locale, "Toca el corazón en cualquier ficha para guardarla.", "Tap the heart on any listing to save it.")}</p>}
+              {saved.length === 0 && <p className="text-sm text-muted">{tx(locale, "Toca el corazón en cualquier ficha para guardarla.", "Tap the heart on any listing to save it.")}</p>}
               {saved.slice(0, 4).map((id) => {
                 const l = listingById(id);
                 if (!l) return null;
@@ -207,7 +207,7 @@ export function HubView({ locale, data }: { locale: Locale; data: HubData }) {
                     <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="h-12 w-16 shrink-0 rounded-md" />
                     <div className="min-w-0">
                       <div className="line-clamp-1 text-sm font-semibold">{tx(locale, l.title_es, l.title_en)}</div>
-                      <div className="text-sm text-ink/65">{money(l.priceAmount, locale)} · {l.zone}</div>
+                      <div className="text-sm text-muted">{money(l.priceAmount, locale)} · {l.zone}</div>
                     </div>
                   </Link>
                 );
@@ -219,7 +219,7 @@ export function HubView({ locale, data }: { locale: Locale; data: HubData }) {
               <h2 className="flex items-center gap-2 font-serif text-[24px] font-medium leading-tight"><Bell size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Alertas", "Alerts")}</h2>
               <Link href={`/${locale}/alerts`} className={cn("text-sm", k.link)}>{tx(locale, "Gestionar", "Manage")}</Link>
             </div>
-            {SAVED_SEARCHES.length === 0 && <p className="mt-3 text-sm text-ink/65">{tx(locale, "Guarda una búsqueda desde el mapa y te avisamos.", "Save a search from the map and we’ll let you know.")}</p>}
+            {SAVED_SEARCHES.length === 0 && <p className="mt-3 text-sm text-muted">{tx(locale, "Guarda una búsqueda desde el mapa y te avisamos.", "Save a search from the map and we’ll let you know.")}</p>}
             {SAVED_SEARCHES.map((s) => (
               <div key={s.id} className="mt-3 flex items-center justify-between gap-2 text-sm">
                 <span className="line-clamp-1">{s.name}</span>
@@ -251,11 +251,11 @@ function TourRow({ t, l, locale, past }: { t: HubTour; l: Listing | undefined; l
       <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="h-16 w-24 shrink-0 rounded-lg" />
       <div className="min-w-0 flex-1">
         <Link href={`/${locale}/listing/${l.slug}`} className="line-clamp-1 font-semibold hover:underline">{tx(locale, l.title_es, l.title_en)}</Link>
-        <div className="text-sm text-ink/60">{l.address}</div>
+        <div className="text-sm text-muted">{l.address}</div>
         <div className="mt-0.5 flex items-center gap-1.5 text-sm"><Avatar initials={initials} hue={t.agentHue} size={18} /> {t.agentName}</div>
       </div>
       <div className="w-full sm:w-auto sm:text-right">
-        <div className={cn("font-display font-semibold first-letter:uppercase", past && "text-ink/65")}>{dateTime(t.start, locale)}</div>
+        <div className={cn("font-display font-semibold first-letter:uppercase", past && "text-muted")}>{dateTime(t.start, locale)}</div>
         <Badge tone={status.tone}>{status.label}</Badge>
       </div>
     </div>

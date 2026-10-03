@@ -50,13 +50,13 @@ export function ListingCard({ l, locale, compact, className, showCompare }: { l:
         <div className="flex items-baseline justify-between gap-2">
           <div className={cn("font-serif font-semibold leading-none text-navy", compact ? "text-[24px]" : "text-[27px]")}>
             {money(l.priceAmount, locale)}
-            <span className="font-display text-sm font-normal text-ink/60">{priceSuffix(l, locale)}</span>
+            <span className="font-display text-sm font-normal text-muted">{priceSuffix(l, locale)}</span>
           </div>
-          <span className="shrink-0 text-sm text-ink/55">{lbl(TYPE_LABEL[l.listingType], locale)}</span>
+          <span className="shrink-0 text-sm text-muted">{lbl(TYPE_LABEL[l.listingType], locale)}</span>
         </div>
         <div className="mt-2.5 line-clamp-1 text-[15px] font-semibold text-ink">{tx(locale, l.title_es, l.title_en)}</div>
-        <div className="mt-0.5 line-clamp-1 text-sm text-ink/60">{l.zone}, {l.city}</div>
-        <div className="mt-3.5 flex items-center justify-between gap-2 border-t border-line pt-3 text-sm text-ink/65">
+        <div className="mt-0.5 line-clamp-1 text-sm text-muted">{l.zone}, {l.city}</div>
+        <div className="mt-3.5 flex items-center justify-between gap-2 border-t border-line pt-3 text-sm text-muted">
           <span className="flex flex-wrap gap-x-4">
             {factsLine(l, locale).map((f) => (
               <span key={f}>{f}</span>
@@ -79,10 +79,10 @@ export function MapPreviewCard({ l, locale }: { l: Listing; locale: Locale }) {
       <div className="p-3.5">
         <div className="font-serif text-[22px] font-semibold leading-none text-navy">
           {money(l.priceAmount, locale)}
-          <span className="font-display text-sm font-normal text-ink/60">{priceSuffix(l, locale)}</span>
+          <span className="font-display text-sm font-normal text-muted">{priceSuffix(l, locale)}</span>
         </div>
         <div className="mt-1.5 line-clamp-1 text-sm font-semibold">{tx(locale, l.title_es, l.title_en)}</div>
-        <div className="text-sm text-ink/60">{factsLine(l, locale).join(" · ")}</div>
+        <div className="text-sm text-muted">{factsLine(l, locale).join(" · ")}</div>
       </div>
     </Link>
   );

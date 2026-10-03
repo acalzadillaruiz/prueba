@@ -116,6 +116,11 @@ for (const s of SHOTS) {
     await s.act(page).catch((e) => errors.push(`act: ${e.message.split("\n")[0]}`));
     await page.waitForTimeout(700);
   }
+  if (s.full) {
+    // Lazy sections (the home map mounts when scrolled into view): walk the page before the full-page shot.
+    await page.evaluate(async () => { for (let y = 0; y < document.body.scrollHeight; y += 600) { window.scrollTo(0, y); await new Promise((r) => setTimeout(r, 120)); } window.scrollTo(0, 0); });
+    await page.waitForTimeout(1500);
+  }
   const file = `${s.id}.jpg`;
   await page.screenshot({ path: OUT + file, fullPage: !!s.full, type: "jpeg", quality: 84 });
   index.push({ id: s.id, section: s.section, title: s.title, file, path: s.path, mobile: !!s.mobile });

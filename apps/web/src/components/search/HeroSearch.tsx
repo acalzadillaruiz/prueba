@@ -71,7 +71,7 @@ export function HeroSearch({ locale }: { locale: Locale }) {
     if (budget && !q.maxPrice) q.maxPrice = Number(budget);
     router.push(`/${locale}/search?${queryToParams(q, text).toString()}`);
   };
-  const label = "np-eyebrow block text-[10.5px] tracking-[0.18em] text-[#8A6A35]";
+  const label = "np-eyebrow block text-[10.5px] tracking-[0.18em] text-[#735829]";
   const field = "w-full bg-transparent font-display text-[15px] text-[#162638] placeholder:text-[#162638]/50 focus:outline-none";
   return (
     <form

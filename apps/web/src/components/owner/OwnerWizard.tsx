@@ -287,7 +287,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
       <div className="mx-auto max-w-xl px-4 py-20 text-center" data-testid="owner-published">
         <CheckCircle2 size={56} className="mx-auto text-ok" />
         <h1 className="mt-4 font-serif text-[36px] font-medium leading-[1.05] md:text-[44px]">{done.mode === "AGENCY" ? tx(locale, "Inmueble creado", "Listing created") : done.mode === "FSBO" ? (done.pending ? tx(locale, "Enviado a revisión", "Sent for review") : tx(locale, `¡Publicado en ${d.addr?.zone}!`, `Live in ${d.addr?.zone}!`)) : tx(locale, "Encargo enviado", "Request sent")}</h1>
-        <p className="mt-2 text-ink/60">
+        <p className="mt-2 text-muted">
           {done.mode === "AGENCY"
             ? user?.role === "AGENT"
               ? tx(locale, "Quedó pendiente de aprobación del backoffice.", "It’s pending backoffice approval.")
@@ -330,13 +330,13 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
         <div className="mb-6">
           <div className="mb-3 flex items-center justify-between text-sm">
             <span className="font-display font-semibold">{tx(locale, `Paso ${step + 1} de 6`, `Step ${step + 1} of 6`)} · {tx(locale, STEPS[step][0], STEPS[step][1])}</span>
-            <span className="text-ink/65">{tx(locale, "Borrador guardado en este dispositivo", "Draft saved on this device")}</span>
+            <span className="text-muted">{tx(locale, "Borrador guardado en este dispositivo", "Draft saved on this device")}</span>
           </div>
           <div className="grid grid-cols-6 gap-1.5">
             {STEPS.map((s, i) => (
               <button key={i} onClick={() => i <= step && setStep(i)} className="min-h-11 py-2 text-left" aria-label={tx(locale, s[0], s[1])} aria-current={i === step ? "step" : undefined}>
                 <div className={cn("h-1.5 rounded-full", i <= step ? "bg-navy dark:bg-ivory" : "bg-black/10")} />
-                <div className={cn("mt-1.5 hidden text-xs sm:block", i === step ? "font-semibold text-ink" : "text-ink/65")}>{tx(locale, s[0], s[1])}</div>
+                <div className={cn("mt-1.5 hidden text-xs sm:block", i === step ? "font-semibold text-ink" : "text-muted")}>{tx(locale, s[0], s[1])}</div>
               </button>
             ))}
           </div>
@@ -349,12 +349,12 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               <button className={opt(d.mode === "FSBO")} onClick={() => set({ mode: "FSBO" })}>
                 <User strokeWidth={1.6} className="text-navy dark:text-ivory" />
                 <div className="mt-2 font-display text-lg font-semibold">{tx(locale, "Publicar yo mismo", "List it myself")}</div>
-                <div className="text-sm text-ink/60">{tx(locale, "Gratis. Tú gestionas visitas y ofertas.", "Free. You handle tours and offers.")}</div>
+                <div className="text-sm text-muted">{tx(locale, "Gratis. Tú gestionas visitas y ofertas.", "Free. You handle tours and offers.")}</div>
               </button>
               <button className={opt(d.mode === "MANDATE")} onClick={() => set({ mode: "MANDATE" })}>
                 <Building2 strokeWidth={1.6} className="text-navy dark:text-ivory" />
                 <div className="mt-2 font-display text-lg font-semibold">{tx(locale, "Encargar a una agencia", "Hire an agency")}</div>
-                <div className="text-sm text-ink/60">{tx(locale, "Un agente verificado se encarga de todo.", "A verified agent handles everything.")}</div>
+                <div className="text-sm text-muted">{tx(locale, "Un agente verificado se encarga de todo.", "A verified agent handles everything.")}</div>
               </button>
             </div>}
             {d.mode === "MANDATE" && (
@@ -365,7 +365,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                       <span className="flex h-8 w-8 items-center justify-center rounded-lg font-display text-xs font-bold text-navy" style={{ background: a.color }}>{a.initials}</span>
                       <span className="font-semibold">{a.name}</span>
                     </div>
-                    <div className="mt-1 flex items-center gap-1 text-xs text-ink/65">{a.verified && <ShieldCheck size={12} className="text-ok" />} {a.verified ? tx(locale, "Verificada", "Verified") : tx(locale, "En verificación", "Pending verification")} · {a.commissionPct} %</div>
+                    <div className="mt-1 flex items-center gap-1 text-xs text-muted">{a.verified && <ShieldCheck size={12} className="text-ok" />} {a.verified ? tx(locale, "Verificada", "Verified") : tx(locale, "En verificación", "Pending verification")} · {a.commissionPct} %</div>
                   </button>
                 ))}
               </div>
@@ -410,7 +410,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               className="h-72 rounded-np"
               controls={false}
             />
-            {d.addr && <p className="text-xs text-ink/65">{tx(locale, "Toca el mapa para ajustar el punto exacto.", "Tap the map to fine-tune the exact point.")}</p>}
+            {d.addr && <p className="text-xs text-muted">{tx(locale, "Toca el mapa para ajustar el punto exacto.", "Tap the map to fine-tune the exact point.")}</p>}
             {d.addr && (
               <div className={cn("np-in flex flex-wrap items-center gap-3 rounded-np border p-3 text-sm", dup ? "border-warn/60 bg-[#8A5A0014]" : "border-[#2F6B4F55] bg-[#2F6B4F0D]")}>
                 {checking ? <Loader2 size={18} className="animate-spin" /> : dup ? <AlertTriangle size={18} className="text-warn" /> : <CheckCircle2 size={18} className="text-ok" />}
@@ -421,9 +421,9 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                     {dup.slug ? <Link className="font-semibold text-navy underline underline-offset-4" href={`/${locale}/listing/${dup.slug}`}>{dup.title}</Link> : tx(locale, "un inmueble en revisión o no público.", "a listing under review or not public.")}
                   </span>
                 ) : dupError ? (
-                  <span className="text-ink/65">· {tx(locale, "No pudimos verificar duplicados ahora; lo revisaremos al publicar.", "Couldn’t check for duplicates now; we’ll check again when you publish.")}</span>
+                  <span className="text-muted">· {tx(locale, "No pudimos verificar duplicados ahora; lo revisaremos al publicar.", "Couldn’t check for duplicates now; we’ll check again when you publish.")}</span>
                 ) : (
-                  <span className="text-ink/65">· {tx(locale, "Sin duplicados (fingerprint lat/lng + m² + dirección)", "No duplicates (fingerprint lat/lng + m² + address)")}</span>
+                  <span className="text-muted">· {tx(locale, "Sin duplicados (fingerprint lat/lng + m² + dirección)", "No duplicates (fingerprint lat/lng + m² + address)")}</span>
                 )}
               </div>
             )}
@@ -470,7 +470,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                 <input type="checkbox" checked={d.privateListing} onChange={(e) => set({ privateListing: e.target.checked })} className="mt-0.5 h-4 w-4 shrink-0 accent-navy dark:accent-[#E79A7F]" />
                 <span>
                   <span className="font-semibold">{tx(locale, "Anuncio privado", "Private listing")}</span>
-                  <span className="block text-ink/65">{tx(locale, "No aparece en el buscador ni en el mapa; solo quien tenga el enlace puede verlo.", "Hidden from search and the map; only people with the link can see it.")}</span>
+                  <span className="block text-muted">{tx(locale, "No aparece en el buscador ni en el mapa; solo quien tenga el enlace puede verlo.", "Hidden from search and the map; only people with the link can see it.")}</span>
                 </span>
               </label>
             )}
@@ -509,7 +509,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
             >
               <ImagePlus size={30} strokeWidth={1.5} className="text-navy dark:text-ivory" />
               <span className="mt-2 font-display font-semibold">{tx(locale, "Arrastra tus fotos o haz clic", "Drag your photos or click")}</span>
-              <span className="text-sm text-ink/65">JPG / PNG / WebP · {tx(locale, "máx. 12 MB c/u · ideal 8 a 20", "max 12 MB each · ideally 8 to 20")}</span>
+              <span className="text-sm text-muted">JPG / PNG / WebP · {tx(locale, "máx. 12 MB c/u · ideal 8 a 20", "max 12 MB each · ideally 8 to 20")}</span>
             </button>
             {fileNote && <p role="alert" className="text-sm font-semibold text-warn">{fileNote}</p>}
             {files.length > 0 && (
@@ -531,10 +531,10 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
             )}
             <div className="grid gap-2 text-sm sm:grid-cols-2">
               {[[files.length >= 8, tx(locale, `${files.length}/8 fotos recomendadas`, `${files.length}/8 recommended photos`)], [files.length > 0, tx(locale, "Portada elegida", "Cover set")]].map(([ok, t]) => (
-                <div key={String(t)} className={cn("flex items-center gap-2 rounded-lg border px-3 py-2", ok ? "border-[#2F6B4F55] text-ok" : "border-line text-ink/65")}>{ok ? <CheckCircle2 size={16} /> : <span className="h-4 w-4 rounded-full border-2 border-current" />}{t as string}</div>
+                <div key={String(t)} className={cn("flex items-center gap-2 rounded-lg border px-3 py-2", ok ? "border-[#2F6B4F55] text-ok" : "border-line text-muted")}>{ok ? <CheckCircle2 size={16} /> : <span className="h-4 w-4 rounded-full border-2 border-current" />}{t as string}</div>
               ))}
             </div>
-            {files.length === 0 && <p className="text-sm text-ink/65">{tx(locale, "Puedes continuar sin fotos y subirlas después desde «Mis inmuebles».", "You can continue without photos and add them later from “My properties”.")}</p>}
+            {files.length === 0 && <p className="text-sm text-muted">{tx(locale, "Puedes continuar sin fotos y subirlas después desde «Mis inmuebles».", "You can continue without photos and add them later from “My properties”.")}</p>}
           </div>
         )}
 
@@ -546,10 +546,10 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               {estimate ? (
                 <>
                   <div className="mt-2 font-serif text-[36px] font-medium leading-[1.05] md:text-[44px]">{money(estimate.low, locale)} – {money(estimate.high, locale)}</div>
-                  <div className="text-sm text-ink/65">{tx(locale, "Valor medio", "Mid value")} {money(estimate.mid, locale)} · {tx(locale, "confianza", "confidence")} {Math.round(estimate.confidence * 100)} % · {estimate.comparables.length} {tx(locale, "comparables", "comparables")}</div>
+                  <div className="text-sm text-muted">{tx(locale, "Valor medio", "Mid value")} {money(estimate.mid, locale)} · {tx(locale, "confianza", "confidence")} {Math.round(estimate.confidence * 100)} % · {estimate.comparables.length} {tx(locale, "comparables", "comparables")}</div>
                 </>
               ) : (
-                <div className="mt-2 flex items-center gap-2 text-ink/65"><Loader2 size={16} className="animate-spin" /> {tx(locale, "Calculando…", "Calculating…")}</div>
+                <div className="mt-2 flex items-center gap-2 text-muted"><Loader2 size={16} className="animate-spin" /> {tx(locale, "Calculando…", "Calculating…")}</div>
               )}
               <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto]">
                 <Field label={tx(locale, `Tu precio (USD${priceUnit})`, `Your price (USD${priceUnit})`)} error={priceErr ?? undefined}>
@@ -561,7 +561,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                   </div>
                 )}
               </div>
-              {fxVes > 0 && <div className="mt-2 text-xs text-ink/65">≈ Bs. {num(Math.round(d.price * fxVes), locale)} ({tx(locale, "tasa referencial", "reference rate")})</div>}
+              {fxVes > 0 && <div className="mt-2 text-xs text-muted">≈ Bs. {num(Math.round(d.price * fxVes), locale)} ({tx(locale, "tasa referencial", "reference rate")})</div>}
             </div>
             <div className="rounded-[18px] bg-white shadow-[0_8px_24px_rgba(22,38,56,.06)] p-5">
               <div className="flex flex-wrap items-center justify-between gap-2">
@@ -590,7 +590,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                 onChange={(e) => set({ copy: { ...d.copy, [lang === "es" ? "body_es" : "body_en"]: e.target.value } })}
               />
               {aiErr && <div role="alert" className="mt-2 rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-sm text-danger">{aiErr}</div>}
-              <div className="mt-2 text-xs text-ink/65">{tx(locale, "Si lo dejas vacío, generamos un texto base al publicar.", "Leave empty and we’ll generate a base text on publish.")}</div>
+              <div className="mt-2 text-xs text-muted">{tx(locale, "Si lo dejas vacío, generamos un texto base al publicar.", "Leave empty and we’ll generate a base text on publish.")}</div>
             </div>
           </div>
         )}
@@ -616,11 +616,11 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                   <PropertyArt scene={d.kind === "house" ? "house-dusk" : "tower-day"} seed="wiz" className="aspect-[4/3] w-full" />
                 )}
                 <div className="p-5">
-                  <div className="font-display text-2xl font-semibold">{money(d.price, locale)}<span className="text-sm font-normal text-ink/65">{priceUnit}</span></div>
+                  <div className="font-display text-2xl font-semibold">{money(d.price, locale)}<span className="text-sm font-normal text-muted">{priceUnit}</span></div>
                   <div className="font-semibold">{(lang === "es" ? d.copy.title_es : d.copy.title_en) || tx(locale, "(título automático)", "(auto title)")}</div>
-                  <div className="text-sm text-ink/65" data-testid="review-address">{address}</div>
+                  <div className="text-sm text-muted" data-testid="review-address">{address}</div>
                   <div className="mt-2 text-sm" data-testid="review-facts">{facts}</div>
-                  {extrasSummary && <div className="mt-1 text-sm text-ink/65">{extrasSummary}</div>}
+                  {extrasSummary && <div className="mt-1 text-sm text-muted">{extrasSummary}</div>}
                   <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#E6EBF1] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[.12em] text-navy">{d.mode === "AGENCY" ? tx(locale, "Inventario de la agencia", "Agency inventory") : d.mode === "FSBO" ? tx(locale, "Publicación directa (FSBO)", "For sale by owner") : tx(locale, "Encargo a agencia", "Agency mandate")}</div>
                 </div>
               </div>
@@ -630,12 +630,12 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               <Progress value={quality} tone="ok" className="mt-2" />
               <ul className="mt-3 grid gap-1.5 text-sm sm:grid-cols-2">
                 {[[files.length >= 8, tx(locale, "8+ fotos (+35)", "8+ photos (+35)")], [!!(d.copy.title_en && d.copy.body_en), tx(locale, "Bilingüe ES/EN (+20)", "Bilingual ES/EN (+20)")], [!!d.addr, tx(locale, "Geolocalizado (+20)", "Geolocated (+20)")], [false, tx(locale, "Plano (+15, después)", "Floor plan (+15, later)")]].map(([ok, t]) => (
-                  <li key={String(t)} className={cn("flex items-center gap-2", ok ? "text-ok" : "text-ink/65")}>{ok ? <Check size={15} /> : <span className="h-3.5 w-3.5 rounded-full border-2 border-current" />}{t as string}</li>
+                  <li key={String(t)} className={cn("flex items-center gap-2", ok ? "text-ok" : "text-muted")}>{ok ? <Check size={15} /> : <span className="h-3.5 w-3.5 rounded-full border-2 border-current" />}{t as string}</li>
                 ))}
               </ul>
             </div>
-            <label className="flex items-start gap-2 text-sm text-ink/65"><input type="checkbox" checked={confirm} onChange={(e) => setConfirm(e.target.checked)} className="mt-1 h-4 w-4 shrink-0 accent-navy dark:accent-[#E79A7F]" /> {tx(locale, "Confirmo que soy el propietario o tengo autorización para publicar.", "I confirm I’m the owner or authorised to list.")}</label>
-            {!confirm && <p className="text-xs text-ink/65">{tx(locale, "Marca la confirmación para poder publicar.", "Tick the confirmation to publish.")}</p>}
+            <label className="flex items-start gap-2 text-sm text-muted"><input type="checkbox" checked={confirm} onChange={(e) => setConfirm(e.target.checked)} className="mt-1 h-4 w-4 shrink-0 accent-navy dark:accent-[#E79A7F]" /> {tx(locale, "Confirmo que soy el propietario o tengo autorización para publicar.", "I confirm I’m the owner or authorised to list.")}</label>
+            {!confirm && <p className="text-xs text-muted">{tx(locale, "Marca la confirmación para poder publicar.", "Tick the confirmation to publish.")}</p>}
             {!user && <p className="rounded-lg bg-[#A8452A0D] px-3 py-2 text-sm">{tx(locale, "Te pediremos iniciar sesión para publicar. Tu borrador se conserva.", "We’ll ask you to sign in to publish. Your draft is kept.")}</p>}
             {err && <div className="rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-sm text-danger" role="alert">{err}</div>}
           </div>
@@ -674,10 +674,10 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               <PropertyArt scene={d.kind === "house" ? "house-dusk" : "tower-day"} seed="ph" className="aspect-[4/3] w-full opacity-40" />
             )}
             <div className="p-4">
-              <div className="text-xs font-semibold uppercase tracking-wide text-ink/65">{tx(locale, "Vista previa", "Preview")}</div>
-              <div className="font-display text-xl font-semibold">{money(d.price, locale)}<span className="text-sm font-normal text-ink/65">{priceUnit}</span></div>
+              <div className="text-xs font-semibold uppercase tracking-wide text-muted">{tx(locale, "Vista previa", "Preview")}</div>
+              <div className="font-display text-xl font-semibold">{money(d.price, locale)}<span className="text-sm font-normal text-muted">{priceUnit}</span></div>
               <div className="text-sm">{facts}</div>
-              <div className="text-sm text-ink/65">{d.addr ? fullAddress([d.addr.zone, d.addr.city]) : tx(locale, "Dirección pendiente", "Address pending")}</div>
+              <div className="text-sm text-muted">{d.addr ? fullAddress([d.addr.zone, d.addr.city]) : tx(locale, "Dirección pendiente", "Address pending")}</div>
             </div>
           </div>
           <div className="rounded-np bg-navy p-4 text-ivory">
@@ -685,7 +685,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
             <div className="mt-1 font-display text-2xl">{estimate ? money(estimate.mid, locale) : "—"}</div>
             <div className="text-xs text-mist">{tx(locale, "Se actualiza mientras completas", "Updates as you go")}</div>
           </div>
-          <Link href={`/${locale}/owner/listings`} className="block text-center text-sm text-ink/65 underline-offset-4 hover:text-navy hover:underline"><MapPin size={13} className="inline" /> {tx(locale, "Guardar y salir", "Save & exit")}</Link>
+          <Link href={`/${locale}/owner/listings`} className="block text-center text-sm text-muted underline-offset-4 hover:text-navy hover:underline"><MapPin size={13} className="inline" /> {tx(locale, "Guardar y salir", "Save & exit")}</Link>
         </div>
       </aside>
     </div>

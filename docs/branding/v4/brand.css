@@ -1,0 +1,26 @@
+@font-face{font-family:Cinzel;font-weight:400;src:url(node_modules/@fontsource/cinzel/files/cinzel-latin-400-normal.woff2)}
+@font-face{font-family:Cinzel;font-weight:500;src:url(node_modules/@fontsource/cinzel/files/cinzel-latin-500-normal.woff2)}
+@font-face{font-family:Cinzel;font-weight:600;src:url(node_modules/@fontsource/cinzel/files/cinzel-latin-600-normal.woff2)}
+@font-face{font-family:Cormorant;font-weight:400;src:url(node_modules/@fontsource/cormorant-garamond/files/cormorant-garamond-latin-400-normal.woff2)}
+@font-face{font-family:Cormorant;font-weight:500;src:url(node_modules/@fontsource/cormorant-garamond/files/cormorant-garamond-latin-500-normal.woff2)}
+@font-face{font-family:Cormorant;font-weight:600;src:url(node_modules/@fontsource/cormorant-garamond/files/cormorant-garamond-latin-600-normal.woff2)}
+@font-face{font-family:Cormorant;font-weight:500;font-style:italic;src:url(node_modules/@fontsource/cormorant-garamond/files/cormorant-garamond-latin-500-italic.woff2)}
+@font-face{font-family:Manrope;font-weight:400;src:url(node_modules/@fontsource/manrope/files/manrope-latin-400-normal.woff2)}
+@font-face{font-family:Manrope;font-weight:500;src:url(node_modules/@fontsource/manrope/files/manrope-latin-500-normal.woff2)}
+@font-face{font-family:Manrope;font-weight:600;src:url(node_modules/@fontsource/manrope/files/manrope-latin-600-normal.woff2)}
+:root{
+  --cal:#F8F5EF; --arena:#EDE4D5; --egeo:#C6D9E4; --egeo-2:#DCE8EF; --salvia:#BCC6B0; --oro:#B4935A; --oro-2:#D9C59C;
+  --noche:#162638; --noche-2:#1F344A; --tinta:#1C2632; --gris:#6B7179; --linea:#E3DBCD; --blanco:#FFFFFF;
+}
+*{box-sizing:border-box;margin:0}
+body{font:400 15px/1.6 Manrope,system-ui,sans-serif;color:var(--tinta);background:var(--cal);-webkit-font-smoothing:antialiased}
+.serif{font-family:Cormorant,Georgia,serif}
+.caps{font:600 11px Manrope;letter-spacing:.24em;text-transform:uppercase}
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:12px 24px;font:600 14px Manrope;letter-spacing:.02em;white-space:nowrap}
+.btn.noche{background:var(--noche);color:var(--cal)}
+.btn.oro{border:1px solid var(--oro);color:var(--noche);background:transparent}
+.btn.claro{background:var(--cal);color:var(--noche)}
+.badge{display:inline-block;font:600 10px Manrope;letter-spacing:.18em;text-transform:uppercase;padding:5px 10px;border-radius:999px}
+.b-oro{background:#F1E8D6;color:#7E6334}
+.b-egeo{background:var(--egeo-2);color:#2F4C63}
+.b-salvia{background:#E3E8DC;color:#4C5A40}

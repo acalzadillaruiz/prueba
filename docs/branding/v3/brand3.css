@@ -1,0 +1,10 @@
+@import url(brand2.css);
+/* v3 — reglas del comité: navy = seleccionado, terracota = una sola acción por pantalla, cifras alineadas en todo */
+:root{--arena:#E8DCC8;--egeo:#A9C6D8;--egeo-t:#1F4A63;--rosa:#F2DDD3;--sel:#162638;--chip:#E6EBF1;--error:#B3261E;--tinta-barra:#7D8B9B}
+*{font-feature-settings:"lnum","tnum" !important}
+h1,h2,h3{text-wrap:balance}
+.badge.excl{background:#fff;color:var(--teja);box-shadow:0 2px 8px rgba(22,38,56,.12)}
+.badge.excl:before{content:"";display:inline-block;width:8px;height:4px;border-left:1.5px solid currentColor;border-top:1.5px solid currentColor;rotate:45deg;margin:0 8px 1px 2px}
+.badge.arena{background:var(--arena);color:var(--noche)}
+.badge.egeo{background:var(--egeo);color:var(--egeo-t)}
+.wa{background:var(--noche)!important;box-shadow:0 0 0 1.5px var(--teja),0 14px 30px rgba(22,38,56,.35)!important}

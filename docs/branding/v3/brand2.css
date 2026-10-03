@@ -1,0 +1,28 @@
+@import url(brand.css);
+/* v2 — sistema del comité: Cal/Blanco 60 · Azul noche 25 · pasteles 10 · Terracota Riviera 4 · oro 1 */
+:root{
+  --cal:#F8F5EF; --blanco:#FFFFFF; --arena:#EDE4D5; --borde:#DDD3C2; --borde-f:#8F8370;
+  --noche:#162638; --noche-2:#1E3048; --tinta:#162638; --gris:#5E6673;
+  --teja:#A8452A; --teja-h:#8E3A23; --teja-t:#F6E6DE; --teja-c:#E79A7F;
+  --egeo:#C6D9E4; --egeo-t:#1F4A63; --salvia:#BCC6B0; --salvia-t:#3F4C33;
+  --oro:#B4935A; --oro-t:#8A6A35; --oro-2:#D9C59C;
+  --ok:#2F6B4F; --warn:#8A5A00; --danger:#A0283C;
+}
+body{color:var(--tinta)}
+.num{font-variant-numeric:lining-nums tabular-nums}
+.btn.teja{background:var(--teja);color:#fff}
+.btn.noche{background:var(--noche);color:var(--cal)}
+.btn.borde{border:1px solid var(--noche);color:var(--noche)}
+.btn.borde-c{border:1px solid rgba(248,245,239,.6);color:var(--cal)}
+.badge.excl{background:var(--teja-t);color:var(--teja)}
+.badge.egeo{background:var(--egeo);color:var(--egeo-t)}
+.badge.salvia{background:var(--salvia);color:var(--salvia-t)}
+.eyebrow{font:600 12px Manrope;letter-spacing:.16em;text-transform:uppercase}
+/* pin con forma de tejado: la firma de interfaz */
+.rpin{position:absolute;display:grid;justify-items:center;transform:translate(-50%,-100%)}
+.rpin b{background:var(--blanco);color:var(--noche);font:600 13px Manrope;padding:6px 12px;border-radius:8px;box-shadow:0 8px 18px rgba(22,38,56,.18);font-variant-numeric:lining-nums}
+.rpin:before{content:"";width:0;height:0;border-left:16px solid transparent;border-right:16px solid transparent;border-bottom:9px solid var(--blanco);margin-bottom:-1px}
+.rpin.on b{background:var(--teja);color:#fff}
+.rpin.on:before{border-bottom-color:var(--teja)}
+.arch{border-radius:999px 999px 0 0;overflow:hidden;background-size:cover;background-position:center}
+.wa{position:fixed;right:28px;bottom:28px;width:58px;height:58px;border-radius:50%;background:var(--teja);display:grid;place-items:center;box-shadow:0 14px 30px rgba(168,69,42,.35)}

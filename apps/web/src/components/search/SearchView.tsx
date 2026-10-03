@@ -292,7 +292,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
           </button>
         </div>
         {alertError && (
-          <div role="alert" className="border-t border-line bg-[#B423181A] px-4 py-2 text-sm text-danger md:px-5">{alertError}</div>
+          <div role="alert" className="border-t border-line bg-[#B3261E1A] px-4 py-2 text-sm text-danger md:px-5">{alertError}</div>
         )}
         {moreOpen && (
           <div id="search-more-filters" className="np-in absolute inset-x-0 top-full max-h-[70vh] overflow-y-auto border-b border-line bg-white px-4 py-4 shadow-np md:px-5">
@@ -389,7 +389,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
         <div
           data-search-sheet={mobileList ? "open" : "peek"}
           className={cn(
-            "absolute inset-x-0 bottom-0 z-20 flex flex-col overflow-hidden rounded-t-2xl bg-ivory shadow-[0_-10px_30px_rgba(11,18,32,.28)] transition-[height] duration-300 ease-np",
+            "absolute inset-x-0 bottom-0 z-20 flex flex-col overflow-hidden rounded-t-2xl bg-ivory shadow-[0_-10px_30px_rgba(22,38,56,.28)] transition-[height] duration-300 ease-np",
             mobileList ? "h-[88%]" : "h-[132px]",
             "lg:static lg:z-auto lg:h-auto lg:basis-[40%] lg:rounded-none lg:border-l lg:border-line lg:shadow-none lg:transition-none",
           )}
@@ -419,7 +419,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
               <div>
                 <div className="font-display text-lg font-semibold">
                   {plural(query.data?.total ?? results.length, locale, ["resultado", "resultados"], ["result", "results"])}{query.isFetching && <Loader2 size={15} className="ml-2 inline animate-spin text-ink/65" />}
-                  {shape && <span className="ml-2 rounded-full bg-coral/10 bg-[#F26B4D1A] px-2 py-0.5 text-xs text-coral-hover">{tx(locale, "en tu zona dibujada", "in your drawn area")}</span>}
+                  {shape && <span className="ml-2 rounded-full bg-coral/10 bg-[#A8452A1A] px-2 py-0.5 text-xs text-coral-hover">{tx(locale, "en tu zona dibujada", "in your drawn area")}</span>}
                 </div>
                 <div className="text-xs text-ink/65">{tx(locale, "Precios en USD · actualizados en tiempo real", "Prices in USD · updated in real time")}</div>
               </div>

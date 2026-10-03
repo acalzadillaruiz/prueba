@@ -120,7 +120,7 @@ export function AgencyDashboard({ locale, stats, listings, newLeads, tours, agen
               <div key={ld.id} className="flex items-center gap-3 border-t border-navy-line py-2.5 text-sm">
                 <span className="font-semibold">{ld.name}</span>
                 <span className="line-clamp-1 flex-1 text-mist">{l ? tx(locale, l.title_es, l.title_en) : ""}</span>
-                <Badge tone={mins > 15 ? "danger" : "warn"} className={mins > 15 ? "bg-[#B4231833] text-[#FF8A7A]" : "bg-[#C9862A33] text-[#F2B866]"}>{mins > 15 ? tx(locale, "SLA vencido", "SLA breached") : `${15 - mins} min`}</Badge>
+                <Badge tone={mins > 15 ? "danger" : "warn"} className={mins > 15 ? "bg-[#B3261E33] text-[#E79A7F]" : "bg-[#8A5A0033] text-[#F2B866]"}>{mins > 15 ? tx(locale, "SLA vencido", "SLA breached") : `${15 - mins} min`}</Badge>
               </div>
             );
           })}
@@ -136,7 +136,7 @@ export function AgencyDashboard({ locale, stats, listings, newLeads, tours, agen
                 <span className="w-32 font-display inline-block first-letter:uppercase">{dateTime(t.start, locale)}</span>
                 <span className="line-clamp-1 flex-1">{t.seekerName} · <span className="text-mist">{l?.zone}</span></span>
                 <Avatar initials={a.initials} hue={a.hue} size={22} />
-                <Badge className={t.status === "CONFIRMED" ? "bg-[#2F6F4E40] text-[#7FD3A8]" : "bg-[#C9862A33] text-[#F2B866]"}>{t.status === "CONFIRMED" ? "OK" : tx(locale, "Pend.", "Pend.")}</Badge>
+                <Badge className={t.status === "CONFIRMED" ? "bg-[#2F6B4F40] text-[#7FC8A4]" : "bg-[#8A5A0033] text-[#F2B866]"}>{t.status === "CONFIRMED" ? "OK" : tx(locale, "Pend.", "Pend.")}</Badge>
               </div>
             );
           })}

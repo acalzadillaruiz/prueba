@@ -13,7 +13,7 @@ import { dateTime, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import { caracasInputToIso, isoToCaracasInput } from "@/lib/caracas-time";
 
-const TONE: Record<MediaJob["status"], string> = { SCHEDULED: "bg-white/10 text-mist", SHOOTING: "bg-[#F26B4D33] text-coral", UPLOADING: "bg-[#C9862A33] text-[#F2B866]", DELIVERED: "bg-[#2F6F4E40] text-[#7FD3A8]" };
+const TONE: Record<MediaJob["status"], string> = { SCHEDULED: "bg-white/10 text-mist", SHOOTING: "bg-[#A8452A33] text-coral", UPLOADING: "bg-[#8A5A0033] text-[#F2B866]", DELIVERED: "bg-[#2F6B4F40] text-[#7FC8A4]" };
 const ORDER: MediaJob["status"][] = ["SCHEDULED", "SHOOTING", "UPLOADING", "DELIVERED"];
 const STATUS: Record<MediaJob["status"], [string, string]> = {
   SCHEDULED: ["Programada", "Scheduled"],
@@ -74,7 +74,7 @@ function NewJob({ locale, manage, onDone }: { locale: Locale; manage: NonNullabl
           <Button disabled={busy}>{busy ? <Loader2 size={15} className="animate-spin" /> : <Plus size={15} />} {tx(locale, "Asignar", "Assign")}</Button>
         </div>
       )}
-      {err && <div role="alert" className="mt-3 rounded-lg bg-[#B4231833] px-3 py-2 text-sm text-[#FF8A7A]">{err}</div>}
+      {err && <div role="alert" className="mt-3 rounded-lg bg-[#B3261E33] px-3 py-2 text-sm text-[#E79A7F]">{err}</div>}
     </form>
   );
 }
@@ -202,14 +202,14 @@ export function MediaView({ locale, jobs, listings, names = {}, manage = null }:
                 </Field>
               </div>
             )}
-            {err && <div role="alert" className="mt-3 rounded-lg bg-[#B4231833] px-3 py-2 text-sm text-[#FF8A7A]">{err}</div>}
+            {err && <div role="alert" className="mt-3 rounded-lg bg-[#B3261E33] px-3 py-2 text-sm text-[#E79A7F]">{err}</div>}
             <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
               {items.map(([ok, t, I], i) => (
                 <button
                   key={t}
                   disabled={i < 2}
                   onClick={() => run(`chk${i}`, () => api(`media/${job.id}`, { method: "PATCH", json: i === 2 ? { floorplan: !job.checklist.floorplan } : { video: !job.checklist.video } }))}
-                  className={cn("flex items-center gap-2 rounded-lg border px-3 py-2 text-left text-sm", ok ? "border-[#2F6F4E80] text-[#7FD3A8]" : "border-navy-line text-mist", i >= 2 && "hover:border-coral")}
+                  className={cn("flex items-center gap-2 rounded-lg border px-3 py-2 text-left text-sm", ok ? "border-[#2F6B4F80] text-[#7FC8A4]" : "border-navy-line text-mist", i >= 2 && "hover:border-coral")}
                 >
                   {ok ? <Check size={15} /> : <I size={15} />}
                   {t}

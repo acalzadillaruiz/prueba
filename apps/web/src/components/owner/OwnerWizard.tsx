@@ -270,7 +270,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
     }
   };
 
-  const opt = (active: boolean) => cn("rounded-np border p-4 text-left transition-colors duration-np", active ? "border-coral bg-[#F26B4D0D] ring-1 ring-coral" : "border-line bg-white hover:border-navy/30");
+  const opt = (active: boolean) => cn("rounded-np border p-4 text-left transition-colors duration-np", active ? "border-coral bg-[#A8452A0D] ring-1 ring-coral" : "border-line bg-white hover:border-navy/30");
   const stepper = (label: string, v: number, onChange: (n: number) => void) => (
     <div className="flex items-center justify-between rounded-np border border-line bg-white px-4 py-3">
       <span className="font-semibold">{label}</span>
@@ -298,7 +298,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
             ? tx(locale, "Pasó la revisión automática (sin duplicados) y ya aparece en el mapa.", "It passed automated checks (no duplicates) and is live on the map.")
             : tx(locale, `${agencies.find((a) => a.id === d.agency)?.name} asignará un agente. Estado: SOLICITADO.`, `${agencies.find((a) => a.id === d.agency)?.name} will assign an agent. Status: REQUESTED.`)}
         </p>
-        {photoWarn && <p role="alert" className="mt-4 rounded-lg bg-[#C9862A14] px-3 py-2 text-sm text-warn">{photoWarn}</p>}
+        {photoWarn && <p role="alert" className="mt-4 rounded-lg bg-[#8A5A0014] px-3 py-2 text-sm text-warn">{photoWarn}</p>}
         <div className="mt-6 flex flex-wrap justify-center gap-3">
           {done.mode === "AGENCY" ? (
             <Button href={`/${locale}/agency/listings/${done.id}/edit`}>{tx(locale, "Editar en el panel", "Edit in dashboard")}</Button>
@@ -412,7 +412,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
             />
             {d.addr && <p className="text-xs text-ink/65">{tx(locale, "Toca el mapa para ajustar el punto exacto.", "Tap the map to fine-tune the exact point.")}</p>}
             {d.addr && (
-              <div className={cn("np-in flex flex-wrap items-center gap-3 rounded-np border p-3 text-sm", dup ? "border-warn/60 bg-[#C9862A14]" : "border-[#2F6F4E55] bg-[#2F6F4E0D]")}>
+              <div className={cn("np-in flex flex-wrap items-center gap-3 rounded-np border p-3 text-sm", dup ? "border-warn/60 bg-[#8A5A0014]" : "border-[#2F6B4F55] bg-[#2F6B4F0D]")}>
                 {checking ? <Loader2 size={18} className="animate-spin" /> : dup ? <AlertTriangle size={18} className="text-warn" /> : <CheckCircle2 size={18} className="text-ok" />}
                 <span className="font-semibold">{tx(locale, "Ubicación", "Location")}: {d.addr.lat.toFixed(5)}, {d.addr.lng.toFixed(5)}</span>
                 {dup ? (
@@ -460,14 +460,14 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
             </div>
             {!listingType.startsWith("COMMERCIAL") && RESIDENTIAL_KINDS.includes(d.kind) && (
               <label className="flex items-center gap-2 text-sm font-semibold">
-                <input type="checkbox" checked={d.luxury} onChange={(e) => set({ luxury: e.target.checked })} className="h-4 w-4 accent-[#F26B4D]" />
+                <input type="checkbox" checked={d.luxury} onChange={(e) => set({ luxury: e.target.checked })} className="h-4 w-4 accent-[#A8452A]" />
                 {tx(locale, "Inmueble de lujo", "Luxury property")}
               </label>
             )}
             <ListingTypeFields locale={locale} listingType={listingType} luxury={luxury} value={d.extras} onChange={(x) => set({ extras: x })} showErrors={showExtrasErr} />
             {luxury && (
               <label className="flex items-start gap-2 text-sm">
-                <input type="checkbox" checked={d.privateListing} onChange={(e) => set({ privateListing: e.target.checked })} className="mt-0.5 h-4 w-4 shrink-0 accent-[#F26B4D]" />
+                <input type="checkbox" checked={d.privateListing} onChange={(e) => set({ privateListing: e.target.checked })} className="mt-0.5 h-4 w-4 shrink-0 accent-[#A8452A]" />
                 <span>
                   <span className="font-semibold">{tx(locale, "Anuncio privado", "Private listing")}</span>
                   <span className="block text-ink/65">{tx(locale, "No aparece en el buscador ni en el mapa; solo quien tenga el enlace puede verlo.", "Hidden from search and the map; only people with the link can see it.")}</span>
@@ -531,7 +531,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
             )}
             <div className="grid gap-2 text-sm sm:grid-cols-2">
               {[[files.length >= 8, tx(locale, `${files.length}/8 fotos recomendadas`, `${files.length}/8 recommended photos`)], [files.length > 0, tx(locale, "Portada elegida", "Cover set")]].map(([ok, t]) => (
-                <div key={String(t)} className={cn("flex items-center gap-2 rounded-lg border px-3 py-2", ok ? "border-[#2F6F4E55] text-ok" : "border-line text-ink/65")}>{ok ? <CheckCircle2 size={16} /> : <span className="h-4 w-4 rounded-full border-2 border-current" />}{t as string}</div>
+                <div key={String(t)} className={cn("flex items-center gap-2 rounded-lg border px-3 py-2", ok ? "border-[#2F6B4F55] text-ok" : "border-line text-ink/65")}>{ok ? <CheckCircle2 size={16} /> : <span className="h-4 w-4 rounded-full border-2 border-current" />}{t as string}</div>
               ))}
             </div>
             {files.length === 0 && <p className="text-sm text-ink/65">{tx(locale, "Puedes continuar sin fotos y subirlas después desde «Mis inmuebles».", "You can continue without photos and add them later from “My properties”.")}</p>}
@@ -589,7 +589,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                 value={lang === "es" ? d.copy.body_es : d.copy.body_en}
                 onChange={(e) => set({ copy: { ...d.copy, [lang === "es" ? "body_es" : "body_en"]: e.target.value } })}
               />
-              {aiErr && <div role="alert" className="mt-2 rounded-lg bg-[#B423181A] px-3 py-2 text-sm text-danger">{aiErr}</div>}
+              {aiErr && <div role="alert" className="mt-2 rounded-lg bg-[#B3261E1A] px-3 py-2 text-sm text-danger">{aiErr}</div>}
               <div className="mt-2 text-xs text-ink/65">{tx(locale, "Si lo dejas vacío, generamos un texto base al publicar.", "Leave empty and we’ll generate a base text on publish.")}</div>
             </div>
           </div>
@@ -599,7 +599,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
           <div className="np-in space-y-5">
             <h1 className="font-display text-3xl font-semibold">{tx(locale, "Revisa y publica", "Review & publish")}</h1>
             {dup && (
-              <div className="flex items-center gap-2 rounded-np border border-warn/60 bg-[#C9862A14] p-3 text-sm" role="alert">
+              <div className="flex items-center gap-2 rounded-np border border-warn/60 bg-[#8A5A0014] p-3 text-sm" role="alert">
                 <AlertTriangle size={18} className="text-warn" />
                 <span>
                   {tx(locale, "Con estos datos ya existe un anuncio:", "A listing with these details already exists:")}{" "}
@@ -621,7 +621,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                   <div className="text-sm text-ink/65" data-testid="review-address">{address}</div>
                   <div className="mt-2 text-sm" data-testid="review-facts">{facts}</div>
                   {extrasSummary && <div className="mt-1 text-sm text-ink/65">{extrasSummary}</div>}
-                  <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#F26B4D14] px-2.5 py-1 text-xs font-bold text-coral-hover">{d.mode === "AGENCY" ? tx(locale, "Inventario de la agencia", "Agency inventory") : d.mode === "FSBO" ? tx(locale, "Publicación directa (FSBO)", "For sale by owner") : tx(locale, "Encargo a agencia", "Agency mandate")}</div>
+                  <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#A8452A14] px-2.5 py-1 text-xs font-bold text-coral-hover">{d.mode === "AGENCY" ? tx(locale, "Inventario de la agencia", "Agency inventory") : d.mode === "FSBO" ? tx(locale, "Publicación directa (FSBO)", "For sale by owner") : tx(locale, "Encargo a agencia", "Agency mandate")}</div>
                 </div>
               </div>
             </div>
@@ -634,10 +634,10 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                 ))}
               </ul>
             </div>
-            <label className="flex items-start gap-2 text-sm text-ink/65"><input type="checkbox" checked={confirm} onChange={(e) => setConfirm(e.target.checked)} className="mt-1 h-4 w-4 shrink-0 accent-[#F26B4D]" /> {tx(locale, "Confirmo que soy el propietario o tengo autorización para publicar.", "I confirm I’m the owner or authorised to list.")}</label>
+            <label className="flex items-start gap-2 text-sm text-ink/65"><input type="checkbox" checked={confirm} onChange={(e) => setConfirm(e.target.checked)} className="mt-1 h-4 w-4 shrink-0 accent-[#A8452A]" /> {tx(locale, "Confirmo que soy el propietario o tengo autorización para publicar.", "I confirm I’m the owner or authorised to list.")}</label>
             {!confirm && <p className="text-xs text-ink/65">{tx(locale, "Marca la confirmación para poder publicar.", "Tick the confirmation to publish.")}</p>}
-            {!user && <p className="rounded-lg bg-[#F26B4D0D] px-3 py-2 text-sm">{tx(locale, "Te pediremos iniciar sesión para publicar. Tu borrador se conserva.", "We’ll ask you to sign in to publish. Your draft is kept.")}</p>}
-            {err && <div className="rounded-lg bg-[#B423181A] px-3 py-2 text-sm text-danger" role="alert">{err}</div>}
+            {!user && <p className="rounded-lg bg-[#A8452A0D] px-3 py-2 text-sm">{tx(locale, "Te pediremos iniciar sesión para publicar. Tu borrador se conserva.", "We’ll ask you to sign in to publish. Your draft is kept.")}</p>}
+            {err && <div className="rounded-lg bg-[#B3261E1A] px-3 py-2 text-sm text-danger" role="alert">{err}</div>}
           </div>
         )}
 

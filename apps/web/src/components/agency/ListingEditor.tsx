@@ -168,9 +168,9 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
         </div>
       }
     >
-      {err && <div className="mb-4 rounded-lg bg-[#B4231833] px-3 py-2 text-sm text-[#FF8A7A]" role="alert">{err}</div>}
-      {l.review === "PENDING" && <div className="mb-4 rounded-lg bg-[#C9862A33] px-3 py-2 text-sm text-[#F2B866]">{tx(locale, "Pendiente de aprobación del backoffice. No es visible al público todavía.", "Pending backoffice approval. Not public yet.")}</div>}
-      {l.review === "REJECTED" && <div className="mb-4 rounded-lg bg-[#B4231833] px-3 py-2 text-sm text-[#FF8A7A]">{tx(locale, "Rechazado por el backoffice: no es visible al público.", "Rejected by backoffice: not public.")}{user?.role === "AGENT" && canEdit ? ` ${tx(locale, "Corrígelo y guarda para reenviarlo a revisión.", "Fix it and save to resubmit it for review.")}` : ""}</div>}
+      {err && <div className="mb-4 rounded-lg bg-[#B3261E33] px-3 py-2 text-sm text-[#E79A7F]" role="alert">{err}</div>}
+      {l.review === "PENDING" && <div className="mb-4 rounded-lg bg-[#8A5A0033] px-3 py-2 text-sm text-[#F2B866]">{tx(locale, "Pendiente de aprobación del backoffice. No es visible al público todavía.", "Pending backoffice approval. Not public yet.")}</div>}
+      {l.review === "REJECTED" && <div className="mb-4 rounded-lg bg-[#B3261E33] px-3 py-2 text-sm text-[#E79A7F]">{tx(locale, "Rechazado por el backoffice: no es visible al público.", "Rejected by backoffice: not public.")}{user?.role === "AGENT" && canEdit ? ` ${tx(locale, "Corrígelo y guarda para reenviarlo a revisión.", "Fix it and save to resubmit it for review.")}` : ""}</div>}
       <div className="grid gap-6 [&>*]:min-w-0 xl:grid-cols-[1fr_420px]">
         <div className="space-y-6">
           <div className={section}>
@@ -230,8 +230,8 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
               })}
             </div>
             <div className="mt-4 flex flex-wrap gap-4 text-sm">
-              <label className="flex items-center gap-2"><input type="checkbox" disabled={!canEdit} checked={f.hasFloorplan} onChange={(e) => { setF({ ...f, hasFloorplan: e.target.checked }); dirty(); }} className="accent-[#F26B4D]" /> {tx(locale, "Tiene plano", "Has floor plan")}</label>
-              <label className="flex items-center gap-2"><input type="checkbox" disabled={!canEdit} checked={f.hasVirtualTour} onChange={(e) => { setF({ ...f, hasVirtualTour: e.target.checked }); dirty(); }} className="accent-[#F26B4D]" /> {tx(locale, "Tour virtual", "Virtual tour")}</label>
+              <label className="flex items-center gap-2"><input type="checkbox" disabled={!canEdit} checked={f.hasFloorplan} onChange={(e) => { setF({ ...f, hasFloorplan: e.target.checked }); dirty(); }} className="accent-[#A8452A]" /> {tx(locale, "Tiene plano", "Has floor plan")}</label>
+              <label className="flex items-center gap-2"><input type="checkbox" disabled={!canEdit} checked={f.hasVirtualTour} onChange={(e) => { setF({ ...f, hasVirtualTour: e.target.checked }); dirty(); }} className="accent-[#A8452A]" /> {tx(locale, "Tour virtual", "Virtual tour")}</label>
             </div>
             {f.hasVirtualTour && (
               <div className="mt-3 max-w-md">
@@ -302,7 +302,7 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
                     <img src={p.url} alt="" className="aspect-[4/3] w-full object-cover" />
                     {canPhotos && <div className="absolute inset-x-1 top-1 flex justify-between transition-opacity [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 [@media(hover:hover)]:group-focus-within:opacity-100">
                       <button onClick={() => move(i, -1)} className="rounded bg-navy/80 p-0.5" aria-label={tx(locale, "Mover antes", "Move earlier")}><ArrowLeft size={12} /></button>
-                      <button onClick={() => photoOp({ remove: p.id })} className="rounded bg-navy/80 p-0.5 text-[#FF8A7A]" aria-label={tx(locale, "Eliminar", "Delete")}><Trash2 size={12} /></button>
+                      <button onClick={() => photoOp({ remove: p.id })} className="rounded bg-navy/80 p-0.5 text-[#E79A7F]" aria-label={tx(locale, "Eliminar", "Delete")}><Trash2 size={12} /></button>
                       <button onClick={() => move(i, 1)} className="rounded bg-navy/80 p-0.5" aria-label={tx(locale, "Mover después", "Move later")}><ArrowRight size={12} /></button>
                     </div>}
                     {p.isCover ? (
@@ -326,13 +326,13 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
           <div className={section}>
             <div className="flex items-center justify-between">
               <span className="font-display text-lg font-semibold">{tx(locale, "Calidad de ficha", "Listing quality")}</span>
-              <span className={cn("font-display text-3xl font-semibold", quality >= 85 ? "text-[#7FD3A8]" : "text-gold")}>{quality}</span>
+              <span className={cn("font-display text-3xl font-semibold", quality >= 85 ? "text-[#7FC8A4]" : "text-gold")}>{quality}</span>
             </div>
             <div className="mt-2 h-2 rounded-full bg-white/10"><div className="h-full rounded-full bg-ok" style={{ width: `${quality}%` }} /></div>
             <ul className="mt-4 space-y-2 text-sm">
               {checks.map(([ok, t, pts]) => (
                 <li key={t} className={cn("flex items-center gap-2", ok ? "text-ivory" : "text-mist")}>
-                  {ok ? <Check size={15} className="text-[#7FD3A8]" /> : <span className="h-3.5 w-3.5 rounded-full border-2 border-current" />} {t}
+                  {ok ? <Check size={15} className="text-[#7FC8A4]" /> : <span className="h-3.5 w-3.5 rounded-full border-2 border-current" />} {t}
                   <span className="ml-auto text-xs text-mist">+{pts}</span>
                 </li>
               ))}

@@ -56,7 +56,7 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={tx(locale, "Buscar título, zona, agente…", "Search title, area, agent…")} aria-label={tx(locale, "Buscar inmuebles", "Search listings")} className="h-9 w-full rounded-lg border border-navy-line bg-navy pl-9 pr-3 text-sm placeholder:text-mist/60 focus:border-coral focus:outline-none" />
         </label>
       </div>
-      {error && <div className="mb-3 rounded-lg bg-[#B423181A] px-3 py-2 text-sm text-danger" role="alert">{error}</div>}
+      {error && <div className="mb-3 rounded-lg bg-[#B3261E1A] px-3 py-2 text-sm text-danger" role="alert">{error}</div>}
       {mandates.length > 0 && (
         <section className="mb-5 rounded-np border border-gold/40 bg-navy-card p-4" aria-labelledby="mandates-title" data-testid="mandates">
           <div id="mandates-title" className="mb-2 flex items-center gap-2 font-display text-lg font-semibold"><FileSignature size={17} className="text-gold" /> {tx(locale, "Encargos de propietarios", "Owner mandates")} <span className="rounded-full bg-white/10 px-2 text-xs">{mandates.length}</span></div>
@@ -70,7 +70,7 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
                     {m.status === "ASSIGNED" && m.listing ? <Link href={`/${locale}/agency/listings/${m.listing.id}/edit`} className="line-clamp-1 font-semibold hover:text-coral">{title}</Link> : <div className="line-clamp-1 font-semibold">{title}</div>}
                     <div className="text-xs text-mist">{m.ownerName}{m.listing ? ` · ${m.listing.zone}, ${m.listing.city} · ${money(m.listing.priceAmount, locale)}` : ""} · {ago(m.createdAt, locale)}</div>
                   </div>
-                  <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-bold uppercase", m.status === "REQUESTED" ? "bg-[#C9862A33] text-[#F2B866]" : "bg-[#2F6F4E40] text-[#7FD3A8]")}>{m.status === "REQUESTED" ? tx(locale, "Solicitado", "Requested") : tx(locale, "Asignado", "Assigned")}</span>
+                  <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-bold uppercase", m.status === "REQUESTED" ? "bg-[#8A5A0033] text-[#F2B866]" : "bg-[#2F6B4F40] text-[#7FC8A4]")}>{m.status === "REQUESTED" ? tx(locale, "Solicitado", "Requested") : tx(locale, "Asignado", "Assigned")}</span>
                   {manager && (
                     <select value={m.agentId ?? ""} disabled={busy === m.id} onChange={(e) => e.target.value && patch(m.id, { agentId: e.target.value }, `mandates/${m.id}`)} className="h-8 rounded-md border border-navy-line bg-navy-2 px-2 text-xs" aria-label={tx(locale, `Agente del encargo ${title}`, `Agent for mandate ${title}`)}>
                       <option value="" disabled>{tx(locale, "Asignar agente…", "Assign agent…")}</option>
@@ -119,7 +119,7 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
                       </div>
                     </Link>
                   </td>
-                  <td className="whitespace-nowrap px-3">{inReview ? <span className="whitespace-nowrap rounded-full bg-[#C9862A33] px-2 py-0.5 text-[11px] font-bold uppercase text-[#F2B866]">{tx(locale, "En revisión", "In review")}</span> : l.review === "REJECTED" ? <span className="rounded-full bg-[#B4231833] px-2 py-0.5 text-[11px] font-bold uppercase text-[#FF8A7A]">{tx(locale, "Rechazado", "Rejected")}</span> : <StatusBadge status={l.status} locale={locale} />}</td>
+                  <td className="whitespace-nowrap px-3">{inReview ? <span className="whitespace-nowrap rounded-full bg-[#8A5A0033] px-2 py-0.5 text-[11px] font-bold uppercase text-[#F2B866]">{tx(locale, "En revisión", "In review")}</span> : l.review === "REJECTED" ? <span className="rounded-full bg-[#B3261E33] px-2 py-0.5 text-[11px] font-bold uppercase text-[#E79A7F]">{tx(locale, "Rechazado", "Rejected")}</span> : <StatusBadge status={l.status} locale={locale} />}</td>
                   <td className="px-3 text-right font-display">{money(l.priceAmount, locale)}<span className="text-xs text-mist">{priceSuffix(l, locale)}</span></td>
                   <td className="px-3">
                     <select value={l.agentId ?? ""} disabled={!manager || busy === l.id} onChange={(e) => patch(l.id, { agentId: e.target.value || null })} className="h-8 rounded-md border border-navy-line bg-navy-2 px-2 text-xs" aria-label={tx(locale, "Agente", "Agent")}>

@@ -88,7 +88,7 @@ export function SavedView({ locale, all }: { locale: Locale; all: Listing[] }) {
                     <tr key={label} className="border-t border-line">
                       <td className="px-4 py-2.5 font-semibold text-ink/60">{label}</td>
                       {cmp.map((l, i) => (
-                        <td key={l.id} className={cn("px-4 py-2.5", val && cmp.length > 1 && vals[i] === target && "bg-[#2F6F4E0F]")}>
+                        <td key={l.id} className={cn("px-4 py-2.5", val && cmp.length > 1 && vals[i] === target && "bg-[#2F6B4F0F]")}>
                           {render(l)} {val && cmp.length > 1 && vals[i] === target && <Check size={13} className="ml-1 inline text-ok" />}
                         </td>
                       ))}

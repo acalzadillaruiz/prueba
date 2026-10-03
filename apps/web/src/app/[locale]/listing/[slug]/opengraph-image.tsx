@@ -18,19 +18,19 @@ export default async function OgImage({ params }: { params: Promise<{ locale: Lo
   const facts = l ? [l.beds ? `${l.beds} ${tx(locale, "hab", "bd")}` : "", l.baths ? `${l.baths} ${tx(locale, "baños", "ba")}` : "", `${l.areaM2} m²`].filter(Boolean).join("  ·  ") : "";
   return new ImageResponse(
     (
-      <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", background: l?.luxury ? "#0B1220" : "#0B1220", color: "#F7F4EF", padding: 64, fontFamily: "sans-serif" }}>
+      <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", background: l?.luxury ? "#162638" : "#162638", color: "#F8F5EF", padding: 64, fontFamily: "sans-serif" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 16, fontSize: 34, fontWeight: 700 }}>
-          <div style={{ width: 40, height: 40, borderRadius: 20, background: "#F26B4D" }} />
+          <div style={{ width: 40, height: 40, borderRadius: 20, background: "#A8452A" }} />
           New Place
-          {l?.luxury && <div style={{ marginLeft: 16, fontSize: 24, color: "#D4AF77", border: "2px solid #D4AF77", borderRadius: 999, padding: "4px 16px" }}>LUXURY</div>}
+          {l?.luxury && <div style={{ marginLeft: 16, fontSize: 24, color: "#B4935A", border: "2px solid #B4935A", borderRadius: 999, padding: "4px 16px" }}>LUXURY</div>}
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
           <div style={{ fontSize: 64, fontWeight: 700, lineHeight: 1.1, maxWidth: 1050 }}>{title}</div>
-          <div style={{ fontSize: 34, color: "#8AA4B5" }}>{where}</div>
+          <div style={{ fontSize: 34, color: "#A9B4C2" }}>{where}</div>
         </div>
         <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
-          <div style={{ fontSize: 60, fontWeight: 700, color: "#F26B4D" }}>{price}</div>
-          <div style={{ fontSize: 30, color: "#F7F4EF" }}>{facts}</div>
+          <div style={{ fontSize: 60, fontWeight: 700, color: "#A8452A" }}>{price}</div>
+          <div style={{ fontSize: 30, color: "#F8F5EF" }}>{facts}</div>
         </div>
       </div>
     ),

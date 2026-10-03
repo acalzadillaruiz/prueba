@@ -19,9 +19,9 @@ function html(subject: string, body: string) {
   // The email-verification link (/api/v1/auth/verify?token=<base64url>.<base64url>) is the only API path allowed.
   const appPath = /^\/(es|en)\/[^\s\\]*$/.test(body) || /^\/api\/v1\/auth\/verify\?token=[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(body);
   const link = appPath && !body.startsWith("//") && APP_URL ? `${APP_URL}${body}` : null;
-  return `<!doctype html><html><body style="margin:0;background:#F7F4EF;font-family:system-ui,sans-serif;color:#111827">
+  return `<!doctype html><html><body style="margin:0;background:#F8F5EF;font-family:system-ui,sans-serif;color:#162638">
 <div style="max-width:560px;margin:0 auto;padding:32px 24px">
-<div style="font-weight:700;font-size:20px;color:#0B1220">New Place</div>
+<div style="font-weight:700;font-size:20px;color:#162638">New Place</div>
 <h1 style="font-size:22px;line-height:1.3;margin:24px 0 12px">${esc(subject)}</h1>
 ${link ? `<p><a href="${esc(link)}" style="display:inline-block;background:#C2452A;color:#fff;padding:12px 20px;border-radius:12px;text-decoration:none;font-weight:600">Abrir en New Place</a></p>` : body ? `<p style="font-size:15px;line-height:1.5">${esc(body)}</p>` : ""}
 <p style="margin-top:32px;font-size:12px;color:#6b7280">New Place · Un nuevo lugar.</p>

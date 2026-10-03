@@ -104,7 +104,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
             <ChevronRight size={14} /> <span>{l.city}</span> <ChevronRight size={14} /> <span>{l.zone}</span>
           </nav>
           {!isPublic && (
-            <div className="mb-3 rounded-np border border-warn/60 bg-[#C9862A1a] px-4 py-2.5 text-sm font-semibold text-[#8F5E1C]">
+            <div className="mb-3 rounded-np border border-warn/60 bg-[#8A5A001a] px-4 py-2.5 text-sm font-semibold text-[#8A5A00]">
               {l.review === "PENDING" ? tx(locale, "Pendiente de aprobación: solo tu equipo ve esta ficha.", "Pending approval: only your team can see this listing.") : tx(locale, `No publicado (${l.status}). Solo tu equipo ve esta ficha.`, `Not public (${l.status}). Only your team can see this listing.`)}
               {l.takedownReason && ` · ${l.takedownReason}`}
             </div>

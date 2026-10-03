@@ -84,7 +84,7 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
 
   return (
     <AdminShell locale={locale} area="agency" title={tx(locale, "Calendario", "Calendar")}>
-      {error && <div className="mb-3 rounded-lg bg-[#B423181A] px-3 py-2 text-sm text-danger" role="alert">{error}</div>}
+      {error && <div className="mb-3 rounded-lg bg-[#B3261E1A] px-3 py-2 text-sm text-danger" role="alert">{error}</div>}
       <div className="grid gap-6 [&>*]:min-w-0 xl:grid-cols-[1fr_300px]">
         <div ref={scroller} className="overflow-x-auto rounded-np border border-navy-line bg-navy-card">
           <div className="min-w-[760px]">
@@ -132,7 +132,7 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
                       className={cn(
                         "pointer-events-auto absolute overflow-hidden rounded-md px-2 py-1 text-left text-xs",
                         e.kind === "tour" && "bg-coral-cta text-white",
-                        e.kind === "req" && "border border-dashed border-gold bg-[#D4AF771f] text-gold",
+                        e.kind === "req" && "border border-dashed border-gold bg-[#B4935A1f] text-gold",
                         (e.kind === "done" || e.kind === "cancelled") && "bg-white/10 text-mist line-through",
                         e.kind === "media" && "bg-[#3E5A6B] text-ivory",
                       )}

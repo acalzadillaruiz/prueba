@@ -4,67 +4,88 @@
 @tailwind utilities;
 
 :root {
-  --np-navy: #0B1220;
-  --np-navy-2: #111827;
-  --np-coral: #F26B4D;
-  --np-coral-hover: #E25538;
-  --np-ivory: #F7F4EF;
-  --np-mist: #8AA4B5;
-  --np-gold: #D4AF77;
-  --np-ink: #111827;
-  --np-line: #E6E1D8;
-  --np-ok: #2F6F4E;
-  --np-warn: #C9862A;
-  --np-danger: #B42318;
-  --np-map-dark: #0B1220;
-  --font-display: var(--font-outfit), ui-sans-serif, system-ui;
-  --font-body: var(--font-source-sans), ui-sans-serif, system-ui;
+  /* New Place brand (v4, approved by the committee):
+     Cal 60 % · Azul noche 25 % · Arena/Egeo 10 % · Terracota "Teja" 4 % (one action per screen) · Oro 1 % (fillets). */
+  --np-navy: #162638;
+  --np-navy-2: #1E3048;
+  --np-coral: #A8452A;          /* Terracota "Teja": the single main action per screen */
+  --np-coral-hover: #8E3A23;
+  --np-coral-light: #E79A7F;    /* terracota on navy surfaces */
+  --np-ivory: #F8F5EF;          /* Cal */
+  --np-arena: #E8DCC8;
+  --np-egeo: #A9C6D8;
+  --np-rosa: #F2DDD3;
+  --np-mist: #A9B4C2;           /* muted text on navy */
+  --np-gold: #B4935A;           /* fillets only; text uses --np-gold-text */
+  --np-gold-text: #8A6A35;
+  --np-ink: #162638;
+  --np-muted: #5E6673;
+  --np-line: #DDD3C2;
+  --np-ok: #2F6B4F;
+  --np-warn: #8A5A00;
+  --np-danger: #B3261E;
+  --np-map-dark: #162638;
+  --font-display: var(--font-manrope), ui-sans-serif, system-ui;   /* interface (buttons, labels) */
+  --font-body: var(--font-manrope), ui-sans-serif, system-ui;
+  --font-serif: var(--font-cormorant), Georgia, "Times New Roman", serif;  /* titles and prices */
+  --font-logo: var(--font-cinzel), Georgia, serif;
   /* rgb channels for Tailwind opacity modifiers (text-ink/60, bg-ivory/90…) */
-  --np-navy-rgb: 11 18 32;
-  --np-navy-2-rgb: 17 24 39;
-  --np-coral-rgb: 242 107 77;
-  --np-coral-hover-rgb: 226 85 56;
-  /* Accessible coral for white-text CTAs and coral text on light surfaces (≥4.5:1, WCAG AA) */
-  --np-coral-cta-rgb: 194 69 42;
-  --np-coral-cta-hover-rgb: 169 58 34;
-  --np-ivory-rgb: 247 244 239;
-  --np-mist-rgb: 138 164 181;
-  --np-gold-rgb: 212 175 119;
-  --np-ink-rgb: 17 24 39;
-  --np-line-rgb: 230 225 216;
-  --np-ok-rgb: 47 111 78;
-  --np-warn-rgb: 201 134 42;
-  --np-danger-rgb: 180 35 24;
+  --np-navy-rgb: 22 38 56;
+  --np-navy-2-rgb: 30 48 72;
+  --np-coral-rgb: 168 69 42;
+  --np-coral-hover-rgb: 142 58 35;
+  /* Terracota already meets WCAG AA with white text (5.9:1) and as text on Cal (5.4:1). */
+  --np-coral-cta-rgb: 168 69 42;
+  --np-coral-cta-hover-rgb: 142 58 35;
+  --np-ivory-rgb: 248 245 239;
+  --np-arena-rgb: 232 220 200;
+  --np-egeo-rgb: 169 198 216;
+  --np-rosa-rgb: 242 221 211;
+  --np-mist-rgb: 169 180 194;
+  --np-gold-rgb: 180 147 90;
+  --np-gold-text-rgb: 138 106 53;
+  --np-ink-rgb: 22 38 56;
+  --np-muted-rgb: 94 102 115;
+  --np-line-rgb: 221 211 194;
+  --np-ok-rgb: 47 107 79;
+  --np-warn-rgb: 138 90 0;
+  --np-danger-rgb: 179 38 30;
   --np-surface-rgb: 255 255 255;
-  --radius: 14px;
-  --shadow: 0 12px 40px rgba(11,18,32,.12);
+  --radius: 16px;
+  --shadow: 0 8px 24px rgba(22,38,56,.07);
 }
 
 html { -webkit-font-smoothing: antialiased; }
 body { font-family: var(--font-body); background: var(--np-ivory); color: var(--np-ink); }
-h1, h2, h3, .font-display { font-family: var(--font-display); letter-spacing: -0.02em; }
-*:focus-visible { outline: 2px solid var(--np-coral); outline-offset: 2px; }
+/* Lining figures everywhere: prices and data align (Cormorant defaults to old-style figures). */
+* { font-feature-settings: "lnum", "tnum"; }
+.font-display { font-family: var(--font-display); letter-spacing: 0; }
+/* Titles in Cormorant Garamond, even when they carry the UI font class. */
+h1, h2, h3, h1.font-display, h2.font-display, h3.font-display, .font-serif { font-family: var(--font-serif); font-weight: 500; letter-spacing: -0.005em; font-feature-settings: "lnum", "pnum"; }
+h1, h2, h3 { text-wrap: balance; }
+.font-logo { font-family: var(--font-logo); }
+*:focus-visible { outline: 2px solid var(--np-navy); outline-offset: 3px; }
 
 /* Public dark mode (toggle). Admin is always dark; only light surfaces of the public scope are remapped,
    so navy sections (hero, footer, Luxury) keep their ivory text. */
-html.dark body { background: #0E1626; }
+html.dark body { background: #101C2B; }
 html.dark .np-public {
   --np-ink: #EEF1F4;
   --np-ink-rgb: 238 241 244;
-  --np-line: #22304A;
+  --np-line: #2A3E55;
   --np-line-rgb: 34 48 74;
   --shadow: 0 12px 40px rgba(0,0,0,.35);
   color-scheme: dark;
-  background: #0E1626;
+  background: #101C2B;
   color: var(--np-ink);
 }
-html.dark .np-public .bg-white { background-color: #152033; }
+html.dark .np-public .bg-white { background-color: #1E3048; }
 html.dark .np-public .bg-white\/90 { background-color: rgb(21 32 51 / .9); }
 html.dark .np-public .bg-white\/60 { background-color: rgb(21 32 51 / .6); }
-html.dark .np-public .bg-ivory { background-color: #0E1626; }
+html.dark .np-public .bg-ivory { background-color: #101C2B; }
 html.dark .np-public .bg-ivory\/90, html.dark .np-public .bg-ivory\/95 { background-color: rgb(14 22 38 / .92); }
-html.dark .np-public .hover\:bg-ivory:hover { background-color: #1B2840; }
-html.dark .np-public .text-navy { color: #F7F4EF; }
+html.dark .np-public .hover\:bg-ivory:hover { background-color: #243852; }
+html.dark .np-public .text-navy { color: #F8F5EF; }
 html.dark .np-public .bg-black\/5, html.dark .np-public .hover\:bg-black\/5:hover { background-color: rgb(255 255 255 / .06); }
 html.dark .np-public .bg-black\/10 { background-color: rgb(255 255 255 / .12); }
 html.dark .np-public :is(input, select, textarea) { color-scheme: dark; }
@@ -85,7 +106,7 @@ html:not(.dark) .np-public :is(.bg-navy, .bg-navy-2, .bg-navy-card) .text-coral 
 .sr-only-focusable:not(:focus) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
-.scrollbar-thin::-webkit-scrollbar-thumb { background: #8AA4B566; border-radius: 6px; }
+.scrollbar-thin::-webkit-scrollbar-thumb { background: #A9B4C266; border-radius: 6px; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { scrollbar-width: none; }
 

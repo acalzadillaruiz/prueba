@@ -16,9 +16,9 @@ const CARACAS = { lat: 10.4806, lng: -66.9036 };
 
 function pillIcon(label: string, active: boolean, gold: boolean): google.maps.Icon {
   const w = Math.round(label.length * 7.6 + 20);
-  const bg = active ? "#F7F4EF" : gold ? "#D4AF77" : "#F26B4D";
-  const fg = active || gold ? "#0B1220" : "#FFFFFF";
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="36"><path d="M${w / 2 - 6} 26 L${w / 2} 34 L${w / 2 + 6} 26 Z" fill="${bg}"/><rect x="1" y="1" width="${w - 2}" height="26" rx="13" fill="${bg}" stroke="#0B1220" stroke-width="1.5"/><text x="${w / 2}" y="18.5" text-anchor="middle" font-family="Outfit,Arial" font-weight="700" font-size="12.5" fill="${fg}">${label}</text></svg>`;
+  const bg = active ? "#F8F5EF" : gold ? "#B4935A" : "#A8452A";
+  const fg = active || gold ? "#162638" : "#FFFFFF";
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="36"><path d="M${w / 2 - 6} 26 L${w / 2} 34 L${w / 2 + 6} 26 Z" fill="${bg}"/><rect x="1" y="1" width="${w - 2}" height="26" rx="13" fill="${bg}" stroke="#162638" stroke-width="1.5"/><text x="${w / 2}" y="18.5" text-anchor="middle" font-family="Outfit,Arial" font-weight="700" font-size="12.5" fill="${fg}">${label}</text></svg>`;
   return { url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`, anchor: new google.maps.Point(w / 2, 34), scaledSize: new google.maps.Size(w, 36) };
 }
 
@@ -39,7 +39,7 @@ function Layers({ props, theme, mode, setMode, draft, setDraft }: { props: MapVi
           new google.maps.Marker({
             position,
             label: { text: String(count), color: "#fff", fontWeight: "700", fontFamily: "Outfit, Arial" },
-            icon: { path: google.maps.SymbolPath.CIRCLE, scale: 16, fillColor: "#F26B4D", fillOpacity: 1, strokeColor: "#0B1220", strokeWeight: 2 },
+            icon: { path: google.maps.SymbolPath.CIRCLE, scale: 16, fillColor: "#A8452A", fillOpacity: 1, strokeColor: "#162638", strokeWeight: 2 },
             zIndex: 1000 + count,
           }),
       },
@@ -81,7 +81,7 @@ function Layers({ props, theme, mode, setMode, draft, setDraft }: { props: MapVi
     if (!map) return;
     shapeRefs.current.forEach((s) => s.setMap(null));
     shapeRefs.current = [];
-    const coral = "#F26B4D";
+    const coral = "#A8452A";
     if (shape?.type === "poly") shapeRefs.current.push(new google.maps.Polygon({ map, paths: shape.pts, strokeColor: coral, strokeWeight: 2, fillColor: coral, fillOpacity: 0.12, clickable: false }));
     if (shape?.type === "radius") shapeRefs.current.push(new google.maps.Circle({ map, center: shape.center, radius: shape.km * 1000, strokeColor: coral, strokeWeight: 2, fillColor: coral, fillOpacity: 0.12, clickable: false }));
     if (draft.length) shapeRefs.current.push(new google.maps.Polyline({ map, path: draft, strokeColor: coral, strokeWeight: 2, clickable: false }));

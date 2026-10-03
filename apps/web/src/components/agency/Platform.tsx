@@ -72,7 +72,7 @@ export function PlatformHome({ locale, data }: { locale: Locale; data: PlatformH
           <div className="mb-3 font-display text-lg font-semibold">{tx(locale, "Salud del sistema", "System health")}</div>
           {data.health.map((h) => (
             <div key={h.k} className="flex items-center gap-2 border-t border-navy-line py-2.5 text-sm first:border-0">
-              {h.ok ? <CheckCircle2 size={15} className="text-[#7FD3A8]" /> : <AlertTriangle size={15} className="text-[#F2B866]" />}
+              {h.ok ? <CheckCircle2 size={15} className="text-[#7FC8A4]" /> : <AlertTriangle size={15} className="text-[#F2B866]" />}
               <span className="flex-1">{h.k}</span>
               <span className="text-right text-xs text-mist">{h.v}</span>
             </div>
@@ -116,9 +116,9 @@ export function PlatformAgencies({ locale, agencies }: { locale: Locale; agencie
   const [f, setF] = useState({ name: "", city: "Caracas" });
   return (
     <AdminShell locale={locale} area="platform" title={tx(locale, "Agencias", "Agencies")} actions={<Button size="sm" onClick={() => setCreating(!creating)}><Plus size={15} /> {tx(locale, "Nueva agencia", "New agency")}</Button>}>
-      {err && <div role="alert" className="mb-4 rounded-lg bg-[#B4231833] px-3 py-2 text-sm text-[#FF8A7A]">{err}</div>}
+      {err && <div role="alert" className="mb-4 rounded-lg bg-[#B3261E33] px-3 py-2 text-sm text-[#E79A7F]">{err}</div>}
       {current && (
-        <div className="np-in mb-4 flex flex-wrap items-center gap-3 rounded-np border border-coral bg-[#F26B4D1a] p-3 text-sm">
+        <div className="np-in mb-4 flex flex-wrap items-center gap-3 rounded-np border border-coral bg-[#A8452A1a] p-3 text-sm">
           <LogIn size={16} className="text-coral" /> {tx(locale, `Impersonando a ${current.name}. Todo queda en el registro de auditoría.`, `Impersonating ${current.name}. Everything is audit-logged.`)}
           <a href={`/${locale}/agency`} className="ml-auto font-semibold text-coral">{tx(locale, "Abrir panel", "Open dashboard")} →</a>
           <button onClick={() => run("exit", () => api("platform/impersonate", { method: "POST", json: { agencyId: null } }))} className="text-mist">{tx(locale, "Salir", "Exit")}</button>
@@ -150,7 +150,7 @@ export function PlatformAgencies({ locale, agencies }: { locale: Locale; agencie
                     <option value="ACTIVE">{tx(locale, "Activa", "Active")}</option><option value="TRIAL">{tx(locale, "En prueba", "Trial")}</option><option value="SUSPENDED">{tx(locale, "Suspendida", "Suspended")}</option>
                   </select>
                 </td>
-                <td className="px-3">{a.verified ? <span className="flex items-center gap-1 text-[#7FD3A8]"><ShieldCheck size={15} /> {tx(locale, "Verificada", "Verified")}</span> : <Button size="sm" variant="dark-outline" disabled={busy === a.id} onClick={() => run(a.id, () => api(`platform/agencies/${a.id}`, { method: "PATCH", json: { verified: true } }))}><Eye size={13} /> {tx(locale, "Verificar", "Verify")}</Button>}</td>
+                <td className="px-3">{a.verified ? <span className="flex items-center gap-1 text-[#7FC8A4]"><ShieldCheck size={15} /> {tx(locale, "Verificada", "Verified")}</span> : <Button size="sm" variant="dark-outline" disabled={busy === a.id} onClick={() => run(a.id, () => api(`platform/agencies/${a.id}`, { method: "PATCH", json: { verified: true } }))}><Eye size={13} /> {tx(locale, "Verificar", "Verify")}</Button>}</td>
                 <td className="px-3">
                   <select value={a.plan} onChange={(e) => run(a.id, () => api(`platform/agencies/${a.id}`, { method: "PATCH", json: { plan: e.target.value } }))} className="h-8 rounded-md border border-navy-line bg-navy-2 px-2 text-xs" aria-label="Plan">
                     <option>FREE</option><option>PRO</option><option>ENTERPRISE</option>
@@ -203,7 +203,7 @@ export function PlatformUsers({ locale, users, providers }: { locale: Locale; us
     });
   return (
     <AdminShell locale={locale} area="platform" title={tx(locale, "Usuarios", "Users")}>
-      {(roleErr || err) && <div role="alert" className="mb-4 rounded-lg bg-[#B4231833] px-3 py-2 text-sm text-[#FF8A7A]">{roleErr ?? err}</div>}
+      {(roleErr || err) && <div role="alert" className="mb-4 rounded-lg bg-[#B3261E33] px-3 py-2 text-sm text-[#E79A7F]">{roleErr ?? err}</div>}
       <div className="mb-4 flex flex-wrap items-center gap-3">
         <div className="relative w-80 max-w-full"><Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-mist" /><input value={q} onChange={(e) => setQ(e.target.value)} className={darkInputCls + " pl-9"} placeholder={tx(locale, "Nombre, email, rol o agencia…", "Name, email, role or agency…")} aria-label={tx(locale, "Buscar", "Search")} /></div>
         <span className="text-sm text-mist">{rows.length} / {users.length}</span>
@@ -239,7 +239,7 @@ export function PlatformUsers({ locale, users, providers }: { locale: Locale; us
                     <button disabled={busy === u.id} onClick={() => {
                       if (!u.suspended && !window.confirm(tx(locale, `¿Suspender a ${u.name}? No podrá iniciar sesión.`, `Suspend ${u.name}? They won’t be able to sign in.`))) return;
                       run(u.id, () => api(`platform/users/${u.id}`, { method: "PATCH", json: { suspended: !u.suspended } }));
-                    }} className={cn("rounded-md p-1.5 hover:bg-white/5", u.suspended ? "text-[#7FD3A8]" : "text-[#FF8A7A]")} aria-label={u.suspended ? tx(locale, "Reactivar", "Restore") : tx(locale, "Suspender", "Suspend")} title={u.suspended ? tx(locale, "Reactivar", "Restore") : tx(locale, "Suspender", "Suspend")}>
+                    }} className={cn("rounded-md p-1.5 hover:bg-white/5", u.suspended ? "text-[#7FC8A4]" : "text-[#E79A7F]")} aria-label={u.suspended ? tx(locale, "Reactivar", "Restore") : tx(locale, "Suspender", "Suspend")} title={u.suspended ? tx(locale, "Reactivar", "Restore") : tx(locale, "Suspender", "Suspend")}>
                       {u.suspended ? <RotateCcw size={14} /> : <Ban size={14} />}
                     </button>
                   )}
@@ -262,7 +262,7 @@ export function PlatformModeration({ locale, reports, listings }: { locale: Loca
   const rows = listings.filter((l) => (l.title_es + " " + l.title_en + " " + l.zone + " " + (l.agency?.name ?? "")).toLowerCase().includes(q.toLowerCase())).slice(0, 40);
   return (
     <AdminShell locale={locale} area="platform" title={tx(locale, "Moderación", "Moderation")}>
-      {err && <div role="alert" className="mb-4 rounded-lg bg-[#B4231833] px-3 py-2 text-sm text-[#FF8A7A]">{err}</div>}
+      {err && <div role="alert" className="mb-4 rounded-lg bg-[#B3261E33] px-3 py-2 text-sm text-[#E79A7F]">{err}</div>}
       <div className="grid gap-6 [&>*]:min-w-0 xl:grid-cols-[1fr_1.3fr]">
         <div className="rounded-np border border-navy-line bg-navy-card p-5">
           <div className="mb-3 flex items-center gap-2 font-display text-lg font-semibold"><ShieldAlert size={18} className="text-coral" /> {tx(locale, "Reportes", "Reports")} · {reports.length}</div>
@@ -291,7 +291,7 @@ export function PlatformModeration({ locale, reports, listings }: { locale: Loca
               </div>
               {m.listingId && confirming === `report-${m.id}` && (
                 <form
-                  className="np-in mt-2 flex flex-wrap items-center gap-2 rounded-lg bg-[#B4231814] p-2.5"
+                  className="np-in mt-2 flex flex-wrap items-center gap-2 rounded-lg bg-[#B3261E14] p-2.5"
                   onSubmit={(e) => {
                     e.preventDefault();
                     setConfirming(null);
@@ -321,7 +321,7 @@ export function PlatformModeration({ locale, reports, listings }: { locale: Loca
             const down = !!l.takedownReason;
             return (
               <div key={l.id} data-listing={l.id} className="border-t border-navy-line first:border-0">
-              <div className={cn("flex flex-wrap items-center gap-3 px-4 py-2.5", down && "bg-[#B4231814]")}>
+              <div className={cn("flex flex-wrap items-center gap-3 px-4 py-2.5", down && "bg-[#B3261E14]")}>
                 <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className={cn("h-11 w-14 shrink-0 rounded-md", down && "opacity-40 grayscale")} />
                 <div className="min-w-0 flex-1 basis-48">
                   <div className={cn("truncate font-semibold", down && "text-mist line-through")}>{tx(locale, l.title_es, l.title_en)}</div>
@@ -352,7 +352,7 @@ export function PlatformModeration({ locale, reports, listings }: { locale: Loca
               </div>
               {confirming === l.id && (
                 <form
-                  className="np-in flex flex-wrap items-center gap-2 border-t border-navy-line bg-[#B4231814] px-4 py-2.5"
+                  className="np-in flex flex-wrap items-center gap-2 border-t border-navy-line bg-[#B3261E14] px-4 py-2.5"
                   onSubmit={(e) => {
                     e.preventDefault();
                     setConfirming(null);
@@ -380,14 +380,14 @@ export function PlatformAI({ locale, settings, fx, counts }: { locale: Locale; s
   const [msg, setMsg] = useState<string | null>(null);
   return (
     <AdminShell locale={locale} area="platform" title={tx(locale, "IA · Tasas FX · Seed", "AI · FX rates · Seed")}>
-      {err && <div role="alert" className="mb-4 rounded-lg bg-[#B4231833] px-3 py-2 text-sm text-[#FF8A7A]">{err}</div>}
+      {err && <div role="alert" className="mb-4 rounded-lg bg-[#B3261E33] px-3 py-2 text-sm text-[#E79A7F]">{err}</div>}
       <div className="grid gap-6 [&>*]:min-w-0 xl:grid-cols-2">
         <div className="rounded-np border border-navy-line bg-navy-card p-5">
           <div className="flex items-center gap-2 font-display text-lg font-semibold"><Bot size={18} className="text-coral" /> {tx(locale, "Proveedor de IA", "AI provider")}</div>
           <p className="mt-1 text-sm text-mist">{tx(locale, "Una sola interfaz AIProvider para las 4 funciones. Cambia en caliente.", "One AIProvider interface for all 4 features. Hot-swappable.")}</p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             {([["heuristic", "HeuristicProvider", tx(locale, "Local · sin API key · por defecto", "Local · no API key · default")], ["openai-compatible", "OpenAICompatibleProvider", "OpenAI · Groq · xAI · OpenRouter…"]] as const).map(([k, n, d]) => (
-              <button key={k} disabled={busy === "ai"} onClick={() => run("ai", () => api("platform/settings", { method: "PUT", json: { aiProvider: k } }))} className={cn("rounded-np border p-4 text-left", settings.aiProvider === k ? "border-coral bg-[#F26B4D14]" : "border-navy-line hover:bg-white/5")}>
+              <button key={k} disabled={busy === "ai"} onClick={() => run("ai", () => api("platform/settings", { method: "PUT", json: { aiProvider: k } }))} className={cn("rounded-np border p-4 text-left", settings.aiProvider === k ? "border-coral bg-[#A8452A14]" : "border-navy-line hover:bg-white/5")}>
                 <div className="flex items-center justify-between"><span className="font-mono text-sm font-semibold">{n}</span>{settings.aiProvider === k && <CheckCircle2 size={16} className="text-coral" />}</div>
                 <div className="mt-1 text-xs text-mist">{d}</div>
               </button>
@@ -398,12 +398,12 @@ export function PlatformAI({ locale, settings, fx, counts }: { locale: Locale; s
               <div className="flex justify-between"><span className="text-mist">AI_BASE_URL</span><code>{settings.aiBaseUrl ?? "—"}</code></div>
               <div className="flex justify-between"><span className="text-mist">AI_MODEL</span><code>{settings.aiModel ?? "—"}</code></div>
               <div className="flex justify-between"><span className="text-mist">AI_API_KEY</span><code>{settings.aiKeyConfigured ? "••••••••" : tx(locale, "no configurada", "not set")}</code></div>
-              {!settings.aiKeyConfigured && <div className="flex items-center gap-2 rounded-lg bg-[#C9862A1a] p-2 text-xs text-[#F2B866]"><AlertTriangle size={14} /> {tx(locale, "Sin key: la plataforma sigue usando Heuristic automáticamente. Nunca se rompe.", "No key: the platform keeps using Heuristic automatically. It never breaks.")}</div>}
+              {!settings.aiKeyConfigured && <div className="flex items-center gap-2 rounded-lg bg-[#8A5A001a] p-2 text-xs text-[#F2B866]"><AlertTriangle size={14} /> {tx(locale, "Sin key: la plataforma sigue usando Heuristic automáticamente. Nunca se rompe.", "No key: the platform keeps using Heuristic automatically. It never breaks.")}</div>}
             </div>
           )}
           <div className="mt-5 grid grid-cols-2 gap-2 text-sm">
             {[["estimate()", "PlaceEstimate"], ["searchParse()", tx(locale, "Búsqueda NL", "NL search")], ["writeListing()", tx(locale, "Redactar con IA", "Write with AI")], ["leadScore()", "Score + next action"]].map(([fn, t]) => (
-              <div key={fn} className="flex items-center gap-2 rounded-lg bg-white/5 px-3 py-2"><CheckCircle2 size={14} className="text-[#7FD3A8]" /><code className="text-xs text-coral">{fn}</code><span className="text-xs text-mist">{t}</span></div>
+              <div key={fn} className="flex items-center gap-2 rounded-lg bg-white/5 px-3 py-2"><CheckCircle2 size={14} className="text-[#7FC8A4]" /><code className="text-xs text-coral">{fn}</code><span className="text-xs text-mist">{t}</span></div>
             ))}
           </div>
         </div>
@@ -444,7 +444,7 @@ export function PlatformAI({ locale, settings, fx, counts }: { locale: Locale; s
               </Button>
               <code className="self-center rounded bg-white/5 px-2 py-1 text-xs text-mist">npm run db:seed</code>
             </div>
-            {msg && <div className="np-in mt-3 rounded-lg bg-[#2F6F4E33] p-2.5 font-mono text-xs text-[#7FD3A8]">{msg}</div>}
+            {msg && <div className="np-in mt-3 rounded-lg bg-[#2F6B4F33] p-2.5 font-mono text-xs text-[#7FC8A4]">{msg}</div>}
           </div>
         </div>
       </div>

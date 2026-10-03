@@ -109,7 +109,7 @@ export function Gallery({ l, locale, luxury }: { l: Listing; locale: Locale; lux
       </div>
 
       {open && (
-        <div className="fixed inset-0 z-[60] flex flex-col bg-navy/97 bg-[#0B1220F7] text-ivory" role="dialog" aria-modal="true" aria-label={tx(locale, l.title_es, l.title_en)}>
+        <div className="fixed inset-0 z-[60] flex flex-col bg-navy/97 bg-[#162638F7] text-ivory" role="dialog" aria-modal="true" aria-label={tx(locale, l.title_es, l.title_en)}>
           <div className="no-scrollbar flex items-center gap-2 overflow-x-auto px-4 py-3">
             {tabs.filter((t) => t[3]).map(([k, Icon, label]) => (
               <button key={k} onClick={() => setTab(k)} aria-pressed={tab === k} className={cn("inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full px-3 font-display text-sm", tab === k ? "bg-ivory text-navy" : "text-ivory/75 hover:bg-white/10")}>

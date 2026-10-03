@@ -105,7 +105,7 @@ export function HubOffers({ locale, offers: initial, offerable, listingById, onC
             </Button>
             {sent && <span role="status" className="ml-0 mt-2 block text-sm font-semibold text-ok sm:ml-3 sm:mt-0 sm:inline">{tx(locale, "Oferta enviada al agente.", "Offer sent to the agent.")}</span>}
           </div>
-          {errors.form && <div role="alert" className="rounded-lg bg-[#B423181A] px-3 py-2 text-sm text-danger sm:col-span-2">{errors.form}</div>}
+          {errors.form && <div role="alert" className="rounded-lg bg-[#B3261E1A] px-3 py-2 text-sm text-danger sm:col-span-2">{errors.form}</div>}
         </form>
       ) : (
         <p className="mt-3 text-sm text-ink/65">{tx(locale, "Para ofertar, primero escribe al agente o pide una visita desde la ficha del inmueble.", "To make an offer, first message the agent or book a tour from the listing.")}</p>

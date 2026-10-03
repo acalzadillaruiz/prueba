@@ -42,13 +42,13 @@ export function Button({
 export function Badge({ children, tone = "neutral", className }: { children: ReactNode; tone?: "neutral" | "coral" | "gold" | "ok" | "warn" | "danger" | "navy" | "mist" | "dark"; className?: string }) {
   const t = {
     neutral: "bg-black/5 text-ink",
-    coral: "bg-coral/12 text-coral-hover bg-[#F26B4D1F]",
-    gold: "bg-[#D4AF7729] text-[#8A6A3C]",
-    ok: "bg-[#2F6F4E1F] text-ok",
-    warn: "bg-[#C9862A24] text-[#8F5E1C]",
-    danger: "bg-[#B423181A] text-danger",
+    coral: "bg-coral/12 text-coral-hover bg-[#A8452A1F]",
+    gold: "bg-[#B4935A29] text-[#8A6A3C]",
+    ok: "bg-[#2F6B4F1F] text-ok",
+    warn: "bg-[#8A5A0024] text-[#8A5A00]",
+    danger: "bg-[#B3261E1A] text-danger",
     navy: "bg-navy text-ivory",
-    mist: "bg-[#8AA4B52E] text-[#3E5A6B]",
+    mist: "bg-[#A9B4C22E] text-[#3E5A6B]",
     dark: "bg-white/10 text-ivory",
   }[tone];
   return <span className={cn("inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold", t, className)}>{children}</span>;
@@ -79,7 +79,7 @@ export function Field({ label, children, hint, dark, error }: { label: string; c
       <span className={cn("mb-1.5 block text-sm font-semibold", dark ? "text-ivory/80" : "text-ink/80")}>{label}</span>
       {children}
       {error ? (
-        <span role="alert" className={cn("mt-1 block text-xs font-semibold", dark ? "text-[#FF8A7A]" : "text-danger")}>{error}</span>
+        <span role="alert" className={cn("mt-1 block text-xs font-semibold", dark ? "text-[#E79A7F]" : "text-danger")}>{error}</span>
       ) : (
         hint && <span className={cn("mt-1 block text-xs", dark ? "text-mist" : "text-ink/65")}>{hint}</span>
       )}
@@ -127,7 +127,7 @@ export function Progress({ value, className, tone = "coral" }: { value: number; 
 export function EmptyState({ icon, title, body, cta, dark }: { icon: ReactNode; title: string; body: string; cta?: ReactNode; dark?: boolean }) {
   return (
     <div className={cn("flex flex-col items-center rounded-np border border-dashed px-6 py-12 text-center", dark ? "border-navy-line" : "border-line bg-white/60")}>
-      <div className={cn("mb-3 flex h-12 w-12 items-center justify-center rounded-full", dark ? "bg-white/5 text-coral" : "bg-coral/10 text-coral bg-[#F26B4D14]")}>{icon}</div>
+      <div className={cn("mb-3 flex h-12 w-12 items-center justify-center rounded-full", dark ? "bg-white/5 text-coral" : "bg-coral/10 text-coral bg-[#A8452A14]")}>{icon}</div>
       <div className="font-display text-lg font-semibold">{title}</div>
       <p className={cn("mt-1 max-w-sm text-sm", dark ? "text-mist" : "text-ink/60")}>{body}</p>
       {cta && <div className="mt-4">{cta}</div>}

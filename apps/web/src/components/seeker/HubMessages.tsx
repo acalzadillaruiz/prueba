@@ -174,7 +174,7 @@ export function HubMessages({ locale, threads, meId, listingById }: { locale: Lo
               <span className="hidden sm:inline">{tx(locale, "Enviar", "Send")}</span>
             </Button>
           </form>
-          {err && <div role="alert" className="mt-2 rounded-lg bg-[#B423181A] px-3 py-2 text-sm text-danger">{err}</div>}
+          {err && <div role="alert" className="mt-2 rounded-lg bg-[#B3261E1A] px-3 py-2 text-sm text-danger">{err}</div>}
         </div>
       )}
     </Card>

@@ -20,7 +20,7 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
         <div className="flex items-center gap-2 font-display text-lg font-semibold">
           <Sparkles size={18} className="text-coral" /> PlaceEstimate
         </div>
-        <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-semibold", dark ? "bg-white/10 text-mist" : "bg-[#8AA4B52E] text-[#3E5A6B]")}>
+        <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-semibold", dark ? "bg-white/10 text-mist" : "bg-[#A9B4C22E] text-[#3E5A6B]")}>
           {aiProvider === "heuristic" ? tx(locale, "Estimación New Place (modelo local)", "New Place estimate (local model)") : tx(locale, "Estimación New Place (IA externa)", "New Place estimate (external AI)")}
         </span>
       </div>
@@ -34,7 +34,7 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
         </div>
       </div>
       <div className={cn("relative mt-8 h-2.5 rounded-full", dark ? "bg-white/10" : "bg-black/5")}>
-        <div className="absolute inset-y-0 rounded-full bg-gradient-to-r from-[#8AA4B5] via-[#D4AF77] to-[#F26B4D]" style={{ left: `${at(e.low)}%`, right: `${100 - at(e.high)}%` }} />
+        <div className="absolute inset-y-0 rounded-full bg-gradient-to-r from-[#A9B4C2] via-[#B4935A] to-[#A8452A]" style={{ left: `${at(e.low)}%`, right: `${100 - at(e.high)}%` }} />
         <div className="absolute -top-7 whitespace-nowrap text-xs font-semibold" style={{ left: `${pos}%`, transform: `translateX(-${Math.min(100, Math.max(0, pos))}%)` }}>
           {tx(locale, "Precio pedido", "Asking")}
         </div>
@@ -43,7 +43,7 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
       <div className={cn("mt-2 flex justify-between text-xs", muted)}>
         <span>{money(e.low, locale)}</span>
         {/* AA contrast on both surfaces: brand ok/warn are too dark on navy / too light on white respectively */}
-        <span className={cn("font-semibold", Math.abs(diff) > 4 && diff > 0 ? (dark ? "text-warn" : "text-[#8F5E1C]") : dark ? "text-[#5FBF8F]" : "text-ok")}>{verdict}</span>
+        <span className={cn("font-semibold", Math.abs(diff) > 4 && diff > 0 ? (dark ? "text-warn" : "text-[#8A5A00]") : dark ? "text-[#5FBF8F]" : "text-ok")}>{verdict}</span>
         <span>{money(e.high, locale)}</span>
       </div>
       {showComparables && e.comparables.length > 0 && (

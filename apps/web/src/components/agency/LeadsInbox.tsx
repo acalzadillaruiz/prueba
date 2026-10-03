@@ -40,9 +40,9 @@ function ScoreRing({ score }: { score: number }) {
   const c = 2 * Math.PI * r;
   return (
     <svg viewBox="0 0 80 80" className="h-20 w-20">
-      <circle cx={40} cy={40} r={r} fill="none" stroke="#22304a" strokeWidth={7} />
-      <circle cx={40} cy={40} r={r} fill="none" stroke={score >= 70 ? "#F26B4D" : score >= 45 ? "#D4AF77" : "#8AA4B5"} strokeWidth={7} strokeDasharray={`${(score / 100) * c} ${c}`} strokeLinecap="round" transform="rotate(-90 40 40)" />
-      <text x={40} y={46} textAnchor="middle" fontSize={20} fontWeight={700} fill="#F7F4EF" fontFamily="var(--font-display)">{score}</text>
+      <circle cx={40} cy={40} r={r} fill="none" stroke="#2A3E55" strokeWidth={7} />
+      <circle cx={40} cy={40} r={r} fill="none" stroke={score >= 70 ? "#A8452A" : score >= 45 ? "#B4935A" : "#A9B4C2"} strokeWidth={7} strokeDasharray={`${(score / 100) * c} ${c}`} strokeLinecap="round" transform="rotate(-90 40 40)" />
+      <text x={40} y={46} textAnchor="middle" fontSize={20} fontWeight={700} fill="#F8F5EF" fontFamily="var(--font-display)">{score}</text>
     </svg>
   );
 }
@@ -54,7 +54,7 @@ function Sla({ lead, locale }: { lead: Lead; locale: Locale }) {
   const pct = Math.max(0, Math.min(100, (m / 15) * 100));
   return (
     <div className="w-20">
-      <div className={cn("text-right text-[11px] font-bold", left > 5 ? "text-[#7FD3A8]" : left > 0 ? "text-[#F2B866]" : "text-[#FF8A7A]")}>{left > 0 ? `${left} min` : tx(locale, "SLA vencido", "SLA breached")}</div>
+      <div className={cn("text-right text-[11px] font-bold", left > 5 ? "text-[#7FC8A4]" : left > 0 ? "text-[#F2B866]" : "text-[#E79A7F]")}>{left > 0 ? `${left} min` : tx(locale, "SLA vencido", "SLA breached")}</div>
       <div className="mt-1 h-1 rounded-full bg-white/10"><div className={cn("h-full rounded-full", left > 5 ? "bg-ok" : left > 0 ? "bg-warn" : "bg-danger")} style={{ width: `${pct}%` }} /></div>
     </div>
   );
@@ -104,7 +104,7 @@ function TourPicker({ locale, listingId, agentId, busy, onPropose, onClose }: { 
         {tx(locale, "…u otra fecha y hora (Caracas)", "…or another date & time (Caracas)")}
         <input type="datetime-local" min={minInput} value={custom} onChange={(e) => { setCustom(e.target.value); setPick(null); setErr(null); }} className="mt-1 h-9 w-full rounded-lg border border-navy-line bg-navy-2 px-2 text-sm text-ivory" />
       </label>
-      {err && <div role="alert" className="mt-2 text-xs text-[#FF8A7A]">{err}</div>}
+      {err && <div role="alert" className="mt-2 text-xs text-[#E79A7F]">{err}</div>}
       <Button
         size="sm"
         className="mt-3"
@@ -229,7 +229,7 @@ export function LeadsInbox({ locale, initial, listings, agents }: { locale: Loca
           );
         })}
       </div>
-      {error && <div className="mb-3 rounded-lg bg-[#B423181A] px-3 py-2 text-sm text-danger" role="alert">{error}</div>}
+      {error && <div className="mb-3 rounded-lg bg-[#B3261E1A] px-3 py-2 text-sm text-danger" role="alert">{error}</div>}
       <div className="grid gap-4 [&>*]:min-w-0 xl:grid-cols-[420px_1fr]">
         <div className="overflow-hidden rounded-np border border-navy-line bg-navy-card">
           {visible.map((l) => {
@@ -257,7 +257,7 @@ export function LeadsInbox({ locale, initial, listings, agents }: { locale: Loca
                   <div className="mt-1 truncate text-sm text-ivory/70">{l.message}</div>
                 </div>
                 <div className="flex flex-col items-end gap-1.5">
-                  <span className={cn("rounded-md px-1.5 py-0.5 font-display text-sm font-bold", score >= 70 ? "bg-[#F26B4D33] text-coral" : score >= 45 ? "bg-[#D4AF7733] text-gold" : "bg-white/10 text-mist")}>{score}</span>
+                  <span className={cn("rounded-md px-1.5 py-0.5 font-display text-sm font-bold", score >= 70 ? "bg-[#A8452A33] text-coral" : score >= 45 ? "bg-[#B4935A33] text-gold" : "bg-white/10 text-mist")}>{score}</span>
                   <Sla lead={l} locale={locale} />
                 </div>
               </button>
@@ -305,7 +305,7 @@ export function LeadsInbox({ locale, initial, listings, agents }: { locale: Loca
             </div>
 
             <div className="grid gap-4 lg:grid-cols-[1fr_1.2fr]">
-              <div className="rounded-np border border-coral/40 bg-gradient-to-br from-[#F26B4D1f] to-transparent p-5">
+              <div className="rounded-np border border-coral/40 bg-gradient-to-br from-[#A8452A1f] to-transparent p-5">
                 <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-coral"><Sparkles size={14} /> {tx(locale, "Score IA · siguiente mejor acción", "AI score · next best action")}</div>
                 <div className="mt-3 flex items-center gap-4">
                   <ScoreRing score={sel.score ?? 0} />

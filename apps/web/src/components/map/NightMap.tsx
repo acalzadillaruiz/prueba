@@ -17,8 +17,8 @@ const BOUNDS: Record<Region, { latMin: number; latMax: number; lngMin: number; l
 };
 
 const PAL: Record<Theme, Record<string, string>> = {
-  night: { land: "#101A2C", land2: "#0F1829", water: "#0B1220", mountain: "#15233A", contour: "#1D2D48", park: "#13261F", road: "#1D2B47", hwy: "#2F4670", label: "#8AA4B5", label2: "#5E7486", runway: "#1F2C45", pin: "#F26B4D" },
-  light: { land: "#EFEBE3", land2: "#E9E4DA", water: "#BCD3DF", mountain: "#D3DCCB", contour: "#C4CFBC", park: "#CFE0C6", road: "#FFFFFF", hwy: "#F6D6C6", label: "#4F6372", label2: "#8395A1", runway: "#D9D3C8", pin: "#F26B4D" },
+  night: { land: "#101A2C", land2: "#0F1829", water: "#162638", mountain: "#15233A", contour: "#1D2D48", park: "#13261F", road: "#1D2B47", hwy: "#2F4670", label: "#A9B4C2", label2: "#5E7486", runway: "#1F2C45", pin: "#A8452A" },
+  light: { land: "#EFEBE3", land2: "#E9E4DA", water: "#BCD3DF", mountain: "#D3DCCB", contour: "#C4CFBC", park: "#CFE0C6", road: "#FFFFFF", hwy: "#F6D6C6", label: "#4F6372", label2: "#8395A1", runway: "#D9D3C8", pin: "#A8452A" },
 };
 
 const L = (lat: number, lng: number) => ({ lat, lng });
@@ -254,15 +254,15 @@ export function NightMap({
 
   const shapeEl =
     shape?.type === "poly" ? (
-      <path d={path(shape.pts, true)} fill="#F26B4D22" stroke="#F26B4D" strokeWidth={2} strokeDasharray="6 4" vectorEffect="non-scaling-stroke" />
+      <path d={path(shape.pts, true)} fill="#A8452A22" stroke="#A8452A" strokeWidth={2} strokeDasharray="6 4" vectorEffect="non-scaling-stroke" />
     ) : shape?.type === "radius" ? (
       (() => {
         const c = P(shape.center.lat, shape.center.lng);
         const rx = (shape.km / 111 / Math.cos((shape.center.lat * Math.PI) / 180) / (B.lngMax - B.lngMin)) * B.W;
         return (
           <g>
-            <ellipse cx={c.x} cy={c.y} rx={rx} ry={rx} fill="#F26B4D1f" stroke="#F26B4D" strokeWidth={2} vectorEffect="non-scaling-stroke" />
-            <circle cx={c.x} cy={c.y} r={4 / view.s} fill="#F26B4D" />
+            <ellipse cx={c.x} cy={c.y} rx={rx} ry={rx} fill="#A8452A1f" stroke="#A8452A" strokeWidth={2} vectorEffect="non-scaling-stroke" />
+            <circle cx={c.x} cy={c.y} r={4 / view.s} fill="#A8452A" />
           </g>
         );
       })()
@@ -405,11 +405,11 @@ export function NightMap({
           )}
           {shapeEl}
           {draft.length > 0 && (
-            <path d={path(draft)} fill="#F26B4D18" stroke="#F26B4D" strokeWidth={2} vectorEffect="non-scaling-stroke" />
+            <path d={path(draft)} fill="#A8452A18" stroke="#A8452A" strokeWidth={2} vectorEffect="non-scaling-stroke" />
           )}
           {draft.map((p, i) => {
             const c = P(p.lat, p.lng);
-            return <circle key={i} cx={c.x} cy={c.y} r={5 / view.s} fill="#F7F4EF" stroke="#F26B4D" strokeWidth={2 / view.s} />;
+            return <circle key={i} cx={c.x} cy={c.y} r={5 / view.s} fill="#F8F5EF" stroke="#A8452A" strokeWidth={2 / view.s} />;
           })}
         </g>
 
@@ -434,11 +434,11 @@ export function NightMap({
               }}
             >
               <g className="opacity-0 group-focus-visible:opacity-100">
-                <circle r={25} fill="none" stroke="#0B1220" strokeWidth={4.5} />
-                <circle r={25} fill="none" stroke="#F7F4EF" strokeWidth={2} />
+                <circle r={25} fill="none" stroke="#162638" strokeWidth={4.5} />
+                <circle r={25} fill="none" stroke="#F8F5EF" strokeWidth={2} />
               </g>
-              <circle r={22} fill="#F26B4D" opacity={0.18} />
-              <circle r={15} fill="#F26B4D" stroke="#0B1220" strokeWidth={2} />
+              <circle r={22} fill="#A8452A" opacity={0.18} />
+              <circle r={15} fill="#A8452A" stroke="#162638" strokeWidth={2} />
               <text textAnchor="middle" dy={4.5} fontSize={12.5} fontWeight={700} fill="#fff" fontFamily="var(--font-display)">
                 {g.items.length}
               </text>
@@ -464,7 +464,7 @@ export function NightMap({
         const y = p.y * view.s + view.y;
         return (
           <div className="pointer-events-none absolute z-10" style={{ left: x / k - (B.W / k - box.w) / 2, top: y / k - (B.H / k - box.h) / 2, transform: "translate(-50%, -100%)" }}>
-            <svg viewBox="0 0 32 36" width="30" height="34" aria-hidden><path d="M16 35C14.6 35 13.8 34.2 13 33L3.2 16.4C-.6 9.8 4.2 1.5 11.8 1.5H20.2C27.8 1.5 32.6 9.8 28.8 16.4L19 33C18.2 34.2 17.4 35 16 35Z" fill="#F26B4D" stroke="#0B1220" strokeWidth="1.5" /><circle cx="16" cy="12.5" r="4.6" fill="#F7F4EF" /></svg>
+            <svg viewBox="0 0 32 36" width="30" height="34" aria-hidden><path d="M16 35C14.6 35 13.8 34.2 13 33L3.2 16.4C-.6 9.8 4.2 1.5 11.8 1.5H20.2C27.8 1.5 32.6 9.8 28.8 16.4L19 33C18.2 34.2 17.4 35 16 35Z" fill="#A8452A" stroke="#162638" strokeWidth="1.5" /><circle cx="16" cy="12.5" r="4.6" fill="#F8F5EF" /></svg>
           </div>
         );
       })()}
@@ -580,13 +580,13 @@ function PricePin({ l, x, y, active, locale, onClick, k }: { l: Listing; x: numb
       style={{ transition: "transform 180ms ease-out" }}
     >
       <g className="opacity-0 group-focus-visible:opacity-100">
-        <rect x={-w / 2 - 5} y={-38} width={w + 10} height={35} rx={17.5} fill="none" stroke="#0B1220" strokeWidth={4.5} />
-        <rect x={-w / 2 - 5} y={-38} width={w + 10} height={35} rx={17.5} fill="none" stroke="#F7F4EF" strokeWidth={2} />
+        <rect x={-w / 2 - 5} y={-38} width={w + 10} height={35} rx={17.5} fill="none" stroke="#162638" strokeWidth={4.5} />
+        <rect x={-w / 2 - 5} y={-38} width={w + 10} height={35} rx={17.5} fill="none" stroke="#F8F5EF" strokeWidth={2} />
       </g>
       <g transform={active ? "scale(1.15)" : undefined}>
-        <path d={`M0 0 L-6 -9 L6 -9 Z`} fill={active ? "#F7F4EF" : gold ? "#D4AF77" : "#F26B4D"} />
-        <rect x={-w / 2} y={-33} width={w} height={25} rx={12.5} fill={active ? "#F7F4EF" : gold ? "#D4AF77" : "#F26B4D"} stroke="#0B1220" strokeWidth={1.5} />
-        <text textAnchor="middle" y={-16} fontSize={12.5} fontWeight={700} fontFamily="var(--font-display)" fill={active || gold ? "#0B1220" : "#fff"}>
+        <path d={`M0 0 L-6 -9 L6 -9 Z`} fill={active ? "#F8F5EF" : gold ? "#B4935A" : "#A8452A"} />
+        <rect x={-w / 2} y={-33} width={w} height={25} rx={12.5} fill={active ? "#F8F5EF" : gold ? "#B4935A" : "#A8452A"} stroke="#162638" strokeWidth={1.5} />
+        <text textAnchor="middle" y={-16} fontSize={12.5} fontWeight={700} fontFamily="var(--font-display)" fill={active || gold ? "#162638" : "#fff"}>
           {label}
         </text>
       </g>

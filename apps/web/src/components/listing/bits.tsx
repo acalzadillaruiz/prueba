@@ -56,7 +56,7 @@ const STATUS_TONE: Record<ListingStatus, string> = {
   DRAFT: "bg-black/60 text-white",
   COMING_SOON: "bg-[#4F6285] text-white",
   ACTIVE: "bg-ok text-white",
-  UNDER_OFFER: "bg-[#8F5E1C] text-white",
+  UNDER_OFFER: "bg-[#8A5A00] text-white",
   SOLD: "bg-navy text-ivory",
   RENTED: "bg-navy text-ivory",
   WITHDRAWN: "bg-danger text-white",
@@ -70,7 +70,7 @@ const STATUS_TONE: Record<ListingStatus, string> = {
 export function StatusBadge({ status, locale, className, review }: { status: ListingStatus; locale: Locale; className?: string; review?: "PENDING" | "APPROVED" | "REJECTED" }) {
   if (review && review !== "APPROVED" && status !== "DRAFT" && status !== "WITHDRAWN") {
     return (
-      <span className={cn("inline-flex items-center whitespace-nowrap rounded-full px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide", review === "PENDING" ? "bg-[#8F5E1C] text-white" : "bg-danger text-white", className)}>
+      <span className={cn("inline-flex items-center whitespace-nowrap rounded-full px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide", review === "PENDING" ? "bg-[#8A5A00] text-white" : "bg-danger text-white", className)}>
         {review === "PENDING" ? tx(locale, "En revisión", "In review") : tx(locale, "Rechazado", "Rejected")}
       </span>
     );

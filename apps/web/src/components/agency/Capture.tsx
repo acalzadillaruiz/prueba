@@ -13,9 +13,9 @@ import { cn } from "@/lib/cn";
 
 const TONE: Record<CaptureLead["result"], string> = {
   PENDING: "bg-white/10 text-mist",
-  CAPTURED: "bg-[#2F6F4E40] text-[#7FD3A8]",
-  REJECTED: "bg-[#B4231833] text-[#FF8A7A]",
-  DUPLICATE: "bg-[#C9862A33] text-[#F2B866]",
+  CAPTURED: "bg-[#2F6B4F40] text-[#7FC8A4]",
+  REJECTED: "bg-[#B3261E33] text-[#E79A7F]",
+  DUPLICATE: "bg-[#8A5A0033] text-[#F2B866]",
 };
 type Row = CaptureLead & { listingId?: string };
 type ListingType = keyof typeof TYPE_LABEL;
@@ -84,7 +84,7 @@ export function CaptureView({ locale, rows: initialRows, zones, titles, canConve
 
   return (
     <AdminShell locale={locale} area="agency" title={tx(locale, "Cola de captación", "Capture queue")}>
-      {rowErr && <div role="alert" className="mb-4 rounded-lg bg-[#B4231833] px-3 py-2 text-sm text-[#FF8A7A]">{rowErr}</div>}
+      {rowErr && <div role="alert" className="mb-4 rounded-lg bg-[#B3261E33] px-3 py-2 text-sm text-[#E79A7F]">{rowErr}</div>}
       <div className="grid gap-6 [&>*]:min-w-0 xl:grid-cols-[1fr_380px]">
         <div className="overflow-x-auto rounded-np border border-navy-line bg-navy-card">
           <table className="w-full min-w-[720px] text-sm">
@@ -108,12 +108,12 @@ export function CaptureView({ locale, rows: initialRows, zones, titles, canConve
                     {c.result === "PENDING" && (
                       <div className="flex flex-wrap gap-1">
                         {canConvert && (
-                          <button onClick={() => setConverting(converting?.id === c.id ? null : { id: c.id, listingType: "SALE" })} className="flex items-center gap-1 rounded-md bg-[#F26B4D33] px-2 py-1.5 text-xs font-semibold text-coral" aria-expanded={converting?.id === c.id}>
+                          <button onClick={() => setConverting(converting?.id === c.id ? null : { id: c.id, listingType: "SALE" })} className="flex items-center gap-1 rounded-md bg-[#A8452A33] px-2 py-1.5 text-xs font-semibold text-coral" aria-expanded={converting?.id === c.id}>
                             <Building2 size={14} /> {tx(locale, "Convertir en inmueble", "Convert to listing")}
                           </button>
                         )}
-                        <button onClick={() => setResult(c.id, "CAPTURED")} className="rounded-md bg-[#2F6F4E40] p-1.5 text-[#7FD3A8]" aria-label={tx(locale, "Marcar como captado", "Mark as captured")} title={tx(locale, "Marcar como captado", "Mark as captured")}><CheckCircle2 size={15} /></button>
-                        <button onClick={() => setResult(c.id, "REJECTED")} className="rounded-md bg-[#B4231833] p-1.5 text-[#FF8A7A]" aria-label={tx(locale, "Rechazar", "Reject")} title={tx(locale, "Rechazar", "Reject")}><XCircle size={15} /></button>
+                        <button onClick={() => setResult(c.id, "CAPTURED")} className="rounded-md bg-[#2F6B4F40] p-1.5 text-[#7FC8A4]" aria-label={tx(locale, "Marcar como captado", "Mark as captured")} title={tx(locale, "Marcar como captado", "Mark as captured")}><CheckCircle2 size={15} /></button>
+                        <button onClick={() => setResult(c.id, "REJECTED")} className="rounded-md bg-[#B3261E33] p-1.5 text-[#E79A7F]" aria-label={tx(locale, "Rechazar", "Reject")} title={tx(locale, "Rechazar", "Reject")}><XCircle size={15} /></button>
                       </div>
                     )}
                     {c.listingId && (
@@ -192,13 +192,13 @@ export function CaptureView({ locale, rows: initialRows, zones, titles, canConve
             </div>
           </div>
           {f.address.length >= 6 && (
-            <div className={cn("np-in mt-4 rounded-lg border p-3 text-sm", dup ? "border-[#C9862A80] bg-[#C9862A1a]" : "border-[#2F6F4E80] bg-[#2F6F4E1a]")}>
-              <div className="flex items-center gap-2 font-semibold">{checking ? <Loader2 size={16} className="animate-spin" /> : dup ? <AlertTriangle size={16} className="text-[#F2B866]" /> : <CheckCircle2 size={16} className="text-[#7FD3A8]" />}{dup ? tx(locale, "Posible duplicado", "Possible duplicate") : tx(locale, "Sin duplicados", "No duplicates")}</div>
+            <div className={cn("np-in mt-4 rounded-lg border p-3 text-sm", dup ? "border-[#8A5A0080] bg-[#8A5A001a]" : "border-[#2F6B4F80] bg-[#2F6B4F1a]")}>
+              <div className="flex items-center gap-2 font-semibold">{checking ? <Loader2 size={16} className="animate-spin" /> : dup ? <AlertTriangle size={16} className="text-[#F2B866]" /> : <CheckCircle2 size={16} className="text-[#7FC8A4]" />}{dup ? tx(locale, "Posible duplicado", "Possible duplicate") : tx(locale, "Sin duplicados", "No duplicates")}</div>
               <div className="mt-1 text-xs text-mist">{dup ? (dup.zone ? `${dup.title} · ${dup.zone} · ${dup.areaM2} m²` : dup.title ?? tx(locale, "Ya existe en otra agencia (no público)", "Already listed by another agency (not public)")) : tx(locale, "Fingerprint: lat/lng + m² + hash de dirección", "Fingerprint: lat/lng + m² + address hash")}</div>
               <div className="mt-1 font-mono text-[10px] text-mist/80">{dup?.fingerprint ?? fp}</div>
             </div>
           )}
-          {err && <div role="alert" className="mt-3 rounded-lg bg-[#B4231833] px-3 py-2 text-sm text-[#FF8A7A]">{err}</div>}
+          {err && <div role="alert" className="mt-3 rounded-lg bg-[#B3261E33] px-3 py-2 text-sm text-[#E79A7F]">{err}</div>}
           <Button className="mt-4 w-full" disabled={busy}>{busy ? <Loader2 size={15} className="animate-spin" /> : <Plus size={15} />} {dup ? tx(locale, "Registrar como duplicado", "Log as duplicate") : tx(locale, "Añadir a la cola", "Add to queue")}</Button>
           <div className="mt-3 flex gap-2 text-xs text-mist"><Badge tone="dark">{tx(locale, "1 inmueble = 1 unidad física", "1 listing = 1 physical unit")}</Badge></div>
         </form>

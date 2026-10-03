@@ -52,11 +52,11 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
       <div>
         <h1 className="font-display text-3xl font-semibold">{tx(locale, "Alertas de búsqueda", "Search alerts")}</h1>
         <p className="mt-1 text-ink/60">{tx(locale, "Te avisamos cuando entra algo nuevo o baja de precio.", "We’ll tell you when something new lands or drops in price.")}</p>
-        {error && <div role="alert" className="mt-4 rounded-lg bg-[#B423181A] px-3 py-2 text-sm text-danger">{error}</div>}
+        {error && <div role="alert" className="mt-4 rounded-lg bg-[#B3261E1A] px-3 py-2 text-sm text-danger">{error}</div>}
         <div className="mt-6 space-y-3">
           {items.map((s) => (
             <Card key={s.id} className="flex flex-wrap items-center gap-4 p-4">
-              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#F26B4D1A] text-coral">{s.polygon || /(^|&)(poly|radius)=/.test(s.query) ? <MapPin size={20} /> : <Bell size={20} />}</span>
+              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#A8452A1A] text-coral">{s.polygon || /(^|&)(poly|radius)=/.test(s.query) ? <MapPin size={20} /> : <Bell size={20} />}</span>
               <div className="min-w-0 flex-1">
                 <div className="font-display font-semibold">{s.name}</div>
                 <div className="text-sm text-ink/65">

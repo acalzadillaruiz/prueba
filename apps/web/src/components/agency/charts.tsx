@@ -19,8 +19,8 @@ export function BarChart({ data, height = 180, format = (v: number) => String(v)
           const y = H - pad.b - (t / max) * (H - pad.t - pad.b);
           return (
             <g key={t}>
-              <line x1={pad.l} x2={W - pad.r} y1={y} y2={y} stroke="#22304a" strokeWidth={1} />
-              <text x={pad.l - 6} y={y + 3.5} textAnchor="end" fontSize={10} fill="#8AA4B5">{t}</text>
+              <line x1={pad.l} x2={W - pad.r} y1={y} y2={y} stroke="#2A3E55" strokeWidth={1} />
+              <text x={pad.l - 6} y={y + 3.5} textAnchor="end" fontSize={10} fill="#A9B4C2">{t}</text>
             </g>
           );
         })}
@@ -32,9 +32,9 @@ export function BarChart({ data, height = 180, format = (v: number) => String(v)
           return (
             <g key={i} onMouseEnter={() => setHover(i)} onMouseLeave={() => setHover(null)}>
               <rect x={pad.l + i * bw} y={pad.t} width={bw} height={H - pad.t - pad.b} fill="transparent" />
-              {d.value > 0 && <path d={`M${x} ${H - pad.b} V${Math.min(y + 4, H - pad.b)} q0 -4 4 -4 h${w - 8} q4 0 4 4 V${H - pad.b} Z`} fill="#F26B4D" opacity={hover === null || hover === i ? 1 : 0.45} />}
+              {d.value > 0 && <path d={`M${x} ${H - pad.b} V${Math.min(y + 4, H - pad.b)} q0 -4 4 -4 h${w - 8} q4 0 4 4 V${H - pad.b} Z`} fill="#A8452A" opacity={hover === null || hover === i ? 1 : 0.45} />}
               {(i % Math.ceil(data.length / 8) === 0 || i === data.length - 1) && (
-                <text x={x + w / 2} y={H - 6} textAnchor="middle" fontSize={10} fill="#8AA4B5">{d.label}</text>
+                <text x={x + w / 2} y={H - 6} textAnchor="middle" fontSize={10} fill="#A9B4C2">{d.label}</text>
               )}
             </g>
           );
@@ -76,7 +76,7 @@ export function Spark({ values, className }: { values: number[]; className?: str
   const pts = values.map((v, i) => `${(i / (values.length - 1)) * 100},${28 - ((v - min) / (max - min || 1)) * 24}`).join(" ");
   return (
     <svg viewBox="0 0 100 30" className={className} preserveAspectRatio="none" aria-hidden>
-      <polyline points={pts} fill="none" stroke="#F26B4D" strokeWidth={2} vectorEffect="non-scaling-stroke" strokeLinejoin="round" />
+      <polyline points={pts} fill="none" stroke="#A8452A" strokeWidth={2} vectorEffect="non-scaling-stroke" strokeLinejoin="round" />
     </svg>
   );
 }

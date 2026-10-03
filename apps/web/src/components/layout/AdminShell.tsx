@@ -101,7 +101,7 @@ export function AdminShell({ locale, area, children, title, actions }: { locale:
                 href={href}
                 className={cn(
                   "flex items-center gap-3 rounded-lg px-3 py-2 text-[15px] transition-colors duration-np",
-                  active ? "bg-coral/15 bg-[#F26B4D26] text-ivory" : "text-ivory/70 hover:bg-white/5 hover:text-ivory",
+                  active ? "bg-coral/15 bg-[#A8452A26] text-ivory" : "text-ivory/70 hover:bg-white/5 hover:text-ivory",
                 )}
               >
                 <i.icon size={17} className={active ? "text-coral" : ""} />
@@ -155,7 +155,7 @@ export function AdminShell({ locale, area, children, title, actions }: { locale:
           <button onClick={() => logout(locale)} className="flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm text-ivory/60"><LogOut size={15} /> {tx(locale, "Salir", "Sign out")}</button>
         </nav>
         {area === "agency" && u.role === "SUPERADMIN" && (
-          <div className="flex items-center gap-3 border-b border-coral/40 bg-[#F26B4D1a] px-4 py-2 text-sm md:px-6">
+          <div className="flex items-center gap-3 border-b border-coral/40 bg-[#A8452A1a] px-4 py-2 text-sm md:px-6">
             {agency ? tx(locale, `Viendo como superadmin: ${agency.name}`, `Viewing as superadmin: ${agency.name}`) : tx(locale, "Elige una agencia en Platform → Agencias para impersonarla.", "Pick an agency in Platform → Agencies to impersonate it.")}
             <Link href={`/${locale}/platform/agencies`} className="ml-auto font-semibold text-coral">Platform →</Link>
           </div>

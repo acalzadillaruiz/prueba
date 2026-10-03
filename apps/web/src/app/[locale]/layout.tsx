@@ -10,7 +10,7 @@ import { SITE_URL } from "@/lib/seo";
 import { fontVars } from "../fonts";
 import "../globals.css";
 
-export const viewport: Viewport = { themeColor: "#0B1220", width: "device-width", initialScale: 1, viewportFit: "cover" };
+export const viewport: Viewport = { themeColor: "#162638", width: "device-width", initialScale: 1, viewportFit: "cover" };
 
 /** Applies the saved theme before first paint (no flash). */
 const THEME_SCRIPT = "try{if(localStorage.getItem('np-theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}";

@@ -114,7 +114,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
               {agent.verified && <ShieldCheck size={15} className="text-ok" aria-label="Verified" />}
             </div>
             <div className={cn("text-sm", muted)}>{agency ? agency.name : tx(locale, "Propietario · publica directo", "Owner · listing directly")}</div>
-            {agent.verified && <span className="mt-1 inline-block rounded-full bg-[#2F6F4E1F] px-2 py-0.5 text-[11px] font-bold text-ok">VERIFIED</span>}
+            {agent.verified && <span className="mt-1 inline-block rounded-full bg-[#2F6B4F1F] px-2 py-0.5 text-[11px] font-bold text-ok">VERIFIED</span>}
           </div>
           {agency?.whatsapp && (
             <span className={cn("flex items-center gap-1 rounded-full border px-2.5 py-1.5 text-xs", dark ? "border-navy-line" : "border-line")} title="WhatsApp">
@@ -196,7 +196,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
             </ul>
           )}
         </div>
-        {err && <div role="alert" className="mt-2 rounded-lg bg-[#B423181A] px-3 py-2 text-sm text-danger">{err}</div>}
+        {err && <div role="alert" className="mt-2 rounded-lg bg-[#B3261E1A] px-3 py-2 text-sm text-danger">{err}</div>}
         <Button className="mt-3 w-full" size="lg" onClick={form.handleSubmit(submit)} disabled={busy || (mode === "tour" && !chosen)} variant={dark ? "gold" : "coral"}>
           {busy && <Loader2 size={16} className="animate-spin" />}
           {mode === "tour" ? tx(locale, "Solicitar visita", "Request tour") : tx(locale, "Enviar mensaje", "Send message")}

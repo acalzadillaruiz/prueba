@@ -43,7 +43,7 @@ export function SettingsView({ locale, agency, rule, logoUrl = "" }: { locale: L
       title={tx(locale, "Ajustes de la agencia", "Agency settings")}
       actions={owner ? <Button size="sm" onClick={save} disabled={busy}>{busy ? <Loader2 size={14} className="animate-spin" /> : saved ? <Check size={14} /> : <Save size={14} />} {saved ? tx(locale, "Guardado", "Saved") : tx(locale, "Guardar", "Save")}</Button> : undefined}
     >
-      {err && <div role="alert" className="mb-4 rounded-lg bg-[#B4231833] px-3 py-2 text-sm text-[#FF8A7A]">{err}</div>}
+      {err && <div role="alert" className="mb-4 rounded-lg bg-[#B3261E33] px-3 py-2 text-sm text-[#E79A7F]">{err}</div>}
       <div className="grid gap-6 [&>*]:min-w-0 xl:grid-cols-2">
         <div className="rounded-np border border-navy-line bg-navy-card p-5">
           <div className="font-display text-lg font-semibold">{tx(locale, "Marca de agencia (white-label light)", "Agency branding (light white-label)")}</div>
@@ -93,7 +93,7 @@ export function SettingsView({ locale, agency, rule, logoUrl = "" }: { locale: L
             <div className="flex items-center gap-2 font-display text-lg font-semibold"><Lock size={16} className="text-mist" /> {tx(locale, "Plan (solo lectura)", "Plan (read-only)")}</div>
             <div className="mt-3 grid grid-cols-3 gap-2 text-center text-sm">
               {["FREE", "PRO", "ENTERPRISE"].map((p) => (
-                <div key={p} className={p === agency.plan ? "rounded-lg border border-coral bg-[#F26B4D1a] p-3" : "rounded-lg border border-navy-line p-3 text-mist"}><div className="font-display font-semibold">{p}</div><div className="text-xs">{p === "FREE" ? "10 listings" : p === "PRO" ? "100 listings · IA" : tx(locale, "Ilimitado", "Unlimited")}</div></div>
+                <div key={p} className={p === agency.plan ? "rounded-lg border border-coral bg-[#A8452A1a] p-3" : "rounded-lg border border-navy-line p-3 text-mist"}><div className="font-display font-semibold">{p}</div><div className="text-xs">{p === "FREE" ? "10 listings" : p === "PRO" ? "100 listings · IA" : tx(locale, "Ilimitado", "Unlimited")}</div></div>
               ))}
             </div>
             <p className="mt-3 text-xs text-mist">{tx(locale, "Sin cobros en v1. El plan lo gestiona el superadmin.", "No billing in v1. Plans are managed by the superadmin.")}</p>

@@ -120,7 +120,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
         <div className="mx-auto my-auto w-full max-w-md py-10">
           <h1 className="font-display text-3xl font-semibold">{mode === "login" ? tx(locale, "Entra a New Place", "Sign in to New Place") : tx(locale, "Crea tu cuenta", "Create your account")}</h1>
           {inv && (
-            <div className="mt-4 rounded-np border border-coral/40 bg-[#F26B4D0D] p-3 text-sm" role="status">
+            <div className="mt-4 rounded-np border border-coral/40 bg-[#A8452A0D] p-3 text-sm" role="status">
               {tx(locale, `${inv.agencyName} te invita a su equipo como ${ROLE_LABEL[inv.role]?.[0] ?? inv.role}.`, `${inv.agencyName} invited you to their team as ${ROLE_LABEL[inv.role]?.[1] ?? inv.role}.`)}{" "}
               {mode === "register" ? (
                 <Link className="font-semibold text-coral" href={`/${locale}/login${carry}`}>{tx(locale, "¿Ya tienes cuenta? Entra", "Have an account? Sign in")}</Link>
@@ -151,7 +151,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
             </Field>
             {mode === "register" && !inv && (
               <label className="flex cursor-pointer items-start gap-3 rounded-np border border-line bg-white p-3.5">
-                <input type="checkbox" checked={agency} onChange={(e) => setAgency(e.target.checked)} className="mt-1 accent-[#F26B4D]" />
+                <input type="checkbox" checked={agency} onChange={(e) => setAgency(e.target.checked)} className="mt-1 accent-[#A8452A]" />
                 <span>
                   <span className="flex items-center gap-1.5 font-display font-semibold"><Building2 size={16} /> {tx(locale, "¿Eres agencia?", "Are you an agency?")}</span>
                   <span className="text-sm text-ink/65">{tx(locale, "Crea tu inmobiliaria y empieza con el plan Free.", "Set up your agency on the Free plan.")}</span>
@@ -159,7 +159,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
               </label>
             )}
             {agency && !inv && <Field label={tx(locale, "Nombre de la agencia", "Agency name")} error={fieldError(errs.agencyName, locale, "agencyName")}><input className={inputCls} {...register("agencyName")} placeholder="Andes Prime" /></Field>}
-            {err && <div className="rounded-lg bg-[#B423181A] px-3 py-2 text-sm text-danger" role="alert">{err}</div>}
+            {err && <div className="rounded-lg bg-[#B3261E1A] px-3 py-2 text-sm text-danger" role="alert">{err}</div>}
             <Button className="w-full" size="lg" disabled={!!busy}>
               {busy === "form" && <Loader2 size={16} className="animate-spin" />}
               {mode === "login" ? tx(locale, "Entrar", "Sign in") : tx(locale, "Crear cuenta", "Create account")}
@@ -173,7 +173,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
             )}
           </p>
           {mode === "login" && DEMO_ENABLED && (
-            <div className="mt-8 rounded-np border border-dashed border-coral/50 bg-[#F26B4D0D] p-4">
+            <div className="mt-8 rounded-np border border-dashed border-coral/50 bg-[#A8452A0D] p-4">
               <div className="flex items-center gap-2 font-display text-sm font-semibold text-coral-hover"><FlaskConical size={15} /> DEMO_AUTH=true · {tx(locale, "Entrar como…", "Sign in as…")}</div>
               <div className="mt-3 grid grid-cols-2 gap-2">
                 {DEMO_LOGINS.map((d) => (

@@ -122,7 +122,7 @@ export function HubView({ locale, data }: { locale: Locale; data: HubData }) {
               const l = listingById(ld.listingId);
               if (!l) return null;
               return (
-                <div key={ld.id} className="np-in flex flex-wrap items-center gap-4 rounded-np border border-coral/40 bg-[#F26B4D0A] p-3 sm:flex-nowrap">
+                <div key={ld.id} className="np-in flex flex-wrap items-center gap-4 rounded-np border border-coral/40 bg-[#A8452A0A] p-3 sm:flex-nowrap">
                   <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="h-16 w-24 shrink-0 rounded-lg" />
                   <div className="min-w-0 flex-1">
                     <div className="line-clamp-1 font-semibold">{tx(locale, l.title_es, l.title_en)}</div>
@@ -160,10 +160,10 @@ export function HubView({ locale, data }: { locale: Locale; data: HubData }) {
           <h2 className="flex items-center gap-2 font-display text-lg font-semibold"><CircleDollarSign size={18} className="text-coral" /> {tx(locale, "Precalificación (simulada)", "Pre-qualification (mock)")}</h2>
           <p className="mt-1 text-xs text-ink/65">{tx(locale, "Referencial. New Place no origina créditos.", "For reference. New Place does not originate loans.")}</p>
           <div className="mt-4 space-y-4 text-sm">
-            <label className="block"><div className="flex justify-between"><span>{tx(locale, "Precio", "Price")}</span><b>{money(price, locale)}</b></div><input type="range" min={50000} max={500000} step={5000} value={price} onChange={(e) => setPrice(+e.target.value)} className="w-full accent-[#F26B4D]" aria-label={tx(locale, "Precio", "Price")} /></label>
-            <label className="block"><div className="flex justify-between"><span>{tx(locale, "Inicial", "Down payment")}</span><b>{down} %</b></div><input type="range" min={10} max={70} value={down} onChange={(e) => setDown(+e.target.value)} className="w-full accent-[#F26B4D]" aria-label={tx(locale, "Inicial (%)", "Down payment (%)")} /></label>
-            <label className="block"><div className="flex justify-between"><span>{tx(locale, "Plazo", "Term")}</span><b>{years} {tx(locale, "años", "yrs")}</b></div><input type="range" min={5} max={25} value={years} onChange={(e) => setYears(+e.target.value)} className="w-full accent-[#F26B4D]" aria-label={tx(locale, "Plazo (años)", "Term (years)")} /></label>
-            <label className="block"><div className="flex justify-between"><span>{tx(locale, "Tasa anual", "Annual rate")}</span><b>{ratePct.toLocaleString(locale === "es" ? "es-VE" : "en-US")} %</b></div><input type="range" min={0} max={30} step={0.5} value={ratePct} onChange={(e) => setRatePct(+e.target.value)} className="w-full accent-[#F26B4D]" aria-label={tx(locale, "Tasa anual (%)", "Annual rate (%)")} /></label>
+            <label className="block"><div className="flex justify-between"><span>{tx(locale, "Precio", "Price")}</span><b>{money(price, locale)}</b></div><input type="range" min={50000} max={500000} step={5000} value={price} onChange={(e) => setPrice(+e.target.value)} className="w-full accent-[#A8452A]" aria-label={tx(locale, "Precio", "Price")} /></label>
+            <label className="block"><div className="flex justify-between"><span>{tx(locale, "Inicial", "Down payment")}</span><b>{down} %</b></div><input type="range" min={10} max={70} value={down} onChange={(e) => setDown(+e.target.value)} className="w-full accent-[#A8452A]" aria-label={tx(locale, "Inicial (%)", "Down payment (%)")} /></label>
+            <label className="block"><div className="flex justify-between"><span>{tx(locale, "Plazo", "Term")}</span><b>{years} {tx(locale, "años", "yrs")}</b></div><input type="range" min={5} max={25} value={years} onChange={(e) => setYears(+e.target.value)} className="w-full accent-[#A8452A]" aria-label={tx(locale, "Plazo (años)", "Term (years)")} /></label>
+            <label className="block"><div className="flex justify-between"><span>{tx(locale, "Tasa anual", "Annual rate")}</span><b>{ratePct.toLocaleString(locale === "es" ? "es-VE" : "en-US")} %</b></div><input type="range" min={0} max={30} step={0.5} value={ratePct} onChange={(e) => setRatePct(+e.target.value)} className="w-full accent-[#A8452A]" aria-label={tx(locale, "Tasa anual (%)", "Annual rate (%)")} /></label>
           </div>
           <div className="mt-4 rounded-np bg-navy p-4 text-ivory">
             <div className="text-xs text-mist">{tx(locale, `Cuota estimada (${ratePct.toLocaleString("es-VE")} % anual)`, `Est. payment (${ratePct}% APR)`)}</div>
@@ -173,7 +173,7 @@ export function HubView({ locale, data }: { locale: Locale; data: HubData }) {
             {prequalBusy ? <Loader2 size={16} className="animate-spin" /> : savedPrequal && !dirty ? <Check size={16} /> : <FileCheck2 size={16} />}
             {savedPrequal && !dirty ? tx(locale, "Precalificación guardada", "Pre-qualification saved") : tx(locale, "Guardar y generar carta", "Save and generate letter")}
           </Button>
-          {prequalErr && <div role="alert" className="mt-2 rounded-lg bg-[#B423181A] px-3 py-2 text-sm text-danger">{prequalErr}</div>}
+          {prequalErr && <div role="alert" className="mt-2 rounded-lg bg-[#B3261E1A] px-3 py-2 text-sm text-danger">{prequalErr}</div>}
           {savedPrequal && (
             <div className="np-in mt-3 rounded-np border border-dashed border-line p-3 text-xs leading-relaxed text-ink/70" data-testid="prequal-letter">
               <b>{tx(locale, "Carta de precalificación (simulada)", "Pre-qualification letter (mock)")}</b>

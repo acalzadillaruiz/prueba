@@ -41,7 +41,7 @@ export function TeamView({ locale, members, listingsByAgent, invites: initialInv
   };
   return (
     <AdminShell locale={locale} area="agency" title={tx(locale, "Equipo", "Team")}>
-      {err && <div role="alert" className="mb-4 rounded-lg bg-[#B4231833] px-3 py-2 text-sm text-[#FF8A7A]">{err}</div>}
+      {err && <div role="alert" className="mb-4 rounded-lg bg-[#B3261E33] px-3 py-2 text-sm text-[#E79A7F]">{err}</div>}
       <div className="grid gap-6 [&>*]:min-w-0 xl:grid-cols-[1fr_360px]">
         <div className="overflow-x-auto rounded-np border border-navy-line bg-navy-card">
           <table className="w-full min-w-[720px] text-sm">
@@ -60,10 +60,10 @@ export function TeamView({ locale, members, listingsByAgent, invites: initialInv
                   <td className="px-3">
                     {u.role === "AGENT" ? (
                       u.verified ? (
-                        <Badge className="bg-[#2F6F4E40] text-[#7FD3A8]"><ShieldCheck size={12} /> {tx(locale, "Verificado", "Verified")}</Badge>
+                        <Badge className="bg-[#2F6B4F40] text-[#7FC8A4]"><ShieldCheck size={12} /> {tx(locale, "Verificado", "Verified")}</Badge>
                       ) : (
                         <span className="flex items-center gap-2">
-                          <Badge className="bg-[#C9862A33] text-[#F2B866]"><ShieldQuestion size={12} /> {tx(locale, "Documento en revisión", "Document in review")}</Badge>
+                          <Badge className="bg-[#8A5A0033] text-[#F2B866]"><ShieldQuestion size={12} /> {tx(locale, "Documento en revisión", "Document in review")}</Badge>
                           {manager && <Button size="sm" variant="dark-outline" disabled={busy === u.id} onClick={() => patch(u.id, { verified: true })}>{tx(locale, "Verificar", "Verify")}</Button>}
                         </span>
                       )

@@ -102,7 +102,7 @@ export function AccountView({ locale, data }: { locale: Locale; data: AccountDat
           </div>
         </div>
       </Card>
-      {err && <div role="alert" className="mt-4 rounded-lg bg-[#B423181A] px-3 py-2 text-sm text-danger">{err}</div>}
+      {err && <div role="alert" className="mt-4 rounded-lg bg-[#B3261E1A] px-3 py-2 text-sm text-danger">{err}</div>}
       <div className="mt-6 flex justify-between">
         <Button variant="ghost" onClick={() => logout(locale)}>
           <LogOut size={16} /> {tx(locale, "Cerrar sesión", "Sign out")}

@@ -91,7 +91,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
         <Button href={`/${locale}/owner/new`}><Plus size={16} /> {tx(locale, "Publicar otro", "List another")}</Button>
       </div>
       {error && (
-        <div className="mt-4 rounded-lg bg-[#B423181A] px-3 py-2 text-sm text-danger" role="alert">
+        <div className="mt-4 rounded-lg bg-[#B3261E1A] px-3 py-2 text-sm text-danger" role="alert">
           {error}
         </div>
       )}
@@ -350,7 +350,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
                 <button disabled={sending} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-coral-cta text-white disabled:opacity-60" aria-label={tx(locale, "Enviar", "Send")}>{sending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}</button>
               </form>
               )}
-              {chatErr && <div role="alert" className="mx-3 mb-2 rounded-lg bg-[#B423181A] px-3 py-2 text-xs text-danger">{chatErr}</div>}
+              {chatErr && <div role="alert" className="mx-3 mb-2 rounded-lg bg-[#B3261E1A] px-3 py-2 text-xs text-danger">{chatErr}</div>}
               <div className="pb-2 text-center text-[10px] text-ink/65">{tx(locale, "Inbox interno · se actualiza cada 15 s", "Internal inbox · refreshes every 15 s")}</div>
             </>
           ) : (

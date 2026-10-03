@@ -56,14 +56,14 @@ type BadgeTone = "neutral" | "coral" | "gold" | "ok" | "warn" | "danger" | "navy
  */
 export function Badge({ children, tone = "neutral", className }: { children: ReactNode; tone?: BadgeTone; className?: string }) {
   const t = {
-    neutral: "bg-black/5 text-ink",
-    coral: "bg-[#A8452A1F] text-coral-hover",
-    gold: "bg-[#B4935A29] text-gold-text",
-    ok: "bg-[#2F6B4F1F] text-ok",
-    warn: "bg-[#8A5A0024] text-[#8A5A00]",
-    danger: "bg-[#B3261E1A] text-danger",
+    neutral: "bg-black/5 text-ink dark:bg-white/10 dark:text-[#E8EDF2]",
+    coral: "bg-[#A8452A1F] text-coral-hover dark:bg-[#E79A7F26] dark:text-[#E79A7F]",
+    gold: "bg-[#B4935A29] text-gold-text dark:text-[#D9C59C]",
+    ok: "bg-[#2F6B4F1F] text-ok dark:bg-[#7FC8A426] dark:text-[#7FC8A4]",
+    warn: "bg-[#8A5A0024] text-[#8A5A00] dark:bg-[#F2B86626] dark:text-[#F2B866]",
+    danger: "bg-[#B3261E1A] text-danger dark:bg-[#F2A09A26] dark:text-[#F2A09A]",
     navy: "bg-navy text-ivory",
-    mist: "bg-[#A9B4C22E] text-[#3E5A6B]",
+    mist: "bg-[#A9B4C22E] text-[#3E5A6B] dark:text-[#C9D2DB]",
     dark: "bg-white/10 text-ivory",
     exclusive: "bg-[#ffffff] text-[#A8452A] shadow-[inset_0_0_0_1px_rgba(168,69,42,.3)]",
     egeo: "bg-[#A9C6D8] text-[#1F4A63]",

@@ -104,7 +104,7 @@ export function CaptureView({ locale, rows: initialRows, zones, titles, canConve
                     {c.result === "PENDING" && (
                       <div className="flex flex-wrap gap-1">
                         {canConvert && (
-                          <button onClick={() => setConverting(converting?.id === c.id ? null : { id: c.id, listingType: "SALE" })} className={cn("flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold", k.outline, "border")} aria-expanded={converting?.id === c.id}>
+                          <button onClick={() => setConverting(converting?.id === c.id ? null : { id: c.id, listingType: "SALE" })} className={cn("flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold", "border-[1.5px]", k.outline)} aria-expanded={converting?.id === c.id}>
                             <Building2 size={14} /> {tx(locale, "Convertir en inmueble", "Convert to listing")}
                           </button>
                         )}

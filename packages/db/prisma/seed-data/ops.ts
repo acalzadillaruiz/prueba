@@ -1,6 +1,6 @@
 import type { CaptureLead, EmailOutbox, Lead, MediaJob, Message, Offer, Tour } from "@/types/domain";
 import { LISTINGS } from "./listings";
-import { inMinutes, minutesAgo } from "./people";
+import { caracasAt, inMinutes, minutesAgo } from "./people";
 
 const L = (i: number) => LISTINGS[i].id;
 
@@ -20,14 +20,14 @@ export const LEADS: Lead[] = [
 ];
 
 export const TOURS: Tour[] = [
-  { id: "tr-1", listingId: L(16), leadId: "ld-05", agentId: "u-agent", seekerName: "Ana Lucía Pérez", start: inMinutes(60 * 20), status: "CONFIRMED" },
-  { id: "tr-2", listingId: L(0), leadId: "ld-01", agentId: "u-agent", seekerName: "Gabriela Torres", start: inMinutes(60 * 44), status: "REQUESTED" },
-  { id: "tr-3", listingId: L(1), agentId: "u-agent", seekerName: "Daniel Ortega", start: inMinutes(60 * 2), status: "CONFIRMED" },
-  { id: "tr-4", listingId: L(41), leadId: "ld-04", agentId: "u-agent", seekerName: "Carlos Medina", start: inMinutes(60 * 68), status: "CONFIRMED" },
-  { id: "tr-5", listingId: L(4), leadId: "ld-11", agentId: "u-agent2", seekerName: "Daniela Quintero", start: inMinutes(60 * 26), status: "CONFIRMED" },
-  { id: "tr-6", listingId: L(10), leadId: "ld-06", agentId: "u-agent", seekerName: "Ricardo Salazar", start: minutesAgo(60 * 30), status: "DONE" },
-  { id: "tr-7", listingId: L(14), leadId: "ld-07", agentId: "u-agent", seekerName: "Paola Hernández", start: minutesAgo(60 * 50), status: "DONE" },
-  { id: "tr-8", listingId: L(5), agentId: "u-agent", seekerName: "Jorge Castillo", start: inMinutes(60 * 92), status: "REQUESTED" },
+  { id: "tr-1", listingId: L(16), leadId: "ld-05", agentId: "u-agent", seekerName: "Ana Lucía Pérez", start: caracasAt(1, 10), status: "CONFIRMED" },
+  { id: "tr-2", listingId: L(0), leadId: "ld-01", agentId: "u-agent", seekerName: "Gabriela Torres", start: caracasAt(2, 11), status: "REQUESTED" },
+  { id: "tr-3", listingId: L(1), agentId: "u-agent", seekerName: "Daniel Ortega", start: caracasAt(1, 15), status: "CONFIRMED" },
+  { id: "tr-4", listingId: L(41), leadId: "ld-04", agentId: "u-agent", seekerName: "Carlos Medina", start: caracasAt(3, 16), status: "CONFIRMED" },
+  { id: "tr-5", listingId: L(4), leadId: "ld-11", agentId: "u-agent2", seekerName: "Daniela Quintero", start: caracasAt(2, 9), status: "CONFIRMED" },
+  { id: "tr-6", listingId: L(10), leadId: "ld-06", agentId: "u-agent", seekerName: "Ricardo Salazar", start: caracasAt(-1, 11), status: "DONE" },
+  { id: "tr-7", listingId: L(14), leadId: "ld-07", agentId: "u-agent", seekerName: "Paola Hernández", start: caracasAt(-2, 17), status: "DONE" },
+  { id: "tr-8", listingId: L(5), agentId: "u-agent", seekerName: "Jorge Castillo", start: caracasAt(4, 14), status: "REQUESTED" },
 ];
 
 /** Weekly availability of the agent (slots). Hours are local. */

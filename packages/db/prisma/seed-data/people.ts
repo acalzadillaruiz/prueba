@@ -3,6 +3,11 @@ import type { Agency, User } from "@/types/domain";
 export const NOW = new Date("2026-09-26T14:00:00-04:00");
 export const minutesAgo = (m: number) => new Date(NOW.getTime() - m * 60_000).toISOString();
 export const inMinutes = (m: number) => new Date(NOW.getTime() + m * 60_000).toISOString();
+/** A plausible appointment time in Caracas (UTC−4): `days` from today's Caracas date, at hour:minute local time. */
+export const caracasAt = (days: number, hour: number, minute = 0) => {
+  const local = new Date(NOW.getTime() - 4 * 3_600_000); // shift to Caracas wall clock
+  return new Date(Date.UTC(local.getUTCFullYear(), local.getUTCMonth(), local.getUTCDate() + days, hour + 4, minute)).toISOString();
+};
 
 export const AGENCIES: Agency[] = [
   { id: "ag-andes", name: "Andes Prime", slug: "andes-prime", verified: true, plan: "PRO", city: "Caracas", phone: "+58 212 555 0142", whatsapp: "+58 414 555 0142", color: "#F26B4D", initials: "AP", commissionPct: 5, agentSplitPct: 50, createdAt: minutesAgo(60 * 24 * 410), status: "ACTIVE" },

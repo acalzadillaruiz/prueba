@@ -38,7 +38,8 @@ export const k = {
   /** Button skins (pass as className to ui/Button). */
   primary: "dark:bg-[#E79A7F] dark:text-navy dark:hover:bg-[#EDAE97]",
   navy: "dark:bg-ivory dark:text-navy dark:hover:bg-white",
-  outline: "border-navy/70 bg-transparent text-navy hover:border-navy hover:bg-[#E6EBF1] dark:border-ivory/40 dark:bg-transparent dark:text-ivory dark:hover:bg-white/[.06]",
+  /** On top of ui/Button "outline" (1.5 px navy): selected-state hover + dark-theme twin. */
+  outline: "border-navy bg-transparent text-navy hover:bg-[#E6EBF1] dark:border-ivory/50 dark:bg-transparent dark:text-ivory dark:hover:bg-white/[.06]",
   ghost: "text-navy hover:bg-[#E6EBF1] dark:text-ivory dark:hover:bg-white/[.06]",
   okText: "text-ok dark:text-[#7FC8A4]",
   warnText: "text-warn dark:text-[#F2B866]",

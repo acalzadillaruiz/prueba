@@ -19,14 +19,14 @@ export function SaveButton({ id, className, locale }: { id: string; className?: 
         e.stopPropagation();
         toggleSaved(id);
       }}
-      className={cn("flex h-11 w-11 items-center justify-center rounded-full bg-white/90 shadow-sm backdrop-blur transition-transform duration-np hover:scale-105", className)}
+      className={cn("flex h-11 w-11 items-center justify-center rounded-full bg-[#ffffffe6] text-[#162638] shadow-sm backdrop-blur transition-transform duration-np hover:scale-105", className)}
     >
-      <Heart size={18} aria-hidden className={on ? "fill-coral text-coral" : "text-navy"} />
+      <Heart size={18} strokeWidth={1.7} aria-hidden className={on ? "fill-[#A8452A] text-[#A8452A]" : "text-[#162638]"} />
     </button>
   );
 }
 
-export function CompareButton({ id, locale, dark }: { id: string; locale: Locale; dark?: boolean }) {
+export function CompareButton({ id, locale, dark, className }: { id: string; locale: Locale; dark?: boolean; className?: string }) {
   const { compare, toggleCompare } = useApp();
   const on = compare.includes(id);
   const [full, setFull] = useState(false);
@@ -44,7 +44,8 @@ export function CompareButton({ id, locale, dark }: { id: string; locale: Locale
       className={cn(
         // after: invisible 44 px hit area around the compact pill (tap target) without changing the card layout
         "relative inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold transition-colors duration-np after:absolute after:-inset-x-1 after:-inset-y-2.5 after:content-['']",
-        on ? "border-navy bg-navy text-ivory" : dark ? "border-white/20 text-ivory" : "border-line bg-white text-ink/70 hover:border-navy/40",
+        on ? "np-sel border-2" : dark ? "border-white/20 text-ivory" : "border-line bg-white text-ink/70 hover:border-navy/40",
+        className,
       )}
     >
       <Scale size={13} /> <span aria-live="polite">{full ? tx(locale, "Máximo 3: quita uno", "Max 3: remove one") : on ? tx(locale, "Comparando", "Comparing") : tx(locale, "Comparar", "Compare")}</span>
@@ -52,15 +53,16 @@ export function CompareButton({ id, locale, dark }: { id: string; locale: Locale
   );
 }
 
+// Brand pills: egeo / arena for market states, navy for closed deals; status colours only where they warn.
 const STATUS_TONE: Record<ListingStatus, string> = {
-  DRAFT: "bg-black/60 text-white",
-  COMING_SOON: "bg-[#4F6285] text-white",
-  ACTIVE: "bg-ok text-white",
-  UNDER_OFFER: "bg-[#8A5A00] text-white",
-  SOLD: "bg-navy text-ivory",
-  RENTED: "bg-navy text-ivory",
+  DRAFT: "bg-[#5E6673] text-white",
+  COMING_SOON: "bg-[#A9C6D8] text-[#1F4A63]",
+  ACTIVE: "bg-[#2F6B4F] text-white",
+  UNDER_OFFER: "bg-[#E8DCC8] text-[#162638]",
+  SOLD: "bg-[#162638] text-[#F8F5EF]",
+  RENTED: "bg-[#162638] text-[#F8F5EF]",
   WITHDRAWN: "bg-danger text-white",
-  EXPIRED: "bg-black/50 text-white",
+  EXPIRED: "bg-[#5E6673] text-white",
 };
 
 /**
@@ -76,7 +78,7 @@ export function StatusBadge({ status, locale, className, review }: { status: Lis
     );
   }
   return (
-    <span className={cn("inline-flex items-center whitespace-nowrap rounded-full px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide", STATUS_TONE[status], className)}>
+    <span className={cn("inline-flex items-center whitespace-nowrap rounded-full px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-[0.14em]", STATUS_TONE[status], className)}>
       {lbl(STATUS_LABEL[status], locale)}
     </span>
   );
@@ -87,7 +89,7 @@ export function Freshness({ iso, locale, className }: { iso: string; locale: Loc
   return (
     <span className={cn("inline-flex items-center gap-1.5 text-xs", className)}>
       {/* Relative time differs between the cached server HTML and the browser: not a hydration error. */}
-      <span className={cn("relative h-2 w-2 rounded-full", minutes < 60 ? "np-pulse bg-coral" : "bg-mist")} suppressHydrationWarning />
+      <span className={cn("relative h-2 w-2 rounded-full", minutes < 60 ? "np-pulse bg-[#2F6B4F]" : "bg-mist")} suppressHydrationWarning />
       <span>
         {tx(locale, "Actualizado", "Updated")}{" "}
         <time dateTime={iso} suppressHydrationWarning>

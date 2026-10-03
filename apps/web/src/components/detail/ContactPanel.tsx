@@ -6,9 +6,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { leadSchema } from "@newplace/config";
 import { fieldError } from "@/lib/form";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { CalendarCheck, CheckCircle2, Loader2, MessageSquare, Phone, ShieldCheck, Video } from "lucide-react";
+import { CalendarCheck, CheckCircle2, Loader2, MessageSquare, ShieldCheck, Video } from "lucide-react";
 import type { Listing, Locale } from "@/types/domain";
-import { Avatar, Button, inputCls } from "@/components/ui";
+import { Button, inputCls } from "@/components/ui";
+import { WhatsAppIcon } from "@/components/brand/PublicChrome";
+import { whatsappHref } from "@/lib/listing-href";
 import { useApp } from "@/lib/store";
 import { api, ApiClientError } from "@/lib/api";
 import { tx } from "@/lib/i18n";
@@ -83,126 +85,155 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
     }
   };
 
-  const box = dark ? "border-navy-line bg-navy-card text-ivory" : "border-line bg-white";
   const muted = dark ? "text-mist" : "text-ink/65";
-  const field = cn(inputCls, "h-11", dark && "border-navy-line bg-navy-2 text-ivory");
+  const field = cn(inputCls, "h-12 rounded-xl border-[#DDD3C2]", dark && "border-navy-line bg-navy-2 text-ivory");
+  const wa = whatsappHref(l, locale);
+  const first = agent?.name.split(" ")[0] ?? agency?.name ?? "";
+  const initials = (agent?.name ?? agency?.name ?? "NP").split(" ").map((p) => p[0]).slice(0, 2).join("");
+  const box = dark ? "bg-navy-card text-ivory ring-navy-line" : "bg-white ring-black/[.04]";
+  const seg = (active: boolean) => cn("flex min-h-11 items-center justify-center gap-1.5 rounded-full border-2 font-display text-sm transition-colors duration-np", active ? "np-sel font-semibold" : "border-transparent text-ink/65 hover:text-ink");
 
   if (done !== null)
     return (
-      <div id="contact-panel" tabIndex={-1} className={cn("np-in rounded-np border p-5", box)} data-testid="lead-done">
+      <div id="contact-panel" tabIndex={-1} className={cn("np-in rounded-[24px] p-6 shadow-[0_24px_60px_rgba(22,38,56,.12)] ring-1", box)} data-testid="lead-done">
         <CheckCircle2 className="text-ok" size={30} />
-        <div className="mt-3 font-display text-xl font-semibold">{mode === "tour" && done ? tx(locale, "Visita solicitada", "Tour requested") : tx(locale, "Mensaje enviado", "Message sent")}</div>
-        {done && <div className="mt-1 font-display first-letter:uppercase text-coral">{done}</div>}
-        <p className={cn("mt-2 text-sm", muted)}>
+        <div className="mt-3 font-serif text-[28px] leading-tight">{mode === "tour" && done ? tx(locale, "Visita solicitada", "Tour requested") : tx(locale, "Mensaje enviado", "Message sent")}</div>
+        {done && <div className="mt-1 font-display text-[17px] font-semibold first-letter:uppercase text-ink">{done}</div>}
+        <p className={cn("mt-2 text-[15px]", muted)}>
           {tx(locale, `${agent?.name.split(" ")[0] ?? "El agente"} suele responder en menos de 15 minutos. Te enviamos la confirmación a ${email}.`, `${agent?.name.split(" ")[0] ?? "The agent"} usually replies within 15 minutes. Confirmation sent to ${email}.`)}
         </p>
-        <div className="mt-4 flex gap-2">
-          {user && <Button href={`/${locale}/app`} size="sm">{tx(locale, "Ver en mi Hub", "Open my Hub")}</Button>}
+        <div className="mt-5 flex flex-wrap gap-2">
+          {user && <Button href={`/${locale}/app`} size="sm" variant="navy">{tx(locale, "Ver en mi Hub", "Open my Hub")}</Button>}
           <Button size="sm" variant={dark ? "dark-outline" : "outline"} onClick={() => { setDone(null); setIso(null); setDay(null); }}>{tx(locale, "Nueva solicitud", "New request")}</Button>
         </div>
       </div>
     );
 
   return (
-    <div id="contact-panel" tabIndex={-1} className={cn("rounded-np border shadow-np", box)}>
-      {agent && (
-        <div className={cn("flex items-center gap-3 border-b p-4", dark ? "border-navy-line" : "border-line")}>
-          <Avatar initials={agent.name.split(" ").map((p) => p[0]).slice(0, 2).join("")} hue={agent.hue} size={46} />
+    <div id="contact-panel" tabIndex={-1} data-hide-fab className={cn("rounded-[24px] p-6 shadow-[0_24px_60px_rgba(22,38,56,.12)] ring-1", box)}>
+      {(agent || agency) && (
+        <div className="flex items-center gap-4">
+          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#E8DCC8] font-serif text-[22px] font-semibold text-[#162638]" aria-hidden>{initials}</span>
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-1.5 font-display font-semibold">
-              {agent.name}
-              {agent.verified && <ShieldCheck size={15} className="text-ok" aria-label="Verified" />}
+            <div className="flex items-center gap-1.5 text-[17px] font-semibold">
+              {agent?.name ?? agency?.name}
+              {agent?.verified && <ShieldCheck size={15} className="text-ok" aria-label={tx(locale, "Verificado", "Verified")} />}
             </div>
-            <div className={cn("text-sm", muted)}>{agency ? agency.name : tx(locale, "Propietario · publica directo", "Owner · listing directly")}</div>
-            {agent.verified && <span className="mt-1 inline-block rounded-full bg-[#2F6B4F1F] px-2 py-0.5 text-[11px] font-bold text-ok">VERIFIED</span>}
+            <div className={cn("text-sm", muted)}>
+              {agent?.verified ? tx(locale, "Asesor verificado", "Verified advisor") : tx(locale, "Asesor", "Advisor")}
+              {agency ? ` · ${agency.name}` : ""}
+            </div>
           </div>
-          {agency?.whatsapp && (
-            <span className={cn("flex items-center gap-1 rounded-full border px-2.5 py-1.5 text-xs", dark ? "border-navy-line" : "border-line")} title="WhatsApp">
-              <Phone size={13} /> {agency.whatsapp}
-            </span>
-          )}
         </div>
       )}
-      <div className="p-4">
-        <div className={cn("mb-4 grid rounded-full p-1", bookable ? "grid-cols-2" : "grid-cols-1", dark ? "bg-white/5" : "bg-ivory")}>
-          {bookable && (
-            <button onClick={() => setMode("tour")} className={cn("flex min-h-11 items-center justify-center gap-1.5 rounded-full py-1.5 font-display text-sm", mode === "tour" && (dark ? "bg-ivory text-navy" : "bg-navy text-ivory"))}>
-              <CalendarCheck size={15} /> {tx(locale, "Pedir visita", "Book a tour")}
-            </button>
-          )}
-          <button onClick={() => setMode("msg")} className={cn("flex min-h-11 items-center justify-center gap-1.5 rounded-full py-1.5 font-display text-sm", mode === "msg" && (dark ? "bg-ivory text-navy" : "bg-navy text-ivory"))}>
-            <MessageSquare size={15} /> {tx(locale, "Mensaje", "Message")}
+      {!agent && !agency && <div className={cn("text-sm", muted)}>{tx(locale, "Propietario · publica directo", "Owner · listing directly")}</div>}
+      <div className={cn("mt-5 grid gap-1 rounded-full bg-[#F3EEE5] p-1 dark:bg-white/5", bookable ? "grid-cols-2" : "grid-cols-1")}>
+        {bookable && (
+          <button onClick={() => setMode("tour")} aria-pressed={mode === "tour"} className={seg(mode === "tour")}>
+            <CalendarCheck size={15} aria-hidden /> {tx(locale, "Pedir visita", "Book a tour")}
           </button>
-        </div>
-        {mode === "tour" && (
-          <>
-            {slots.isLoading && <div className={cn("flex items-center gap-2 text-sm", muted)}><Loader2 size={14} className="animate-spin" /> {tx(locale, "Cargando agenda…", "Loading calendar…")}</div>}
-            {!slots.isLoading && days.length === 0 && <div className={cn("text-sm", muted)}>{tx(locale, "Sin horarios esta semana. Envía un mensaje y te propondrán uno.", "No slots this week. Send a message and they’ll propose one.")}</div>}
-            <div className="no-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
-              {days.map((d, i) => (
+        )}
+        <button onClick={() => setMode("msg")} aria-pressed={mode === "msg"} className={seg(mode === "msg")}>
+          <MessageSquare size={15} aria-hidden /> {tx(locale, "Mensaje", "Message")}
+        </button>
+      </div>
+      {mode === "tour" && (
+        <div className="mt-5">
+          <div className="np-eyebrow mb-3 text-gold-text">{tx(locale, "Agendar una visita privada", "Book a private viewing")}</div>
+          {slots.isLoading && (
+            <div className="grid grid-cols-4 gap-2" aria-label={tx(locale, "Cargando agenda…", "Loading calendar…")}>
+              {[0, 1, 2, 3].map((i) => <div key={i} className="np-skeleton h-[86px] rounded-xl" />)}
+            </div>
+          )}
+          {!slots.isLoading && days.length === 0 && <div className={cn("text-sm", muted)}>{tx(locale, "Sin horarios esta semana. Envía un mensaje y te propondrán uno.", "No slots this week. Send a message and they’ll propose one.")}</div>}
+          <div className="no-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
+            {days.map((d, i) => {
+              const label = fmt(d.date, { weekday: "short", day: "numeric" });
+              const cut = label.lastIndexOf(" ");
+              return (
                 <button
                   key={d.date}
                   onClick={() => {
                     setDay(i);
                     setIso(null);
                   }}
-                  className={cn("min-w-[62px] rounded-xl border px-2 py-2 text-center font-display text-sm first-letter:uppercase", day === i ? "border-coral bg-coral-cta text-white" : dark ? "border-navy-line" : "border-line")}
-                >
-                  {fmt(d.date, { weekday: "short", day: "numeric" })}
-                </button>
-              ))}
-            </div>
-            {days.length > 0 && !days[day]?.hours.some((h) => h.available) && (
-              <div className={cn("mt-3 text-sm", muted)} role="status">
-                {firstOpenDay === -1 ? tx(locale, "No quedan horarios libres esta semana. Envía un mensaje y te propondrán uno.", "No free slots left this week. Send a message and they’ll propose one.") : tx(locale, "Este día ya no tiene horarios libres. Elige otro día.", "No free slots left on this day. Pick another day.")}
-              </div>
-            )}
-            <div className="mt-3 grid grid-cols-3 gap-2">
-              {days[day]?.hours.map((h) => (
-                <button
-                  key={h.iso}
-                  disabled={!h.available}
-                  onClick={() => {
-                    setDay(day); // pin the day shown, so a refresh of the calendar can't move the view away from the chosen slot
-                    setIso(h.iso);
-                  }}
+                  aria-pressed={day === i}
+                  aria-label={fmt(d.date, { weekday: "long", day: "numeric", month: "long" })}
+                  data-month={fmt(d.date, { month: "short" }).replace(".", "")}
                   className={cn(
-                    "min-h-11 rounded-lg border py-1.5 text-sm font-semibold disabled:cursor-not-allowed disabled:line-through disabled:opacity-40",
-                    chosen === h.iso ? "border-navy bg-navy text-ivory" : dark ? "border-navy-line" : "border-line",
+                    "min-w-[62px] flex-1 rounded-xl border px-2 py-2.5 text-center font-display text-sm first-letter:uppercase after:mt-0.5 after:block after:text-[13px] after:text-ink/60 after:content-[attr(data-month)]",
+                    day === i ? "np-sel border-2" : dark ? "border-navy-line" : "border-[#DDD3C2] hover:border-navy/50",
                   )}
                 >
-                  {String(h.hour).padStart(2, "0")}:00
+                  <span className="block">{label.slice(0, cut)}</span> <span className="mt-0.5 block font-serif text-[24px] font-semibold leading-none">{label.slice(cut + 1)}</span>
                 </button>
-              ))}
-            </div>
-            <label className={cn("mt-3 flex min-h-11 cursor-pointer items-center gap-2 text-sm", muted)}>
-              <input type="checkbox" checked={virtual} onChange={(e) => setVirtual(e.target.checked)} className="h-5 w-5 accent-[#C2452A]" />
-              <Video size={14} /> {tx(locale, "Prefiero visita por videollamada", "I prefer a video tour")}
-            </label>
-          </>
-        )}
-        <div className="mt-3 space-y-2">
-          <input className={field} placeholder={tx(locale, "Nombre", "Name")} {...form.register("name")} aria-invalid={!!errs.name} aria-describedby={errs.name ? "cp-err-name" : undefined} aria-label={tx(locale, "Nombre", "Name")} />
-          <div className="grid grid-cols-2 gap-2">
-            <input className={field} type="email" placeholder="Email" {...form.register("email")} aria-invalid={!!errs.email} aria-describedby={errs.email ? "cp-err-email" : undefined} aria-label="Email" />
-            <input className={field} type="tel" placeholder={tx(locale, "Teléfono", "Phone")} {...form.register("phone")} aria-invalid={!!errs.phone} aria-describedby={errs.phone ? "cp-err-phone" : undefined} aria-label={tx(locale, "Teléfono", "Phone")} />
+              );
+            })}
           </div>
-          <textarea className={cn(field, "h-20 py-2")} {...form.register("message")} aria-invalid={!!errs.message} aria-describedby={errs.message ? "cp-err-message" : undefined} aria-label={tx(locale, "Mensaje", "Message")} />
-          {fieldErrors.length > 0 && (
-            <ul className="space-y-0.5 text-xs font-semibold text-danger" role="alert">
-              {fieldErrors.map(([k, msg]) => (
-                <li key={k} id={`cp-err-${k}`}>{msg}</li>
-              ))}
-            </ul>
+          {days.length > 0 && !days[day]?.hours.some((h) => h.available) && (
+            <div className={cn("mt-3 text-sm", muted)} role="status">
+              {firstOpenDay === -1 ? tx(locale, "No quedan horarios libres esta semana. Envía un mensaje y te propondrán uno.", "No free slots left this week. Send a message and they’ll propose one.") : tx(locale, "Este día ya no tiene horarios libres. Elige otro día.", "No free slots left on this day. Pick another day.")}
+            </div>
           )}
+          <div className="mt-3 grid grid-cols-3 gap-2">
+            {days[day]?.hours.map((h) => (
+              <button
+                key={h.iso}
+                disabled={!h.available}
+                aria-pressed={chosen === h.iso}
+                onClick={() => {
+                  setDay(day); // pin the day shown, so a refresh of the calendar can't move the view away from the chosen slot
+                  setIso(h.iso);
+                }}
+                className={cn(
+                  "min-h-11 rounded-xl border font-display text-[15px] font-semibold tracking-[0.04em] disabled:cursor-not-allowed disabled:line-through disabled:opacity-40",
+                  chosen === h.iso ? "np-sel border-2" : dark ? "border-navy-line" : "border-[#DDD3C2] hover:border-navy/50",
+                )}
+              >
+                {String(h.hour).padStart(2, "0")}:00
+              </button>
+            ))}
+          </div>
+          <label className={cn("mt-3 flex min-h-11 cursor-pointer items-center gap-2 text-sm", muted)}>
+            <input type="checkbox" checked={virtual} onChange={(e) => setVirtual(e.target.checked)} className="h-5 w-5 accent-[#162638]" />
+            <Video size={14} aria-hidden /> {tx(locale, "Prefiero visita por videollamada", "I prefer a video tour")}
+          </label>
         </div>
-        {err && <div role="alert" className="mt-2 rounded-lg bg-[#B3261E1A] px-3 py-2 text-sm text-danger">{err}</div>}
-        <Button className="mt-3 w-full" size="lg" onClick={form.handleSubmit(submit)} disabled={busy || (mode === "tour" && !chosen)} variant={dark ? "gold" : "coral"}>
-          {busy && <Loader2 size={16} className="animate-spin" />}
-          {mode === "tour" ? tx(locale, "Solicitar visita", "Request tour") : tx(locale, "Enviar mensaje", "Send message")}
-        </Button>
-        {bookable && mode === "tour" && <p className={cn("mt-2 text-center text-xs", muted)}>{tx(locale, "Horarios reales de la agenda del agente. Sin costo.", "Real slots from the agent’s calendar. Free.")}</p>}
+      )}
+      {wa && (
+        <>
+          <a href={wa} target="_blank" rel="noopener noreferrer" className="mt-4 flex min-h-[52px] w-full items-center justify-center gap-2 rounded-full bg-coral-cta font-display text-[15px] font-semibold text-white transition-colors duration-np hover:bg-coral-cta-hover">
+            <WhatsAppIcon size={19} /> {tx(locale, `WhatsApp con ${first}`, `WhatsApp ${first}`)}
+            <span className="sr-only">{tx(locale, "(se abre en una pestaña nueva)", "(opens in a new tab)")}</span>
+          </a>
+          <div className={cn("my-4 flex items-center gap-3 text-sm", muted)}>
+            <span className="h-px flex-1 bg-line" aria-hidden /> {tx(locale, "o déjenos sus datos", "or leave your details")} <span className="h-px flex-1 bg-line" aria-hidden />
+          </div>
+        </>
+      )}
+      <div className={cn("space-y-2", !wa && "mt-4")}>
+        <input className={field} placeholder={tx(locale, "Nombre", "Name")} {...form.register("name")} aria-invalid={!!errs.name} aria-describedby={errs.name ? "cp-err-name" : undefined} aria-label={tx(locale, "Nombre", "Name")} />
+        <div className="grid grid-cols-2 gap-2">
+          <input className={field} type="email" placeholder="Email" {...form.register("email")} aria-invalid={!!errs.email} aria-describedby={errs.email ? "cp-err-email" : undefined} aria-label="Email" />
+          <input className={field} type="tel" placeholder={tx(locale, "Teléfono", "Phone")} {...form.register("phone")} aria-invalid={!!errs.phone} aria-describedby={errs.phone ? "cp-err-phone" : undefined} aria-label={tx(locale, "Teléfono", "Phone")} />
+        </div>
+        <textarea className={cn(field, "h-20 py-2.5")} {...form.register("message")} aria-invalid={!!errs.message} aria-describedby={errs.message ? "cp-err-message" : undefined} aria-label={tx(locale, "Mensaje", "Message")} />
+        {fieldErrors.length > 0 && (
+          <ul className="space-y-0.5 text-sm font-semibold text-danger" role="alert">
+            {fieldErrors.map(([k, msg]) => (
+              <li key={k} id={`cp-err-${k}`}>{msg}</li>
+            ))}
+          </ul>
+        )}
       </div>
+      {err && <div role="alert" className="mt-2 rounded-xl bg-[#B3261E1A] px-3 py-2 text-sm text-danger">{err}</div>}
+      <Button className="mt-3 h-[52px] w-full md:h-[52px]" size="lg" onClick={form.handleSubmit(submit)} disabled={busy || (mode === "tour" && !chosen)} variant={wa ? (dark ? "dark-outline" : "outline") : "primary"}>
+        {busy && <Loader2 size={16} className="animate-spin" />}
+        {mode === "tour" ? tx(locale, "Solicitar visita", "Request tour") : tx(locale, "Enviar mensaje", "Send message")}
+      </Button>
+      <p className={cn("mt-3 text-center text-sm", muted)}>
+        {bookable && mode === "tour" ? tx(locale, "Horarios reales de la agenda del asesor · Sin costo", "Real slots from the advisor’s calendar · Free") : tx(locale, "Suele responder en menos de 15 minutos", "Usually replies within 15 minutes")}
+      </p>
     </div>
   );
 }

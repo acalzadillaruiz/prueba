@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, Loader2, MessageSquare, Send } from "lucide-react";
 import type { Listing, Locale, Message } from "@/types/domain";
-import { Avatar, Badge, Button, Card, EmptyState, inputCls } from "@/components/ui";
+import { Avatar, Badge, Button, Card, inputCls } from "@/components/ui";
+import { Empty, k } from "@/components/agency/kit";
 import { api } from "@/lib/api";
 import { ago, dateTime, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
@@ -84,11 +85,11 @@ export function HubMessages({ locale, threads, meId, listingById }: { locale: Lo
   const totalUnread = list.reduce((n, t) => n + t.unread, 0);
 
   return (
-    <Card className="p-5 lg:col-span-2">
+    <Card className={cn(k.card, "border-0 p-5 lg:col-span-2")}>
       <div className="flex items-center justify-between gap-2">
-        <h2 className="flex items-center gap-2 font-display text-lg font-semibold">
-          <MessageSquare size={18} className="text-coral" /> {tx(locale, "Mensajes", "Messages")}
-          {totalUnread > 0 && <Badge tone="coral">{totalUnread} {tx(locale, totalUnread === 1 ? "nuevo" : "nuevos", "new")}</Badge>}
+        <h2 className="flex items-center gap-2 font-serif text-[24px] font-medium leading-tight">
+          <MessageSquare size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Mensajes", "Messages")}
+          {totalUnread > 0 && <Badge className="bg-[#E6EBF1] text-navy dark:bg-white/10">{totalUnread} {tx(locale, totalUnread === 1 ? "nuevo" : "nuevos", "new")}</Badge>}
         </h2>
         {open && (
           <Button size="sm" variant="ghost" onClick={() => setOpenId(null)}>
@@ -99,7 +100,7 @@ export function HubMessages({ locale, threads, meId, listingById }: { locale: Lo
 
       {!open && list.length === 0 && (
         <div className="mt-4">
-          <EmptyState icon={<MessageSquare size={20} />} title={tx(locale, "Aún no tienes mensajes", "No messages yet")} body={tx(locale, "Escribe al agente desde cualquier ficha y la conversación aparecerá aquí.", "Write to the agent from any listing and the conversation will show up here.")} />
+          <Empty className="py-6" title={tx(locale, "Aún no tienes mensajes", "No messages yet")} body={tx(locale, "Escribe al agente desde cualquier ficha y la conversación aparecerá aquí.", "Write to the agent from any listing and the conversation will show up here.")} />
         </div>
       )}
 
@@ -121,7 +122,7 @@ export function HubMessages({ locale, threads, meId, listingById }: { locale: Lo
                       <span className="line-clamp-1 text-sm text-ink/65">
                         {last ? `${last.mine ? tx(locale, "Tú: ", "You: ") : ""}${last.body}` : tx(locale, "Sin mensajes todavía", "No messages yet")}
                       </span>
-                      {t.unread > 0 && <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-coral-cta px-1.5 text-[11px] font-bold text-white">{t.unread}</span>}
+                      {t.unread > 0 && <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-navy px-1.5 text-[11px] font-bold text-ivory">{t.unread}</span>}
                     </div>
                   </div>
                 </button>
@@ -169,12 +170,12 @@ export function HubMessages({ locale, threads, meId, listingById }: { locale: Lo
                 }
               }}
             />
-            <Button type="submit" disabled={sending} aria-label={tx(locale, "Enviar respuesta", "Send reply")} className="h-11 shrink-0">
+            <Button type="submit" variant="navy" disabled={sending} aria-label={tx(locale, "Enviar respuesta", "Send reply")} className="h-11 shrink-0">
               {sending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
               <span className="hidden sm:inline">{tx(locale, "Enviar", "Send")}</span>
             </Button>
           </form>
-          {err && <div role="alert" className="mt-2 rounded-lg bg-[#B3261E1A] px-3 py-2 text-sm text-danger">{err}</div>}
+          {err && <div role="alert" className="mt-2 rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-sm text-danger">{err}</div>}
         </div>
       )}
     </Card>

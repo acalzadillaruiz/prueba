@@ -105,12 +105,13 @@ async function cliente() {
   await caption("New Place · Perfil cliente (buscador). Home con mapa night centrado en Caracas.", 2600);
   await moveTo(page.locator("h1"), { pause: 600 });
   await caption("Pines con precio agrupados en clusters. Clic en un pin → vista previa.");
+  await page.locator("#explorar").scrollIntoViewIfNeeded();
   const map = page.locator('svg[role="application"]').first();
   await click(page.getByRole("button", { name: /^(Acercar|Zoom in)$/ }).first(), { after: 600 });
   const pin = map.locator("g.cursor-pointer:not(:has(circle))").nth(3);
   await realClick(pin, { after: 1800 });
   await caption("Búsqueda en lenguaje natural con IA (funciona sin API key).", 800);
-  await type(page.getByRole("textbox", { name: "Buscar" }), "ático con luz en Los Palos Grandes por menos de 180 mil", 45);
+  await type(page.getByRole("textbox", { name: /^(Ubicación|Location)/ }), "ático con luz en Los Palos Grandes por menos de 180 mil", 45);
   await realClick(page.getByRole("button", { name: /Buscar/ }).last(), { after: 2200 });
   await caption("La IA convirtió la frase en filtros: zona, precio máximo y tipo «ático».", 3000);
   await caption("Filtro del criterio de aceptación: Comprar · 2+ hab · < 250.000 USD · Chacao.");

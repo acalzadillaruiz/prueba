@@ -1,11 +1,11 @@
 {
-  "brand": { "tagline": "Real estate. Redefined." },
-  "nav": { "buy": "Buy", "rent": "Rent", "vacation": "Vacation", "commercial": "Commercial", "luxury": "Luxury", "saved": "Saved", "publish": "List a property", "signIn": "Sign in", "signOut": "Sign out", "menu": "Menu" },
+  "brand": { "tagline": "The Caribbean, with a Mediterranean soul.", "sub": "Real estate" },
+  "nav": { "buy": "Buy", "rent": "Rent", "vacation": "Vacation", "commercial": "Commercial", "luxury": "Luxury", "saved": "Saved", "publish": "List a property", "signIn": "Sign in", "signOut": "Sign out", "menu": "Menu", "privateCollection": "Private Collection", "remoteBuying": "Buy from abroad", "sell": "Sell with us", "home": "Home", "map": "Map", "account": "Account" },
   "footer": {
-    "about": "Marketplace and operating system for real-estate agencies. Made in Caracas, built for the world.",
+    "about": "High-end real estate advisory in Lechería, El Morro, Margarita and Caracas.",
     "search": "Search", "owners": "Owners", "agencies": "Agencies",
     "listFree": "List for free", "hireAgency": "Hire an agency", "myProperties": "My properties",
-    "forAgencies": "New Place for agencies", "legal": "Prices in USD. VES/EUR conversion for reference only.", "listedOn": "Listed on New Place"
+    "forAgencies": "New Place for agencies", "legal": "Prices in USD. VES/EUR conversion for reference only.", "listedOn": "Listed on New Place", "sellWithUs": "Sell with us", "valuation": "Value my property"
   },
   "admin": {
     "dashboard": "Dashboard", "leads": "Leads", "listings": "Listings", "calendar": "Calendar", "capture": "Capture", "media": "Media", "team": "Team", "reports": "Reports", "settings": "Settings",
@@ -14,5 +14,5 @@
   },
   "roles": { "SUPERADMIN": "Superadmin", "AGENCY_OWNER": "Agency owner", "AGENT": "Agent", "CAPTOR": "Captor", "PHOTOGRAPHER": "Photographer", "BACKOFFICE": "Backoffice", "OWNER_PRIVATE": "Owner", "SEEKER": "Seeker" },
   "errors": { "UNAUTHORIZED": "Sign in to continue.", "FORBIDDEN": "You don’t have permission to do this.", "NOT_FOUND": "Not found.", "VALIDATION": "Please check the submitted data.", "CONFLICT": "A matching record already exists.", "INTERNAL": "Something went wrong. Please try again." },
-  "common": { "loading": "Loading…", "retry": "Try again", "back": "Back home", "notFound": "We couldn’t find this page", "notFoundBody": "The listing may no longer be published.", "error": "Something went wrong", "errorBody": "Please try again in a few seconds." }
+  "common": { "loading": "Loading…", "retry": "Try again", "back": "Back home", "notFound": "We couldn’t find this page", "notFoundBody": "The property may no longer be listed. Let’s take you back home.", "error": "Something went wrong", "errorBody": "Please try again in a few seconds." }
 }

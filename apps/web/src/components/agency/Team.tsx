@@ -7,7 +7,9 @@ import { useTranslations } from "next-intl";
 import type { Role } from "@newplace/config";
 import type { Locale, User } from "@/types/domain";
 import { AdminShell } from "@/components/layout/AdminShell";
-import { Avatar, Badge, Button, darkInputCls } from "@/components/ui";
+import { Button } from "@/components/ui";
+import { Chip, Initials, Pill, k } from "./kit";
+import { cn } from "@/lib/cn";
 import { useApp } from "@/lib/store";
 import { api } from "@/lib/api";
 import { ago, tx } from "@/lib/i18n";
@@ -41,38 +43,38 @@ export function TeamView({ locale, members, listingsByAgent, invites: initialInv
   };
   return (
     <AdminShell locale={locale} area="agency" title={tx(locale, "Equipo", "Team")}>
-      {err && <div role="alert" className="mb-4 rounded-lg bg-[#B3261E33] px-3 py-2 text-sm text-[#E79A7F]">{err}</div>}
+      {err && <div role="alert" className={cn("mb-4", k.err)}>{err}</div>}
       <div className="grid gap-6 [&>*]:min-w-0 xl:grid-cols-[1fr_360px]">
-        <div className="overflow-x-auto rounded-np border border-navy-line bg-navy-card">
+        <div className={cn("self-start overflow-x-auto", k.card)}>
           <table className="w-full min-w-[720px] text-sm">
-            <thead className="border-b border-navy-line text-left text-xs uppercase tracking-wide text-mist">
+            <thead className={cn("border-b text-left", k.line, k.th)}>
               <tr><th className="px-4 py-3">{tx(locale, "Persona", "Member")}</th><th className="px-3 py-3">{tx(locale, "Rol", "Role")}</th><th className="px-3 py-3">{tx(locale, "Verificación", "Verification")}</th><th className="px-3 py-3 text-right">{tx(locale, "Inmuebles", "Listings")}</th><th className="px-3 py-3">{tx(locale, "Última actividad", "Last active")}</th></tr>
             </thead>
             <tbody>
               {members.map((u) => (
-                <tr key={u.id} className="border-t border-navy-line">
-                  <td className="px-4 py-3"><div className="flex items-center gap-3"><Avatar initials={u.initials} hue={u.hue} size={34} /><div><div className="font-semibold">{u.name}</div><div className="text-xs text-mist">{u.email}</div></div></div></td>
+                <tr key={u.id} className={cn("border-t first:border-t-0", k.line)}>
+                  <td className="px-4 py-3"><div className="flex items-center gap-3"><Initials name={u.name} size={38} /><div><div className="font-semibold">{u.name}</div><div className={cn("text-xs", k.muted)}>{u.email}</div></div></div></td>
                   <td className="px-3">
-                    <select value={u.role} disabled={!manager || u.id === user?.id || busy === u.id || (u.role === "AGENCY_OWNER" && !isOwner)} onChange={(e) => patch(u.id, { role: e.target.value })} className="h-8 rounded-md border border-navy-line bg-navy-2 px-2 text-xs" aria-label={tx(locale, "Rol", "Role")}>
+                    <select value={u.role} disabled={!manager || u.id === user?.id || busy === u.id || (u.role === "AGENCY_OWNER" && !isOwner)} onChange={(e) => patch(u.id, { role: e.target.value })} className={k.select} aria-label={tx(locale, "Rol", "Role")}>
                       {ROLE_OPTS.filter((r) => isOwner || r !== "AGENCY_OWNER" || u.role === "AGENCY_OWNER").map((r) => <option key={r} value={r}>{tr(r)}</option>)}
                     </select>
                   </td>
                   <td className="px-3">
                     {u.role === "AGENT" ? (
                       u.verified ? (
-                        <Badge className="bg-[#2F6B4F40] text-[#7FC8A4]"><ShieldCheck size={12} /> {tx(locale, "Verificado", "Verified")}</Badge>
+                        <Pill tone="ok"><ShieldCheck size={12} /> {tx(locale, "Verificado", "Verified")}</Pill>
                       ) : (
                         <span className="flex items-center gap-2">
-                          <Badge className="bg-[#8A5A0033] text-[#F2B866]"><ShieldQuestion size={12} /> {tx(locale, "Documento en revisión", "Document in review")}</Badge>
-                          {manager && <Button size="sm" variant="dark-outline" disabled={busy === u.id} onClick={() => patch(u.id, { verified: true })}>{tx(locale, "Verificar", "Verify")}</Button>}
+                          <Pill tone="warn"><ShieldQuestion size={12} /> {tx(locale, "Documento en revisión", "Document in review")}</Pill>
+                          {manager && <Button size="sm" variant="outline" className={k.outline} disabled={busy === u.id} onClick={() => patch(u.id, { verified: true })}>{tx(locale, "Verificar", "Verify")}</Button>}
                         </span>
                       )
                     ) : (
-                      <span className="text-xs text-mist">—</span>
+                      <span className={cn("text-xs", k.muted)}>—</span>
                     )}
                   </td>
                   <td className="px-3 text-right">{listingsByAgent[u.id] ?? "—"}</td>
-                  <td className="px-3 text-xs text-mist" suppressHydrationWarning>{ago(u.lastSeen, locale)}</td>
+                  <td className={cn("px-3 text-xs", k.muted)} suppressHydrationWarning>{ago(u.lastSeen, locale)}</td>
                 </tr>
               ))}
             </tbody>
@@ -81,7 +83,7 @@ export function TeamView({ locale, members, listingsByAgent, invites: initialInv
         <div className="space-y-4">
           {manager && (
             <form
-              className="rounded-np border border-navy-line bg-navy-card p-4"
+              className={cn(k.card, "p-5 md:p-6")}
               onSubmit={async (e) => {
                 e.preventDefault();
                 setErr(null);
@@ -98,25 +100,25 @@ export function TeamView({ locale, members, listingsByAgent, invites: initialInv
                 }
               }}
             >
-              <div className="font-display text-lg font-semibold">{tx(locale, "Invitar por email", "Invite by email")}</div>
-              <input className={darkInputCls + " mt-3"} type="email" required placeholder="nombre@agencia.ve" value={email} onChange={(e) => setEmail(e.target.value)} aria-label="Email" />
-              <select className={darkInputCls + " mt-2"} value={role} onChange={(e) => setRole(e.target.value as Role)} aria-label={tx(locale, "Rol", "Role")}>
+              <h2 className={k.title}>{tx(locale, "Invitar por email", "Invite by email")}</h2>
+              <input className={cn(k.input, "mt-3")} type="email" required placeholder="nombre@agencia.ve" value={email} onChange={(e) => setEmail(e.target.value)} aria-label="Email" />
+              <select className={cn(k.input, "mt-2")} value={role} onChange={(e) => setRole(e.target.value as Role)} aria-label={tx(locale, "Rol", "Role")}>
                 {ROLE_OPTS.filter((r) => r !== "AGENCY_OWNER").map((r) => <option key={r} value={r}>{tr(r)}</option>)}
               </select>
-              <Button className="mt-3 w-full" disabled={busy === "invite"}>{busy === "invite" ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />} {tx(locale, "Enviar invitación", "Send invite")}</Button>
+              <Button className={cn("mt-3 w-full", k.primary)} disabled={busy === "invite"}>{busy === "invite" ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />} {tx(locale, "Enviar invitación", "Send invite")}</Button>
             </form>
           )}
-          <div className="rounded-np border border-navy-line bg-navy-card p-4">
-            <div className="font-display font-semibold">{tx(locale, "Invitaciones pendientes", "Pending invites")}</div>
-            {invites.length === 0 && <div className="mt-2 text-sm text-mist">—</div>}
+          <div className={cn(k.card, "p-5 md:p-6")}>
+            <h2 className={k.titleSm}>{tx(locale, "Invitaciones pendientes", "Pending invites")}</h2>
+            {invites.length === 0 && <div className={cn("mt-2 text-sm", k.muted)}>{tx(locale, "No hay invitaciones pendientes.", "No pending invites.")}</div>}
             {invites.map((i) => (
               <div key={i.id} className="np-in mt-3 flex items-center gap-2 text-sm">
-                <Mail size={15} className="text-coral" />
+                <Mail size={15} strokeWidth={1.6} className={k.muted} />
                 <span className="flex-1 truncate">{i.email}</span>
-                <Badge tone="dark">{tr(i.role)}</Badge>
+                <Chip>{tr(i.role)}</Chip>
                 {manager && (
                   <button
-                    className="flex h-9 w-9 items-center justify-center rounded-full text-mist hover:bg-white/10 hover:text-ivory"
+                    className={cn("flex h-9 w-9 items-center justify-center rounded-full", k.muted, "hover:bg-[#E6EBF1] hover:text-navy dark:hover:bg-white/10 dark:hover:text-ivory")}
                     aria-label={tx(locale, `Revocar invitación a ${i.email}`, `Revoke invite to ${i.email}`)}
                     onClick={async () => {
                       try {

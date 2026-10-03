@@ -6,17 +6,13 @@ import Link from "next/link";
 import { AlertTriangle, Building2, CheckCircle2, ExternalLink, Fingerprint, Loader2, Plus, XCircle } from "lucide-react";
 import type { CaptureLead, Locale, Zone } from "@/types/domain";
 import { AdminShell } from "@/components/layout/AdminShell";
-import { Badge, Button, Field, darkInputCls } from "@/components/ui";
+import { Button, Field } from "@/components/ui";
+import { Chip, Pill, k } from "./kit";
 import { api, type ApiClientError } from "@/lib/api";
 import { TYPE_LABEL, ago, lbl, money, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 
-const TONE: Record<CaptureLead["result"], string> = {
-  PENDING: "bg-white/10 text-mist",
-  CAPTURED: "bg-[#2F6B4F40] text-[#7FC8A4]",
-  REJECTED: "bg-[#B3261E33] text-[#E79A7F]",
-  DUPLICATE: "bg-[#8A5A0033] text-[#F2B866]",
-};
+const TONE: Record<CaptureLead["result"], "neutral" | "ok" | "danger" | "warn"> = { PENDING: "neutral", CAPTURED: "ok", REJECTED: "danger", DUPLICATE: "warn" };
 type Row = CaptureLead & { listingId?: string };
 type ListingType = keyof typeof TYPE_LABEL;
 const KINDS: [string, string, string][] = [["apartment", "Apartamento", "Apartment"], ["penthouse", "Penthouse", "Penthouse"], ["house", "Casa", "House"], ["townhouse", "Townhouse", "Townhouse"], ["studio", "Estudio", "Studio"], ["villa", "Villa", "Villa"], ["chalet", "Chalet", "Chalet"], ["office", "Oficina", "Office"], ["retail", "Local", "Retail"], ["warehouse", "Galpón", "Warehouse"], ["land", "Terreno", "Land"]];
@@ -84,61 +80,61 @@ export function CaptureView({ locale, rows: initialRows, zones, titles, canConve
 
   return (
     <AdminShell locale={locale} area="agency" title={tx(locale, "Cola de captación", "Capture queue")}>
-      {rowErr && <div role="alert" className="mb-4 rounded-lg bg-[#B3261E33] px-3 py-2 text-sm text-[#E79A7F]">{rowErr}</div>}
+      {rowErr && <div role="alert" className={cn("mb-4", k.err)}>{rowErr}</div>}
       <div className="grid gap-6 [&>*]:min-w-0 xl:grid-cols-[1fr_380px]">
-        <div className="overflow-x-auto rounded-np border border-navy-line bg-navy-card">
-          <table className="w-full min-w-[720px] text-sm">
-            <thead className="border-b border-navy-line text-left text-xs uppercase tracking-wide text-mist">
+        <div className={cn("self-start overflow-x-auto", k.card)}>
+          <table className="w-full min-w-[860px] text-sm">
+            <thead className={cn("border-b text-left", k.line, k.th)}>
               <tr><th className="px-4 py-3">{tx(locale, "Dirección", "Address")}</th><th className="px-3 py-3">{tx(locale, "Dueño", "Owner")}</th><th className="px-3 py-3 text-right">m²</th><th className="px-3 py-3 text-right">{tx(locale, "Pide", "Asking")}</th><th className="px-3 py-3">{tx(locale, "Resultado", "Result")}</th><th className="px-3 py-3" /></tr>
             </thead>
             <tbody>
               {rows.map((c) => (
                 <Fragment key={c.id}>
-                <tr className="border-t border-navy-line align-top">
+                <tr className={cn("border-t align-top first:border-t-0", k.line)}>
                   <td className="px-4 py-3">
                     <div className="font-semibold">{c.address}</div>
-                    <div className="text-xs text-mist">{c.zone} · {ago(c.createdAt, locale)}</div>
-                    {c.duplicateOf && <div className="mt-1 flex items-center gap-1 text-xs text-[#F2B866]"><Fingerprint size={12} /> = {titles[c.duplicateOf] ?? c.duplicateOf}</div>}
+                    <div className={cn("text-xs", k.muted)}>{c.zone} · {ago(c.createdAt, locale)}</div>
+                    {c.duplicateOf && <div className={cn("mt-1 flex items-center gap-1 text-xs font-semibold", k.warnText)}><Fingerprint size={12} /> = {titles[c.duplicateOf] ?? c.duplicateOf}</div>}
                   </td>
-                  <td className="px-3 py-3"><div>{c.ownerName}</div><div className="text-xs text-mist">{c.phone}</div></td>
+                  <td className="px-3 py-3"><div>{c.ownerName}</div><div className={cn("text-xs", k.muted)}>{c.phone}</div></td>
                   <td className="px-3 py-3 text-right">{c.areaM2}</td>
-                  <td className="whitespace-nowrap px-3 py-3 text-right font-display">{money(c.askingPrice, locale)}</td>
-                  <td className="px-3 py-3"><span className={cn("rounded-full px-2 py-0.5 text-[11px] font-bold uppercase", TONE[c.result])}>{label[c.result]}</span></td>
+                  <td className={cn("whitespace-nowrap px-3 py-3 text-right tracking-normal", k.num)}>{money(c.askingPrice, locale)}</td>
+                  <td className="px-3 py-3"><Pill tone={TONE[c.result]}>{label[c.result]}</Pill></td>
                   <td className="px-3 py-3">
                     {c.result === "PENDING" && (
                       <div className="flex flex-wrap gap-1">
                         {canConvert && (
-                          <button onClick={() => setConverting(converting?.id === c.id ? null : { id: c.id, listingType: "SALE" })} className="flex items-center gap-1 rounded-md bg-[#A8452A33] px-2 py-1.5 text-xs font-semibold text-coral" aria-expanded={converting?.id === c.id}>
+                          <button onClick={() => setConverting(converting?.id === c.id ? null : { id: c.id, listingType: "SALE" })} className={cn("flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold", k.outline, "border")} aria-expanded={converting?.id === c.id}>
                             <Building2 size={14} /> {tx(locale, "Convertir en inmueble", "Convert to listing")}
                           </button>
                         )}
-                        <button onClick={() => setResult(c.id, "CAPTURED")} className="rounded-md bg-[#2F6B4F40] p-1.5 text-[#7FC8A4]" aria-label={tx(locale, "Marcar como captado", "Mark as captured")} title={tx(locale, "Marcar como captado", "Mark as captured")}><CheckCircle2 size={15} /></button>
-                        <button onClick={() => setResult(c.id, "REJECTED")} className="rounded-md bg-[#B3261E33] p-1.5 text-[#E79A7F]" aria-label={tx(locale, "Rechazar", "Reject")} title={tx(locale, "Rechazar", "Reject")}><XCircle size={15} /></button>
+                        <button onClick={() => setResult(c.id, "CAPTURED")} className={cn("rounded-full p-1.5 hover:bg-[#2F6B4F14] dark:hover:bg-white/5", k.okText)} aria-label={tx(locale, "Marcar como captado", "Mark as captured")} title={tx(locale, "Marcar como captado", "Mark as captured")}><CheckCircle2 size={15} /></button>
+                        <button onClick={() => setResult(c.id, "REJECTED")} className={cn("rounded-full p-1.5 hover:bg-[#B3261E12] dark:hover:bg-white/5", k.dangerText)} aria-label={tx(locale, "Rechazar", "Reject")} title={tx(locale, "Rechazar", "Reject")}><XCircle size={15} /></button>
                       </div>
                     )}
                     {c.listingId && (
-                      <Link href={`/${locale}/agency/listings/${c.listingId}/edit`} className="flex items-center gap-1 whitespace-nowrap text-xs font-semibold text-coral hover:underline">
+                      <Link href={`/${locale}/agency/listings/${c.listingId}/edit`} className={cn("flex items-center gap-1 whitespace-nowrap text-xs", k.link)}>
                         <ExternalLink size={13} /> {tx(locale, "Ver inmueble", "Open listing")}
                       </Link>
                     )}
                   </td>
                 </tr>
                 {converting?.id === c.id && (
-                  <tr className="bg-white/[.03]">
+                  <tr className={k.soft}>
                     <td colSpan={6} className="px-4 py-3">
                       <div className="flex flex-wrap items-end gap-3">
                         <div className="w-56">
-                          <Field dark label={tx(locale, "Operación", "Listing type")}>
-                            <select className={darkInputCls} value={converting.listingType} onChange={(e) => setConverting({ ...converting, listingType: e.target.value as ListingType })}>
+                          <Field label={tx(locale, "Operación", "Listing type")}>
+                            <select className={k.input} value={converting.listingType} onChange={(e) => setConverting({ ...converting, listingType: e.target.value as ListingType })}>
                               {(Object.keys(TYPE_LABEL) as ListingType[]).map((k) => <option key={k} value={k}>{lbl(TYPE_LABEL[k], locale)}</option>)}
                             </select>
                           </Field>
                         </div>
-                        <p className="max-w-sm flex-1 text-xs text-mist">{tx(locale, "Se crea un borrador en tu agencia con la dirección, zona, m² y precio de la captación. Podrás completarlo antes de publicar.", "A draft is created in your agency with the capture’s address, area, m² and price. You can complete it before publishing.")}</p>
-                        <Button size="sm" disabled={rowBusy === c.id} onClick={convert}>
+                        <p className={cn("max-w-sm flex-1 text-xs", k.muted)}>{tx(locale, "Se crea un borrador en tu agencia con la dirección, zona, m² y precio de la captación. Podrás completarlo antes de publicar.", "A draft is created in your agency with the capture’s address, area, m² and price. You can complete it before publishing.")}</p>
+                        <Button size="sm" variant="navy" className={k.navy} disabled={rowBusy === c.id} onClick={convert}>
                           {rowBusy === c.id ? <Loader2 size={14} className="animate-spin" /> : <Building2 size={14} />} {tx(locale, "Crear borrador", "Create draft")}
                         </Button>
-                        <Button size="sm" variant="dark-ghost" type="button" onClick={() => setConverting(null)}>{tx(locale, "Cancelar", "Cancel")}</Button>
+                        <Button size="sm" variant="ghost" className={k.ghost} type="button" onClick={() => setConverting(null)}>{tx(locale, "Cancelar", "Cancel")}</Button>
                       </div>
                     </td>
                   </tr>
@@ -146,13 +142,13 @@ export function CaptureView({ locale, rows: initialRows, zones, titles, canConve
                 </Fragment>
               ))}
               {rows.length === 0 && (
-                <tr><td colSpan={6} className="px-4 py-10 text-center text-mist">{tx(locale, "La cola está vacía. Registra la primera captación con el formulario.", "The queue is empty. Log the first capture with the form.")}</td></tr>
+                <tr><td colSpan={6} className={cn("px-4 py-10 text-center", k.muted)}>{tx(locale, "La cola está vacía. Registra la primera captación con el formulario.", "The queue is empty. Log the first capture with the form.")}</td></tr>
               )}
             </tbody>
           </table>
         </div>
         <form
-          className="rounded-np border border-navy-line bg-navy-card p-4"
+          className={cn(k.card, "self-start p-5 md:p-6")}
           onSubmit={async (e) => {
             e.preventDefault();
             setErr(null);
@@ -169,38 +165,38 @@ export function CaptureView({ locale, rows: initialRows, zones, titles, canConve
             }
           }}
         >
-          <div className="font-display text-lg font-semibold">{tx(locale, "Nueva captación", "New capture")}</div>
+          <h2 className={k.title}>{tx(locale, "Nueva captación", "New capture")}</h2>
           <div className="mt-3 space-y-3">
-            <Field dark label={tx(locale, "Dirección", "Address")}><input required minLength={5} className={darkInputCls} value={f.address} onChange={(e) => setF({ ...f, address: e.target.value })} /></Field>
-            <Field dark label={tx(locale, "Zona", "Area")}>
-              <select className={darkInputCls} value={f.zone} onChange={(e) => setF({ ...f, zone: e.target.value })}>
+            <Field label={tx(locale, "Dirección", "Address")}><input required minLength={5} className={k.input} value={f.address} onChange={(e) => setF({ ...f, address: e.target.value })} /></Field>
+            <Field label={tx(locale, "Zona", "Area")}>
+              <select className={k.input} value={f.zone} onChange={(e) => setF({ ...f, zone: e.target.value })}>
                 {zones.map((z) => <option key={z.slug}>{z.name}</option>)}
               </select>
             </Field>
-            <Field dark label={tx(locale, "Tipo de inmueble", "Property type")}>
-              <select className={darkInputCls} value={f.kind} onChange={(e) => setF({ ...f, kind: e.target.value })}>
+            <Field label={tx(locale, "Tipo de inmueble", "Property type")}>
+              <select className={k.input} value={f.kind} onChange={(e) => setF({ ...f, kind: e.target.value })}>
                 {KINDS.map(([k, es, en]) => <option key={k} value={k}>{tx(locale, es, en)}</option>)}
               </select>
             </Field>
             <div className="grid grid-cols-2 gap-2">
-              <Field dark label="m²"><input className={darkInputCls} type="number" min={1} value={f.areaM2} onChange={(e) => setF({ ...f, areaM2: +e.target.value })} /></Field>
-              <Field dark label={tx(locale, "Precio pedido", "Asking")}><input className={darkInputCls} type="number" min={1} value={f.askingPrice} onChange={(e) => setF({ ...f, askingPrice: +e.target.value })} /></Field>
+              <Field label="m²"><input className={k.input} type="number" min={1} value={f.areaM2} onChange={(e) => setF({ ...f, areaM2: +e.target.value })} /></Field>
+              <Field label={tx(locale, "Precio pedido", "Asking")}><input className={k.input} type="number" min={1} value={f.askingPrice} onChange={(e) => setF({ ...f, askingPrice: +e.target.value })} /></Field>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              <Field dark label={tx(locale, "Dueño", "Owner")}><input required minLength={2} className={darkInputCls} value={f.ownerName} onChange={(e) => setF({ ...f, ownerName: e.target.value })} /></Field>
-              <Field dark label={tx(locale, "Teléfono", "Phone")}><input required minLength={6} className={darkInputCls} value={f.phone} onChange={(e) => setF({ ...f, phone: e.target.value })} /></Field>
+              <Field label={tx(locale, "Dueño", "Owner")}><input required minLength={2} className={k.input} value={f.ownerName} onChange={(e) => setF({ ...f, ownerName: e.target.value })} /></Field>
+              <Field label={tx(locale, "Teléfono", "Phone")}><input required minLength={6} className={k.input} value={f.phone} onChange={(e) => setF({ ...f, phone: e.target.value })} /></Field>
             </div>
           </div>
           {f.address.length >= 6 && (
-            <div className={cn("np-in mt-4 rounded-lg border p-3 text-sm", dup ? "border-[#8A5A0080] bg-[#8A5A001a]" : "border-[#2F6B4F80] bg-[#2F6B4F1a]")}>
-              <div className="flex items-center gap-2 font-semibold">{checking ? <Loader2 size={16} className="animate-spin" /> : dup ? <AlertTriangle size={16} className="text-[#F2B866]" /> : <CheckCircle2 size={16} className="text-[#7FC8A4]" />}{dup ? tx(locale, "Posible duplicado", "Possible duplicate") : tx(locale, "Sin duplicados", "No duplicates")}</div>
-              <div className="mt-1 text-xs text-mist">{dup ? (dup.zone ? `${dup.title} · ${dup.zone} · ${dup.areaM2} m²` : dup.title ?? tx(locale, "Ya existe en otra agencia (no público)", "Already listed by another agency (not public)")) : tx(locale, "Fingerprint: lat/lng + m² + hash de dirección", "Fingerprint: lat/lng + m² + address hash")}</div>
-              <div className="mt-1 font-mono text-[10px] text-mist/80">{dup?.fingerprint ?? fp}</div>
+            <div className={cn("np-in mt-4", dup ? k.warnBox : k.okBox)}>
+              <div className="flex items-center gap-2 font-semibold">{checking ? <Loader2 size={16} className="animate-spin" /> : dup ? <AlertTriangle size={16} /> : <CheckCircle2 size={16} />}{dup ? tx(locale, "Posible duplicado", "Possible duplicate") : tx(locale, "Sin duplicados", "No duplicates")}</div>
+              <div className="mt-1 text-xs text-navy/75 dark:text-ivory/75">{dup ? (dup.zone ? `${dup.title} · ${dup.zone} · ${dup.areaM2} m²` : dup.title ?? tx(locale, "Ya existe en otra agencia (no público)", "Already listed by another agency (not public)")) : tx(locale, "Fingerprint: lat/lng + m² + hash de dirección", "Fingerprint: lat/lng + m² + address hash")}</div>
+              <div className="mt-1 font-mono text-[10px] text-navy/55 dark:text-ivory/55">{dup?.fingerprint ?? fp}</div>
             </div>
           )}
-          {err && <div role="alert" className="mt-3 rounded-lg bg-[#B3261E33] px-3 py-2 text-sm text-[#E79A7F]">{err}</div>}
-          <Button className="mt-4 w-full" disabled={busy}>{busy ? <Loader2 size={15} className="animate-spin" /> : <Plus size={15} />} {dup ? tx(locale, "Registrar como duplicado", "Log as duplicate") : tx(locale, "Añadir a la cola", "Add to queue")}</Button>
-          <div className="mt-3 flex gap-2 text-xs text-mist"><Badge tone="dark">{tx(locale, "1 inmueble = 1 unidad física", "1 listing = 1 physical unit")}</Badge></div>
+          {err && <div role="alert" className={cn("mt-3", k.err)}>{err}</div>}
+          <Button className={cn("mt-4 w-full", k.primary)} disabled={busy}>{busy ? <Loader2 size={15} className="animate-spin" /> : <Plus size={15} />} {dup ? tx(locale, "Registrar como duplicado", "Log as duplicate") : tx(locale, "Añadir a la cola", "Add to queue")}</Button>
+          <div className="mt-3 flex gap-2"><Chip>{tx(locale, "1 inmueble = 1 unidad física", "1 listing = 1 physical unit")}</Chip></div>
         </form>
       </div>
     </AdminShell>

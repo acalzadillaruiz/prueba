@@ -19,13 +19,29 @@ function html(subject: string, body: string) {
   // The email-verification link (/api/v1/auth/verify?token=<base64url>.<base64url>) is the only API path allowed.
   const appPath = /^\/(es|en)\/[^\s\\]*$/.test(body) || /^\/api\/v1\/auth\/verify\?token=[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(body);
   const link = appPath && !body.startsWith("//") && APP_URL ? `${APP_URL}${body}` : null;
-  return `<!doctype html><html><body style="margin:0;background:#F8F5EF;font-family:system-ui,sans-serif;color:#162638">
-<div style="max-width:560px;margin:0 auto;padding:32px 24px">
-<div style="font-weight:700;font-size:20px;color:#162638">New Place</div>
-<h1 style="font-size:22px;line-height:1.3;margin:24px 0 12px">${esc(subject)}</h1>
-${link ? `<p><a href="${esc(link)}" style="display:inline-block;background:#C2452A;color:#fff;padding:12px 20px;border-radius:12px;text-decoration:none;font-weight:600">Abrir en New Place</a></p>` : body ? `<p style="font-size:15px;line-height:1.5">${esc(body)}</p>` : ""}
-<p style="margin-top:32px;font-size:12px;color:#6b7280">New Place · Un nuevo lugar.</p>
-</div></body></html>`;
+  // Brand v4 (Cal background, navy header, one terracotta action). Table layout + inline styles for mail clients;
+  // brand fonts are named first and fall back to Georgia/Arial (no external stylesheet: the only href is the CTA).
+  const sans = "Manrope,'Helvetica Neue',Arial,sans-serif";
+  const serif = "'Cormorant Garamond',Georgia,'Times New Roman',serif";
+  const content = link
+    ? `<tr><td style="padding:8px 40px 8px"><a href="${esc(link)}" style="display:inline-block;background:#A8452A;color:#ffffff;padding:14px 28px;border-radius:999px;text-decoration:none;font-family:${sans};font-size:15px;font-weight:600;letter-spacing:.01em">Abrir en New Place</a></td></tr>`
+    : body
+      ? `<tr><td style="padding:0 40px 8px;font-family:${sans};font-size:15px;line-height:1.6;color:#162638">${esc(body)}</td></tr>`
+      : "";
+  return `<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>${esc(subject)}</title></head>
+<body style="margin:0;padding:0;background:#F8F5EF;color:#162638;-webkit-font-smoothing:antialiased">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F8F5EF"><tr><td align="center" style="padding:32px 16px">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;background:#ffffff;border-radius:18px;overflow:hidden;box-shadow:0 8px 24px rgba(22,38,56,.06)">
+<tr><td align="center" style="background:#162638;padding:28px 24px 24px">
+<div style="font-family:${serif};font-size:22px;letter-spacing:.32em;color:#F8F5EF;padding-left:.32em">NEW PLACE</div>
+<div style="margin:8px auto 0;width:44px;height:2px;background:#E79A7F;line-height:2px;font-size:0">&nbsp;</div>
+<div style="margin-top:8px;font-family:${sans};font-size:10px;letter-spacing:.34em;text-transform:uppercase;color:#D9C59C;padding-left:.34em">Bienes raíces</div>
+</td></tr>
+<tr><td style="padding:36px 40px 12px"><h1 style="margin:0;font-family:${serif};font-weight:500;font-size:30px;line-height:1.15;color:#162638">${esc(subject)}</h1></td></tr>
+${content}
+<tr><td style="padding:28px 40px 32px"><div style="border-top:1px solid #ECE6DA;padding-top:16px;font-family:${sans};font-size:12px;line-height:1.5;color:#5E6673">New Place · Bienes raíces · El Caribe, con alma mediterránea.</div></td></tr>
+</table>
+</td></tr></table></body></html>`;
 }
 
 export async function deliver(to: string, subject: string, body: string): Promise<Delivery> {

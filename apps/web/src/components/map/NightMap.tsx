@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
 import { Circle, Minus, Moon, PenLine, Plus, Sun, X } from "lucide-react";
 import type { Listing, Locale } from "@/types/domain";
 import type { LatLng, Shape } from "@/lib/geo";
@@ -16,9 +16,11 @@ const BOUNDS: Record<Region, { latMin: number; latMax: number; lngMin: number; l
   venezuela: { latMin: 0.5, latMax: 12.4, lngMin: -73.5, lngMax: -59.6, W: 1000, H: 870 },
 };
 
+// "light" is the default brand map (Mediterranean: Cal/arena land, Egeo sea, sand roads, warm-grey labels);
+// "night" is kept as the alternative style behind the toggle.
 const PAL: Record<Theme, Record<string, string>> = {
-  night: { land: "#101A2C", land2: "#0F1829", water: "#162638", mountain: "#15233A", contour: "#1D2D48", park: "#13261F", road: "#1D2B47", hwy: "#2F4670", label: "#A9B4C2", label2: "#5E7486", runway: "#1F2C45", pin: "#A8452A" },
-  light: { land: "#EFEBE3", land2: "#E9E4DA", water: "#BCD3DF", mountain: "#D3DCCB", contour: "#C4CFBC", park: "#CFE0C6", road: "#FFFFFF", hwy: "#F6D6C6", label: "#4F6372", label2: "#8395A1", runway: "#D9D3C8", pin: "#A8452A" },
+  night: { land: "#101A2C", land2: "#17243D", water: "#162638", mountain: "#15233A", contour: "#1D2D48", park: "#13261F", road: "#1D2B47", hwy: "#2F4670", label: "#A9B4C2", label2: "#7D8B9B", runway: "#1F2C45", pin: "#A8452A", note: "#A9B4C2" },
+  light: { land: "#F3EEE5", land2: "#EAE1D1", water: "#BFD5E2", mountain: "#EAE1D1", contour: "#E3D7C2", park: "#E6E5D3", road: "#E3D7C2", hwy: "#D8C8AC", label: "#8F8370", label2: "#A3977F", runway: "#E8DFCF", pin: "#A8452A", note: "#5E6673" },
 };
 
 const L = (lat: number, lng: number) => ({ lat, lng });
@@ -100,13 +102,14 @@ export function NightMap({
   controls = true,
   className,
   renderPreview,
-  initialTheme = "night",
+  initialTheme = "light",
   initialScale,
   focus,
   pin,
   onPick,
 }: NightMapProps) {
   const B = BOUNDS[region];
+  const uid = useId().replace(/:/g, "");
   const P = useCallback(
     (lat: number, lng: number) => ({
       x: ((lng - B.lngMin) / (B.lngMax - B.lngMin)) * B.W,
@@ -235,7 +238,7 @@ export function NightMap({
       pins.map((g) => {
         if (g.items.length > 1) return { x0: g.x - 22 * k, x1: g.x + 22 * k, y0: g.y - 22 * k, y1: g.y + 22 * k };
         const hw = (pinWidth(pinLabel(g.items[0], locale)) / 2) * k * 1.15;
-        return { x0: g.x - hw, x1: g.x + hw, y0: g.y - 38 * k, y1: g.y + 2 * k };
+        return { x0: g.x - hw, x1: g.x + hw, y0: g.y - 46 * k, y1: g.y + 2 * k };
       }),
     [pins, k, locale],
   );
@@ -250,18 +253,22 @@ export function NightMap({
   };
 
   const selected = listings.find((l) => l.id === selectedId);
+  // Map controls: white on the light map, navy glass on the night map.
+  const ctl = theme === "light" ? "border-[#E3D7C2] bg-[#ffffff] text-[#162638]" : "border-white/10 bg-navy/90 text-ivory backdrop-blur";
+  const ctlHover = theme === "light" ? "hover:bg-[#F3EEE5]" : "hover:bg-white/10";
+  const ctlLine = theme === "light" ? "border-[#E3D7C2]" : "border-white/10";
   const selPt = selected ? { x: P(selected.lat, selected.lng).x * view.s + view.x, y: P(selected.lat, selected.lng).y * view.s + view.y } : null;
 
   const shapeEl =
     shape?.type === "poly" ? (
-      <path d={path(shape.pts, true)} fill="#A8452A22" stroke="#A8452A" strokeWidth={2} strokeDasharray="6 4" vectorEffect="non-scaling-stroke" />
+      <path data-shape="poly" d={path(shape.pts, true)} fill="#A8452A1c" stroke="#A8452A" strokeWidth={2} strokeDasharray="6 4" vectorEffect="non-scaling-stroke" />
     ) : shape?.type === "radius" ? (
       (() => {
         const c = P(shape.center.lat, shape.center.lng);
         const rx = (shape.km / 111 / Math.cos((shape.center.lat * Math.PI) / 180) / (B.lngMax - B.lngMin)) * B.W;
         return (
           <g>
-            <ellipse cx={c.x} cy={c.y} rx={rx} ry={rx} fill="#A8452A1f" stroke="#A8452A" strokeWidth={2} vectorEffect="non-scaling-stroke" />
+            <ellipse data-shape="radius" cx={c.x} cy={c.y} rx={rx} ry={rx} fill="#A8452A1c" stroke="#A8452A" strokeWidth={2} vectorEffect="non-scaling-stroke" />
             <circle cx={c.x} cy={c.y} r={4 / view.s} fill="#A8452A" />
           </g>
         );
@@ -287,6 +294,11 @@ export function NightMap({
         role="application"
         aria-label={tx(locale, "Mapa de resultados", "Results map")}
       >
+        <defs>
+          <filter id={`${uid}-pin`} x="-50%" y="-80%" width="200%" height="260%">
+            <feDropShadow dx="0" dy="4" stdDeviation="4" floodColor="#162638" floodOpacity="0.2" />
+          </filter>
+        </defs>
         <rect x={-5000} y={-5000} width={12000} height={12000} fill={pal.water} />
         <g transform={`translate(${view.x} ${view.y}) scale(${view.s})`}>
           {region === "caracas" ? (
@@ -380,7 +392,7 @@ export function NightMap({
           ) : (
             <>
               {VE_RINGS.map((r, i) => (
-                <path key={i} d={path(r.map(([lat, lng]) => L(lat, lng)), true)} fill={theme === "night" ? "#17243D" : pal.land} stroke={pal.hwy} strokeWidth={1.2} vectorEffect="non-scaling-stroke" />
+                <path key={i} d={path(r.map(([lat, lng]) => L(lat, lng)), true)} fill={pal.land2 && theme === "night" ? pal.land2 : pal.land} stroke={pal.hwy} strokeWidth={1.2} vectorEffect="non-scaling-stroke" />
               ))}
               {VE_CITIES.map((c) => {
                 const p = P(c.lat, c.lng);
@@ -394,10 +406,10 @@ export function NightMap({
                 );
               })}
               {(() => {
-                const p = P(12.1, -61.5);
+                const p = P(11.55, -65.6);
                 return (
-                  <text transform={labelAt(p.x, p.y)} fill={pal.label2} letterSpacing={3} fontFamily="var(--font-display)" fontSize={14}>
-                    MAR CARIBE
+                  <text transform={labelAt(p.x, p.y)} fill={theme === "light" ? "#3E6A86" : pal.label2} fontStyle="italic" fontFamily="var(--font-serif)" fontSize={20}>
+                    {tx(locale, "Mar Caribe", "Caribbean Sea")}
                   </text>
                 );
               })()}
@@ -434,12 +446,12 @@ export function NightMap({
               }}
             >
               <g className="opacity-0 group-focus-visible:opacity-100">
-                <circle r={25} fill="none" stroke="#162638" strokeWidth={4.5} />
-                <circle r={25} fill="none" stroke="#F8F5EF" strokeWidth={2} />
+                <circle r={26} fill="none" stroke="#F8F5EF" strokeWidth={4.5} />
+                <circle r={26} fill="none" stroke="#162638" strokeWidth={2} />
               </g>
-              <circle r={22} fill="#A8452A" opacity={0.18} />
-              <circle r={15} fill="#A8452A" stroke="#162638" strokeWidth={2} />
-              <text textAnchor="middle" dy={4.5} fontSize={12.5} fontWeight={700} fill="#fff" fontFamily="var(--font-display)">
+              <circle r={22} fill="#162638" opacity={0.14} />
+              <circle r={16.5} fill="#162638" stroke="#F8F5EF" strokeWidth={2} filter={`url(#${uid}-pin)`} />
+              <text textAnchor="middle" dy={4.5} fontSize={13} fontWeight={600} fill="#F8F5EF" fontFamily="var(--font-display)">
                 {g.items.length}
               </text>
             </g>
@@ -453,6 +465,7 @@ export function NightMap({
               locale={locale}
               onClick={() => onSelect?.(g.items[0].id)}
               k={k}
+              shadow={`url(#${uid}-pin)`}
             />
           ),
         )}
@@ -464,7 +477,7 @@ export function NightMap({
         const y = p.y * view.s + view.y;
         return (
           <div className="pointer-events-none absolute z-10" style={{ left: x / k - (B.W / k - box.w) / 2, top: y / k - (B.H / k - box.h) / 2, transform: "translate(-50%, -100%)" }}>
-            <svg viewBox="0 0 32 36" width="30" height="34" aria-hidden><path d="M16 35C14.6 35 13.8 34.2 13 33L3.2 16.4C-.6 9.8 4.2 1.5 11.8 1.5H20.2C27.8 1.5 32.6 9.8 28.8 16.4L19 33C18.2 34.2 17.4 35 16 35Z" fill="#A8452A" stroke="#162638" strokeWidth="1.5" /><circle cx="16" cy="12.5" r="4.6" fill="#F8F5EF" /></svg>
+            <svg viewBox="0 0 32 36" width="30" height="34" aria-hidden><path d="M16 35C14.6 35 13.8 34.2 13 33L3.2 16.4C-.6 9.8 4.2 1.5 11.8 1.5H20.2C27.8 1.5 32.6 9.8 28.8 16.4L19 33C18.2 34.2 17.4 35 16 35Z" fill="#162638" stroke="#F8F5EF" strokeWidth="1.5" /><path d="M9.5 14.5 16 9.5l6.5 5" fill="none" stroke="#E79A7F" strokeWidth="2.2" /></svg>
           </div>
         );
       })()}
@@ -483,29 +496,28 @@ export function NightMap({
       {controls && (
         <>
           <div className="absolute right-3 top-3 z-10 flex flex-col gap-2">
-            <div className="flex flex-col overflow-hidden rounded-xl border border-white/10 bg-navy/90 text-ivory shadow-np backdrop-blur">
-              <button aria-label={tx(locale, "Acercar", "Zoom in")} className="flex h-11 w-11 items-center justify-center hover:bg-white/10" onClick={() => zoom(1.4)}>
+            <div className={cn("flex flex-col overflow-hidden rounded-xl border shadow-np", ctl)}>
+              <button aria-label={tx(locale, "Acercar", "Zoom in")} className={cn("flex h-11 w-11 items-center justify-center", ctlHover)} onClick={() => zoom(1.4)}>
                 <Plus size={16} />
               </button>
-              <button aria-label={tx(locale, "Alejar", "Zoom out")} className="flex h-11 w-11 items-center justify-center border-t border-white/10 hover:bg-white/10" onClick={() => zoom(1 / 1.4)}>
+              <button aria-label={tx(locale, "Alejar", "Zoom out")} className={cn("flex h-11 w-11 items-center justify-center border-t", ctlLine, ctlHover)} onClick={() => zoom(1 / 1.4)}>
                 <Minus size={16} />
               </button>
             </div>
             <button
-              aria-label={tx(locale, "Cambiar estilo de mapa", "Toggle map style")}
-              className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-navy/90 text-ivory shadow-np backdrop-blur hover:bg-white/10"
+              aria-label={theme === "light" ? tx(locale, "Mapa nocturno", "Night map") : tx(locale, "Mapa claro", "Light map")}
+              aria-pressed={theme === "night"}
+              className={cn("flex h-11 w-11 items-center justify-center rounded-xl border shadow-np", ctl, ctlHover)}
               onClick={() => setTheme((t) => (t === "night" ? "light" : "night"))}
             >
               {theme === "night" ? <Sun size={16} /> : <Moon size={16} />}
             </button>
           </div>
           {onShape && (
-            <div className="absolute left-3 top-3 z-10 flex flex-wrap gap-2">
+            <div className="absolute left-3 top-3 z-10 flex flex-wrap gap-2 pr-16">
               <button
-                className={cn(
-                  "flex min-h-11 items-center gap-1.5 rounded-full border px-3 font-display text-sm shadow-np backdrop-blur transition-colors duration-np",
-                  mode === "draw" ? "border-coral bg-coral-cta text-white" : "border-white/10 bg-navy/90 text-ivory hover:bg-navy",
-                )}
+                aria-pressed={mode === "draw"}
+                className={cn("flex min-h-11 items-center gap-1.5 rounded-full border px-3.5 font-display text-sm shadow-np transition-colors duration-np", mode === "draw" ? "np-sel" : cn(ctl, ctlHover))}
                 onClick={(e) => {
                   e.stopPropagation();
                   setDraft([]);
@@ -515,10 +527,8 @@ export function NightMap({
                 <PenLine size={14} /> {mode === "draw" ? tx(locale, "Toca para dibujar…", "Tap to draw…") : tx(locale, "Dibujar zona", "Draw area")}
               </button>
               <button
-                className={cn(
-                  "flex min-h-11 items-center gap-1.5 rounded-full border px-3 font-display text-sm shadow-np backdrop-blur",
-                  mode === "radius" ? "border-coral bg-coral-cta text-white" : "border-white/10 bg-navy/90 text-ivory hover:bg-navy",
-                )}
+                aria-pressed={mode === "radius"}
+                className={cn("flex min-h-11 items-center gap-1.5 rounded-full border px-3.5 font-display text-sm shadow-np transition-colors duration-np", mode === "radius" ? "np-sel" : cn(ctl, ctlHover))}
                 onClick={(e) => {
                   e.stopPropagation();
                   setMode(mode === "radius" ? "pan" : "radius");
@@ -527,13 +537,13 @@ export function NightMap({
                 <Circle size={14} /> {tx(locale, "Radio 1,2 km", "1.2 km radius")}
               </button>
               {mode === "draw" && draft.length >= 3 && (
-                <button className="min-h-11 rounded-full bg-ivory px-3 font-display text-sm text-navy shadow-np" onClick={(e) => { e.stopPropagation(); closePoly(); }}>
+                <button className="np-btn-navy min-h-11 rounded-full bg-navy px-4 font-display text-sm font-semibold text-ivory shadow-np" onClick={(e) => { e.stopPropagation(); closePoly(); }}>
                   {tx(locale, "Cerrar zona", "Close area")} ({draft.length})
                 </button>
               )}
               {shape && (
                 <button
-                  className="flex min-h-11 items-center gap-1 rounded-full bg-ivory px-3 font-display text-sm text-navy shadow-np"
+                  className={cn("flex min-h-11 items-center gap-1 rounded-full border px-3.5 font-display text-sm shadow-np", ctl, ctlHover)}
                   onClick={(e) => {
                     e.stopPropagation();
                     onShape(null);
@@ -544,7 +554,7 @@ export function NightMap({
               )}
             </div>
           )}
-          <div className="pointer-events-none absolute bottom-2 left-3 z-10 text-xs text-mist">
+          <div className="pointer-events-none absolute bottom-2 left-3 z-10 text-xs" style={{ color: pal.note }}>
             {tx(locale, "Mapa ilustrativo · Google Maps en producción", "Illustrative map · Google Maps in production")}
           </div>
         </>
@@ -554,13 +564,18 @@ export function NightMap({
 }
 
 const pinLabel = (l: Listing, locale: Locale) => compactMoney(l.priceAmount, locale) + (l.pricePeriod === "night" ? tx(locale, "/n", "/nt") : l.pricePeriod === "month" ? tx(locale, "/m", "/mo") : "");
-const pinWidth = (label: string) => label.length * 7.4 + 18;
+const pinWidth = (label: string) => label.length * 7.8 + 22;
 
-function PricePin({ l, x, y, active, locale, onClick, k }: { l: Listing; x: number; y: number; active: boolean; locale: Locale; onClick: () => void; k: number }) {
+/**
+ * Roof-shaped price pin (brand signature): white label with a small roof on top. Selected / hovered: navy label,
+ * bigger terracotta roof and a rosa-cal halo. Anchored at its bottom centre.
+ */
+function PricePin({ l, x, y, active, locale, onClick, k, shadow }: { l: Listing; x: number; y: number; active: boolean; locale: Locale; onClick: () => void; k: number; shadow: string }) {
   const label = pinLabel(l, locale);
   const w = pinWidth(label);
-  const gold = l.luxury;
   const period = l.pricePeriod === "night" ? tx(locale, " por noche", " per night") : l.pricePeriod === "month" ? tx(locale, " al mes", " per month") : "";
+  const H = 25; // label height
+  const top = -H - 3;
   return (
     <g
       transform={`translate(${x} ${y}) scale(${k})`}
@@ -568,6 +583,7 @@ function PricePin({ l, x, y, active, locale, onClick, k }: { l: Listing; x: numb
       role="button"
       tabIndex={0}
       aria-label={`${compactMoney(l.priceAmount, locale)}${period}${l.zone ? ` · ${l.zone}` : ""}`}
+      aria-pressed={active}
       onClick={(e) => {
         e.stopPropagation();
         onClick();
@@ -577,19 +593,29 @@ function PricePin({ l, x, y, active, locale, onClick, k }: { l: Listing; x: numb
         e.preventDefault();
         onClick();
       }}
-      style={{ transition: "transform 180ms ease-out" }}
     >
       <g className="opacity-0 group-focus-visible:opacity-100">
-        <rect x={-w / 2 - 5} y={-38} width={w + 10} height={35} rx={17.5} fill="none" stroke="#162638" strokeWidth={4.5} />
-        <rect x={-w / 2 - 5} y={-38} width={w + 10} height={35} rx={17.5} fill="none" stroke="#F8F5EF" strokeWidth={2} />
+        <rect x={-w / 2 - 6} y={top - 18} width={w + 12} height={H + 24} rx={10} fill="none" stroke="#F8F5EF" strokeWidth={4.5} />
+        <rect x={-w / 2 - 6} y={top - 18} width={w + 12} height={H + 24} rx={10} fill="none" stroke="#162638" strokeWidth={2} />
       </g>
-      <g transform={active ? "scale(1.15)" : undefined}>
-        <path d={`M0 0 L-6 -9 L6 -9 Z`} fill={active ? "#F8F5EF" : gold ? "#B4935A" : "#A8452A"} />
-        <rect x={-w / 2} y={-33} width={w} height={25} rx={12.5} fill={active ? "#F8F5EF" : gold ? "#B4935A" : "#A8452A"} stroke="#162638" strokeWidth={1.5} />
-        <text textAnchor="middle" y={-16} fontSize={12.5} fontWeight={700} fontFamily="var(--font-display)" fill={active || gold ? "#162638" : "#fff"}>
-          {label}
-        </text>
-      </g>
+      {active ? (
+        <g>
+          <path d={`M-20 ${top - 5} L0 ${top - 17} L20 ${top - 5} Z`} fill="#A8452A" />
+          <rect x={-w / 2 - 4} y={top - 4} width={w + 8} height={H + 8} rx={10} fill="#F2DDD3" opacity={0.95} />
+          <rect x={-w / 2} y={top} width={w} height={H} rx={7} fill="#162638" filter={shadow} />
+          <text textAnchor="middle" y={top + 17} fontSize={13} fontWeight={600} fontFamily="var(--font-display)" fill="#FFFFFF">
+            {label}
+          </text>
+        </g>
+      ) : (
+        <g filter={shadow}>
+          <path d={`M-16 ${top + 1} L0 ${top - 9} L16 ${top + 1} Z`} fill="#FFFFFF" />
+          <rect x={-w / 2} y={top} width={w} height={H} rx={7} fill="#FFFFFF" />
+          <text textAnchor="middle" y={top + 17} fontSize={13} fontWeight={600} fontFamily="var(--font-display)" fill="#162638">
+            {label}
+          </text>
+        </g>
+      )}
     </g>
   );
 }

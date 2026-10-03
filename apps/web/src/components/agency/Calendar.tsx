@@ -10,6 +10,7 @@ import { Button } from "@/components/ui";
 import { api } from "@/lib/api";
 import { plural, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
+import { k, tab } from "./kit";
 
 export type CalEvent = { id: string; start: string; title: string; sub: string; kind: "tour" | "req" | "done" | "media" | "cancelled"; agentName: string; tourId?: string };
 
@@ -84,36 +85,36 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
 
   return (
     <AdminShell locale={locale} area="agency" title={tx(locale, "Calendario", "Calendar")}>
-      {error && <div className="mb-3 rounded-lg bg-[#B3261E1A] px-3 py-2 text-sm text-danger" role="alert">{error}</div>}
+      {error && <div className={cn("mb-3", k.err)} role="alert">{error}</div>}
       <div className="grid gap-6 [&>*]:min-w-0 xl:grid-cols-[1fr_300px]">
-        <div ref={scroller} className="overflow-x-auto rounded-np border border-navy-line bg-navy-card">
+        <div ref={scroller} className={cn("overflow-x-auto", k.card)}>
           <div className="min-w-[760px]">
-            <div className="flex items-center gap-3 border-b border-navy-line px-4 py-3">
-              <Link href={`?w=${week - 1}`} className="rounded-lg p-1.5 hover:bg-white/5" aria-label={tx(locale, "Semana anterior", "Previous week")}><ChevronLeft size={18} /></Link>
-              <Link href={`?w=${week + 1}`} className="rounded-lg p-1.5 hover:bg-white/5" aria-label={tx(locale, "Semana siguiente", "Next week")}><ChevronRight size={18} /></Link>
-              <span className="font-display text-lg font-semibold inline-block first-letter:uppercase">{fmt(days[0], { day: "numeric", month: "short" })} – {fmt(days[6], { day: "numeric", month: "short", year: "numeric" })}</span>
-              {week !== 0 && <Link href="?w=0" className="text-sm text-coral">{tx(locale, "Hoy", "Today")}</Link>}
-              <div className="ml-auto flex gap-3 text-xs text-mist">
-                <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-sm bg-coral" /> {tx(locale, "Visita", "Tour")}</span>
-                <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-sm border border-dashed border-gold" /> {tx(locale, "Solicitada", "Requested")}</span>
-                <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-sm bg-[#3E5A6B]" /> {tx(locale, "Fotos", "Media")}</span>
-                <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-sm bg-white/10" /> {tx(locale, "Slot libre", "Open slot")}</span>
+            <div className={cn("flex flex-wrap items-center gap-3 border-b px-5 py-4", k.line)}>
+              <Link href={`?w=${week - 1}`} className={cn("rounded-full p-1.5 shadow-[inset_0_0_0_1px_#D9D2C4] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,.18)]", k.hover)} aria-label={tx(locale, "Semana anterior", "Previous week")}><ChevronLeft size={18} /></Link>
+              <Link href={`?w=${week + 1}`} className={cn("rounded-full p-1.5 shadow-[inset_0_0_0_1px_#D9D2C4] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,.18)]", k.hover)} aria-label={tx(locale, "Semana siguiente", "Next week")}><ChevronRight size={18} /></Link>
+              <span className={cn(k.titleSm, "inline-block first-letter:uppercase")}>{fmt(days[0], { day: "numeric", month: "short" })} – {fmt(days[6], { day: "numeric", month: "short", year: "numeric" })}</span>
+              {week !== 0 && <Link href="?w=0" className={cn("text-sm", k.link)}>{tx(locale, "Hoy", "Today")}</Link>}
+              <div className={cn("ml-auto flex gap-3 text-xs", k.muted)}>
+                <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-navy dark:bg-ivory" /> {tx(locale, "Visita", "Tour")}</span>
+                <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm border border-dashed border-navy/60 bg-[#E6EBF1] dark:border-ivory/60 dark:bg-white/10" /> {tx(locale, "Solicitada", "Requested")}</span>
+                <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-egeo" /> {tx(locale, "Fotos", "Media")}</span>
+                <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-[#F3EEE4] ring-1 ring-[#E4DCCD] dark:bg-white/[.06] dark:ring-white/10" /> {tx(locale, "Slot libre", "Open slot")}</span>
               </div>
             </div>
             <div className="grid grid-cols-[56px_repeat(7,1fr)]">
               <div />
               {days.map((d, i) => (
-                <div key={i} ref={i === todayIdx ? todayCol : undefined} className={cn("border-l border-navy-line py-2 text-center font-display text-sm first-letter:uppercase", i === todayIdx && "text-coral")}>{fmt(d, { weekday: "short", day: "numeric" })}</div>
+                <div key={i} ref={i === todayIdx ? todayCol : undefined} className={cn("border-l py-2.5 text-center font-display text-[13px] font-medium first-letter:uppercase", k.line, i === todayIdx ? "bg-[#E6EBF1] font-semibold text-navy dark:bg-white/10 dark:text-ivory" : k.muted)}>{fmt(d, { weekday: "short", day: "numeric" })}</div>
               ))}
             </div>
             <div className="relative">
               <div className="grid grid-cols-[56px_repeat(7,1fr)]">
                 {HOURS.map((h) => (
                   <div key={h} className="contents">
-                    <div className="h-14 border-t border-navy-line pr-2 pt-1 text-right text-[11px] text-mist">{String(h).padStart(2, "0")}:00</div>
+                    <div className={cn("h-14 border-t pr-2 pt-1 text-right text-[11px]", k.line, k.muted)}>{String(h).padStart(2, "0")}:00</div>
                     {days.map((_, i) => {
                       const open = !!mySlots.find((x) => x.day === weekday(i))?.hours.includes(h);
-                      return <div key={i} className={cn("h-14 border-l border-t border-navy-line", open && "bg-white/[.04]")} />;
+                      return <div key={i} className={cn("h-14 border-l border-t", k.line, open && "bg-[#F6F2EA] dark:bg-white/[.04]")} />;
                     })}
                   </div>
                 ))}
@@ -130,11 +131,11 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
                       key={e.id}
                       onClick={() => setSel(e)}
                       className={cn(
-                        "pointer-events-auto absolute overflow-hidden rounded-md px-2 py-1 text-left text-xs",
-                        e.kind === "tour" && "bg-coral-cta text-white",
-                        e.kind === "req" && "border border-dashed border-gold bg-[#B4935A1f] text-gold",
-                        (e.kind === "done" || e.kind === "cancelled") && "bg-white/10 text-mist line-through",
-                        e.kind === "media" && "bg-[#3E5A6B] text-ivory",
+                        "pointer-events-auto absolute overflow-hidden rounded-lg px-2 py-1 text-left text-xs",
+                        e.kind === "tour" && "bg-navy text-ivory dark:bg-ivory dark:text-navy",
+                        e.kind === "req" && "border border-dashed border-navy/60 bg-[#E6EBF1] text-navy dark:border-ivory/50 dark:bg-white/10 dark:text-ivory",
+                        (e.kind === "done" || e.kind === "cancelled") && "bg-[#F1ECE3] text-muted line-through dark:bg-white/[.06] dark:text-mist",
+                        e.kind === "media" && "bg-egeo/70 text-[#1F3E52] dark:bg-egeo/25 dark:text-[#DCEAF2]",
                       )}
                       style={{ left: `calc(${(di / 7) * 100}% + ${(col / cols) * (100 / 7)}% + 3px)`, width: `calc(${100 / 7 / cols}% - 6px)`, top: (hr - firstH) * 56 + 3, height: 50 }}
                       title={`${e.title} · ${e.sub}`}
@@ -150,29 +151,29 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
         </div>
         <div className="space-y-4">
           {sel && (
-            <div className="np-in rounded-np border border-coral/50 bg-navy-card p-4">
+            <div className={cn("np-in p-5 shadow-[inset_0_0_0_2px_#162638] dark:shadow-[inset_0_0_0_2px_#E79A7F]", k.card)}>
               <div className="flex items-start justify-between">
-                <div className="font-display text-lg font-semibold">{sel.title}</div>
-                <button onClick={() => setSel(null)} aria-label={tx(locale, "Cerrar", "Close")}><X size={16} /></button>
+                <div className={k.titleSm}>{sel.title}</div>
+                <button onClick={() => setSel(null)} className={cn("rounded-full p-1", k.hover)} aria-label={tx(locale, "Cerrar", "Close")}><X size={16} /></button>
               </div>
-              <div className="text-sm first-letter:uppercase text-mist">{fmt(new Date(sel.start), { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" })}</div>
+              <div className={cn("text-sm first-letter:uppercase", k.muted)}>{fmt(new Date(sel.start), { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" })}</div>
               <div className="mt-1 text-sm">{sel.sub} · {sel.agentName}</div>
               {sel.tourId && sel.kind !== "done" && sel.kind !== "cancelled" && (
                 <div className="mt-3 flex flex-wrap gap-2">
-                  {sel.kind === "req" && <Button size="sm" onClick={() => setTour("CONFIRMED")}><Check size={14} /> {tx(locale, "Confirmar", "Confirm")}</Button>}
-                  <Button size="sm" variant="dark-outline" onClick={() => setTour("DONE")}>{tx(locale, "Marcar realizada", "Mark done")}</Button>
-                  <Button size="sm" variant="dark-ghost" onClick={() => setTour("CANCELLED")}>{tx(locale, "Cancelar", "Cancel")}</Button>
+                  {sel.kind === "req" && <Button size="sm" className={k.primary} onClick={() => setTour("CONFIRMED")}><Check size={14} /> {tx(locale, "Confirmar", "Confirm")}</Button>}
+                  <Button size="sm" variant="outline" className={k.outline} onClick={() => setTour("DONE")}>{tx(locale, "Marcar realizada", "Mark done")}</Button>
+                  <Button size="sm" variant="ghost" className={k.ghost} onClick={() => setTour("CANCELLED")}>{tx(locale, "Cancelar", "Cancel")}</Button>
                 </div>
               )}
             </div>
           )}
           {canEditSlots && (
-            <div className="rounded-np border border-navy-line bg-navy-card p-4">
+            <div className={cn(k.card, "p-5")}>
               <div className="flex items-center justify-between">
-                <div className="font-display text-lg font-semibold">{tx(locale, "Mis slots de visita", "My tour slots")}</div>
-                {saving && <Loader2 size={14} className="animate-spin text-mist" />}
+                <div className={k.titleSm}>{tx(locale, "Mis slots de visita", "My tour slots")}</div>
+                {saving && <Loader2 size={14} className={cn("animate-spin", k.muted)} />}
               </div>
-              <p className="text-xs text-mist">{tx(locale, "Los compradores solo ven estos horarios en la ficha.", "Buyers only see these slots on the listing.")}</p>
+              <p className={cn("mt-1 text-xs", k.muted)}>{tx(locale, "Los compradores solo ven estos horarios en la ficha.", "Buyers only see these slots on the listing.")}</p>
               <div className="mt-3 space-y-3">
                 {mySlots.map((s) => (
                   <div key={s.day}>
@@ -181,7 +182,7 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
                       {[9, 10, 11, 14, 15, 16, 17].map((h) => {
                         const on = s.hours.includes(h);
                         return (
-                          <button key={h} onClick={() => saveSlots(mySlots.map((x) => (x.day === s.day ? { ...x, hours: on ? x.hours.filter((y) => y !== h) : [...x.hours, h].sort((a, b) => a - b) } : x)))} className={cn("rounded-md px-2 py-1 text-xs font-semibold", on ? "bg-coral-cta text-white" : "bg-white/5 text-mist")}>
+                          <button key={h} onClick={() => saveSlots(mySlots.map((x) => (x.day === s.day ? { ...x, hours: on ? x.hours.filter((y) => y !== h) : [...x.hours, h].sort((a, b) => a - b) } : x)))} aria-pressed={on} className={cn(tab(on), "px-2.5 py-1 text-xs")}>
                             {h}h
                           </button>
                         );
@@ -192,9 +193,9 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
               </div>
             </div>
           )}
-          <div className="rounded-np border border-navy-line bg-navy-card p-4 text-sm">
-            <div className="font-display text-lg font-semibold">{tx(locale, "Esta semana", "This week")}</div>
-            <div className="mt-2 text-mist">{(() => {
+          <div className={cn(k.card, "p-5 text-sm")}>
+            <div className={k.titleSm}>{tx(locale, "Esta semana", "This week")}</div>
+            <div className={cn("mt-2", k.muted)}>{(() => {
               const t = inWeek.filter((e) => e.kind === "tour" || e.kind === "req").length;
               const m = inWeek.filter((e) => e.kind === "media").length;
               return `${plural(t, locale, ["visita", "visitas"], ["tour", "tours"])} · ${plural(m, locale, ["sesión de fotos", "sesiones de fotos"], ["photo shoot", "photo shoots"])}`;

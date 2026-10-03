@@ -7,8 +7,9 @@ import type { PrequalInput } from "@newplace/config";
 import type { Lead, Listing, Locale, Tour } from "@/types/domain";
 import { listingPhoto } from "@/lib/photos";
 import { PropertyArt } from "@/components/art/PropertyArt";
-import { Avatar, Badge, Button, Card, EmptyState, Progress } from "@/components/ui";
+import { Avatar, Badge, Button, Card, Progress } from "@/components/ui";
 import { useApp } from "@/lib/store";
+import { Empty, k } from "@/components/agency/kit";
 import { api } from "@/lib/api";
 import { dateTime, money, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
@@ -85,19 +86,19 @@ export function HubView({ locale, data }: { locale: Locale; data: HubData }) {
       <div className="flex flex-wrap items-center gap-4">
         <Avatar initials={me.initials} hue={me.hue} size={56} />
         <div>
-          <div className="text-sm text-ink/65">Homebuyer Hub</div>
-          <h1 className="font-display text-3xl font-semibold">{tx(locale, `Hola, ${me.name.split(" ")[0]}`, `Hi, ${me.name.split(" ")[0]}`)}</h1>
+          <div className={k.eyebrow}>Homebuyer Hub</div>
+          <h1 className="mt-1 font-serif text-[40px] font-medium leading-[1.05] md:text-[48px]">{tx(locale, `Hola, ${me.name.split(" ")[0]}`, `Hi, ${me.name.split(" ")[0]}`)}</h1>
         </div>
         <div className="ml-auto w-full max-w-xs">
           <div className="mb-1 flex justify-between text-sm"><span className="font-semibold">{tx(locale, "Tu avance", "Your progress")}</span><span className="text-ink/65">{doneCount}/5</span></div>
-          <Progress value={(doneCount / 5) * 100} />
+          <Progress value={(doneCount / 5) * 100} tone="ok" />
         </div>
       </div>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-3">
         {/* next steps */}
-        <Card className="p-5 lg:col-span-1">
-          <h2 className="font-display text-lg font-semibold">{tx(locale, "Siguientes pasos", "Next steps")}</h2>
+        <Card className={cn(k.card, "border-0 p-5 lg:col-span-1")}>
+          <h2 className="font-serif text-[24px] font-medium leading-tight">{tx(locale, "Siguientes pasos", "Next steps")}</h2>
           <ol className="mt-4 space-y-3">
             {steps.map((s, i) => (
               <li key={i} className="flex items-start gap-3">
@@ -112,9 +113,9 @@ export function HubView({ locale, data }: { locale: Locale; data: HubData }) {
         </Card>
 
         {/* tours */}
-        <Card className="p-5 lg:col-span-2">
+        <Card className={cn(k.card, "border-0 p-5 lg:col-span-2")}>
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <h2 className="flex items-center gap-2 font-display text-lg font-semibold"><CalendarCheck size={18} className="text-coral" /> {tx(locale, "Mis visitas y solicitudes", "My tours & requests")}</h2>
+            <h2 className="flex items-center gap-2 font-serif text-[24px] font-medium leading-tight"><CalendarCheck size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Mis visitas y solicitudes", "My tours & requests")}</h2>
             <Badge tone="ok">{tx(locale, "Recordatorio por email", "Email reminders on")}</Badge>
           </div>
           <div className="mt-4 space-y-3">
@@ -122,7 +123,7 @@ export function HubView({ locale, data }: { locale: Locale; data: HubData }) {
               const l = listingById(ld.listingId);
               if (!l) return null;
               return (
-                <div key={ld.id} className="np-in flex flex-wrap items-center gap-4 rounded-np border border-coral/40 bg-[#A8452A0A] p-3 sm:flex-nowrap">
+                <div key={ld.id} className="np-in flex flex-wrap items-center gap-4 rounded-2xl bg-[#F6F2EA] p-3 sm:flex-nowrap dark:bg-white/[.05]">
                   <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="h-16 w-24 shrink-0 rounded-lg" />
                   <div className="min-w-0 flex-1">
                     <div className="line-clamp-1 font-semibold">{tx(locale, l.title_es, l.title_en)}</div>
@@ -134,16 +135,15 @@ export function HubView({ locale, data }: { locale: Locale; data: HubData }) {
             })}
             {myTours.map((t) => <TourRow key={t.id} t={t} l={listingById(t.listingId)} locale={locale} />)}
             {myTours.length === 0 && extraLeads.length === 0 && (
-              <EmptyState
-                icon={<CalendarCheck size={20} />}
+              <Empty className="py-6"
                 title={tx(locale, "Sin visitas próximas", "No upcoming tours")}
                 body={tx(locale, "Pide una visita desde cualquier ficha con los horarios reales del agente.", "Book a tour from any listing using the agent’s real calendar.")}
-                cta={<Button href={`/${locale}/search`} size="sm">{tx(locale, "Buscar inmuebles", "Browse homes")}</Button>}
+                cta={<Button href={`/${locale}/search`} size="sm" variant="outline" className={k.outline}>{tx(locale, "Buscar inmuebles", "Browse homes")}</Button>}
               />
             )}
             {data.pastTours.length > 0 && (
               <div className="pt-2">
-                <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink/65">{tx(locale, "Visitas pasadas", "Past tours")}</h3>
+                <div className={cn("mb-2", k.label)}>{tx(locale, "Visitas pasadas", "Past tours")}</div>
                 <div className="space-y-3 opacity-80">
                   {data.pastTours.map((t) => <TourRow key={t.id} t={t} l={listingById(t.listingId)} locale={locale} past />)}
                 </div>
@@ -156,24 +156,24 @@ export function HubView({ locale, data }: { locale: Locale; data: HubData }) {
         <HubMessages locale={locale} threads={data.threads} meId={user?.id ?? ""} listingById={listingById} />
 
         {/* preapproval mock */}
-        <Card className="p-5">
-          <h2 className="flex items-center gap-2 font-display text-lg font-semibold"><CircleDollarSign size={18} className="text-coral" /> {tx(locale, "Precalificación (simulada)", "Pre-qualification (mock)")}</h2>
+        <Card className={cn(k.card, "border-0 p-5")}>
+          <h2 className="flex items-center gap-2 font-serif text-[24px] font-medium leading-tight"><CircleDollarSign size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Precalificación (simulada)", "Pre-qualification (mock)")}</h2>
           <p className="mt-1 text-xs text-ink/65">{tx(locale, "Referencial. New Place no origina créditos.", "For reference. New Place does not originate loans.")}</p>
           <div className="mt-4 space-y-4 text-sm">
-            <label className="block"><div className="flex justify-between"><span>{tx(locale, "Precio", "Price")}</span><b>{money(price, locale)}</b></div><input type="range" min={50000} max={500000} step={5000} value={price} onChange={(e) => setPrice(+e.target.value)} className="w-full accent-[#A8452A]" aria-label={tx(locale, "Precio", "Price")} /></label>
-            <label className="block"><div className="flex justify-between"><span>{tx(locale, "Inicial", "Down payment")}</span><b>{down} %</b></div><input type="range" min={10} max={70} value={down} onChange={(e) => setDown(+e.target.value)} className="w-full accent-[#A8452A]" aria-label={tx(locale, "Inicial (%)", "Down payment (%)")} /></label>
-            <label className="block"><div className="flex justify-between"><span>{tx(locale, "Plazo", "Term")}</span><b>{years} {tx(locale, "años", "yrs")}</b></div><input type="range" min={5} max={25} value={years} onChange={(e) => setYears(+e.target.value)} className="w-full accent-[#A8452A]" aria-label={tx(locale, "Plazo (años)", "Term (years)")} /></label>
-            <label className="block"><div className="flex justify-between"><span>{tx(locale, "Tasa anual", "Annual rate")}</span><b>{ratePct.toLocaleString(locale === "es" ? "es-VE" : "en-US")} %</b></div><input type="range" min={0} max={30} step={0.5} value={ratePct} onChange={(e) => setRatePct(+e.target.value)} className="w-full accent-[#A8452A]" aria-label={tx(locale, "Tasa anual (%)", "Annual rate (%)")} /></label>
+            <label className="block"><div className="flex justify-between"><span>{tx(locale, "Precio", "Price")}</span><b>{money(price, locale)}</b></div><input type="range" min={50000} max={500000} step={5000} value={price} onChange={(e) => setPrice(+e.target.value)} className="w-full accent-navy dark:accent-[#E79A7F]" aria-label={tx(locale, "Precio", "Price")} /></label>
+            <label className="block"><div className="flex justify-between"><span>{tx(locale, "Inicial", "Down payment")}</span><b>{down} %</b></div><input type="range" min={10} max={70} value={down} onChange={(e) => setDown(+e.target.value)} className="w-full accent-navy dark:accent-[#E79A7F]" aria-label={tx(locale, "Inicial (%)", "Down payment (%)")} /></label>
+            <label className="block"><div className="flex justify-between"><span>{tx(locale, "Plazo", "Term")}</span><b>{years} {tx(locale, "años", "yrs")}</b></div><input type="range" min={5} max={25} value={years} onChange={(e) => setYears(+e.target.value)} className="w-full accent-navy dark:accent-[#E79A7F]" aria-label={tx(locale, "Plazo (años)", "Term (years)")} /></label>
+            <label className="block"><div className="flex justify-between"><span>{tx(locale, "Tasa anual", "Annual rate")}</span><b>{ratePct.toLocaleString(locale === "es" ? "es-VE" : "en-US")} %</b></div><input type="range" min={0} max={30} step={0.5} value={ratePct} onChange={(e) => setRatePct(+e.target.value)} className="w-full accent-navy dark:accent-[#E79A7F]" aria-label={tx(locale, "Tasa anual (%)", "Annual rate (%)")} /></label>
           </div>
           <div className="mt-4 rounded-np bg-navy p-4 text-ivory">
             <div className="text-xs text-mist">{tx(locale, `Cuota estimada (${ratePct.toLocaleString("es-VE")} % anual)`, `Est. payment (${ratePct}% APR)`)}</div>
             <div className="font-display text-3xl font-semibold">{money(Math.round(monthly), locale)}<span className="text-sm font-normal text-mist"> / {tx(locale, "mes", "mo")}</span></div>
           </div>
-          <Button className="mt-3 w-full" variant="outline" onClick={savePrequal} disabled={prequalBusy || !dirty}>
+          <Button className={cn("mt-3 w-full", k.outline)} variant="outline" onClick={savePrequal} disabled={prequalBusy || !dirty}>
             {prequalBusy ? <Loader2 size={16} className="animate-spin" /> : savedPrequal && !dirty ? <Check size={16} /> : <FileCheck2 size={16} />}
             {savedPrequal && !dirty ? tx(locale, "Precalificación guardada", "Pre-qualification saved") : tx(locale, "Guardar y generar carta", "Save and generate letter")}
           </Button>
-          {prequalErr && <div role="alert" className="mt-2 rounded-lg bg-[#B3261E1A] px-3 py-2 text-sm text-danger">{prequalErr}</div>}
+          {prequalErr && <div role="alert" className="mt-2 rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-sm text-danger">{prequalErr}</div>}
           {savedPrequal && (
             <div className="np-in mt-3 rounded-np border border-dashed border-line p-3 text-xs leading-relaxed text-ink/70" data-testid="prequal-letter">
               <b>{tx(locale, "Carta de precalificación (simulada)", "Pre-qualification letter (mock)")}</b>
@@ -192,10 +192,10 @@ export function HubView({ locale, data }: { locale: Locale; data: HubData }) {
 
         {/* saved + alerts */}
         <div className="space-y-6">
-          <Card className="p-5">
+          <Card className={cn(k.card, "border-0 p-5")}>
             <div className="flex items-center justify-between">
-              <h2 className="flex items-center gap-2 font-display text-lg font-semibold"><Heart size={18} className="text-coral" /> {tx(locale, "Guardados", "Saved")}</h2>
-              <Link href={`/${locale}/saved`} className="text-sm font-semibold text-coral">{tx(locale, "Ver todo", "See all")}</Link>
+              <h2 className="flex items-center gap-2 font-serif text-[24px] font-medium leading-tight"><Heart size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Guardados", "Saved")}</h2>
+              <Link href={`/${locale}/saved`} className={cn("text-sm", k.link)}>{tx(locale, "Ver todo", "See all")}</Link>
             </div>
             <div className="mt-4 space-y-3">
               {saved.length === 0 && <p className="text-sm text-ink/65">{tx(locale, "Toca el corazón en cualquier ficha para guardarla.", "Tap the heart on any listing to save it.")}</p>}
@@ -214,16 +214,16 @@ export function HubView({ locale, data }: { locale: Locale; data: HubData }) {
               })}
             </div>
           </Card>
-          <Card className="p-5">
+          <Card className={cn(k.card, "border-0 p-5")}>
             <div className="flex items-center justify-between">
-              <h2 className="flex items-center gap-2 font-display text-lg font-semibold"><Bell size={18} className="text-coral" /> {tx(locale, "Alertas", "Alerts")}</h2>
-              <Link href={`/${locale}/alerts`} className="text-sm font-semibold text-coral">{tx(locale, "Gestionar", "Manage")}</Link>
+              <h2 className="flex items-center gap-2 font-serif text-[24px] font-medium leading-tight"><Bell size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Alertas", "Alerts")}</h2>
+              <Link href={`/${locale}/alerts`} className={cn("text-sm", k.link)}>{tx(locale, "Gestionar", "Manage")}</Link>
             </div>
             {SAVED_SEARCHES.length === 0 && <p className="mt-3 text-sm text-ink/65">{tx(locale, "Guarda una búsqueda desde el mapa y te avisamos.", "Save a search from the map and we’ll let you know.")}</p>}
             {SAVED_SEARCHES.map((s) => (
               <div key={s.id} className="mt-3 flex items-center justify-between gap-2 text-sm">
                 <span className="line-clamp-1">{s.name}</span>
-                {s.newCount > 0 && <Badge tone="coral">+{s.newCount}</Badge>}
+                {s.newCount > 0 && <Badge className="bg-[#E6EBF1] text-navy dark:bg-white/10">+{s.newCount}</Badge>}
               </div>
             ))}
           </Card>

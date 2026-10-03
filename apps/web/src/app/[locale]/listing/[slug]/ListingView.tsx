@@ -1,10 +1,12 @@
 import Link from "next/link";
-import { Bath, BedDouble, Calendar, Car, ChevronRight, Clock, Eye, Heart, Maximize2, Ruler, Users } from "lucide-react";
+import { Clock, Eye, Heart } from "lucide-react";
 import type { Listing, Locale } from "@/types/domain";
 import { PublicPage } from "@/components/layout/PublicPage";
 import { Gallery } from "@/components/detail/Gallery";
 import { EstimateCard } from "@/components/detail/Estimate";
 import { ContactPanel } from "@/components/detail/ContactPanel";
+import { whatsappHref } from "@/lib/listing-href";
+import { Badge } from "@/components/ui";
 import { BilingualBody, PriceHistory } from "@/components/detail/Bits";
 import { DetailMap } from "@/components/detail/DetailMap";
 import { mapListing } from "@/components/map/mapListing";
@@ -45,28 +47,25 @@ export function isPublicListing(l: Pick<Listing, "status" | "review" | "privateL
   return PUBLIC_STATUSES.includes(l.status) && l.review === "APPROVED";
 }
 
-function Facts({ l, locale, dark }: { l: Listing; locale: Locale; dark?: boolean }) {
+function Facts({ l, locale }: { l: Listing; locale: Locale }) {
   const items = [
-    l.beds > 0 && [BedDouble, `${l.beds}`, tx(locale, "habitaciones", "bedrooms")],
-    l.baths > 0 && [Bath, `${l.baths}`, l.baths === 1 ? tx(locale, "baño", "bath") : tx(locale, "baños", "baths")],
-    [Maximize2, `${num(l.areaM2, locale)} m²`, tx(locale, "construidos", "built")],
-    l.plotM2 && [Ruler, `${num(l.plotM2, locale)} m²`, tx(locale, "terreno", "plot")],
-    l.parking > 0 && [Car, `${l.parking}`, l.parking === 1 ? tx(locale, "puesto", "parking spot") : tx(locale, "puestos", "parking")],
-    l.kind !== "land" && [Calendar, `${l.yearBuilt}`, tx(locale, "año", "built in")],
-    l.shortRent && [Users, `${l.shortRent.maxGuests}`, tx(locale, "huéspedes", "guests")],
-  ].filter(Boolean) as [React.ElementType, string, string][];
+    l.beds > 0 && [`${l.beds}`, tx(locale, l.beds === 1 ? "habitación" : "habitaciones", l.beds === 1 ? "bedroom" : "bedrooms")],
+    l.baths > 0 && [`${l.baths}`, l.baths === 1 ? tx(locale, "baño", "bath") : tx(locale, "baños", "baths")],
+    [`${num(l.areaM2, locale)} m²`, tx(locale, "construcción", "built")],
+    l.plotM2 && [`${num(l.plotM2, locale)} m²`, tx(locale, "parcela", "plot")],
+    l.parking > 0 && [`${l.parking}`, l.parking === 1 ? tx(locale, "puesto", "parking spot") : tx(locale, "puestos", "parking")],
+    l.kind !== "land" && [`${l.yearBuilt}`, tx(locale, "año", "year built")],
+    l.shortRent && [`${l.shortRent.maxGuests}`, tx(locale, "huéspedes", "guests")],
+  ].filter(Boolean) as [string, string][];
   return (
-    <div className="flex flex-wrap gap-x-7 gap-y-3">
-      {items.map(([Icon, v, t]) => (
-        <div key={t} className="flex items-center gap-2">
-          <Icon size={20} className={dark ? "text-gold" : "text-coral"} />
-          <div>
-            <div className="font-display text-lg font-semibold leading-none">{v}</div>
-            <div className={cn("text-xs", dark ? "text-mist" : "text-ink/65")}>{t}</div>
-          </div>
+    <dl className="flex flex-wrap gap-x-12 gap-y-5 border-y border-line py-6 lg:gap-x-14">
+      {items.map(([v, t]) => (
+        <div key={t} className="flex flex-col-reverse">
+          <dt className="mt-1 text-[13px] font-semibold uppercase tracking-[0.14em] text-ink/60">{t}</dt>
+          <dd className="font-serif text-[30px] font-semibold leading-none text-ink">{v}</dd>
         </div>
       ))}
-    </div>
+    </dl>
   );
 }
 
@@ -89,30 +88,34 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
   const nearby = nearbyRows.map((r) => toCard(toDomain(r)));
   const ves = fx.find((f) => f.code === "VES")?.perUsd ?? 0;
   const eur = fx.find((f) => f.code === "EUR")?.perUsd ?? 0;
-  const dark = l.luxury;
+  const ppm = l.listingType === "SALE" || l.listingType === "COMMERCIAL_SALE" ? Math.round(l.priceAmount / Math.max(1, l.areaM2)) : null;
   const soldNearby = soldRows.map((r) => toCard(toDomain(r))).map((o) => ({ t: `${tx(locale, o.title_es, o.title_en)} · ${o.areaM2} m²`, p: o.priceAmount, d: tx(locale, o.status === "SOLD" ? "Vendido" : "Alquilado", o.status === "SOLD" ? "Sold" : "Rented") }));
-  const H = ({ children }: { children: React.ReactNode }) => <h3 className="mb-4 font-display text-xl font-semibold">{children}</h3>;
-  const sec = cn("border-t py-8", dark ? "border-navy-line" : "border-line");
+  const H = ({ children }: { children: React.ReactNode }) => <h3 className="mb-5 font-serif text-[28px] leading-tight">{children}</h3>;
+  const sec = "border-t border-line py-10";
+  const tile = "rounded-xl border border-line bg-white px-4 py-3 text-[15px]";
+  const searchType = l.listingType.startsWith("COMMERCIAL") ? "COMMERCIAL" : l.listingType;
 
   return (
-    <PublicPage locale={locale} header={dark ? "dark" : "light"}>
+    <PublicPage locale={locale}>
       {/* Bottom padding on phones: the sticky contact bar never hides the last section. */}
-      <div className={cn("pb-24 md:pb-0", dark && "bg-navy text-ivory")}>
-        <div className={cn("mx-auto max-w-[1280px] px-4 pt-4 md:px-6", dark && "max-w-none px-0 md:px-0")}>
-          <nav aria-label={tx(locale, "Ruta de navegación", "Breadcrumb")} className={cn("mb-3 flex items-center gap-1 text-sm", dark ? "mx-auto max-w-[1280px] px-4 text-mist md:px-6" : "text-ink/65")}>
-            <Link className="inline-flex min-h-11 items-center underline-offset-2 hover:underline" href={`/${locale}/search?type=${l.listingType.startsWith("COMMERCIAL") ? "COMMERCIAL" : l.listingType}`}>{lbl(TYPE_LABEL[l.listingType], locale)}</Link>
-            <ChevronRight size={14} /> <span>{l.city}</span> <ChevronRight size={14} /> <span>{l.zone}</span>
+      <div className="pb-28 md:pb-0">
+        <div className="mx-auto max-w-[1320px] px-4 pt-5 md:px-8">
+          <nav aria-label={tx(locale, "Ruta de navegación", "Breadcrumb")} className="mb-3 flex flex-wrap items-center text-[15px] text-ink/65">
+            <Link className="inline-flex min-h-11 items-center underline-offset-4 hover:text-ink hover:underline" href={`/${locale}/search?type=${searchType}`}>{lbl(TYPE_LABEL[l.listingType], locale)}</Link>
+            {[l.state, l.city, l.zone].filter((x, i, a) => x && a.indexOf(x) === i).map((x) => (
+              <span key={x}><span aria-hidden className="px-1.5">·</span>{x}</span>
+            ))}
           </nav>
           {!isPublic && (
-            <div className="mb-3 rounded-np border border-warn/60 bg-[#8A5A001a] px-4 py-2.5 text-sm font-semibold text-[#8A5A00]">
+            <div className="mb-3 rounded-xl border border-warn/60 bg-[#8A5A001a] px-4 py-2.5 text-sm font-semibold text-[#8A5A00]">
               {l.review === "PENDING" ? tx(locale, "Pendiente de aprobación: solo tu equipo ve esta ficha.", "Pending approval: only your team can see this listing.") : tx(locale, `No publicado (${l.status}). Solo tu equipo ve esta ficha.`, `Not public (${l.status}). Only your team can see this listing.`)}
               {l.takedownReason && ` · ${l.takedownReason}`}
             </div>
           )}
-          <Gallery l={l} locale={locale} luxury={dark} />
+          <Gallery l={l} locale={locale} />
           {isPublic && <ViewBeacon id={l.id} />}
           {l.luxury && l.brochurePdf && (
-            <a href={l.brochurePdf} target="_blank" rel="noreferrer" className={cn("mt-3 inline-flex min-h-11 items-center gap-2 rounded-full border px-4 font-display text-sm", dark ? "border-gold/50 text-gold hover:bg-white/5" : "border-line bg-white")}>
+            <a href={l.brochurePdf} target="_blank" rel="noreferrer" className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-full border-[1.5px] border-navy px-5 font-display text-sm font-semibold text-navy hover:bg-navy/5">
               {tx(locale, "Descargar brochure (PDF)", "Download brochure (PDF)")}
             </a>
           )}
@@ -125,81 +128,78 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
           )}
         </div>
 
-        <div className="mx-auto grid max-w-[1280px] gap-10 px-4 pt-6 md:px-6 grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1fr)_380px]">
+        <div className="mx-auto grid max-w-[1320px] grid-cols-[minmax(0,1fr)] gap-12 px-4 pt-8 md:px-8 lg:grid-cols-[minmax(0,1fr)_420px] lg:gap-16">
           <div>
             <div className="flex flex-wrap items-center gap-2">
-              <StatusBadge status={l.status} locale={locale} />
-              {dark && <span className="rounded-full border border-gold px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-gold">Luxury collection</span>}
-              <Freshness iso={l.updatedAt} locale={locale} className={dark ? "text-mist" : "text-ink/65"} />
+              {l.luxury && <Badge tone="exclusive">{tx(locale, "Exclusiva New Place", "New Place exclusive")}</Badge>}
+              {l.status !== "ACTIVE" && <StatusBadge status={l.status} locale={locale} />}
+              {l.amenities.includes("view") && <Badge tone="egeo">{tx(locale, "Con vista", "With a view")}</Badge>}
+              {l.furnished && <Badge tone="arena">{tx(locale, "Amoblado", "Furnished")}</Badge>}
               <div className="ml-auto flex items-center gap-2">
-                <CompareButton id={l.id} locale={locale} dark={dark} />
-                <ShareButton locale={locale} title={tx(locale, l.title_es, l.title_en)} className={cn("inline-flex min-h-11 items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold", dark ? "border-white/20" : "border-line bg-white")} />
+                <CompareButton id={l.id} locale={locale} className="min-h-11 px-3.5 text-[13px]" />
+                <ShareButton locale={locale} title={tx(locale, l.title_es, l.title_en)} className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-line bg-white px-3.5 text-[13px] font-semibold" />
                 <SaveButton id={l.id} locale={locale} className="border border-line" />
               </div>
             </div>
-            <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
-              <div>
-                <div className="font-display text-4xl font-bold">
-                  {money(l.priceAmount, locale)}
-                  <span className={cn("text-lg font-normal", dark ? "text-mist" : "text-ink/65")}>{priceSuffix(l, locale)}</span>
-                </div>
-                <div className={cn("mt-1 text-sm", dark ? "text-mist" : "text-ink/65")}>
-                  ≈ Bs. {num(Math.round(l.priceAmount * ves), locale)} · € {num(Math.round(l.priceAmount * eur), locale)} <span>({tx(locale, "tasa referencial", "reference rate")})</span>
-                </div>
+            <h1 className="mt-5 max-w-[760px] text-[38px] leading-[1.08] md:text-[52px]">{tx(locale, l.title_es, l.title_en)}</h1>
+            <p className="mt-2 text-[15px] text-ink/65">{l.address} · {l.zone}, {l.city}{l.state && l.state !== l.city ? `, ${l.state}` : ""}</p>
+            <div className="mt-7 flex flex-wrap items-baseline gap-x-5 gap-y-1">
+              <div className="font-serif text-[48px] font-semibold leading-none text-ink md:text-[58px]">
+                {money(l.priceAmount, locale)}
+                <span className="font-display text-lg font-normal text-ink/60">{priceSuffix(l, locale)}</span>
               </div>
-              <div className={cn("text-right text-sm", dark ? "text-mist" : "text-ink/60")}>
-                <div className="font-semibold">{l.address}</div>
-                <div>{l.zone}, {l.city} · {l.state}</div>
+              <div className="text-[15px] text-ink/65">
+                {ppm ? `${money(ppm, locale)} / m² · ` : ""}≈ Bs. {num(Math.round(l.priceAmount * ves), locale)} · € {num(Math.round(l.priceAmount * eur), locale)} <span>({tx(locale, "tasa referencial", "reference rate")})</span>
               </div>
             </div>
-            <h1 className="mt-4 font-display text-2xl font-semibold md:text-3xl">{tx(locale, l.title_es, l.title_en)}</h1>
-            <div className="mt-5"><Facts l={l} locale={locale} dark={dark} /></div>
-            <div className={cn("mt-5 flex flex-wrap gap-4 text-sm", dark ? "text-mist" : "text-ink/65")}>
-              <span className="inline-flex items-center gap-1.5"><Eye size={15} /> {num(l.stats.impressions, locale)} {tx(locale, "vistas", "views")}</span>
-              <span className="inline-flex items-center gap-1.5"><Heart size={15} /> {l.stats.saves} {tx(locale, "lo guardaron", "saves")}</span>
-              <span className="inline-flex items-center gap-1.5"><Clock size={15} /> {l.daysOnMarket === 0 ? tx(locale, "Publicado hoy", "Listed today") : plural(l.daysOnMarket, locale, ["día publicado", "días publicado"], ["day on New Place", "days on New Place"])}</span>
+            <div className="mt-8"><Facts l={l} locale={locale} /></div>
+            <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-ink/60">
+              <Freshness iso={l.updatedAt} locale={locale} />
+              <span className="inline-flex items-center gap-1.5"><Eye size={15} aria-hidden /> {num(l.stats.impressions, locale)} {tx(locale, "vistas", "views")}</span>
+              <span className="inline-flex items-center gap-1.5"><Heart size={15} aria-hidden /> {l.stats.saves} {tx(locale, "lo guardaron", "saves")}</span>
+              <span className="inline-flex items-center gap-1.5"><Clock size={15} aria-hidden /> {l.daysOnMarket === 0 ? tx(locale, "Publicado hoy", "Listed today") : plural(l.daysOnMarket, locale, ["día publicado", "días publicado"], ["day on New Place", "days on New Place"])}</span>
             </div>
 
-            <div className={sec + " mt-8"}><BilingualBody l={l} locale={locale} dark={dark} /></div>
+            <div className="mt-8 py-6"><BilingualBody l={l} locale={locale} /></div>
 
             <div className={sec}>
               <H>{tx(locale, "Amenidades", "Amenities")}</H>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                 {l.amenities.map((a) => (
-                  <div key={a} className={cn("rounded-lg border px-3 py-2.5 text-sm font-semibold", dark ? "border-navy-line" : "border-line bg-white")}>{lbl(AMENITY_LABEL[a], locale)}</div>
+                  <div key={a} className={cn(tile, "font-semibold")}>{lbl(AMENITY_LABEL[a], locale)}</div>
                 ))}
                 {l.commercial && (
                   <>
-                    <div className={cn("rounded-lg border px-3 py-2.5 text-sm", dark ? "border-navy-line" : "border-line bg-white")}><b>{l.commercial.ceilingHeight} m</b> {tx(locale, "altura libre", "clear height")}</div>
-                    <div className={cn("rounded-lg border px-3 py-2.5 text-sm", dark ? "border-navy-line" : "border-line bg-white")}><b>{l.commercial.zoning}</b></div>
-                    {l.commercial.capRate && <div className={cn("rounded-lg border px-3 py-2.5 text-sm", dark ? "border-navy-line" : "border-line bg-white")}>Cap rate <b>{l.commercial.capRate} %</b></div>}
-                    {l.commercial.loadingDock && <div className={cn("rounded-lg border px-3 py-2.5 text-sm", dark ? "border-navy-line" : "border-line bg-white")}><b>{tx(locale, "Andén de carga", "Loading dock")}</b></div>}
+                    <div className={tile}><b>{l.commercial.ceilingHeight} m</b> {tx(locale, "altura libre", "clear height")}</div>
+                    <div className={tile}><b>{l.commercial.zoning}</b></div>
+                    {l.commercial.capRate && <div className={tile}>Cap rate <b>{l.commercial.capRate} %</b></div>}
+                    {l.commercial.loadingDock && <div className={tile}><b>{tx(locale, "Andén de carga", "Loading dock")}</b></div>}
                   </>
                 )}
                 {l.shortRent && (
-                  <div className={cn("rounded-lg border px-3 py-2.5 text-sm", dark ? "border-navy-line" : "border-line bg-white")}>{tx(locale, "Mín.", "Min.")} <b>{l.shortRent.minNights} {tx(locale, "noches", "nights")}</b> · {tx(locale, "limpieza", "cleaning")} {money(l.shortRent.cleaningFee, locale)}</div>
+                  <div className={tile}>{tx(locale, "Mín.", "Min.")} <b>{l.shortRent.minNights} {tx(locale, "noches", "nights")}</b> · {tx(locale, "limpieza", "cleaning")} {money(l.shortRent.cleaningFee, locale)}</div>
                 )}
               </div>
             </div>
 
-            <div className={sec}><EstimateCard l={l} locale={locale} dark={dark} /></div>
+            <div className={sec}><EstimateCard l={l} locale={locale} /></div>
 
             <div className={sec}>
               <H>{tx(locale, "Ubicación", "Location")}</H>
               <DetailMap l={mapListing(l)} locale={locale} nearby={nearby.map(mapListing)} />
-              <p className={cn("mt-2 text-xs", dark ? "text-mist" : "text-ink/65")}>
+              <p className="mt-3 text-sm text-ink/60">
                 {tx(locale, "Colegios y trayectos se muestran solo cuando hay datos verificados para la zona.", "Schools and commute times appear only when verified data exists for the area.")}
               </p>
             </div>
 
-            <div className={cn(sec, "grid gap-8 md:grid-cols-2")}>
+            <div className={cn(sec, "grid gap-10 md:grid-cols-2")}>
               <div>
                 <H>{tx(locale, "Historial de precio", "Price history")}</H>
-                <PriceHistory events={l.priceHistory} locale={locale} dark={dark} />
+                <PriceHistory events={l.priceHistory} locale={locale} />
               </div>
               <div>
                 <H>{tx(locale, `Informe de zona · ${l.zone}`, `Area report · ${l.zone}`)}</H>
-                <p className={cn("-mt-2 mb-3 text-xs", dark ? "text-mist" : "text-ink/65")}>{zone.live ? tx(locale, "Calculado con los anuncios publicados en New Place.", "Computed from listings published on New Place.") : tx(locale, "Pocos anuncios en la zona: valores de referencia.", "Few listings in this area: reference values.")}</p>
+                <p className="-mt-3 mb-4 text-sm text-ink/60">{zone.live ? tx(locale, "Calculado con los anuncios publicados en New Place.", "Computed from listings published on New Place.") : tx(locale, "Pocos anuncios en la zona: valores de referencia.", "Few listings in this area: reference values.")}</p>
                 <div className="grid grid-cols-2 gap-3">
                   {[
                     [money(zone.salePpm, locale), tx(locale, "USD/m² venta", "USD/m² sale")],
@@ -207,9 +207,9 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
                     [num(zone.activeListings, locale), tx(locale, "en oferta en New Place", "available on New Place")],
                     [zone.daysOnMarket, tx(locale, "días en mercado (mediana)", "median days on market")],
                   ].map(([v, t]) => (
-                    <div key={String(t)} className={cn("rounded-np border p-3", dark ? "border-navy-line" : "border-line bg-white")}>
-                      <div className="font-display text-xl font-semibold">{v}</div>
-                      <div className={cn("text-xs", dark ? "text-mist" : "text-ink/65")}>{t}</div>
+                    <div key={String(t)} className="rounded-xl border border-line bg-white p-4">
+                      <div className="font-serif text-[26px] font-semibold leading-none">{v}</div>
+                      <div className="mt-1.5 text-sm text-ink/60">{t}</div>
                     </div>
                   ))}
                 </div>
@@ -219,12 +219,12 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
             {soldNearby.length > 0 && (
               <div className={sec}>
                 <H>{tx(locale, "Vendidos cerca", "Sold nearby")}</H>
-                <div className={cn("divide-y rounded-np border", dark ? "divide-navy-line border-navy-line" : "divide-line border-line bg-white")}>
+                <div className="divide-y divide-line rounded-xl border border-line bg-white">
                   {soldNearby.map((s) => (
-                    <div key={s.t} className="flex items-center justify-between px-4 py-3 text-sm">
+                    <div key={s.t} className="flex items-center justify-between gap-3 px-4 py-3 text-[15px]">
                       <span className="font-semibold">{s.t}</span>
-                      <span className={dark ? "text-mist" : "text-ink/65"}>{s.d}</span>
-                      <span className="font-display">{money(s.p, locale)}</span>
+                      <span className="text-ink/60">{s.d}</span>
+                      <span className="font-serif text-lg font-semibold">{money(s.p, locale)}</span>
                     </div>
                   ))}
                 </div>
@@ -232,26 +232,29 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
             )}
           </div>
 
-          <aside id="contact" className="scroll-mt-20 lg:sticky lg:top-20 lg:self-start">
-            <ContactPanel l={l} locale={locale} dark={dark} />
+          <aside id="contact" className="scroll-mt-24 lg:sticky lg:top-24 lg:self-start">
+            <ContactPanel l={l} locale={locale} />
           </aside>
           <StickyContactBar
             locale={locale}
             price={money(l.priceAmount, locale)}
             suffix={priceSuffix(l, locale)}
             tour={!!l.agentId && ["ACTIVE", "COMING_SOON", "UNDER_OFFER"].includes(l.status)}
-            dark={dark}
+            whatsapp={whatsappHref(l, locale)}
+            agentFirst={l.agent?.name.split(" ")[0]}
           />
         </div>
 
-        <div className="mx-auto max-w-[1280px] px-4 pb-16 pt-6 md:px-6">
-          <H>{tx(locale, "Similares", "Similar homes")}</H>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {similar.map((s) => (
-              <ListingCard key={s.id} l={s} locale={locale} />
-            ))}
+        {similar.length > 0 && (
+          <div className="mx-auto max-w-[1320px] px-4 pb-20 pt-10 md:px-8">
+            <h2 className="mb-8 text-[34px] leading-tight md:text-[42px]">{tx(locale, "Propiedades similares", "Similar properties")}</h2>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {similar.map((s) => (
+                <ListingCard key={s.id} l={s} locale={locale} compact />
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </PublicPage>
   );

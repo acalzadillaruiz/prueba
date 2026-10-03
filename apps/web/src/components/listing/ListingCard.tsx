@@ -1,69 +1,69 @@
 import Link from "next/link";
-import { Bath, BedDouble, Car, Maximize2, ShieldCheck } from "lucide-react";
 import type { Listing, Locale } from "@/types/domain";
 import { listingPhoto } from "@/lib/photos";
 import { PropertyArt } from "@/components/art/PropertyArt";
-import { TYPE_LABEL, lbl, money, num, priceSuffix, tx, plural } from "@/lib/i18n";
+import { Badge } from "@/components/ui";
+import { TYPE_LABEL, lbl, money, num, priceSuffix, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
-import { CompareButton, Freshness, SaveButton, StatusBadge } from "./bits";
+import { CompareButton, SaveButton, StatusBadge } from "./bits";
+
+/** "5 hab. · 6 baños · 620 m²" (metadata line, ≥ 14 px). */
+export function factsLine(l: Pick<Listing, "beds" | "baths" | "areaM2">, locale: Locale) {
+  return [
+    l.beds > 0 && `${l.beds} ${tx(locale, "hab.", l.beds === 1 ? "bed" : "beds")}`,
+    l.baths > 0 && `${l.baths} ${tx(locale, l.baths === 1 ? "baño" : "baños", l.baths === 1 ? "bath" : "baths")}`,
+    `${num(l.areaM2, locale)} m²`,
+  ].filter(Boolean) as string[];
+}
+
+/** Brand badges on the photo: Exclusive (luxury) → status → new → view. Two at most, calm. */
+function PhotoBadges({ l, locale }: { l: Listing; locale: Locale }) {
+  const fresh = Date.now() - Date.parse(l.publishedAt) < 24 * 3600_000;
+  const drop = l.priceHistory?.some((p) => p.kind === "DROP");
+  const out: React.ReactNode[] = [];
+  if (l.luxury) out.push(<Badge key="x" tone="exclusive">{tx(locale, "Exclusiva New Place", "New Place exclusive")}</Badge>);
+  if (l.status !== "ACTIVE") out.push(<StatusBadge key="s" status={l.status} locale={locale} />);
+  if (fresh && l.status === "ACTIVE") out.push(<Badge key="n" tone="arena">{tx(locale, "Nuevo", "New")}</Badge>);
+  if (drop) out.push(<Badge key="d" tone="arena">{tx(locale, "Bajó de precio", "Price cut")}</Badge>);
+  if (l.amenities?.includes("view")) out.push(<Badge key="v" tone="egeo">{tx(locale, "Con vista", "With a view")}</Badge>);
+  return <div className="absolute left-3 top-3 flex max-w-[calc(100%-4.5rem)] flex-wrap gap-1.5">{out.slice(0, 2)}</div>;
+}
 
 export function ListingCard({ l, locale, compact, className, showCompare }: { l: Listing; locale: Locale; compact?: boolean; className?: string; showCompare?: boolean }) {
-  const agency = l.agency;
-  const fresh = Date.now() - Date.parse(l.publishedAt) < 24 * 3600_000;
-  const drop = l.priceHistory.find((p) => p.kind === "DROP");
   return (
     <Link
       href={`/${locale}/listing/${l.slug}`}
-      className={cn("group block overflow-hidden rounded-np border border-line bg-white transition-shadow duration-np hover:shadow-np", l.luxury && "ring-1 ring-gold/60", className)}
+      className={cn("group block overflow-hidden rounded-np bg-white shadow-[0_1px_2px_rgba(22,38,56,.05),0_8px_24px_rgba(22,38,56,.06)] transition-shadow duration-np hover:shadow-[0_2px_4px_rgba(22,38,56,.06),0_16px_36px_rgba(22,38,56,.12)]", className)}
     >
-      <div className="relative aspect-[4/3] overflow-hidden bg-navy">
-        <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="h-full w-full transition-transform duration-500 group-hover:scale-[1.03]" label={tx(locale, l.title_es, l.title_en)} />
-        <div className="absolute left-2.5 top-2.5 flex flex-wrap gap-1.5">
-          {l.status !== "ACTIVE" && <StatusBadge status={l.status} locale={locale} />}
-          {fresh && l.status === "ACTIVE" && <span className="rounded-full bg-coral-cta px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-white">{tx(locale, "Nuevo hoy", "New today")}</span>}
-          {l.luxury && <span className="rounded-full bg-navy px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-gold">Luxury</span>}
-          {drop && <span className="rounded-full bg-white/90 px-2 py-0.5 text-[11px] font-bold text-ok">↓ {tx(locale, "Bajó", "Reduced")}</span>}
-        </div>
+      <div className="relative aspect-[4/3] overflow-hidden bg-arena">
+        <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="h-full w-full transition-transform duration-700 ease-out group-hover:scale-[1.03]" label={tx(locale, l.title_es, l.title_en)} />
+        <PhotoBadges l={l} locale={locale} />
         <SaveButton id={l.id} locale={locale} className="absolute right-2.5 top-2.5" />
-        {/* Photo counter only for real photos; illustration-only listings say so instead of "1/8". */}
-        <span className="absolute bottom-2.5 right-2.5 rounded-md bg-navy/80 px-1.5 py-0.5 text-[11px] font-semibold text-ivory">{l.photos?.length ? `1/${l.scenes.length}` : tx(locale, "Ilustración", "Illustration")}</span>
-      </div>
-      <div className={cn("p-3.5", compact && "p-3")}>
-        <div className="flex items-baseline justify-between gap-2">
-          <div className="font-display text-xl font-semibold text-navy">
-            {money(l.priceAmount, locale)}
-            <span className="text-sm font-normal text-ink/65">{priceSuffix(l, locale)}</span>
-          </div>
-          <span className="text-xs font-semibold text-ink/65">{lbl(TYPE_LABEL[l.listingType], locale)}</span>
-        </div>
-        <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-ink/70">
-          {l.beds > 0 && (
-            <span className="inline-flex items-center gap-1"><BedDouble size={14} /> {l.beds}</span>
-          )}
-          {l.baths > 0 && (
-            <span className="inline-flex items-center gap-1"><Bath size={14} /> {l.baths}</span>
-          )}
-          <span className="inline-flex items-center gap-1"><Maximize2 size={13} /> {num(l.areaM2, locale)} m²</span>
-          {l.parking > 0 && (
-            <span className="inline-flex items-center gap-1"><Car size={14} /> {l.parking}</span>
-          )}
-        </div>
-        <div className="mt-1.5 line-clamp-1 font-semibold text-ink">{tx(locale, l.title_es, l.title_en)}</div>
-        <div className="line-clamp-1 text-sm text-ink/60">{l.zone}, {l.city}</div>
-        {!compact && (
-          <div className="mt-3 flex items-center justify-between border-t border-line pt-2.5 text-ink/60">
-            <span className="inline-flex items-center gap-1 text-xs">
-              {agency ? (
-                <>
-                  {agency.verified && <ShieldCheck size={13} className="text-ok" />} {agency.name}
-                </>
-              ) : (
-                tx(locale, "Dueño directo", "By owner")
-              )}
-            </span>
-            {showCompare ? <CompareButton id={l.id} locale={locale} /> : <Freshness iso={l.updatedAt} locale={locale} />}
-          </div>
+        {/* Honest label for illustration-only listings (never a fake "1/8" photo counter). */}
+        {l.photos?.length ? (
+          <span className="absolute bottom-2.5 right-2.5 rounded-full bg-navy/70 px-2 py-0.5 text-xs font-semibold text-ivory">1/{l.photos.length}</span>
+        ) : (
+          <span className="absolute bottom-2.5 right-2.5 rounded-full bg-white/85 px-2 py-0.5 text-xs font-medium text-[#162638]">{tx(locale, "Ilustración", "Illustration")}</span>
         )}
+      </div>
+      <div className={cn("px-5 pb-4 pt-4", compact && "px-4 pb-3.5 pt-3.5")}>
+        <div className="flex items-baseline justify-between gap-2">
+          <div className={cn("font-serif font-semibold leading-none text-navy", compact ? "text-[24px]" : "text-[27px]")}>
+            {money(l.priceAmount, locale)}
+            <span className="font-display text-sm font-normal text-ink/60">{priceSuffix(l, locale)}</span>
+          </div>
+          <span className="shrink-0 text-sm text-ink/55">{lbl(TYPE_LABEL[l.listingType], locale)}</span>
+        </div>
+        <div className="mt-2.5 line-clamp-1 text-[15px] font-semibold text-ink">{tx(locale, l.title_es, l.title_en)}</div>
+        <div className="mt-0.5 line-clamp-1 text-sm text-ink/60">{l.zone}, {l.city}</div>
+        <div className="mt-3.5 flex items-center justify-between gap-2 border-t border-line pt-3 text-sm text-ink/65">
+          <span className="flex flex-wrap gap-x-4">
+            {factsLine(l, locale).map((f) => (
+              <span key={f}>{f}</span>
+            ))}
+          </span>
+          {showCompare && <CompareButton id={l.id} locale={locale} />}
+        </div>
       </div>
     </Link>
   );
@@ -71,22 +71,18 @@ export function ListingCard({ l, locale, compact, className, showCompare }: { l:
 
 export function MapPreviewCard({ l, locale }: { l: Listing; locale: Locale }) {
   return (
-    <Link href={`/${locale}/listing/${l.slug}`} className="block overflow-hidden rounded-np bg-white shadow-np ring-1 ring-black/5">
-      <div className="relative aspect-[16/9]">
+    <Link href={`/${locale}/listing/${l.slug}`} className="block overflow-hidden rounded-np bg-white shadow-[0_16px_40px_rgba(22,38,56,.22)] ring-1 ring-black/5">
+      <div className="relative aspect-[16/9] bg-arena">
         <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="h-full w-full" />
         <SaveButton id={l.id} locale={locale} className="absolute right-2 top-2" />
       </div>
-      <div className="p-3">
-        <div className="font-display text-lg font-semibold text-navy">
+      <div className="p-3.5">
+        <div className="font-serif text-[22px] font-semibold leading-none text-navy">
           {money(l.priceAmount, locale)}
-          <span className="text-xs font-normal text-ink/65">{priceSuffix(l, locale)}</span>
+          <span className="font-display text-sm font-normal text-ink/60">{priceSuffix(l, locale)}</span>
         </div>
-        <div className="text-sm text-ink/70">
-          {l.beds > 0 && `${l.beds} ${tx(locale, "hab", "bd")} · `}
-          {l.baths > 0 && `${plural(l.baths, locale, ["baño", "baños"], ["ba", "ba"])} · `}
-          {l.areaM2} m²
-        </div>
-        <div className="line-clamp-1 text-sm font-semibold">{tx(locale, l.title_es, l.title_en)}</div>
+        <div className="mt-1.5 line-clamp-1 text-sm font-semibold">{tx(locale, l.title_es, l.title_en)}</div>
+        <div className="text-sm text-ink/60">{factsLine(l, locale).join(" · ")}</div>
       </div>
     </Link>
   );

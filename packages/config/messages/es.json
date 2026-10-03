@@ -1,11 +1,11 @@
 {
-  "brand": { "tagline": "Un nuevo lugar." },
-  "nav": { "buy": "Comprar", "rent": "Alquilar", "vacation": "Vacacional", "commercial": "Comercial", "luxury": "Luxury", "saved": "Guardados", "publish": "Publicar", "signIn": "Entrar", "signOut": "Cerrar sesión", "menu": "Menú" },
+  "brand": { "tagline": "El Caribe, con alma mediterránea.", "sub": "Bienes raíces" },
+  "nav": { "buy": "Comprar", "rent": "Alquilar", "vacation": "Vacacional", "commercial": "Comercial", "luxury": "Luxury", "saved": "Guardados", "publish": "Publicar", "signIn": "Entrar", "signOut": "Cerrar sesión", "menu": "Menú", "privateCollection": "Colección Privada", "remoteBuying": "Compra a distancia", "sell": "Vender con nosotros", "home": "Inicio", "map": "Mapa", "account": "Cuenta" },
   "footer": {
-    "about": "Marketplace y sistema operativo para inmobiliarias. Hecho en Caracas, pensado para el mundo.",
+    "about": "Asesoría inmobiliaria de alto nivel en Lechería, El Morro, Margarita y Caracas.",
     "search": "Buscar", "owners": "Propietarios", "agencies": "Agencias",
     "listFree": "Publicar gratis", "hireAgency": "Encargar a agencia", "myProperties": "Mis inmuebles",
-    "forAgencies": "New Place para agencias", "legal": "Precios en USD. Conversión a VES/EUR solo referencial.", "listedOn": "Listed on New Place"
+    "forAgencies": "New Place para agencias", "legal": "Precios en USD. Conversión a VES/EUR solo referencial.", "listedOn": "Listed on New Place", "sellWithUs": "Vender con nosotros", "valuation": "Valorar mi propiedad"
   },
   "admin": {
     "dashboard": "Panel", "leads": "Leads", "listings": "Inmuebles", "calendar": "Calendario", "capture": "Captación", "media": "Fotografía", "team": "Equipo", "reports": "Informes", "settings": "Ajustes",
@@ -14,5 +14,5 @@
   },
   "roles": { "SUPERADMIN": "Superadmin", "AGENCY_OWNER": "Dueño de agencia", "AGENT": "Agente", "CAPTOR": "Captador", "PHOTOGRAPHER": "Fotógrafo", "BACKOFFICE": "Backoffice", "OWNER_PRIVATE": "Propietario", "SEEKER": "Buscador" },
   "errors": { "UNAUTHORIZED": "Inicia sesión para continuar.", "FORBIDDEN": "No tienes permiso para esta acción.", "NOT_FOUND": "No encontrado.", "VALIDATION": "Revisa los datos enviados.", "CONFLICT": "Ya existe un registro igual.", "INTERNAL": "Algo salió mal. Inténtalo de nuevo." },
-  "common": { "loading": "Cargando…", "retry": "Reintentar", "back": "Volver al inicio", "notFound": "No encontramos esta página", "notFoundBody": "Puede que el inmueble ya no esté publicado.", "error": "Algo salió mal", "errorBody": "Intenta de nuevo en unos segundos." }
+  "common": { "loading": "Cargando…", "retry": "Reintentar", "back": "Volver al inicio", "notFound": "No encontramos esta página", "notFoundBody": "Puede que la propiedad ya no esté publicada. Le esperamos en el inicio.", "error": "Algo salió mal", "errorBody": "Intenta de nuevo en unos segundos." }
 }

@@ -2,7 +2,8 @@
 
 import type { ZodTypeAny } from "zod";
 import { brochurePdfSchema, commercialSchema, shortRentSchema, type CommercialInput, type ShortRentInput } from "@newplace/config";
-import { Field, darkInputCls, inputCls } from "@/components/ui";
+import { Field, inputCls } from "@/components/ui";
+import { k } from "@/components/agency/kit";
 import { tx } from "@/lib/i18n";
 import type { Locale } from "@/types/domain";
 
@@ -69,7 +70,7 @@ export function ListingTypeFields({
   value,
   onChange,
   showErrors = true,
-  dark = false,
+  admin = false,
   disabled = false,
 }: {
   locale: Locale;
@@ -78,16 +79,17 @@ export function ListingTypeFields({
   value: ExtrasDraft;
   onChange: (x: ExtrasDraft) => void;
   showErrors?: boolean;
-  dark?: boolean;
+  /** Private cockpit skin (light by default, follows the dark theme). */
+  admin?: boolean;
   disabled?: boolean;
 }) {
   const { errors } = validateExtras(locale, listingType, luxury, value);
   const err = (k: keyof ExtrasDraft) => (showErrors ? errors[k] : undefined);
-  const cls = dark ? darkInputCls : inputCls;
+  const cls = admin ? k.input : inputCls;
   const set = (p: Partial<ExtrasDraft>) => onChange({ ...value, ...p });
-  const title = (t: string) => <div className={dark ? "mb-3 font-semibold text-ivory" : "mb-2 font-semibold"}>{t}</div>;
+  const title = (t: string) => <div className={admin ? k.title + " mb-3" : "mb-2 font-semibold"}>{t}</div>;
   const input = (k: keyof ExtrasDraft, label: string, opts: { min: number; max: number; step?: number; hint?: string }) => (
-    <Field dark={dark} label={label} hint={opts.hint} error={err(k)}>
+    <Field label={label} hint={opts.hint} error={err(k)}>
       <input
         className={cls}
         type="number"
@@ -121,13 +123,13 @@ export function ListingTypeFields({
           {title(tx(locale, "Datos comerciales", "Commercial details"))}
           <div className="grid gap-3 sm:grid-cols-3">
             {input("ceilingHeight", tx(locale, "Altura libre (m)", "Clear height (m)"), { min: 2, max: 40, step: 0.1 })}
-            <Field dark={dark} label={tx(locale, "Zonificación", "Zoning")} error={err("zoning")}>
+            <Field label={tx(locale, "Zonificación", "Zoning")} error={err("zoning")}>
               <input className={cls} maxLength={60} disabled={disabled} aria-invalid={!!err("zoning")} value={value.zoning} onChange={(e) => set({ zoning: e.target.value })} placeholder="C-3 Comercial" />
             </Field>
             {input("capRate", tx(locale, "Cap rate (%) · opcional", "Cap rate (%) · optional"), { min: 0, max: 30, step: 0.1 })}
           </div>
-          <label className={dark ? "mt-3 flex items-center gap-2 text-sm text-ivory" : "mt-3 flex items-center gap-2 text-sm"}>
-            <input type="checkbox" disabled={disabled} checked={value.loadingDock} onChange={(e) => set({ loadingDock: e.target.checked })} className="h-4 w-4 accent-[#A8452A]" />
+          <label className="mt-3 flex items-center gap-2 text-sm">
+            <input type="checkbox" disabled={disabled} checked={value.loadingDock} onChange={(e) => set({ loadingDock: e.target.checked })} className="h-4 w-4 accent-navy dark:accent-[#E79A7F]" />
             {tx(locale, "Tiene andén de carga", "Has a loading dock")}
           </label>
         </div>
@@ -135,7 +137,7 @@ export function ListingTypeFields({
       {luxury && (
         <div>
           {title(tx(locale, "Lujo", "Luxury"))}
-          <Field dark={dark} label={tx(locale, "Folleto PDF (URL) · opcional", "Brochure PDF (URL) · optional")} error={err("brochurePdf")}>
+          <Field label={tx(locale, "Folleto PDF (URL) · opcional", "Brochure PDF (URL) · optional")} error={err("brochurePdf")}>
             <input className={cls} type="url" inputMode="url" maxLength={500} disabled={disabled} aria-invalid={!!err("brochurePdf")} value={value.brochurePdf} onChange={(e) => set({ brochurePdf: e.target.value })} placeholder="https://…/folleto.pdf" />
           </Field>
         </div>

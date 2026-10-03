@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Bell, BellRing, Check, Loader2, ChevronDown, SlidersHorizontal, Sparkles, X } from "lucide-react";
+import { Bell, Check, Loader2, ChevronDown, SlidersHorizontal, Sparkles, X } from "lucide-react";
 import { heuristicSearchParse } from "@newplace/ai";
 import type { Amenity, Listing, Locale } from "@/types/domain";
 import { MapView as NightMap } from "@/components/map/MapView";
@@ -15,6 +15,7 @@ import { useApp } from "@/lib/store";
 import { api } from "@/lib/api";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { queryToParams } from "./HeroSearch";
+import { URL_CHANGE_EVENT } from "@/components/layout/PublicHeader";
 
 const TYPES = [
   ["SALE", "Comprar", "Buy"],
@@ -114,6 +115,8 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
   const pending = useRef<string | null>(null);
   useEffect(() => {
     pending.current = null;
+    // The header marks Comprar / Alquilar from the query: tell it the URL changed (replaceState fires no event).
+    window.dispatchEvent(new Event(URL_CHANGE_EVENT));
   }, [sp]);
   const set = (patch: Record<string, string | null>) => {
     const p = new URLSearchParams(pending.current ?? sp.toString());
@@ -191,17 +194,19 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
   const kmLabel = shape?.type === "radius" ? shape.km.toLocaleString(locale === "es" ? "es-VE" : "en-US", { maximumFractionDigits: 1 }) : "";
   if (shape) activeChips.push(["shape", shape.type === "radius" ? tx(locale, `Radio ${kmLabel} km`, `${kmLabel} km radius`) : tx(locale, "Zona dibujada", "Drawn area"), { poly: null, radius: null }]);
   if (kind) activeChips.push(["kind", KIND_CHIP[kind] ? tx(locale, ...KIND_CHIP[kind]) : kind, { kind: null }]);
-  if (lux) activeChips.push(["lux", "Luxury", { lux: null }]);
+  if (lux) activeChips.push(["lux", tx(locale, "Colección Privada", "Private Collection"), { lux: null }]);
   if (pub) activeChips.push(["pub", pub === "24h" ? tx(locale, "Últimas 24 h", "Last 24 h") : tx(locale, "Últimos 7 días", "Last 7 days"), { pub: null }]);
   if (furnished) activeChips.push(["furnished", tx(locale, "Amoblado", "Furnished"), { furnished: null }]);
   if (pets) activeChips.push(["pets", tx(locale, "Mascotas", "Pets"), { pets: null }]);
   if (verified) activeChips.push(["verified", tx(locale, "Agencia verificada", "Verified agency"), { verified: null }]);
   amen.forEach((a) => activeChips.push([a, lbl(AMENITY_LABEL[a], locale), { am: amen.filter((x) => x !== a).join(",") || null }]));
 
-  const pill = "flex h-11 md:h-9 shrink-0 items-center gap-1.5 rounded-full border px-3.5 font-display text-sm transition-colors duration-np";
+  const pill = "flex h-11 md:h-10 shrink-0 items-center gap-1.5 rounded-full border px-4 font-display text-sm transition-colors duration-np";
+  // Selected filter = navy tint + 2 px navy border (brand v4).
+  const on = "np-sel border-2 px-[15px]";
 
   return (
-    <div className="flex h-[calc(100vh-64px)] flex-col">
+    <div className="flex h-[calc(100dvh-72px)] flex-col">
       {/* filter bar */}
       <div className="relative z-30 border-b border-line bg-ivory">
         <div className="no-scrollbar flex items-center gap-2 overflow-x-auto px-4 py-2.5 md:flex-wrap md:overflow-visible md:px-5">
@@ -214,9 +219,9 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
               if (!q.listingType) p.set("type", type);
               router.replace(`/${locale}/search?${p.toString()}`);
             }}
-            className="flex h-11 md:h-9 min-w-[220px] shrink-0 items-center gap-2 rounded-full border border-line bg-white px-3 md:flex-1 xl:max-w-[300px]"
+            className="flex h-11 min-w-[220px] shrink-0 items-center gap-2 rounded-full border border-line bg-white px-4 focus-within:border-navy md:h-10 md:flex-1 xl:max-w-[300px]"
           >
-            <Sparkles size={15} className="shrink-0 text-coral" />
+            <Sparkles size={15} className="shrink-0 text-gold-text" aria-hidden />
             <input
               value={nl}
               onChange={(e) => setNl(e.target.value)}
@@ -225,13 +230,13 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
               className="min-w-0 flex-1 bg-transparent text-sm focus:outline-none"
             />
           </form>
-          <div className="flex shrink-0 rounded-full border border-line bg-white p-0.5">
+          <div className="flex shrink-0 gap-0.5 rounded-full border border-line bg-white p-1">
             {TYPES.map(([k, es, en]) => (
               <button
                 key={k}
                 onClick={() => set({ type: k, max: null, min: null })}
                 aria-pressed={type === k}
-                className={cn("min-h-11 rounded-full px-3 py-1 font-display text-sm md:min-h-0", type === k ? "bg-navy text-ivory" : "text-ink/70 hover:text-ink")}
+                className={cn("min-h-11 rounded-full border-2 px-3.5 font-display text-sm md:min-h-8", type === k ? "np-sel font-semibold" : "border-transparent text-ink/70 hover:text-ink")}
               >
                 {tx(locale, es, en)}
               </button>
@@ -240,7 +245,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
           <select
             value={min ?? ""}
             onChange={(e) => set({ min: e.target.value || null })}
-            className={cn(pill, "appearance-none border-line bg-white pr-8", min && "border-navy")}
+            className={cn(pill, "appearance-none border-line bg-white pr-8", min && on)}
             aria-label={tx(locale, "Precio mínimo", "Min price")}
           >
             <option value="">{tx(locale, "Precio mín.", "Min price")}</option>
@@ -251,7 +256,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
           <select
             value={max ?? ""}
             onChange={(e) => set({ max: e.target.value || null })}
-            className={cn(pill, "appearance-none border-line bg-white pr-8", max && "border-navy")}
+            className={cn(pill, "appearance-none border-line bg-white pr-8", max && on)}
             aria-label={tx(locale, "Precio máximo", "Max price")}
           >
             <option value="">{tx(locale, "Precio máx.", "Max price")}</option>
@@ -259,34 +264,34 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
               <option key={v} value={v} disabled={!!min && v <= min}>≤ {money(v, locale)}</option>
             ))}
           </select>
-          <select value={beds ?? ""} onChange={(e) => set({ beds: e.target.value || null })} className={cn(pill, "appearance-none border-line bg-white", beds && "border-navy")} aria-label={tx(locale, "Habitaciones", "Bedrooms")}>
+          <select value={beds ?? ""} onChange={(e) => set({ beds: e.target.value || null })} className={cn(pill, "appearance-none border-line bg-white", beds && on)} aria-label={tx(locale, "Habitaciones", "Bedrooms")}>
             <option value="">{tx(locale, "Habitaciones", "Beds")}</option>
             {[1, 2, 3, 4].map((b) => (
               <option key={b} value={b}>{b}+ {tx(locale, "hab", "bd")}</option>
             ))}
           </select>
-          <select value={zone ?? ""} onChange={(e) => set({ zone: e.target.value || null })} className={cn(pill, "appearance-none border-line bg-white", zone && "border-navy")} aria-label={tx(locale, "Zona", "Area")}>
+          <select value={zone ?? ""} onChange={(e) => set({ zone: e.target.value || null })} className={cn(pill, "appearance-none border-line bg-white", zone && on)} aria-label={tx(locale, "Zona", "Area")}>
             <option value="">{tx(locale, "Todas las zonas", "All areas")}</option>
             {/* A zone that came from the URL or the NL parser (e.g. a city) stays selectable and visible. */}
             {(zone && !zones.includes(zone) ? [zone, ...zones] : zones).map((z) => (
               <option key={z} value={z}>{z}</option>
             ))}
           </select>
-          <button onClick={() => setMoreOpen((o) => !o)} aria-expanded={moreOpen} aria-controls="search-more-filters" className={cn(pill, "border-line bg-white", (moreOpen || baths || minM2) && "border-navy")}>
+          <button onClick={() => setMoreOpen((o) => !o)} aria-expanded={moreOpen} aria-controls="search-more-filters" className={cn(pill, "border-line bg-white", (moreOpen || baths || minM2) && on)}>
             <SlidersHorizontal size={15} /> {tx(locale, "Más filtros", "More filters")} <ChevronDown size={14} />
           </button>
           <button
             onClick={() => set({ lux: lux ? null : "1" })}
             aria-pressed={lux}
-            className={cn(pill, lux ? "border-gold bg-gold text-navy" : "border-gold/60 bg-white text-[#8A6A3C]")}
+            className={cn(pill, lux ? on : "border-line bg-white")}
           >
-            Luxury
+            {tx(locale, "Colección Privada", "Private Collection")}
           </button>
           <button
             onClick={createAlert}
             disabled={alertSaved || savingAlert}
             aria-live="polite"
-            className={cn(pill, "ml-auto disabled:cursor-default", alertSaved ? "border-ok bg-ok text-white" : "border-coral bg-coral-cta text-white hover:bg-coral-cta-hover")}
+            className={cn(pill, "ml-auto disabled:cursor-default", alertSaved ? "border-ok bg-ok text-white" : "np-btn-navy border-navy bg-navy font-semibold text-ivory hover:bg-navy-2")}
           >
             {alertSaved ? <Check size={15} /> : savingAlert ? <Loader2 size={15} className="animate-spin" /> : <Bell size={15} />} {alertSaved ? tx(locale, "Alerta creada", "Alert saved") : tx(locale, "Guardar búsqueda", "Save search")}
           </button>
@@ -299,7 +304,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
             <div className="mb-5 grid grid-cols-2 gap-3 sm:max-w-md">
               <label className="block">
                 <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-ink/65">{tx(locale, "Baños", "Bathrooms")}</span>
-                <select value={baths ?? ""} onChange={(e) => set({ baths: e.target.value || null })} className={cn(pill, "w-full appearance-none border-line bg-white", baths && "border-navy")}>
+                <select value={baths ?? ""} onChange={(e) => set({ baths: e.target.value || null })} className={cn(pill, "w-full appearance-none border-line bg-white", baths && on)}>
                   <option value="">{tx(locale, "Cualquiera", "Any")}</option>
                   {[1, 2, 3, 4].map((b) => (
                     <option key={b} value={b}>{b}+ {tx(locale, b === 1 ? "baño" : "baños", b === 1 ? "bath" : "baths")}</option>
@@ -308,7 +313,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
               </label>
               <label className="block">
                 <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-ink/65">{tx(locale, "Superficie mínima", "Min. area")}</span>
-                <select value={minM2 ?? ""} onChange={(e) => set({ m2: e.target.value || null })} className={cn(pill, "w-full appearance-none border-line bg-white", minM2 && "border-navy")}>
+                <select value={minM2 ?? ""} onChange={(e) => set({ m2: e.target.value || null })} className={cn(pill, "w-full appearance-none border-line bg-white", minM2 && on)}>
                   <option value="">{tx(locale, "Cualquiera", "Any")}</option>
                   {MIN_M2_STEPS.map((v) => (
                     <option key={v} value={v}>≥ {num(v, locale)} m²</option>
@@ -321,25 +326,25 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
                 <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink/65">{tx(locale, "Publicado", "Published")}</div>
                 <div className="flex gap-2">
                   {[["24h", "24 h"], ["7d", tx(locale, "7 días", "7 days")]].map(([k, v]) => (
-                    <button key={k} onClick={() => set({ pub: pub === k ? null : k })} className={cn(pill, pub === k ? "border-navy bg-navy text-ivory" : "border-line")}>{v}</button>
+                    <button key={k} onClick={() => set({ pub: pub === k ? null : k })} className={cn(pill, pub === k ? on : "border-line")}>{v}</button>
                   ))}
                 </div>
               </div>
               <div>
                 <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink/65">{tx(locale, "Condiciones", "Conditions")}</div>
                 <div className="flex flex-wrap gap-2">
-                  <button onClick={() => set({ furnished: furnished ? null : "1" })} className={cn(pill, furnished ? "border-navy bg-navy text-ivory" : "border-line")}>{tx(locale, "Amoblado", "Furnished")}</button>
-                  <button onClick={() => set({ pets: pets ? null : "1" })} className={cn(pill, pets ? "border-navy bg-navy text-ivory" : "border-line")}>{tx(locale, "Mascotas", "Pets")}</button>
-                  <button onClick={() => set({ verified: verified ? null : "1" })} className={cn(pill, verified ? "border-navy bg-navy text-ivory" : "border-line")}>{tx(locale, "Agencia verificada", "Verified agency")}</button>
+                  <button onClick={() => set({ furnished: furnished ? null : "1" })} className={cn(pill, furnished ? on : "border-line")}>{tx(locale, "Amoblado", "Furnished")}</button>
+                  <button onClick={() => set({ pets: pets ? null : "1" })} className={cn(pill, pets ? on : "border-line")}>{tx(locale, "Mascotas", "Pets")}</button>
+                  <button onClick={() => set({ verified: verified ? null : "1" })} className={cn(pill, verified ? on : "border-line")}>{tx(locale, "Agencia verificada", "Verified agency")}</button>
                 </div>
               </div>
               <div className="md:col-span-2">
                 <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink/65">{tx(locale, "Amenidades", "Amenities")}</div>
                 <div className="flex flex-wrap gap-2">
                   {FILTER_AMENITIES.map((a) => {
-                    const on = amen.includes(a);
+                    const sel = amen.includes(a);
                     return (
-                      <button key={a} onClick={() => set({ am: (on ? amen.filter((x) => x !== a) : [...amen, a]).join(",") || null })} className={cn(pill, "md:h-8 text-[13px]", on ? "border-navy bg-navy text-ivory" : "border-line")}>
+                      <button key={a} aria-pressed={sel} onClick={() => set({ am: (sel ? amen.filter((x) => x !== a) : [...amen, a]).join(",") || null })} className={cn(pill, "md:h-9", sel ? on : "border-line")}>
                         {lbl(AMENITY_LABEL[a], locale)}
                       </button>
                     );
@@ -349,7 +354,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
             </div>
             {/* The panel covers the map/list (full width on mobile): give it an explicit way out. */}
             <div className="mt-5 flex justify-end border-t border-line pt-4">
-              <button onClick={() => setMoreOpen(false)} className="rounded-np bg-navy px-4 py-2 font-display text-sm text-ivory">
+              <button onClick={() => setMoreOpen(false)} className="np-btn-navy min-h-11 rounded-full bg-navy px-5 font-display text-sm font-semibold text-ivory">
                 {query.isFetching ? <Loader2 size={14} className="mr-1.5 inline animate-spin" /> : null}
                 {tx(locale, `Ver ${plural(query.data?.total ?? results.length, locale, ["resultado", "resultados"], ["result", "results"])}`, `Show ${plural(query.data?.total ?? results.length, locale, ["resultado", "resultados"], ["result", "results"])}`)}
               </button>
@@ -377,9 +382,9 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
             renderPreview={(l) => <MapPreviewCard l={l} locale={locale} />}
             initialScale={fit.scale}
           />
-          <div className="absolute bottom-8 right-3 z-10 flex overflow-hidden rounded-full border border-white/10 bg-navy/90 p-0.5 font-display text-xs text-ivory shadow-np">
+          <div className="absolute bottom-8 right-3 z-10 flex gap-0.5 overflow-hidden rounded-full border border-[#E3D7C2] bg-[#ffffff] p-1 font-display text-sm text-[#162638] shadow-np">
             {(["caracas", "venezuela"] as const).map((r) => (
-              <button key={r} onClick={() => setRegionPick(r)} className={cn("min-h-11 rounded-full px-3 py-1.5 md:min-h-0", region === r ? "bg-ivory text-navy" : "text-ivory/80")}>
+              <button key={r} onClick={() => setRegionPick(r)} aria-pressed={region === r} className={cn("min-h-11 rounded-full border-2 px-3.5 md:min-h-8", region === r ? "np-sel font-semibold" : "border-transparent text-[#162638]/70")}>
                 {r === "caracas" ? "Caracas" : "Venezuela"}
               </button>
             ))}
@@ -417,13 +422,13 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
           <div className="sticky top-0 z-10 border-b border-line bg-ivory/95 px-4 py-3 backdrop-blur">
             <div className="flex items-center justify-between gap-2">
               <div>
-                <div className="font-display text-lg font-semibold">
+                <div className="font-serif text-[26px] leading-tight">
                   {plural(query.data?.total ?? results.length, locale, ["resultado", "resultados"], ["result", "results"])}{query.isFetching && <Loader2 size={15} className="ml-2 inline animate-spin text-ink/65" />}
-                  {shape && <span className="ml-2 rounded-full bg-coral/10 bg-[#A8452A1A] px-2 py-0.5 text-xs text-coral-hover">{tx(locale, "en tu zona dibujada", "in your drawn area")}</span>}
+                  {shape && <span className="ml-2 inline-block rounded-full bg-[#A9C6D8] px-2.5 py-0.5 align-middle font-display text-xs font-semibold text-[#1F4A63]">{tx(locale, "en tu zona dibujada", "in your drawn area")}</span>}
                 </div>
-                <div className="text-xs text-ink/65">{tx(locale, "Precios en USD · actualizados en tiempo real", "Prices in USD · updated in real time")}</div>
+                <div className="text-sm text-ink/60">{tx(locale, "Precios en USD · actualizados en tiempo real", "Prices in USD · updated in real time")}</div>
               </div>
-              <select value={sort} onChange={(e) => set({ sort: e.target.value === "new" ? null : e.target.value })} aria-label={tx(locale, "Ordenar por", "Sort by")} className="h-11 rounded-lg border border-line bg-white px-2 text-sm md:h-8">
+              <select value={sort} onChange={(e) => set({ sort: e.target.value === "new" ? null : e.target.value })} aria-label={tx(locale, "Ordenar por", "Sort by")} className="h-11 rounded-full border border-line bg-white px-3 text-sm md:h-9">
                 <option value="new">{tx(locale, "Más nuevos", "Newest")}</option>
                 <option value="price-asc">{tx(locale, "Precio ↑", "Price ↑")}</option>
                 <option value="price-desc">{tx(locale, "Precio ↓", "Price ↓")}</option>
@@ -433,7 +438,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
             {activeChips.length > 0 && (
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {activeChips.map(([k, label, patch]) => (
-                  <button key={k} onClick={() => set(patch)} aria-label={`${tx(locale, "Quitar filtro", "Remove filter")}: ${label}`} className="inline-flex items-center gap-1 rounded-full bg-navy px-2.5 py-0.5 text-xs font-semibold text-ivory">
+                  <button key={k} onClick={() => set(patch)} aria-label={`${tx(locale, "Quitar filtro", "Remove filter")}: ${label}`} className="np-sel inline-flex min-h-8 items-center gap-1 rounded-full px-3 text-[13px] font-semibold">
                     {label} <X size={12} />
                   </button>
                 ))}
@@ -452,11 +457,11 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
           {results.length === 0 && (
             <div className="p-4">
               <EmptyState
-                icon={<BellRing size={20} />}
+                monogram
                 title={tx(locale, "Nada por aquí… todavía", "Nothing here… yet")}
                 body={tx(locale, "Guarda la búsqueda y te avisamos en cuanto aparezca algo que encaje.", "Save this search and we’ll tell you as soon as something matches.")}
                 cta={
-                  <button onClick={createAlert} disabled={alertSaved || savingAlert} className="rounded-np bg-coral-cta px-4 py-2 font-display text-white disabled:opacity-60">
+                  <button onClick={createAlert} disabled={alertSaved || savingAlert} className="np-btn-navy min-h-11 rounded-full bg-navy px-5 font-display font-semibold text-ivory disabled:opacity-60">
                     {alertSaved ? tx(locale, "Alerta creada", "Alert saved") : tx(locale, "Crear alerta", "Create alert")}
                   </button>
                 }

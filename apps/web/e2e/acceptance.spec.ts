@@ -7,10 +7,12 @@ const stamp = Date.now().toString(36);
 test.describe.serial("Criterios de aceptación §15", () => {
   test("1 · /es muestra el mapa night centrado en Caracas con pines", async ({ page }) => {
     await page.goto("/es");
+    await expect(page.getByText("El Caribe, con alma mediterránea")).toBeVisible();
+    // The map lives in the "Explore en el mapa" section (mounted when it nears the viewport).
+    await page.locator("#explorar").scrollIntoViewIfNeeded();
     const map = page.locator('[role="application"]').first();
     await expect(map).toBeVisible();
     await expect(map.locator("g.cursor-pointer").first()).toBeVisible();
-    await expect(page.getByText(/inmuebles verificados en Venezuela/)).toBeVisible();
   });
 
   test("2 · filtro comprar · 2+ hab · < 250.000 USD · Chacao", async ({ page }) => {
@@ -104,7 +106,7 @@ test.describe.serial("Criterios de aceptación §15", () => {
     const m = await r.json();
     expect(m.name).toBe("New Place");
     expect(m.display).toBe("standalone");
-    expect(m.theme_color).toBe("#0B1220");
+    expect(m.theme_color).toBe("#162638"); // brand navy (Rebrand foundation)
     expect(m.id).toBe("/");
     // start_url lets the middleware pick the visitor's language (/es or /en)
     const start = await request.get(m.start_url);

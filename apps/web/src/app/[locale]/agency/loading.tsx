@@ -1,16 +1,22 @@
-/** Admin skeleton (navy). */
+/** Cockpit skeleton (brand v4): navy sidebar, Cal canvas, warm sand placeholders. */
+const bone = "rounded-[18px] bg-gradient-to-r from-[#EFE7DA] via-[#F7F2EA] to-[#EFE7DA] dark:from-white/[.05] dark:via-white/[.08] dark:to-white/[.05]";
+
 export default function Loading() {
   return (
-    <div className="min-h-screen bg-navy-2 lg:pl-60" aria-busy="true" aria-live="polite">
-      <div className="fixed inset-y-0 left-0 hidden w-60 border-r border-navy-line bg-navy lg:block" />
-      <div className="h-16 border-b border-navy-line" />
-      <div className="animate-pulse space-y-6 p-6">
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-          {Array.from({ length: 5 }).map((_, i) => <div key={i} className="h-24 rounded-np border border-navy-line bg-navy-card" />)}
+    <div className="min-h-screen bg-ivory lg:pl-[264px] dark:bg-[#101C2B]" aria-busy="true" aria-live="polite">
+      <div className="fixed inset-y-0 left-0 hidden w-[264px] bg-navy lg:block" />
+      <div className="h-[104px] bg-navy lg:hidden" />
+      <div className="mx-auto max-w-[1360px] animate-pulse space-y-6 px-4 pb-16 pt-6 md:px-10 md:pt-10">
+        <div className="space-y-3">
+          <div className={`h-3 w-40 ${bone}`} />
+          <div className={`h-10 w-72 max-w-full ${bone}`} />
         </div>
-        <div className="grid gap-6 xl:grid-cols-3">
-          <div className="h-64 rounded-np border border-navy-line bg-navy-card xl:col-span-2" />
-          <div className="h-64 rounded-np border border-navy-line bg-navy-card" />
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+          {Array.from({ length: 5 }).map((_, i) => <div key={i} className={`h-[132px] ${bone}`} />)}
+        </div>
+        <div className="grid gap-6 xl:grid-cols-[1.45fr_1fr]">
+          <div className={`h-72 ${bone}`} />
+          <div className={`h-72 ${bone}`} />
         </div>
       </div>
     </div>

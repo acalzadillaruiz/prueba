@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { CalendarPlus, Clock, Loader2, Mail, MessageCircle, Phone, RefreshCw, Search, Send, Sparkles, Star, Target, UserRoundCog, X } from "lucide-react";
+import { CalendarPlus, Clock, Loader2, Mail, MessageCircle, Phone, RefreshCw, Search, Send, Sparkles, Star, UserRoundCog, X } from "lucide-react";
 import type { NextAction } from "@newplace/ai";
 import type { Lead, LeadStage, Listing, Locale } from "@/types/domain";
 import { api } from "@/lib/api";
@@ -11,7 +11,8 @@ import { api } from "@/lib/api";
 import { AdminShell } from "@/components/layout/AdminShell";
 import { listingPhoto } from "@/lib/photos";
 import { PropertyArt } from "@/components/art/PropertyArt";
-import { Avatar, Badge, Button } from "@/components/ui";
+import { Button } from "@/components/ui";
+import { Chip, Count, Empty, Initials, Pill, k, tab } from "./kit";
 import { ago, dateTime, money, priceSuffix, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import { caracasInputToIso, isoToCaracasInput } from "@/lib/caracas-time";
@@ -40,22 +41,22 @@ function ScoreRing({ score }: { score: number }) {
   const c = 2 * Math.PI * r;
   return (
     <svg viewBox="0 0 80 80" className="h-20 w-20">
-      <circle cx={40} cy={40} r={r} fill="none" stroke="#2A3E55" strokeWidth={7} />
-      <circle cx={40} cy={40} r={r} fill="none" stroke={score >= 70 ? "#A8452A" : score >= 45 ? "#B4935A" : "#A9B4C2"} strokeWidth={7} strokeDasharray={`${(score / 100) * c} ${c}`} strokeLinecap="round" transform="rotate(-90 40 40)" />
-      <text x={40} y={46} textAnchor="middle" fontSize={20} fontWeight={700} fill="#F8F5EF" fontFamily="var(--font-display)">{score}</text>
+      <circle cx={40} cy={40} r={r} fill="none" strokeWidth={6} className="stroke-[#E6EBF1] dark:stroke-white/10" />
+      <circle cx={40} cy={40} r={r} fill="none" strokeWidth={6} strokeDasharray={`${(score / 100) * c} ${c}`} strokeLinecap="round" transform="rotate(-90 40 40)" className={score >= 45 ? "stroke-navy dark:stroke-ivory" : "stroke-[#7D8B9B]"} />
+      <text x={40} y={47} textAnchor="middle" fontSize={22} fontWeight={600} letterSpacing="-1" fontFamily="var(--font-display)" className="fill-navy dark:fill-ivory">{score}</text>
     </svg>
   );
 }
 
 function Sla({ lead, locale }: { lead: Lead; locale: Locale }) {
   const m = minsAgo(lead.createdAt);
-  if (lead.stage !== "NEW") return lead.firstResponseMin != null ? <span className="text-[11px] text-mist">{tx(locale, "resp.", "resp.")} {lead.firstResponseMin} min</span> : null;
+  if (lead.stage !== "NEW") return lead.firstResponseMin != null ? <span className={cn("text-[11px]", k.muted)}>{tx(locale, "resp.", "resp.")} {lead.firstResponseMin} min</span> : null;
   const left = 15 - m;
   const pct = Math.max(0, Math.min(100, (m / 15) * 100));
   return (
     <div className="w-20">
-      <div className={cn("text-right text-[11px] font-bold", left > 5 ? "text-[#7FC8A4]" : left > 0 ? "text-[#F2B866]" : "text-[#E79A7F]")}>{left > 0 ? `${left} min` : tx(locale, "SLA vencido", "SLA breached")}</div>
-      <div className="mt-1 h-1 rounded-full bg-white/10"><div className={cn("h-full rounded-full", left > 5 ? "bg-ok" : left > 0 ? "bg-warn" : "bg-danger")} style={{ width: `${pct}%` }} /></div>
+      <div className={cn("text-right text-[11px] font-semibold", left > 5 ? k.okText : left > 0 ? k.warnText : k.dangerText)} suppressHydrationWarning>{left > 0 ? `${left} min` : tx(locale, "SLA vencido", "SLA breached")}</div>
+      <div className="mt-1 h-1 rounded-full bg-[#ECE6DA] dark:bg-white/10"><div className={cn("h-full rounded-full", left > 5 ? "bg-ok" : left > 0 ? "bg-warn" : "bg-danger")} style={{ width: `${pct}%` }} /></div>
     </div>
   );
 }
@@ -75,21 +76,21 @@ function TourPicker({ locale, listingId, agentId, busy, onPropose, onClose }: { 
   const days = (slots.data?.days ?? []).map((d) => ({ ...d, hours: d.hours.filter((h) => h.available) })).filter((d) => d.hours.length);
   const minInput = isoToCaracasInput(Date.now() + 5 * 60e3);
   return (
-    <div className="np-in mt-4 rounded-lg border border-navy-line bg-navy-2/60 p-3" role="group" aria-label={tx(locale, "Proponer visita", "Propose a tour")}>
+    <div className={cn("np-in mt-4 rounded-xl border p-4", k.line, k.soft)} role="group" aria-label={tx(locale, "Proponer visita", "Propose a tour")}>
       <div className="flex items-center justify-between">
         <div className="text-sm font-semibold">{tx(locale, "Horarios libres del agente", "Agent’s free slots")}</div>
-        <button type="button" onClick={onClose} className="rounded p-1 text-mist hover:bg-white/5" aria-label={tx(locale, "Cerrar", "Close")}><X size={14} /></button>
+        <button type="button" onClick={onClose} className={cn("rounded-full p-1.5", k.muted, k.hover)} aria-label={tx(locale, "Cerrar", "Close")}><X size={14} /></button>
       </div>
       {slots.isLoading ? (
-        <div className="mt-2 flex items-center gap-2 text-xs text-mist"><Loader2 size={13} className="animate-spin" /> {tx(locale, "Cargando agenda…", "Loading calendar…")}</div>
+        <div className={cn("mt-2 flex items-center gap-2 text-xs", k.muted)}><Loader2 size={13} className="animate-spin" /> {tx(locale, "Cargando agenda…", "Loading calendar…")}</div>
       ) : days.length ? (
         <div className="mt-2 max-h-40 space-y-2 overflow-y-auto scrollbar-thin">
           {days.map((d) => (
             <div key={d.date}>
-              <div className="text-[11px] first-letter:uppercase text-mist">{dateTime(d.date, locale, { weekday: "long", day: "numeric", month: "short" })}</div>
+              <div className={cn("text-[11px] first-letter:uppercase", k.muted)}>{dateTime(d.date, locale, { weekday: "long", day: "numeric", month: "short" })}</div>
               <div className="mt-1 flex flex-wrap gap-1.5">
                 {d.hours.map((h) => (
-                  <button key={h.iso} type="button" aria-pressed={pick === h.iso} onClick={() => { setPick(h.iso); setCustom(""); setErr(null); }} className={cn("rounded-md border px-2 py-1 text-xs", pick === h.iso ? "border-coral bg-coral-cta text-white" : "border-navy-line hover:border-coral")}>
+                  <button key={h.iso} type="button" aria-pressed={pick === h.iso} onClick={() => { setPick(h.iso); setCustom(""); setErr(null); }} className={cn(tab(pick === h.iso), "px-3 py-1 text-[13px]")}>
                     {dateTime(h.iso, locale, { hour: "2-digit", minute: "2-digit" })}
                   </button>
                 ))}
@@ -98,16 +99,16 @@ function TourPicker({ locale, listingId, agentId, busy, onPropose, onClose }: { 
           ))}
         </div>
       ) : (
-        <div className="mt-2 text-xs text-mist">{tx(locale, "Sin horarios libres publicados en los próximos días. Propón una hora libre abajo.", "No free published slots in the coming days. Propose any time below.")}</div>
+        <div className={cn("mt-2 text-xs", k.muted)}>{tx(locale, "Sin horarios libres publicados en los próximos días. Propón una hora libre abajo.", "No free published slots in the coming days. Propose any time below.")}</div>
       )}
-      <label className="mt-3 block text-xs text-mist">
+      <label className={cn("mt-3 block text-xs", k.muted)}>
         {tx(locale, "…u otra fecha y hora (Caracas)", "…or another date & time (Caracas)")}
-        <input type="datetime-local" min={minInput} value={custom} onChange={(e) => { setCustom(e.target.value); setPick(null); setErr(null); }} className="mt-1 h-9 w-full rounded-lg border border-navy-line bg-navy-2 px-2 text-sm text-ivory" />
+        <input type="datetime-local" min={minInput} value={custom} onChange={(e) => { setCustom(e.target.value); setPick(null); setErr(null); }} className={cn(k.input, "mt-1")} />
       </label>
-      {err && <div role="alert" className="mt-2 text-xs text-[#E79A7F]">{err}</div>}
+      {err && <div role="alert" className={cn("mt-2 text-xs font-semibold", k.dangerText)}>{err}</div>}
       <Button
         size="sm"
-        className="mt-3"
+        className={cn("mt-3", k.primary)}
         disabled={busy || (!pick && !custom)}
         onClick={() => {
           const iso = pick ?? caracasInputToIso(custom);
@@ -211,27 +212,27 @@ export function LeadsInbox({ locale, initial, listings, agents }: { locale: Loca
   };
 
   return (
-    <AdminShell locale={locale} area="agency" title={tx(locale, "Leads", "Leads")} actions={<span className="hidden items-center gap-1.5 text-xs text-mist md:flex"><RefreshCw size={12} className={list.isFetching ? "animate-spin" : ""} /> {tx(locale, "auto cada 15 s", "auto every 15 s")}</span>}>
+    <AdminShell locale={locale} area="agency" title={tx(locale, "Leads", "Leads")} actions={<span className={cn("hidden items-center gap-1.5 text-xs md:flex", k.muted)}><RefreshCw size={12} className={list.isFetching ? "animate-spin" : ""} /> {tx(locale, "auto cada 15 s", "auto every 15 s")}</span>}>
       <div className="mb-3 flex flex-wrap items-center gap-3">
-        <div className="relative w-96 max-w-full">
-          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-mist" />
-          <input type="search" value={q} onChange={(e) => setQ(e.target.value)} className="h-10 w-full rounded-lg border border-navy-line bg-navy-2 pl-9 pr-3 text-sm focus:border-coral focus:outline-none" placeholder={tx(locale, "Buscar por nombre, email, teléfono o inmueble…", "Search by name, email, phone or listing…")} aria-label={tx(locale, "Buscar leads", "Search leads")} />
+        <div className="relative w-[28rem] max-w-full">
+          <Search size={15} className={cn("absolute left-3.5 top-1/2 -translate-y-1/2", k.muted)} />
+          <input type="search" value={q} onChange={(e) => setQ(e.target.value)} className={cn(k.input, "rounded-full pl-10")} placeholder={tx(locale, "Buscar por nombre, email, teléfono o inmueble…", "Search by name, email, phone or listing…")} aria-label={tx(locale, "Buscar leads", "Search leads")} />
         </div>
-        {needle && <span className="text-sm text-mist">{found.length} / {leads.length}</span>}
+        {needle && <span className={cn("text-sm", k.muted)}>{found.length} / {leads.length}</span>}
       </div>
       <div className="mb-4 flex flex-wrap gap-2">
-        {[["ALL", "Todos", "All"] as const, ...STAGES].map(([k, es, en]) => {
-          const n = k === "ALL" ? found.length : found.filter((l) => l.stage === k).length;
+        {[["ALL", "Todos", "All"] as const, ...STAGES].map(([key, es, en]) => {
+          const n = key === "ALL" ? found.length : found.filter((l) => l.stage === key).length;
           return (
-            <button key={k} onClick={() => setStage(k)} className={cn("flex items-center gap-2 rounded-full border px-3.5 py-1.5 font-display text-sm", stage === k ? "border-coral bg-coral-cta text-white" : "border-navy-line text-ivory/80 hover:bg-white/5")}>
-              {tx(locale, es, en)} <span className={cn("rounded-full px-1.5 text-xs", stage === k ? "bg-white/25" : "bg-white/10")}>{n}</span>
+            <button key={key} onClick={() => setStage(key)} aria-pressed={stage === key} className={tab(stage === key)}>
+              {tx(locale, es, en)} <Count>{n}</Count>
             </button>
           );
         })}
       </div>
-      {error && <div className="mb-3 rounded-lg bg-[#B3261E1A] px-3 py-2 text-sm text-danger" role="alert">{error}</div>}
+      {error && <div className={cn("mb-3", k.err)} role="alert">{error}</div>}
       <div className="grid gap-4 [&>*]:min-w-0 xl:grid-cols-[420px_1fr]">
-        <div className="overflow-hidden rounded-np border border-navy-line bg-navy-card">
+        <div className={cn("overflow-hidden self-start", k.card)}>
           {visible.map((l) => {
             const lst = byId.get(l.listingId);
             const score = l.score ?? 0;
@@ -242,47 +243,47 @@ export function LeadsInbox({ locale, initial, listings, agents }: { locale: Loca
                   setSelId(l.id);
                   // On phones/tablets the detail sits under the list: bring it into view.
                   if (window.innerWidth < 1280) requestAnimationFrame(() => document.getElementById("lead-detail")?.scrollIntoView({ behavior: "smooth", block: "start" }));
-                }} className={cn("flex w-full items-start gap-3 border-b border-navy-line px-4 py-3 text-left transition-colors duration-np", sel?.id === l.id ? "bg-white/[.06]" : "hover:bg-white/[.03]")}>
+                }} className={cn("flex w-full items-start gap-3 border-b px-4 py-3.5 text-left transition-colors duration-np last:border-b-0", k.line, sel?.id === l.id ? "bg-[#E6EBF1] shadow-[inset_3px_0_0_#162638] dark:bg-white/[.07] dark:shadow-[inset_3px_0_0_#E79A7F]" : k.hover)}>
                 <div className="relative">
-                  <Avatar initials={l.name.split(" ").map((p) => p[0]).slice(0, 2).join("")} hue={(l.name.length * 37) % 360} size={38} />
-                  {l.stage === "NEW" && <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-navy-card bg-coral" />}
+                  <Initials name={l.name} size={40} />
+                  {l.stage === "NEW" && <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-white bg-navy dark:border-navy-card dark:bg-[#E79A7F]" />}
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <span className="truncate font-semibold">{l.name}</span>
                     {l.priority && <Star size={13} className="fill-gold text-gold" />}
-                    {minsAgo(l.createdAt) < 60 && l.stage === "NEW" && <Badge className="bg-coral-cta text-white">{tx(locale, "Nuevo", "New")}</Badge>}
+                    {minsAgo(l.createdAt) < 60 && l.stage === "NEW" && <Pill tone="neutral">{tx(locale, "Nuevo", "New")}</Pill>}
                   </div>
-                  <div className="truncate text-xs text-mist">{lst ? tx(locale, lst.title_es, lst.title_en) : ""}</div>
-                  <div className="mt-1 truncate text-sm text-ivory/70">{l.message}</div>
+                  <div className={cn("truncate text-xs", k.muted)}>{lst ? tx(locale, lst.title_es, lst.title_en) : ""}</div>
+                  <div className="mt-1 truncate text-sm text-navy/75 dark:text-ivory/70">{l.message}</div>
                 </div>
                 <div className="flex flex-col items-end gap-1.5">
-                  <span className={cn("rounded-md px-1.5 py-0.5 font-display text-sm font-bold", score >= 70 ? "bg-[#A8452A33] text-coral" : score >= 45 ? "bg-[#B4935A33] text-gold" : "bg-white/10 text-mist")}>{score}</span>
+                  <Chip className={score < 45 ? "bg-transparent text-muted shadow-[inset_0_0_0_1px_#D9D2C4] dark:text-mist" : ""}>{tx(locale, "Interés", "Interest")} {score}</Chip>
                   <Sla lead={l} locale={locale} />
                 </div>
               </button>
             );
           })}
-          {visible.length === 0 && <div className="p-8 text-center text-sm text-mist">{needle ? tx(locale, "Ningún lead coincide con la búsqueda", "No leads match your search") : tx(locale, "Sin leads en esta etapa", "No leads in this stage")}</div>}
+          {visible.length === 0 && <div className={cn("p-8 text-center text-sm", k.muted)}>{needle ? tx(locale, "Ningún lead coincide con la búsqueda", "No leads match your search") : tx(locale, "Sin leads en esta etapa", "No leads in this stage")}</div>}
         </div>
 
         {sel ? (
           <div className="np-in scroll-mt-28 space-y-4" key={sel.id} id="lead-detail">
-            <div className="rounded-np border border-navy-line bg-navy-card p-5">
+            <div className={cn(k.card, "p-5 md:p-6")}>
               <div className="flex flex-wrap items-start gap-4">
-                <Avatar initials={sel.name.split(" ").map((p) => p[0]).slice(0, 2).join("")} hue={(sel.name.length * 37) % 360} size={52} />
-                <div className="min-w-0 flex-1">
-                  <div className="font-display text-xl font-semibold">{sel.name}</div>
-                  <div className="text-sm text-mist">{sel.email}{sel.phone && ` · ${sel.phone}`}</div>
+                <Initials name={sel.name} size={56} />
+                <div className="min-w-0 flex-1 basis-[260px]">
+                  <h2 className={k.title}>{sel.name}</h2>
+                  <div className={cn("text-sm", k.muted)}>{sel.email}{sel.phone && ` · ${sel.phone}`}</div>
                   <div className="mt-2 flex flex-wrap gap-2 text-xs">
-                    <Badge tone="dark">{SOURCE_LABEL[sel.source]?.[locale] ?? sel.source}</Badge>
-                    {sel.budget && <Badge tone="dark">{tx(locale, "Presupuesto", "Budget")} {money(sel.budget, locale)}</Badge>}
-                    <Badge tone="dark"><Clock size={11} /> {ago(sel.createdAt, locale)}</Badge>
-                    {sel.agentId && agents[sel.agentId] && <Badge tone="dark">{agents[sel.agentId]}</Badge>}
+                    <Chip>{SOURCE_LABEL[sel.source]?.[locale] ?? sel.source}</Chip>
+                    {sel.budget && <Chip>{tx(locale, "Presupuesto", "Budget")} {money(sel.budget, locale)}</Chip>}
+                    <Chip className="gap-1"><Clock size={11} /> {ago(sel.createdAt, locale)}</Chip>
+                    {sel.agentId && agents[sel.agentId] && <Chip>{agents[sel.agentId]}</Chip>}
                   </div>
                 </div>
                 {detail.data?.agents && (
-                  <label className="flex items-center gap-2 text-xs text-mist">
+                  <label className={cn("flex items-center gap-2 text-xs", k.muted)}>
                     <UserRoundCog size={15} />
                     <span className="sr-only">{tx(locale, "Agente asignado", "Assigned agent")}</span>
                     <select
@@ -290,7 +291,7 @@ export function LeadsInbox({ locale, initial, listings, agents }: { locale: Loca
                       disabled={busy === "assign"}
                       aria-label={tx(locale, "Agente asignado", "Assigned agent")}
                       onChange={(e) => run("assign", () => api(`leads/${sel.id}`, { method: "PATCH", json: { agentId: e.target.value } }))}
-                      className="h-9 rounded-lg border border-navy-line bg-navy-2 px-3 text-sm text-ivory"
+                      className={k.select}
                     >
                       {!sel.agentId && <option value="">{tx(locale, "Sin asignar", "Unassigned")}</option>}
                       {sel.agentId && !detail.data.agents.some((a) => a.id === sel.agentId) && <option value={sel.agentId}>{agents[sel.agentId] ?? "—"}</option>}
@@ -298,79 +299,79 @@ export function LeadsInbox({ locale, initial, listings, agents }: { locale: Loca
                     </select>
                   </label>
                 )}
-                <select value={sel.stage} aria-label={tx(locale, "Etapa", "Stage")} onChange={(e) => run("stage", () => api(`leads/${sel.id}`, { method: "PATCH", json: { stage: e.target.value } }))} className="h-9 rounded-lg border border-navy-line bg-navy-2 px-3 text-sm">
+                <select value={sel.stage} aria-label={tx(locale, "Etapa", "Stage")} onChange={(e) => run("stage", () => api(`leads/${sel.id}`, { method: "PATCH", json: { stage: e.target.value } }))} className={k.select}>
                   {STAGES.map(([k, es, en]) => <option key={k} value={k}>{tx(locale, es, en)}</option>)}
                 </select>
               </div>
             </div>
 
-            <div className="grid gap-4 lg:grid-cols-[1fr_1.2fr]">
-              <div className="rounded-np border border-coral/40 bg-gradient-to-br from-[#A8452A1f] to-transparent p-5">
-                <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-coral"><Sparkles size={14} /> {tx(locale, "Score IA · siguiente mejor acción", "AI score · next best action")}</div>
+            <div className="grid gap-4 [&>*]:min-w-0 2xl:grid-cols-[1fr_1.2fr]">
+              <div className={cn(k.card, "p-5 md:p-6")}>
+                <div className={cn("flex items-center gap-2", k.label)}><Sparkles size={14} /> {tx(locale, "Score IA · siguiente mejor acción", "AI score · next best action")}</div>
                 <div className="mt-3 flex items-center gap-4">
                   <ScoreRing score={sel.score ?? 0} />
                   <div>
-                    <div className="font-display text-xl font-semibold" data-testid="next-action" data-action={sel.nextAction ?? ""}>{tx(locale, A[0], A[1])}</div>
-                    <div className="text-sm text-mist">{sel.reason}</div>
-                    <div className="mt-1 text-[11px] text-mist/70">{tx(locale, "Siguiente acción sugerida por la IA", "Next action suggested by AI")}</div>
+                    <div className={k.title} data-testid="next-action" data-action={sel.nextAction ?? ""}>{tx(locale, A[0], A[1])}</div>
+                    <div className={cn("text-sm", k.muted)}>{sel.reason}</div>
+                    <div className={cn("mt-1 text-[11px] opacity-80", k.muted)}>{tx(locale, "Siguiente acción sugerida por la IA", "Next action suggested by AI")}</div>
                   </div>
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  <Button size="sm" onClick={doNextAction} disabled={busy === "action"}>
+                  <Button size="sm" className={k.primary} onClick={doNextAction} disabled={busy === "action"}>
                     <ActionIcon size={15} /> {tx(locale, A[0], A[1])}
                   </Button>
                   {sel.nextAction !== "PROPOSE_TOUR" && listing && (
-                    <Button size="sm" variant="dark-outline" onClick={() => setTourOpen(!tourOpen)} aria-expanded={tourOpen}>
+                    <Button size="sm" variant="outline" className={k.outline} onClick={() => setTourOpen(!tourOpen)} aria-expanded={tourOpen}>
                       <CalendarPlus size={14} /> {tx(locale, "Proponer visita", "Propose tour")}
                     </Button>
                   )}
-                  <Button size="sm" variant="dark-outline" onClick={() => run("prio", () => api(`leads/${sel.id}`, { method: "PATCH", json: { priority: !sel.priority } }))}>
+                  <Button size="sm" variant="outline" className={k.outline} onClick={() => run("prio", () => api(`leads/${sel.id}`, { method: "PATCH", json: { priority: !sel.priority } }))}>
                     <Star size={14} className={sel.priority ? "fill-gold text-gold" : ""} /> {sel.priority ? tx(locale, "Prioritario", "Priority") : tx(locale, "Marcar prioridad", "Flag priority")}
                   </Button>
-                  <Button size="sm" variant="dark-ghost" onClick={() => run("rescore", () => api("ai/lead-score", { method: "POST", json: { leadId: sel.id } }))}>
+                  <Button size="sm" variant="ghost" className={k.ghost} onClick={() => run("rescore", () => api("ai/lead-score", { method: "POST", json: { leadId: sel.id } }))}>
                     <RefreshCw size={13} /> {tx(locale, "Recalcular", "Re-score")}
                   </Button>
                 </div>
                 {tourOpen && listing && <TourPicker agentId={sel?.agentId} locale={locale} listingId={listing.id} busy={busy === "tour"} onPropose={proposeTour} onClose={() => setTourOpen(false)} />}
               </div>
 
-              <div className="rounded-np border border-navy-line bg-navy-card p-4">
+              <div className={cn(k.card, "p-5")}>
                 {listing && (
                   <div className="flex gap-3">
-                    <PropertyArt scene={listing.scenes[0]} seed={listing.id} photo={listingPhoto(listing, 0)} className="h-20 w-28 shrink-0 rounded-lg" />
+                    <PropertyArt scene={listing.scenes[0]} seed={listing.id} photo={listingPhoto(listing, 0)} className="h-20 w-28 shrink-0 rounded-xl" />
                     <div className="min-w-0">
                       <div className="line-clamp-1 font-semibold">{tx(locale, listing.title_es, listing.title_en)}</div>
-                      <div className="text-sm text-mist">{listing.zone} · {money(listing.priceAmount, locale)}{priceSuffix(listing, locale)}</div>
-                      <div className="mt-1 text-xs text-mist">PlaceEstimate {money(listing.estimate.mid, locale)} · {tx(locale, "encaje", "fit")} {sel.budget ? Math.round((sel.budget / listing.priceAmount) * 100) : "—"} %</div>
+                      <div className={cn("text-sm", k.muted)}>{listing.zone} · {money(listing.priceAmount, locale)}{priceSuffix(listing, locale)}</div>
+                      <div className={cn("mt-1 text-xs", k.muted)}>PlaceEstimate {money(listing.estimate.mid, locale)} · {tx(locale, "encaje", "fit")} {sel.budget ? Math.round((sel.budget / listing.priceAmount) * 100) : "—"} %</div>
                     </div>
                   </div>
                 )}
-                <div className="mt-4 text-xs font-bold uppercase tracking-wider text-mist">{tx(locale, "Historial", "Timeline")}</div>
-                <ol className="mt-2 space-y-2 border-l border-navy-line pl-4 text-sm">
+                <div className={cn("mt-5", k.label)}>{tx(locale, "Historial", "Timeline")}</div>
+                <ol className={cn("mt-2 space-y-2 border-l pl-4 text-sm", k.line)}>
                   {(detail.data?.events ?? []).map((e, i) => (
                     <li key={i} className="relative">
-                      <span className={cn("absolute -left-[21px] top-1.5 h-2 w-2 rounded-full", i === 0 ? "bg-coral" : "bg-mist")} />
+                      <span className={cn("absolute -left-[21px] top-1.5 h-2 w-2 rounded-full", i === 0 ? "bg-navy dark:bg-ivory" : "bg-[#C9C1B2] dark:bg-mist")} />
                       {eventText(e)}{" "}
-                      <span className="text-mist">· {ago(e.at, locale)}</span>
+                      <span className={k.muted}>· {ago(e.at, locale)}</span>
                     </li>
                   ))}
                 </ol>
               </div>
             </div>
 
-            <div className="rounded-np border border-navy-line bg-navy-card">
-              <div className="flex items-center gap-2 border-b border-navy-line px-4 py-3 font-display font-semibold"><MessageCircle size={16} className="text-coral" /> {tx(locale, "Conversación", "Conversation")}</div>
+            <div className={k.card}>
+              <div className={cn("flex items-center gap-2 border-b px-5 py-4", k.line)}><MessageCircle size={17} strokeWidth={1.6} /> <span className={k.titleSm}>{tx(locale, "Conversación", "Conversation")}</span></div>
               <div className="max-h-80 space-y-3 overflow-y-auto p-4 scrollbar-thin">
-                <div className="max-w-[80%] rounded-2xl rounded-bl-md bg-white/[.06] px-3.5 py-2 text-sm">{sel.message}<div className="mt-1 text-[10px] text-mist">{ago(sel.createdAt, locale)}</div></div>
+                <div className={cn("max-w-[80%] rounded-2xl rounded-bl-md px-3.5 py-2 text-sm", k.soft)}>{sel.message}<div className={cn("mt-1 text-[10px]", k.muted)}>{ago(sel.createdAt, locale)}</div></div>
                 {(detail.data?.messages ?? []).filter((m) => m.body !== sel.message).map((m) => (
-                  <div key={m.id} className={cn("max-w-[80%] rounded-2xl px-3.5 py-2 text-sm", m.mine ? "np-in ml-auto rounded-br-md bg-coral-cta text-white" : "rounded-bl-md bg-white/[.06]")}>
+                  <div key={m.id} className={cn("max-w-[80%] rounded-2xl px-3.5 py-2 text-sm", m.mine ? "np-in ml-auto rounded-br-md bg-navy text-ivory dark:bg-ivory dark:text-navy" : cn("rounded-bl-md", k.soft))}>
                     {m.body}
-                    <div className={cn("mt-1 text-[10px]", m.mine ? "text-white/70" : "text-mist")}>{ago(m.at, locale)} · {m.from}</div>
+                    <div className={cn("mt-1 text-[10px]", m.mine ? "opacity-70" : k.muted)}>{ago(m.at, locale)} · {m.from}</div>
                   </div>
                 ))}
               </div>
               <form
-                className="flex gap-2 border-t border-navy-line p-3"
+                className={cn("flex gap-2 border-t p-3", k.line)}
                 onSubmit={(e) => {
                   e.preventDefault();
                   if (!draft.trim()) return;
@@ -380,13 +381,13 @@ export function LeadsInbox({ locale, initial, listings, agents }: { locale: Loca
                   run("msg", () => api(`leads/${sel.id}/messages`, { method: "POST", json: { body } }).catch((e) => { setDraft(body); throw e; }));
                 }}
               >
-                <input value={draft} onChange={(e) => setDraft(e.target.value)} className="h-10 flex-1 rounded-full border border-navy-line bg-navy-2 px-4 text-sm focus:border-coral focus:outline-none" placeholder={tx(locale, "Responder… (se envía también por email)", "Reply… (also sent by email)")} aria-label={tx(locale, "Respuesta", "Reply")} />
-                <button className="flex h-10 w-10 items-center justify-center rounded-full bg-coral-cta text-white" aria-label={tx(locale, "Enviar", "Send")}><Send size={16} /></button>
+                <input value={draft} onChange={(e) => setDraft(e.target.value)} className={cn(k.input, "h-11 flex-1 rounded-full px-4 md:h-11")} placeholder={tx(locale, "Responder… (se envía también por email)", "Reply… (also sent by email)")} aria-label={tx(locale, "Respuesta", "Reply")} />
+                <button className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-navy text-ivory hover:bg-navy-2 dark:bg-ivory dark:text-navy" aria-label={tx(locale, "Enviar", "Send")}><Send size={16} /></button>
               </form>
             </div>
           </div>
         ) : (
-          <div className="rounded-np border border-dashed border-navy-line p-10 text-center text-mist"><Target className="mx-auto mb-2" />{tx(locale, "Sin leads todavía", "No leads yet")}</div>
+          <div className={k.card}><Empty title={tx(locale, "Sin leads todavía", "No leads yet")} body={tx(locale, "Cuando alguien escriba o pida una visita desde una ficha, aparecerá aquí con su score.", "When someone writes or books a tour from a listing, it shows up here with its score.")} /></div>
         )}
       </div>
     </AdminShell>

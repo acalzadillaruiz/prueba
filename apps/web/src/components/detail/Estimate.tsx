@@ -1,5 +1,5 @@
 // No state or handlers: rendered on the server in the listing page (no hydration cost); client parents can use it too.
-import { Info, Sparkles } from "lucide-react";
+import { Info } from "lucide-react";
 import type { Listing, Locale } from "@/types/domain";
 import { compactMoney, money, num, priceSuffix, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
@@ -14,44 +14,48 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
   const diff = ((l.priceAmount - e.mid) / e.mid) * 100;
   const verdict = Math.abs(diff) <= 4 ? tx(locale, "En línea con el mercado", "In line with the market") : diff > 0 ? tx(locale, `${diff.toFixed(0)} % sobre la estimación`, `${diff.toFixed(0)}% above estimate`) : tx(locale, `${Math.abs(diff).toFixed(0)} % bajo la estimación`, `${Math.abs(diff).toFixed(0)}% below estimate`);
   const muted = dark ? "text-mist" : "text-ink/65";
+  const conf = e.confidence >= 0.75 ? tx(locale, "Confianza alta", "High confidence") : e.confidence >= 0.5 ? tx(locale, "Confianza media", "Medium confidence") : tx(locale, "Confianza baja", "Low confidence");
+  const inRange = l.priceAmount >= e.low && l.priceAmount <= e.high;
   return (
-    <div className={cn("rounded-np border p-5", dark ? "border-navy-line bg-navy-card" : "border-line bg-white")}>
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center gap-2 font-display text-lg font-semibold">
-          <Sparkles size={18} className="text-coral" /> PlaceEstimate
+    <div className={cn("overflow-hidden rounded-[20px]", dark ? "border border-navy-line bg-navy-card" : "border border-line bg-white")}>
+      {/* Navy valuation panel (brand): range in Cormorant, gold fillet scale, the asking price as a dot. */}
+      <div className="np-navy-panel bg-navy px-6 py-7 text-ivory md:px-8">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="np-eyebrow text-[#D9C59C]">PlaceEstimate · {tx(locale, "Valor estimado", "Estimated value")}</div>
+          <div className="text-sm text-ivory/70">
+            {conf} · {e.comparables.length > 0 ? `${e.comparables.length} ${tx(locale, "comparables", "comparables")}` : aiProvider === "heuristic" ? tx(locale, "modelo local", "local model") : tx(locale, "IA externa", "external AI")}
+          </div>
         </div>
-        <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-semibold", dark ? "bg-white/10 text-mist" : "bg-[#A9B4C22E] text-[#3E5A6B]")}>
-          {aiProvider === "heuristic" ? tx(locale, "Estimación New Place (modelo local)", "New Place estimate (local model)") : tx(locale, "Estimación New Place (IA externa)", "New Place estimate (external AI)")}
-        </span>
-      </div>
-      <div className="mt-4 flex flex-wrap items-end gap-x-6 gap-y-2">
-        <div>
-          <div className={cn("text-xs font-semibold uppercase tracking-wide", muted)}>{tx(locale, "Valor estimado", "Estimated value")}</div>
-          <div className="font-display text-3xl font-semibold">{money(e.mid, locale)}<span className={cn("text-sm font-normal", muted)}>{priceSuffix(l, locale)}</span></div>
+        <div className="mt-4 font-serif text-[36px] font-semibold leading-tight md:text-[46px]">
+          {money(e.low, locale)} – {money(e.high, locale)}
+          <span className="font-display text-base font-normal text-ivory/60">{priceSuffix(l, locale)}</span>
         </div>
-        <div className={cn("pb-1 text-sm", muted)}>
-          {tx(locale, "Rango", "Range")} {money(e.low, locale)} – {money(e.high, locale)} · {tx(locale, "confianza", "confidence")} {Math.round(e.confidence * 100)} %
+        <div className="mt-1 text-sm text-ivory/70">
+          {tx(locale, "Valor central", "Mid value")} {money(e.mid, locale)} · {tx(locale, "confianza", "confidence")} {Math.round(e.confidence * 100)} %
         </div>
-      </div>
-      <div className={cn("relative mt-8 h-2.5 rounded-full", dark ? "bg-white/10" : "bg-black/5")}>
-        <div className="absolute inset-y-0 rounded-full bg-gradient-to-r from-[#A9B4C2] via-[#B4935A] to-[#A8452A]" style={{ left: `${at(e.low)}%`, right: `${100 - at(e.high)}%` }} />
-        <div className="absolute -top-7 whitespace-nowrap text-xs font-semibold" style={{ left: `${pos}%`, transform: `translateX(-${Math.min(100, Math.max(0, pos))}%)` }}>
-          {tx(locale, "Precio pedido", "Asking")}
+        <div className="relative mt-9 h-[3px] rounded-full bg-white/15">
+          <div className="absolute inset-y-0 rounded-full bg-gradient-to-r from-[#B4935A]/60 via-[#D9C59C] to-[#B4935A]/60" style={{ left: `${at(e.low)}%`, right: `${100 - at(e.high)}%` }} />
+          <div className="absolute -top-8 whitespace-nowrap text-[13px] font-semibold text-ivory/85" style={{ left: `${pos}%`, transform: `translateX(-${Math.min(100, Math.max(0, pos))}%)` }}>
+            {tx(locale, "Precio pedido", "Asking")} · {compactMoney(l.priceAmount, locale)}
+          </div>
+          <div className="absolute top-1/2 h-[18px] w-[18px] -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] border-[#D9C59C] bg-ivory" style={{ left: `${pos}%` }} />
         </div>
-        <div className="absolute top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] border-white bg-navy shadow" style={{ left: `${pos}%` }} />
+        <div className="mt-4 flex items-center justify-between gap-2 text-sm text-ivory/70">
+          <span>{compactMoney(e.low, locale).replace("$", "USD ")}</span>
+          <span className={cn("text-center font-semibold", Math.abs(diff) > 4 && diff > 0 ? "text-[#E9C98F]" : "text-[#9ED7B8]")}>
+            {inRange ? tx(locale, "Precio publicado dentro del rango", "Asking price within the range") : verdict}
+          </span>
+          <span>{compactMoney(e.high, locale).replace("$", "USD ")}</span>
+        </div>
+        {inRange && <div className="mt-1 text-center text-[13px] text-ivory/55">{verdict}</div>}
       </div>
-      <div className={cn("mt-2 flex justify-between text-xs", muted)}>
-        <span>{money(e.low, locale)}</span>
-        {/* AA contrast on both surfaces: brand ok/warn are too dark on navy / too light on white respectively */}
-        <span className={cn("font-semibold", Math.abs(diff) > 4 && diff > 0 ? (dark ? "text-warn" : "text-[#8A5A00]") : dark ? "text-[#5FBF8F]" : "text-ok")}>{verdict}</span>
-        <span>{money(e.high, locale)}</span>
-      </div>
+      <div className={cn("px-6 pb-6 md:px-8", !(showComparables && e.comparables.length > 0) && "hidden")}>
       {showComparables && e.comparables.length > 0 && (
-        <div className="mt-5">
-          <div className="mb-2 flex items-center gap-1.5 text-sm font-semibold">
+        <div className="mt-6">
+          <div className="mb-3 flex items-center gap-1.5 text-[15px] font-semibold">
             {tx(locale, "Comparables usados", "Comparables used")} <Info size={14} className={muted} />
           </div>
-          <div className="overflow-hidden rounded-lg border border-inherit">
+          <div className="overflow-x-auto rounded-lg border border-inherit">
             <table className="w-full whitespace-nowrap text-sm">
               <thead className={cn("text-left text-xs", dark ? "bg-white/5 text-mist" : "bg-ivory text-ink/65")}>
                 <tr>
@@ -80,9 +84,10 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
               </tbody>
             </table>
           </div>
-          <p className={cn("mt-2 text-xs", muted)}>{tx(locale, "Método: m² × precio de zona, ajustado por antigüedad, amenidades y comparables cercanos.", "Method: m² × area price, adjusted for age, amenities and nearby comparables.")}</p>
+          <p className={cn("mt-3 text-sm", muted)}>{tx(locale, "Método: m² × precio de zona, ajustado por antigüedad, amenidades y comparables cercanos.", "Method: m² × area price, adjusted for age, amenities and nearby comparables.")}</p>
         </div>
       )}
+      </div>
     </div>
   );
 }

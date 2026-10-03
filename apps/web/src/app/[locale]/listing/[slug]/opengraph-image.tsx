@@ -18,19 +18,24 @@ export default async function OgImage({ params }: { params: Promise<{ locale: Lo
   const facts = l ? [l.beds ? `${l.beds} ${tx(locale, "hab", "bd")}` : "", l.baths ? `${l.baths} ${tx(locale, "baños", "ba")}` : "", `${l.areaM2} m²`].filter(Boolean).join("  ·  ") : "";
   return new ImageResponse(
     (
-      <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", background: l?.luxury ? "#162638" : "#162638", color: "#F8F5EF", padding: 64, fontFamily: "sans-serif" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 16, fontSize: 34, fontWeight: 700 }}>
-          <div style={{ width: 40, height: 40, borderRadius: 20, background: "#A8452A" }} />
-          New Place
-          {l?.luxury && <div style={{ marginLeft: 16, fontSize: 24, color: "#B4935A", border: "2px solid #B4935A", borderRadius: 999, padding: "4px 16px" }}>LUXURY</div>}
+      <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", background: "#162638", color: "#F8F5EF", padding: 64, fontFamily: "serif" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
+          {/* Brand roof mark: outer roof in Cal, inner "teja" in light terracotta. */}
+          <svg width="96" height="34" viewBox="0 0 120 42">
+            <path d="M6 37 60 7l54 30" fill="none" stroke="#F8F5EF" strokeWidth="6" />
+            <path d="M30 38 60 21.5 90 38" fill="none" stroke="#E79A7F" strokeWidth="5" />
+          </svg>
+          <div style={{ fontSize: 30, letterSpacing: 8, color: "#F8F5EF" }}>NEW PLACE</div>
+          {l?.luxury && <div style={{ marginLeft: 18, fontSize: 20, letterSpacing: 4, color: "#A8452A", background: "#FFFFFF", borderRadius: 999, padding: "6px 18px" }}>{tx(locale, "EXCLUSIVA", "EXCLUSIVE")}</div>}
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-          <div style={{ fontSize: 64, fontWeight: 700, lineHeight: 1.1, maxWidth: 1050 }}>{title}</div>
-          <div style={{ fontSize: 34, color: "#A9B4C2" }}>{where}</div>
+          <div style={{ width: 120, height: 2, background: "#B4935A" }} />
+          <div style={{ fontSize: 66, lineHeight: 1.08, maxWidth: 1050 }}>{l ? title : tx(locale, "Pocas propiedades. Todas extraordinarias.", "Few properties. All extraordinary.")}</div>
+          <div style={{ fontSize: 32, color: "#A9B4C2", fontFamily: "sans-serif" }}>{l ? where : tx(locale, "El Caribe, con alma mediterránea", "The Caribbean, with a Mediterranean soul")}</div>
         </div>
         <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
-          <div style={{ fontSize: 60, fontWeight: 700, color: "#A8452A" }}>{price}</div>
-          <div style={{ fontSize: 30, color: "#F8F5EF" }}>{facts}</div>
+          <div style={{ fontSize: 64, color: "#F8F5EF" }}>{price}</div>
+          <div style={{ fontSize: 28, color: "#D9C59C", fontFamily: "sans-serif" }}>{facts}</div>
         </div>
       </div>
     ),

@@ -6,8 +6,10 @@ import { logout } from "@/lib/logout";
 import { BadgeCheck, Check, Globe, Loader2, Lock, LogOut } from "lucide-react";
 import type { Locale } from "@/types/domain";
 import { Avatar, Badge, Button, Card, Field, inputCls } from "@/components/ui";
+import { k } from "@/components/agency/kit";
 import { api } from "@/lib/api";
 import { tx } from "@/lib/i18n";
+import { cn } from "@/lib/cn";
 
 export interface AccountData {
   name: string;
@@ -61,8 +63,9 @@ export function AccountView({ locale, data }: { locale: Locale; data: AccountDat
   };
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 md:px-6">
-      <h1 className="font-display text-3xl font-semibold">{tx(locale, "Mi cuenta", "My account")}</h1>
-      <Card className="mt-6 p-6">
+      <div className={k.eyebrow}>{tx(locale, "Área privada", "Private area")}</div>
+      <h1 className="mt-1 font-serif text-[40px] font-medium leading-[1.05] md:text-[48px]">{tx(locale, "Mi cuenta", "My account")}</h1>
+      <Card className={cn(k.card, "border-0 mt-6 p-6")}>
         <div className="flex flex-wrap items-center gap-4">
           <Avatar initials={data.initials} hue={data.hue} size={64} />
           <div>
@@ -80,9 +83,9 @@ export function AccountView({ locale, data }: { locale: Locale; data: AccountDat
           <Field label={tx(locale, "Zonas de interés", "Areas of interest")} error={showErrs ? errs.interests ?? undefined : undefined}><input className={inputCls} value={f.interests} maxLength={200} aria-invalid={showErrs && !!errs.interests} onChange={(e) => setF({ ...f, interests: e.target.value })} /></Field>
         </div>
       </Card>
-      <Card className="mt-6 divide-y divide-line">
+      <Card className={cn(k.card, "border-0 mt-6 divide-y divide-line")}>
         <div className="flex flex-wrap items-center gap-4 p-5">
-          <Globe size={20} className="text-coral" />
+          <Globe size={20} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" />
           <div className="flex-1">
             <div className="font-semibold">{tx(locale, "Idioma", "Language")}</div>
             <div className="text-sm text-ink/65">{tx(locale, "Precios en USD con referencia en VES y EUR.", "Prices in USD with VES and EUR reference.")}</div>
@@ -93,7 +96,7 @@ export function AccountView({ locale, data }: { locale: Locale; data: AccountDat
           </select>
         </div>
         <div className="flex items-center gap-4 p-5">
-          <Lock size={20} className="text-coral" />
+          <Lock size={20} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" />
           <div className="flex-1">
             <div className="font-semibold">{tx(locale, "Inicio de sesión", "Sign-in")}</div>
             <div className="text-sm text-ink/65">
@@ -102,7 +105,7 @@ export function AccountView({ locale, data }: { locale: Locale; data: AccountDat
           </div>
         </div>
       </Card>
-      {err && <div role="alert" className="mt-4 rounded-lg bg-[#B3261E1A] px-3 py-2 text-sm text-danger">{err}</div>}
+      {err && <div role="alert" className="mt-4 rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-sm text-danger">{err}</div>}
       <div className="mt-6 flex justify-between">
         <Button variant="ghost" onClick={() => logout(locale)}>
           <LogOut size={16} /> {tx(locale, "Cerrar sesión", "Sign out")}

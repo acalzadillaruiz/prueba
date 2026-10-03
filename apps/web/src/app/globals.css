@@ -67,36 +67,57 @@ h1, h2, h3 { text-wrap: balance; }
 *:focus-visible { outline: 2px solid var(--np-navy); outline-offset: 3px; }
 
 /* Public dark mode (toggle). Admin is always dark; only light surfaces of the public scope are remapped,
-   so navy sections (hero, footer, Luxury) keep their ivory text. */
+   so navy sections (hero, footer, trust strip) keep their Cal text. Committee dark panel:
+   background #101C2B, surfaces #1E3048, text Cal, accent terracotta-light #E79A7F (6.8:1 on navy). */
 html.dark body { background: #101C2B; }
 html.dark .np-public {
-  --np-ink: #EEF1F4;
-  --np-ink-rgb: 238 241 244;
+  --np-ink: #F8F5EF;
+  --np-ink-rgb: 248 245 239;
+  --np-muted-rgb: 169 180 194;
   --np-line: #2A3E55;
-  --np-line-rgb: 34 48 74;
+  --np-line-rgb: 42 62 85;
+  --np-arena-rgb: 30 48 72;
+  --np-rosa-rgb: 58 44 48;
+  --np-gold-text-rgb: 217 197 156;
+  --np-coral-cta-rgb: 168 69 42;
+  --np-sel: #243852;
+  --np-logo-ink: #F8F5EF;
+  --np-logo-teja: #E79A7F;
   --shadow: 0 12px 40px rgba(0,0,0,.35);
   color-scheme: dark;
   background: #101C2B;
   color: var(--np-ink);
 }
 html.dark .np-public .bg-white { background-color: #1E3048; }
-html.dark .np-public .bg-white\/90 { background-color: rgb(21 32 51 / .9); }
-html.dark .np-public .bg-white\/60 { background-color: rgb(21 32 51 / .6); }
+html.dark .np-public .bg-white\/90 { background-color: rgb(30 48 72 / .9); }
+html.dark .np-public .bg-white\/60 { background-color: rgb(30 48 72 / .6); }
 html.dark .np-public .bg-ivory { background-color: #101C2B; }
-html.dark .np-public .bg-ivory\/90, html.dark .np-public .bg-ivory\/95 { background-color: rgb(14 22 38 / .92); }
+html.dark .np-public .bg-ivory\/90, html.dark .np-public .bg-ivory\/95 { background-color: rgb(16 28 43 / .92); }
 html.dark .np-public .hover\:bg-ivory:hover { background-color: #243852; }
 html.dark .np-public .text-navy { color: #F8F5EF; }
+html.dark .np-public .border-navy { border-color: #E79A7F; }
 html.dark .np-public .bg-black\/5, html.dark .np-public .hover\:bg-black\/5:hover { background-color: rgb(255 255 255 / .06); }
 html.dark .np-public .bg-black\/10 { background-color: rgb(255 255 255 / .12); }
 html.dark .np-public :is(input, select, textarea) { color-scheme: dark; }
+/* Navy solid surfaces stay navy in dark mode but lift slightly so they read as panels on #101C2B. */
+html.dark .np-public .np-navy-panel { background-color: #1E3048; }
+html.dark .np-public .np-sel { background-color: #243852; border-color: #E79A7F; color: #F8F5EF; }
+html.dark .np-public .np-btn-navy { background-color: #F8F5EF; color: #162638; }
+html.dark .np-public .np-btn-navy:hover { background-color: #fff; }
+html.dark .np-public .np-btn-outline { border-color: rgb(248 245 239 / .7); color: #F8F5EF; }
+html.dark .np-public .np-btn-outline:hover { background-color: rgb(255 255 255 / .06); }
+html.dark .np-public .text-coral-cta { color: #E79A7F; }
 
 /* Coral text on light public surfaces uses the AA-contrast shade; navy sections and dark mode keep brand coral. */
 html:not(.dark) .np-public .text-coral { color: rgb(var(--np-coral-cta-rgb)); }
-html:not(.dark) .np-public :is(.bg-navy, .bg-navy-2, .bg-navy-card) .text-coral { color: rgb(var(--np-coral-rgb)); }
+html:not(.dark) .np-public :is(.bg-navy, .bg-navy-2, .bg-navy-card) .text-coral { color: var(--np-coral-light); }
+html.dark .np-public .text-coral { color: var(--np-coral-light); }
 
 /* Listing detail on phones: keep the demo pill above the sticky "Request a tour" bar. */
 @media (max-width: 767px) {
   body:has([data-sticky-cta="shown"]) [data-demobar] { bottom: calc(5rem + env(safe-area-inset-bottom)); }
+  /* Public mobile tab bar: the demo pill and the floating contact button sit above it. */
+  body:has([data-tabbar]) [data-demobar] { bottom: calc(4.75rem + env(safe-area-inset-bottom)); }
 }
 /* Search on phones/tablets: keep it above the peeking results sheet. */
 @media (max-width: 1023px) {
@@ -111,6 +132,42 @@ html:not(.dark) .np-public :is(.bg-navy, .bg-navy-2, .bg-navy-card) .text-coral 
 .no-scrollbar { scrollbar-width: none; }
 
 @keyframes np-pulse { 0% { transform: scale(1); opacity: .7 } 100% { transform: scale(2.4); opacity: 0 } }
-.np-pulse::after { content: ""; position: absolute; inset: 0; border-radius: 9999px; background: var(--np-coral); animation: np-pulse 1.6s ease-out infinite; }
+.np-pulse::after { content: ""; position: absolute; inset: 0; border-radius: 9999px; background: currentColor; color: inherit; background-color: inherit; animation: np-pulse 1.6s ease-out infinite; }
 @keyframes np-in { from { opacity: 0; transform: translateY(6px) } to { opacity: 1; transform: none } }
 .np-in { animation: np-in 180ms ease-out both; }
+
+/* ——— Brand v4 devices ——— */
+:root { --np-sel: #E6EBF1; }  /* selected state: navy tint + 2px navy border */
+.np-sel { background-color: var(--np-sel); border: 2px solid var(--np-navy); color: var(--np-navy); }
+.np-eyebrow { font-family: var(--font-display); font-size: 12px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; }
+/* Arch mask (Mediterranean arch): hero and feature photos. */
+.np-arch { border-radius: 999px 999px 0 0; overflow: hidden; }
+/* Listing gallery: main photo with an arched top-left corner. */
+.np-arch-tl { border-radius: 78% 16px 16px 16px / 62% 16px 16px 16px; overflow: hidden; }
+/* Hero headline: the italic line in Cal on the photo. */
+.np-hero-title em { font-style: italic; font-weight: 500; color: var(--np-ivory); }
+/* Signature: the active nav item carries a small roof under it. */
+.np-navroof { position: relative; }
+.np-navroof::after {
+  content: ""; position: absolute; left: 50%; bottom: -9px; width: 20px; height: 7px; transform: translateX(-50%);
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 8'%3E%3Cpath d='M1 7 11 1l10 6' fill='none' stroke='black' stroke-width='1.8'/%3E%3C/svg%3E") center/contain no-repeat;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 8'%3E%3Cpath d='M1 7 11 1l10 6' fill='none' stroke='black' stroke-width='1.8'/%3E%3C/svg%3E") center/contain no-repeat;
+}
+/* Signature: the roof strokes draw themselves in 0.9 s (first load, empty states). */
+@keyframes np-roof { from { stroke-dashoffset: 1 } to { stroke-dashoffset: 0 } }
+.np-roof-draw path { stroke-dasharray: 1; stroke-dashoffset: 1; animation: np-roof 0.55s cubic-bezier(.4,0,.2,1) forwards; }
+.np-roof-draw path + path { animation-delay: 0.35s; }
+@keyframes np-fade { from { opacity: 0 } to { opacity: 1 } }
+.np-roof-fade { animation: np-fade 0.5s ease-out 0.45s both; }
+@media (prefers-reduced-motion: reduce) {
+  .np-roof-draw path { animation: none; stroke-dashoffset: 0; }
+  .np-roof-fade { animation: none; }
+  .np-in { animation: none; }
+}
+/* Skeleton (loading): warm arena shimmer. */
+@keyframes np-shimmer { from { background-position: -400px 0 } to { background-position: 400px 0 } }
+.np-skeleton { background: linear-gradient(90deg, #EFE7DA 0%, #F7F2EA 50%, #EFE7DA 100%); background-size: 800px 100%; animation: np-shimmer 1.4s linear infinite; }
+@media (prefers-reduced-motion: reduce) { .np-skeleton { animation: none; } }
+/* Keyboard focus stays visible on navy surfaces and in dark mode (light terracotta ring). */
+:is(.bg-navy, .np-navy-panel, .text-ivory) *:focus-visible, html.dark .np-public *:focus-visible { outline-color: var(--np-coral-light); }

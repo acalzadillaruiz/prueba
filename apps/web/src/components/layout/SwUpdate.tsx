@@ -49,9 +49,9 @@ export function SwUpdate({ locale }: { locale: Locale }) {
 
   if (!waiting) return null;
   return (
-    <div role="status" className="fixed inset-x-4 bottom-4 z-[60] mx-auto flex max-w-md items-center gap-3 rounded-np border border-navy-line bg-navy px-4 py-3 text-sm text-ivory shadow-np sm:left-auto sm:right-4" style={{ marginBottom: "env(safe-area-inset-bottom)" }}>
+    <div role="status" className="fixed inset-x-4 bottom-4 z-[60] mx-auto flex max-w-md items-center gap-3 rounded-2xl border border-navy-line bg-navy px-4 py-3 text-sm text-ivory shadow-np sm:left-auto sm:right-4" style={{ marginBottom: "env(safe-area-inset-bottom)" }}>
       <span className="flex-1">{tx(locale, "Hay una nueva versión de New Place.", "A new version of New Place is available.")}</span>
-      <button onClick={() => waiting.postMessage({ type: "SKIP_WAITING" })} className="flex min-h-11 items-center gap-1.5 rounded-full bg-coral-cta px-4 font-display font-semibold text-white">
+      <button onClick={() => waiting.postMessage({ type: "SKIP_WAITING" })} className="flex min-h-11 items-center gap-1.5 rounded-full bg-ivory px-4 font-display font-semibold text-navy hover:bg-white">
         <RefreshCw size={14} aria-hidden /> {tx(locale, "Actualizar", "Update")}
       </button>
     </div>

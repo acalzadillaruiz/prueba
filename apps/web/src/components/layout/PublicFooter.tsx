@@ -7,12 +7,11 @@ import { FooterAccountLink } from "./FooterAccountLink";
 export async function PublicFooter({ locale }: { locale: Locale }) {
   const t = await getTranslations({ locale, namespace: "footer" });
   const nav = await getTranslations({ locale, namespace: "nav" });
-  const brand = await getTranslations({ locale, namespace: "brand" });
-  const linkCls = "inline-flex min-h-11 min-w-11 items-center hover:text-ivory md:min-h-0 md:min-w-0 md:py-1";
+  const linkCls = "inline-flex min-h-11 items-center text-[15px] text-ivory/80 transition-colors hover:text-ivory md:min-h-0 md:py-1";
   const col = (title: string, links: [string, string][], extra?: React.ReactNode) => (
     <div>
-      <div className="mb-3 font-display text-sm font-semibold text-ivory">{title}</div>
-      <ul className="space-y-2 text-sm text-mist">
+      <div className="np-eyebrow mb-4 text-[#D9C59C]">{title}</div>
+      <ul className="space-y-1.5 md:space-y-2">
         {links.map(([label, h]) => (
           <li key={label}><Link href={h} className={linkCls}>{label}</Link></li>
         ))}
@@ -21,19 +20,25 @@ export async function PublicFooter({ locale }: { locale: Locale }) {
     </div>
   );
   return (
-    <footer className="mt-20 bg-navy text-ivory">
-      <div className="mx-auto grid max-w-[1400px] gap-10 px-4 py-14 md:grid-cols-5 md:px-6">
-        <div className="md:col-span-2">
-          <Logo tone="ivory" />
-          <p className="mt-3 max-w-xs font-display text-2xl text-ivory/90">{brand("tagline")}</p>
-          <p className="mt-3 max-w-sm text-sm text-mist">{t("about")}</p>
+    <footer className="np-navy-panel bg-navy text-ivory">
+      <div className="mx-auto grid max-w-[1320px] grid-cols-2 gap-x-6 gap-y-10 px-4 pb-14 pt-16 md:grid-cols-[1.3fr_1fr_1fr_1fr] md:gap-12 md:px-8">
+        <div className="col-span-2 flex flex-col items-start md:col-span-1 md:items-center md:text-center">
+          <Logo tone="ivory" size="lg" />
+          <p className="mt-6 max-w-[280px] text-[15px] leading-relaxed text-ivory/75">{t("about")}</p>
         </div>
-        {col(t("search"), [[nav("buy"), `/${locale}/search?type=SALE`], [nav("rent"), `/${locale}/search?type=LONG_RENT`], [nav("vacation"), `/${locale}/search?type=SHORT_RENT`], [nav("luxury"), `/${locale}/luxury`]])}
-        {col(t("owners"), [[t("listFree"), `/${locale}/owner/new`], [t("hireAgency"), `/${locale}/owner/new`], [t("myProperties"), `/${locale}/owner/listings`]])}
+        {col(t("search"), [
+          [nav("buy"), `/${locale}/search?type=SALE`],
+          [nav("rent"), `/${locale}/search?type=LONG_RENT`],
+          [nav("privateCollection"), `/${locale}/luxury`],
+          [nav("remoteBuying"), `/${locale}#compra-a-distancia`],
+          [nav("vacation"), `/${locale}/search?type=SHORT_RENT`],
+          [nav("commercial"), `/${locale}/search?type=COMMERCIAL`],
+        ])}
+        {col(t("owners"), [[t("sellWithUs"), `/${locale}/owner/new`], [t("valuation"), `/${locale}/owner/new`], [t("myProperties"), `/${locale}/owner/listings`]])}
         {col(t("agencies"), [[t("forAgencies"), `/${locale}/register`]], <FooterAccountLink locale={locale} signIn={nav("signIn")} className={linkCls} />)}
       </div>
-      <div className="border-t border-navy-line">
-        <div className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-2 px-4 py-4 text-xs text-mist md:px-6">
+      <div className="border-t border-[#B4935A]/30">
+        <div className="mx-auto flex max-w-[1320px] flex-wrap items-center justify-between gap-2 px-4 py-5 text-sm text-ivory/60 md:px-8">
           <span>© {new Date().getFullYear()} New Place · {t("legal")}</span>
           <span>{t("listedOn")}</span>
         </div>

@@ -5,7 +5,8 @@ import Link from "next/link";
 import { HandCoins, Loader2 } from "lucide-react";
 import { offerSchema } from "@newplace/config";
 import type { Listing, Locale } from "@/types/domain";
-import { Badge, Button, Card, EmptyState, inputCls } from "@/components/ui";
+import { Badge, Button, Card, inputCls } from "@/components/ui";
+import { Empty, k } from "@/components/agency/kit";
 import { api } from "@/lib/api";
 import { ago, money, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
@@ -63,8 +64,8 @@ export function HubOffers({ locale, offers: initial, offerable, listingById, onC
   };
 
   return (
-    <Card className="p-5 lg:col-span-2">
-      <h2 className="flex items-center gap-2 font-display text-lg font-semibold"><HandCoins size={18} className="text-coral" /> {tx(locale, "Mis ofertas", "My offers")}</h2>
+    <Card className={cn(k.card, "border-0 p-5 lg:col-span-2")}>
+      <h2 className="flex items-center gap-2 font-serif text-[24px] font-medium leading-tight"><HandCoins size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Mis ofertas", "My offers")}</h2>
 
       {offerable.length > 0 ? (
         <form
@@ -105,7 +106,7 @@ export function HubOffers({ locale, offers: initial, offerable, listingById, onC
             </Button>
             {sent && <span role="status" className="ml-0 mt-2 block text-sm font-semibold text-ok sm:ml-3 sm:mt-0 sm:inline">{tx(locale, "Oferta enviada al agente.", "Offer sent to the agent.")}</span>}
           </div>
-          {errors.form && <div role="alert" className="rounded-lg bg-[#B3261E1A] px-3 py-2 text-sm text-danger sm:col-span-2">{errors.form}</div>}
+          {errors.form && <div role="alert" className="rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-sm text-danger sm:col-span-2">{errors.form}</div>}
         </form>
       ) : (
         <p className="mt-3 text-sm text-ink/65">{tx(locale, "Para ofertar, primero escribe al agente o pide una visita desde la ficha del inmueble.", "To make an offer, first message the agent or book a tour from the listing.")}</p>
@@ -113,7 +114,7 @@ export function HubOffers({ locale, offers: initial, offerable, listingById, onC
 
       <div className="mt-5">
         {offers.length === 0 ? (
-          <EmptyState icon={<HandCoins size={20} />} title={tx(locale, "Sin ofertas todavía", "No offers yet")} body={tx(locale, "Cuando hagas una oferta verás aquí su estado.", "Once you make an offer you’ll see its status here.")} />
+          <Empty className="py-6" title={tx(locale, "Sin ofertas todavía", "No offers yet")} body={tx(locale, "Cuando hagas una oferta verás aquí su estado.", "Once you make an offer you’ll see its status here.")} />
         ) : (
           <ul className="divide-y divide-line" aria-label={tx(locale, "Ofertas enviadas", "Offers sent")}>
             {offers.map((o) => {

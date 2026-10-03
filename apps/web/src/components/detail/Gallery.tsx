@@ -14,7 +14,7 @@ type Tab = "photos" | "plan" | "street";
 /** Only https links are opened (the API validates the same on write). */
 const safeTour = (u?: string | null) => (u && /^https:\/\//i.test(u) ? u : null);
 
-export function Gallery({ l, locale, luxury }: { l: Listing; locale: Locale; luxury?: boolean }) {
+export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: boolean }) {
   const [open, setOpen] = useState(false);
   const [i, setI] = useState(0);
   const opener = useRef<HTMLElement | null>(null);
@@ -57,50 +57,51 @@ export function Gallery({ l, locale, luxury }: { l: Listing; locale: Locale; lux
     ["street", MapPinned, tx(locale, "Vista de calle", "Street view"), !!GOOGLE_MAPS_KEY],
   ];
   const tag = illustrated && (
-    <span className="pointer-events-none absolute bottom-3 left-3 rounded-full bg-navy/80 px-2.5 py-1 font-display text-xs text-ivory">{tx(locale, "Ilustración · sin fotos reales aún", "Illustration · no real photos yet")}</span>
+    <span className="pointer-events-none absolute bottom-4 left-4 rounded-full bg-[#ffffffe6] px-3 py-1 font-display text-[13px] text-[#162638]">{tx(locale, "Ilustración · sin fotos reales aún", "Illustration · no real photos yet")}</span>
   );
+  const thumbs = shots.slice(1, 5);
+  const allLabel = illustrated ? tx(locale, `Ver las ${total} ilustraciones`, `View all ${total} illustrations`) : tx(locale, `Ver las ${total} fotos`, `View all ${total} photos`);
+  const chip = "inline-flex min-h-11 items-center gap-1.5 rounded-full border border-line bg-white px-4 font-display text-sm text-ink transition-colors duration-np hover:border-navy/40";
   return (
     <>
-      {luxury ? (
-        <button onClick={() => show(0)} className="relative block h-[72vh] max-h-[760px] w-full overflow-hidden" aria-label={view(1)}>
-          <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} sizes="100vw" priority className="h-full w-full" />
+      {/* Main photo with the brand's arched top-left corner; four thumbnails on the right (desktop). */}
+      <div className={cn("grid h-[320px] gap-3 sm:h-[420px] md:h-[540px] lg:h-[600px]", thumbs.length > 0 && "md:grid-cols-2")}>
+        <button onClick={() => show(0)} className="np-arch-tl relative block overflow-hidden bg-arena" aria-label={view(1)}>
+          <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} sizes="(max-width: 768px) 100vw, 50vw" priority className="h-full w-full transition-transform duration-700 hover:scale-[1.02]" />
           {tag}
+          <span className="absolute right-3 top-3 rounded-full bg-white/95 px-3.5 py-1.5 font-display text-[13px] font-semibold text-[#162638] md:hidden">{allLabel}</span>
         </button>
-      ) : (
-        <div className="grid h-[300px] grid-cols-4 grid-rows-2 gap-2 overflow-hidden rounded-np md:h-[460px]">
-          <button onClick={() => show(0)} className={cn("relative col-span-4 row-span-2 overflow-hidden", total > 1 && "md:col-span-2")} aria-label={view(1)}>
-            <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} sizes="(max-width: 768px) 100vw, 50vw" priority className="h-full w-full transition-transform duration-500 hover:scale-[1.02]" />
-            {tag}
-          </button>
-          {shots.slice(1, 5).map((s, n, arr) => (
-            <button key={n} onClick={() => show(n + 1)} className={cn("relative hidden overflow-hidden md:block", arr.length === 1 && "col-span-2 row-span-2", arr.length === 2 && "col-span-2", arr.length === 3 && n === 2 && "col-span-2")} aria-label={view(n + 2)}>
-              <PropertyArt scene={s} seed={l.id + n} photo={listingPhoto(l, n + 1)} className="h-full w-full transition-transform duration-500 hover:scale-[1.03]" />
-              {n === 3 && total > 5 && (
-                <span className="absolute inset-0 flex items-center justify-center bg-navy/55 font-display text-lg text-ivory">
-                  +{total - 5} {illustrated ? tx(locale, "ilustraciones", "illustrations") : tx(locale, "fotos", "photos")}
-                </span>
-              )}
-            </button>
-          ))}
-        </div>
-      )}
-      <div className={cn("mt-3 flex flex-wrap gap-2", luxury && "mx-auto max-w-[1200px] px-4 md:px-6")}>
+        {thumbs.length > 0 && (
+          <div className={cn("hidden gap-3 md:grid", thumbs.length > 1 ? "grid-cols-2" : "grid-cols-1", thumbs.length > 2 ? "grid-rows-2" : "grid-rows-1")}>
+            {thumbs.map((sc, n, arr) => (
+              <button
+                key={n}
+                onClick={() => show(n + 1)}
+                className={cn(
+                  "relative overflow-hidden rounded-2xl bg-arena",
+                  arr.length === 3 && n === 2 && "col-span-2",
+                )}
+                aria-label={view(n + 2)}
+              >
+                <PropertyArt scene={sc} seed={l.id + n} photo={listingPhoto(l, n + 1)} className="h-full w-full transition-transform duration-700 hover:scale-[1.03]" />
+                {n === arr.length - 1 && (
+                  <span className="absolute bottom-4 right-4 rounded-full bg-white/95 px-4 py-2 font-display text-[14px] font-semibold text-[#162638] shadow-sm">
+                    {allLabel}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+      <div className="mt-4 flex flex-wrap gap-2">
         {tabs.filter((t) => t[3]).map(([k, Icon, label]) => (
-          <button
-            key={k}
-            onClick={() => show(0, k)}
-            className={cn("inline-flex min-h-11 items-center gap-1.5 rounded-full border px-3 font-display text-sm transition-colors duration-np", luxury ? "border-gold/50 text-ivory hover:bg-white/5" : "border-line bg-white hover:border-navy/40")}
-          >
+          <button key={k} onClick={() => show(0, k)} className={chip}>
             <Icon size={15} aria-hidden /> {label}
           </button>
         ))}
         {tour && (
-          <a
-            href={tour}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={cn("inline-flex min-h-11 items-center gap-1.5 rounded-full border px-3 font-display text-sm transition-colors duration-np", luxury ? "border-gold/50 text-ivory hover:bg-white/5" : "border-line bg-white hover:border-navy/40")}
-          >
+          <a href={tour} target="_blank" rel="noopener noreferrer" className={chip}>
             <Box size={15} aria-hidden /> {tx(locale, "Tour 360°", "360° tour")}
             <ExternalLink size={13} aria-hidden />
             <span className="sr-only">{tx(locale, "(se abre en una pestaña nueva)", "(opens in a new tab)")}</span>
@@ -112,7 +113,7 @@ export function Gallery({ l, locale, luxury }: { l: Listing; locale: Locale; lux
         <div className="fixed inset-0 z-[60] flex flex-col bg-navy/97 bg-[#162638F7] text-ivory" role="dialog" aria-modal="true" aria-label={tx(locale, l.title_es, l.title_en)}>
           <div className="no-scrollbar flex items-center gap-2 overflow-x-auto px-4 py-3">
             {tabs.filter((t) => t[3]).map(([k, Icon, label]) => (
-              <button key={k} onClick={() => setTab(k)} aria-pressed={tab === k} className={cn("inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full px-3 font-display text-sm", tab === k ? "bg-ivory text-navy" : "text-ivory/75 hover:bg-white/10")}>
+              <button key={k} onClick={() => setTab(k)} aria-pressed={tab === k} className={cn("inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full px-3 font-display text-sm", tab === k ? "border-2 border-ivory bg-white/15 text-ivory" : "border-2 border-transparent text-ivory/75 hover:bg-white/10")}>
                 <Icon size={15} aria-hidden /> {label}
               </button>
             ))}
@@ -152,7 +153,7 @@ export function Gallery({ l, locale, luxury }: { l: Listing; locale: Locale; lux
           {tab === "photos" && (
             <div className="no-scrollbar flex gap-2 overflow-x-auto px-4 py-3">
               {shots.map((s, n) => (
-                <button key={n} onClick={() => setI(n)} aria-label={What(n + 1)} aria-current={n === i || undefined} className={cn("h-16 w-24 shrink-0 overflow-hidden rounded-lg ring-2", n === i ? "ring-coral" : "ring-transparent opacity-60")}>
+                <button key={n} onClick={() => setI(n)} aria-label={What(n + 1)} aria-current={n === i || undefined} className={cn("h-16 w-24 shrink-0 overflow-hidden rounded-lg ring-2", n === i ? "ring-[#E79A7F]" : "ring-transparent opacity-60")}>
                   <PropertyArt scene={s} seed={n === 0 ? l.id : l.id + (n - 1)} photo={listingPhoto(l, n)} className="h-full w-full" />
                 </button>
               ))}

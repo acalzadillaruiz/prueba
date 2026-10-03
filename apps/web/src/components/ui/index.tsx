@@ -1,19 +1,29 @@
 import Link from "next/link";
 import { cn } from "@/lib/cn";
 import type { ReactNode } from "react";
+import { Monogram, RoofGlyph } from "@/components/brand/Logo";
 
-type BtnVariant = "coral" | "navy" | "ghost" | "outline" | "dark-ghost" | "dark-outline" | "gold";
+/**
+ * Brand v4 buttons (pill). One solid terracotta ("primary") per visible view: the main action only.
+ * Everything else is navy: solid ("navy") or 1.5 px outline ("outline"). On navy surfaces use "light" / "dark-outline".
+ * Legacy names stay valid: "coral" = primary, "gold" = light (gold is reserved for thin fillets).
+ */
+type BtnVariant = "primary" | "coral" | "navy" | "ghost" | "outline" | "light" | "dark-ghost" | "dark-outline" | "gold";
+const PRIMARY = "bg-coral-cta text-white hover:bg-coral-cta-hover active:bg-coral-cta-hover";
+const LIGHT = "bg-ivory text-navy hover:bg-white";
 const BTN: Record<BtnVariant, string> = {
-  coral: "bg-coral-cta text-white hover:bg-coral-cta-hover shadow-sm",
-  navy: "bg-navy text-ivory hover:bg-navy-2",
-  gold: "bg-gold text-navy hover:brightness-95",
+  primary: PRIMARY,
+  coral: PRIMARY,
+  navy: "np-btn-navy bg-navy text-ivory hover:bg-navy-2",
+  outline: "np-btn-outline border-[1.5px] border-navy bg-transparent text-navy hover:bg-navy/5",
   ghost: "text-ink hover:bg-black/5",
-  outline: "border border-line bg-white text-ink hover:border-navy/30",
+  light: LIGHT,
+  gold: LIGHT,
   "dark-ghost": "text-ivory/80 hover:bg-white/5 hover:text-ivory",
-  "dark-outline": "border border-navy-line text-ivory hover:bg-white/5",
+  "dark-outline": "border-[1.5px] border-ivory/60 text-ivory hover:border-ivory hover:bg-white/5",
 };
 // md is 44 px tall on touch-sized screens (tap target), 40 px from md up.
-const SIZE = { sm: "h-8 px-3 text-sm", md: "h-11 px-4 text-[15px] md:h-10", lg: "h-12 px-6 text-base" };
+const SIZE = { sm: "h-9 px-4 text-sm", md: "h-11 px-5 text-[15px] md:h-10", lg: "h-12 px-7 text-[15px]" };
 
 export function Button({
   children,
@@ -30,7 +40,7 @@ export function Button({
   href?: string;
 } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
   const cls = cn(
-    "inline-flex items-center justify-center gap-2 rounded-np font-display font-medium transition-all duration-np ease-np disabled:opacity-50 whitespace-nowrap",
+    "inline-flex items-center justify-center gap-2 rounded-full font-display font-semibold tracking-[0.01em] transition-colors duration-np ease-np disabled:cursor-not-allowed disabled:bg-[#E3DDD3] disabled:text-[#8A8F96] disabled:border-transparent whitespace-nowrap",
     BTN[variant],
     SIZE[size],
     className,
@@ -39,19 +49,33 @@ export function Button({
   return <button className={cls} {...rest}>{children}</button>;
 }
 
-export function Badge({ children, tone = "neutral", className }: { children: ReactNode; tone?: "neutral" | "coral" | "gold" | "ok" | "warn" | "danger" | "navy" | "mist" | "dark"; className?: string }) {
+type BadgeTone = "neutral" | "coral" | "gold" | "ok" | "warn" | "danger" | "navy" | "mist" | "dark" | "exclusive" | "egeo" | "arena";
+/**
+ * Pills. Brand tones: "exclusive" (white, terracotta text, roof glyph, 1 px terracotta 30 % border), "egeo" (map/chips blue)
+ * and "arena". Status tones (ok/warn/danger) are for notices only, never decoration.
+ */
+export function Badge({ children, tone = "neutral", className }: { children: ReactNode; tone?: BadgeTone; className?: string }) {
   const t = {
     neutral: "bg-black/5 text-ink",
-    coral: "bg-coral/12 text-coral-hover bg-[#A8452A1F]",
-    gold: "bg-[#B4935A29] text-[#8A6A3C]",
+    coral: "bg-[#A8452A1F] text-coral-hover",
+    gold: "bg-[#B4935A29] text-gold-text",
     ok: "bg-[#2F6B4F1F] text-ok",
     warn: "bg-[#8A5A0024] text-[#8A5A00]",
     danger: "bg-[#B3261E1A] text-danger",
     navy: "bg-navy text-ivory",
     mist: "bg-[#A9B4C22E] text-[#3E5A6B]",
     dark: "bg-white/10 text-ivory",
+    exclusive: "bg-[#ffffff] text-[#A8452A] shadow-[inset_0_0_0_1px_rgba(168,69,42,.3)]",
+    egeo: "bg-[#A9C6D8] text-[#1F4A63]",
+    arena: "bg-[#E8DCC8] text-[#162638]",
   }[tone];
-  return <span className={cn("inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold", t, className)}>{children}</span>;
+  const caps = tone === "exclusive" || tone === "egeo" || tone === "arena";
+  return (
+    <span className={cn("inline-flex items-center gap-1.5 whitespace-nowrap rounded-full", caps ? "px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em]" : "px-2.5 py-0.5 text-xs font-semibold", t, className)}>
+      {tone === "exclusive" && <RoofGlyph className="h-[6px] w-[13px]" />}
+      {children}
+    </span>
+  );
 }
 
 export function Card({ children, className, dark }: { children: ReactNode; className?: string; dark?: boolean }) {
@@ -88,7 +112,7 @@ export function Field({ label, children, hint, dark, error }: { label: string; c
 }
 
 export const inputCls =
-  "h-11 w-full rounded-np border border-line bg-white px-3.5 text-[15px] text-ink placeholder:text-ink/65 transition-colors duration-np focus:border-coral focus:outline-none";
+  "h-11 w-full rounded-np border border-line bg-white px-3.5 text-[15px] text-ink placeholder:text-ink/55 transition-colors duration-np focus:border-navy focus:shadow-[0_0_0_1px_var(--np-navy)] focus:outline-none aria-[invalid=true]:border-danger";
 export const darkInputCls =
   "h-10 w-full rounded-np border border-navy-line bg-navy-2 px-3 text-sm text-ivory placeholder:text-mist/60 focus:border-coral focus:outline-none";
 
@@ -109,7 +133,7 @@ export function Stat({ label, value, delta, dark, hint }: { label: string; value
 export function SectionTitle({ children, action, className }: { children: ReactNode; action?: ReactNode; className?: string }) {
   return (
     <div className={cn("mb-4 flex items-end justify-between gap-4", className)}>
-      <h2 className="font-display text-xl font-semibold md:text-2xl">{children}</h2>
+      <h2 className="font-serif text-[28px] leading-tight md:text-[34px]">{children}</h2>
       {action}
     </div>
   );
@@ -124,13 +148,18 @@ export function Progress({ value, className, tone = "coral" }: { value: number; 
   );
 }
 
-export function EmptyState({ icon, title, body, cta, dark }: { icon: ReactNode; title: string; body: string; cta?: ReactNode; dark?: boolean }) {
+/** Empty state: rosa-cal circle with the NP monogram whose roof draws itself (static under reduced motion). */
+export function EmptyState({ icon, title, body, cta, dark, monogram }: { icon?: ReactNode; title: string; body: string; cta?: ReactNode; dark?: boolean; monogram?: boolean }) {
   return (
-    <div className={cn("flex flex-col items-center rounded-np border border-dashed px-6 py-12 text-center", dark ? "border-navy-line" : "border-line bg-white/60")}>
-      <div className={cn("mb-3 flex h-12 w-12 items-center justify-center rounded-full", dark ? "bg-white/5 text-coral" : "bg-coral/10 text-coral bg-[#A8452A14]")}>{icon}</div>
-      <div className="font-display text-lg font-semibold">{title}</div>
-      <p className={cn("mt-1 max-w-sm text-sm", dark ? "text-mist" : "text-ink/60")}>{body}</p>
-      {cta && <div className="mt-4">{cta}</div>}
+    <div className={cn("flex flex-col items-center rounded-np border px-6 py-12 text-center", dark ? "border-navy-line" : "border-line bg-white")}>
+      {monogram || !icon ? (
+        <Monogram className="mb-4 h-16 w-16" bg={dark ? "#243852" : "#F2DDD3"} ink={dark ? "#F8F5EF" : "#162638"} teja={dark ? "#E79A7F" : "#A8452A"} animate />
+      ) : (
+        <div className={cn("mb-4 flex h-14 w-14 items-center justify-center rounded-full", dark ? "bg-white/5 text-[#E79A7F]" : "bg-rosa text-coral")}>{icon}</div>
+      )}
+      <div className="font-serif text-2xl">{title}</div>
+      <p className={cn("mt-1.5 max-w-sm text-[15px]", dark ? "text-mist" : "text-ink/65")}>{body}</p>
+      {cta && <div className="mt-5">{cta}</div>}
     </div>
   );
 }

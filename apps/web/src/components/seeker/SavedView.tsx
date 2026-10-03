@@ -2,14 +2,15 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
-import { Check, Heart, Minus, Scale, X } from "lucide-react";
+import { Check, Minus, Scale, X } from "lucide-react";
 import type { Listing, Locale } from "@/types/domain";
 import { ListingCard } from "@/components/listing/ListingCard";
 import { listingPhoto } from "@/lib/photos";
 import { PropertyArt } from "@/components/art/PropertyArt";
-import { Button, EmptyState } from "@/components/ui";
+import { Button } from "@/components/ui";
 import { useQuery } from "@tanstack/react-query";
 import { useApp } from "@/lib/store";
+import { Empty, k } from "@/components/agency/kit";
 import { api } from "@/lib/api";
 import { AMENITY_LABEL, TYPE_LABEL, lbl, money, num, priceSuffix, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
@@ -32,7 +33,7 @@ export function SavedView({ locale, all }: { locale: Locale; all: Listing[] }) {
   const unit = (l: Listing) => <span className="text-xs font-normal text-ink/65">{priceSuffix(l, locale)}</span>;
   const ppm = (l: Listing) => (l.areaM2 > 0 ? l.priceAmount / l.areaM2 : NaN);
   const rows: [string, (l: Listing) => React.ReactNode, ((l: Listing) => number)?, ("min" | "max")?][] = [
-    [tx(locale, "Precio", "Price"), (l) => <span className="font-display text-lg font-semibold">{money(l.priceAmount, locale)}{unit(l)}</span>, sameUnit ? (l) => l.priceAmount : undefined, "min"],
+    [tx(locale, "Precio", "Price"), (l) => <span className="font-serif text-[24px] font-medium leading-tight">{money(l.priceAmount, locale)}{unit(l)}</span>, sameUnit ? (l) => l.priceAmount : undefined, "min"],
     ["PlaceEstimate", (l) => <>{money(l.estimate.mid, locale)}{unit(l)}</>],
     [tx(locale, "Vs. estimación", "Vs. estimate"), (l) => { const d = ((l.priceAmount - l.estimate.mid) / l.estimate.mid) * 100; return <span className={d <= 0 ? "font-semibold text-ok" : "font-semibold text-warn"}>{d > 0 ? "+" : ""}{d.toFixed(0)} %</span>; }, (l) => (l.priceAmount - l.estimate.mid) / l.estimate.mid, "min"],
     [tx(locale, "Precio por m²", "Price per m²"), (l) => (Number.isFinite(ppm(l)) ? <>{num(Math.round(ppm(l) * (l.pricePeriod ? 10 : 1)) / (l.pricePeriod ? 10 : 1), locale)} USD/m²{unit(l)}</> : "—"), sameUnit ? ppm : undefined, "min"],
@@ -51,17 +52,18 @@ export function SavedView({ locale, all }: { locale: Locale; all: Listing[] }) {
     <div className="mx-auto max-w-[1280px] px-4 py-10 md:px-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl font-semibold">{tx(locale, "Guardados", "Saved homes")}</h1>
+          <div className={k.eyebrow}>{tx(locale, "Su colección privada", "Your private collection")}</div>
+          <h1 className="mt-1 font-serif text-[40px] font-medium leading-[1.05] md:text-[48px]">{tx(locale, "Guardados", "Saved homes")}</h1>
           <p className="mt-1 text-ink/60">{tx(locale, `${items.length} inmuebles · selecciona hasta 3 para comparar`, `${items.length} homes · pick up to 3 to compare`)}</p>
         </div>
-        <Button href={`/${locale}/alerts`} variant="outline">{tx(locale, "Mis alertas", "My alerts")}</Button>
+        <Button href={`/${locale}/alerts`} variant="outline" className={k.outline}>{tx(locale, "Mis alertas", "My alerts")}</Button>
       </div>
 
       {cmp.length > 0 && (
-        <section className="np-in mt-8 overflow-hidden rounded-np border border-line bg-white shadow-np">
+        <section className={cn("np-in mt-8 overflow-hidden", k.card)}>
           <div className="flex items-center gap-2 border-b border-line bg-navy px-5 py-3 text-ivory">
-            <Scale size={18} className="text-coral" />
-            <span className="font-display font-semibold">{tx(locale, "Comparador", "Compare")}</span>
+            <Scale size={18} strokeWidth={1.6} className="text-[#E79A7F]" />
+            <span className="font-serif text-[22px] font-medium">{tx(locale, "Comparador", "Compare")}</span>
             <span className="text-sm text-mist">{cmp.length}/3</span>
           </div>
           <div className="overflow-x-auto">
@@ -75,7 +77,7 @@ export function SavedView({ locale, all }: { locale: Locale; all: Listing[] }) {
                         <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="aspect-[4/3] w-full rounded-lg" />
                         <button onClick={() => toggleCompare(l.id)} className="absolute right-2 top-2 rounded-full bg-white p-1 shadow"><X size={14} /></button>
                       </div>
-                      <Link href={`/${locale}/listing/${l.slug}`} className="mt-2 line-clamp-2 block font-display font-semibold hover:text-coral">{tx(locale, l.title_es, l.title_en)}</Link>
+                      <Link href={`/${locale}/listing/${l.slug}`} className="mt-2 line-clamp-2 block font-serif text-[20px] font-medium leading-tight underline-offset-4 hover:underline">{tx(locale, l.title_es, l.title_en)}</Link>
                     </th>
                   ))}
                 </tr>
@@ -115,7 +117,7 @@ export function SavedView({ locale, all }: { locale: Locale; all: Listing[] }) {
         ))}
       </div>
       {items.length === 0 && (
-        <EmptyState icon={<Heart size={20} />} title={tx(locale, "Aún no guardas nada", "Nothing saved yet")} body={tx(locale, "Toca el corazón en cualquier inmueble para tenerlo aquí, incluso sin conexión.", "Tap the heart on any listing to keep it here — even offline.")} cta={<Button href={`/${locale}/search`}>{tx(locale, "Explorar el mapa", "Explore the map")}</Button>} />
+        <Empty title={tx(locale, "Aún no guardas nada", "Nothing saved yet")} body={tx(locale, "Toca el corazón en cualquier inmueble para tenerlo aquí, incluso sin conexión.", "Tap the heart on any listing to keep it here — even offline.")} cta={<Button href={`/${locale}/search`} variant="outline" className={k.outline}>{tx(locale, "Explorar el mapa", "Explore the map")}</Button>} />
       )}
     </div>
   );

@@ -102,14 +102,21 @@ const freeSlot = () => page.locator("button:not([disabled])", { hasText: /^\d\d:
 
 async function cliente() {
   await go("/es", 600);
-  await caption("New Place · Perfil cliente (buscador). Home con mapa night centrado en Caracas.", 2600);
+  await caption("New Place · Perfil cliente (buscador). Portada con la nueva marca: arco al mar y buscador.", 2600);
   await moveTo(page.locator("h1"), { pause: 600 });
   await caption("Pines con precio agrupados en clusters. Clic en un pin → vista previa.");
-  await page.locator("#explorar").scrollIntoViewIfNeeded();
+  // The home map mounts lazily once its section scrolls into view.
+  await page.locator("#explorar").evaluate((el) => el.scrollIntoView({ block: "start", behavior: "smooth" }));
   const map = page.locator('svg[role="application"]').first();
+  await map.waitFor({ timeout: 15000 });
+  await map.evaluate((el) => el.scrollIntoView({ block: "center", behavior: "smooth" }));
+  await wait(800);
   await click(page.getByRole("button", { name: /^(Acercar|Zoom in)$/ }).first(), { after: 600 });
+  // Pins can sit under the fixed header/demo bar: move the cursor there, then dispatch the click on the pin itself.
   const pin = map.locator("g.cursor-pointer:not(:has(circle))").nth(3);
-  await realClick(pin, { after: 1800 });
+  await moveTo(pin, { pause: 300 }).catch(() => {});
+  await pin.dispatchEvent("click");
+  await wait(1800);
   await caption("Búsqueda en lenguaje natural con IA (funciona sin API key).", 800);
   await type(page.getByRole("textbox", { name: /^(Ubicación|Location)/ }), "ático con luz en Los Palos Grandes por menos de 180 mil", 45);
   await realClick(page.getByRole("button", { name: /Buscar/ }).last(), { after: 2200 });

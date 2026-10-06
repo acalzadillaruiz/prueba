@@ -117,7 +117,7 @@ test.describe("Revisión admin: regresiones", () => {
     await page.goto("/es/agency");
     await expect(page.getByRole("heading", { name: "Mi rendimiento" })).toBeVisible();
     await expect(page.getByRole("link", { name: "CSV" })).toHaveCount(0);
-    await expect(page.getByText("Mis resultados")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Mis resultados" })).toBeVisible();
   });
 
   test("aprobación: el backoffice puede rechazar; al editarlo el agente lo reenvía a revisión", async ({ page }) => {

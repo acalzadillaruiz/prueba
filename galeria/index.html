@@ -75,13 +75,19 @@ dialog::backdrop{background:rgba(11,18,32,.88)}
 .lbbar span{flex:1}
 .lbbar button{background:#152033;color:#F7F4EF;border:1px solid #22304A;border-radius:999px;padding:6px 14px;font:500 14px Manrope,system-ui,sans-serif;cursor:pointer}
 .lbbar button:hover{border-color:#E79A7F}
+.feature{display:grid;gap:10px;background:#1E3048;border:1px solid #2A3E55;border-radius:16px;padding:20px}
+.feature-k{margin:0;font:600 12px Manrope,system-ui,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#E79A7F}
+.feature-t{margin:0;font:500 clamp(28px,4vw,40px)/1.05 "Cormorant Garamond",Georgia,serif;color:#F8F5EF}
+.feature-p{margin:0;max-width:72ch;color:#C9D2DB}
+.feature video{display:block;width:100%;aspect-ratio:16/10;background:#000;border-radius:10px;margin-top:6px}
 @media (prefers-reduced-motion:reduce){.thumb{transition:none}}
 </style>
 <div class="hero"><div class="wrap">
 <div class="brand"><svg viewBox="0 0 120 42" aria-hidden="true"><path d="M6 37 60 7l54 30" fill="none" stroke="#F8F5EF" stroke-width="6"/><path d="M30 38 60 21.5 90 38" fill="none" stroke="#E79A7F" stroke-width="5"/></svg>NEW PLACE</div>
-<h1>La web, con la nueva marca. <em>Funcionando.</em></h1>
+<h1>La web, con la nueva marca. <em>Ahora en movimiento.</em></h1>
 <p class="lede">New Place reconstruida entera con la marca aprobada: paleta de cal, arena y azul Egeo sobre azul noche, una sola terracota por pantalla, títulos en Cormorant, logotipo del tejado y fotos en arco. Mira los tres vídeos (cliente, agencia y propietario) y pulsa cualquier captura para verla en grande y pasar con las flechas. Todo se grabó sobre la versión de producción con los datos de ejemplo: 48 inmuebles, 3 agencias y 16 usuarios. Las fotos de los inmuebles están creadas con IA y se sustituyen por las reales al subirlas.</p>
 <div class="facts"><span class="pill"><b>96,8</b> nota del comité de marca</span><span class="pill"><b>52</b> capturas</span><span class="pill"><b>8</b> roles</span><span class="pill"><b>ES/EN</b></span><span class="pill"><b>59</b> pruebas unitarias en verde</span><span class="pill"><b>70</b> pruebas de extremo a extremo en verde</span><span class="pill"><b>100</b> accesibilidad (Lighthouse)</span></div>
+<div class="feature"><p class="feature-k">Nuevo · portada inmersiva</p><h2 class="feature-t">La portada, en movimiento</h2><p class="feature-p">Al hacer scroll se cruza el arco hasta el mar, un edificio en 3D se construye planta a planta, recibe el tejado de New Place y se iluminan las plantas con residencias disponibles. Después la Colección Privada se desliza en horizontal y las rutas desde Madrid, Miami y Panamá se dibujan hasta Lechería.</p><video controls preload="metadata" playsinline poster="../videos/poster-portada.jpg" src="../videos/new-place-portada.mp4"></video></div>
 <div class="videos">
 <div class="video"><video controls preload="metadata" playsinline poster="../videos/poster-cliente.jpg" src="../videos/new-place-cliente.mp4"></video><div class="vbody"><div class="vtitle">Cliente <span>1:47</span></div><p>Portada nueva, mapa con pines-tejado, búsqueda con IA, filtro Chacao, dibujar zona, ficha con PlaceEstimate, pedir visita, guardados y comparador, alertas y cambio a inglés.</p></div></div>
 <div class="video"><video controls preload="metadata" playsinline poster="../videos/poster-admin.jpg" src="../videos/new-place-admin.mp4"></video><div class="vbody"><div class="vtitle">Agencia y superadmin <span>1:19</span></div><p>El lead llega al agente con score de IA, calendario, edición, panel del dueño, captación, y el superadmin apaga un anuncio.</p></div></div>

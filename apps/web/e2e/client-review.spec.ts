@@ -275,7 +275,8 @@ test.describe("Cliente · regresiones de la revisión", () => {
     // The day shown is the second one (selected style), and "Solicitar visita" is enabled with the free slot pre-chosen.
     await expect(page.getByRole("button", { name: "Solicitar visita" })).toBeEnabled();
     // Going back to the fully booked day explains why nothing can be picked.
-    const dayButtons = page.locator("button", { hasText: /^(lun|mar|mié|jue|vie|sáb|dom) \d+$/ });
+    // Visible text is the short day ("lun 6"); the full date follows for screen readers.
+    const dayButtons = page.locator("button", { hasText: /^(lun|mar|mié|jue|vie|sáb|dom) \d+/ });
     await dayButtons.first().click();
     await expect(page.getByText("Este día ya no tiene horarios libres. Elige otro día.")).toBeVisible();
     await expect(page.getByRole("button", { name: "Solicitar visita" })).toBeDisabled();

@@ -172,3 +172,17 @@ html.dark .np-public .text-coral { color: var(--np-coral-light); }
 @media (prefers-reduced-motion: reduce) { .np-skeleton { animation: none; } }
 /* Keyboard focus stays visible on navy surfaces and in dark mode (light terracotta ring). */
 :is(.bg-navy, .np-navy-panel, .text-ivory) *:focus-visible, html.dark .np-public *:focus-visible { outline-color: var(--np-coral-light); }
+
+/* ── Immersive home (components/home) ───────────────────────────────────────── */
+.np-chapter-dot.is-on { background: var(--np-coral-light, #E79A7F); }
+.np-scroll-line::after { content: ""; position: absolute; inset: 0; background: #F8F5EF; transform: translateY(-100%); animation: np-scroll-line 2.2s cubic-bezier(.65,0,.35,1) infinite; }
+@keyframes np-scroll-line { 0% { transform: translateY(-100%) } 55% { transform: translateY(0) } 100% { transform: translateY(100%) } }
+/* Steps light up as the route draws; text stays full-contrast, only the numeral and a rule change. */
+.np-steps li { position: relative; transition: transform .6s ease; }
+.np-steps li::before { content: ""; position: absolute; left: -16px; top: 18px; bottom: 18px; width: 2px; background: var(--np-coral, #A8452A); transform: scaleY(0); transition: transform .6s ease; }
+.np-steps li[data-on="1"]::before { transform: scaleY(1); }
+.np-steps li[data-on="0"] { transform: translateX(-4px); }
+.np-steps li .np-step-n { color: var(--np-gold-text, #735829); transition: color .6s ease; }
+.np-steps li[data-on="1"] .np-step-n { color: var(--np-coral, #A8452A); }
+html.np-motion { scroll-behavior: auto; }
+@media (prefers-reduced-motion: reduce) { .np-scroll-line::after { animation: none; } }

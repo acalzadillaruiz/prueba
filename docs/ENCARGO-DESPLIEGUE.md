@@ -97,6 +97,13 @@ Entregar al dueño: captura de cada punto y el registro de compilación si algo 
 | La web arranca pero da error 500 | Falta una variable | Revisar que estén las 8 variables; guardar redespliega. |
 | El dominio no carga | DNS aún propagando | Esperar; comprobar que los nameservers en GoDaddy son los de Hostinger. |
 
-## 6. Después (no forma parte de este encargo)
+## 6. Actualizar a una versión con datos de ejemplo nuevos (vista previa)
+Al redesplegar, la base **no se toca** (solo se aplican migraciones). Si una versión trae datos de ejemplo nuevos
+(zonas, inmuebles, guardias) y se quieren ver en la vista previa:
+1. Añadir la variable `RESEED_DEMO` = `1` y redesplegar. **Borra la base y recarga los datos de ejemplo.**
+   Solo funciona mientras `DEMO_AUTH=true`; con datos reales se ignora.
+2. Al terminar, **borrar `RESEED_DEMO`** (si se queda, cada redespliegue volvería a borrar la base).
+
+## 7. Después (no forma parte de este encargo)
 - Día del lanzamiento: borrar `SITE_ACCESS_CODE`, `DEMO_AUTH` y `NEXT_PUBLIC_DEMO_AUTH` y redesplegar.
 - La paleta definitiva (A, B o C) se aplicará con un nuevo push a la misma rama; Hostinger redespliega solo.

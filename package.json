@@ -10,7 +10,7 @@
     "dev": "npm run dev -w apps/web",
     "build": "npm run build -w apps/web",
     "start": "npm run start -w apps/web",
-    "build:host": "npm run generate -w packages/db && npm run db:setup && npm run build -w apps/web",
+    "build:host": "npm run generate -w packages/db && npm run db:setup && LOW_MEMORY_BUILD=1 NODE_OPTIONS=--max-old-space-size=1024 npm run build -w apps/web",
     "test": "npm run test --workspaces --if-present",
     "shots": "node scripts/capture.mjs",
     "db:up": "bash scripts/db-local.sh",

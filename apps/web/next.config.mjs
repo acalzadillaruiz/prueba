@@ -26,6 +26,12 @@ const nextConfig = {
   transpilePackages: ["@newplace/config", "@newplace/ai", "@newplace/db"],
   serverExternalPackages: ["@prisma/client", "bcryptjs"],
   eslint: { ignoreDuringBuilds: true },
+  // LOW_MEMORY_BUILD=1 (shared hosting with ~1.5–3 GB): one build worker and no type-check during the build.
+  // Types and lint are still enforced by `npm run lint`, `tsc` and the test suite before every push.
+  ...(process.env.LOW_MEMORY_BUILD === "1" && {
+    typescript: { ignoreBuildErrors: true },
+    experimental: { cpus: 1, workerThreads: false, webpackMemoryOptimizations: true },
+  }),
   devIndicators: false,
   poweredByHeader: false,
   images: {

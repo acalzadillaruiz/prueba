@@ -14,6 +14,8 @@ Todo es gratis en los planes básicos. Tiempo: unos 10 minutos. No hace falta in
 | `AUTH_TRUST_HOST` | `true` |
 | `DEMO_AUTH` | `true` solo para la demo: permite «Entrar como…» con las 8 cuentas de ejemplo (nunca con usuarios reales). **Bórralo antes de abrir la app al público.** |
 | `NEXT_PUBLIC_DEMO_AUTH` | `true` (igual que el anterior) |
+| `SITE_ACCESS_CODE` | el código de acceso de la vista previa (6 cifras). Mientras exista, toda la web pide ese código antes de entrar. **Bórrala (y pulsa Redeploy) el día del lanzamiento.** |
+| `APP_URL` y `NEXT_PUBLIC_APP_URL` | `https://newplace.site` en cuanto el dominio esté conectado (enlaces, SEO y correos). |
 
 5. Pulsa **Deploy**. El primer intento fallará porque aún no hay base de datos: es normal.
 
@@ -26,6 +28,20 @@ Lo normal es fusionar la rama de trabajo en `main` y dejar `main` como rama de p
 
 ## 4. Desplegar
 **Deployments → … → Redeploy**. En el build se aplican las migraciones versionadas (`prisma migrate deploy`) y, si la base está vacía, se cargan los datos de ejemplo de Venezuela (48 inmuebles, 3 agencias, 16 usuarios). Los despliegues siguientes **no** borran nada: solo aplican migraciones nuevas.
+
+## 5. Dominio propio: newplace.site (comprado en Hostinger)
+El dominio se queda en Hostinger; solo se apunta a Vercel.
+1. En Vercel → proyecto → **Settings → Domains** → añade `newplace.site` y también `www.newplace.site` (elige que `www` redirija a `newplace.site`).
+2. Vercel muestra los registros que hay que crear. Normalmente son:
+
+| Tipo | Nombre | Valor |
+|---|---|---|
+| A | `@` | `76.76.21.21` |
+| CNAME | `www` | `cname.vercel-dns.com` |
+
+3. En Hostinger → **hPanel → Dominios → newplace.site → DNS / Nameservers → Registros DNS**: borra los registros `A` de `@` y el `CNAME` de `www` que vengan por defecto (apuntan a la página de "dominio aparcado") y crea los dos de la tabla. Usa exactamente los valores que te muestre Vercel si son distintos.
+4. Espera de unos minutos a unas horas. Cuando Vercel marque el dominio como **Valid Configuration**, crea el certificado HTTPS solo.
+5. Cambia `APP_URL` y `NEXT_PUBLIC_APP_URL` a `https://newplace.site` y pulsa **Redeploy**.
 
 ## Enlaces (sustituye `TU-APP` por el dominio que te da Vercel)
 Contraseña de todos los usuarios de ejemplo: `NewPlace!2026`.

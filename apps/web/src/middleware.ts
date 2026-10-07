@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import createIntlMiddleware from "next-intl/middleware";
 import { authConfig } from "./auth.config";
 import { routing } from "./i18n/routing";
+import { GATE_COOKIE, gateCode, gateToken } from "./lib/site-gate";
 
 const intl = createIntlMiddleware(routing);
 
@@ -10,8 +11,16 @@ const { auth } = NextAuth(authConfig);
 
 const AGENCY_ROLES = ["AGENCY_OWNER", "AGENT", "CAPTOR", "PHOTOGRAPHER", "BACKOFFICE", "SUPERADMIN"];
 
-export default auth((req) => {
+export default auth(async (req) => {
   const { pathname, search } = req.nextUrl;
+  // Pre-launch gate (SITE_ACCESS_CODE): every page asks for the access code until the cookie is set.
+  if (gateCode() && !/^\/(es|en)\/acceso\/?$/.test(pathname) && req.cookies.get(GATE_COOKIE)?.value !== (await gateToken())) {
+    const gate = new URL(`/${pathname.match(/^\/(en)(\/|$)/) ? "en" : "es"}/acceso`, req.url);
+    gate.searchParams.set("next", pathname + search);
+    const res = NextResponse.redirect(gate);
+    res.headers.set("X-Robots-Tag", "noindex");
+    return res;
+  }
   const m = pathname.match(/^\/(es|en)\/(agency|platform|owner|app|account|saved|alerts|preview)(\/|$)/);
   // locale detection / prefixing (Accept-Language + NEXT_LOCALE cookie)
   if (!m) return intl(req);

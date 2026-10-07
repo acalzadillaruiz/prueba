@@ -1,5 +1,11 @@
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import withSerwistInit from "@serwist/next";
 import createNextIntlPlugin from "next-intl/plugin";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+// Monorepo root (npm workspaces): standalone tracing must see the hoisted node_modules and packages/*.
+const monorepoRoot = path.join(__dirname, "../../");
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
@@ -23,6 +29,13 @@ const withSerwist = withSerwistInit({
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   distDir: process.env.NEXT_DIST || ".next",
+  // Self-contained server in .next/standalone (Hostinger's Node.js Web App requires it; see scripts/standalone-postbuild.mjs).
+  output: "standalone",
+  outputFileTracingRoot: monorepoRoot,
+  // Prisma's generated client + query engine live in the hoisted node_modules/.prisma: make sure they ship.
+  outputFileTracingIncludes: {
+    "/**/*": ["../../node_modules/.prisma/client/**/*", "../../node_modules/@prisma/client/**/*"],
+  },
   transpilePackages: ["@newplace/config", "@newplace/ai", "@newplace/db"],
   serverExternalPackages: ["@prisma/client", "bcryptjs"],
   eslint: { ignoreDuringBuilds: true },

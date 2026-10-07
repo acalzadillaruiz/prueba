@@ -1,6 +1,9 @@
 // New Place v1 — data model (brief §8). PostgreSQL 16.
 generator client {
   provider = "prisma-client-js"
+  // native = the machine that runs `prisma generate` (Hostinger builds on the server itself); the others cover
+  // common Linux hosts in case the build and the runtime ever differ.
+  binaryTargets = ["native", "debian-openssl-3.0.x", "rhel-openssl-3.0.x"]
 }
 
 datasource db {

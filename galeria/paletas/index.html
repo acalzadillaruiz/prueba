@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>New Place · Paletas tierra</title>
+<meta property="og:title" content="New Place · Tres paletas en tonos tierra">
+<meta property="og:description" content="Tres propuestas de color y tipografía aplicadas a la web, el logotipo y las fichas.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600&family=Cinzel:wght@500&family=Gilda+Display&family=Hanken+Grotesk:wght@400;500;600&family=Jost:wght@400;500;600&family=Marcellus&family=Prata&family=Instrument+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: neutral presentation chrome; each proposal is a full-width band rendered in its own palette (fixed on purpose: the colours are the content). */
+:root{
+  --page:#F4F2EF; --panel:#FFFFFF; --text:#26221F; --soft:#5F5852; --line:#DEDAD4; --chip:#ECE8E2;
+  --ui:"Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --logo:Cinzel,Georgia,serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--page:#181614;--panel:#211E1B;--text:#EDE8E1;--soft:#ADA59C;--line:#36312C;--chip:#2A2622;color-scheme:dark}}
+:root[data-theme="dark"]{--page:#181614;--panel:#211E1B;--text:#EDE8E1;--soft:#ADA59C;--line:#36312C;--chip:#2A2622;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--page);color:var(--text);font:16px/1.6 var(--ui);margin:0;font-variant-numeric:lining-nums}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:16px}
+a{color:inherit}
+:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+
+/* Intro */
+.intro{padding-block:56px 40px;display:grid;gap:18px}
+.kicker{font:600 12px var(--ui);letter-spacing:.16em;text-transform:uppercase;color:var(--soft);margin:0}
+.intro h1{font:400 clamp(40px,6.4vw,72px)/1.02 Prata,Georgia,serif;margin:0;text-wrap:balance;max-width:16ch}
+.intro p{margin:0;max-width:66ch;color:var(--soft)}
+.picker{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:12px;margin-top:10px}
+.pick{display:grid;gap:10px;padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--panel);text-decoration:none}
+.pick:hover{border-color:var(--soft)}
+.pick b{font-weight:600}
+.pick span{color:var(--soft);font-size:14px}
+.minibar{display:flex;height:34px;border-radius:8px;overflow:hidden}
+.minibar i{display:block}
+
+/* Proposal band */
+.prop{--fd:Georgia,serif;--fb:system-ui,sans-serif;background:var(--bg);color:var(--ink);padding-block:64px;font-family:var(--fb)}
+.prop .wrap{display:grid;gap:44px}
+.p-head{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 22px;align-items:end}
+.p-letter{grid-row:span 2;font:400 clamp(72px,12vw,140px)/.8 var(--fd);color:var(--act)}
+.p-tag{font:600 12px var(--fb);letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin:0}
+.p-name{font:400 clamp(36px,5.6vw,64px)/1 var(--fd);margin:0;text-wrap:balance}
+.p-concept{grid-column:1/-1;margin:6px 0 0;max-width:68ch;font-size:17px;color:var(--muted)}
+.label{font:600 11px var(--fb);letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin:0 0 12px}
+
+/* Palette */
+.bar{display:flex;height:120px;border-radius:14px;overflow:hidden;box-shadow:0 0 0 1px var(--hair)}
+.bar div{display:flex;align-items:flex-end;padding:10px;font:600 12px var(--fb);min-width:0}
+.sw{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:12px;margin-top:14px}
+.sw div{display:grid;grid-template-columns:28px minmax(0,1fr);gap:2px 10px;align-items:start}
+.sw i{grid-row:span 3;width:28px;height:28px;border-radius:50%;box-shadow:0 0 0 1px var(--hair)}
+.sw b{font-weight:600;font-size:15px}
+.sw code{font:500 13px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--muted)}
+.sw span{font-size:13px;color:var(--muted);line-height:1.4}
+
+/* Type */
+.type{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:32px;align-items:start}
+@media (max-width:820px){.type{grid-template-columns:1fr}}
+.spec-big{font:400 clamp(40px,6vw,76px)/1.02 var(--fd);margin:0;text-wrap:balance}
+.spec-big em{font-style:normal;color:var(--act)}
+.spec-body{display:grid;gap:12px}
+.spec-body p{margin:0;font-size:17px;line-height:1.65;max-width:52ch}
+.font-meta{display:grid;gap:4px;padding-top:12px;border-top:1px solid var(--hair);font-size:14px;color:var(--muted)}
+.font-meta b{color:var(--ink);font-weight:600}
+.aa{font:400 64px/1 var(--fd)}
+
+/* Website mock */
+.mock{border-radius:16px;overflow:hidden;background:var(--bg);box-shadow:0 30px 70px rgba(20,14,10,.22),0 0 0 1px var(--hair)}
+.chrome{display:flex;gap:6px;padding:10px 14px;background:var(--dark)}
+.chrome i{width:10px;height:10px;border-radius:50%;background:var(--onDark);opacity:.35}
+.m-hero{position:relative;min-height:440px;display:flex;flex-direction:column;justify-content:space-between;color:#fff;background:var(--dark) center/cover no-repeat}
+.m-hero::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,color-mix(in srgb,var(--dark) 70%,transparent) 0%,color-mix(in srgb,var(--dark) 10%,transparent) 40%,color-mix(in srgb,var(--dark) 88%,transparent) 100%)}
+.m-hero>*{position:relative}
+.m-nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 24px;flex-wrap:wrap}
+.m-logo{display:flex;align-items:center;gap:10px;font:500 15px var(--logo);letter-spacing:.22em;color:var(--onDark)}
+.m-logo svg{width:44px;height:15px}
+.m-links{display:flex;gap:18px;font-size:13px;color:var(--onDark);opacity:.9;flex-wrap:wrap}
+.m-copy{padding:0 24px 26px;display:grid;gap:12px;max-width:720px}
+.m-eyebrow{font:600 11px var(--fb);letter-spacing:.2em;text-transform:uppercase;color:var(--accOnDark)}
+.m-title{font:400 clamp(30px,4.4vw,52px)/1.04 var(--fd);margin:0;color:var(--onDark);text-wrap:balance}
+.m-search{display:flex;align-items:center;gap:8px;background:var(--bg);color:var(--ink);border-radius:999px;padding:6px 6px 6px 18px;max-width:560px;font-size:13px;flex-wrap:wrap}
+.m-search span{flex:1;min-width:120px;color:var(--muted)}
+.m-search .btn{flex:0 0 auto;min-width:0;color:#fff}
+.btn{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:10px 20px;font:600 13px var(--fb);background:var(--act);color:#fff;border:0}
+.btn.light{background:var(--onDark);color:var(--ink)}
+.btn.ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--ink)}
+.m-body{padding:28px 24px;display:grid;gap:18px;background:var(--bg)}
+.m-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+@media (max-width:720px){.m-row{grid-template-columns:1fr}}
+.card{display:grid;gap:6px;min-width:0}
+.card .ph{aspect-ratio:4/5;border-radius:999px 999px 10px 10px;background:var(--sec) center/cover;position:relative;overflow:hidden;max-width:100%}
+.card .ph b{position:absolute;left:50%;top:14%;transform:translateX(-50%);background:var(--bg);color:var(--ink);font:600 10px var(--fb);letter-spacing:.16em;text-transform:uppercase;padding:4px 10px;border-radius:999px;white-space:nowrap}
+.card h4{font:400 20px/1.15 var(--fd);margin:4px 0 0}
+.card small{color:var(--muted);font-size:12.5px}
+.card .price{font:600 14px var(--fb)}
+.m-sec{background:var(--sec);border-radius:12px;padding:18px;display:grid;gap:10px;align-content:center}
+.m-sec h4{font:400 22px/1.15 var(--fd);margin:0}
+.m-sec p{margin:0;font-size:13px;color:var(--secText)}
+.m-dark{background:var(--dark);color:var(--onDark);display:grid;grid-template-columns:minmax(0,1fr) 200px;gap:20px;align-items:center;padding:26px 24px}
+@media (max-width:620px){.m-dark{grid-template-columns:1fr}}
+.m-dark h4{font:400 30px/1.05 var(--fd);margin:6px 0 8px}
+.m-dark p{margin:0;font-size:13px;opacity:.85;max-width:44ch}
+.m-dark .m-eyebrow{color:var(--accOnDark)}
+.m-dark svg{width:100%;height:auto;max-width:200px}
+
+/* Logos + checks */
+.logos{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:12px}
+.lg{border-radius:14px;min-height:170px;display:grid;place-items:center;gap:8px;padding:20px;box-shadow:0 0 0 1px var(--hair)}
+.lg .stack{display:grid;justify-items:center;gap:8px}
+.lg svg{width:120px;height:42px}
+.lg .wm{font:500 22px var(--logo);letter-spacing:.24em;padding-left:.24em}
+.lg .sub{font:600 10px var(--fb);letter-spacing:.34em;text-transform:uppercase;padding-left:.34em;opacity:.75}
+.checks{display:flex;flex-wrap:wrap;gap:8px}
+.checks span{font-size:13px;padding:6px 12px;border-radius:999px;box-shadow:inset 0 0 0 1px var(--hair);font-variant-numeric:tabular-nums}
+.duo{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px}
+@media (max-width:820px){.duo{grid-template-columns:1fr}}
+
+/* Committee */
+.score{display:grid;gap:8px}
+.score table{border-collapse:collapse;width:100%;font-size:14px}
+.score td,.score th{padding:8px 10px;border-bottom:1px solid var(--hair);text-align:left}
+.score th{font:600 11px var(--fb);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.score td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.score .avg td{font-weight:600}
+.quote{margin:0;font-size:15px;color:var(--muted);max-width:70ch}
+
+/* Proposal palettes (content colours) */
+#a{--bg:#F1EBE3;--sec:#D9C6AB;--ink:#1E1A18;--dark:#1E1A18;--act:#8E3B22;--acc:#B08A55;--onDark:#F1EBE3;--accOnDark:#C9A574;--muted:#665A50;--secText:#4F443B;--hair:rgba(30,26,24,.14);--fd:Prata,Georgia,serif;--fb:Jost,system-ui,sans-serif}
+#b{--bg:#EFEAE2;--sec:#CFC4B4;--ink:#24201C;--dark:#24201C;--act:#9A6238;--acc:#B8862F;--onDark:#EFEAE2;--accOnDark:#C8946A;--muted:#665C52;--secText:#4A3326;--hair:rgba(36,32,28,.14);--fd:"Gilda Display",Georgia,serif;--fb:"Hanken Grotesk",system-ui,sans-serif}
+#c{--bg:#F2EEE3;--sec:#DDD2BC;--ink:#2A241F;--dark:#3F4A33;--act:#7B4A30;--acc:#B8862F;--onDark:#F2EEE3;--accOnDark:#D8B26A;--muted:#5E5A4E;--secText:#2A241F;--hair:rgba(42,36,31,.14);--fd:Marcellus,Georgia,serif;--fb:"Albert Sans",system-ui,sans-serif}
+#a .m-hero{background-image:url(img/a-hero.jpg)} #b .m-hero{background-image:url(img/b-hero.jpg)} #c .m-hero{background-image:url(img/c-hero.jpg)}
+
+/* Comparison + next */
+.compare{padding-block:64px;display:grid;gap:24px}
+.compare h2,.next h2{font:400 clamp(30px,4vw,44px)/1.05 Prata,Georgia,serif;margin:0;text-wrap:balance}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--panel)}
+.tbl table{border-collapse:collapse;width:100%;min-width:640px;font-size:15px}
+.tbl th,.tbl td{padding:12px 14px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.tbl th{font:600 11px var(--ui);letter-spacing:.14em;text-transform:uppercase;color:var(--soft)}
+.tbl tr:last-child td{border-bottom:0}
+.tbl td.n{font-variant-numeric:tabular-nums;white-space:nowrap}
+.next{padding-block:8px 72px;display:grid;gap:14px}
+.next ol{margin:0;padding-left:22px;max-width:70ch;display:grid;gap:6px}
+.note{color:var(--soft);font-size:14px;max-width:72ch;margin:0}
+</style>
+</head>
+<body>
+
+<header class="wrap intro">
+  <p class="kicker">New Place Bienes Raíces · nueva dirección de color</p>
+  <h1>Tres caminos en tierra</h1>
+  <p>El cliente pidió colores tipo tierra. El equipo de marketing preparó tres propuestas de paleta y tipografía, cada una con un carácter distinto, y las sometió a dos rondas de un comité de cuatro expertos (lujo inmobiliario, dirección creativa, estrategia de marca y diseño digital). Cada propuesta se muestra aplicada a la portada de la web, al logotipo y a las tarjetas de inmueble. El tejado del logo se mantiene en todas.</p>
+  <nav class="picker" aria-label="Propuestas">
+    <a class="pick" href="#a"><b>A · Arcilla y Obsidiana</b><span>Contemporánea, contraste profundo</span><span class="minibar" aria-hidden="true"><i style="flex:55;background:#F1EBE3"></i><i style="flex:15;background:#D9C6AB"></i><i style="flex:22;background:#1E1A18"></i><i style="flex:5;background:#8E3B22"></i><i style="flex:3;background:#B08A55"></i></span></a>
+    <a class="pick" href="#b"><b>B · Piedra y Camel</b><span>Lujo silencioso, cuero y piedra</span><span class="minibar" aria-hidden="true"><i style="flex:55;background:#EFEAE2"></i><i style="flex:15;background:#CFC4B4"></i><i style="flex:20;background:#24201C"></i><i style="flex:4;background:#4A3326"></i><i style="flex:4;background:#9A6238"></i><i style="flex:2;background:#B8862F"></i></span></a>
+    <a class="pick" href="#c"><b>C · Musgo y Ocre</b><span>Lujo natural, tierra y vegetación</span><span class="minibar" aria-hidden="true"><i style="flex:55;background:#F2EEE3"></i><i style="flex:15;background:#DDD2BC"></i><i style="flex:15;background:#3F4A33"></i><i style="flex:8;background:#2A241F"></i><i style="flex:5;background:#7B4A30"></i><i style="flex:2;background:#B8862F"></i></span></a>
+  </nav>
+</header>
+
+<!-- ═════════ A ═════════ -->
+<section class="prop" id="a" aria-labelledby="a-name">
+  <div class="wrap">
+    <div class="p-head">
+      <div class="p-letter" aria-hidden="true">A</div>
+      <p class="p-tag">Propuesta A · contemporánea</p>
+      <h2 class="p-name" id="a-name">Arcilla y Obsidiana</h2>
+      <p class="p-concept">Barro cocido, lino y piedra volcánica. Una tierra oscura y segura de sí misma: fondos de lino, bandas en obsidiana cálida para el héroe, el edificio 3D y el pie, y un ladrillo profundo solo en la acción principal. Se aleja del beige con terracota de las redes por su contraste.</p>
+    </div>
+
+    <div>
+      <p class="label">Paleta y proporción de uso</p>
+      <div class="bar" role="img" aria-label="Proporciones: Lino 55 %, Arena tostada 15 %, Obsidiana 22 %, Arcilla quemada 5 %, Bronce 3 %">
+        <div style="flex:55;background:#F1EBE3;color:#1E1A18">55 %</div><div style="flex:15;background:#D9C6AB;color:#1E1A18">15 %</div><div style="flex:22;background:#1E1A18;color:#F1EBE3">22 %</div><div style="flex:5;background:#8E3B22;color:#fff">5</div><div style="flex:3;background:#B08A55"></div>
+      </div>
+      <div class="sw">
+        <div><i style="background:#F1EBE3"></i><b>Lino</b><code>#F1EBE3</code><span>Fondo de página</span></div>
+        <div><i style="background:#D9C6AB"></i><b>Arena tostada</b><code>#D9C6AB</code><span>Secciones y etiquetas</span></div>
+        <div><i style="background:#1E1A18"></i><b>Obsidiana</b><code>#1E1A18</code><span>Texto y bandas oscuras</span></div>
+        <div><i style="background:#8E3B22"></i><b>Arcilla quemada</b><code>#8E3B22</code><span>Una sola acción por pantalla</span></div>
+        <div><i style="background:#B08A55"></i><b>Bronce</b><code>#B08A55</code><span>Filetes, teja del logo, texto solo sobre obsidiana</span></div>
+      </div>
+      <p class="quote" style="margin-top:14px">Reglas: sobre Obsidiana el botón principal va en Lino con texto Obsidiana; la Arcilla solo sobre fondos claros. Prata solo en titulares de 32 px o más; antetítulos y precios en Jost.</p>
+    </div>
+
+    <div class="type">
+      <div>
+        <p class="label">Tipografía</p>
+        <p class="spec-big">Pocas propiedades. <em>Todas extraordinarias.</em></p>
+      </div>
+      <div class="spec-body">
+        <p>Residencias seleccionadas en Lechería, El Morro, Margarita y Caracas, valoradas con datos reales y presentadas en privado por asesores verificados.</p>
+        <div class="font-meta"><span><b>Títulos · Prata</b> didona robusta, pensada para pantalla</span><span><b>Texto · Jost</b> geométrica, limpia y moderna</span><span><b>Logotipo · Cinzel</b> se mantiene</span></div>
+        <div class="aa" aria-hidden="true">Aa 1.450.000</div>
+      </div>
+    </div>
+
+    <div>
+      <p class="label">Así se vería la portada</p>
+      <div class="mock">
+        <div class="chrome" aria-hidden="true"><i></i><i></i><i></i></div>
+        <div class="m-hero" role="img" aria-label="Portada de ejemplo con la propuesta A: patio con arcos y piscina">
+          <div class="m-nav"><span class="m-logo"><svg viewBox="0 0 120 42" aria-hidden="true"><path d="M6 37 60 7l54 30" fill="none" stroke="#F1EBE3" stroke-width="6"/><path d="M30 38 60 21.5 90 38" fill="none" stroke="#B08A55" stroke-width="5"/></svg>NEW PLACE</span><span class="m-links"><span>Comprar</span><span>Alquilar</span><span>Colección Privada</span><span>Compra a distancia</span></span></div>
+          <div class="m-copy">
+            <span class="m-eyebrow">El Caribe, en tierra firme</span>
+            <p class="m-title">Pocas propiedades. Todas extraordinarias.</p>
+            <div class="m-search"><span>Lechería, El Morro, Margarita…</span><span class="btn">Buscar</span></div>
+          </div>
+        </div>
+        <div class="m-body">
+          <div class="m-row">
+            <div class="card"><div class="ph" style="background-image:url(img/a-1.jpg)"><b>Colección Privada</b></div><h4>Villa con portal en arco</h4><small>El Morro · 5 hab. · 620 m²</small><span class="price">USD 1.450.000</span></div>
+            <div class="card"><div class="ph" style="background-image:url(img/a-2.jpg)"></div><h4>Salón con vistas al mar</h4><small>Lechería · 4 hab. · 380 m²</small><span class="price">USD 890.000</span></div>
+            <div class="m-sec"><span class="m-eyebrow" style="color:var(--muted)">Propietarios</span><h4>Venda en privado.</h4><p>Valoración con comparables reales y visitas solo con compradores verificados.</p><span><span class="btn ghost">Valorar mi propiedad</span></span></div>
+          </div>
+        </div>
+        <div class="m-dark">
+          <div><span class="m-eyebrow">04 · Su planta</span><h4>Su residencia le espera.</h4><p>Las plantas iluminadas son residencias disponibles hoy.</p><p style="margin-top:14px"><span class="btn light">Ver residencias</span></p></div>
+          <svg viewBox="0 0 200 190" aria-hidden="true"><path d="M30 64 100 22l70 42" fill="none" stroke="#F1EBE3" stroke-width="7"/><path d="M58 66 100 44l42 22" fill="none" stroke="#B08A55" stroke-width="6"/><g fill="#3A322D"><rect x="50" y="70" width="100" height="12"/><rect x="50" y="86" width="100" height="12"/><rect x="50" y="102" width="100" height="12"/><rect x="50" y="118" width="100" height="12"/><rect x="50" y="134" width="100" height="12"/><rect x="50" y="150" width="100" height="12"/></g><rect x="50" y="86" width="100" height="12" fill="#B08A55"/><rect x="50" y="134" width="100" height="12" fill="#B08A55"/><rect x="40" y="166" width="120" height="10" fill="#D9C6AB"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="duo">
+      <div>
+        <p class="label">Logotipo</p>
+        <div class="logos">
+          <div class="lg" style="background:#F1EBE3;color:#1E1A18"><div class="stack"><svg viewBox="0 0 120 42" aria-hidden="true"><path d="M4 37 60 6l56 31" fill="none" stroke="#1E1A18" stroke-width="3.4"/><path d="M24 37 60 17 96 37" fill="none" stroke="#8E3B22" stroke-width="2.4"/></svg><span class="wm">NEW PLACE</span><span class="sub">Bienes raíces</span></div></div>
+          <div class="lg" style="background:#1E1A18;color:#F1EBE3"><div class="stack"><svg viewBox="0 0 120 42" aria-hidden="true"><path d="M4 37 60 6l56 31" fill="none" stroke="#F1EBE3" stroke-width="3.4"/><path d="M24 37 60 17 96 37" fill="none" stroke="#B08A55" stroke-width="2.4"/></svg><span class="wm">NEW PLACE</span><span class="sub" style="color:#C9A574">Bienes raíces</span></div></div>
+        </div>
+      </div>
+      <div class="score">
+        <p class="label">Comité de expertos</p>
+        <table><thead><tr><th>Experto</th><th style="text-align:right">Ronda 1</th><th style="text-align:right">Ronda 2</th></tr></thead><tbody data-score="a"></tbody></table>
+        <p class="quote" data-quote="a"></p>
+        <div class="checks"><span>Blanco sobre Arcilla 7,5:1</span><span>Obsidiana sobre Lino 14,6:1</span><span>Bronce sobre Obsidiana 5,4:1</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════ B ═════════ -->
+<section class="prop" id="b" aria-labelledby="b-name">
+  <div class="wrap">
+    <div class="p-head">
+      <div class="p-letter" aria-hidden="true">B</div>
+      <p class="p-tag">Propuesta B · lujo silencioso</p>
+      <h2 class="p-name" id="b-name">Piedra y Camel</h2>
+      <p class="p-concept">Cuero, piedra caliza y madera tostada. El lenguaje del lujo discreto de las grandes casas europeas: tonos hueso y piedra, carbón cálido para el contraste, camel cobrizo en la acción y un hilo de ocre en los filetes y la teja del logo.</p>
+    </div>
+
+    <div>
+      <p class="label">Paleta y proporción de uso</p>
+      <div class="bar" role="img" aria-label="Proporciones: Hueso 55 %, Piedra 15 %, Carbón cálido 20 %, Tabaco 4 %, Camel cobrizo 4 %, Ocre 2 %">
+        <div style="flex:55;background:#EFEAE2;color:#24201C">55 %</div><div style="flex:15;background:#CFC4B4;color:#24201C">15 %</div><div style="flex:20;background:#24201C;color:#EFEAE2">20 %</div><div style="flex:4;background:#4A3326"></div><div style="flex:4;background:#9A6238"></div><div style="flex:2;background:#B8862F"></div>
+      </div>
+      <div class="sw">
+        <div><i style="background:#EFEAE2"></i><b>Hueso</b><code>#EFEAE2</code><span>Fondo de página</span></div>
+        <div><i style="background:#CFC4B4"></i><b>Piedra</b><code>#CFC4B4</code><span>Secciones y etiquetas</span></div>
+        <div><i style="background:#24201C"></i><b>Carbón cálido</b><code>#24201C</code><span>Texto y bandas oscuras</span></div>
+        <div><i style="background:#4A3326"></i><b>Tabaco</b><code>#4A3326</code><span>Secundario, titulares de sección</span></div>
+        <div><i style="background:#9A6238"></i><b>Camel cobrizo</b><code>#9A6238</code><span>Una sola acción por pantalla</span></div>
+        <div><i style="background:#B8862F"></i><b>Ocre</b><code>#B8862F</code><span>Solo filetes y teja del logo</span></div>
+      </div>
+      <p class="quote" style="margin-top:14px">Reglas: el Camel nunca como texto (ni enlaces) sobre Hueso o Piedra; los enlaces van en Tabaco. Sobre Carbón el botón principal va en Hueso con texto Carbón.</p>
+    </div>
+
+    <div class="type">
+      <div>
+        <p class="label">Tipografía</p>
+        <p class="spec-big">Pocas propiedades. <em>Todas extraordinarias.</em></p>
+      </div>
+      <div class="spec-body">
+        <p>Residencias seleccionadas en Lechería, El Morro, Margarita y Caracas, valoradas con datos reales y presentadas en privado por asesores verificados.</p>
+        <div class="font-meta"><span><b>Títulos · Gilda Display</b> didona de trazo moderado, editorial</span><span><b>Texto · Hanken Grotesk</b> grotesca sobria, muy legible</span><span><b>Logotipo · Cinzel</b> se mantiene</span></div>
+        <div class="aa" aria-hidden="true">Aa 1.450.000</div>
+      </div>
+    </div>
+
+    <div>
+      <p class="label">Así se vería la portada</p>
+      <div class="mock">
+        <div class="chrome" aria-hidden="true"><i></i><i></i><i></i></div>
+        <div class="m-hero" role="img" aria-label="Portada de ejemplo con la propuesta B: terraza al atardecer">
+          <div class="m-nav"><span class="m-logo"><svg viewBox="0 0 120 42" aria-hidden="true"><path d="M6 37 60 7l54 30" fill="none" stroke="#EFEAE2" stroke-width="6"/><path d="M30 38 60 21.5 90 38" fill="none" stroke="#B8862F" stroke-width="5"/></svg>NEW PLACE</span><span class="m-links"><span>Comprar</span><span>Alquilar</span><span>Colección Privada</span><span>Compra a distancia</span></span></div>
+          <div class="m-copy">
+            <span class="m-eyebrow">Residencias de autor en el Caribe</span>
+            <p class="m-title">Pocas propiedades. Todas extraordinarias.</p>
+            <div class="m-search"><span>Lechería, El Morro, Margarita…</span><span class="btn">Buscar</span></div>
+          </div>
+        </div>
+        <div class="m-body">
+          <div class="m-row">
+            <div class="card"><div class="ph" style="background-image:url(img/b-1.jpg)"><b>Colección Privada</b></div><h4>Villa con piscina frente al golf</h4><small>Country Club · 6 hab. · 1.100 m²</small><span class="price">USD 2.300.000</span></div>
+            <div class="card"><div class="ph" style="background-image:url(img/b-2.jpg)"></div><h4>Estudio con ventanal en arco</h4><small>Altamira · 3 hab. · 210 m²</small><span class="price">USD 480.000</span></div>
+            <div class="m-sec"><span class="m-eyebrow" style="color:var(--secText)">Propietarios</span><h4>Venda en privado.</h4><p>Valoración con comparables reales y visitas solo con compradores verificados.</p><span><span class="btn ghost">Valorar mi propiedad</span></span></div>
+          </div>
+        </div>
+        <div class="m-dark">
+          <div><span class="m-eyebrow">04 · Su planta</span><h4>Su residencia le espera.</h4><p>Las plantas iluminadas son residencias disponibles hoy.</p><p style="margin-top:14px"><span class="btn light">Ver residencias</span></p></div>
+          <svg viewBox="0 0 200 190" aria-hidden="true"><path d="M30 64 100 22l70 42" fill="none" stroke="#EFEAE2" stroke-width="7"/><path d="M58 66 100 44l42 22" fill="none" stroke="#B8862F" stroke-width="6"/><g fill="#3B342E"><rect x="50" y="70" width="100" height="12"/><rect x="50" y="86" width="100" height="12"/><rect x="50" y="102" width="100" height="12"/><rect x="50" y="118" width="100" height="12"/><rect x="50" y="134" width="100" height="12"/><rect x="50" y="150" width="100" height="12"/></g><rect x="50" y="86" width="100" height="12" fill="#C8946A"/><rect x="50" y="134" width="100" height="12" fill="#C8946A"/><rect x="40" y="166" width="120" height="10" fill="#CFC4B4"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="duo">
+      <div>
+        <p class="label">Logotipo</p>
+        <div class="logos">
+          <div class="lg" style="background:#EFEAE2;color:#24201C"><div class="stack"><svg viewBox="0 0 120 42" aria-hidden="true"><path d="M4 37 60 6l56 31" fill="none" stroke="#24201C" stroke-width="3.4"/><path d="M24 37 60 17 96 37" fill="none" stroke="#9A6238" stroke-width="2.4"/></svg><span class="wm">NEW PLACE</span><span class="sub">Bienes raíces</span></div></div>
+          <div class="lg" style="background:#24201C;color:#EFEAE2"><div class="stack"><svg viewBox="0 0 120 42" aria-hidden="true"><path d="M4 37 60 6l56 31" fill="none" stroke="#EFEAE2" stroke-width="3.4"/><path d="M24 37 60 17 96 37" fill="none" stroke="#B8862F" stroke-width="2.4"/></svg><span class="wm">NEW PLACE</span><span class="sub" style="color:#C8946A">Bienes raíces</span></div></div>
+        </div>
+      </div>
+      <div class="score">
+        <p class="label">Comité de expertos</p>
+        <table><thead><tr><th>Experto</th><th style="text-align:right">Ronda 1</th><th style="text-align:right">Ronda 2</th></tr></thead><tbody data-score="b"></tbody></table>
+        <p class="quote" data-quote="b"></p>
+        <div class="checks"><span>Blanco sobre Camel 5,0:1</span><span>Carbón sobre Hueso 13,5:1</span><span>Tabaco sobre Hueso 9,8:1</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════ C ═════════ -->
+<section class="prop" id="c" aria-labelledby="c-name">
+  <div class="wrap">
+    <div class="p-head">
+      <div class="p-letter" aria-hidden="true">C</div>
+      <p class="p-tag">Propuesta C · lujo natural</p>
+      <h2 class="p-name" id="c-name">Musgo y Ocre</h2>
+      <p class="p-concept">Hacienda, piedra y vegetación tropical. Crema y pergamino de fondo, musgo profundo solo en las bandas oscuras, barro en la acción y ocre dorado en los filetes. Es la tierra de El Morro y Margarita, con fotografía siempre cálida para que no parezca un hotel ecológico.</p>
+    </div>
+
+    <div>
+      <p class="label">Paleta y proporción de uso</p>
+      <div class="bar" role="img" aria-label="Proporciones: Crema 55 %, Pergamino 15 %, Musgo 15 %, Espresso 8 %, Barro 5 %, Ocre 2 %">
+        <div style="flex:55;background:#F2EEE3;color:#2A241F">55 %</div><div style="flex:15;background:#DDD2BC;color:#2A241F">15 %</div><div style="flex:15;background:#3F4A33;color:#F2EEE3">15 %</div><div style="flex:8;background:#2A241F"></div><div style="flex:5;background:#7B4A30"></div><div style="flex:2;background:#B8862F"></div>
+      </div>
+      <div class="sw">
+        <div><i style="background:#F2EEE3"></i><b>Crema</b><code>#F2EEE3</code><span>Fondo de página</span></div>
+        <div><i style="background:#DDD2BC"></i><b>Pergamino</b><code>#DDD2BC</code><span>Secciones y etiquetas</span></div>
+        <div><i style="background:#3F4A33"></i><b>Musgo</b><code>#3F4A33</code><span>Solo bandas oscuras</span></div>
+        <div><i style="background:#2A241F"></i><b>Espresso</b><code>#2A241F</code><span>Texto</span></div>
+        <div><i style="background:#7B4A30"></i><b>Barro</b><code>#7B4A30</code><span>Una sola acción por pantalla</span></div>
+        <div><i style="background:#B8862F"></i><b>Ocre</b><code>#B8862F</code><span>Solo filetes, nunca texto</span></div>
+      </div>
+      <p class="quote" style="margin-top:14px">Reglas: el Ocre nunca como texto; el Musgo solo en bandas oscuras y sobre él el botón va en Crema con texto Espresso. Fotografía siempre cálida.</p>
+    </div>
+
+    <div class="type">
+      <div>
+        <p class="label">Tipografía</p>
+        <p class="spec-big">Pocas propiedades. <em>Todas extraordinarias.</em></p>
+      </div>
+      <div class="spec-body">
+        <p>Residencias seleccionadas en Lechería, El Morro, Margarita y Caracas, valoradas con datos reales y presentadas en privado por asesores verificados.</p>
+        <div class="font-meta"><span><b>Títulos · Marcellus</b> capitulares romanas, de la misma familia que el logotipo</span><span><b>Texto · Albert Sans</b> sans refinada y cálida</span><span><b>Logotipo · Cinzel</b> se mantiene</span></div>
+        <div class="aa" aria-hidden="true">Aa 1.450.000</div>
+      </div>
+    </div>
+
+    <div>
+      <p class="label">Así se vería la portada</p>
+      <div class="mock">
+        <div class="chrome" aria-hidden="true"><i></i><i></i><i></i></div>
+        <div class="m-hero" role="img" aria-label="Portada de ejemplo con la propuesta C: patio de hacienda con arcos">
+          <div class="m-nav"><span class="m-logo"><svg viewBox="0 0 120 42" aria-hidden="true"><path d="M6 37 60 7l54 30" fill="none" stroke="#F2EEE3" stroke-width="6"/><path d="M30 38 60 21.5 90 38" fill="none" stroke="#D8B26A" stroke-width="5"/></svg>NEW PLACE</span><span class="m-links"><span>Comprar</span><span>Alquilar</span><span>Colección Privada</span><span>Compra a distancia</span></span></div>
+          <div class="m-copy">
+            <span class="m-eyebrow">Haciendas y residencias del oriente</span>
+            <p class="m-title">Pocas propiedades. Todas extraordinarias.</p>
+            <div class="m-search"><span>Lechería, El Morro, Margarita…</span><span class="btn">Buscar</span></div>
+          </div>
+        </div>
+        <div class="m-body">
+          <div class="m-row">
+            <div class="card"><div class="ph" style="background-image:url(img/c-1.jpg)"><b>Colección Privada</b></div><h4>Quinta clásica con jardines</h4><small>Lomas de San Román · 5 hab. · 700 m²</small><span class="price">USD 1.100.000</span></div>
+            <div class="card"><div class="ph" style="background-image:url(img/c-2.jpg)"></div><h4>Casa colonial restaurada</h4><small>Margarita · 4 hab. · 420 m²</small><span class="price">USD 650.000</span></div>
+            <div class="m-sec"><span class="m-eyebrow" style="color:var(--muted)">Propietarios</span><h4>Venda en privado.</h4><p>Valoración con comparables reales y visitas solo con compradores verificados.</p><span><span class="btn ghost">Valorar mi propiedad</span></span></div>
+          </div>
+        </div>
+        <div class="m-dark">
+          <div><span class="m-eyebrow">04 · Su planta</span><h4>Su residencia le espera.</h4><p>Las plantas iluminadas son residencias disponibles hoy.</p><p style="margin-top:14px"><span class="btn light">Ver residencias</span></p></div>
+          <svg viewBox="0 0 200 190" aria-hidden="true"><path d="M30 64 100 22l70 42" fill="none" stroke="#F2EEE3" stroke-width="7"/><path d="M58 66 100 44l42 22" fill="none" stroke="#B8862F" stroke-width="6"/><g fill="#56634A"><rect x="50" y="70" width="100" height="12"/><rect x="50" y="86" width="100" height="12"/><rect x="50" y="102" width="100" height="12"/><rect x="50" y="118" width="100" height="12"/><rect x="50" y="134" width="100" height="12"/><rect x="50" y="150" width="100" height="12"/></g><rect x="50" y="86" width="100" height="12" fill="#D8B26A"/><rect x="50" y="134" width="100" height="12" fill="#D8B26A"/><rect x="40" y="166" width="120" height="10" fill="#DDD2BC"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="duo">
+      <div>
+        <p class="label">Logotipo</p>
+        <div class="logos">
+          <div class="lg" style="background:#F2EEE3;color:#2A241F"><div class="stack"><svg viewBox="0 0 120 42" aria-hidden="true"><path d="M4 37 60 6l56 31" fill="none" stroke="#2A241F" stroke-width="3.4"/><path d="M24 37 60 17 96 37" fill="none" stroke="#7B4A30" stroke-width="2.4"/></svg><span class="wm">NEW PLACE</span><span class="sub">Bienes raíces</span></div></div>
+          <div class="lg" style="background:#3F4A33;color:#F2EEE3"><div class="stack"><svg viewBox="0 0 120 42" aria-hidden="true"><path d="M4 37 60 6l56 31" fill="none" stroke="#F2EEE3" stroke-width="3.4"/><path d="M24 37 60 17 96 37" fill="none" stroke="#D8B26A" stroke-width="2.4"/></svg><span class="wm">NEW PLACE</span><span class="sub" style="color:#DDD2BC">Bienes raíces</span></div></div>
+        </div>
+      </div>
+      <div class="score">
+        <p class="label">Comité de expertos</p>
+        <table><thead><tr><th>Experto</th><th style="text-align:right">Ronda 1</th><th style="text-align:right">Ronda 2</th></tr></thead><tbody data-score="c"></tbody></table>
+        <p class="quote" data-quote="c"></p>
+        <div class="checks"><span>Blanco sobre Barro 7,3:1</span><span>Espresso sobre Crema 13,2:1</span><span>Crema sobre Musgo 8,1:1</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="wrap compare" aria-labelledby="cmp">
+  <p class="kicker">Comparativa</p>
+  <h2 id="cmp">Qué transmite cada una</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Propuesta</th><th>Sensación</th><th>Mejor para</th><th>Riesgo</th><th>Comité (ronda 2)</th></tr></thead>
+    <tbody data-compare></tbody>
+  </table></div>
+  <p class="note" data-reco></p>
+</section>
+
+<section class="wrap next" aria-labelledby="nx">
+  <h2 id="nx">Siguiente paso</h2>
+  <ol>
+    <li>El cliente elige A, B o C (o pide mezclar algo de otra).</li>
+    <li>Aplicamos la elegida a toda la web: portada inmersiva, edificio 3D, buscador, fichas, panel de agencia, correos e icono de la app.</li>
+    <li>Entregamos capturas, vídeo y enlace actualizado para revisar.</li>
+  </ol>
+  <p class="note">Las fotos son ilustrativas, creadas con IA; en la web final se usarán las fotografías reales de cada propiedad.</p>
+</section>
+
+<script>
+// Committee scores (filled from the two review rounds).
+const S = {
+  a: { r: [["Marketing inmobiliario de lujo", 68, 84], ["Dirección creativa y color", 64, 85], ["Estrategia de marca", 60, 78], ["Diseño digital y accesibilidad", 80, 80]], q: "«Ya no se parece al beige con terracota de las redes: el ladrillo profundo sobre obsidiana se lee como arquitectura contemporánea y dinero. Es la que mejor enmarca el edificio 3D y las fotos en arco.»" },
+  b: { r: [["Marketing inmobiliario de lujo", 82, 80], ["Dirección creativa y color", 80, 74], ["Estrategia de marca", 74, 76], ["Diseño digital y accesibilidad", 72, 70]], q: "«El lujo silencioso más claro de las tres, pero con tres marrones y el ocre la paleta se enturbia, y le falta carácter local.»" },
+  c: { r: [["Marketing inmobiliario de lujo", 70, 74], ["Dirección creativa y color", 73, 70], ["Estrategia de marca", 78, 80], ["Diseño digital y accesibilidad", 70, 68]], q: "«El sistema tipográfico más coherente con el logotipo, pero el musgo puede leerse como hotel ecológico y depende mucho de la fotografía.»" },
+};
+const CMP = [
+  ["<b>A · Arcilla y Obsidiana</b>", "Contemporánea, segura, arquitectónica", "Torres y residencias modernas, diáspora en Madrid y Miami, la web inmersiva", "Que el lino sin suficiente obsidiana vuelva a parecer beige genérico", "82"],
+  ["<b>B · Piedra y Camel</b>", "Lujo discreto europeo, dinero de siempre", "Villas y casas de autor, compradores de alto patrimonio", "Fría y algo turbia; poco carácter caribeño", "75"],
+  ["<b>C · Musgo y Ocre</b>", "Natural, hacienda, oriente venezolano", "Quintas, haciendas, Margarita y El Morro", "Leerse como hotel ecológico si la foto no es cálida", "73"],
+];
+const RECO = "Recomendación del comité: A, Arcilla y Obsidiana (82). Es la única que cumple todo el encargo: tierra, contemporánea, distinta de la moda de las redes y la que más luce en una web inmersiva. Tras la ronda 2 ya se aplicaron sus dos ajustes finales (botón claro en las bandas oscuras y uso de Prata solo en titulares grandes) y el de C (sección Pergamino más marcada); esos ajustes no se volvieron a puntuar.";
+const avg = (a, i) => (a.reduce((s, r) => s + r[i], 0) / a.length).toFixed(1).replace(".", ",");
+for (const [k, v] of Object.entries(S)) {
+  const tb = document.querySelector(`[data-score="${k}"]`);
+  tb.innerHTML = v.r.map((r) => `<tr><td>${r[0]}</td><td class="n">${r[1]}</td><td class="n"><b>${r[2]}</b></td></tr>`).join("") + `<tr class="avg"><td>Media</td><td class="n">${avg(v.r, 1)}</td><td class="n">${avg(v.r, 2)}</td></tr>`;
+  document.querySelector(`[data-quote="${k}"]`).textContent = v.q;
+}
+document.querySelector("[data-compare]").innerHTML = CMP.map((r) => `<tr>${r.map((c, i) => `<td${i === 4 ? ' class="n"' : ""}>${c}</td>`).join("")}</tr>`).join("");
+document.querySelector("[data-reco]").textContent = RECO;
+</script>
+
+</body>
+</html>

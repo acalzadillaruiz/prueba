@@ -109,3 +109,65 @@ export const MODERATION_QUEUE = [
   { id: "mod-2", listingId: "blh349", title: "Local en Las Mercedes — precio sospechoso", reason: { es: "Precio no realista", en: "Unrealistic price" }, reporter: "Usuario #u-8812", agency: "Caracas Night Realty", at: minutesAgo(140), severity: "medium" as const },
   { id: "mod-3", listingId: "1g0xf0", title: "Casa en El Hatillo", reason: { es: "Teléfono en la descripción", en: "Phone number in description" }, reporter: "Sistema · reglas", agency: "Particular", at: minutesAgo(400), severity: "low" as const },
 ];
+
+// ───────────────────────── Team chats for "Auditoría del gerente" (appended block: threads only)
+// Buyer ↔ advisor conversations so the owner's read-only chat audit has real content. Participants are user ids
+// (people.ts); `at` follows the same "minutes ago" convention as the rest of the seed. lastRead of each participant
+// is set to their own last message, so later messages from the other side stay unread for them.
+export interface TeamThreadSeed {
+  id: string;
+  listingId: string;
+  leadId?: string;
+  subject: string;
+  participants: string[];
+  messages: { from: string; body: string; at: string }[];
+}
+
+export const TEAM_THREADS: TeamThreadSeed[] = [
+  {
+    id: "th-team-1",
+    listingId: L(1),
+    subject: "Visita · Apartamento familiar a dos cuadras de la plaza",
+    participants: ["u-seeker", "u-agent"],
+    messages: [
+      { from: "u-seeker", body: "Buenas tardes, Valentina. Vi el apartamento cerca de la plaza. ¿Sigue disponible?", at: minutesAgo(60 * 28) },
+      { from: "u-agent", body: "¡Hola Daniel! Sí, sigue disponible. ¿Te gustaría visitarlo esta semana?", at: minutesAgo(60 * 28 - 7) },
+      { from: "u-seeker", body: "Sí, por favor. ¿Mañana en la tarde se puede? Salgo del trabajo a las 2.", at: minutesAgo(60 * 27) },
+      { from: "u-agent", body: "Te agendé mañana a las 3:00 p. m. El conserje se llama Ramón; te espero en la entrada principal.", at: minutesAgo(60 * 26 + 50) },
+      { from: "u-seeker", body: "Perfecto. Una pregunta: ¿el condominio incluye el agua del tanque?", at: minutesAgo(60 * 3) },
+    ],
+  },
+  {
+    id: "th-team-2",
+    listingId: L(5),
+    leadId: "ld-02",
+    subject: "Consulta · Apartamento práctico a pasos del metro",
+    participants: ["u-seeker2", "u-agent"],
+    messages: [
+      { from: "u-seeker2", body: "¿El precio es negociable? Pago de contado.", at: minutesAgo(11) },
+    ],
+  },
+  {
+    id: "th-team-3",
+    listingId: L(4),
+    subject: "Casa con jardín y vista al valle",
+    participants: ["u-seeker", "u-agent2"],
+    messages: [
+      { from: "u-seeker", body: "Hola Andrés, ¿la casa tiene planta eléctrica o solo inversor?", at: minutesAgo(60 * 50) },
+      { from: "u-agent2", body: "Hola Daniel. Tiene planta eléctrica a gasoil que cubre toda la casa, más un tanque de 5.000 litros.", at: minutesAgo(60 * 49 + 20) },
+      { from: "u-seeker", body: "Excelente. ¿Los dueños aceptarían una oferta por debajo del precio publicado?", at: minutesAgo(60 * 30) },
+      { from: "u-agent2", body: "Puedo presentarla. Para que tenga fuerza, conviene acompañarla con la constancia de fondos.", at: minutesAgo(60 * 29 + 35) },
+      { from: "u-agent2", body: "Si quieres, primero coordinamos una visita el sábado a las 10:00 para que la veas con tu familia.", at: minutesAgo(60 * 29 + 30) },
+    ],
+  },
+  {
+    id: "th-team-4",
+    listingId: L(18),
+    subject: "Estudio ejecutivo con servicios",
+    participants: ["u-seeker", "u-agent3"],
+    messages: [
+      { from: "u-seeker", body: "Hola Carolina, ¿el estudio se alquila por seis meses?", at: minutesAgo(60 * 9) },
+      { from: "u-agent3", body: "Hola Daniel. El mínimo es un año, pero el propietario evalúa seis meses con dos meses de depósito.", at: minutesAgo(60 * 8 + 40) },
+    ],
+  },
+];

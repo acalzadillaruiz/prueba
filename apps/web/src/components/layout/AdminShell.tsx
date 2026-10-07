@@ -20,6 +20,7 @@ import {
   Search,
   Settings,
   ShieldAlert,
+  ShieldCheck,
   Sun,
   Users,
 } from "lucide-react";
@@ -49,6 +50,7 @@ const AGENCY_NAV: Item[] = (
     ["media", Camera, "media"],
     ["team", Users, "team"],
     ["reports", BarChart3, "reports"],
+    ["auditoria", ShieldCheck, "teamAudit"],
     ["settings", Settings, "settings"],
   ] as const
 ).map(([page, icon, label]) => ({ href: AGENCY_PAGE_PATH[page], icon, label, roles: AGENCY_PAGE_ROLES[page] }));

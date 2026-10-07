@@ -12,6 +12,7 @@ import { AGENCIES, NOW, USERS } from "./seed-data/people";
 import { LISTINGS } from "./seed-data/listings";
 import { ZONES } from "./seed-data/zones";
 import { AGENT_SLOTS, AUDIT, CAPTURES, EMAILS, FX_RATES, LEADS, MEDIA_JOBS, MODERATION_QUEUE, OFFERS, OWNER_THREAD, SAVED_SEARCHES, TOURS } from "./seed-data/ops";
+import { TEAM_THREADS } from "./seed-data/ops";
 
 const prisma = new PrismaClient();
 const SHIFT = Date.now() - NOW.getTime();
@@ -33,7 +34,7 @@ async function main() {
 
   for (const a of AGENCIES) {
     await prisma.agency.create({
-      data: { id: a.id, name: a.name, slug: a.slug, verified: a.verified, plan: a.plan, status: a.status, city: a.city, phone: a.phone, whatsapp: a.whatsapp, color: a.color, initials: a.initials, createdAt: d(a.createdAt) },
+      data: { id: a.id, name: a.name, slug: a.slug, verified: a.verified, plan: a.plan, status: a.status, city: a.city, phone: a.phone, whatsapp: a.whatsapp, color: a.color, initials: a.initials, onCall: a.onCall, createdAt: d(a.createdAt) },
     });
     await prisma.commissionRule.create({ data: { agencyId: a.id, salePct: a.commissionPct, agentSplitPct: a.agentSplitPct } });
   }
@@ -87,6 +88,12 @@ async function main() {
         parking: l.parking,
         yearBuilt: l.yearBuilt,
         amenities: l.amenities,
+        powerBackup: l.powerBackup ?? null,
+        ownWell: l.ownWell,
+        waterTankLiters: l.waterTankLiters ?? null,
+        dockFeet: l.dockFeet ?? null,
+        viewAvila: l.viewAvila,
+        viewSea: l.viewSea,
         status: l.status,
         review: "APPROVED",
         publishedAt: d(l.publishedAt),
@@ -198,6 +205,19 @@ async function main() {
   for (const m of OWNER_THREAD) await prisma.message.create({ data: { threadId: ownerThread.id, senderId: m.mine ? "u-priv" : "u-agent", body: m.body, createdAt: d(m.at) } });
   await prisma.messageThread.create({ data: { leadId: "ld-01", listingId: LISTINGS[0].id, participants: { create: [{ userId: "u-agent" }] } } });
   // The buyer's first message lives on the lead itself; the thread starts empty until the agent replies
+  // Team chats (Auditoría del gerente): buyer ↔ advisor threads; each participant has read up to their own last message.
+  for (const t of TEAM_THREADS) {
+    const lastOwn = (uid: string) => {
+      const mine = t.messages.filter((m) => m.from === uid);
+      return d(mine.length ? mine[mine.length - 1].at : t.messages[0].at);
+    };
+    const updatedAt = d(t.messages[t.messages.length - 1].at);
+    await prisma.messageThread.create({
+      data: { id: t.id, listingId: t.listingId, leadId: t.leadId, subject: t.subject, createdAt: d(t.messages[0].at), participants: { create: t.participants.map((userId) => ({ userId, lastRead: lastOwn(userId) })) } },
+    });
+    for (const m of t.messages) await prisma.message.create({ data: { threadId: t.id, senderId: m.from, body: m.body, createdAt: d(m.at) } });
+    await prisma.$executeRaw`UPDATE "MessageThread" SET "updatedAt" = ${updatedAt} WHERE "id" = ${t.id}`;
+  }
 
   for (const o of OFFERS) await prisma.offer.create({ data: { listingId: o.listingId, bidderName: o.bidder, amount: o.amount, status: o.status, note: o.note, createdAt: d(o.createdAt) } });
   for (const c of CAPTURES)

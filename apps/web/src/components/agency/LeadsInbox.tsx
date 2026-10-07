@@ -16,6 +16,7 @@ import { Chip, Count, Empty, Initials, Pill, k, tab } from "./kit";
 import { ago, dateTime, money, priceSuffix, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import { caracasInputToIso, isoToCaracasInput } from "@/lib/caracas-time";
+import { HubMessages, type HubThread } from "@/components/seeker/HubMessages";
 
 const STAGES: [LeadStage, string, string][] = [
   ["NEW", "Nuevo", "New"],
@@ -135,7 +136,7 @@ const SOURCE_LABEL: Record<string, Record<Locale, string>> = {
   ALERT: { es: "Alerta de búsqueda", en: "Search alert" },
 };
 
-export function LeadsInbox({ locale, initial, listings, agents }: { locale: Locale; initial: ScoredLead[]; listings: Listing[]; agents: Record<string, string> }) {
+export function LeadsInbox({ locale, initial, listings, agents, threads, meId }: { locale: Locale; initial: ScoredLead[]; listings: Listing[]; agents: Record<string, string>; threads?: HubThread[]; meId?: string }) {
   const stageName = (st: string) => stageLabel(locale, st);
   const qc = useQueryClient();
   const router = useRouter();
@@ -390,6 +391,8 @@ export function LeadsInbox({ locale, initial, listings, agents }: { locale: Loca
           <div className={k.card}><Empty title={tx(locale, "Sin leads todavía", "No leads yet")} body={tx(locale, "Cuando alguien escriba o pida una visita desde una ficha, aparecerá aquí con su score.", "When someone writes or books a tour from a listing, it shows up here with its score.")} /></div>
         )}
       </div>
+      {/* Direct chats ("Contactar" on a listing) with this advisor; lead conversations stay in the inbox above. */}
+      {threads && meId && <HubMessages locale={locale} threads={threads} meId={meId} listings={listings} direct className="mt-6 block" />}
     </AdminShell>
   );
 }

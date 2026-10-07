@@ -6,6 +6,7 @@ import { filtersFromParams, listingById, listingInclude, publicWhere, searchList
 import { brochurePdfSchema, commercialSchema, propertyKindSchema, shortRentSchema } from "@newplace/config";
 import { draftCopy, findDuplicate, fingerprintOf, needsModeration, notifySavedSearches, refreshQuality, scenesFor, slugify, snapshotEstimate, uniqueSlug } from "@/server/listing-service";
 import { audit } from "@/server/data";
+import { essentialsSchema } from "@/lib/essentials-schema";
 import { isStaff } from "@/server/access";
 import { bump } from "@/server/counters";
 
@@ -44,6 +45,8 @@ const CreateSchema = z.object({
   parking: z.number().int().min(0).max(50).default(0),
   yearBuilt: z.number().int().min(1800).max(2100).default(new Date().getFullYear()),
   amenities: z.array(z.string().max(60)).max(50).default([]),
+  /** Venezuelan essentials (planta, pozo, tanque, muelle, vistas) */
+  ...essentialsSchema.shape,
   priceAmount: z.number().int().positive().max(1_000_000_000),
   title_es: z.string().max(120).optional(),
   title_en: z.string().max(120).optional(),
@@ -135,6 +138,12 @@ export const POST = handler(async (req: NextRequest) => {
       parking: b.parking,
       yearBuilt: b.yearBuilt,
       amenities: b.amenities,
+      powerBackup: b.powerBackup ?? null,
+      ownWell: b.ownWell ?? false,
+      waterTankLiters: b.waterTankLiters ?? null,
+      dockFeet: b.dockFeet ?? null,
+      viewAvila: b.viewAvila ?? false,
+      viewSea: b.viewSea ?? false,
       status,
       review,
       publishedAt: status === "ACTIVE" ? new Date() : null,

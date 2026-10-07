@@ -1,5 +1,6 @@
 import "server-only";
 import { prisma } from "@newplace/db";
+import { slaPct } from "@/lib/team-metrics";
 
 const DAY = 864e5;
 
@@ -46,8 +47,7 @@ export async function dashboardStats(agencyId: string, agentId?: string): Promis
   const allLeads = await prisma.lead.findMany({ where: { id: { in: [...firstTour.keys()] } }, select: { id: true, createdAt: true } });
   const gaps = allLeads.map((l) => (firstTour.get(l.id)! - l.createdAt.getTime()) / DAY).filter((g) => g >= 0);
   // SLA over every lead old enough to judge: unanswered leads past 15 min count as breached (not ignored).
-  const judged = leads30.filter((l) => l.firstResponseAt || now - l.createdAt.getTime() > 15 * 60000);
-  const sla = judged.length ? Math.round((judged.filter((l) => l.firstResponseAt && l.firstResponseAt.getTime() - l.createdAt.getTime() <= 15 * 60000).length / judged.length) * 100) : null;
+  const sla = slaPct(leads30, now);
   const won = await prisma.commissionEntry.findMany({ where: { agencyId, ...(agentId ? { agentId } : {}) }, include: { listing: { select: { priceAmount: true } } } });
   const ranking = members
     .map((m) => {

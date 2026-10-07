@@ -83,7 +83,8 @@ test.describe("Seguridad: hallazgos de auditoría", () => {
   test("fotos y slots de inmuebles ocultos → 404 salvo para quien puede verlos", async ({ page }) => {
     const pub = await db.listing.findFirstOrThrow({ where: { status: "ACTIVE", review: "APPROVED", privateListing: false }, select: { id: true } });
     const pending = await db.listing.findFirst({ where: { agencyId: "ag-andes", review: "PENDING" }, select: { id: true } });
-    const priv = await db.listing.findFirst({ where: { privateListing: true }, select: { id: true } });
+    // A private DRAFT (never reachable by link); ACTIVE private listings are "solo con enlace" and visible by design.
+    const priv = await db.listing.findFirst({ where: { privateListing: true, status: "DRAFT" }, select: { id: true } });
     const hidden = [pending?.id, priv?.id].filter((x): x is string => !!x);
     expect(hidden.length).toBeGreaterThan(0);
 

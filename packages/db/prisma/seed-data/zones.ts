@@ -23,6 +23,14 @@ export const ZONES: Zone[] = [
   { name: "Zona Industrial Sur", slug: "zona-industrial-sur", city: "Valencia", state: "Carabobo", lat: 10.1305, lng: -67.9905, salePpm: 480, rentPpm: 3.2, activeListings: 64, daysOnMarket: 139, trend12m: 2.2 },
   { name: "Tierra Negra", slug: "tierra-negra", city: "Maracaibo", state: "Zulia", lat: 10.6725, lng: -71.6205, salePpm: 610, rentPpm: 4.6, activeListings: 133, daysOnMarket: 104, trend12m: 1.6 },
   { name: "Del Este", slug: "del-este", city: "Barquisimeto", state: "Lara", lat: 10.0725, lng: -69.2815, salePpm: 560, rentPpm: 4.1, activeListings: 92, daysOnMarket: 97, trend12m: 2.0 },
+  // Oriente (Lechería sub-zones, Barcelona, Puerto La Cruz), Margarita and north Valencia
+  { name: "Cerro El Morro", slug: "cerro-el-morro", city: "Lechería", state: "Anzoátegui", lat: 10.2035, lng: -64.6935, salePpm: 1250, rentPpm: 9.5, activeListings: 38, daysOnMarket: 102, trend12m: 5.8 },
+  { name: "Canales de El Morro", slug: "canales-de-el-morro", city: "Lechería", state: "Anzoátegui", lat: 10.1845, lng: -64.6745, salePpm: 1400, rentPpm: 10.0, activeListings: 47, daysOnMarket: 118, trend12m: 6.4 },
+  { name: "Av. Américo Vespucio", slug: "av-americo-vespucio", city: "Lechería", state: "Anzoátegui", lat: 10.1925, lng: -64.699, salePpm: 1050, rentPpm: 8.5, activeListings: 66, daysOnMarket: 81, trend12m: 4.7 },
+  { name: "Barcelona", slug: "barcelona", city: "Barcelona", state: "Anzoátegui", lat: 10.1335, lng: -64.6865, salePpm: 520, rentPpm: 4.5, activeListings: 112, daysOnMarket: 108, trend12m: 2.2 },
+  { name: "Puerto La Cruz · Paseo Colón", slug: "puerto-la-cruz-paseo-colon", city: "Puerto La Cruz", state: "Anzoátegui", lat: 10.217, lng: -64.633, salePpm: 680, rentPpm: 6.0, activeListings: 89, daysOnMarket: 97, trend12m: 3.1 },
+  { name: "Costa Azul", slug: "costa-azul", city: "Isla de Margarita", state: "Nueva Esparta", lat: 10.9935, lng: -63.8185, salePpm: 900, rentPpm: 7.8, activeListings: 73, daysOnMarket: 104, trend12m: 5.9 },
+  { name: "El Trigaleño", slug: "el-trigaleno", city: "Valencia", state: "Carabobo", lat: 10.2035, lng: -67.987, salePpm: 780, rentPpm: 6.3, activeListings: 95, daysOnMarket: 89, trend12m: 3.6 },
 ];
 
 export const zoneByName = (name: string) => ZONES.find((z) => z.name === name)!;

@@ -34,6 +34,9 @@ export type Scene =
   | "land"
   | "lobby";
 
+/** Backup power: "FULL" = planta eléctrica 100 %, "PARTIAL" = parcial (áreas comunes / algunos circuitos), "NONE" = no tiene. */
+export type PowerBackup = "FULL" | "PARTIAL" | "NONE";
+
 export type Amenity =
   | "pool"
   | "gym"
@@ -101,6 +104,15 @@ export interface Listing {
   parking: number;
   yearBuilt: number;
   amenities: Amenity[];
+  /** Venezuelan essentials as data (source of truth for filters; the generator/waterTank/view tags stay for compatibility). null = unknown. */
+  powerBackup?: PowerBackup | null;
+  ownWell: boolean;
+  /** Water tank capacity in litres; null = unknown / none declared. */
+  waterTankLiters?: number | null;
+  /** Private dock length in feet (Lechería canals, marinas); null = no dock. */
+  dockFeet?: number | null;
+  viewAvila: boolean;
+  viewSea: boolean;
   status: ListingStatus;
   publishedAt: string;
   updatedAt: string;

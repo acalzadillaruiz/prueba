@@ -8,7 +8,7 @@
     "forAgencies": "New Place for agencies", "legal": "Prices in USD. VES/EUR conversion for reference only.", "listedOn": "Listed on New Place", "sellWithUs": "Sell with us", "valuation": "Value my property"
   },
   "admin": {
-    "dashboard": "Dashboard", "leads": "Leads", "listings": "Listings", "calendar": "Calendar", "capture": "Capture", "media": "Media", "team": "Team", "reports": "Reports", "settings": "Settings",
+    "dashboard": "Dashboard", "leads": "Leads", "listings": "Listings", "calendar": "Calendar", "capture": "Capture", "media": "Media", "team": "Team", "reports": "Reports", "teamAudit": "Team audit", "settings": "Settings",
     "globalMetrics": "Global metrics", "agencies": "Agencies", "users": "Users", "moderation": "Moderation", "audit": "Audit log", "ai": "AI · FX · Seed",
     "publicSite": "View public site", "search": "Search lead, listing, person…", "notifications": "Notifications"
   },

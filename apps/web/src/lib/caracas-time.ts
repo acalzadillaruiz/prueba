@@ -11,3 +11,8 @@ export function isoToCaracasInput(iso: string | number | Date): string {
   const d = new Date(new Date(iso).getTime() - 4 * 3600e3);
   return d.toISOString().slice(0, 16);
 }
+
+/** Day of the week (0 = Sunday … 6 = Saturday) on the Caracas wall clock (UTC−4, no DST). */
+export function caracasWeekday(now: number | Date = Date.now()): number {
+  return new Date(new Date(now).getTime() - 4 * 3600e3).getUTCDay();
+}

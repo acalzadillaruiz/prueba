@@ -1,8 +1,9 @@
 import Link from "next/link";
+import { ShieldCheck } from "lucide-react";
 import type { Listing, Locale } from "@/types/domain";
 import { listingPhoto } from "@/lib/photos";
 import { PropertyArt } from "@/components/art/PropertyArt";
-import { Badge } from "@/components/ui";
+import { Avatar, Badge } from "@/components/ui";
 import { TYPE_LABEL, lbl, money, num, priceSuffix, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import { CompareButton, SaveButton, StatusBadge } from "./bits";
@@ -27,6 +28,25 @@ function PhotoBadges({ l, locale }: { l: Listing; locale: Locale }) {
   if (drop) out.push(<Badge key="d" tone="arena">{tx(locale, "Bajó de precio", "Price cut")}</Badge>);
   if (l.amenities?.includes("view")) out.push(<Badge key="v" tone="egeo">{tx(locale, "Con vista", "With a view")}</Badge>);
   return <div className="absolute left-3 top-3 flex max-w-[calc(100%-4.5rem)] flex-wrap gap-1.5">{out.slice(0, 2)}</div>;
+}
+
+/** Assigned advisor in the card footer: small avatar, name and a verified tick. Quiet by design (muted, one line). */
+export function CardAdvisor({ agent, locale }: { agent: NonNullable<Listing["agent"]>; locale: Locale }) {
+  const initials = agent.name.split(/\s+/).filter(Boolean).map((p) => p[0]).slice(0, 2).join("").toUpperCase() || "?";
+  const label = tx(locale, "Asesor/a verificado/a", "Verified advisor");
+  return (
+    <div className="mt-2.5 flex min-w-0 items-center gap-2 text-sm text-muted" data-testid="card-advisor">
+      <span aria-hidden className="contents"><Avatar initials={initials} hue={agent.hue} size={24} /></span>
+      <span className="sr-only">{tx(locale, "Asesor/a:", "Advisor:")}</span>
+      <span className="truncate">{agent.name}</span>
+      {agent.verified && (
+        <span className="inline-flex shrink-0 items-center text-ok" title={label}>
+          <ShieldCheck size={14} aria-hidden />
+          <span className="sr-only">{label}</span>
+        </span>
+      )}
+    </div>
+  );
 }
 
 export function ListingCard({ l, locale, compact, className, showCompare }: { l: Listing; locale: Locale; compact?: boolean; className?: string; showCompare?: boolean }) {
@@ -64,6 +84,7 @@ export function ListingCard({ l, locale, compact, className, showCompare }: { l:
           </span>
           {showCompare && <CompareButton id={l.id} locale={locale} />}
         </div>
+        {l.agent?.name && <CardAdvisor agent={l.agent} locale={locale} />}
       </div>
     </Link>
   );

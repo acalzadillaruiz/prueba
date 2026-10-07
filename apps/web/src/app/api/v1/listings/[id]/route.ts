@@ -7,6 +7,7 @@ import { listingForUser } from "@/server/access";
 import { brochurePdfSchema, commercialSchema, shortRentSchema } from "@newplace/config";
 import { notifySavedSearches, refreshQuality, snapshotEstimate } from "@/server/listing-service";
 import { audit } from "@/server/data";
+import { essentialsSchema } from "@/lib/essentials-schema";
 import { revalidateListing } from "@/server/revalidate";
 
 type Ctx = { params: Promise<{ id: string }> };
@@ -47,6 +48,8 @@ const Patch = z.object({
   parking: z.number().int().min(0).max(50).optional(),
   areaM2: z.number().int().positive().max(1_000_000).optional(),
   amenities: z.array(z.string().max(60)).max(50).optional(),
+  /** Venezuelan essentials; null clears powerBackup / waterTankLiters / dockFeet */
+  ...essentialsSchema.shape,
   privateListing: z.boolean().optional(),
   hasFloorplan: z.boolean().optional(),
   hasVirtualTour: z.boolean().optional(),
@@ -82,7 +85,7 @@ export const PATCH = handler(async (req: NextRequest, { params }: Ctx) => {
   if (b.title_en !== undefined) data.titleEn = b.title_en;
   if (b.body_es) data.bodyEs = b.body_es;
   if (b.body_en !== undefined) data.bodyEn = b.body_en;
-  for (const k of ["beds", "baths", "parking", "areaM2", "amenities", "privateListing", "hasFloorplan", "hasVirtualTour", "virtualTourUrl", "brochurePdf"] as const) if (b[k] !== undefined) data[k] = b[k];
+  for (const k of ["beds", "baths", "parking", "areaM2", "amenities", "powerBackup", "ownWell", "waterTankLiters", "dockFeet", "viewAvila", "viewSea", "privateListing", "hasFloorplan", "hasVirtualTour", "virtualTourUrl", "brochurePdf"] as const) if (b[k] !== undefined) data[k] = b[k];
   // Json columns: null clears (Prisma.DbNull), an object replaces.
   for (const k of ["shortRent", "commercial"] as const) if (b[k] !== undefined) data[k] = b[k] === null ? Prisma.DbNull : b[k];
   if (b.agentId !== undefined) {

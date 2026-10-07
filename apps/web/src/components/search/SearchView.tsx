@@ -16,6 +16,7 @@ import { api } from "@/lib/api";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { queryToParams } from "./HeroSearch";
 import { URL_CHANGE_EVENT } from "@/components/layout/PublicHeader";
+import { TANK_STEPS, essentialChips, essentialsFromParams } from "@/lib/essentials";
 
 const TYPES = [
   ["SALE", "Comprar", "Buy"],
@@ -110,6 +111,9 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
   const pets = sp.get("pets") === "1";
   const verified = sp.get("verified") === "1";
   const amen = (sp.get("am") ?? "").split(",").filter(Boolean) as Amenity[];
+  // Venezuelan essentials (same parser as the API): power=full|partial, well, tank, dock, avila, sea
+  const ess = essentialsFromParams(sp);
+  const essCount = [ess.power, ess.well, ess.tank, ess.dock, ess.avila, ess.sea].filter(Boolean).length;
 
   // Quick successive changes must stack: start from the last URL we asked for, not the (not yet updated) search params.
   const pending = useRef<string | null>(null);
@@ -200,6 +204,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
   if (pets) activeChips.push(["pets", tx(locale, "Mascotas", "Pets"), { pets: null }]);
   if (verified) activeChips.push(["verified", tx(locale, "Agencia verificada", "Verified agency"), { verified: null }]);
   amen.forEach((a) => activeChips.push([a, lbl(AMENITY_LABEL[a], locale), { am: amen.filter((x) => x !== a).join(",") || null }]));
+  activeChips.push(...essentialChips(ess, locale));
 
   const pill = "flex h-11 md:h-10 shrink-0 items-center gap-1.5 rounded-full border px-4 font-display text-sm transition-colors duration-np";
   // Selected filter = navy tint + 2 px navy border (brand v4).
@@ -277,8 +282,10 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
               <option key={z} value={z}>{z}</option>
             ))}
           </select>
-          <button onClick={() => setMoreOpen((o) => !o)} aria-expanded={moreOpen} aria-controls="search-more-filters" className={cn(pill, "border-line bg-white", (moreOpen || baths || minM2) && on)}>
-            <SlidersHorizontal size={15} /> {tx(locale, "Más filtros", "More filters")} <ChevronDown size={14} />
+          <button onClick={() => setMoreOpen((o) => !o)} aria-expanded={moreOpen} aria-controls="search-more-filters" className={cn(pill, "border-line bg-white", (moreOpen || baths || minM2 || essCount) && on)}>
+            <SlidersHorizontal size={15} /> {tx(locale, "Más filtros", "More filters")}
+            {essCount > 0 && <span className="rounded-full bg-navy px-1.5 text-xs font-semibold text-ivory [font-feature-settings:'lnum']" aria-label={tx(locale, `${essCount} servicios esenciales activos`, `${essCount} essential-service filters on`)}>{essCount}</span>}
+            <ChevronDown size={14} />
           </button>
           <button
             onClick={() => set({ lux: lux ? null : "1" })}
@@ -349,6 +356,36 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
                       </button>
                     );
                   })}
+                </div>
+              </div>
+            </div>
+            <div className="mt-6 border-t border-line pt-5" role="group" aria-labelledby="search-essentials-title">
+              <div id="search-essentials-title" className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted">{tx(locale, "Servicios esenciales", "Essential services")}</div>
+              <div className="grid gap-6 md:grid-cols-4">
+                <div>
+                  <div className="mb-2 text-sm font-semibold">{tx(locale, "Planta eléctrica", "Backup power")}</div>
+                  <div className="flex flex-wrap gap-2">
+                    {([["full", "100 %", "100%"], ["partial", "Al menos parcial", "At least partial"]] as const).map(([k, es, en]) => (
+                      <button key={k} aria-pressed={ess.power === k} onClick={() => set({ power: ess.power === k ? null : k })} className={cn(pill, "md:h-9", ess.power === k ? on : "border-line")}>{tx(locale, es, en)}</button>
+                    ))}
+                  </div>
+                </div>
+                <label className="block">
+                  <span className="mb-2 block text-sm font-semibold">{tx(locale, "Tanque de agua", "Water tank")}</span>
+                  <select value={ess.tank ?? ""} onChange={(e) => set({ tank: e.target.value || null })} className={cn(pill, "w-full appearance-none border-line bg-white md:h-9", ess.tank && on)}>
+                    <option value="">{tx(locale, "Cualquiera", "Any")}</option>
+                    {(ess.tank && !TANK_STEPS.includes(ess.tank) ? [...TANK_STEPS, ess.tank].sort((a, b) => a - b) : TANK_STEPS).map((v) => (
+                      <option key={v} value={v}>≥ {num(v, locale)} L</option>
+                    ))}
+                  </select>
+                </label>
+                <div className="md:col-span-2">
+                  <div className="mb-2 text-sm font-semibold">{tx(locale, "Agua, muelle y vistas", "Water, dock and views")}</div>
+                  <div className="flex flex-wrap gap-2">
+                    {([["well", "Pozo propio", "Own well"], ["dock", "Con muelle", "With dock"], ["avila", "Vista al Ávila", "Ávila view"], ["sea", "Vista al mar", "Sea view"]] as const).map(([k, es, en]) => (
+                      <button key={k} aria-pressed={!!ess[k]} onClick={() => set({ [k]: ess[k] ? null : "1" })} className={cn(pill, "md:h-9", ess[k] ? on : "border-line")}>{tx(locale, es, en)}</button>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>

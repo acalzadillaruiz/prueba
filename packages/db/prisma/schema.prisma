@@ -230,6 +230,8 @@ model Agency {
   color        String       @default("#F26B4D")
   logoUrl      String?
   initials     String
+  /// Guardia 24/7: weekday rotation {"0".."6": userId} (0 = Sunday, Caracas time). Members only.
+  onCall       Json?
   createdAt    DateTime     @default(now())
 
   members      AgencyMember[]
@@ -314,6 +316,13 @@ model Listing {
   parking        Int           @default(0)
   yearBuilt      Int
   amenities      String[]
+  /// Venezuelan essentials, as data (filters): backup power "FULL" | "PARTIAL" | "NONE", own well, tank, dock, views
+  powerBackup    String?
+  ownWell        Boolean       @default(false)
+  waterTankLiters Int?
+  dockFeet       Int?
+  viewAvila      Boolean       @default(false)
+  viewSea        Boolean       @default(false)
   status         ListingStatus @default(DRAFT)
   review         ReviewStatus  @default(APPROVED)
   /// Status to restore when a moderation takedown is lifted

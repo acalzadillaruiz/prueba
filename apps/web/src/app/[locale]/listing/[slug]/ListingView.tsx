@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Clock, Eye, Heart } from "lucide-react";
+import { Anchor, Clock, Droplet, Droplets, Eye, Heart, Mountain, Waves, Zap, type LucideIcon } from "lucide-react";
 import type { Listing, Locale } from "@/types/domain";
 import { PublicPage } from "@/components/layout/PublicPage";
 import { Gallery } from "@/components/detail/Gallery";
@@ -21,6 +21,32 @@ import { ViewBeacon } from "@/components/detail/ViewBeacon";
 import { StickyContactBar } from "@/components/detail/StickyContactBar";
 import { zoneStats } from "@/server/zone-stats";
 import { SITE_URL } from "@/lib/seo";
+import { essentialLabels } from "@/lib/essentials";
+
+const ESSENTIAL_ICON: Record<string, LucideIcon> = { power: Zap, well: Droplet, tank: Droplets, dock: Anchor, avila: Mountain, sea: Waves };
+
+/** "Servicios esenciales": backup power, water and dock/views — only values the listing actually declares. */
+function Essentials({ l, locale, title }: { l: Listing; locale: Locale; title: React.ReactNode }) {
+  const items = essentialLabels(l, locale);
+  if (!items.length) return null;
+  return (
+    <div className="border-t border-line py-10" data-testid="essentials">
+      {title}
+      <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {items.map(({ key, label }) => {
+          const Icon = ESSENTIAL_ICON[key];
+          return (
+            <li key={key} className="flex items-center gap-3 rounded-xl border border-line bg-white px-4 py-3 text-[15px] font-semibold text-ink [font-feature-settings:'lnum']">
+              <Icon size={18} strokeWidth={1.7} className="shrink-0 text-navy" aria-hidden />
+              <span>{label}</span>
+            </li>
+          );
+        })}
+      </ul>
+      <p className="mt-3 text-sm text-muted">{tx(locale, "Datos declarados por el anunciante. Si un servicio no aparece, no fue informado.", "As declared by the lister. Services not shown were not reported.")}</p>
+    </div>
+  );
+}
 
 function jsonLd(l: Listing, locale: Locale) {
   const url = `${SITE_URL}/${locale}/listing/${l.slug}`;
@@ -133,7 +159,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
             <div className="flex flex-wrap items-center gap-2">
               {l.luxury && <Badge tone="exclusive">{tx(locale, "Exclusiva New Place", "New Place exclusive")}</Badge>}
               {l.status !== "ACTIVE" && <StatusBadge status={l.status} locale={locale} />}
-              {l.amenities.includes("view") && <Badge tone="egeo">{tx(locale, "Con vista", "With a view")}</Badge>}
+              {(l.viewSea || l.viewAvila || l.amenities.includes("view")) && <Badge tone="egeo">{l.viewSea ? tx(locale, "Vista al mar", "Sea view") : l.viewAvila ? tx(locale, "Vista al Ávila", "Ávila view") : tx(locale, "Con vista", "With a view")}</Badge>}
               {l.furnished && <Badge tone="arena">{tx(locale, "Amoblado", "Furnished")}</Badge>}
               <div className="ml-auto flex items-center gap-2">
                 <CompareButton id={l.id} locale={locale} className="min-h-11 px-3.5 text-[13px]" />
@@ -161,6 +187,8 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
             </div>
 
             <div className="mt-8 py-6"><BilingualBody l={l} locale={locale} /></div>
+
+            <Essentials l={l} locale={locale} title={<H>{tx(locale, "Servicios esenciales", "Essential services")}</H>} />
 
             <div className={sec}>
               <H>{tx(locale, "Amenidades", "Amenities")}</H>

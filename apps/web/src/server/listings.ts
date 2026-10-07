@@ -1,8 +1,9 @@
 import "server-only";
 import { prisma, type Prisma } from "@newplace/db";
 import type { EstimateResult } from "@newplace/ai";
-import type { Amenity, Kind, Listing, ListingStatus, ListingType, Scene } from "@/types/domain";
+import type { Amenity, Kind, Listing, ListingStatus, ListingType, PowerBackup, Scene } from "@/types/domain";
 import { inShape, shapeBounds, type Shape } from "@/lib/geo";
+import { POWER_BACKUPS, essentialsFromParams, type EssentialsFilters } from "@/lib/essentials";
 
 export const listingInclude = {
   photos: { orderBy: [{ isCover: "desc" }, { order: "asc" }] },
@@ -100,6 +101,12 @@ export function toDomain(r: ListingRow): Listing {
     parking: r.parking,
     yearBuilt: r.yearBuilt,
     amenities: r.amenities as Amenity[],
+    powerBackup: POWER_BACKUPS.includes(r.powerBackup as PowerBackup) ? (r.powerBackup as PowerBackup) : null,
+    ownWell: r.ownWell,
+    waterTankLiters: r.waterTankLiters,
+    dockFeet: r.dockFeet,
+    viewAvila: r.viewAvila,
+    viewSea: r.viewSea,
     status: r.status as ListingStatus,
     review: r.review,
     takedownReason: r.takedownReason,
@@ -133,7 +140,7 @@ export function toDomain(r: ListingRow): Listing {
   };
 }
 
-export interface SearchFilters {
+export interface SearchFilters extends EssentialsFilters {
   type?: string;
   zone?: string;
   city?: string;
@@ -200,6 +207,8 @@ export function filtersFromParams(sp: URLSearchParams): SearchFilters {
     verified: sp.get("verified") === "1",
     pub: oneOf<NonNullable<SearchFilters["pub"]>>("pub", PUBS),
     amenities: (sp.get("am") ?? "").split(",").filter(Boolean),
+    // Venezuelan essentials: power=full|partial, well=1, tank=<min litres>, dock=1, avila=1, sea=1
+    ...essentialsFromParams(sp),
     bbox: bbox?.length === 4 && bbox.every(Number.isFinite) ? (bbox as SearchFilters["bbox"]) : undefined,
     shape,
     sort: oneOf<NonNullable<SearchFilters["sort"]>>("sort", SORTS) ?? "new",
@@ -230,6 +239,14 @@ export function whereFromFilters(f: SearchFilters): Prisma.ListingWhereInput {
   if (f.verified) and.push({ agency: { verified: true } });
   if (f.pub) and.push({ publishedAt: { gte: new Date(Date.now() - (f.pub === "24h" ? 1 : 7) * 864e5) } });
   if (f.amenities?.length) and.push({ amenities: { hasEvery: f.amenities } });
+  // Structured essentials are the source of truth (not the legacy generator / waterTank / view tags).
+  if (f.power === "full") and.push({ powerBackup: "FULL" });
+  if (f.power === "partial") and.push({ powerBackup: { in: ["FULL", "PARTIAL"] } });
+  if (f.well) and.push({ ownWell: true });
+  if (f.tank) and.push({ waterTankLiters: { gte: f.tank } });
+  if (f.dock) and.push({ dockFeet: { gt: 0 } });
+  if (f.avila) and.push({ viewAvila: true });
+  if (f.sea) and.push({ viewSea: true });
   if (f.bbox) {
     const [s, w, n, e] = f.bbox;
     and.push({ lat: { gte: s, lte: n }, lng: { gte: w, lte: e } });

@@ -22,20 +22,61 @@ export type HubThread = {
 
 const initialsOf = (name: string) => name.split(" ").map((p) => p[0]).slice(0, 2).join("").toUpperCase() || "?";
 
-/** Seeker inbox: every thread with last message + unread badge; opening one shows the full conversation and a reply box. */
-export function HubMessages({ locale, threads, meId, listingById }: { locale: Locale; threads: HubThread[]; meId: string; listingById: (id: string) => Listing | undefined }) {
+type ListingTitle = Pick<Listing, "id" | "title_es" | "title_en">;
+
+/**
+ * Inbox: every thread with last message + unread badge; opening one shows the full conversation and a reply box.
+ * Seeker Hub: all threads. Agency (`direct`): only conversations not tied to a lead (leads are answered from the
+ * leads inbox, which also runs their SLA), e.g. a buyer's "Contactar" chat from a listing.
+ * `?thread=<id>` in the URL opens that thread on arrival.
+ */
+export function HubMessages({
+  locale,
+  threads,
+  meId,
+  listingById,
+  listings,
+  direct = false,
+  className,
+}: {
+  locale: Locale;
+  threads: HubThread[];
+  meId: string;
+  listingById?: (id: string) => ListingTitle | undefined;
+  listings?: ListingTitle[];
+  direct?: boolean;
+  className?: string;
+}) {
   const qc = useQueryClient();
   const live = useQuery({ queryKey: ["hub-threads"], queryFn: () => api<{ threads: HubThread[] }>("threads"), initialData: { threads }, refetchInterval: 15_000 });
-  const list = live.data.threads;
+  const list = direct ? live.data.threads.filter((t) => !t.leadId) : live.data.threads;
+  const findListing = (id: string) => listingById?.(id) ?? listings?.find((l) => l.id === id);
   const [openId, setOpenId] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
+  const rootRef = useRef<HTMLDivElement>(null);
+  // Deep link from a listing's "Contactar": open the thread and, when it is still empty, suggest a first line.
+  useEffect(() => {
+    const id = new URLSearchParams(window.location.search).get("thread");
+    if (!id) return;
+    const t = threads.find((x) => x.id === id);
+    if (!t) return;
+    setOpenId(t.id);
+    if (!t.messages.length) {
+      const l = t.listingId ? listingById?.(t.listingId) ?? listings?.find((x) => x.id === t.listingId) : undefined;
+      const name = l ? tx(locale, l.title_es, l.title_en) : t.subject;
+      setDraft(name ? tx(locale, `Hola, me interesa «${name}». ¿Podemos hablar?`, `Hi, I’m interested in “${name}”. Can we talk?`) : "");
+    }
+    rootRef.current?.scrollIntoView({ block: "start" });
+    // Run once on arrival; later polling must not reopen a thread the user closed.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const [sending, setSending] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const logRef = useRef<HTMLDivElement>(null);
   const open = list.find((t) => t.id === openId) ?? null;
 
   const title = (t: HubThread) => {
-    const l = t.listingId ? listingById(t.listingId) : undefined;
+    const l = t.listingId ? findListing(t.listingId) : undefined;
     if (l) return tx(locale, l.title_es, l.title_en);
     if (t.subject) return t.subject;
     return t.participants.filter((p) => p.id !== meId).map((p) => p.name).join(", ") || tx(locale, "Conversación", "Conversation");
@@ -85,10 +126,11 @@ export function HubMessages({ locale, threads, meId, listingById }: { locale: Lo
   const totalUnread = list.reduce((n, t) => n + t.unread, 0);
 
   return (
-    <Card className={cn(k.card, "border-0 p-5 lg:col-span-2")}>
+    <div ref={rootRef} id="mensajes" className={cn("scroll-mt-24 lg:col-span-2", className)}>
+    <Card className={cn(k.card, "border-0 p-5")}>
       <div className="flex items-center justify-between gap-2">
         <h2 className="flex items-center gap-2 font-serif text-[24px] font-medium leading-tight">
-          <MessageSquare size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Mensajes", "Messages")}
+          <MessageSquare size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {direct ? tx(locale, "Mensajes directos", "Direct messages") : tx(locale, "Mensajes", "Messages")}
           {totalUnread > 0 && <Badge className="bg-[#E6EBF1] text-navy dark:bg-white/10">{totalUnread} {tx(locale, totalUnread === 1 ? "nuevo" : "nuevos", "new")}</Badge>}
         </h2>
         {open && (
@@ -100,7 +142,7 @@ export function HubMessages({ locale, threads, meId, listingById }: { locale: Lo
 
       {!open && list.length === 0 && (
         <div className="mt-4">
-          <Empty className="py-6" title={tx(locale, "Aún no tienes mensajes", "No messages yet")} body={tx(locale, "Escribe al agente desde cualquier ficha y la conversación aparecerá aquí.", "Write to the agent from any listing and the conversation will show up here.")} />
+          <Empty className="py-6" title={tx(locale, "Aún no tienes mensajes", "No messages yet")} body={direct ? tx(locale, "Cuando un cliente pulse «Contactar» en una de tus fichas, la conversación aparecerá aquí.", "When a client taps “Contact” on one of your listings, the conversation shows up here.") : tx(locale, "Escribe al agente desde cualquier ficha y la conversación aparecerá aquí.", "Write to the agent from any listing and the conversation will show up here.")} />
         </div>
       )}
 
@@ -179,5 +221,6 @@ export function HubMessages({ locale, threads, meId, listingById }: { locale: Lo
         </div>
       )}
     </Card>
+    </div>
   );
 }

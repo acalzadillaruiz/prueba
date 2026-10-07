@@ -15,6 +15,7 @@ import { AMENITY_LABEL, STATUS_LABEL, dwell, lbl, money, num, tx } from "@/lib/i
 import { cn } from "@/lib/cn";
 import { commissionAmount } from "@/lib/commission";
 import { ListingTypeFields, extrasFrom, validateExtras, type ExtrasDraft } from "@/components/owner/ListingTypeFields";
+import { EssentialsFields, essentialsFrom, validateEssentials, type EssentialsDraft } from "@/components/owner/EssentialsFields";
 import { listingHref } from "@/lib/listing-href";
 import { useApp } from "@/lib/store";
 
@@ -33,6 +34,7 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
   const tourUrlBad = f.hasVirtualTour && !!tourUrl.trim() && !/^https:\/\/[^\s]+\.[^\s]+$/i.test(tourUrl.trim());
   const [extras, setExtras] = useState<ExtrasDraft>(() => extrasFrom(l));
   const [showExtrasErr, setShowExtrasErr] = useState(false);
+  const [ess, setEss] = useState<EssentialsDraft>(() => essentialsFrom(l));
   const [photos, setPhotos] = useState<Photo[]>(initialPhotos);
   const [writing, setWriting] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
@@ -41,6 +43,7 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
   const fileRef = useRef<HTMLInputElement>(null);
   const dirty = () => setSaved(false);
   const extrasCheck = validateExtras(locale, l.listingType, l.luxury, extras);
+  const essCheck = validateEssentials(locale, ess);
   // The brochure isn't part of the domain Listing: the listing API returns it alongside.
   useEffect(() => {
     if (!l.luxury) return;
@@ -58,7 +61,7 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
       setErr(tx(locale, "El enlace del tour virtual debe empezar por https://", "The virtual tour link must start with https://"));
       return;
     }
-    if (!extrasCheck.ok) {
+    if (!extrasCheck.ok || !essCheck.ok) {
       setShowExtrasErr(true);
       setErr(tx(locale, "Revisa los campos marcados antes de guardar.", "Check the highlighted fields before saving."));
       return;
@@ -72,7 +75,7 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
         ...(l.listingType.startsWith("COMMERCIAL") ? { commercial: p.commercial } : {}),
         ...(l.luxury ? { brochurePdf: p.brochurePdf ?? null } : {}),
       };
-      await api(`listings/${l.id}`, { method: "PATCH", json: { ...copy, ...f, ...typeFields, virtualTourUrl: (f.hasVirtualTour && tourUrl.trim()) || null } });
+      await api(`listings/${l.id}`, { method: "PATCH", json: { ...copy, ...f, ...essCheck.payload, ...typeFields, virtualTourUrl: (f.hasVirtualTour && tourUrl.trim()) || null } });
       setSaved(true);
       router.refresh();
     } catch (e) {
@@ -256,6 +259,20 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
                 </Field>
               </div>
             )}
+          </div>
+
+          <div className={section}>
+            <EssentialsFields
+              locale={locale}
+              value={ess}
+              onChange={(x) => {
+                setEss(x);
+                dirty();
+              }}
+              showErrors={showExtrasErr}
+              disabled={!canEdit}
+              admin
+            />
           </div>
 
           {(l.listingType === "SHORT_RENT" || l.listingType.startsWith("COMMERCIAL") || l.luxury) && (

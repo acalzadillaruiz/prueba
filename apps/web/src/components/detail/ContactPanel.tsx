@@ -1,15 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { leadSchema } from "@newplace/config";
 import { fieldError } from "@/lib/form";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { CalendarCheck, CheckCircle2, Loader2, MessageSquare, ShieldCheck, Video } from "lucide-react";
+import { CalendarCheck, CheckCircle2, Loader2, MessageSquare, MessagesSquare, PhoneCall, ShieldCheck, Video } from "lucide-react";
 import type { Listing, Locale } from "@/types/domain";
 import { Button, inputCls } from "@/components/ui";
-import { WhatsAppIcon } from "@/components/brand/PublicChrome";
+import { OnCallButton, WhatsAppIcon } from "@/components/brand/PublicChrome";
 import { whatsappHref } from "@/lib/listing-href";
 import { useApp } from "@/lib/store";
 import { api, ApiClientError } from "@/lib/api";
@@ -19,7 +20,8 @@ import { cn } from "@/lib/cn";
 type Slots = { agentId: string | null; days: { date: string; hours: { hour: number; iso: string; available: boolean }[] }[] };
 
 export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; dark?: boolean }) {
-  const { user } = useApp();
+  const { user, requireLogin } = useApp();
+  const router = useRouter();
   const qc = useQueryClient();
   const agent = l.agent;
   const agency = l.agency;
@@ -60,6 +62,21 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [done, setDone] = useState<string | null>(null);
+  const [chatBusy, setChatBusy] = useState(false);
+  // "Contactar": in-app chat with the listing's advisor. Anonymous visitors go to login and come back here.
+  const canChat = !!agent && !!l.agentId && user?.id !== l.agentId;
+  const openChat = async () => {
+    if (!requireLogin()) return;
+    setErr(null);
+    setChatBusy(true);
+    try {
+      const t = await api<{ id: string }>("threads", { method: "POST", json: { listingId: l.id } });
+      router.push(`/${locale}/app?thread=${encodeURIComponent(t.id)}#mensajes`);
+    } catch (e) {
+      setErr((e as Error).message);
+      setChatBusy(false);
+    }
+  };
 
   const fmt = (d: string, o: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat(locale === "es" ? "es-VE" : "en-US", { ...o, timeZone: "America/Caracas" }).format(new Date(d)).replace(/[  ]/g, " ");
   const firstAvailable = days[day]?.hours.find((h) => h.available)?.iso ?? null;
@@ -124,6 +141,24 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
               {agency ? ` · ${agency.name}` : ""}
             </div>
           </div>
+        </div>
+      )}
+      {(canChat || (agency?.verified && l.agencyId)) && (
+        <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
+          {canChat && (
+            <Button size="md" variant={dark ? "dark-outline" : "outline"} onClick={openChat} disabled={chatBusy} aria-label={tx(locale, `Contactar a ${agent!.name} por chat`, `Chat with ${agent!.name}`)}>
+              {chatBusy ? <Loader2 size={16} className="animate-spin" aria-hidden /> : <MessagesSquare size={16} aria-hidden />} {tx(locale, "Contactar", "Contact")}
+            </Button>
+          )}
+          {agency?.verified && l.agencyId && (
+            <OnCallButton
+              locale={locale}
+              listingSlug={l.slug}
+              className={cn("inline-flex min-h-11 items-center gap-1.5 rounded-full px-1 text-sm font-semibold underline decoration-current/30 underline-offset-4 hover:decoration-current focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2", dark ? "text-ivory focus-visible:outline-ivory" : "text-navy focus-visible:outline-navy")}
+            >
+              <PhoneCall size={15} aria-hidden /> {tx(locale, "Guardia 24/7", "24/7 on-call")}
+            </OnCallButton>
+          )}
         </div>
       )}
       {!agent && !agency && <div className={cn("text-sm", muted)}>{tx(locale, "Propietario · publica directo", "Owner · listing directly")}</div>}

@@ -1,7 +1,7 @@
 import type { Role } from "@newplace/config";
 
 /** Which agency roles may open each back-office page. Shared by the sidebar and the server-side page guards. */
-export type AgencyPage = "dashboard" | "leads" | "listings" | "calendar" | "capture" | "media" | "team" | "reports" | "settings";
+export type AgencyPage = "dashboard" | "leads" | "listings" | "calendar" | "capture" | "media" | "team" | "reports" | "auditoria" | "settings";
 
 export const AGENCY_PAGE_ROLES: Record<AgencyPage, Role[]> = {
   dashboard: ["AGENCY_OWNER", "AGENT", "BACKOFFICE", "SUPERADMIN"],
@@ -12,6 +12,8 @@ export const AGENCY_PAGE_ROLES: Record<AgencyPage, Role[]> = {
   media: ["AGENCY_OWNER", "PHOTOGRAPHER", "BACKOFFICE", "SUPERADMIN"],
   team: ["AGENCY_OWNER", "BACKOFFICE", "SUPERADMIN"],
   reports: ["AGENCY_OWNER", "BACKOFFICE", "SUPERADMIN"],
+  // Owner-only: advisor performance + read-only team chats (privacy: every chat opened is audit-logged).
+  auditoria: ["AGENCY_OWNER", "SUPERADMIN"],
   settings: ["AGENCY_OWNER", "SUPERADMIN"],
 };
 
@@ -24,6 +26,7 @@ export const AGENCY_PAGE_PATH: Record<AgencyPage, string> = {
   media: "/media",
   team: "/team",
   reports: "/reports",
+  auditoria: "/auditoria",
   settings: "/settings",
 };
 

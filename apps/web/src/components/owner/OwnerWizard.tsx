@@ -16,6 +16,8 @@ import { AMENITY_LABEL, lbl, money, num, plural, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import { EMPTY_EXTRAS, ListingTypeFields, validateExtras, type ExtrasDraft } from "./ListingTypeFields";
 import { listingQuality } from "@newplace/config";
+import { EMPTY_ESSENTIALS, EssentialsFields, validateEssentials, type EssentialsDraft } from "./EssentialsFields";
+import { essentialLabels } from "@/lib/essentials";
 
 const STEPS: [string, string][] = [
   ["Tipo", "Type"],
@@ -46,6 +48,8 @@ type Draft = {
   /** Luxury only: hidden from public search, reachable by link (brief §5). */
   privateListing: boolean;
   extras: ExtrasDraft;
+  /** Venezuelan essentials: planta, pozo, tanque, muelle, vistas. */
+  ess: EssentialsDraft;
 };
 const DRAFT_KEY_BASE = "np-owner-draft-v1";
 const DEFAULT_PRICE: Record<string, number> = { SALE: 150000, LONG_RENT: 900, SHORT_RENT: 80, COMMERCIAL_SALE: 250000, COMMERCIAL_RENT: 1500 };
@@ -86,6 +90,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
     luxury: false,
     privateListing: false,
     extras: EMPTY_EXTRAS,
+    ess: EMPTY_ESSENTIALS,
   });
   const set = (p: Partial<Draft>) => setD((x) => ({ ...x, ...p }));
   /** Switching operation swaps an untouched default price (a sale's 150.000 must not become 150.000/month). */
@@ -120,7 +125,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
       if (raw) {
         const saved = JSON.parse(raw) as { d: Partial<Draft>; step: number };
         // Drafts saved by an older version may lack newer fields: keep the defaults for those.
-        setD((x) => ({ ...x, ...saved.d, extras: { ...x.extras, ...saved.d.extras } }));
+        setD((x) => ({ ...x, ...saved.d, extras: { ...x.extras, ...saved.d.extras }, ess: { ...x.ess, ...saved.d.ess } }));
         setStep(saved.step);
       }
     } catch {}
@@ -136,6 +141,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
   // Luxury is a flag on residential listings (brief §5); not offered for commercial operations or land.
   const luxury = d.luxury && !listingType.startsWith("COMMERCIAL") && RESIDENTIAL_KINDS.includes(d.kind);
   const extras = validateExtras(locale, listingType, luxury, d.extras);
+  const ess = validateEssentials(locale, d.ess);
   const address = fullAddress([d.addr?.main, d.unit, d.addr?.zone, d.addr?.city]);
   const hasBeds = !NO_BEDS.includes(d.kind);
   const hasBaths = d.kind !== "land";
@@ -210,7 +216,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
       return setStep(2);
     }
     if (priceErr) return setStep(4);
-    if (!extras.ok) {
+    if (!extras.ok || !ess.ok) {
       setShowExtrasErr(true);
       return setStep(2);
     }
@@ -241,6 +247,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
           luxury,
           privateListing: luxury && d.privateListing,
           ...extras.payload,
+          ...ess.payload,
           ...(d.copy.title_es ? d.copy : {}),
         },
       });
@@ -322,6 +329,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
     extras.payload.commercial && `${extras.payload.commercial.ceilingHeight} m ${tx(locale, "altura libre", "clear height")} · ${extras.payload.commercial.zoning}${extras.payload.commercial.loadingDock ? ` · ${tx(locale, "andén de carga", "loading dock")}` : ""}${extras.payload.commercial.capRate !== undefined ? ` · cap rate ${extras.payload.commercial.capRate} %` : ""}`,
     luxury && tx(locale, "Lujo", "Luxury"),
     luxury && d.privateListing && tx(locale, "privado (solo por enlace)", "private (link only)"),
+    ...essentialLabels(ess.payload, locale).map((x) => x.label),
   ].filter(Boolean).join(" · ");
 
   return (
@@ -457,6 +465,9 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                   );
                 })}
               </div>
+            </div>
+            <div className="rounded-[18px] bg-white p-5 shadow-[0_8px_24px_rgba(22,38,56,.06)]">
+              <EssentialsFields locale={locale} value={d.ess} onChange={(x) => set({ ess: x })} showErrors={showExtrasErr} />
             </div>
             {!listingType.startsWith("COMMERCIAL") && RESIDENTIAL_KINDS.includes(d.kind) && (
               <label className="flex items-center gap-2 text-sm font-semibold">
@@ -646,7 +657,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
           {step < 5 ? (
             <Button
               onClick={() => {
-                if (step === 2 && (!extras.ok || !detailsOk)) {
+                if (step === 2 && (!extras.ok || !ess.ok || !detailsOk)) {
                   setShowExtrasErr(true);
                   setShowDetailsErr(true);
                   return;

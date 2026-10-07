@@ -8,7 +8,7 @@
     "forAgencies": "New Place para agencias", "legal": "Precios en USD. Conversión a VES/EUR solo referencial.", "listedOn": "Listed on New Place", "sellWithUs": "Vender con nosotros", "valuation": "Valorar mi propiedad"
   },
   "admin": {
-    "dashboard": "Panel", "leads": "Leads", "listings": "Inmuebles", "calendar": "Calendario", "capture": "Captación", "media": "Fotografía", "team": "Equipo", "reports": "Informes", "settings": "Ajustes",
+    "dashboard": "Panel", "leads": "Leads", "listings": "Inmuebles", "calendar": "Calendario", "capture": "Captación", "media": "Fotografía", "team": "Equipo", "reports": "Informes", "teamAudit": "Auditoría", "settings": "Ajustes",
     "globalMetrics": "Métricas globales", "agencies": "Agencias", "users": "Usuarios", "moderation": "Moderación", "audit": "Auditoría", "ai": "IA · FX · Seed",
     "publicSite": "Ver sitio público", "search": "Buscar lead, inmueble, persona…", "notifications": "Notificaciones"
   },

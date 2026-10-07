@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Loader2, Lock, Save } from "lucide-react";
+import { Check, Loader2, Lock, PhoneCall, Save } from "lucide-react";
 import type { Agency, Locale } from "@/types/domain";
 import { AdminShell } from "@/components/layout/AdminShell";
 import { Logo } from "@/components/brand/Logo";
@@ -12,13 +12,35 @@ import { cn } from "@/lib/cn";
 import { useApp } from "@/lib/store";
 import { api } from "@/lib/api";
 import { money, tx } from "@/lib/i18n";
+import { caracasWeekday } from "@/lib/caracas-time";
+import { WEEKDAY_LABEL, WEEK_ORDER, type OnCallRotation } from "@/lib/on-call";
 
-export function SettingsView({ locale, agency, rule, logoUrl = "" }: { locale: Locale; agency: Agency; logoUrl?: string; rule: { salePct: number; agentSplitPct: number; rentMonths: number; captorPct: number } }) {
+type Advisor = { id: string; name: string; owner: boolean };
+
+export function SettingsView({
+  locale,
+  agency,
+  rule,
+  logoUrl = "",
+  onCall: onCallInit,
+  advisors = [],
+}: {
+  locale: Locale;
+  agency: Agency;
+  logoUrl?: string;
+  rule: { salePct: number; agentSplitPct: number; rentMonths: number; captorPct: number };
+  onCall?: OnCallRotation;
+  advisors?: Advisor[];
+}) {
   const router = useRouter();
   const { user } = useApp();
   const owner = user?.role === "AGENCY_OWNER" || user?.role === "SUPERADMIN";
   const [b, setB] = useState({ name: agency.name, color: agency.color, phone: agency.phone, whatsapp: agency.whatsapp, logoUrl });
   const [r, setR] = useState(rule);
+  const [onCall, setOnCall] = useState<OnCallRotation | undefined>(onCallInit);
+  // Today's weekday on the Caracas clock, computed after mount so server and client markup always match.
+  const [today, setToday] = useState<number | null>(null);
+  useEffect(() => setToday(caracasWeekday()), []);
   const [busy, setBusy] = useState(false);
   const [saved, setSaved] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -27,7 +49,7 @@ export function SettingsView({ locale, agency, rule, logoUrl = "" }: { locale: L
     setBusy(true);
     setErr(null);
     try {
-      await api("agency", { method: "PATCH", json: { ...b, logoUrl: b.logoUrl.trim() || null } });
+      await api("agency", { method: "PATCH", json: { ...b, logoUrl: b.logoUrl.trim() || null, ...(onCall ? { onCall } : {}) } });
       await api("agency/commission", { method: "PUT", json: r });
       setSaved(true);
       router.refresh();
@@ -102,6 +124,58 @@ export function SettingsView({ locale, agency, rule, logoUrl = "" }: { locale: L
           </div>
         </div>
       </div>
+      {onCall && (
+        <section className={cn(k.card, "mt-6 p-5 md:p-6")} aria-labelledby="oncall-title">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h2 id="oncall-title" className={cn(k.title, "flex items-center gap-2")}><PhoneCall size={18} strokeWidth={1.6} className={k.muted} aria-hidden /> {tx(locale, "Guardia 24/7", "24/7 on-call")}</h2>
+              <p className={cn("mt-1 max-w-[60ch] text-sm", k.muted)}>
+                {tx(
+                  locale,
+                  "Elige quién atiende cada día (hora de Caracas). El asesor de guardia aparece en la web pública con su nombre, teléfono y WhatsApp; nunca su email.",
+                  "Pick who answers each day (Caracas time). The on-call advisor is shown on the public site with name, phone and WhatsApp; never their email.",
+                )}
+              </p>
+            </div>
+          </div>
+          {advisors.length === 0 ? (
+            <p className={cn("mt-4", k.warnBox)}>{tx(locale, "Aún no hay asesores en el equipo. Invita a un agente para armar la guardia.", "No advisors on the team yet. Invite an agent to build the rota.")}</p>
+          ) : (
+            <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {WEEK_ORDER.map((d) => {
+                const isToday = today === Number(d);
+                const label = tx(locale, ...WEEKDAY_LABEL[d]);
+                return (
+                  <label key={d} className={cn("block rounded-xl border p-3", k.line, isToday && "border-navy/40 dark:border-[#E79A7F]/50")}>
+                    <span className="mb-1.5 flex items-center justify-between gap-2 text-sm font-semibold text-navy dark:text-ivory">
+                      {label}
+                      {isToday && <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[.12em]", k.soft)}>{tx(locale, "Hoy", "Today")}</span>}
+                    </span>
+                    <select
+                      className={k.input}
+                      disabled={!owner}
+                      value={onCall[d] ?? ""}
+                      aria-label={tx(locale, `Guardia del ${label.toLowerCase()}`, `On call on ${label}`)}
+                      onChange={(e) => {
+                        setOnCall({ ...onCall, [d]: e.target.value || null });
+                        dirty();
+                      }}
+                    >
+                      <option value="">{tx(locale, "Sin guardia", "Nobody")}</option>
+                      {advisors.map((a) => (
+                        <option key={a.id} value={a.id}>{a.name}{a.owner ? tx(locale, " (dueño/a)", " (owner)") : ""}</option>
+                      ))}
+                    </select>
+                  </label>
+                );
+              })}
+            </div>
+          )}
+          {advisors.length > 0 && WEEK_ORDER.some((d) => !onCall[d]) && (
+            <p className={cn("mt-3 text-sm", k.muted)}>{tx(locale, "Los días sin guardia no muestran asesor en la web pública.", "Days with nobody on call show no advisor on the public site.")}</p>
+          )}
+        </section>
+      )}
     </AdminShell>
   );
 }

@@ -36,6 +36,7 @@ a{color:inherit}
 .minibar{display:flex;height:34px;border-radius:8px;overflow:hidden}
 .minibar i{display:block}
 
+.vids{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:14px;margin-top:8px}.vid{margin:0;display:grid;gap:8px}.vid video{width:100%;aspect-ratio:16/10;border-radius:12px;background:#000;display:block}.vid figcaption{font-size:14px;color:var(--soft)}
 /* Proposal band */
 .prop{--fd:Georgia,serif;--fb:system-ui,sans-serif;background:var(--bg);color:var(--ink);padding-block:64px;font-family:var(--fb)}
 .prop .wrap{display:grid;gap:44px}
@@ -158,6 +159,7 @@ a{color:inherit}
     <a class="pick" href="#b"><b>B · Piedra y Camel</b><span>Lujo silencioso, cuero y piedra</span><span class="minibar" aria-hidden="true"><i style="flex:55;background:#EFEAE2"></i><i style="flex:15;background:#CFC4B4"></i><i style="flex:20;background:#24201C"></i><i style="flex:4;background:#4A3326"></i><i style="flex:4;background:#9A6238"></i><i style="flex:2;background:#B8862F"></i></span></a>
     <a class="pick" href="#c"><b>C · Musgo y Ocre</b><span>Lujo natural, tierra y vegetación</span><span class="minibar" aria-hidden="true"><i style="flex:55;background:#F2EEE3"></i><i style="flex:15;background:#DDD2BC"></i><i style="flex:15;background:#3F4A33"></i><i style="flex:8;background:#2A241F"></i><i style="flex:5;background:#7B4A30"></i><i style="flex:2;background:#B8862F"></i></span></a>
   </nav>
+  <section class="vids" aria-label="Vídeos"><figure class="vid"><video controls preload="metadata" playsinline poster="../../videos/poster-paleta-a.jpg" src="../../videos/new-place-paleta-a.mp4"></video><figcaption>A · Arcilla y Obsidiana · la web real en 1 minuto</figcaption></figure><figure class="vid"><video controls preload="metadata" playsinline poster="../../videos/poster-paleta-b.jpg" src="../../videos/new-place-paleta-b.mp4"></video><figcaption>B · Piedra y Camel · la web real en 1 minuto</figcaption></figure><figure class="vid"><video controls preload="metadata" playsinline poster="../../videos/poster-paleta-c.jpg" src="../../videos/new-place-paleta-c.mp4"></video><figcaption>C · Musgo y Ocre · la web real en 1 minuto</figcaption></figure></section>
 </header>
 
 <!-- ═════════ A ═════════ -->

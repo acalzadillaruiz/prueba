@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { GATE_COOKIE, gateCode, gateToken, safeNext } from "@/lib/site-gate";
-import { allowed, hit } from "@/server/rate-limit";
+import { allowed, clientIp, hit, UNTRUSTED_IP } from "@/server/rate-limit";
 
 /** Pre-launch gate: checks the fixed access code (form POST) and sets the signed cookie. */
 export async function POST(req: Request) {
@@ -11,7 +11,10 @@ export async function POST(req: Request) {
   const code = gateCode();
   if (!code) return NextResponse.redirect(new URL(next, req.url), 303);
   // 6-digit codes are guessable: 10 tries per 15 min per client, and a site-wide ceiling against distributed guessing.
-  if (!(await allowed(req, "gate", 10, 900))) return back("limit");
+  // Behind a proxy with no trusted client-IP source every visitor shares one bucket: a few typos by one person must
+  // not lock everyone out, so that shared bucket is wider (the site-wide hourly ceiling below still caps guessing).
+  const shared = clientIp(req) === UNTRUSTED_IP;
+  if (!(await allowed(req, "gate", shared ? 60 : 10, 900))) return back("limit");
   if (process.env.NODE_ENV === "production" && !(await hit("gate-all", 300, 3600))) return back("limit");
   const given = String(form?.get("code") ?? "").replace(/\s+/g, "");
   let diff = given.length ^ code.length;

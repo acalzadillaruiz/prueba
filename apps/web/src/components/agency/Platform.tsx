@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -39,6 +39,14 @@ function useRun() {
   };
   return { busy, err, run };
 }
+
+const hostOf = (url: string) => {
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return url;
+  }
+};
 
 export interface PlatformHomeData {
   agencies: (Agency & { listings: number })[];
@@ -113,12 +121,22 @@ export function PlatformAgencies({ locale, agencies }: { locale: Locale; agencie
   const { busy, err, run } = useRun();
   const [creating, setCreating] = useState(false);
   const [f, setF] = useState({ name: "", city: "Caracas" });
+  // Status and plan changes affect a whole agency: the select only proposes, an inline step confirms.
+  const [pending, setPending] = useState<{ id: string; field: "status" | "plan"; value: string } | null>(null);
+  const STATUS: Record<string, [string, string]> = { ACTIVE: ["Activa", "Active"], TRIAL: ["En prueba", "Trial"], SUSPENDED: ["Suspendida", "Suspended"] };
+  const PLAN: Record<string, [string, string]> = { FREE: ["Gratis", "Free"], PRO: ["Profesional", "Professional"], ENTERPRISE: ["Empresa", "Enterprise"] };
+  const consequence = (a: Agency, p: { field: "status" | "plan"; value: string }) =>
+    p.field === "plan"
+      ? tx(locale, `¿Seguro? ${a.name} pasará del plan ${PLAN[a.plan]?.[0] ?? a.plan} al plan ${PLAN[p.value]?.[0] ?? p.value}. Esto cambia lo que su equipo puede usar.`, `Sure? ${a.name} will move from the ${PLAN[a.plan]?.[1] ?? a.plan} plan to ${PLAN[p.value]?.[1] ?? p.value}. This changes what its team can use.`)
+      : p.value === "SUSPENDED"
+        ? tx(locale, `¿Seguro? Si suspendes ${a.name}, sus inmuebles dejarán de verse y su equipo perderá el acceso.`, `Sure? Suspending ${a.name} hides its listings and its team loses access.`)
+        : tx(locale, `¿Seguro? ${a.name} pasará de «${STATUS[a.status]?.[0] ?? a.status}» a «${STATUS[p.value]?.[0] ?? p.value}».`, `Sure? ${a.name} will go from “${STATUS[a.status]?.[1] ?? a.status}” to “${STATUS[p.value]?.[1] ?? p.value}”.`);
   return (
     <AdminShell locale={locale} area="platform" title={tx(locale, "Agencias", "Agencies")} actions={<Button className={k.primary} onClick={() => setCreating(!creating)} aria-expanded={creating}><Plus size={16} /> {tx(locale, "Nueva agencia", "New agency")}</Button>}>
       {err && <div role="alert" className="mb-4 rounded-lg bg-[#B3261E33] px-3 py-2 text-sm text-[#C9A574]">{err}</div>}
       {current && (
         <div className="np-in mb-4 flex flex-wrap items-center gap-3 rounded-[18px] bg-rosa/70 px-4 py-3 text-sm text-navy dark:bg-white/[.08] dark:text-ivory">
-          <LogIn size={16} strokeWidth={1.7} /> {tx(locale, `Impersonando a ${current.name}. Todo queda en el registro de auditoría.`, `Impersonating ${current.name}. Everything is audit-logged.`)}
+          <LogIn size={16} strokeWidth={1.7} /> {tx(locale, `Estás dentro de ${current.name} como su equipo. Todo lo que hagas queda en el registro de auditoría.`, `You’re inside ${current.name} as its team. Everything you do is recorded in the audit log.`)}
           <a href={`/${locale}/agency`} className={cn("ml-auto", k.link)}>{tx(locale, "Abrir panel", "Open dashboard")} →</a>
           <button onClick={() => run("exit", () => api("platform/impersonate", { method: "POST", json: { agencyId: null } }))} className={cn("rounded-full px-3 py-1", k.ghost)}>{tx(locale, "Salir", "Exit")}</button>
         </div>
@@ -137,22 +155,30 @@ export function PlatformAgencies({ locale, agencies }: { locale: Locale; agencie
           </thead>
           <tbody>
             {agencies.map((a) => (
-              <tr key={a.id} className={cn("border-t first:border-t-0", k.line)}>
+              <Fragment key={a.id}>
+              <tr className={cn("border-t first:border-t-0", k.line)}>
                 <td className="px-4 py-3"><div className="flex items-center gap-3"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl font-display text-xs font-bold text-navy" style={{ background: a.color }}>{a.initials}</span><div><div className="font-semibold">{a.name}</div><div className={cn("text-xs", k.muted)}>{a.city} · {tx(locale, "desde", "since")} {dateTime(a.createdAt, locale, { month: "short", year: "numeric" })}</div></div></div></td>
                 <td className="px-3">
-                  <select value={a.status} onChange={(e) => {
-                      const status = e.target.value;
-                      // Suspending hides every listing of the agency and signs its team out: ask first.
-                      if (status === "SUSPENDED" && !window.confirm(tx(locale, `¿Suspender ${a.name}? Sus inmuebles dejarán de verse y su equipo perderá el acceso.`, `Suspend ${a.name}? Its listings will be hidden and its team will lose access.`))) return;
-                      run(a.id, () => api(`platform/agencies/${a.id}`, { method: "PATCH", json: { status } }));
-                    }} className={k.select} aria-label={tx(locale, "Estado", "Status")}>
-                    <option value="ACTIVE">{tx(locale, "Activa", "Active")}</option><option value="TRIAL">{tx(locale, "En prueba", "Trial")}</option><option value="SUSPENDED">{tx(locale, "Suspendida", "Suspended")}</option>
+                  <select
+                    value={pending?.id === a.id && pending.field === "status" ? pending.value : a.status}
+                    disabled={busy === a.id}
+                    onChange={(e) => setPending(e.target.value === a.status ? null : { id: a.id, field: "status", value: e.target.value })}
+                    className={k.select}
+                    aria-label={tx(locale, `Estado de ${a.name}`, `Status of ${a.name}`)}
+                  >
+                    {Object.entries(STATUS).map(([v, [es, en]]) => <option key={v} value={v}>{tx(locale, es, en)}</option>)}
                   </select>
                 </td>
                 <td className="px-3">{a.verified ? <Pill tone="ok"><ShieldCheck size={12} /> {tx(locale, "Verificada", "Verified")}</Pill> : <Button size="sm" variant="outline" className={k.outline} disabled={busy === a.id} onClick={() => run(a.id, () => api(`platform/agencies/${a.id}`, { method: "PATCH", json: { verified: true } }))}><Eye size={13} /> {tx(locale, "Verificar", "Verify")}</Button>}</td>
                 <td className="px-3">
-                  <select value={a.plan} onChange={(e) => run(a.id, () => api(`platform/agencies/${a.id}`, { method: "PATCH", json: { plan: e.target.value } }))} className={k.select} aria-label="Plan">
-                    <option>FREE</option><option>PRO</option><option>ENTERPRISE</option>
+                  <select
+                    value={pending?.id === a.id && pending.field === "plan" ? pending.value : a.plan}
+                    disabled={busy === a.id}
+                    onChange={(e) => setPending(e.target.value === a.plan ? null : { id: a.id, field: "plan", value: e.target.value })}
+                    className={k.select}
+                    aria-label={tx(locale, `Plan de ${a.name}`, `Plan of ${a.name}`)}
+                  >
+                    {Object.entries(PLAN).map(([v, [es, en]]) => <option key={v} value={v}>{tx(locale, es, en)}</option>)}
                   </select>
                 </td>
                 <td className="px-3 text-right">{a.listings}</td>
@@ -160,10 +186,23 @@ export function PlatformAgencies({ locale, agencies }: { locale: Locale; agencie
                 <td className="px-3 text-right">{a.leads30}</td>
                 <td className="px-3">
                   <Button size="sm" variant={current?.id === a.id ? "navy" : "outline"} className={current?.id === a.id ? k.navy : k.outline} disabled={busy === `imp-${a.id}`} onClick={() => run(`imp-${a.id}`, () => api("platform/impersonate", { method: "POST", json: { agencyId: a.id } }))}>
-                    <LogIn size={13} /> {current?.id === a.id ? tx(locale, "Activa", "Active") : tx(locale, "Impersonar", "Impersonate")}
+                    <LogIn size={13} /> {current?.id === a.id ? tx(locale, "Dentro", "Inside") : tx(locale, "Entrar como esta agencia", "Enter as this agency")}
                   </Button>
                 </td>
               </tr>
+              {pending?.id === a.id && (
+                <tr className={cn("border-t", k.line)}>
+                  <td colSpan={8} className="px-4 py-3">
+                    <div className="np-in flex flex-wrap items-center gap-3 rounded-xl bg-[#B3261E0D] p-3 text-sm dark:bg-[#B3261E26]" role="alert">
+                      <AlertTriangle size={16} className={k.warnText} />
+                      <span className="min-w-0 flex-1">{consequence(a, pending)}</span>
+                      <Button size="sm" className="bg-danger hover:bg-[#962019] dark:bg-[#F3A493] dark:text-navy" onClick={() => { const p = pending; setPending(null); void run(a.id, () => api(`platform/agencies/${a.id}`, { method: "PATCH", json: { [p.field]: p.value } })); }}>{tx(locale, "Confirmar", "Confirm")}</Button>
+                      <Button size="sm" variant="ghost" className={k.ghost} onClick={() => setPending(null)}>{tx(locale, "Cancelar", "Cancel")}</Button>
+                    </div>
+                  </td>
+                </tr>
+              )}
+              </Fragment>
             ))}
           </tbody>
         </table>
@@ -181,6 +220,7 @@ export function PlatformUsers({ locale, users, providers }: { locale: Locale; us
   const { busy, err, run } = useRun();
   const [roleErr, setRoleErr] = useState<string | null>(null);
   const [q, setQ] = useState("");
+  const [suspending, setSuspending] = useState<string | null>(null);
   const rows = users.filter((u) => (u.name + u.email + u.role + tr(u.role) + (u.agencyName ?? "")).toLowerCase().includes(q.toLowerCase()));
   const changeRole = (u: User & { agencyName?: string }, role: Role) =>
     run(`role-${u.id}`, async () => {
@@ -212,7 +252,8 @@ export function PlatformUsers({ locale, users, providers }: { locale: Locale; us
           <thead className={cn("border-b text-left", k.line, k.th)}><tr><th className="px-4 py-3">{tx(locale, "Usuario", "User")}</th><th className="px-3 py-3">{tx(locale, "Rol", "Role")}</th><th className="px-3 py-3">{tx(locale, "Agencia", "Agency")}</th><th className="px-3 py-3">{tx(locale, "Acceso", "Sign-in")}</th><th className="px-3 py-3">{tx(locale, "Actividad", "Activity")}</th><th className="px-3 py-3" /></tr></thead>
           <tbody>
             {rows.map((u) => (
-              <tr key={u.id} className={cn("border-t first:border-t-0", k.line, u.suspended && "opacity-50")}>
+              <Fragment key={u.id}>
+              <tr className={cn("border-t first:border-t-0", k.line, u.suspended && "opacity-50")}>
                 <td className="px-4 py-2.5"><div className="flex items-center gap-3"><Initials name={u.name} size={36} /><div><div className="font-semibold">{u.name}</div><div className={cn("text-xs", k.muted)}>{u.email}</div></div></div></td>
                 <td className="px-3">
                   {u.id === me?.id ? (
@@ -236,14 +277,28 @@ export function PlatformUsers({ locale, users, providers }: { locale: Locale; us
                 <td className="px-3">
                   {u.id !== me?.id && (
                     <button disabled={busy === u.id} onClick={() => {
-                      if (!u.suspended && !window.confirm(tx(locale, `¿Suspender a ${u.name}? No podrá iniciar sesión.`, `Suspend ${u.name}? They won’t be able to sign in.`))) return;
-                      run(u.id, () => api(`platform/users/${u.id}`, { method: "PATCH", json: { suspended: !u.suspended } }));
+                      // Suspending is confirmed inline (below the row); restoring needs no confirmation.
+                      if (!u.suspended) return setSuspending(suspending === u.id ? null : u.id);
+                      run(u.id, () => api(`platform/users/${u.id}`, { method: "PATCH", json: { suspended: false } }));
                     }} className={cn("rounded-full p-2 hover:bg-[#E6DDD2] dark:hover:bg-white/5", u.suspended ? k.okText : k.dangerText)} aria-label={u.suspended ? tx(locale, "Reactivar", "Restore") : tx(locale, "Suspender", "Suspend")} title={u.suspended ? tx(locale, "Reactivar", "Restore") : tx(locale, "Suspender", "Suspend")}>
                       {u.suspended ? <RotateCcw size={14} /> : <Ban size={14} />}
                     </button>
                   )}
                 </td>
               </tr>
+              {suspending === u.id && !u.suspended && (
+                <tr className={cn("border-t", k.line)}>
+                  <td colSpan={6} className="px-4 py-3">
+                    <div className="np-in flex flex-wrap items-center gap-3 rounded-xl bg-[#B3261E0D] p-3 text-sm dark:bg-[#B3261E26]" role="alert">
+                      <AlertTriangle size={16} className={k.warnText} />
+                      <span className="min-w-0 flex-1">{tx(locale, `¿Seguro? Si suspendes a ${u.name}, no podrá iniciar sesión hasta que lo reactives.`, `Sure? If you suspend ${u.name}, they can’t sign in until you restore them.`)}</span>
+                      <Button size="sm" className="bg-danger hover:bg-[#962019] dark:bg-[#F3A493] dark:text-navy" onClick={() => { setSuspending(null); void run(u.id, () => api(`platform/users/${u.id}`, { method: "PATCH", json: { suspended: true } })); }}>{tx(locale, "Sí, suspender", "Yes, suspend")}</Button>
+                      <Button size="sm" variant="ghost" className={k.ghost} onClick={() => setSuspending(null)}>{tx(locale, "Cancelar", "Cancel")}</Button>
+                    </div>
+                  </td>
+                </tr>
+              )}
+              </Fragment>
             ))}
           </tbody>
         </table>
@@ -379,37 +434,40 @@ export function PlatformAI({ locale, settings, fx, counts }: { locale: Locale; s
   const [rates, setRates] = useState(fx);
   const [msg, setMsg] = useState<string | null>(null);
   return (
-    <AdminShell locale={locale} area="platform" title={tx(locale, "IA · Tasas FX · Seed", "AI · FX rates · Seed")}>
+    <AdminShell locale={locale} area="platform" title={tx(locale, "Valoraciones, tasas y datos", "Valuations, rates & data")}>
       {err && <div role="alert" className={cn("mb-4", k.err)}>{err}</div>}
       <div className="grid gap-6 [&>*]:min-w-0 xl:grid-cols-2">
         <div className={cn(k.card, "self-start p-5 md:p-6")}>
-          <h2 className={cn(k.title, "flex items-center gap-2")}><Bot size={18} strokeWidth={1.6} /> {tx(locale, "Proveedor de IA", "AI provider")}</h2>
-          <p className={cn("mt-1 text-sm", k.muted)}>{tx(locale, "Una sola interfaz AIProvider para las 4 funciones. Cambia en caliente.", "One AIProvider interface for all 4 features. Hot-swappable.")}</p>
+          <h2 className={cn(k.title, "flex items-center gap-2")}><Bot size={18} strokeWidth={1.6} /> {tx(locale, "Motor de valoración y textos", "Valuation & writing engine")}</h2>
+          <p className={cn("mt-1 text-sm", k.muted)}>{tx(locale, "Elige quién calcula las valoraciones, redacta los anuncios y puntúa los contactos. El cambio se aplica al momento.", "Choose what computes valuations, writes listings and scores leads. Changes apply right away.")}</p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            {([["heuristic", "HeuristicProvider", tx(locale, "Local · sin API key · por defecto", "Local · no API key · default")], ["openai-compatible", "OpenAICompatibleProvider", "OpenAI · Groq · xAI · OpenRouter…"]] as const).map(([key, n, d]) => (
+            {([
+              ["heuristic", tx(locale, "Reglas internas", "Internal rules"), tx(locale, "Funciona sin servicios externos. Es la opción por defecto.", "Works without outside services. The default.")],
+              ["openai-compatible", tx(locale, "Proveedor de IA externo", "External AI provider"), tx(locale, "Un servicio de IA contratado (OpenAI, Groq…). Necesita su clave.", "A paid AI service (OpenAI, Groq…). Needs its key.")],
+            ] as const).map(([key, n, d]) => (
               <button key={key} disabled={busy === "ai"} onClick={() => run("ai", () => api("platform/settings", { method: "PUT", json: { aiProvider: key } }))} aria-pressed={settings.aiProvider === key} className={cn("rounded-[18px] p-4 text-left transition-shadow duration-np", settings.aiProvider === key ? "bg-[#E6DDD2] shadow-[inset_0_0_0_2px_#1E1A18] dark:bg-white/10 dark:shadow-[inset_0_0_0_2px_#C9A574]" : cn("shadow-[inset_0_0_0_1px_#D8CBB7] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,.15)]", k.hover))}>
-                <div className="flex items-center justify-between"><span className="font-mono text-sm font-semibold">{n}</span>{settings.aiProvider === key && <CheckCircle2 size={16} />}</div>
+                <div className="flex items-center justify-between"><span className="font-display text-sm font-semibold">{n}</span>{settings.aiProvider === key && <CheckCircle2 size={16} />}</div>
                 <div className={cn("mt-1 text-xs", k.muted)}>{d}</div>
               </button>
             ))}
           </div>
           {settings.aiProvider === "openai-compatible" && (
             <div className={cn("np-in mt-4 space-y-2 rounded-xl p-3.5 text-sm", k.soft)}>
-              <div className="flex justify-between"><span className={k.muted}>AI_BASE_URL</span><code>{settings.aiBaseUrl ?? "—"}</code></div>
-              <div className="flex justify-between"><span className={k.muted}>AI_MODEL</span><code>{settings.aiModel ?? "—"}</code></div>
-              <div className="flex justify-between"><span className={k.muted}>AI_API_KEY</span><code>{settings.aiKeyConfigured ? "••••••••" : tx(locale, "no configurada", "not set")}</code></div>
-              {!settings.aiKeyConfigured && <div className={cn("flex items-center gap-2 text-xs", k.warnBox)}><AlertTriangle size={14} /> {tx(locale, "Sin key: la plataforma sigue usando Heuristic automáticamente. Nunca se rompe.", "No key: the platform keeps using Heuristic automatically. It never breaks.")}</div>}
+              <div className="flex justify-between gap-3"><span className={k.muted}>{tx(locale, "Servicio", "Service")}</span><span className="truncate">{settings.aiBaseUrl ? hostOf(settings.aiBaseUrl) : tx(locale, "sin configurar", "not set")}</span></div>
+              <div className="flex justify-between gap-3"><span className={k.muted}>{tx(locale, "Modelo", "Model")}</span><span className="truncate">{settings.aiModel ?? tx(locale, "sin configurar", "not set")}</span></div>
+              <div className="flex justify-between gap-3"><span className={k.muted}>{tx(locale, "Clave", "Key")}</span><span>{settings.aiKeyConfigured ? tx(locale, "configurada", "set") : tx(locale, "falta", "missing")}</span></div>
+              {!settings.aiKeyConfigured && <div className={cn("flex items-center gap-2 text-xs", k.warnBox)}><AlertTriangle size={14} /> {tx(locale, "Falta la clave: mientras tanto se usan las reglas internas, así que nada deja de funcionar. Pídela al equipo técnico.", "The key is missing: internal rules are used meanwhile, so nothing stops working. Ask the tech team for it.")}</div>}
             </div>
           )}
-          <div className="mt-5 grid grid-cols-2 gap-2 text-sm">
-            {[["estimate()", "PlaceEstimate"], ["searchParse()", tx(locale, "Búsqueda NL", "NL search")], ["writeListing()", tx(locale, "Redactar con IA", "Write with AI")], ["leadScore()", "Score + next action"]].map(([fn, t]) => (
-              <div key={fn} className={cn("flex items-center gap-2 rounded-xl px-3 py-2.5", k.soft)}><CheckCircle2 size={14} className={cn("shrink-0", k.okText)} /><code className="text-xs font-semibold">{fn}</code><span className={cn("truncate text-xs", k.muted)}>{t}</span></div>
+          <div className="mt-5 grid gap-2 text-sm sm:grid-cols-2">
+            {[tx(locale, "Valoración de inmuebles (PlaceEstimate)", "Property valuation (PlaceEstimate)"), tx(locale, "Búsqueda escribiendo con tus palabras", "Search in plain words"), tx(locale, "Redactar anuncios", "Write listings"), tx(locale, "Puntuar contactos y sugerir el siguiente paso", "Score leads and suggest the next step")].map((t) => (
+              <div key={t} className={cn("flex items-center gap-2 rounded-xl px-3 py-2.5", k.soft)}><CheckCircle2 size={14} className={cn("shrink-0", k.okText)} /><span className="text-xs">{t}</span></div>
             ))}
           </div>
         </div>
         <div className="space-y-6">
           <div className={cn(k.card, "p-5 md:p-6")}>
-            <div className="flex items-center justify-between"><h2 className={k.title}>{tx(locale, "Tasas de cambio (display)", "FX rates (display)")}</h2><Chip className="font-mono text-[11px]">fx_rates</Chip></div>
+            <h2 className={k.title}>{tx(locale, "Tasas de cambio", "Exchange rates")}</h2>
             <table className="mt-3 w-full text-sm">
               <tbody>
                 {rates.map((r, i) => (
@@ -417,7 +475,7 @@ export function PlatformAI({ locale, settings, fx, counts }: { locale: Locale; s
                     <td className="py-2.5 font-semibold">1 USD →</td>
                     <td><input className={cn(k.input, "h-9 w-32 md:h-9")} type="number" step="0.01" value={r.perUsd} onChange={(e) => setRates(rates.map((x, j) => (j === i ? { ...x, perUsd: +e.target.value } : x)))} aria-label={r.code} /></td>
                     <td className="font-display">{r.code}</td>
-                    <td className={cn("text-xs", k.muted)}>{ago(r.updatedAt, locale)} · {r.source}</td>
+                    <td className={cn("text-xs", k.muted)}>{tx(locale, "actualizada", "updated")} {ago(r.updatedAt, locale)}{/seed|manual/i.test(r.source) ? tx(locale, " · a mano", " · by hand") : ` · ${r.source}`}</td>
                   </tr>
                 ))}
               </tbody>
@@ -428,23 +486,23 @@ export function PlatformAI({ locale, settings, fx, counts }: { locale: Locale; s
                 // Show the saved values and their new timestamp/source (local state doesn't follow router.refresh).
                 setRates(rates.map((x) => r.rates.find((y) => y.code === x.code) ?? x));
               })}>{busy === "fx" && <Loader2 size={13} className="animate-spin" />} {tx(locale, "Guardar tasas", "Save rates")}</Button>
-              <span className={cn("text-xs", k.muted)}>{tx(locale, "Solo para mostrar conversiones. No hay pagos en v1.", "Display conversions only. No payments in v1.")}</span>
+              <span className={cn("text-xs", k.muted)}>{tx(locale, "Solo sirven para mostrar precios convertidos; la plataforma no cobra pagos.", "Only used to show converted prices; the platform takes no payments.")}</span>
             </div>
           </div>
           <div className={cn(k.card, "p-5 md:p-6")}>
-            <h2 className={cn(k.title, "flex items-center gap-2")}><Sprout size={18} strokeWidth={1.6} /> {tx(locale, "Datos de demostración", "Seed tools")}</h2>
-            <div className="mt-3 grid grid-cols-4 gap-3 text-center text-sm">
-              {[[counts.listings, "listings"], [counts.agencies, tx(locale, "agencias", "agencies")], [counts.users, tx(locale, "usuarios", "users")], [counts.leads, "leads"]].map(([n, t]) => (
+            <h2 className={cn(k.title, "flex items-center gap-2")}><Sprout size={18} strokeWidth={1.6} /> {tx(locale, "Datos de la plataforma", "Platform data")}</h2>
+            <div className="mt-3 grid grid-cols-2 gap-3 text-center text-sm sm:grid-cols-4">
+              {[[counts.listings, tx(locale, "inmuebles", "listings")], [counts.agencies, tx(locale, "agencias", "agencies")], [counts.users, tx(locale, "usuarios", "users")], [counts.leads, tx(locale, "contactos", "leads")]].map(([n, t]) => (
                 <div key={String(t)} className={cn("rounded-xl p-3", k.soft)}><div className={cn(k.num, "text-[26px] leading-tight")}>{n}</div><div className={cn("text-xs", k.muted)}>{t}</div></div>
               ))}
             </div>
-            <div className="mt-4 flex flex-wrap gap-2">
-              <Button size="sm" variant="outline" className={k.outline} disabled={busy === "est"} onClick={() => run("est", async () => { const r = await api<{ recomputed: number }>("platform/estimates", { method: "POST" }); setMsg(tx(locale, `✓ PlaceEstimate recalculado en ${r.recomputed} inmuebles`, `✓ PlaceEstimate recomputed for ${r.recomputed} listings`)); })}>
-                {busy === "est" ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />} {tx(locale, "Recalcular PlaceEstimate", "Recompute PlaceEstimate")}
+            <div className="mt-4 flex flex-wrap items-center gap-3">
+              <Button size="sm" variant="outline" className={k.outline} disabled={busy === "est"} onClick={() => run("est", async () => { const r = await api<{ recomputed: number }>("platform/estimates", { method: "POST" }); setMsg(tx(locale, `✓ Valoraciones recalculadas en ${r.recomputed} inmuebles`, `✓ Valuations recomputed for ${r.recomputed} listings`)); })}>
+                {busy === "est" ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />} {tx(locale, "Recalcular valoraciones", "Recompute valuations")}
               </Button>
-              <code className={cn("self-center rounded-lg px-2 py-1 text-xs", k.soft, k.muted)}>npm run db:seed</code>
+              <span className={cn("text-xs", k.muted)}>{tx(locale, "Útil después de cambiar el motor de valoración.", "Handy after changing the valuation engine.")}</span>
             </div>
-            {msg && <div className={cn("np-in mt-3 font-mono text-xs", k.okBox)}>{msg}</div>}
+            {msg && <div className={cn("np-in mt-3 text-xs", k.okBox)}>{msg}</div>}
           </div>
         </div>
       </div>

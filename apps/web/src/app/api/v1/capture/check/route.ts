@@ -7,7 +7,7 @@ import { publicWhere } from "@/server/listings";
 import { prisma } from "@newplace/db";
 import { limit } from "@/server/rate-limit";
 
-const Check = z.object({ address: z.string().min(3), areaM2: z.number().int().positive(), lat: z.number().optional(), lng: z.number().optional() });
+const Check = z.object({ address: z.string().min(3), areaM2: z.number().int().nonnegative(), lat: z.number().optional(), lng: z.number().optional() });
 
 /** Anti-duplicate check (fingerprint lat/lng + m² + address hash). */
 /** Duplicate check. Public (the owner wizard runs it before sign-in) but rate-limited; internals only for staff. */

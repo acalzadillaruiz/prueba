@@ -78,7 +78,7 @@ export function PlacesSearch({ locale, zones, value, onPick }: { locale: Locale;
                 </span>
               </button>
             ))}
-            <div className="border-t border-line px-4 py-1.5 text-right text-[10px] text-muted">{tx(locale, "Geocodificador local · añade NEXT_PUBLIC_GOOGLE_MAPS_KEY para Google Places", "Local geocoder · set NEXT_PUBLIC_GOOGLE_MAPS_KEY for Google Places")}</div>
+            <div className="border-t border-line px-4 py-1.5 text-right text-[10px] text-muted">{tx(locale, "Elige la urbanización; después puedes ajustar el punto en el mapa", "Pick the neighborhood; you can fine-tune the point on the map afterwards")}</div>
           </div>
         )}
       </div>

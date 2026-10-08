@@ -3,6 +3,7 @@ import type { Locale } from "@/types/domain";
 import { PlatformAudit } from "@/components/agency/Platform";
 import { auditFilters, auditPage } from "@/server/audit-log";
 import { getAppUser } from "@/server/session";
+import { humanAuditRows } from "@/server/platform";
 
 export const dynamic = "force-dynamic";
 
@@ -18,5 +19,5 @@ export default async function Page({ params, searchParams }: { params: Promise<{
   const one = (v: unknown) => (typeof v === "string" && v.length <= 80 ? v : undefined);
   const filters = { cursor: one(sp.cursor), action: one(sp.action), actor: one(sp.actor) };
   const [page, options] = await Promise.all([auditPage({ cursor: filters.cursor, action: filters.action, actorId: filters.actor }), auditFilters()]);
-  return <PlatformAudit locale={locale} page={page} options={options} filters={filters} />;
+  return <PlatformAudit locale={locale} page={{ ...page, items: await humanAuditRows(page.items, locale) }} options={options} filters={filters} />;
 }

@@ -17,8 +17,17 @@ export function fingerprintOf(lat: number, lng: number, areaM2: number, address:
   return `${lat.toFixed(4)}|${lng.toFixed(4)}|${areaM2}|${(h >>> 0).toString(16)}`;
 }
 
-/** Duplicate if same address hash, or within ~40 m with m² ±5 % (one listing = one physical unit). */
+/**
+ * Duplicate if same address hash, or within ~40 m with m² ±5 % (one listing = one physical unit).
+ * `address` includes the unit ("Av. X, Res. Y, Piso 6, apto 6-B"). With the area still unknown (0, early in the
+ * owner wizard) only the exact address (street + unit) is compared: a pin alone can't tell two flats apart.
+ */
 export async function findDuplicate(lat: number, lng: number, areaM2: number, address: string, excludeId?: string) {
+  if (!(areaM2 > 0)) {
+    const a = address.replace(/\s+/g, " ").trim();
+    if (a.length <= 12) return null;
+    return prisma.listing.findFirst({ where: { id: excludeId ? { not: excludeId } : undefined, address: { equals: a, mode: "insensitive" } } });
+  }
   const fp = fingerprintOf(lat, lng, areaM2, address);
   const exact = await prisma.duplicateFingerprint.findUnique({ where: { fingerprint: fp } });
   if (exact && exact.listingId !== excludeId) return prisma.listing.findUnique({ where: { id: exact.listingId } });

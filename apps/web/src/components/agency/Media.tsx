@@ -122,7 +122,7 @@ export function MediaView({ locale, jobs, listings, names = {}, manage = null }:
     return (
       <AdminShell locale={locale} area="agency" title={tx(locale, "Trabajos de fotografía", "Media jobs")} actions={newButton}>
         {newForm}
-        <Empty className={k.card} title={tx(locale, "Sin trabajos asignados", "No jobs assigned")} body={manage ? tx(locale, "Crea una sesión con «Nueva sesión» y asígnala a un fotógrafo.", "Create a shoot with “New shoot” and assign it to a photographer.") : tx(locale, "Cuando el backoffice te asigne una sesión aparecerá aquí.", "When backoffice assigns a shoot it will show up here.")} />
+        <Empty className={k.card} title={tx(locale, "Sin trabajos asignados", "No jobs assigned")} body={manage ? tx(locale, "Crea una sesión con «Nueva sesión» y asígnala a un fotógrafo.", "Create a shoot with “New shoot” and assign it to a photographer.") : tx(locale, "Cuando la oficina te asigne una sesión, aparecerá aquí.", "When the office assigns you a shoot, it will show up here.")} />
       </AdminShell>
     );
 
@@ -233,7 +233,7 @@ export function MediaView({ locale, jobs, listings, names = {}, manage = null }:
               <div className={cn("mt-5 rounded-xl border border-dashed p-8 text-center text-sm", k.line, k.muted)}>{tx(locale, "Aún no hay fotos. Usa «Subida masiva» (JPG/PNG/WebP, 12 MB máx. cada una).", "No photos yet. Use “Bulk upload” (JPG/PNG/WebP, 12 MB max each).")}</div>
             )}
             <div className={cn("mt-4 flex flex-wrap items-center justify-between gap-2 text-xs", k.muted)}>
-              <span>{tx(locale, "El orden y la portada se ajustan en «Editar inmueble» · StorageProvider: Local (dev) / S3 (prod)", "Order and cover are set in “Edit listing” · StorageProvider: Local (dev) / S3 (prod)")}</span>
+              <span>{tx(locale, "El orden y la portada se ajustan en «Editar inmueble».", "Order and cover are set in “Edit listing”.")}</span>
               <Pill tone={TONE[job.status]}>{statusLabel(job.status)}</Pill>
             </div>
           </div>

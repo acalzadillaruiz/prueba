@@ -174,8 +174,8 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
       }
     >
       {err && <div className={cn("mb-4", k.err)} role="alert">{err}</div>}
-      {l.review === "PENDING" && <div className={cn("mb-4", k.warnBox)}>{tx(locale, "Pendiente de aprobación del backoffice. No es visible al público todavía.", "Pending backoffice approval. Not public yet.")}</div>}
-      {l.review === "REJECTED" && <div className={cn("mb-4", k.err)}>{tx(locale, "Rechazado por el backoffice: no es visible al público.", "Rejected by backoffice: not public.")}{user?.role === "AGENT" && canEdit ? ` ${tx(locale, "Corrígelo y guarda para reenviarlo a revisión.", "Fix it and save to resubmit it for review.")}` : ""}</div>}
+      {l.review === "PENDING" && <div className={cn("mb-4", k.warnBox)}>{tx(locale, "Pendiente de que la oficina de la agencia lo apruebe. Todavía no es visible al público.", "Waiting for the agency office to approve it. Not public yet.")}</div>}
+      {l.review === "REJECTED" && <div className={cn("mb-4", k.err)}>{tx(locale, "La oficina de la agencia lo rechazó: no es visible al público.", "The agency office rejected it: not public.")}{user?.role === "AGENT" && canEdit ? ` ${tx(locale, "Corrígelo y guarda para reenviarlo a revisión.", "Fix it and save to resubmit it for review.")}` : ""}</div>}
       <div className="grid gap-6 [&>*]:min-w-0 xl:grid-cols-[1fr_420px]">
         <div className="space-y-6">
           <div className={section}>
@@ -365,7 +365,7 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
           <div className={section}>
             <h2 className={cn(k.title, "mb-3")}>{tx(locale, "Rendimiento", "Performance")}</h2>
             <div className="grid grid-cols-2 gap-3 text-sm">
-              {[[tx(locale, "Impresiones", "Impressions"), num2(l.stats.impressions, locale)], ["Saves", l.stats.saves], ["Leads", l.stats.leads], [tx(locale, "Tiempo medio", "Avg. time"), dwell(l.stats.avgTimeSec)], [tx(locale, "Interacciones", "Interactions"), l.stats.interactions], [tx(locale, "Días en mercado", "Days on market"), l.daysOnMarket]].map(([t, v]) => (
+              {[[tx(locale, "Impresiones", "Impressions"), num2(l.stats.impressions, locale)], [tx(locale, "Guardados", "Saves"), l.stats.saves], ["Leads", l.stats.leads], [tx(locale, "Tiempo medio", "Avg. time"), dwell(l.stats.avgTimeSec)], [tx(locale, "Interacciones", "Interactions"), l.stats.interactions], [tx(locale, "Días en mercado", "Days on market"), l.daysOnMarket]].map(([t, v]) => (
                 <div key={String(t)} className={cn("rounded-xl p-3.5", k.soft)}><div className={cn("text-[11px] font-semibold uppercase tracking-[.1em]", k.muted)}>{t}</div><div className={cn(k.num, "mt-1 text-[22px] leading-none")}>{v}</div></div>
               ))}
             </div>

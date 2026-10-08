@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, Mail, Send, ShieldCheck, ShieldQuestion, X } from "lucide-react";
+import { AlertTriangle, Loader2, Mail, Send, ShieldCheck, ShieldQuestion, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import type { Role } from "@newplace/config";
 import type { Locale, User } from "@/types/domain";
@@ -29,6 +29,8 @@ export function TeamView({ locale, members, listingsByAgent, invites: initialInv
   const [role, setRole] = useState<Role>("AGENT");
   const [busy, setBusy] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
+  // A role change alters what someone can see and do: the select proposes, an inline step confirms.
+  const [pendingRole, setPendingRole] = useState<{ id: string; role: Role } | null>(null);
   const patch = async (id: string, json: object) => {
     setBusy(id);
     setErr(null);
@@ -52,10 +54,17 @@ export function TeamView({ locale, members, listingsByAgent, invites: initialInv
             </thead>
             <tbody>
               {members.map((u) => (
-                <tr key={u.id} className={cn("border-t first:border-t-0", k.line)}>
+                <Fragment key={u.id}>
+                <tr className={cn("border-t first:border-t-0", k.line)}>
                   <td className="px-4 py-3"><div className="flex items-center gap-3"><Initials name={u.name} size={38} /><div><div className="font-semibold">{u.name}</div><div className={cn("text-xs", k.muted)}>{u.email}</div></div></div></td>
                   <td className="px-3">
-                    <select value={u.role} disabled={!manager || u.id === user?.id || busy === u.id || (u.role === "AGENCY_OWNER" && !isOwner)} onChange={(e) => patch(u.id, { role: e.target.value })} className={k.select} aria-label={tx(locale, "Rol", "Role")}>
+                    <select
+                      value={pendingRole?.id === u.id ? pendingRole.role : u.role}
+                      disabled={!manager || u.id === user?.id || busy === u.id || (u.role === "AGENCY_OWNER" && !isOwner)}
+                      onChange={(e) => setPendingRole(e.target.value === u.role ? null : { id: u.id, role: e.target.value as Role })}
+                      className={k.select}
+                      aria-label={tx(locale, `Rol de ${u.name}`, `Role of ${u.name}`)}
+                    >
                       {ROLE_OPTS.filter((r) => isOwner || r !== "AGENCY_OWNER" || u.role === "AGENCY_OWNER").map((r) => <option key={r} value={r}>{tr(r)}</option>)}
                     </select>
                   </td>
@@ -76,6 +85,21 @@ export function TeamView({ locale, members, listingsByAgent, invites: initialInv
                   <td className="px-3 text-right">{listingsByAgent[u.id] ?? "—"}</td>
                   <td className={cn("px-3 text-xs", k.muted)} suppressHydrationWarning>{ago(u.lastSeen, locale)}</td>
                 </tr>
+                {pendingRole?.id === u.id && (
+                  <tr className={cn("border-t", k.line)}>
+                    <td colSpan={5} className="px-4 py-3">
+                      <div className="np-in flex flex-wrap items-center gap-3 rounded-xl bg-[#B3261E0D] p-3 text-sm dark:bg-[#B3261E26]" role="alert">
+                        <AlertTriangle size={16} className={k.warnText} />
+                        <span className="min-w-0 flex-1">
+                          {tx(locale, `¿Seguro? ${u.name} pasará de ${tr(u.role)} a ${tr(pendingRole.role)}. Esto cambia lo que puede ver y hacer en el panel.`, `Sure? ${u.name} will go from ${tr(u.role)} to ${tr(pendingRole.role)}. This changes what they can see and do in the dashboard.`)}
+                        </span>
+                        <Button size="sm" className="bg-danger hover:bg-[#962019] dark:bg-[#F3A493] dark:text-navy" onClick={() => { const r = pendingRole.role; setPendingRole(null); void patch(u.id, { role: r }); }}>{tx(locale, "Confirmar", "Confirm")}</Button>
+                        <Button size="sm" variant="ghost" className={k.ghost} onClick={() => setPendingRole(null)}>{tx(locale, "Cancelar", "Cancel")}</Button>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+                </Fragment>
               ))}
             </tbody>
           </table>

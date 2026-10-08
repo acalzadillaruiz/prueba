@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import type { Locale } from "@/types/domain";
 import { PublicHeader } from "@/components/layout/PublicHeader";
+import { CompareTray } from "@/components/compare/CompareTray";
 import { SearchView, type ZoneGroup } from "@/components/search/SearchView";
 import { filtersFromParams, searchListings } from "@/server/listings";
 import { prisma } from "@newplace/db";
@@ -63,6 +64,7 @@ export default async function SearchPage({ params, searchParams }: { params: Pro
         <SearchView locale={locale} initial={{ items: initial.items, total: initial.total }} zones={groupZones(zones)} />
       </Suspense>
       </main>
+      <CompareTray locale={locale} />
     </div>
   );
 }

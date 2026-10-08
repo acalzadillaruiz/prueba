@@ -67,11 +67,15 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
   const rawNext = sp.get("next");
   // Same-origin paths only: "/x" is fine, "//evil.com" and "/\\evil.com" and "/\tevil.com" are not.
   const next = rawNext && /^\/(?![\/\\])[^\s\\]*$/.test(rawNext) ? rawNext : null;
+  // Why the visitor is here (saving a home, a search alert): a contextual welcome instead of "good to see you again".
+  const rawReason = sp.get("reason");
+  const reason = rawReason === "save" || rawReason === "alert" ? rawReason : null;
   // Switching between sign-in and sign-up keeps where the user was going and the invitation.
   const carry = (() => {
     const p = new URLSearchParams();
     if (next) p.set("next", next);
     if (invite) p.set("invite", invite);
+    if (reason) p.set("reason", reason);
     const q = p.toString();
     return q ? `?${q}` : "";
   })();
@@ -113,7 +117,27 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
     }
   };
 
-  const title = mode === "login" ? tx(locale, "Qué bueno verte de nuevo", "Good to see you again") : tx(locale, "Crea tu cuenta", "Create your account");
+  const title =
+    reason === "save"
+      ? mode === "login"
+        ? tx(locale, "Entra para guardar tus casas", "Sign in to keep your homes")
+        : tx(locale, "Crea tu cuenta para guardar tus casas", "Create your account to keep your homes")
+      : reason === "alert"
+        ? mode === "login"
+          ? tx(locale, "Entra y te avisamos", "Sign in and we’ll let you know")
+          : tx(locale, "Crea tu cuenta para que te avisemos", "Create your account and we’ll let you know")
+        : mode === "login"
+          ? tx(locale, "Qué bueno verte de nuevo", "Good to see you again")
+          : tx(locale, "Crea tu cuenta", "Create your account");
+  const lead = reason
+    ? mode === "login"
+      ? tx(locale, "¿Primera vez aquí? Crea tu cuenta gratis abajo: las casas que guardaste en este dispositivo pasan a tu cuenta.", "First time here? Create a free account below: the homes you saved on this device move into your account.")
+      : reason === "save"
+        ? tx(locale, "Es gratis. Las casas que guardaste en este dispositivo pasan a tu cuenta y te avisamos si bajan de precio.", "It’s free. The homes you saved on this device move into your account, and we’ll tell you if their price drops.")
+        : tx(locale, "Es gratis. Guardamos tu búsqueda y te escribimos en cuanto aparezca una casa que encaje.", "It’s free. We keep your search and write to you as soon as a matching home appears.")
+    : mode === "login"
+      ? tx(locale, "Retoma tus casas guardadas, compáralas con calma y agenda tus visitas.", "Pick up where you left off: your saved homes, side by side, and your tours.")
+      : tx(locale, "Es gratis y no te pedimos tarjeta.", "It’s free, and no card is needed.");
   return (
     <div className="np-public grid min-h-screen bg-ivory lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
       <main id="main" className="flex flex-col px-5 pb-10 pt-8 sm:px-10 lg:px-16">
@@ -129,7 +153,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
               ) : null}
             </div>
           )}
-          <p className={cn("mt-3 text-[16px]", k.muted)}>{mode === "login" ? tx(locale, "Retoma tus casas guardadas, compáralas con calma y agenda tus visitas.", "Pick up where you left off: your saved homes, side by side, and your tours.") : tx(locale, "Es gratis y no te pedimos tarjeta.", "It’s free, and no card is needed.")}</p>
+          <p className={cn("mt-3 text-[16px]", k.muted)}>{lead}</p>
           <button
             type="button"
             disabled={!GOOGLE}

@@ -199,7 +199,7 @@ test.describe("Cliente · regresiones de la revisión", () => {
     page.on("console", (m) => {
       if (m.type() === "error" && m.text().includes("same key")) dupKeys.push(m.text());
     });
-    await page.goto("/en/saved");
+    await page.goto("/en/compare");
     await page.evaluate((c) => localStorage.setItem("np-compare-v1", JSON.stringify(c)), ids.slice(0, 2));
     await page.reload();
     const table = page.getByRole("table");

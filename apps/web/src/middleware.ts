@@ -33,8 +33,9 @@ export default auth(async (req) => {
   const user = req.auth?.user;
   const login = new URL(`/${locale}/login`, req.url);
   login.searchParams.set("next", pathname + search);
-  // /owner/new is reachable anonymously (the wizard asks to sign in before publishing)
-  if (!user) return pathname.startsWith(`/${locale}/owner/new`) ? NextResponse.next() : NextResponse.redirect(login);
+  // /owner/new is reachable anonymously (the wizard asks to sign in before publishing); /saved shows the homes a
+  // visitor saved on this device (they move into the account on sign-in).
+  if (!user) return pathname.startsWith(`/${locale}/owner/new`) || area === "saved" ? NextResponse.next() : NextResponse.redirect(login);
   if (area === "platform" && user.role !== "SUPERADMIN") return NextResponse.redirect(new URL(`/${locale}?denied=platform`, req.url));
   if (area === "agency" && !AGENCY_ROLES.includes(user.role)) return NextResponse.redirect(new URL(`/${locale}?denied=agency`, req.url));
   return intl(req);

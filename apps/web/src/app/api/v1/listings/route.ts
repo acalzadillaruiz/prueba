@@ -62,6 +62,8 @@ const CreateSchema = z.object({
   commercial: commercialSchema.optional(),
   /** luxury only */
   brochurePdf: brochurePdfSchema.optional(),
+  /** The owner says the possible duplicate is another unit: created anyway, but held for manual review. */
+  dupOverride: z.boolean().default(false),
 });
 
 export const POST = handler(async (req: NextRequest) => {
@@ -82,7 +84,9 @@ export const POST = handler(async (req: NextRequest) => {
   if (b.brochurePdf && !b.luxury) throw new ApiError("VALIDATION", { brochurePdf: "only for luxury listings" });
 
   const dup = await findDuplicate(b.lat, b.lng, b.areaM2, b.address);
-  if (dup) throw new ApiError("CONFLICT", { duplicateOf: { id: dup.id, slug: dup.slug, title: dup.titleEs } });
+  if (dup && !b.dupOverride) throw new ApiError("CONFLICT", { duplicateOf: { id: dup.id, slug: dup.slug, title: dup.titleEs } });
+  /** A possible duplicate the owner vouched for: never published straight away, a moderator decides. */
+  const dupReview = !!dup;
 
   // A seeker who publishes becomes a private owner.
   if (u.role === "SEEKER" && b.mode !== "AGENCY") await prisma.user.update({ where: { id: u.id }, data: { role: "OWNER_PRIVATE" } });
@@ -103,7 +107,7 @@ export const POST = handler(async (req: NextRequest) => {
   const fp = fingerprintOf(b.lat, b.lng, b.areaM2, b.address);
   const slug = await uniqueSlug(`${slugify(b.zone)}-${b.beds ? `${b.beds}h` : b.kind}-${b.areaM2}m-${Math.random().toString(36).slice(2, 8)}`);
   const status = b.mode === "MANDATE" || !b.publish ? "DRAFT" : "ACTIVE";
-  const review = (b.mode === "AGENCY" && u.role === "AGENT") || b.mode === "MANDATE" || (u.role !== "SUPERADMIN" && (await needsModeration(b.mode, u.id, agencyId))) ? "PENDING" : "APPROVED";
+  const review = dupReview || (b.mode === "AGENCY" && u.role === "AGENT") || b.mode === "MANDATE" || (u.role !== "SUPERADMIN" && (await needsModeration(b.mode, u.id, agencyId))) ? "PENDING" : "APPROVED";
   const titleEs = b.title_es ?? copy!.title_es;
   const bodyEs = b.body_es ?? copy!.body_es;
   const titleEn = b.title_en ?? copy?.title_en ?? "";
@@ -157,14 +161,15 @@ export const POST = handler(async (req: NextRequest) => {
       brochurePdf: b.brochurePdf,
       fingerprint: fp,
       priceHistory: { create: { amount: b.priceAmount, kind: "LISTED" } },
-      fingerprints: { create: { fingerprint: fp } },
+      // An overridden exact duplicate already owns this fingerprint (unique): don't claim it twice.
+      fingerprints: dupReview && (await prisma.duplicateFingerprint.findUnique({ where: { fingerprint: fp } })) ? undefined : { create: { fingerprint: fp } },
     },
   });
   await refreshQuality(listing.id);
   await snapshotEstimate(listing.id);
   if (b.mode === "MANDATE") await prisma.mandate.create({ data: { ownerUserId: u.id, agencyId: b.agencyId!, listingId: listing.id, status: "REQUESTED" } });
   if (status === "ACTIVE" && review === "APPROVED") await notifySavedSearches(listing.id, "new");
-  await audit(u.id, `listing.create.${b.mode.toLowerCase()}`, titleEs);
+  await audit(u.id, `listing.create.${b.mode.toLowerCase()}`, dupReview ? `${titleEs} · posible duplicado de ${dup!.titleEs}` : titleEs);
   return ok(await listingById(listing.id), 201);
 });
 

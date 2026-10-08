@@ -66,6 +66,19 @@ function fullAddress(parts: (string | undefined | null)[]) {
   }
   return out.join(", ");
 }
+/**
+ * What the owner wrote beyond the urbanización/city ("Av. San Juan Bosco, Res. Las Lomas" out of
+ * "Av. San Juan Bosco, Res. Las Lomas, Altamira"). Picking only the zone leaves this empty, so the pin
+ * would land at the zone centre and collide with every other "Altamira" listing.
+ */
+export function streetPart(main: string, drop: (string | undefined | null)[]) {
+  let t = ` ${norm(main).replace(/[^a-z0-9]+/g, " ")} `;
+  for (const x of [...drop, "venezuela"]) {
+    const w = norm(x ?? "").replace(/[^a-z0-9]+/g, " ").trim();
+    if (w) t = t.split(` ${w} `).join(" ");
+  }
+  return t.replace(/\s+/g, " ").trim();
+}
 
 export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: { locale: Locale; zones: Zone[]; agencies: Agency[]; fxVes: number; staff?: boolean }) {
   const router = useRouter();
@@ -99,13 +112,15 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
   const [files, setFiles] = useState<File[]>([]);
   const [cover, setCover] = useState(0);
   const [dup, setDup] = useState<{ title: string | null; slug: string | null } | null>(null);
+  /** The owner says the possible duplicate is another unit: allowed, but the listing goes to manual review. */
+  const [dupOverride, setDupOverride] = useState(false);
   const [checking, setChecking] = useState(false);
   const [estimate, setEstimate] = useState<EstimateResult | null>(null);
   const [writing, setWriting] = useState(false);
   const [lang, setLang] = useState<Locale>(locale);
   const [busy, setBusy] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
-  const [done, setDone] = useState<{ slug: string; id: string; mode: Draft["mode"]; pending?: boolean } | null>(null);
+  const [done, setDone] = useState<{ slug: string; id: string; mode: Draft["mode"]; pending?: boolean; dupReview?: boolean } | null>(null);
   const [confirm, setConfirm] = useState(false);
   const [showExtrasErr, setShowExtrasErr] = useState(false);
   const [showDetailsErr, setShowDetailsErr] = useState(false);
@@ -142,6 +157,12 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
   const extras = validateExtras(locale, listingType, luxury, d.extras);
   const ess = validateEssentials(locale, d.ess);
   const address = fullAddress([d.addr?.main, d.unit, d.addr?.zone, d.addr?.city]);
+  /** Address line sent to the API (and to the duplicate check): street/building + unit. */
+  const apiAddress = d.addr ? `${d.addr.main}${d.unit.trim() ? `, ${d.unit.trim()}` : ""}` : "";
+  const streetErr =
+    d.addr && streetPart(d.addr.main, [d.addr.zone, d.addr.city, d.addr.state]).length < 8
+      ? tx(locale, "Escribe la calle o el edificio, no solo la urbanización (por ejemplo «Av. San Juan Bosco, Res. Los Pinos»), y vuelve a elegir la zona en la lista.", "Write the street or building, not just the neighborhood (for example “Av. San Juan Bosco, Res. Los Pinos”), then pick the area from the list again.")
+      : null;
   const hasBeds = !NO_BEDS.includes(d.kind);
   const hasBaths = d.kind !== "land";
   const beds = hasBeds ? d.beds : 0;
@@ -156,11 +177,14 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
   const priceErr = !Number.isInteger(d.price) || d.price < 1 || d.price > 1_000_000_000 ? tx(locale, "Escribe un precio en USD mayor que 0, sin decimales.", "Enter a USD price above 0, no decimals.") : null;
   const priceUnit = listingType === "SHORT_RENT" ? tx(locale, " / noche", " / night") : listingType.includes("RENT") ? tx(locale, " / mes", " / month") : "";
   // duplicate check once the address is known
+  // A different address or unit is a different question: the owner must confirm again.
+  useEffect(() => setDupOverride(false), [apiAddress]);
   useEffect(() => {
     if (!d.addr) return setDup(null);
     setChecking(true);
     const t = setTimeout(() => {
-      api<{ duplicate: { title: string | null; slug: string | null } | null }>("capture/check", { method: "POST", json: { address: `${d.addr!.main} ${d.unit}`.trim(), areaM2: d.m2, lat: d.addr!.lat, lng: d.addr!.lng } })
+      // Same address string (street + unit) the listing is created with; area 0 = not known yet (address-only check).
+      api<{ duplicate: { title: string | null; slug: string | null } | null }>("capture/check", { method: "POST", json: { address: apiAddress, areaM2: d.m2 > 0 ? d.m2 : 0, lat: d.addr!.lat, lng: d.addr!.lng } })
         .then((r) => {
           setDup(r.duplicate);
           setDupError(false);
@@ -173,6 +197,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
         .finally(() => setChecking(false));
     }, 400);
     return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- apiAddress derives from d.addr + d.unit
   }, [d.addr, d.unit, d.m2]);
 
   // live PlaceEstimate (debounced)
@@ -210,7 +235,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
 
   const publish = async () => {
     if (!requireLogin()) return;
-    if (!d.addr) return setStep(1);
+    if (!d.addr || streetErr) return setStep(1);
     if (!detailsOk) {
       setShowDetailsErr(true);
       return setStep(2);
@@ -230,7 +255,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
           agencyId: d.mode === "MANDATE" ? d.agency : undefined,
           listingType,
           kind: d.kind,
-          address: `${d.addr.main}${d.unit ? `, ${d.unit}` : ""}`,
+          address: apiAddress,
           zone: d.addr.zone,
           city: d.addr.city,
           state: d.addr.state ?? "",
@@ -249,6 +274,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
           ...extras.payload,
           ...ess.payload,
           ...(d.copy.title_es ? d.copy : {}),
+          ...(dupOverride ? { dupOverride: true } : {}),
         },
       });
       if (files.length) {
@@ -264,13 +290,14 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
         }
       }
       sessionStorage.removeItem(DRAFT_KEY);
-      setDone({ slug: created.slug, id: created.id, mode: d.mode, pending: created.review === "PENDING" });
+      setDone({ slug: created.slug, id: created.id, mode: d.mode, pending: created.review === "PENDING", dupReview: dupOverride });
       router.refresh();
     } catch (e) {
       if (e instanceof ApiClientError && e.code === "CONFLICT") {
         const dd = (e.details as { duplicateOf?: { title: string; slug: string } })?.duplicateOf;
         if (dd) setDup(dd);
-        setErr(tx(locale, "Este inmueble ya está publicado en New Place, así que no podemos publicarlo dos veces.", "This property is already on New Place, so we can’t list it twice."));
+        setDupOverride(false);
+        setErr(tx(locale, "Este inmueble parece estar ya publicado en New Place. Si es otra unidad, indícalo abajo y lo revisaremos a mano.", "This property seems to be on New Place already. If it’s a different unit, say so below and we’ll review it by hand."));
       } else setErr((e as Error).message);
     } finally {
       setBusy(null);
@@ -296,9 +323,11 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
         <h1 className="mt-4 font-serif text-[36px] font-medium leading-[1.05] md:text-[44px]">{done.mode === "AGENCY" ? tx(locale, "Anuncio creado", "Listing created") : done.mode === "FSBO" ? (done.pending ? tx(locale, "Lo estamos revisando", "We’re reviewing it") : tx(locale, `Ya está publicado en ${d.addr?.zone}`, `Now live in ${d.addr?.zone}`)) : tx(locale, "Tu encargo va en camino", "Your request is on its way")}</h1>
         <p className="mt-2 text-muted">
           {done.mode === "AGENCY"
-            ? user?.role === "AGENT"
-              ? tx(locale, "Queda a la espera de que el backoffice lo apruebe.", "It’s waiting for backoffice approval.")
+            ? user?.role === "AGENT" || done.pending
+              ? tx(locale, "Queda pendiente de revisión antes de publicarse.", "It’s waiting for review before going live.")
               : tx(locale, "Ya está publicado y visible en el mapa.", "It’s live and on the map.")
+            : done.dupReview && done.pending
+            ? tx(locale, "Como se parece a otro anuncio, alguien de nuestro equipo lo revisará antes de publicarlo. Te escribimos por email en cuanto esté listo.", "Since it looks like another listing, someone from our team will check it before it goes live. We’ll email you as soon as it’s ready.")
             : done.mode === "FSBO" && done.pending
             ? tx(locale, "Como tu cuenta es nueva, alguien de nuestro equipo revisará el anuncio antes de publicarlo. Te escribimos por email en cuanto esté listo.", "Since your account is new, someone from our team will look over the listing before it goes live. We’ll email you as soon as it’s ready.")
             : done.mode === "FSBO"
@@ -317,7 +346,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
       </div>
     );
 
-  const canNext = step === 1 ? !!d.addr && !dup : step === 4 ? !priceErr : true;
+  const canNext = step === 1 ? !!d.addr && !streetErr && (!dup || dupOverride) : step === 4 ? !priceErr : true;
   const facts = [
     beds > 0 && plural(beds, locale, ["habitación", "habitaciones"], ["bedroom", "bedrooms"]),
     baths > 0 && plural(baths, locale, ["baño", "baños"], ["bathroom", "bathrooms"]),
@@ -401,6 +430,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
           <div className="np-in space-y-5">
             <h1 className="font-serif text-[36px] font-medium leading-[1.05] md:text-[44px]">{tx(locale, "¿Dónde está?", "Where is it?")}</h1>
             <PlacesSearch locale={locale} zones={zones} value={d.addr} onPick={(p) => set({ addr: p })} />
+            {streetErr && <p role="alert" className="-mt-2 text-sm text-danger" data-testid="street-error">{streetErr}</p>}
             <div className="grid gap-3 sm:grid-cols-3">
               <Field label={tx(locale, "Piso / apto / casa", "Floor / unit")}><input className={inputCls} value={d.unit} onChange={(e) => set({ unit: e.target.value })} placeholder="Piso 6, apto 6-B" /></Field>
               <Field label={tx(locale, "Urbanización", "Neighborhood")}><input className={inputCls} value={d.addr?.zone ?? ""} readOnly /></Field>
@@ -419,15 +449,12 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               controls={false}
             />
             {d.addr && <p className="text-xs text-muted">{tx(locale, "Toca el mapa para ajustar el punto exacto.", "Tap the map to fine-tune the exact point.")}</p>}
-            {d.addr && (
-              <div className={cn("np-in flex flex-wrap items-center gap-3 rounded-np border p-3 text-sm", dup ? "border-warn/60 bg-[#8A5A0014]" : "border-[#2F6B4F55] bg-[#2F6B4F0D]")}>
-                {checking ? <Loader2 size={18} className="animate-spin" /> : dup ? <AlertTriangle size={18} className="text-warn" /> : <CheckCircle2 size={18} className="text-ok" />}
-                <span className="font-semibold">{tx(locale, "Ubicación", "Location")}: {d.addr.lat.toFixed(5)}, {d.addr.lng.toFixed(5)}</span>
+            {d.addr && !streetErr && (
+              <div className={cn("np-in flex flex-wrap items-center gap-3 rounded-np border p-3 text-sm", dup && !dupOverride ? "border-warn/60 bg-[#8A5A0014]" : "border-[#2F6B4F55] bg-[#2F6B4F0D]")}>
+                {checking ? <Loader2 size={18} className="animate-spin" /> : dup && !dupOverride ? <AlertTriangle size={18} className="text-warn" /> : <CheckCircle2 size={18} className="text-ok" />}
+                <span className="font-semibold">{tx(locale, "Ubicación marcada en el mapa", "Location marked on the map")}</span>
                 {dup ? (
-                  <span>
-                    · {tx(locale, "Ya está publicado:", "Already listed:")}{" "}
-                    {dup.slug ? <Link className="font-semibold text-navy underline underline-offset-4" href={`/${locale}/listing/${dup.slug}`}>{dup.title}</Link> : tx(locale, "un anuncio que está en revisión o no es público.", "a listing that’s under review or not public.")}
-                  </span>
+                  <DupNotice locale={locale} dup={dup} override={dupOverride} onOverride={() => setDupOverride(true)} hasUnit={!!d.unit.trim()} />
                 ) : dupError ? (
                   <span className="text-muted">· {tx(locale, "Ahora no pudimos comprobar si ya está publicado; lo revisaremos cuando publiques.", "We couldn’t check for duplicates right now; we’ll check again when you publish.")}</span>
                 ) : (
@@ -610,12 +637,9 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
           <div className="np-in space-y-5">
             <h1 className="font-serif text-[36px] font-medium leading-[1.05] md:text-[44px]">{tx(locale, "Revisa y publica", "Review & publish")}</h1>
             {dup && (
-              <div className="flex items-center gap-2 rounded-np border border-warn/60 bg-[#8A5A0014] p-3 text-sm" role="alert">
-                <AlertTriangle size={18} className="text-warn" />
-                <span>
-                  {tx(locale, "Ya hay un anuncio con estos datos:", "There’s already a listing with these details:")}{" "}
-                  {dup.slug ? <Link className="font-semibold text-navy underline underline-offset-4" href={`/${locale}/listing/${dup.slug}`}>{dup.title}</Link> : tx(locale, "un anuncio que está en revisión o no es público.", "a listing that’s under review or not public.")}
-                </span>
+              <div className={cn("flex flex-wrap items-center gap-2 rounded-np border p-3 text-sm", dupOverride ? "border-[#2F6B4F55] bg-[#2F6B4F0D]" : "border-warn/60 bg-[#8A5A0014]")} role="alert">
+                {dupOverride ? <CheckCircle2 size={18} className="text-ok" /> : <AlertTriangle size={18} className="text-warn" />}
+                <DupNotice locale={locale} dup={dup} override={dupOverride} onOverride={() => { setDupOverride(true); setErr(null); }} hasUnit={!!d.unit.trim()} />
               </div>
             )}
             <div className="overflow-hidden rounded-[18px] bg-white shadow-[0_8px_24px_rgba(30,26,24,.06)]">
@@ -632,7 +656,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                   <div className="text-sm text-muted" data-testid="review-address">{address}</div>
                   <div className="mt-2 text-sm" data-testid="review-facts">{facts}</div>
                   {extrasSummary && <div className="mt-1 text-sm text-muted">{extrasSummary}</div>}
-                  <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#E6DDD2] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[.12em] text-navy">{d.mode === "AGENCY" ? tx(locale, "Inventario de la agencia", "Agency inventory") : d.mode === "FSBO" ? tx(locale, "Publicación directa (FSBO)", "For sale by owner") : tx(locale, "Encargo a agencia", "Agency mandate")}</div>
+                  <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#E6DDD2] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[.12em] text-navy">{d.mode === "AGENCY" ? tx(locale, "Inventario de la agencia", "Agency inventory") : d.mode === "FSBO" ? tx(locale, "Publicado por el propietario", "Listed by the owner") : tx(locale, "Encargo a agencia", "Agency mandate")}</div>
                 </div>
               </div>
             </div>
@@ -703,3 +727,24 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
   );
 }
 
+/** "Possible duplicate" notice with the way out: the owner can say it's another unit (→ manual review). */
+function DupNotice({ locale, dup, override, onOverride, hasUnit }: { locale: Locale; dup: { title: string | null; slug: string | null }; override: boolean; onOverride: () => void; hasUnit: boolean }) {
+  const link = dup.slug ? <Link className="font-semibold text-navy underline underline-offset-4" href={`/${locale}/listing/${dup.slug}`}>{dup.title}</Link> : tx(locale, "un anuncio que está en revisión o no es público.", "a listing that’s under review or not public.");
+  if (override)
+    return (
+      <span data-testid="dup-override">
+        · {tx(locale, "Entendido: es otra unidad. Alguien de nuestro equipo lo revisará antes de publicarlo.", "Got it: it’s a different unit. Someone from our team will check it before it goes live.")}
+      </span>
+    );
+  return (
+    <span className="flex flex-1 flex-wrap items-center gap-x-3 gap-y-2">
+      <span>
+        · {tx(locale, "Puede que ya esté publicado:", "It may already be listed:")} {link}
+        {!hasUnit && <span className="block text-xs text-muted">{tx(locale, "Si es otro apartamento o casa, escribe arriba el piso / apto / casa.", "If it’s another flat or house, add the floor / unit above.")}</span>}
+      </span>
+      <button type="button" onClick={onOverride} className="rounded-full border border-navy/70 bg-white px-3 py-1.5 font-display text-sm font-semibold text-navy hover:bg-[#E6DDD2]">
+        {tx(locale, "No es la misma casa — es otra unidad", "Not the same home — it’s another unit")}
+      </button>
+    </span>
+  );
+}

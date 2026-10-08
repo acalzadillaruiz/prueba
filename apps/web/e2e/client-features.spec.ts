@@ -85,7 +85,11 @@ test.describe.serial("Cliente: búsqueda, Hub y precalificación", () => {
     await expect(page).toHaveURL(/poly=[-\d.,%3B;]+/);
     await expect(page.getByText("en la zona que dibujaste")).toBeVisible();
     await page.getByRole("button", { name: "Guardar búsqueda" }).click();
-    await page.waitForURL(/\/es\/login/);
+    // No hard redirect: a small dialog offers to register or sign in, both coming back to this exact search.
+    const dialog = page.getByRole("dialog", { name: "Crea tu cuenta para que te avisemos" });
+    await expect(dialog).toBeVisible();
+    await dialog.getByRole("link", { name: /Entrar/ }).click();
+    await page.waitForURL(/\/es\/login\?.*reason=alert/);
     const next = new URL(page.url()).searchParams.get("next")!;
     expect(next).toContain("/es/search?");
     expect(next).toContain("beds=2");

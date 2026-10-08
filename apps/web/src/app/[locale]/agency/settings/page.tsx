@@ -17,11 +17,11 @@ export default async function Page({ params }: { params: Promise<{ locale: Local
     prisma.commissionRule.findUnique({ where: { agencyId: agency.id } }),
     prisma.agency.findUnique({ where: { id: agency.id }, select: { logoUrl: true, onCall: true } }),
     // Guardia 24/7 candidates: advisors and the owner of this agency (same rule the API enforces).
-    prisma.agencyMember.findMany({ where: { agencyId: agency.id, role: { in: [...ON_CALL_ROLES] }, user: { suspended: false } }, select: { userId: true, role: true, user: { select: { name: true } } }, orderBy: { createdAt: "asc" } }),
+    prisma.agencyMember.findMany({ where: { agencyId: agency.id, role: { in: [...ON_CALL_ROLES] }, user: { suspended: false } }, select: { userId: true, role: true, verified: true, user: { select: { name: true } } }, orderBy: { createdAt: "asc" } }),
   ]);
   // Someone who left the team (or changed role) drops out of the rota shown here, so saving never trips on a stale id.
   const ids = new Set(advisors.map((m) => m.userId));
   const rota = parseRotation(extra?.onCall);
   for (const d of ON_CALL_DAYS) if (rota[d] && !ids.has(rota[d]!)) rota[d] = null;
-  return <SettingsView locale={locale} agency={agency} logoUrl={extra?.logoUrl ?? ""} onCall={rota} advisors={advisors.map((m) => ({ id: m.userId, name: m.user.name ?? "—", owner: m.role === "AGENCY_OWNER" }))} rule={{ salePct: rule?.salePct ?? 5, agentSplitPct: rule?.agentSplitPct ?? 50, rentMonths: rule?.rentMonths ?? 1, captorPct: rule?.captorPct ?? 10 }} />;
+  return <SettingsView locale={locale} agency={agency} logoUrl={extra?.logoUrl ?? ""} onCall={rota} advisors={advisors.map((m) => ({ id: m.userId, name: m.user.name ?? "—", owner: m.role === "AGENCY_OWNER", verified: m.verified }))} rule={{ salePct: rule?.salePct ?? 5, agentSplitPct: rule?.agentSplitPct ?? 50, rentMonths: rule?.rentMonths ?? 1, captorPct: rule?.captorPct ?? 10 }} />;
 }

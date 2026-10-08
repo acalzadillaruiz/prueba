@@ -1,5 +1,6 @@
 import type { Locale } from "@/types/domain";
 import { FloatingContact, MobileTabBar } from "@/components/brand/PublicChrome";
+import { CompareTray } from "@/components/compare/CompareTray";
 import { cn } from "@/lib/cn";
 import { PublicHeader } from "./PublicHeader";
 import { PublicFooter } from "./PublicFooter";
@@ -30,6 +31,7 @@ export function PublicPage({
       {footer && <PublicFooter locale={locale} />}
       {contact && <FloatingContact {...contact} tabbar={tabbar} />}
       {tabbar && <MobileTabBar locale={locale} />}
+      <CompareTray locale={locale} />
     </div>
   );
 }

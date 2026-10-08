@@ -60,7 +60,7 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
           {items.map((s) => (
             <Card key={s.id} className={cn(k.card, "border-0 flex flex-wrap items-center gap-4 p-4")}>
               <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-egeo/40 text-navy dark:bg-white/10 dark:text-ivory">{s.polygon || /(^|&)(poly|radius)=/.test(s.query) ? <MapPin size={20} strokeWidth={1.6} /> : <Bell size={20} strokeWidth={1.6} />}</span>
-              <div className="min-w-0 flex-1">
+              <div className="min-w-0 flex-1 basis-[calc(100%-4rem)] sm:basis-auto">
                 <div className="font-serif text-[22px] font-medium leading-tight">{s.name}</div>
                 <div className="text-sm text-muted">
                   {freq[s.frequency]} · {s.lastSentAt ? `${tx(locale, "último envío", "last sent")} ${ago(s.lastSentAt, locale)}` : tx(locale, "sin envíos aún", "nothing sent yet")}

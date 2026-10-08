@@ -68,6 +68,10 @@ test.describe("Smoke: login, mapa, crear inmueble · RBAC duro", () => {
   });
 
   test("reservas: el mismo horario no se puede reservar dos veces a la vez, ni en el pasado", async ({ page }) => {
+    // Earlier tests also create leads from this IP: start from a clean anti-abuse counter so only the slot rule is tested.
+    const db = new PrismaClient({ datasourceUrl: process.env.DATABASE_URL ?? "postgresql://postgres:postgres@localhost:5432/newplace" });
+    await db.rateLimit.deleteMany({});
+    await db.$disconnect();
     await page.goto("/es");
     const slots = await apiAs(page, "GET", "listings/wi3sg7/slots");
     const free = slots.json.days.flatMap((d: { hours: { iso: string; available: boolean }[] }) => d.hours).filter((h: { available: boolean }) => h.available);

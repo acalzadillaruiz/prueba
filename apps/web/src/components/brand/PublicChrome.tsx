@@ -205,6 +205,7 @@ export function FloatingContact({ href, label, whatsapp = false, tabbar = false,
   const listingSlug = pathname?.match(/^\/(?:es|en)\/listing\/([^/?#]+)/)?.[1];
   return (
     <div
+      data-fab
       aria-hidden={hidden || undefined}
       className={cn(
         "fixed right-4 z-40 flex flex-col items-end gap-3 transition-[opacity,transform] duration-300 md:bottom-8 md:right-8 print:hidden",

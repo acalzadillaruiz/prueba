@@ -256,3 +256,5 @@ html.dark .np-public .text-ink\/45 { color: rgb(241 235 227 / .55); }
 html.dark .np-public :is(.border-ink\/10, .border-ink\/\[\.07\], .border-ink\/\[\.06\]) { border-color: rgb(255 255 255 / .1); }
 html.dark .np-public .bg-ivory { background-color: #15120F; }
 html.dark .np-public .np-aura i { opacity: .12; }
+/* The compare tray sits at the bottom: the floating contact buttons step up above it. */
+body:has([data-compare-tray]) [data-fab] { transform: translateY(-88px); }

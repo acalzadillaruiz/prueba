@@ -52,7 +52,7 @@ export function AgencyDashboard({ locale, stats, listings, newLeads, tours, agen
         <Kpi label={tx(locale, "Leads · 7 días", "Leads · 7 days")} value={stats.leads7d} delta={`${sign(stats.leadsDeltaPct)} %`} down={stats.leadsDeltaPct < 0} hint={tx(locale, "vs. semana anterior", "vs. previous week")} />
         <Kpi label={tx(locale, "Conversión lead → visita", "Lead → tour")} value={`${stats.convTourPct} %`} hint={tx(locale, "últimos 30 días", "last 30 days")} />
         <Kpi label={tx(locale, "Tiempo medio a visita", "Avg. time to tour")} value={stats.avgDaysToTour === null ? "—" : `${String(stats.avgDaysToTour).replace(".", locale === "es" ? "," : ".")} d`} hint={tx(locale, "desde el lead", "from lead")} />
-        <Kpi label={tx(locale, "SLA 15 min cumplido", "15-min SLA met")} value={stats.slaPct === null ? "—" : `${stats.slaPct} %`} hint={tx(locale, "primera respuesta", "first response")} />
+        <Kpi label={tx(locale, "Respondidos en 15 min", "Answered within 15 min")} value={stats.slaPct === null ? "—" : `${stats.slaPct} %`} hint={tx(locale, "primera respuesta", "first response")} />
       </div>
 
       <div className="mt-6 grid gap-6 [&>*]:min-w-0 xl:grid-cols-[1.45fr_1fr]">
@@ -73,7 +73,7 @@ export function AgencyDashboard({ locale, stats, listings, newLeads, tours, agen
                     <div className="truncate text-[15px] font-semibold">{ld.name}</div>
                     <div className={cn("truncate text-[13px]", k.muted)}>
                       {l?.zone ?? "—"} ·{" "}
-                      {late ? <span className={cn("font-semibold", k.dangerText)} suppressHydrationWarning>{tx(locale, "SLA vencido", "SLA breached")} · {span(mins)}</span> : <span suppressHydrationWarning>{tx(locale, `quedan ${15 - mins} min`, `${15 - mins} min left`)}</span>}
+                      {late ? <span className={cn("font-semibold", k.dangerText)} suppressHydrationWarning>{tx(locale, "Sin respuesta a tiempo", "Not answered in time")} · {span(mins)}</span> : <span suppressHydrationWarning>{tx(locale, `quedan ${15 - mins} min`, `${15 - mins} min left`)}</span>}
                     </div>
                   </div>
                   {ld.score != null && <Chip>{tx(locale, "Interés", "Interest")} {ld.score}</Chip>}

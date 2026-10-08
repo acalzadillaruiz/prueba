@@ -153,7 +153,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
                   <div className="p-5">
                     <div className="flex flex-wrap items-center gap-2">
                       <StatusPill status={l.status} review={l.review} locale={locale} />
-                      <span className="text-xs font-semibold text-muted">{isMandate ? tx(locale, "Encargo", "Mandate") : "FSBO"}</span>
+                      <span className="text-xs font-semibold text-muted">{isMandate ? tx(locale, "Encargo", "Mandate") : tx(locale, "Publicado por ti", "Listed by you")}</span>
                       <span className="text-xs text-muted">· {l.photos?.length ?? 0} {tx(locale, "fotos", "photos")} · {tx(locale, "calidad", "quality")} {l.quality}</span>
                     </div>
                     <Link href={listingHref(locale, l)} className="mt-1 block font-serif text-[24px] font-medium leading-tight underline-offset-4 hover:underline">{tx(locale, l.title_es, l.title_en)}</Link>

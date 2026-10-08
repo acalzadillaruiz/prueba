@@ -181,7 +181,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
   }, [results.length, qs, scrollKey]);
   const createAlert = async () => {
     if (alertSaved || savingAlert) return;
-    if (!requireLogin()) return;
+    if (!requireLogin("alert")) return;
     setSavingAlert(true);
     setAlertError(null);
     try {

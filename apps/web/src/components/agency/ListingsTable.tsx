@@ -24,6 +24,7 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
   const manager = user?.role === "AGENCY_OWNER" || user?.role === "BACKOFFICE" || user?.role === "SUPERADMIN";
   const [status, setStatus] = useState<ListingStatus | "ALL" | "REVIEW">("ALL");
   const [busy, setBusy] = useState<string | null>(null);
+  const [declineId, setDeclineId] = useState<string | null>(null);
   const [q, setQ] = useState("");
   const [error, setError] = useState<string | null>(null);
   const norm = (x: string) => x.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
@@ -80,8 +81,15 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
                   {m.status === "ASSIGNED" && (
                     <Button size="sm" variant="navy" className={k.navy} disabled={busy === m.id} onClick={() => patch(m.id, { status: "ACTIVE" }, `mandates/${m.id}`)}><Rocket size={14} /> {tx(locale, "Publicar", "Publish")}</Button>
                   )}
-                  {manager && (
-                    <Button size="sm" variant="ghost" className={k.ghost} disabled={busy === m.id} onClick={() => patch(m.id, { status: "CANCELLED" }, `mandates/${m.id}`)} aria-label={tx(locale, `Rechazar encargo ${title}`, `Decline mandate ${title}`)}><XCircle size={14} /> {tx(locale, "Rechazar", "Decline")}</Button>
+                  {manager && declineId !== m.id && (
+                    <Button size="sm" variant="ghost" className={k.ghost} disabled={busy === m.id} onClick={() => setDeclineId(m.id)} aria-label={tx(locale, `Rechazar encargo ${title}`, `Decline mandate ${title}`)}><XCircle size={14} /> {tx(locale, "Rechazar", "Decline")}</Button>
+                  )}
+                  {manager && declineId === m.id && (
+                    <span role="group" aria-label={tx(locale, "Confirmar rechazo", "Confirm decline")} className="flex flex-wrap items-center gap-2 text-sm">
+                      <span className="font-semibold">{tx(locale, "¿Rechazar este encargo? El propietario dejará de verlo como activo.", "Decline this mandate? The owner will no longer see it as active.")}</span>
+                      <Button size="sm" variant="navy" className={k.navy} disabled={busy === m.id} onClick={() => { setDeclineId(null); patch(m.id, { status: "CANCELLED" }, `mandates/${m.id}`); }}>{tx(locale, "Sí, rechazar", "Yes, decline")}</Button>
+                      <Button size="sm" variant="ghost" className={k.ghost} onClick={() => setDeclineId(null)}>{tx(locale, "Cancelar", "Cancel")}</Button>
+                    </span>
                   )}
                 </div>
               );

@@ -56,7 +56,7 @@ function Sla({ lead, locale }: { lead: Lead; locale: Locale }) {
   const pct = Math.max(0, Math.min(100, (m / 15) * 100));
   return (
     <div className="w-20">
-      <div className={cn("text-right text-[11px] font-semibold", left > 5 ? k.okText : left > 0 ? k.warnText : k.dangerText)} suppressHydrationWarning>{left > 0 ? `${left} min` : tx(locale, "SLA vencido", "SLA breached")}</div>
+      <div className={cn("text-right text-[11px] font-semibold", left > 5 ? k.okText : left > 0 ? k.warnText : k.dangerText)} suppressHydrationWarning>{left > 0 ? `${left} min` : tx(locale, "A destiempo", "Overdue")}</div>
       <div className="mt-1 h-1 rounded-full bg-[#ECE6DA] dark:bg-white/10"><div className={cn("h-full rounded-full", left > 5 ? "bg-ok" : left > 0 ? "bg-warn" : "bg-danger")} style={{ width: `${pct}%` }} /></div>
     </div>
   );

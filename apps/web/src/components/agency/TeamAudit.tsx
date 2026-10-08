@@ -96,7 +96,7 @@ function Performance({ locale, days, rows }: { locale: Locale; days: AuditPeriod
     ["leads", tx(locale, "Leads", "Leads")],
     ["answered", tx(locale, "Respondidos", "Answered")],
     ["respMedianMin", tx(locale, "1.ª respuesta (más rápida)", "1st response (fastest)")],
-    ["slaPct", "SLA 15 min"],
+    ["slaPct", "En 15 min"],
     ["toursBooked", tx(locale, "Visitas", "Tours")],
     ["toursDone", tx(locale, "Visitas realizadas", "Tours done")],
     ["leadToTourPct", tx(locale, "Lead → visita", "Lead → tour")],
@@ -158,7 +158,7 @@ function Performance({ locale, days, rows }: { locale: Locale; days: AuditPeriod
                     {metric(tx(locale, "Leads", "Leads"), n(r.leads))}
                     {metric(tx(locale, "Respondidos", "Answered"), n(r.answered))}
                     {metric(
-                      "SLA 15 min",
+                      "En 15 min",
                       <span className={cn(k.num, "tracking-normal", r.slaPct != null && (r.slaPct >= 80 ? k.okText : r.slaPct < 50 ? k.dangerText : k.warnText))}>{dash(r.slaPct, " %")}</span>,
                     )}
                     {metric(
@@ -190,7 +190,7 @@ function Performance({ locale, days, rows }: { locale: Locale; days: AuditPeriod
                   {th("leads", tx(locale, "Leads", "Leads"))}
                   {th("answered", tx(locale, "Respondidos", "Answered"))}
                   {th("respMedianMin", tx(locale, "1.ª respuesta", "1st response"), true, tx(locale, "Mediana (y media) desde que entra el lead hasta la primera respuesta", "Median (and mean) from lead arrival to first response"))}
-                  {th("slaPct", "SLA 15 min", true, tx(locale, "Misma definición que el Panel: los leads sin responder tras 15 min cuentan como incumplidos", "Same definition as the Dashboard: leads unanswered after 15 min count as breached"))}
+                  {th("slaPct", "En 15 min", true, tx(locale, "Igual que en el Panel: un lead sin respuesta pasados 15 min cuenta como tardío", "Same definition as the Dashboard: leads unanswered after 15 min count as breached"))}
                   {th("toursBooked", tx(locale, "Visitas", "Tours"), true, tx(locale, "Visitas agendadas en el periodo (sin canceladas)", "Tours booked in the period (cancelled excluded)"))}
                   {th("toursDone", tx(locale, "Realizadas", "Done"))}
                   {th("leadToTourPct", tx(locale, "Lead → visita", "Lead → tour"), true, tx(locale, "Leads del periodo que llegaron a visita", "Leads of the period that reached a tour"))}

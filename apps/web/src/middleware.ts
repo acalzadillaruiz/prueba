@@ -13,14 +13,19 @@ const AGENCY_ROLES = ["AGENCY_OWNER", "AGENT", "CAPTOR", "PHOTOGRAPHER", "BACKOF
 
 export default auth(async (req) => {
   const { pathname, search } = req.nextUrl;
-  // Pre-launch gate (SITE_ACCESS_CODE): every page asks for the access code until the cookie is set.
-  if (gateCode() && !/^\/(es|en)\/acceso\/?$/.test(pathname) && req.cookies.get(GATE_COOKIE)?.value !== (await gateToken())) {
+  // Pre-launch gate (SITE_ACCESS_CODE): every page and API asks for the access code until the cookie is set.
+  // The API is gated too: otherwise the demo sign-in (/api/auth/callback/demo) and /api/v1 bypass the preview.
+  const isApi = pathname === "/api" || pathname.startsWith("/api/");
+  if (gateCode() && !/^\/(es|en)\/acceso\/?$/.test(pathname) && pathname !== "/api/access" && req.cookies.get(GATE_COOKIE)?.value !== (await gateToken())) {
+    const wantsPage = req.method === "GET" && (req.headers.get("accept") ?? "").includes("text/html");
+    if (isApi && !wantsPage) return NextResponse.json({ error: "site_locked" }, { status: 401, headers: { "X-Robots-Tag": "noindex", "Cache-Control": "no-store" } });
     const gate = new URL(`/${pathname.match(/^\/(en)(\/|$)/) ? "en" : "es"}/acceso`, req.url);
     gate.searchParams.set("next", pathname + search);
     const res = NextResponse.redirect(gate);
     res.headers.set("X-Robots-Tag", "noindex");
     return res;
   }
+  if (isApi) return NextResponse.next();
   const m = pathname.match(/^\/(es|en)\/(agency|platform|owner|app|account|saved|alerts|preview)(\/|$)/);
   // locale detection / prefixing (Accept-Language + NEXT_LOCALE cookie)
   if (!m) return intl(req);
@@ -35,4 +40,4 @@ export default auth(async (req) => {
   return intl(req);
 });
 
-export const config = { matcher: ["/((?!api|uploads|photos|icons|_next|_vercel|sw.js|swe-worker|offline|robots.txt|sitemap.xml|manifest.webmanifest|.*\\..*).*)"] };
+export const config = { matcher: ["/((?!uploads|photos|icons|_next|_vercel|sw.js|swe-worker|offline|robots.txt|sitemap.xml|manifest.webmanifest|.*\\..*).*)"] };

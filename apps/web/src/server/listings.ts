@@ -16,6 +16,13 @@ export const listingInclude = {
 
 export type ListingRow = Prisma.ListingGetPayload<{ include: typeof listingInclude }>;
 
+/** Same shape as listingInclude, trimmed in the database to what toCard keeps (5 photos, last price drop). */
+const cardInclude = {
+  ...listingInclude,
+  photos: { orderBy: [{ isCover: "desc" }, { order: "asc" }], take: 5 },
+  priceHistory: { where: { kind: "DROP" }, orderBy: { date: "desc" }, take: 1 },
+} satisfies Prisma.ListingInclude;
+
 export const PUBLIC_STATUSES: ListingStatus[] = ["COMING_SOON", "ACTIVE", "UNDER_OFFER", "SOLD", "RENTED"];
 
 /**
@@ -266,10 +273,12 @@ export async function searchListings(f: SearchFilters): Promise<{ items: Listing
     f.sort === "price-asc" ? [{ priceAmount: "asc" }] : f.sort === "price-desc" ? [{ priceAmount: "desc" }] : [{ publishedAt: "desc" }];
   const take = Math.max(1, Math.min(Math.floor(f.take ?? 500), 500));
   if (f.shape) return searchInShape(f, where, [...orderBy, { id: "asc" }], take);
-  const rows = await prisma.listing.findMany({ where, include: listingInclude, orderBy: [...orderBy, { id: "asc" }], take: take + 1, ...(f.cursor ? { cursor: { id: f.cursor }, skip: 1 } : {}) });
+  const [rows, total] = await Promise.all([
+    prisma.listing.findMany({ where, include: cardInclude, orderBy: [...orderBy, { id: "asc" }], take: take + 1, ...(f.cursor ? { cursor: { id: f.cursor }, skip: 1 } : {}) }),
+    prisma.listing.count({ where }),
+  ]);
   const items = rows.slice(0, take).map((r) => toCard(toDomain(r)));
   if (f.sort === "ppm") items.sort((a, b) => a.priceAmount / a.areaM2 - b.priceAmount / b.areaM2);
-  const total = await prisma.listing.count({ where });
   return { items, nextCursor: rows.length > take ? rows[take - 1].id : null, total };
 }
 
@@ -286,7 +295,7 @@ async function searchInShape(f: SearchFilters, where: Prisma.ListingWhereInput, 
   const ids = candidates.filter((c) => inShape(c, f.shape!)).map((c) => c.id);
   const start = f.cursor ? ids.indexOf(f.cursor) + 1 : 0;
   const pageIds = ids.slice(start, start + take);
-  const rows = pageIds.length ? await prisma.listing.findMany({ where: { id: { in: pageIds } }, include: listingInclude }) : [];
+  const rows = pageIds.length ? await prisma.listing.findMany({ where: { id: { in: pageIds } }, include: cardInclude }) : [];
   const byId = new Map(rows.map((r) => [r.id, r]));
   const items = pageIds.map((id) => byId.get(id)).filter((r): r is ListingRow => !!r).map((r) => toCard(toDomain(r)));
   if (f.sort === "ppm") items.sort((a, b) => a.priceAmount / a.areaM2 - b.priceAmount / b.areaM2);
@@ -294,7 +303,7 @@ async function searchInShape(f: SearchFilters, where: Prisma.ListingWhereInput, 
 }
 
 export async function publicListings(): Promise<Listing[]> {
-  const rows = await prisma.listing.findMany({ where: publicWhere(), include: listingInclude, orderBy: { publishedAt: "desc" } });
+  const rows = await prisma.listing.findMany({ where: publicWhere(), include: cardInclude, orderBy: { publishedAt: "desc" } });
   return rows.map((r) => toCard(toDomain(r)));
 }
 

@@ -14,7 +14,7 @@ const W = 6;
 const D = 4.2;
 const H = 1;
 const BASE = 0.5;
-const C = { cal: 0xf1ebe3, arena: 0xd9c6ab, navy: 0x1e1a18, card: 0x2a2420, glass: 0x48403a, teja: 0x8e3b22, tejaLight: 0xc9a574, warm: 0xf3c48d };
+const C = { sky: 0xe9e0d3, ground: 0xdccdb8, cal: 0xfbf8f3, arena: 0xd9c6ab, navy: 0x1e1a18, card: 0x2a2420, glass: 0xd6cdc2, teja: 0x8e3b22, tejaLight: 0xc9a574, warm: 0xf3c48d };
 
 /**
  * "El edificio que se construye": a real-time 3D building (Three.js, loaded only when the section nears the
@@ -91,11 +91,11 @@ export function BuildingScroll({ chapters, picks, heading, cta }: { chapters: Ch
       renderer.toneMappingExposure = 1.05;
 
       const scene = new THREE.Scene();
-      const fog = new THREE.Fog(C.navy, 26, 52);
+      const fog = new THREE.Fog(C.sky, 26, 52);
       scene.fog = fog;
       const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 200);
 
-      scene.add(new THREE.HemisphereLight(0xe6dcd1, 0x3a322d, 1.6));
+      scene.add(new THREE.HemisphereLight(0xfff8ef, 0xb9a689, 1.9));
       const sun = new THREE.DirectionalLight(0xfff1e2, 2.2);
       sun.position.set(-8, 14, 10);
       scene.add(sun);
@@ -106,8 +106,8 @@ export function BuildingScroll({ chapters, picks, heading, cta }: { chapters: Ch
       const disposables: { dispose: () => void }[] = [];
       const keep = <T extends { dispose: () => void }>(x: T) => (disposables.push(x), x);
 
-      // Ground: a soft round plinth on the night-blue page.
-      const ground = new THREE.Mesh(keep(new THREE.CircleGeometry(14, 64)), keep(new THREE.MeshStandardMaterial({ color: C.card, roughness: 1 })));
+      // Ground: a soft round plinth on the sunlit sand-coloured page.
+      const ground = new THREE.Mesh(keep(new THREE.CircleGeometry(14, 64)), keep(new THREE.MeshStandardMaterial({ color: C.ground, roughness: 1 })));
       ground.rotation.x = -Math.PI / 2;
       scene.add(ground);
       const podium = new THREE.Mesh(keep(new THREE.BoxGeometry(W + 2.2, BASE, D + 2.2)), keep(new THREE.MeshStandardMaterial({ color: C.arena, roughness: 0.9 })));
@@ -128,7 +128,7 @@ export function BuildingScroll({ chapters, picks, heading, cta }: { chapters: Ch
       for (let i = 0; i < FLOORS; i++) {
         const g = new THREE.Group();
         const slabM = keep(new THREE.MeshStandardMaterial({ color: C.cal, roughness: 0.7, transparent: true }));
-        const glassM = keep(new THREE.MeshStandardMaterial({ color: C.glass, roughness: 0.22, metalness: 0.15, emissive: C.warm, emissiveIntensity: 0, transparent: true }));
+        const glassM = keep(new THREE.MeshStandardMaterial({ color: C.glass, roughness: 0.12, metalness: 0.35, emissive: C.warm, emissiveIntensity: 0, transparent: true }));
         const finM = keep(new THREE.MeshStandardMaterial({ color: C.cal, roughness: 0.6, transparent: true }));
         const slab = new THREE.Mesh(slabGeo, slabM);
         slab.position.y = -0.07;
@@ -300,25 +300,25 @@ export function BuildingScroll({ chapters, picks, heading, cta }: { chapters: Ch
 
   if (reduced || failed)
     return (
-      <section className="bg-navy text-ivory">
+      <section className="bg-[#E9E0D3] text-ink">
         <div className="mx-auto max-w-[1320px] px-4 py-20 md:px-8">
-          <h2 className="max-w-[760px] text-[36px] leading-tight text-ivory md:text-[48px]">{heading}</h2>
+          <h2 className="max-w-[760px] text-[36px] leading-tight text-ink md:text-[48px]">{heading}</h2>
           <ol className="mt-10 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
             {chapters.map((c) => (
               <li key={c.title}>
-                <p className="np-eyebrow text-[#D4B98C]">{c.eyebrow}</p>
-                <h3 className="mt-2 text-[26px] leading-tight text-ivory">{c.title}</h3>
-                <p className="mt-2 text-[15px] text-ivory/75">{c.body}</p>
+                <p className="np-eyebrow text-gold-text">{c.eyebrow}</p>
+                <h3 className="mt-2 text-[26px] leading-tight text-ink">{c.title}</h3>
+                <p className="mt-2 text-[15px] text-ink/70">{c.body}</p>
               </li>
             ))}
           </ol>
           <ul className="mt-12 grid gap-3 md:grid-cols-3">
             {picks.map((k) => (
               <li key={k.href}>
-                <Link href={k.href} className="block rounded-2xl border border-ivory/15 p-5 hover:border-[#C9A574]">
-                  <span className="block font-serif text-[22px] text-ivory">{k.title}</span>
-                  <span className="block text-sm text-ivory/70">{k.meta}</span>
-                  <span className="mt-2 block font-display font-semibold text-[#C9A574]">{k.price}</span>
+                <Link href={k.href} className="block rounded-2xl np-glass p-5 hover:border-ink/30">
+                  <span className="block font-serif text-[22px] text-ink">{k.title}</span>
+                  <span className="block text-sm text-ink/60">{k.meta}</span>
+                  <span className="mt-2 block font-display font-semibold text-coral">{k.price}</span>
                 </Link>
               </li>
             ))}
@@ -328,9 +328,9 @@ export function BuildingScroll({ chapters, picks, heading, cta }: { chapters: Ch
     );
 
   return (
-    <section ref={root} className="relative h-[420vh] bg-navy text-ivory" aria-label={heading}>
+    <section ref={root} className="relative h-[420vh] bg-[#E9E0D3] text-ink" aria-label={heading}>
       <div className="sticky top-0 h-[100svh] overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_65%_40%,rgba(194,169,136,.16),transparent_60%)]" aria-hidden />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_65%_35%,rgba(255,250,242,.9),transparent_62%)]" aria-hidden />
         <canvas ref={canvas} className="absolute inset-0 h-full w-full" aria-hidden />
 
         {/* Copy column */}
@@ -339,17 +339,17 @@ export function BuildingScroll({ chapters, picks, heading, cta }: { chapters: Ch
           <div className="relative h-[220px] max-w-[440px] lg:h-[300px]">
             {chapters.map((c, i) => (
               <div key={c.title} ref={(el) => void (chapterEls.current[i] = el)} className="absolute inset-x-0 bottom-0 lg:top-0" style={{ opacity: i === 0 ? 1 : 0 }}>
-                <p className="np-eyebrow text-[12px] tracking-[0.2em] text-[#D4B98C]">{c.eyebrow}</p>
-                <h3 className="mt-3 text-[34px] leading-[1.05] text-ivory sm:text-[44px] lg:text-[56px]">{c.title}</h3>
-                <p className="mt-4 max-w-[400px] text-[16px] leading-relaxed text-ivory/80">{c.body}</p>
+                <p className="np-eyebrow text-[12px] tracking-[0.2em] text-gold-text">{c.eyebrow}</p>
+                <h3 className="mt-3 text-[34px] leading-[1.05] text-ink sm:text-[44px] lg:text-[56px] tracking-[-0.015em]">{c.title}</h3>
+                <p className="mt-4 max-w-[400px] text-[16px] leading-relaxed text-ink/70">{c.body}</p>
               </div>
             ))}
           </div>
           <div className="mt-8 flex items-center gap-3" aria-hidden>
             {chapters.map((c, i) => (
-              <span key={c.title} ref={(el) => void (dots.current[i] = el)} className="np-chapter-dot h-[2px] w-10 bg-ivory/20 transition-colors duration-500" />
+              <span key={c.title} ref={(el) => void (dots.current[i] = el)} className="np-chapter-dot h-[2px] w-10 bg-ink/15 transition-colors duration-500" />
             ))}
-            <span className="ml-3 font-display text-[12px] font-semibold uppercase tracking-[0.24em] text-ivory/60">
+            <span className="ml-3 font-display text-[12px] font-semibold uppercase tracking-[0.24em] text-ink/50">
               <span ref={floorTag}>00</span> / {String(FLOORS).padStart(2, "0")}
             </span>
           </div>
@@ -364,12 +364,12 @@ export function BuildingScroll({ chapters, picks, heading, cta }: { chapters: Ch
             tabIndex={-1}
             className="group absolute left-0 top-0 flex items-center gap-3 opacity-0 will-change-transform"
           >
-            <span className="h-px w-4 bg-[#C9A574] sm:w-14" aria-hidden />
-            <span className="rounded-xl border border-ivory/15 bg-[#1E1A18]/85 px-3 py-2 sm:px-4 sm:py-3 shadow-[0_18px_40px_rgba(0,0,0,.35)] backdrop-blur-md transition-colors group-hover:border-[#C9A574]">
-              <span className="block max-w-[150px] truncate font-serif text-[16px] leading-tight text-ivory sm:max-w-[240px] sm:text-[20px]">{k.title}</span>
-              <span className="hidden text-[12px] text-ivory/70 sm:block">{k.meta}</span>
-              <span className="mt-1 block font-display text-[14px] font-semibold text-[#C9A574]">
-                {k.price} <span className="font-normal text-ivory/70">· {cta} →</span>
+            <span className="h-px w-4 bg-ink/40 sm:w-14" aria-hidden />
+            <span className="np-glass rounded-2xl px-3 py-2 transition-colors group-hover:border-ink/30 sm:px-4 sm:py-3">
+              <span className="block max-w-[150px] truncate font-serif text-[16px] leading-tight text-ink sm:max-w-[240px] sm:text-[20px]">{k.title}</span>
+              <span className="hidden text-[12px] text-ink/60 sm:block">{k.meta}</span>
+              <span className="mt-1 block font-display text-[14px] font-semibold text-coral">
+                {k.price} <span className="font-normal text-ink/60">· {cta} →</span>
               </span>
             </span>
           </Link>

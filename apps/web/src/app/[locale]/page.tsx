@@ -1,14 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import type { Listing, Locale } from "@/types/domain";
 import { PublicPage } from "@/components/layout/PublicPage";
-import { HeroSearch } from "@/components/search/HeroSearch";
 import { HomeMap } from "@/components/search/HomeMap";
 import { mapListing } from "@/components/map/mapListing";
 import { factsLine } from "@/components/listing/ListingCard";
 import { HomeMotion } from "@/components/home/HomeMotion";
-import { HeroCinema } from "@/components/home/HeroCinema";
+import { HeroAura } from "@/components/home/HeroAura";
 import { BuildingScroll } from "@/components/home/BuildingScroll";
 import { CollectionRail } from "@/components/home/CollectionRail";
 import { RemoteRoute } from "@/components/home/RemoteRoute";
@@ -66,60 +65,61 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
   const zones = await Promise.all(FEATURED_ZONES.map(async (z) => ({ ...z, stats: await zoneStats(z.zone), href: zoneLink(locale, z.zone, available) })));
 
   const chapters = [
-    { eyebrow: tx(locale, "01 · Cimientos", "01 · Foundations"), title: tx(locale, "Cimientos legales sólidos.", "Solid legal foundations."), body: tx(locale, "Asesoría legal y notarial: títulos, solvencias y cargas revisados antes de firmar.", "Legal and notarial advice: titles, tax clearances and liens checked before you sign.") },
-    { eyebrow: tx(locale, "02 · Planta a planta", "02 · Floor by floor"), title: tx(locale, "Cada propiedad, verificada.", "Every property, verified."), body: tx(locale, "Valoración PlaceEstimate con comparables reales y fotografía profesional de cada planta.", "PlaceEstimate valuation with real comparables and professional photography of every floor.") },
-    { eyebrow: tx(locale, "03 · Nuestra firma", "03 · Our signature"), title: tx(locale, "Coronada por New Place.", "Crowned by New Place."), body: tx(locale, "Visitas privadas en la agenda real de su asesor, en persona o por videollamada.", "Private viewings on your advisor’s real calendar, in person or by video call.") },
-    { eyebrow: tx(locale, "04 · Su planta", "04 · Your floor"), title: tx(locale, "Su residencia le espera.", "Your residence awaits."), body: tx(locale, "Las plantas iluminadas son residencias disponibles hoy. Pulse una para verla.", "The lit floors are residences available today. Tap one to see it.") },
+    { eyebrow: tx(locale, "01 · Antes de firmar", "01 · Before you sign"), title: tx(locale, "Papeles en regla, sin sorpresas.", "Paperwork in order, no surprises."), body: tx(locale, "Nuestro equipo legal revisa títulos, solvencias y gravámenes antes de que pongas un dólar. Si algo no cuadra, te lo decimos primero.", "Our legal team checks titles, tax clearances and liens before you put down a dollar. If something doesn't add up, you hear it from us first.") },
+    { eyebrow: tx(locale, "02 · El precio justo", "02 · A fair price"), title: tx(locale, "Sabes lo que vale. De verdad.", "You'll know what it's worth. Really."), body: tx(locale, "Cada casa trae su valoración PlaceEstimate, hecha con ventas reales de la zona. Nada de precios inflados.", "Every home comes with a PlaceEstimate valuation built from real sales nearby. No inflated prices.") },
+    { eyebrow: tx(locale, "03 · A tu ritmo", "03 · At your pace"), title: tx(locale, "Visitas cuando a ti te venga bien.", "Viewings when it suits you."), body: tx(locale, "En persona o por videollamada, con tu asesor de siempre. Su agenda es real: reservas y listo.", "In person or by video call, with the same advisor every time. Their calendar is real: book and you're set.") },
+    { eyebrow: tx(locale, "04 · Tu casa", "04 · Your home"), title: tx(locale, "La luz encendida es para ti.", "The light that's on is for you."), body: tx(locale, "Las plantas iluminadas son casas disponibles hoy. Toca una y entra.", "The lit floors are homes available today. Tap one and step inside.") },
   ];
   const steps = [
-    [tx(locale, "Videovisita privada", "Private video tour"), tx(locale, "Recorremos la propiedad en directo con usted.", "We walk you through the property live.")],
-    [tx(locale, "Revisión legal completa", "Full legal review"), tx(locale, "Títulos, solvencias y cargas verificados antes de firmar.", "Titles, tax clearances and liens checked before signing.")],
-    [tx(locale, "Firma con poder notarial", "Signing by power of attorney"), tx(locale, "Le representamos ante el registro.", "We represent you at the registry.")],
-    [tx(locale, "Pago seguro en USD", "Secure payment in USD"), tx(locale, "Con comprobante en cada paso.", "With a receipt at every step.")],
-    [tx(locale, "Entrega de llaves", "Handover of keys"), tx(locale, "Y, si lo desea, gestión de alquiler vacacional.", "And, if you wish, vacation-rental management.")],
+    [tx(locale, "La recorremos contigo, en vivo", "We walk you through it, live"), tx(locale, "Por videollamada, con calma, mirando lo que tú quieras ver.", "By video call, calmly, looking at whatever you want to see.")],
+    [tx(locale, "Revisamos cada papel", "We check every document"), tx(locale, "Títulos, solvencias y gravámenes, antes de firmar nada.", "Titles, tax clearances and liens, before you sign anything.")],
+    [tx(locale, "Firmamos por ti, si hace falta", "We sign for you, if needed"), tx(locale, "Con un poder notarial, te representamos en el registro.", "With a power of attorney, we represent you at the registry.")],
+    [tx(locale, "Pagas en dólares, con seguridad", "You pay in dollars, safely"), tx(locale, "Y con un comprobante en cada paso.", "With a receipt at every step.")],
+    [tx(locale, "Te damos las llaves", "We hand you the keys"), tx(locale, "Y, si quieres, la alquilamos por ti mientras no estás.", "And, if you like, we rent it out for you while you're away.")],
   ];
   const owner = [
-    tx(locale, "Valoración PlaceEstimate con comparables reales", "PlaceEstimate valuation with real comparables"),
-    tx(locale, "Fotografía profesional y difusión selecta", "Professional photography and selective exposure"),
-    tx(locale, "Visitas agendadas con compradores interesados", "Viewings booked with genuinely interested buyers"),
+    tx(locale, "Te decimos cuánto vale, con datos reales", "We tell you what it's worth, with real data"),
+    tx(locale, "Fotos profesionales y solo compradores serios", "Professional photos and only serious buyers"),
+    tx(locale, "Tú decides quién la ve y cuándo", "You decide who sees it, and when"),
   ];
+  const marquee = ["Lechería", "El Morro", "Playa El Agua", "Pampatar", "Country Club", "Altamira", "La Castellana", "Los Palos Grandes", "Higuerote", "Tucacas"];
+  const featured = ranked[0] && { href: listingHref(locale, ranked[0]), title: tx(locale, ranked[0].title_es, ranked[0].title_en), zone: ranked[0].zone, price: price(ranked[0]), photo: listingPhoto(ranked[0], 0) };
 
   return (
-    <PublicPage locale={locale} header="transparent" tabbar contact={{ href: `/${locale}/luxury#acceso`, label: tx(locale, "Hablar con un asesor", "Talk to an advisor") }}>
+    <PublicPage locale={locale} header="transparent" tabbar contact={{ href: `/${locale}/luxury#acceso`, label: tx(locale, "Hablar con una persona", "Talk to a person") }}>
       <HomeMotion />
-      {/* HERO — a cinematic walk through the arch to the sea, driven by the scroll. */}
-      <HeroCinema
-        eyebrow={tx(locale, "El Caribe, con alma mediterránea", "The Caribbean, with a Mediterranean soul")}
-        title={tx(locale, "Pocas propiedades.", "Few properties.")}
-        titleEm={tx(locale, "Todas extraordinarias.", "All extraordinary.")}
-        lede={tx(
-          locale,
-          "Residencias seleccionadas en Lechería, El Morro, Margarita y Caracas, valoradas con datos reales y presentadas en privado por asesores verificados.",
-          "Selected residences in Lechería, El Morro, Margarita and Caracas, valued with real data and presented privately by verified advisors.",
-        )}
-        search={<HeroSearch locale={locale} />}
-        arrival={tx(locale, "Bienvenido a casa.", "Welcome home.")}
-        arrivalSub="Lechería · El Morro · Margarita · Caracas"
-        scrollHint={tx(locale, "Deslice", "Scroll")}
-      />
+      {/* HERO — light, editorial, with the conversational search. */}
+      <HeroAura locale={locale} available={available.length} featured={featured || undefined} />
+
+      {/* ZONES — they glide by, endlessly. */}
+      <div className="relative overflow-hidden border-y border-ink/[.07] bg-ivory py-6" aria-label={tx(locale, "Dónde estamos", "Where we are")}>
+        <div className="np-marquee gap-12 pr-12">
+          {[...marquee, ...marquee].map((z, i) => (
+            <span key={i} aria-hidden={i >= marquee.length || undefined} className="flex shrink-0 items-center gap-12 font-serif text-[30px] text-ink/80 md:text-[40px]">
+              {z}
+              <span className="h-1.5 w-1.5 rounded-full bg-gold" aria-hidden />
+            </span>
+          ))}
+        </div>
+      </div>
 
       {/* THE BUILDING — 3D, rises floor by floor; the lit floors are the featured residences. */}
-      <BuildingScroll chapters={chapters} picks={floors} heading={tx(locale, "Cómo trabajamos", "How we work")} cta={tx(locale, "Ver", "View")} />
+      <BuildingScroll chapters={chapters} picks={floors} heading={tx(locale, "Así trabajamos", "How we work")} cta={tx(locale, "Entrar", "Step inside")} />
 
       {/* COLECCIÓN PRIVADA — horizontal gallery */}
       <CollectionRail
-        eyebrow={tx(locale, "Selección exclusiva", "Exclusive selection")}
-        title={tx(locale, "Colección Privada", "Private Collection")}
+        eyebrow={tx(locale, "Colección Privada", "Private Collection")}
+        title={tx(locale, "Las que no se olvidan.", "The ones you don't forget.")}
         items={rail}
-        more={{ href: `/${locale}/luxury`, label: tx(locale, "Ver la colección", "View the collection") }}
+        more={{ href: `/${locale}/luxury`, label: tx(locale, "Ver toda la colección", "See the whole collection") }}
       />
 
       {/* EXPLORE EN EL MAPA */}
-      <section id="explorar" className="mx-auto max-w-[1320px] px-4 pt-20 md:px-8 lg:pt-28">
+      <section id="explorar" className="mx-auto max-w-[1320px] px-4 pt-24 md:px-8 lg:pt-32">
         <div data-reveal className="mb-8 grid items-end gap-4 md:grid-cols-[1fr_auto] lg:mb-10">
-          <h2 className="text-[36px] leading-tight md:text-[48px]">{tx(locale, "Explore en el mapa", "Explore on the map")}</h2>
+          <div><p className="np-kicker text-gold-text">{tx(locale, "El mapa", "The map")}</p><h2 className="mt-3 text-[36px] leading-[1.05] tracking-[-0.02em] md:text-[52px]">{tx(locale, "Elige primero el lugar.", "Choose the place first.")}</h2></div>
           <p className="max-w-[380px] text-[15px] leading-relaxed text-muted md:text-right">
-            {tx(locale, "Precio por m² calculado con las propiedades publicadas en cada zona. Dibuje su zona ideal y reciba avisos.", "Price per m² computed from the properties listed in each area. Draw your ideal area and get alerts.")}
+            {tx(locale, "Lo que cuesta el metro cuadrado en cada zona, con casas reales. Dibuja la tuya y te avisamos cuando aparezca algo.", "What a square metre costs in each area, from real homes. Draw yours and we\u2019ll tell you when something turns up.")}
           </p>
         </div>
         <div className="grid gap-6 lg:grid-cols-[1.55fr_1fr]">
@@ -127,8 +127,8 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
           <ul data-reveal="stagger" className="flex flex-col gap-3">
             {zones.map((z) => (
               <li key={z.zone}>
-                <Link href={z.href} className="group flex h-full min-h-[104px] items-stretch overflow-hidden rounded-2xl bg-white shadow-[0_1px_2px_rgba(30,26,24,.05),0_8px_24px_rgba(30,26,24,.06)] transition-shadow duration-np hover:shadow-[0_16px_36px_rgba(30,26,24,.12)]">
-                  <span className="relative w-[84px] shrink-0 overflow-hidden sm:w-[112px]">
+                <Link href={z.href} data-spotlight className="np-glass group flex h-full min-h-[104px] items-stretch overflow-hidden rounded-[24px] transition-transform duration-500 hover:-translate-y-0.5">
+                  <span className="relative m-2 w-[76px] shrink-0 overflow-hidden rounded-[18px] sm:w-[100px]">
                     <Image src={z.photo} alt="" fill sizes="112px" className="object-cover transition-transform duration-700 group-hover:scale-105" />
                   </span>
                   <span className="flex min-w-0 flex-1 items-center justify-between gap-3 px-4 py-4 sm:px-5">
@@ -148,7 +148,7 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
             ))}
             <li className="pt-1">
               <Button href={`/${locale}/search?type=SALE`} variant="outline" className="w-full">
-                {tx(locale, "Abrir el mapa completo", "Open the full map")} <ArrowRight size={16} aria-hidden />
+                {tx(locale, "Abrir el mapa", "Open the map")} <ArrowRight size={16} aria-hidden />
               </Button>
             </li>
           </ul>
@@ -158,25 +158,25 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
       {/* COMPRA A DISTANCIA — the diaspora's routes draw in to Lechería as the steps light up. */}
       <div className="pt-20 lg:pt-28">
         <RemoteRoute
-          eyebrow={tx(locale, "Para venezolanos en el exterior", "For Venezuelans abroad")}
-          title={tx(locale, "Compre en Lechería sin moverse de Madrid, Miami o Panamá.", "Buy in Lechería without leaving Madrid, Miami or Panama.")}
+          eyebrow={tx(locale, "Si vives fuera", "If you live abroad")}
+          title={tx(locale, "Tu casa en Venezuela, sin subirte a un avión.", "Your home in Venezuela, without boarding a plane.")}
           steps={steps as [string, string][]}
         >
           <Button href={`/${locale}/search?type=SALE`} variant="outline" className="mt-8">
-            {tx(locale, "Ver propiedades disponibles", "See available properties")}
+            {tx(locale, "Ver casas disponibles", "See available homes")}
           </Button>
         </RemoteRoute>
       </div>
 
       {/* VENDA EN PRIVADO */}
-      <section className="mt-24 bg-arena lg:mt-32">
-        <div className="mx-auto grid max-w-[1320px] items-end gap-10 px-4 pt-16 md:px-8 lg:grid-cols-2 lg:gap-16 lg:pt-20">
-          <div data-reveal className="pb-4 lg:pb-24">
-            <p className="np-eyebrow text-gold-text">{tx(locale, "Propietarios", "Owners")}</p>
+      <section className="np-grain relative mx-3 mt-24 overflow-hidden rounded-[40px] bg-[#E9E0D3] md:mx-6 lg:mt-32">
+        <div className="relative mx-auto grid max-w-[1320px] items-center gap-10 px-5 pt-16 md:px-10 lg:grid-cols-2 lg:gap-16 lg:pt-12">
+          <div data-reveal className="pb-4 lg:pb-12">
+            <p className="np-kicker text-gold-text">{tx(locale, "Si vas a vender", "If you\u2019re selling")}</p>
             <h2 className="mt-3 text-[38px] leading-[1.05] md:text-[52px]">
-              {tx(locale, "Venda en privado.", "Sell privately.")}
+              {tx(locale, "Tu casa merece", "Your home deserves")}
               <br />
-              {tx(locale, "Compre con certeza.", "Buy with certainty.")}
+              <span className="text-ink/45">{tx(locale, "que la cuenten bien.", "to be told well.")}</span>
             </h2>
             <ul className="mt-7 space-y-3">
               {owner.map((o) => (
@@ -187,11 +187,11 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
             </ul>
             <span data-magnetic className="mt-9 inline-block">
               <Button href={`/${locale}/owner/new`} variant="navy" size="lg">
-                {tx(locale, "Valorar mi propiedad", "Value my property")}
+                {tx(locale, "¿Cuánto vale mi casa?", "What\u2019s my home worth?")} <ArrowUpRight size={18} aria-hidden />
               </Button>
             </span>
           </div>
-          <div className="np-arch relative mx-auto aspect-[5/6] w-full max-w-[520px] bg-[#D9CDB8] lg:mr-0">
+          <div data-unveil className="relative mx-auto mb-6 aspect-[5/6] w-full max-w-[520px] overflow-hidden rounded-[32px] bg-[#D9CDB8] lg:mb-12 lg:mr-0">
             <div data-parallax="40" className="absolute -inset-y-[8%] inset-x-0">
               <Image src="/brand/oficina.jpg" alt={tx(locale, "Despacho con ventanal en arco", "Study with an arched window")} fill sizes="(max-width: 1024px) 90vw, 520px" className="object-cover" />
             </div>

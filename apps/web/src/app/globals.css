@@ -174,7 +174,7 @@ html.dark .np-public .text-coral { color: var(--np-coral-light); }
 :is(.bg-navy, .np-navy-panel, .text-ivory) *:focus-visible, html.dark .np-public *:focus-visible { outline-color: var(--np-coral-light); }
 
 /* ── Immersive home (components/home) ───────────────────────────────────────── */
-.np-chapter-dot.is-on { background: var(--np-coral-light, #C9A574); }
+.np-chapter-dot.is-on { background: var(--np-coral, #8E3B22); }
 .np-scroll-line::after { content: ""; position: absolute; inset: 0; background: #F1EBE3; transform: translateY(-100%); animation: np-scroll-line 2.2s cubic-bezier(.65,0,.35,1) infinite; }
 @keyframes np-scroll-line { 0% { transform: translateY(-100%) } 55% { transform: translateY(0) } 100% { transform: translateY(100%) } }
 /* Steps light up as the route draws; text stays full-contrast, only the numeral and a rule change. */
@@ -189,3 +189,59 @@ html.np-motion { scroll-behavior: auto; }
 
 /* Prata has no italic: emphasis in titles stays upright */
 h1 em, h2 em, h3 em, .np-hero-title em { font-style: normal; }
+
+/* ── 2035 · light, glass and motion (redesign) ─────────────────────────────────────
+   Light-first Palette A: Lino surfaces, frosted glass panels, hairlines, soft aurora light and a whisper of grain.
+   Every moving piece stops under prefers-reduced-motion. */
+:root { --np-glass: rgb(255 255 255 / .58); --np-glass-line: rgb(255 255 255 / .75); --np-hair: rgb(30 26 24 / .08); }
+.np-glass {
+  background: var(--np-glass);
+  -webkit-backdrop-filter: blur(22px) saturate(1.4);
+          backdrop-filter: blur(22px) saturate(1.4);
+  border: 1px solid var(--np-glass-line);
+  box-shadow: 0 1px 0 rgb(255 255 255 / .6) inset, 0 20px 50px -18px rgb(30 26 24 / .22);
+}
+html.dark .np-public .np-glass { background: rgb(42 36 32 / .62); border-color: rgb(255 255 255 / .08); box-shadow: 0 20px 50px -18px rgb(0 0 0 / .6); }
+.np-hairline { border-color: var(--np-hair); }
+/* Aurora: three slow, blurred light pools in Arena, Rosa and Bronce over Lino. */
+.np-aura { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.np-aura i { position: absolute; border-radius: 9999px; filter: blur(70px); opacity: .55; will-change: transform; }
+.np-aura i:nth-child(1) { width: 46vw; height: 46vw; left: -8vw; top: -12vw; background: #E7D6BE; animation: np-drift-a 26s ease-in-out infinite alternate; }
+.np-aura i:nth-child(2) { width: 38vw; height: 38vw; right: -6vw; top: 4vw; background: #EBD5C8; animation: np-drift-b 32s ease-in-out infinite alternate; }
+.np-aura i:nth-child(3) { width: 30vw; height: 30vw; left: 34vw; bottom: -14vw; background: #E2C9A0; opacity: .38; animation: np-drift-a 38s ease-in-out infinite alternate-reverse; }
+@keyframes np-drift-a { to { transform: translate3d(8vw, 6vw, 0) scale(1.12); } }
+@keyframes np-drift-b { to { transform: translate3d(-7vw, 8vw, 0) scale(.92); } }
+.np-grain::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .06; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+/* Spotlight: a soft light follows the pointer across a card (HomeMotion writes --mx/--my). */
+[data-spotlight] { position: relative; isolation: isolate; }
+[data-spotlight]::before {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 1; opacity: 0; transition: opacity .4s ease;
+  background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgb(255 248 238 / .38), transparent 45%);
+}
+[data-spotlight]:hover::before { opacity: 1; }
+/* Marquee: the zones glide by, endlessly. */
+.np-marquee { display: flex; width: max-content; animation: np-marquee 48s linear infinite; }
+.np-marquee:hover { animation-play-state: paused; }
+@keyframes np-marquee { to { transform: translateX(-50%); } }
+/* Live dot (available now / advisor online). */
+.np-live { position: relative; display: inline-block; width: 8px; height: 8px; border-radius: 9999px; background: #2F6B4F; }
+.np-live::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: inherit; animation: np-pulse 1.8s ease-out infinite; }
+/* Typing caret for the conversational search placeholder. */
+.np-caret { display: inline-block; width: 1.5px; height: 1.1em; margin-left: 2px; vertical-align: -0.15em; background: currentColor; animation: np-blink 1s steps(1) infinite; }
+@keyframes np-blink { 50% { opacity: 0; } }
+/* Image reveal: photos open like a curtain when they enter the viewport (HomeMotion toggles .is-in). */
+[data-unveil] { clip-path: inset(12% 8% 12% 8% round 32px); transition: clip-path 1.4s cubic-bezier(.16,1,.3,1); }
+[data-unveil].is-in { clip-path: inset(0 0 0 0 round 32px); }
+.np-kicker { font-family: var(--font-display); font-size: 12px; font-weight: 500; letter-spacing: .22em; text-transform: uppercase; }
+@media (prefers-reduced-motion: reduce) {
+  .np-aura i, .np-marquee, .np-live::after, .np-caret { animation: none; }
+  [data-unveil] { clip-path: none; transition: none; }
+}
+/* Without the motion layer (no JS yet, or other pages) photos are simply shown. */
+html:not(.np-motion) [data-unveil] { clip-path: none; }
+/* Dark mode: the light 2035 panels (footer, owner band, building) take the warm dark surface. */
+html.dark .np-public :is(footer.np-grain, .bg-\[\#E9E0D3\]) { background-color: #2A2420; }
+html.dark .np-public .bg-ink { background-color: #F1EBE3; color: #1E1A18; }

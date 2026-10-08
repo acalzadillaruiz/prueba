@@ -71,7 +71,8 @@ export function PublicHeader({ locale, variant = "light" }: { locale: Locale; va
   };
   const other = locale === "es" ? "en" : "es";
   const switchHref = pathname.replace(/^\/(es|en)/, `/${other}`) + (qs ? `?${qs}` : "");
-  const dark = variant !== "light";
+  const dark = variant === "dark";
+  const float = variant !== "dark";
   const type = new URLSearchParams(qs).get("type") ?? "SALE";
   const onSearch = /\/search$/.test(pathname);
   const nav = [
@@ -93,14 +94,19 @@ export function PublicHeader({ locale, variant = "light" }: { locale: Locale; va
     <header
       style={{ paddingTop: "env(safe-area-inset-top)" }}
       className={cn(
-        "top-0 z-40 border-b transition-[background-color,border-color] duration-300",
-        variant === "light" && "sticky border-line bg-ivory/90 text-ink backdrop-blur",
-        variant === "dark" && "np-navy-panel sticky border-navy-line bg-navy text-ivory",
-        variant === "transparent" && "fixed inset-x-0 text-ivory",
-        variant === "transparent" && (scrolled || menuOpen ? "border-navy-line bg-navy/95 backdrop-blur" : "border-transparent bg-transparent"),
+        "top-0 z-40 transition-[background-color,border-color] duration-300",
+        variant === "dark" && "np-navy-panel sticky border-b border-navy-line bg-navy text-ivory",
+        float && "inset-x-0 px-2.5 pt-2.5 text-ink md:px-5 md:pt-3",
+        variant === "transparent" ? "fixed" : variant === "light" && "sticky",
       )}
     >
-      <div className="mx-auto flex h-[72px] max-w-[1320px] items-center gap-8 px-4 md:px-8">
+      <div
+        className={cn(
+          "mx-auto flex max-w-[1320px] items-center gap-8 transition-[background-color,box-shadow,border-color] duration-500",
+          float ? "h-[62px] rounded-full border pl-5 pr-2 md:pl-6" : "h-[72px] px-4 md:px-8",
+          float && (variant === "light" || scrolled || menuOpen ? "np-glass" : "border-transparent bg-transparent"),
+        )}
+      >
         <Link href={`/${locale}`} aria-label="New Place" className="flex min-h-11 shrink-0 items-center whitespace-nowrap">
           <Logo tone={dark ? "ivory" : "navy"} animate={animate} />
         </Link>

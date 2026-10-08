@@ -7,8 +7,8 @@ const stamp = Date.now().toString(36);
 test.describe.serial("Criterios de aceptación §15", () => {
   test("1 · /es muestra el mapa night centrado en Caracas con pines", async ({ page }) => {
     await page.goto("/es");
-    await expect(page.getByText("El Caribe, con alma mediterránea")).toBeVisible();
-    // The map lives in the "Explore en el mapa" section (mounted when it nears the viewport).
+    await expect(page.getByRole("heading", { level: 1, name: /Hay casas que se visitan/ })).toBeVisible();
+    // The map lives in the "#explorar" section (mounted when it nears the viewport).
     await page.locator("#explorar").scrollIntoViewIfNeeded();
     const map = page.locator('[role="application"]').first();
     await expect(map).toBeVisible();

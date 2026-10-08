@@ -30,31 +30,37 @@ export default async function LuxuryPage({ params }: { params: Promise<{ locale:
   const privateCount = await prisma.listing.count({ where: { luxury: true, privateListing: true, status: "ACTIVE" } });
   const [hero] = lux;
   return (
-    <PublicPage locale={locale} header="transparent" tabbar contact={{ href: "#acceso", label: tx(locale, "Hablar con un asesor", "Talk to an advisor") }}>
-      <section className="relative isolate overflow-hidden bg-navy text-ivory">
-        <Image src="/brand/villa-arcos.jpg" alt="" fill priority sizes="100vw" quality={80} className="-z-10 object-cover object-center" />
-        <div className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(30,26,24,.7)_0%,rgba(30,26,24,.25)_40%,rgba(30,26,24,.9)_100%)]" aria-hidden />
-        <div className="mx-auto flex min-h-[560px] max-w-[1320px] flex-col justify-end px-4 pb-14 pt-[132px] md:px-8 lg:min-h-[680px] lg:pb-20">
-          <p className="np-eyebrow text-ivory/90">{tx(locale, "New Place · Colección Privada", "New Place · Private Collection")}</p>
-          <h1 className="np-hero-title mt-4 max-w-[860px] text-[44px] leading-[1.04] sm:text-[58px] lg:text-[76px]">
-            {tx(locale, "Colección Privada.", "Private Collection.")}
-            <br />
-            <em>{tx(locale, "Lo extraordinario, en privado.", "The extraordinary, in private.")}</em>
-          </h1>
-          <p className="mt-5 max-w-[560px] text-[17px] leading-relaxed text-ivory/85">
-            {tx(
-              locale,
-              `${lux.length} ${lux.length === 1 ? "propiedad seleccionada" : "propiedades seleccionadas"}, verificadas y valoradas con datos reales. Algunas solo se muestran en privado, con enlace.`,
-              `${lux.length} selected ${lux.length === 1 ? "property" : "properties"}, verified and valued with real data. Some are shown privately only, by link.`,
-            )}
-          </p>
+    <PublicPage locale={locale} header="transparent" tabbar contact={{ href: "#acceso", label: tx(locale, "Hablar con una persona", "Talk to a person") }}>
+      <section className="np-grain relative overflow-hidden bg-ivory pt-[104px] lg:pt-[120px]">
+        <div className="np-aura" aria-hidden>
+          <i />
+          <i />
+          <i />
+        </div>
+        <div className="relative mx-auto grid max-w-[1320px] grid-cols-1 items-end gap-10 px-4 pb-14 md:px-8 lg:grid-cols-[1fr_1.1fr] lg:pb-20">
+          <div>
+            <p className="np-kicker text-gold-text">{tx(locale, "Colección Privada", "Private Collection")}</p>
+            <h1 className="mt-5 max-w-[620px] text-[44px] leading-[1.02] tracking-[-0.02em] sm:text-[58px] lg:text-[72px]">
+              {tx(locale, "Casas que no salen", "Homes that never make")} <span className="text-ink/45">{tx(locale, "en ningún portal.", "it to the portals.")}</span>
+            </h1>
+            <p className="mt-6 max-w-[520px] text-[17px] leading-relaxed text-ink/70">
+              {tx(
+                locale,
+                `${lux.length} ${lux.length === 1 ? "casa elegida" : "casas elegidas"} una a una, revisadas y valoradas con datos reales. Algunas solo las enseñamos en privado: pide acceso y te las mostramos con calma.`,
+                `${lux.length} ${lux.length === 1 ? "home" : "homes"} chosen one by one, checked and valued with real data. Some we only show in private: ask for access and we'll take you through them, calmly.`,
+              )}
+            </p>
+          </div>
+          <div className="relative aspect-[16/11] w-full overflow-hidden rounded-[36px] bg-arena shadow-[0_40px_90px_-30px_rgba(30,26,24,.45)]">
+            <Image src="/brand/villa-arcos.jpg" alt={tx(locale, "Patio con arcos de una villa", "A villa's arched courtyard")} fill priority sizes="(max-width: 1024px) 92vw, 680px" quality={80} className="object-cover" />
+          </div>
         </div>
       </section>
 
       <section className="mx-auto max-w-[1320px] px-4 py-20 md:px-8 lg:py-28">
         <div className="mb-10 flex flex-wrap items-end justify-between gap-4 border-b border-line pb-6">
-          <h2 className="text-[36px] leading-tight md:text-[48px]">{tx(locale, "La colección", "The collection")}</h2>
-          <p className="max-w-md text-[15px] text-muted">{tx(locale, "Cada residencia, con su asesor verificado y su valoración PlaceEstimate.", "Every residence comes with its verified advisor and its PlaceEstimate valuation.")}</p>
+          <h2 className="text-[36px] leading-tight tracking-[-0.02em] md:text-[52px]">{tx(locale, "Una a una.", "One by one.")}</h2>
+          <p className="max-w-md text-[15px] text-muted">{tx(locale, "Cada una con su asesor de confianza y lo que vale de verdad, según ventas reales.", "Each with a trusted advisor and what it\u2019s really worth, from real sales.")}</p>
         </div>
         {!hero ? (
           <EmptyState monogram title={tx(locale, "La colección se está renovando", "The collection is being renewed")} body={tx(locale, "Pida acceso y le avisaremos de las nuevas residencias en privado.", "Request access and we’ll tell you privately about new residences.")} />
@@ -65,7 +71,7 @@ export default async function LuxuryPage({ params }: { params: Promise<{ locale:
               const wide = i === 0 || (i === lux.length - 1 && (lux.length - 1) % 2 === 1);
               return (
               <Link key={l.id} href={`/${locale}/listing/${l.slug}`} className={wide ? "group md:col-span-2" : "group"}>
-                <div className={(wide ? "aspect-[4/3] md:aspect-[21/9]" : "aspect-[4/3]") + " relative overflow-hidden rounded-[20px] bg-arena"}>
+                <div className={(wide ? "aspect-[4/3] md:aspect-[21/9]" : "aspect-[4/3]") + " relative overflow-hidden rounded-[32px] bg-arena"} data-spotlight>
                   <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="h-full w-full transition-transform duration-700 group-hover:scale-[1.02]" />
                   <div className="absolute left-4 top-4"><Badge tone="exclusive">{tx(locale, "Exclusiva New Place", "New Place exclusive")}</Badge></div>
                   <SaveButton id={l.id} locale={locale} className="absolute right-3 top-3" />

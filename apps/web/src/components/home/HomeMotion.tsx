@@ -67,6 +67,54 @@ export function HomeMotion() {
       };
     });
 
+    // [data-spotlight]: a soft light follows the pointer (CSS reads --mx/--my).
+    const onSpot = (e: PointerEvent) => {
+      const el = (e.target as HTMLElement).closest?.("[data-spotlight]") as HTMLElement | null;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      el.style.setProperty("--mx", `${e.clientX - r.left}px`);
+      el.style.setProperty("--my", `${e.clientY - r.top}px`);
+    };
+    document.addEventListener("pointermove", onSpot, { passive: true });
+    // [data-tilt]: cards lean a few degrees toward the pointer (fine pointers only).
+    const fine = window.matchMedia("(pointer: fine)").matches;
+    const tilts = fine ? Array.from(document.querySelectorAll<HTMLElement>("[data-tilt]")) : [];
+    const tiltOff = tilts.map((el) => {
+      const max = Number(el.dataset.tilt) || 6;
+      const move = (e: PointerEvent) => {
+        const r = el.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width - 0.5;
+        const y = (e.clientY - r.top) / r.height - 0.5;
+        gsap.to(el, { rotateY: x * max, rotateX: -y * max, transformPerspective: 900, duration: 0.6, ease: "power3.out" });
+      };
+      const leave = () => gsap.to(el, { rotateY: 0, rotateX: 0, duration: 0.9, ease: "power3.out" });
+      el.addEventListener("pointermove", move);
+      el.addEventListener("pointerleave", leave);
+      return () => {
+        el.removeEventListener("pointermove", move);
+        el.removeEventListener("pointerleave", leave);
+      };
+    });
+    // [data-count="62"]: numbers count up once, when they come into view.
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const en of entries) {
+          if (!en.isIntersecting) continue;
+          const el = en.target as HTMLElement;
+          io.unobserve(el);
+          if (el.dataset.unveil !== undefined) {
+            el.classList.add("is-in");
+            continue;
+          }
+          const to = Number(el.dataset.count) || 0;
+          const o = { v: 0 };
+          gsap.to(o, { v: to, duration: 1.6, ease: "power2.out", onUpdate: () => void (el.textContent = Math.round(o.v).toLocaleString(document.documentElement.lang || "es")) });
+        }
+      },
+      { threshold: 0.3 },
+    );
+    document.querySelectorAll("[data-count], [data-unveil]").forEach((el) => io.observe(el));
+
     // Late layout shifts (fonts, images, the lazy map) move every trigger: recompute once things settle.
     const refresh = () => ScrollTrigger.refresh();
     window.addEventListener("load", refresh);
@@ -78,6 +126,9 @@ export function HomeMotion() {
       window.removeEventListener("load", refresh);
       window.clearTimeout(t);
       cleanups.forEach((c) => c());
+      tiltOff.forEach((c) => c());
+      document.removeEventListener("pointermove", onSpot);
+      io.disconnect();
       ctx.revert();
       gsap.ticker.remove(tick);
       lenis.destroy();

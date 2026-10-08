@@ -56,8 +56,8 @@ export function CollectionRail({ eyebrow, title, items, more }: { eyebrow: strin
       <div className="flex flex-col justify-center overflow-hidden py-20 md:sticky md:top-0 md:h-[100svh] md:py-0">
         <div className="mx-auto mb-8 flex w-full max-w-[1320px] items-end justify-between gap-6 px-4 md:mb-12 md:px-8">
           <div>
-            <p className="np-eyebrow text-gold-text">{eyebrow}</p>
-            <h2 className="mt-3 text-[38px] leading-[1.02] md:text-[60px]">{title}</h2>
+            <p className="np-kicker text-gold-text">{eyebrow}</p>
+            <h2 className="mt-3 text-[38px] leading-[1.02] tracking-[-0.02em] md:text-[60px]">{title}</h2>
           </div>
           <div className="hidden items-center gap-4 md:flex" aria-hidden>
             <span className="font-display text-[13px] font-semibold tracking-[0.2em] text-muted">
@@ -73,28 +73,32 @@ export function CollectionRail({ eyebrow, title, items, more }: { eyebrow: strin
           className="no-scrollbar flex snap-x snap-mandatory gap-5 overflow-x-auto px-4 will-change-transform md:snap-none md:gap-8 md:overflow-visible md:px-8 md:pl-[max(2rem,calc((100vw-1320px)/2+2rem))]"
         >
           {items.map((it, i) => (
-            <Link key={it.href} href={it.href} className="group w-[78vw] shrink-0 snap-start sm:w-[46vw] md:w-[34vw] lg:w-[28vw] xl:w-[400px]">
-              <span className="np-arch relative block aspect-[4/5] overflow-hidden bg-arena">
+            <Link key={it.href} href={it.href} data-spotlight className="group relative w-[78vw] shrink-0 snap-start overflow-hidden rounded-[32px] bg-arena sm:w-[46vw] md:w-[34vw] lg:w-[28vw] xl:w-[420px]">
+              <span className="relative block aspect-[4/5] overflow-hidden">
                 {it.photo && (
                   <span data-drift className="absolute inset-0 block scale-[1.18] will-change-transform">
-                    <Image src={it.photo} alt="" fill sizes="(max-width: 768px) 78vw, 400px" className="object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.06]" />
+                    <Image src={it.photo} alt="" fill sizes="(max-width: 768px) 78vw, 420px" className="object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.06]" />
                   </span>
                 )}
-                <span className="absolute inset-0 bg-[linear-gradient(180deg,rgba(30,26,24,0)_55%,rgba(30,26,24,.55)_100%)]" aria-hidden />
-                {it.badge && <span className="absolute left-1/2 top-[18%] -translate-x-1/2 rounded-full bg-[#F1EBE3EE] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#1E1A18]">{it.badge}</span>}
-                <span className="absolute bottom-4 left-5 font-serif text-[64px] leading-none text-ivory/90" aria-hidden>
-                  {String(i + 1).padStart(2, "0")}
+                <span className="absolute inset-0 bg-[linear-gradient(180deg,rgba(30,26,24,0)_45%,rgba(30,26,24,.35)_100%)]" aria-hidden />
+                <span className="np-glass absolute left-4 top-4 rounded-full px-3 py-1 font-display text-[12px] font-medium text-ink">
+                  {String(i + 1).padStart(2, "0")}{it.badge ? ` · ${it.badge}` : ""}
+                </span>
+                <span className="np-glass absolute inset-x-3 bottom-3 block rounded-[22px] p-4 transition-transform duration-500 group-hover:-translate-y-1">
+                  <span className="block truncate font-serif text-[22px] leading-tight text-ink md:text-[24px]">{it.title}</span>
+                  <span className="mt-0.5 block truncate font-display text-[13px] text-ink/60">
+                    {it.zone} · {it.facts}
+                  </span>
+                  <span className="mt-2 flex items-center justify-between font-display text-[15px] font-semibold text-ink">
+                    {it.price}
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-ink text-ivory transition-transform duration-300 group-hover:rotate-[-45deg]" aria-hidden>→</span>
+                  </span>
                 </span>
               </span>
-              <span className="mt-5 block font-serif text-[24px] leading-tight text-ink transition-colors group-hover:text-[#8E3B22] md:text-[27px]">{it.title}</span>
-              <span className="mt-1 block text-sm text-muted">
-                {it.zone} · {it.facts}
-              </span>
-              <span className="mt-2 block font-display text-[16px] font-semibold text-ink">{it.price}</span>
             </Link>
           ))}
           <Link href={more.href} className="group flex w-[60vw] shrink-0 snap-start items-center justify-center sm:w-[36vw] md:w-[26vw] lg:w-[300px]">
-            <span className="np-arch flex aspect-[4/5] w-full flex-col items-center justify-center gap-3 border border-ink/15 text-center transition-colors group-hover:border-ink">
+            <span className="flex aspect-[4/5] w-full flex-col items-center justify-center gap-3 rounded-[32px] border border-ink/15 text-center transition-colors group-hover:border-ink group-hover:bg-white/50">
               <span className="font-serif text-[30px] leading-tight text-ink">{more.label}</span>
               <span className="text-[22px] text-ink transition-transform group-hover:translate-x-1" aria-hidden>
                 →

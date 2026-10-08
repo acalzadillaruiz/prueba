@@ -7,10 +7,10 @@ import { FooterAccountLink } from "./FooterAccountLink";
 export async function PublicFooter({ locale }: { locale: Locale }) {
   const t = await getTranslations({ locale, namespace: "footer" });
   const nav = await getTranslations({ locale, namespace: "nav" });
-  const linkCls = "inline-flex min-h-11 items-center text-[15px] text-ivory/80 transition-colors hover:text-ivory md:min-h-0 md:py-1";
+  const linkCls = "inline-flex min-h-11 items-center text-[15px] text-ink/70 transition-colors hover:text-ink md:min-h-0 md:py-1";
   const col = (title: string, links: [string, string][], extra?: React.ReactNode) => (
     <div>
-      <div className="np-eyebrow mb-4 text-[#D4B98C]">{title}</div>
+      <div className="np-kicker mb-4 text-gold-text">{title}</div>
       <ul className="space-y-1.5 md:space-y-2">
         {links.map(([label, h]) => (
           <li key={label}><Link href={h} className={linkCls}>{label}</Link></li>
@@ -20,11 +20,19 @@ export async function PublicFooter({ locale }: { locale: Locale }) {
     </div>
   );
   return (
-    <footer className="np-navy-panel bg-navy text-ivory">
-      <div className="mx-auto grid max-w-[1320px] grid-cols-2 gap-x-6 gap-y-10 px-4 pb-14 pt-16 md:grid-cols-[1.3fr_1fr_1fr_1fr] md:gap-12 md:px-8">
+    <footer className="np-grain relative mt-24 overflow-hidden rounded-t-[40px] bg-[#E9E0D3] text-ink">
+      <div className="relative mx-auto flex max-w-[1320px] flex-wrap items-end justify-between gap-6 border-b border-ink/10 px-4 pb-12 pt-16 md:px-8 md:pt-20">
+        <p className="max-w-[720px] font-serif text-[40px] leading-[1.04] tracking-[-0.02em] md:text-[64px]">
+          {locale === "es" ? "Cuando quieras," : "Whenever you're ready,"} <span className="text-ink/45">{locale === "es" ? "aquí estamos." : "we're here."}</span>
+        </p>
+        <Link href={`/${locale}/luxury#acceso`} className="inline-flex min-h-12 items-center gap-2 rounded-full bg-ink px-6 font-display text-[15px] font-semibold text-ivory transition-transform duration-300 hover:-translate-y-0.5">
+          {locale === "es" ? "Hablar con una persona" : "Talk to a person"} <span aria-hidden>→</span>
+        </Link>
+      </div>
+      <div className="relative mx-auto grid max-w-[1320px] grid-cols-2 gap-x-6 gap-y-10 px-4 pb-14 pt-16 md:grid-cols-[1.3fr_1fr_1fr_1fr] md:gap-12 md:px-8">
         <div className="col-span-2 flex flex-col items-start md:col-span-1 md:items-center md:text-center">
-          <Logo tone="ivory" size="lg" />
-          <p className="mt-6 max-w-[280px] text-[15px] leading-relaxed text-ivory/75">{t("about")}</p>
+          <Logo tone="navy" size="lg" />
+          <p className="mt-6 max-w-[280px] text-[15px] leading-relaxed text-ink/65">{t("about")}</p>
         </div>
         {col(t("search"), [
           [nav("buy"), `/${locale}/search?type=SALE`],
@@ -37,8 +45,8 @@ export async function PublicFooter({ locale }: { locale: Locale }) {
         {col(t("owners"), [[t("sellWithUs"), `/${locale}/owner/new`], [t("valuation"), `/${locale}/owner/new`], [t("myProperties"), `/${locale}/owner/listings`]])}
         {col(t("agencies"), [[t("forAgencies"), `/${locale}/register`]], <FooterAccountLink locale={locale} signIn={nav("signIn")} className={linkCls} />)}
       </div>
-      <div className="border-t border-[#B08A55]/30">
-        <div className="mx-auto flex max-w-[1320px] flex-wrap items-center justify-between gap-2 px-4 py-5 text-sm text-ivory/60 md:px-8">
+      <div className="relative border-t border-ink/10">
+        <div className="mx-auto flex max-w-[1320px] flex-wrap items-center justify-between gap-2 px-4 py-5 text-sm text-ink/55 md:px-8">
           <span>© {new Date().getFullYear()} New Place · {t("legal")}</span>
           <span>{t("listedOn")}</span>
         </div>

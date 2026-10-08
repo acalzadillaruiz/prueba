@@ -3,13 +3,16 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
-import { ArrowUp, ChevronDown, Search, Sparkles } from "lucide-react";
+import { ArrowUp, ChevronDown, Menu, Search, Sparkles } from "lucide-react";
+import Link from "next/link";
 import { heuristicSearchParse } from "@newplace/ai";
 import type { Locale } from "@/types/domain";
 import { tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import { queryToParams } from "./HeroSearch";
 import { usePlaceSuggest } from "./PlaceSuggest";
+import { RoofMark } from "@/components/brand/Logo";
+import { OPEN_MENU_EVENT } from "@/components/layout/PublicHeader";
 
 const MODES = [
   ["SALE", "Comprar", "Buy"],
@@ -152,8 +155,11 @@ export function AskBar({ locale, className, sticky = false }: { locale: Locale; 
 }
 
 /**
- * The pinned compact search (below the header): mode as a native select (one tap on phones, fully accessible),
- * the same text as the hero bar and a round submit. Hidden = `inert` (out of the tab order and the a11y tree).
+ * The pinned compact search: it REPLACES the header while shown (html[data-np-compact="on"] hides the header, see
+ * globals.css), so it carries the roof mark (home link) and the menu button (opens the header drawer through
+ * OPEN_MENU_EVENT). Mode as a native select (one tap on phones, fully accessible), the same text as the hero bar
+ * and a round submit; the place suggestions open under the whole bar, not just the narrow input. Hidden = `inert`
+ * (out of the tab order and the a11y tree).
  */
 function CompactAsk({
   locale,
@@ -176,6 +182,13 @@ function CompactAsk({
 }) {
   const id = useId();
   const suggest = usePlaceSuggest({ locale, text, setText });
+  // Contract with the header: while this bar is shown the header steps away (one bar at the top, not two).
+  useEffect(() => {
+    const el = document.documentElement;
+    if (shown) el.dataset.npCompact = "on";
+    else delete el.dataset.npCompact;
+    return () => void delete el.dataset.npCompact;
+  }, [shown]);
   const ring = "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink";
   return (
     <div
@@ -184,7 +197,7 @@ function CompactAsk({
       aria-hidden={!shown || undefined}
       className={cn(
         "pointer-events-none fixed inset-x-0 z-[39] px-2.5 transition-[opacity,transform,top] duration-500 ease-[cubic-bezier(.16,1,.3,1)] md:px-5 print:hidden",
-        "top-[calc(env(safe-area-inset-top)+var(--np-header-offset,80px))]",
+        "top-[calc(env(safe-area-inset-top)+8px)]",
         shown ? "translate-y-0 opacity-100" : "-translate-y-3 opacity-0",
       )}
     >
@@ -195,8 +208,11 @@ function CompactAsk({
           e.preventDefault();
           onSubmit();
         }}
-        className={cn("np-glass mx-auto flex h-14 max-w-[640px] [--np-glass:rgb(255_255_255/.8)] items-center gap-1 rounded-full p-1.5 pl-1.5 text-ink", shown && "pointer-events-auto")}
+        className={cn("np-glass relative mx-auto flex h-14 max-w-[720px] items-center gap-1 rounded-full p-1.5 text-ink", shown && "pointer-events-auto")}
       >
+        <Link href={`/${locale}`} aria-label={tx(locale, "New Place, inicio", "New Place, home")} className={cn("flex h-11 w-11 shrink-0 items-center justify-center rounded-full hover:bg-black/5", ring)}>
+          <RoofMark small className="h-[13px] w-[36px]" ink="var(--np-logo-ink, var(--np-navy))" teja="var(--np-logo-teja, var(--np-coral))" />
+        </Link>
         <label htmlFor={`${id}-mode`} className="sr-only">
           {tx(locale, "Qué buscas", "What you're after")}
         </label>
@@ -205,7 +221,7 @@ function CompactAsk({
             id={`${id}-mode`}
             value={mode}
             onChange={(e) => setMode(e.target.value as (typeof MODES)[number][0])}
-            className={cn("h-11 cursor-pointer appearance-none rounded-full bg-ink pl-4 pr-8 font-display text-[14px] font-medium text-ivory", ring)}
+            className={cn("h-11 cursor-pointer appearance-none rounded-full bg-ink pl-3.5 pr-7 font-display text-[14px] font-medium text-ivory sm:pl-4 sm:pr-8", ring)}
           >
             {MODES.map(([k, es, en]) => (
               <option key={k} value={k}>
@@ -213,10 +229,10 @@ function CompactAsk({
               </option>
             ))}
           </select>
-          <ChevronDown size={15} aria-hidden className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-ivory opacity-80 [html.dark_&]:text-[#1E1A18]" />
+          <ChevronDown size={15} aria-hidden className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-ivory opacity-80 [html.dark_&]:text-[#1E1A18]" />
         </span>
-        <Search size={17} aria-hidden className="ml-2 shrink-0 text-ink/55" />
-        <span className="relative flex min-w-0 flex-1">
+        <Search size={17} aria-hidden className="ml-2 hidden shrink-0 text-ink/55 sm:block" />
+        <span className="flex min-w-0 flex-1">
           <input
             id={`${id}-q`}
             {...suggest.inputProps}
@@ -224,10 +240,11 @@ function CompactAsk({
             enterKeyHint="search"
             aria-label={tx(locale, "Describe la casa que buscas", "Describe the home you're looking for")}
             placeholder={tx(locale, "Zona, tipo de casa o presupuesto", "Area, type of home or budget")}
-            className="h-11 min-w-0 flex-1 bg-transparent px-1 font-display text-[16px] text-ink placeholder:text-ink/60 focus:outline-none"
+            className="h-11 min-w-0 flex-1 bg-transparent px-1.5 font-display text-[16px] text-ink placeholder:text-ink/60 focus:outline-none"
           />
-          {suggest.listbox}
         </span>
+        {/* Anchored to the whole bar (the form is `relative`): full place names, never "Mara…". */}
+        {suggest.listbox}
         <button
           type="submit"
           aria-busy={busy}
@@ -236,6 +253,15 @@ function CompactAsk({
         >
           <ArrowUp size={18} aria-hidden className="rotate-45 md:hidden" />
           <span className="hidden font-display text-[15px] font-semibold md:inline">{tx(locale, "Buscar", "Search")}</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => window.dispatchEvent(new CustomEvent(OPEN_MENU_EVENT))}
+          aria-label={tx(locale, "Abrir menú", "Open menu")}
+          aria-haspopup="dialog"
+          className={cn("flex h-11 w-11 shrink-0 items-center justify-center rounded-full hover:bg-black/5", ring)}
+        >
+          <Menu size={21} aria-hidden />
         </button>
       </form>
     </div>

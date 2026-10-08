@@ -227,8 +227,11 @@ export function ZoneSelect({ locale, f, set, zones, className }: { locale: Local
   );
 }
 
-/** Everything behind "Más filtros": rooms and size, publication, conditions, amenities and Venezuelan essentials. */
-export function MoreFields({ locale, f, set }: { locale: Locale; f: FilterValues; set: SetFilters }) {
+/**
+ * Everything behind "Más filtros": rooms and size, publication, conditions, amenities and Venezuelan essentials.
+ * `withLux`: also the "Colección Privada" toggle (desktop: it no longer gets a pill of its own in the filter bar).
+ */
+export function MoreFields({ locale, f, set, withLux = false }: { locale: Locale; f: FilterValues; set: SetFilters; withLux?: boolean }) {
   const { ess } = f;
   return (
     <>
@@ -267,6 +270,9 @@ export function MoreFields({ locale, f, set }: { locale: Locale; f: FilterValues
             <button type="button" aria-pressed={f.furnished} onClick={() => set({ furnished: f.furnished ? null : "1" })} className={cn(pill, f.furnished ? on : "border-line")}>{tx(locale, "Amoblado", "Furnished")}</button>
             <button type="button" aria-pressed={f.pets} onClick={() => set({ pets: f.pets ? null : "1" })} className={cn(pill, f.pets ? on : "border-line")}>{tx(locale, "Mascotas", "Pets")}</button>
             <button type="button" aria-pressed={f.verified} onClick={() => set({ verified: f.verified ? null : "1" })} className={cn(pill, f.verified ? on : "border-line")}>{tx(locale, "Agencia verificada", "Verified agency")}</button>
+            {withLux && (
+              <button type="button" aria-pressed={f.lux} onClick={() => set({ lux: f.lux ? null : "1" })} className={cn(pill, f.lux ? on : "border-line")}>{tx(locale, "Colección Privada", "Private Collection")}</button>
+            )}
           </div>
         </div>
         <div className="md:col-span-2">

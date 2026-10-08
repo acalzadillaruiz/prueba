@@ -2,10 +2,13 @@
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Bell, Check, ChevronDown, List, Loader2, Map as MapIcon, SlidersHorizontal, Sparkles, X } from "lucide-react";
-import { closestPlaces, heuristicSearchParse, queryUnderstood } from "@newplace/ai";
+import Link from "next/link";
+import { ArrowRight, Bell, Check, ChevronDown, List, Loader2, Map as MapIcon, Scale, SlidersHorizontal, Sparkles, X } from "lucide-react";
+import { closestPlaces, heuristicSearchParse, queryUnderstood, splitUnderstood } from "@newplace/ai";
 import type { Amenity, Listing, Locale } from "@/types/domain";
 import { MapView as NightMap } from "@/components/map/MapView";
+import { FIT_PADDING } from "@/components/map/NightMap";
+import { compareHref } from "@/components/compare/CompareTray";
 import { ListingCard, MapPreviewCard } from "@/components/listing/ListingCard";
 import { EmptyState } from "@/components/ui";
 import type { Shape } from "@/lib/geo";
@@ -88,7 +91,7 @@ const MAP_FIT = {
 export function SearchView({ locale, initial, zones }: { locale: Locale; initial: { items: Listing[]; total: number }; zones: ZoneGroup[] }) {
   const sp = useSearchParams();
   const router = useRouter();
-  const { requireLogin } = useApp();
+  const { requireLogin, compare } = useApp();
   const [savingAlert, setSavingAlert] = useState(false);
   const [alertError, setAlertError] = useState<string | null>(null);
   const [sel, setSel] = useState<string | null>(null);
@@ -207,6 +210,12 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
   const notUnderstood = !!qText.trim() && !FILTER_KEYS.some((k) => sp.get(k)) && !queryUnderstood(heuristicSearchParse(qText));
   const didYouMean = useMemo(() => (notUnderstood ? closestPlaces(qText, places, 3) : []), [notUnderstood, qText, places]);
   const placeIdeas = didYouMean.length ? didYouMean : zones.slice(0, 3).map((g) => ({ name: g.city }));
+  // Partly understood ("zzqx casa rara"): the understood words became filters; say which words were left out.
+  const partly = useMemo(() => {
+    if (!qText.trim() || notUnderstood) return null;
+    const r = splitUnderstood(qText);
+    return r.understood.length && r.unknown.length ? r : null;
+  }, [qText, notUnderstood]);
 
   // The listing page offers "← Resultados" back to this exact search.
   useEffect(() => {
@@ -217,17 +226,29 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
     } catch {}
   }, [qs, total, query.isPlaceholderData]);
 
-  // Coming back from a listing lands where you left the list (per search), like any good shop.
+  // Coming back from a listing lands where you left the list (per search), like any good shop. Desktop: the list
+  // scrolls in its own panel (scrollTop). Phones: the document scrolls (window.scrollY), so the header can step away.
   const listRef = useRef<HTMLDivElement>(null);
   const scrollKey = `np-search-scroll:${qs}`;
   const restoring = useRef(false);
+  const listVisible = desktop || view === "list";
+  const readScroll = () => (desktop ? (listRef.current?.scrollTop ?? 0) : window.scrollY);
   const saveListScroll = () => {
-    if (restoring.current) return;
+    if (restoring.current || !listVisible) return;
     try {
-      sessionStorage.setItem(scrollKey, String(listRef.current?.scrollTop ?? 0));
+      sessionStorage.setItem(scrollKey, String(Math.round(readScroll())));
     } catch {}
   };
-  const listVisible = desktop || view === "list";
+  const saveRef = useRef(saveListScroll);
+  saveRef.current = saveListScroll;
+  // Phones: follow the window. A layout effect, so the listener is gone before the map view's (shorter) page clamps
+  // the scroll to 0 — that clamp must not overwrite the saved position.
+  useIsoLayoutEffect(() => {
+    if (desktop || !listVisible) return;
+    const onScroll = () => saveRef.current();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [desktop, listVisible]);
   // Restore before paint, then keep re-applying for a moment while the cards lay out (images, fonts) — the list may
   // not be tall enough on the first frame, which used to clamp 1500 px to ~600. Any wheel/touch by the visitor wins.
   useIsoLayoutEffect(() => {
@@ -238,34 +259,41 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
       target = Number(sessionStorage.getItem(scrollKey) ?? 0) || 0;
     } catch {}
     if (target <= 0) return;
+    const scroller: HTMLElement | Window = desktop ? el : window;
+    const get = () => (desktop ? el.scrollTop : window.scrollY);
+    const put = (y: number) => (desktop ? (el.scrollTop = y) : window.scrollTo({ top: y, behavior: "instant" }));
+    const room = () => (desktop ? el.scrollHeight - el.clientHeight : document.documentElement.scrollHeight - window.innerHeight);
     restoring.current = true;
     let tries = 0;
+    let settled = 0;
     let raf = 0;
     const stop = () => {
       restoring.current = false;
       cancelAnimationFrame(raf);
-      el.removeEventListener("wheel", stop);
-      el.removeEventListener("touchstart", stop);
+      scroller.removeEventListener("wheel", stop);
+      scroller.removeEventListener("touchstart", stop);
     };
     const step = () => {
-      el.scrollTop = target;
-      if (Math.abs(el.scrollTop - target) <= 2 || ++tries > 90) return stop();
+      put(target);
+      // A few frames in place (the router may still move the window once) before letting go.
+      settled = Math.abs(get() - target) <= 2 ? settled + 1 : 0;
+      if (settled >= 4 || ++tries > 90) return stop();
       raf = requestAnimationFrame(step);
     };
-    el.addEventListener("wheel", stop, { passive: true });
-    el.addEventListener("touchstart", stop, { passive: true });
+    scroller.addEventListener("wheel", stop, { passive: true });
+    scroller.addEventListener("touchstart", stop, { passive: true });
     step();
     // A last check once everything settled (late images): only if the visitor hasn't scrolled since.
     const late = window.setTimeout(() => {
       try {
-        if (Math.abs(el.scrollTop - target) > 2 && el.scrollHeight - el.clientHeight >= target && Number(sessionStorage.getItem(scrollKey)) === target) el.scrollTop = target;
+        if (Math.abs(get() - target) > 2 && room() >= target && Number(sessionStorage.getItem(scrollKey)) === target) put(target);
       } catch {}
     }, 1600);
     return () => {
       stop();
       window.clearTimeout(late);
     };
-  }, [scrollKey, hasResults, listVisible]);
+  }, [scrollKey, hasResults, listVisible, desktop]);
 
   const createAlert = async () => {
     if (alertSaved || savingAlert) return;
@@ -361,18 +389,33 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
   const countBadge = filterCount > 0 && <span aria-hidden className="rounded-full bg-navy px-1.5 text-xs font-semibold text-ivory [font-feature-settings:'lnum']">{filterCount}</span>;
   const mapHidden = !desktop && view === "list";
   const listHidden = !desktop && view === "map";
+  // Phones in map view: the page is exactly one screen (the map fills it). Phones in list view: the document scrolls.
+  const phoneMap = listHidden;
+  const fitPoints = useMemo(() => mapListings.map((l) => ({ lat: l.lat, lng: l.lng })), [mapListings]);
+  // Phones: the docked Lista/Filtros bar sits over the map's bottom edge.
+  const fitPadding = useMemo(() => (desktop ? FIT_PADDING : { ...FIT_PADDING, bottom: 96 }), [desktop]);
+  const compareLabel = tx(locale, `Comparar (${compare.length})`, `Compare (${compare.length})`);
+  const compareSeg = compare.length > 0 && (
+    <>
+      <span aria-hidden className="my-3 w-px bg-current opacity-30" />
+      <Link href={compareHref(locale, compare)} aria-label={phoneMap ? compareLabel : undefined} className="flex h-12 items-center gap-1.5 pl-4 pr-5">
+        <Scale size={16} aria-hidden className="shrink-0 text-[#C9A574] [html.dark_&]:text-[#8E3B22]" />
+        {phoneMap ? <span className="[font-feature-settings:'lnum']">{compare.length}</span> : <>{compareLabel} <ArrowRight size={15} aria-hidden /></>}
+      </Link>
+    </>
+  );
 
   return (
-    <div className="flex h-[calc(100dvh-72px)] flex-col">
+    <div className={cn("lg:flex lg:h-[calc(100dvh-72px)] lg:flex-col", phoneMap && "flex h-[calc(100dvh-72px)] flex-col")}>
       {/* search + filter bar */}
       <div className="relative z-30 border-b border-ink/[.06] bg-ivory/80 backdrop-blur-xl">
-        <div className="flex items-center gap-2 px-4 py-2.5 lg:flex-wrap lg:px-5">
+        <div className="flex items-center gap-2 px-4 py-2.5 lg:flex-wrap lg:px-5 xl:flex-nowrap">
           <form
             onSubmit={(e) => {
               e.preventDefault();
               runNl(nl);
             }}
-            className="relative flex h-11 min-w-0 flex-1 items-center gap-2 rounded-full border border-ink/10 bg-white/75 px-4 backdrop-blur focus-within:border-navy lg:h-10 lg:w-[280px] lg:flex-none"
+            className="relative flex h-11 min-w-0 flex-1 items-center gap-2 rounded-full border border-ink/10 bg-white/75 px-4 backdrop-blur focus-within:border-navy lg:h-10 lg:min-w-[180px] lg:max-w-[320px]"
           >
             <Sparkles size={15} className="shrink-0 text-gold-text" aria-hidden />
             <input
@@ -417,7 +460,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
             <FilterPopover label={beds ? `${beds}+ ${tx(locale, "hab.", "beds")}` : tx(locale, "Habitaciones", "Bedrooms")} title={tx(locale, "Habitaciones", "Bedrooms")} active={!!beds} open={pop === "beds"} onOpenChange={(o) => { setPop(o ? "beds" : null); if (o) setMoreOpen(false); }} width="w-auto">
               <BedsFields locale={locale} f={f} set={set} />
             </FilterPopover>
-            <ZoneSelect locale={locale} f={f} set={set} zones={zones} />
+            <ZoneSelect locale={locale} f={f} set={set} zones={zones} className="w-[168px] shrink-0 truncate 2xl:w-[200px]" />
             <button
               ref={moreBtn}
               type="button"
@@ -427,23 +470,24 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
               }}
               aria-expanded={moreOpen}
               aria-controls="search-more-filters"
-              className={cn(pill, "border-line bg-white", (moreOpen || baths || minM2 || essCount || pub || furnished || pets || verified || amen.length) && on)}
+              className={cn(pill, "border-line bg-white", (moreOpen || baths || minM2 || essCount || pub || furnished || pets || verified || lux || amen.length) && on)}
             >
               <SlidersHorizontal size={15} aria-hidden /> {tx(locale, "Más filtros", "More filters")}
               {essCount > 0 && <span className="rounded-full bg-navy px-1.5 text-xs font-semibold text-ivory [font-feature-settings:'lnum']" aria-label={tx(locale, `${essCount} filtros de servicios esenciales activos`, `${essCount} essential-service filters on`)}>{essCount}</span>}
               <ChevronDown size={14} aria-hidden />
             </button>
-            <button type="button" onClick={() => set({ lux: lux ? null : "1" })} aria-pressed={lux} className={cn(pill, lux ? on : "border-line bg-white")}>
-              {tx(locale, "Colección Privada", "Private Collection")}
-            </button>
+            {/* Secondary (outline): the filters are the bar's main job. Below xl only the bell shows; the name stays. */}
             <button
               type="button"
               onClick={createAlert}
               disabled={alertSaved || savingAlert}
               aria-live="polite"
-              className={cn(pill, "ml-auto disabled:cursor-default", alertSaved ? "border-ok bg-ok text-white" : "np-btn-navy border-navy bg-navy font-semibold text-ivory hover:bg-navy-2")}
+              aria-label={alertSaved ? tx(locale, "Búsqueda guardada", "Search saved") : tx(locale, "Guardar búsqueda", "Save search")}
+              title={alertSaved ? undefined : tx(locale, "Te avisamos cuando aparezca algo nuevo", "We’ll tell you when something new turns up")}
+              className={cn(pill, "ml-auto px-3 disabled:cursor-default xl:px-4", alertSaved ? "border-ok text-ok" : "np-btn-outline border-navy bg-transparent font-semibold text-navy hover:bg-navy/5")}
             >
-              {alertSaved ? <Check size={15} /> : savingAlert ? <Loader2 size={15} className="animate-spin" /> : <Bell size={15} />} {alertSaved ? tx(locale, "Búsqueda guardada", "Search saved") : tx(locale, "Guardar búsqueda", "Save search")}
+              {alertSaved ? <Check size={15} aria-hidden /> : savingAlert ? <Loader2 size={15} aria-hidden className="animate-spin" /> : <Bell size={15} aria-hidden />}
+              <span aria-hidden className="hidden xl:inline">{alertSaved ? tx(locale, "Búsqueda guardada", "Search saved") : tx(locale, "Guardar búsqueda", "Save search")}</span>
             </button>
           </div>
         </div>
@@ -452,7 +496,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
         )}
         {moreOpen && desktop && (
           <div ref={morePanel} id="search-more-filters" role="dialog" aria-label={tx(locale, "Más filtros", "More filters")} className="np-in absolute inset-x-0 top-full max-h-[70vh] overflow-y-auto border-b border-line bg-white px-5 py-5 shadow-np">
-            <MoreFields locale={locale} f={f} set={set} />
+            <MoreFields locale={locale} f={f} set={set} withLux />
             <div className="mt-5 flex items-center justify-end gap-4 border-t border-line pt-4">
               <button type="button" onClick={() => setMoreOpen(false)} className="min-h-11 px-2 font-display text-sm font-semibold underline underline-offset-4">
                 {tx(locale, "Cerrar", "Close")}
@@ -466,9 +510,13 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
       {moreOpen && desktop && <div aria-hidden className="np-in fixed inset-0 z-20 bg-[#1E1A18]/35" />}
 
       {/* Phones: room for the bottom tab bar. */}
-      <div className="relative mb-[calc(4rem+env(safe-area-inset-bottom))] flex min-h-0 flex-1 md:mb-0">
-        {/* map 40% (phones: full screen under the list, shown with the "Mapa" toggle) */}
-        <div className="relative min-h-0 flex-1 lg:min-w-0 lg:basis-[40%]" inert={mapHidden || undefined} aria-hidden={mapHidden || undefined}>
+      <div className={cn("relative mb-[calc(4rem+env(safe-area-inset-bottom))] md:mb-0 lg:flex lg:min-h-0 lg:flex-1", phoneMap && "flex min-h-0 flex-1")}>
+        {/* map 40% (phones: full screen, shown with the "Mapa" toggle; in list view it stays mounted, sized and invisible) */}
+        <div
+          className={cn("lg:relative lg:min-h-0 lg:min-w-0 lg:flex-1 lg:basis-[40%]", phoneMap ? "relative min-h-0 flex-1" : "max-lg:pointer-events-none max-lg:invisible max-lg:fixed max-lg:inset-0")}
+          inert={mapHidden || undefined}
+          aria-hidden={mapHidden || undefined}
+        >
           <NightMap
             key={region + mapFilters}
             region={region}
@@ -483,34 +531,37 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
             className="h-full w-full"
             renderPreview={(l) => <MapPreviewCard l={l} locale={locale} />}
             initialScale={fit.scale}
+            fitPoints={fitPoints}
+            fitPadding={fitPadding}
+            fitMaxScale={MAP_FIT[region].max}
+            toolbar={
+              // Which map: in the tool row (top-left), out of the way of the pins and the docked bar.
+              <div role="group" aria-label={tx(locale, "Mapa de", "Map of")} className="flex gap-0.5 rounded-full border border-[#E3D7C2] bg-[#ffffff] p-1 font-display text-[13px] text-[#1E1A18] shadow-np sm:text-sm">
+                {(["caracas", "venezuela"] as const).map((r) => (
+                  <button key={r} type="button" onClick={() => setRegionPick(r)} aria-pressed={region === r} className={cn("min-h-9 rounded-full border-2 px-3 sm:px-3.5", region === r ? "np-sel font-semibold" : "border-transparent text-[#1E1A18]/70")}>
+                    {r === "caracas" ? "Caracas" : "Venezuela"}
+                  </button>
+                ))}
+              </div>
+            }
           />
-          <div className="absolute bottom-[4.75rem] right-3 z-10 flex gap-0.5 overflow-hidden rounded-full border border-[#E3D7C2] bg-[#ffffff] p-1 font-display text-sm text-[#1E1A18] shadow-np lg:bottom-8">
-            {(["caracas", "venezuela"] as const).map((r) => (
-              <button key={r} type="button" onClick={() => setRegionPick(r)} aria-pressed={region === r} className={cn("min-h-11 rounded-full border-2 px-3.5 md:min-h-8", region === r ? "np-sel font-semibold" : "border-transparent text-[#1E1A18]/70")}>
-                {r === "caracas" ? "Caracas" : "Venezuela"}
-              </button>
-            ))}
-          </div>
         </div>
         {/* list 60% (phones: covers the map) */}
+        {/* Phones: in the page flow (the document scrolls, the header steps away). Desktop: its own scrolling panel. */}
         <div
           data-search-sheet={view}
           inert={listHidden || undefined}
-          className={cn(
-            "absolute inset-0 z-20 flex flex-col bg-ivory",
-            "lg:static lg:z-auto lg:min-w-0 lg:flex-1 lg:basis-[60%] lg:border-l lg:border-line",
-            listHidden && "invisible",
-          )}
+          className={cn("bg-ivory lg:flex lg:min-w-0 lg:flex-1 lg:basis-[60%] lg:flex-col lg:border-l lg:border-line", listHidden && "hidden")}
         >
           <div
             ref={listRef}
             id="search-results"
-            onScroll={saveListScroll}
+            onScroll={desktop ? saveListScroll : undefined}
             onClickCapture={saveListScroll}
-            className="min-h-0 flex-1 overflow-y-auto overscroll-contain scrollbar-thin"
+            className="scrollbar-thin lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:overscroll-contain"
           >
-            {/* one row: count · sort · filters */}
-            <div className="sticky top-0 z-10 flex min-h-[52px] items-center gap-2 border-b border-line bg-ivory/95 px-4 py-1 backdrop-blur lg:px-5">
+            {/* one row: count · sort · filters — phones: pinned under the header (follows it as it hides) */}
+            <div className="sticky top-[calc(env(safe-area-inset-top)+var(--np-header-offset,80px)_-_8px)] z-20 flex min-h-[52px] items-center gap-2 border-b border-line bg-ivory/95 px-4 py-1 backdrop-blur transition-[top] duration-300 ease-[cubic-bezier(.2,.7,.2,1)] lg:top-0 lg:z-10 lg:px-5">
               <div className="flex shrink-0 items-center gap-2 lg:min-w-0 lg:flex-1">
                 <p className="whitespace-nowrap font-serif text-[18px] leading-tight sm:text-[20px] lg:text-[22px]" aria-live="polite">
                   {notUnderstood ? tx(locale, `${total} casas en total`, `${total} homes in all`) : plural(total, locale, ["resultado", "resultados"], ["result", "results"])}
@@ -536,6 +587,11 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
                   </button>
                 ))}
               </div>
+            )}
+            {partly && (
+              <p role="status" data-testid="partly-understood" className="px-4 pt-3 text-[13px] leading-snug text-muted lg:px-5">
+                {tx(locale, `Buscamos «${partly.understood.join(" ")}»; no entendimos «${partly.unknown.join(" ")}».`, `We searched for «${partly.understood.join(" ")}»; we didn’t catch «${partly.unknown.join(" ")}».`)}
+              </p>
             )}
             {notUnderstood && (
               <div className="px-4 pt-4 lg:px-5" data-testid="not-understood">
@@ -594,31 +650,38 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
                 />
               </div>
             )}
-            {/* Phones: room so the last card clears the floating "Mapa" button. */}
-            <div aria-hidden className="h-20 lg:hidden" />
+            {/* Phones: room so the last card clears the docked Mapa / Comparar bar. */}
+            <div aria-hidden className="h-[5.5rem] lg:hidden" />
           </div>
         </div>
 
-        {/* Phones: one floating toggle between list and map (plus filters while on the map). */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-4 z-30 flex justify-center lg:hidden" data-search-toggle>
-          <div className="pointer-events-auto flex overflow-hidden rounded-full bg-[#1E1A18] font-display text-[15px] font-semibold text-[#F1EBE3] shadow-[0_12px_30px_-8px_rgba(30,26,24,.55)] [html.dark_&]:bg-[#F1EBE3] [html.dark_&]:text-[#1E1A18]">
-            {view === "list" ? (
-              <button type="button" onClick={() => changeView("map")} className="flex h-12 items-center gap-2 px-5">
-                <MapIcon size={17} aria-hidden /> {tx(locale, "Mapa", "Map")}
+      </div>
+
+      {/* Phones and tablets: ONE docked bar — list/map toggle (+ filters on the map) and the comparator, which does
+          not float a second layer here (CompareTray stays out below lg on /search). `data-search-toggle` lets other
+          floating pieces (the save toast) sit above it. */}
+      <div
+        className="pointer-events-none fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom)+12px)] z-[35] flex justify-center px-4 md:bottom-[calc(env(safe-area-inset-bottom)+16px)] lg:hidden print:hidden"
+        data-search-toggle
+      >
+        <div className="pointer-events-auto flex max-w-full overflow-hidden whitespace-nowrap rounded-full bg-[#1E1A18] font-display text-[15px] font-semibold text-[#F1EBE3] shadow-[0_12px_30px_-8px_rgba(30,26,24,.55)] [html.dark_&]:bg-[#F1EBE3] [html.dark_&]:text-[#1E1A18]">
+          {view === "list" ? (
+            <button type="button" onClick={() => changeView("map")} className={cn("flex h-12 items-center gap-2", compare.length ? "pl-5 pr-4" : "px-5")}>
+              <MapIcon size={17} aria-hidden /> {tx(locale, "Mapa", "Map")}
+            </button>
+          ) : (
+            <>
+              <button type="button" onClick={() => changeView("list")} className="flex h-12 items-center gap-2 pl-5 pr-4">
+                <List size={17} aria-hidden /> {tx(locale, `Lista · ${total}`, `List · ${total}`)}
               </button>
-            ) : (
-              <>
-                <button type="button" onClick={() => changeView("list")} className="flex h-12 items-center gap-2 pl-5 pr-4">
-                  <List size={17} aria-hidden /> {tx(locale, `Lista · ${total}`, `List · ${total}`)}
-                </button>
-                <span aria-hidden className="my-3 w-px bg-current opacity-30" />
-                <button type="button" onClick={openSheet} aria-haspopup="dialog" aria-label={filtersAria} className="flex h-12 items-center gap-1.5 pl-4 pr-5">
-                  <SlidersHorizontal size={16} aria-hidden /> {filtersLabel}
-                  {filterCount > 0 && <span aria-hidden className="rounded-full bg-[#B08A55] px-1.5 text-xs text-[#1E1A18]">{filterCount}</span>}
-                </button>
-              </>
-            )}
-          </div>
+              <span aria-hidden className="my-3 w-px bg-current opacity-30" />
+              <button type="button" onClick={openSheet} aria-haspopup="dialog" aria-label={filtersAria} className={cn("flex h-12 items-center gap-1.5 pl-4", compare.length ? "pr-4" : "pr-5")}>
+                <SlidersHorizontal size={16} aria-hidden /> {filtersLabel}
+                {filterCount > 0 && <span aria-hidden className="rounded-full bg-[#B08A55] px-1.5 text-xs text-[#1E1A18]">{filterCount}</span>}
+              </button>
+            </>
+          )}
+          {compareSeg}
         </div>
       </div>
 

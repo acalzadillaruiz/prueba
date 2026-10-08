@@ -6,9 +6,9 @@
   --t-sky-top: #efd9bd;
   --t-sky-mid: #f4e6d4;
   --t-sky-low: #f1ebe3;
-  --t-sun: rgb(255 226 178 / 0.85);
-  --t-glass-hi: #cfd3d0;
-  --t-glass-lo: #a9a49c;
+  --t-sun: rgb(255 226 178 / 0.7);
+  --t-glass-hi: #dcd8d0;
+  --t-glass-lo: #b2a89b;
   --t-reflect: rgb(255 255 255 / 0.5);
   --t-slab: #f7f2ea;
   --t-slab-edge: rgb(30 26 24 / 0.16);
@@ -28,7 +28,7 @@
   --t-sky-top: #3a2c22;
   --t-sky-mid: #2a221d;
   --t-sky-low: #1e1a18;
-  --t-sun: rgb(201 120 70 / 0.35);
+  --t-sun: rgb(201 120 70 / 0.24);
   --t-glass-hi: #4a4440;
   --t-glass-lo: #2c2724;
   --t-reflect: rgb(255 236 210 / 0.14);
@@ -57,8 +57,8 @@
   background:
     radial-gradient(38% 34% at 72% 30%, var(--t-sun), transparent 70%),
     linear-gradient(180deg, var(--t-sky-top) 0%, var(--t-sky-mid) 48%, var(--t-sky-low) 82%);
-  -webkit-mask-image: radial-gradient(75% 80% at 50% 45%, #000 45%, transparent 100%);
-  mask-image: radial-gradient(75% 80% at 50% 45%, #000 45%, transparent 100%);
+  -webkit-mask-image: radial-gradient(closest-side at 50% 48%, #000 52%, transparent 100%);
+  mask-image: radial-gradient(closest-side at 50% 48%, #000 52%, transparent 100%);
   transform: translate3d(0, 0, 0);
   transition: transform 2.4s cubic-bezier(0.16, 1, 0.3, 1);
 }

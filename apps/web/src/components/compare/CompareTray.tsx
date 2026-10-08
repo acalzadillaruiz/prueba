@@ -18,7 +18,10 @@ export const compareHref = (locale: Locale, ids: string[]) => `/${locale}/compar
 /** Listing detail pages carry the comparator inline (sticky contact bar chip on phones, a link in the action row): no floating tray there. */
 export const isListingPath = (p: string | null) => !!p && /^\/(?:es|en)\/(?:listing|preview)\//.test(p);
 
-/** Height of whatever is pinned to the bottom of a phone screen (tab bar, search sheet), so the tray sits above it. */
+/** Search results: below lg the comparator lives in the page's docked Mapa / Comparar bar instead (no second layer). */
+export const isSearchPath = (p: string | null) => !!p && /^\/(?:es|en)\/search\/?$/.test(p);
+
+/** Height of whatever is pinned to the bottom of a phone screen (tab bar, sticky contact bar), so the tray sits above it. */
 function useBottomInset() {
   const [inset, setInset] = useState(0);
   useEffect(() => {
@@ -28,9 +31,6 @@ function useBottomInset() {
         if (getComputedStyle(el).display === "none") return;
         h = Math.max(h, el.getBoundingClientRect().height);
       });
-      // Search on phones: sit above the floating list/map toggle.
-      const toggle = document.querySelector<HTMLElement>("[data-search-toggle]");
-      if (toggle && window.innerWidth < 1024 && getComputedStyle(toggle).display !== "none") h = Math.max(h, window.innerHeight - toggle.getBoundingClientRect().top + 8);
       setInset(h);
     };
     measure();
@@ -41,7 +41,7 @@ function useBottomInset() {
       window.clearTimeout(t);
       t = window.setTimeout(measure, 350);
     });
-    mo.observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ["data-sticky-cta", "data-search-sheet", "data-search-toggle"] });
+    mo.observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ["data-sticky-cta"] });
     window.addEventListener("resize", measure);
     return () => {
       mo.disconnect();
@@ -93,7 +93,8 @@ function useStepAside() {
  * Persistent comparator: shows up as soon as one home is picked with "Comparar" (no account needed, the list lives on
  * the device) and links to /compare with the chosen ids. Phones: a slim bar above the tab bar. Tablets and desktop: a
  * compact pill in the bottom-right corner that never spans the content. Hidden on the comparison page, on listing
- * pages (they carry it inline), while a form field has focus and while a contact form is on screen.
+ * pages (they carry it inline), below lg on /search (the results page docks it into its Mapa / Comparar bar), while a
+ * form field has focus and while a contact form is on screen.
  */
 export function CompareTray({ locale }: { locale: Locale }) {
   const { compare, toggleCompare, clearCompare } = useApp();
@@ -104,6 +105,7 @@ export function CompareTray({ locale }: { locale: Locale }) {
   if (!compare.length || /\/compare\/?$/.test(pathname) || isListingPath(pathname)) return null;
   const href = compareHref(locale, compare);
   const ready = compare.length > 1;
+  const onSearch = isSearchPath(pathname);
   const thumb = (id: string, size: string) => {
     const l = items.find((x) => x.id === id);
     return l ? <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} sizes="44px" className={cn("overflow-hidden", size)} /> : <div className={cn("np-skeleton", size)} />;
@@ -119,6 +121,7 @@ export function CompareTray({ locale }: { locale: Locale }) {
         "fixed z-[45] transition-[opacity,transform] duration-300 print:hidden",
         "inset-x-3 mx-auto max-w-[560px] sm:inset-x-6 md:inset-x-auto md:right-8 md:mx-0 md:max-w-none",
         aside ? "pointer-events-none translate-y-4 opacity-0" : "np-in",
+        onSearch && "max-lg:hidden",
       )}
       style={{ bottom: `calc(${inset}px + 0.75rem + ${inset ? "0px" : "env(safe-area-inset-bottom)"})` }}
     >

@@ -42,7 +42,7 @@ export async function PublicFooter({ locale }: { locale: Locale }) {
           [nav("vacation"), `/${locale}/search?type=SHORT_RENT`],
           [nav("commercial"), `/${locale}/search?type=COMMERCIAL`],
         ])}
-        {col(t("owners"), [[t("sellWithUs"), `/${locale}/owner/new`], [t("valuation"), `/${locale}/owner/new`], [t("myProperties"), `/${locale}/owner/listings`]])}
+        {col(t("owners"), [[t("sellWithUs"), `/${locale}/sell`], [t("valuation"), `/${locale}/sell#estimar`], [t("myProperties"), `/${locale}/owner/listings`]])}
         {col(t("agencies"), [[t("forAgencies"), `/${locale}/register`]], <FooterAccountLink locale={locale} signIn={nav("signIn")} className={linkCls} />)}
       </div>
       <div className="relative border-t border-ink/10">

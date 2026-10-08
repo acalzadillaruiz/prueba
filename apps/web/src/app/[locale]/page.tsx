@@ -204,7 +204,7 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
               ))}
             </ul>
             <span data-magnetic className="mt-9 inline-block">
-              <Button href={`/${locale}/owner/new`} variant="navy" size="lg">
+              <Button href={`/${locale}/sell`} variant="navy" size="lg">
                 {tx(locale, "¿Cuánto vale mi casa?", "What\u2019s my home worth?")} <ArrowUpRight size={18} aria-hidden />
               </Button>
             </span>

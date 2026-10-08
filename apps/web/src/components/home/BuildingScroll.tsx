@@ -7,6 +7,7 @@ import type { Locale } from "@/types/domain";
 import { tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import { ease, ScrollTrigger, span, useReducedMotion } from "./motion";
+import styles from "./BuildingScroll.module.css";
 
 export type Chapter = { eyebrow: string; title: string; body: string };
 export type FloorPick = { href: string; title: string; meta: string; price: string };
@@ -476,9 +477,10 @@ export function BuildingScroll({ locale, chapters, picks, heading, cta }: { loca
   // Phones: the floating contact buttons step aside while the chapter copy and its controls are on screen.
   const copy = (
     <div data-hide-fab-mobile className="relative min-w-0">
-      <h2 id="np-how-we-work" className="np-kicker flex items-center gap-3 font-display text-[12px] text-gold-text">
-        <span className="h-px w-8 bg-current opacity-60" aria-hidden />
-        {heading}
+      {/* Same kicker as the other home sections (an h2 for the outline; the span carries the sans kicker face,
+          since h2 itself is always set in the serif). */}
+      <h2 id="np-how-we-work" className="text-gold-text">
+        <span className="np-kicker">{heading}</span>
       </h2>
       {/* All chapters share one grid cell: the box keeps the tallest one's height, so nothing below jumps. */}
       <div className="mt-5 grid lg:mt-7">
@@ -487,8 +489,10 @@ export function BuildingScroll({ locale, chapters, picks, heading, cta }: { loca
             key={c.title}
             aria-hidden={i !== step}
             className={cn(
-              "[grid-area:1/1] transition-[opacity,transform,filter] duration-700 ease-[cubic-bezier(.16,1,.3,1)]",
-              i === step ? "visible translate-y-0 opacity-100 blur-0 delay-150" : cn("invisible opacity-0 blur-[2px]", i < step ? "-translate-y-3" : "translate-y-3"),
+              // Crossfade: visibility is part of the transition, so the outgoing chapter stays painted while it fades
+              // (no empty frame between chapters, nor when the loop jumps from the last one back to the first).
+              "[grid-area:1/1] transition-[opacity,transform,filter,visibility] ease-[cubic-bezier(.16,1,.3,1)]",
+              i === step ? "visible translate-y-0 opacity-100 blur-0 delay-100 duration-[900ms]" : cn("invisible opacity-0 blur-[1px] duration-500", i < step ? "-translate-y-2" : "translate-y-2"),
             )}
           >
             <p className="np-eyebrow text-[12px] tracking-[0.2em] text-gold-text">{c.eyebrow}</p>
@@ -587,7 +591,7 @@ function LiteTower({ step, picks, cta }: { step: number; picks: FloorPick[]; cta
   const roof = step >= 2;
   const lit = step >= 3;
   return (
-    <div className="np-tower relative mx-auto h-[220px] w-full max-w-[520px] md:h-[500px]">
+    <div className={cn("np-tower", styles.tower, "relative mx-auto h-[220px] w-full max-w-[520px] md:h-[500px]")}>
       <div className="np-tower-grid" aria-hidden />
       <div className="np-tower-halo" data-on={lit ? "1" : "0"} aria-hidden />
       <div className="absolute inset-y-0 left-[9%] w-[var(--fw)] md:left-[12%]">

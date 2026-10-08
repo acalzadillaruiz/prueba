@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import type { Locale } from "@/types/domain";
 import { PublicHeader } from "@/components/layout/PublicHeader";
 import { CompareTray } from "@/components/compare/CompareTray";
+import { MobileTabBar } from "@/components/brand/PublicChrome";
 import { SearchView, type ZoneGroup } from "@/components/search/SearchView";
 import { filtersFromParams, searchListings } from "@/server/listings";
 import { prisma } from "@newplace/db";
@@ -12,7 +13,7 @@ export const dynamic = "force-dynamic";
 const SEARCH_TITLE: Record<string, [string, string]> = {
   SALE: ["Casas y apartamentos en venta", "Homes for sale"],
   LONG_RENT: ["Casas y apartamentos en alquiler", "Homes for rent"],
-  SHORT_RENT: ["Alquiler vacacional", "Vacation rentals"],
+  SHORT_RENT: ["Alquiler vacacional", "Holiday rentals"],
   COMMERCIAL: ["Locales y espacios comerciales", "Commercial spaces"],
 };
 
@@ -65,6 +66,8 @@ export default async function SearchPage({ params, searchParams }: { params: Pro
       </Suspense>
       </main>
       <CompareTray locale={locale} />
+      {/* Phones: the bottom tab bar stays on search too (SearchView leaves room for it). */}
+      <MobileTabBar locale={locale} />
     </div>
   );
 }

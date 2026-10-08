@@ -81,6 +81,8 @@ export function HubView({ locale, data, emailOn = false }: { locale: Locale; dat
     { done: offerCount > 0, t: tx(locale, "Haz una oferta", "Make an offer"), d: offerCount > 0 ? tx(locale, `${offerCount} ${offerCount === 1 ? "oferta" : "ofertas"}`, `${offerCount} ${offerCount === 1 ? "offer" : "offers"}`) : tx(locale, "Con tu agente", "With your agent") },
   ];
   const doneCount = steps.filter((s) => s.done).length;
+  // Once every step is done the checklist has nothing left to say: visits and messages lead the page instead.
+  const allDone = doneCount === steps.length;
   return (
     <div className="mx-auto max-w-[1280px] px-4 py-10 md:px-6">
       <div className="flex flex-wrap items-center gap-4">
@@ -89,31 +91,17 @@ export function HubView({ locale, data, emailOn = false }: { locale: Locale; dat
           <div className={k.eyebrow}>{tx(locale, "Tu espacio", "Your space")}</div>
           <h1 className="mt-1 font-serif text-[40px] font-medium leading-[1.05] md:text-[48px]">{tx(locale, `Hola, ${me.name.split(" ")[0]}`, `Hi, ${me.name.split(" ")[0]}`)}</h1>
         </div>
-        <div className="ml-auto w-full max-w-xs">
-          <div className="mb-1 flex justify-between text-sm"><span className="font-semibold">{tx(locale, "Tu avance", "Your progress")}</span><span className="text-muted">{doneCount}/5</span></div>
-          <Progress value={(doneCount / 5) * 100} tone="ok" />
-        </div>
+        {!allDone && (
+          <div className="ml-auto w-full max-w-xs">
+            <div className="mb-1 flex justify-between text-sm"><span className="font-semibold">{tx(locale, "Tu avance", "Your progress")}</span><span className="text-muted">{doneCount}/5</span></div>
+            <Progress value={(doneCount / 5) * 100} tone="ok" />
+          </div>
+        )}
       </div>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-3">
-        {/* next steps */}
-        <Card className={cn(k.card, "border-0 p-5 lg:col-span-1")}>
-          <h2 className="font-serif text-[24px] font-medium leading-tight">{tx(locale, "Lo que sigue", "What’s next")}</h2>
-          <ol className="mt-4 space-y-3">
-            {steps.map((s, i) => (
-              <li key={i} className="flex items-start gap-3">
-                <span className={cn("mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold", s.done ? "bg-ok text-white" : "border-2 border-line text-muted")}>{s.done ? <Check size={14} /> : i + 1}</span>
-                <div>
-                  <div className={cn("font-semibold", s.done && "text-muted line-through")}>{s.t}</div>
-                  <div className="text-sm text-muted">{s.d}</div>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </Card>
-
-        {/* tours */}
-        <Card className={cn(k.card, "border-0 p-5 lg:col-span-2")}>
+        {/* tours: first thing on the page */}
+        <section id="visitas" className={cn("rounded-np border border-line bg-white", k.card, "scroll-mt-24 border-0 p-5", allDone ? "lg:col-span-3" : "lg:col-span-2")}>
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 className="flex items-center gap-2 font-serif text-[24px] font-medium leading-tight"><CalendarCheck size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Tus visitas y solicitudes", "Your tours & requests")}</h2>
             {/* Only while an email provider is configured: otherwise reminders are never delivered. */}
@@ -152,10 +140,28 @@ export function HubView({ locale, data, emailOn = false }: { locale: Locale; dat
               </div>
             )}
           </div>
-        </Card>
+        </section>
 
         {/* messages */}
         <HubMessages locale={locale} threads={data.threads} meId={user?.id ?? ""} listingById={listingById} />
+
+        {/* next steps: beside the visits on desktop, after visits and messages on phones; gone once all done */}
+        {!allDone && (
+          <Card className={cn(k.card, "border-0 p-5 lg:col-start-3 lg:row-start-1")}>
+            <h2 className="font-serif text-[24px] font-medium leading-tight">{tx(locale, "Lo que sigue", "What’s next")}</h2>
+            <ol className="mt-4 space-y-3">
+              {steps.map((s, i) => (
+                <li key={i} className="flex items-start gap-3">
+                  <span className={cn("mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold", s.done ? "bg-ok text-white" : "border-2 border-line text-muted")}>{s.done ? <Check size={14} /> : i + 1}</span>
+                  <div>
+                    <div className={cn("font-semibold", s.done && "text-muted line-through")}>{s.t}</div>
+                    <div className="text-sm text-muted">{s.d}</div>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </Card>
+        )}
 
         {/* preapproval mock */}
         <Card className={cn(k.card, "border-0 p-5")}>

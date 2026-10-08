@@ -12,10 +12,10 @@ async function signIn(page: Page, email: string) {
   expectOk((await page.request.get("/api/v1/me")).status());
 }
 
-/** Natural-language search from the filter bar; retried because a dev-server reload can wipe the field. */
+/** Natural-language search from the filter bar (a combobox with zone typeahead); retried because a dev-server reload can wipe the field. */
 async function nlSearch(page: Page, label: string, text: string, until: RegExp) {
   await expect(async () => {
-    const input = page.getByRole("textbox", { name: label });
+    const input = page.getByRole("combobox", { name: label });
     await input.fill(text);
     await expect(input).toHaveValue(text, { timeout: 1000 });
     await input.press("Enter");
@@ -212,15 +212,48 @@ test.describe("Cliente · regresiones de la revisión", () => {
     await page.evaluate(() => localStorage.removeItem("np-compare-v1"));
   });
 
-  test("móvil: el panel «Más filtros» se cierra con «Ver N resultados»", async ({ page }) => {
+  test("móvil: la búsqueda abre en lista y la hoja «Filtros» se cierra con «Ver N casas»", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/es/search?type=LONG_RENT");
+    await page.evaluate(() => sessionStorage.removeItem("np-search-view"));
+    await page.reload();
+    // List first, with the floating "Mapa" toggle and the bottom tab bar.
+    await expect(page.locator('[data-search-sheet="list"]')).toBeVisible();
+    await expect(page.getByRole("button", { name: "Mapa", exact: true })).toBeVisible();
+    await expect(page.locator("[data-tabbar]")).toBeVisible();
     await expect(async () => {
-      await page.getByRole("button", { name: /Más filtros/ }).click();
-      await expect(page.locator("#search-more-filters")).toBeVisible({ timeout: 1000 });
+      await page.getByRole("button", { name: /^Filtros/ }).first().click();
+      await expect(page.locator("#search-filters-sheet")).toBeVisible({ timeout: 1000 });
     }).toPass();
-    await page.locator("#search-more-filters").getByRole("button", { name: /^Ver \d+ resultados?$/ }).click();
-    await expect(page.locator("#search-more-filters")).toHaveCount(0);
+    await page.locator("#search-filters-sheet").getByRole("button", { name: "3+" }).click();
+    await expect(page).toHaveURL(/beds=3/);
+    await page.locator("#search-filters-sheet").getByRole("button", { name: /^Ver \d+ casas?$/ }).click();
+    await expect(page.locator("#search-filters-sheet")).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Quitar filtro: 3+ hab" })).toBeVisible();
+    // Map toggle and back; the choice survives a reload (and a listing → Back).
+    await page.getByRole("button", { name: "Mapa", exact: true }).click();
+    await expect(page.locator('[data-search-sheet="map"]')).toBeAttached();
+    await page.reload();
+    await expect(page.getByRole("button", { name: /^Lista · \d+/ })).toBeVisible();
+    await page.getByRole("button", { name: /^Lista · \d+/ }).click();
+    await expect(page.locator('[data-search-sheet="list"]')).toBeVisible();
+  });
+  test("búsqueda: un texto que no entendemos lo dice y sugiere zonas; «Lech» sugiere Lechería", async ({ page }) => {
+    await page.goto("/es/search?type=SALE&q=xyzzy+castillo");
+    await expect(page.getByTestId("not-understood")).toContainText("No entendimos «xyzzy castillo»");
+    await expect(page.getByText("Mientras tanto, todas las casas")).toBeVisible();
+    const box = page.getByRole("combobox", { name: "Cuéntanos con tus palabras qué buscas" });
+    await expect(async () => {
+      await box.fill("casa en Lech");
+      await expect(page.getByRole("option", { name: /Lechería/ }).first()).toBeVisible({ timeout: 1000 });
+    }).toPass();
+    await box.press("ArrowDown");
+    await expect(box).toHaveAttribute("aria-activedescendant", /.+/);
+    await box.press("Enter");
+    await expect(box).toHaveValue(/^casa en Lechería/);
+    await box.press("Enter");
+    await page.waitForURL(/zone=Lecher/);
+    await expect(page.getByTestId("not-understood")).toHaveCount(0);
   });
   test("ficha: si se envía antes de que llegue la sesión, los errores se limpian al autocompletar y luego se envía", async ({ page }) => {
     await signIn(page, "seeker@gmail.com");
@@ -300,8 +333,8 @@ test.describe("Cliente · regresiones de la revisión", () => {
     const save = page.getByRole("button", { name: "Guardar búsqueda" });
     // Hydrated (the NL box reacts) but the session is still pending.
     await expect(async () => {
-      await page.getByRole("textbox", { name: "Cuéntanos con tus palabras qué buscas" }).fill("x");
-      await expect(page.getByRole("textbox", { name: "Cuéntanos con tus palabras qué buscas" })).toHaveValue("x", { timeout: 1000 });
+      await page.getByRole("combobox", { name: "Cuéntanos con tus palabras qué buscas" }).fill("x");
+      await expect(page.getByRole("combobox", { name: "Cuéntanos con tus palabras qué buscas" })).toHaveValue("x", { timeout: 1000 });
     }).toPass();
     await save.click();
     await page.waitForTimeout(1500);

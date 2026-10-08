@@ -9,20 +9,13 @@ import type { Locale } from "@/types/domain";
 import { tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import { queryToParams } from "./HeroSearch";
+import { usePlaceSuggest } from "./PlaceSuggest";
 
 const MODES = [
   ["SALE", "Comprar", "Buy"],
   ["LONG_RENT", "Alquilar", "Rent"],
-  ["SHORT_RENT", "Vacaciones", "Holidays"],
+  ["SHORT_RENT", "Vacacional", "Holiday rentals"],
 ] as const;
-
-// Every example returns real homes today (checked against the inventory): the first search is never empty.
-const EXAMPLES: [string, string][] = [
-  ["Un ático con vista al mar en Lechería", "A penthouse with sea views in Lechería"],
-  ["Casa con piscina en El Morro", "A house with a pool in El Morro"],
-  ["Apartamento de 2 habitaciones en Chacao", "A 2-bedroom apartment in Chacao"],
-  ["Una villa en Margarita para las vacaciones", "A holiday villa in Margarita"],
-];
 
 /** Chips: one tap runs exactly what the label says, nothing hidden. [label es, label en, query es, query en] */
 const CHIPS: [string, string, string, string][] = [
@@ -34,7 +27,8 @@ const CHIPS: [string, string, string, string][] = [
 
 /**
  * Conversational search (2035 home): the visitor writes what they want the way they'd tell a friend; the parser
- * (AI when configured, local heuristics otherwise) turns it into filters. The placeholder types real examples.
+ * (AI when configured, local heuristics otherwise) turns it into filters. While typing, known zones and cities are
+ * suggested ("Lech" → Lechería) so a half-written place never silently becomes "every home".
  *
  * `sticky`: once this bar scrolls out under the header, a compact copy (same text, same mode, same submit) stays
  * pinned just below the header, Airbnb-style, so searching is always one tap away. It is portalled into the public
@@ -45,32 +39,10 @@ export function AskBar({ locale, className, sticky = false }: { locale: Locale; 
   const [mode, setMode] = useState<(typeof MODES)[number][0]>("SALE");
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
-  const [hint, setHint] = useState("");
   const input = useRef<HTMLInputElement>(null);
   const form = useRef<HTMLFormElement>(null);
   const [stuck, setStuck] = useState(false);
   const [host, setHost] = useState<Element | null>(null);
-
-  // Typewriter placeholder: writes an example, pauses, erases, next. Static under reduced motion.
-  useEffect(() => {
-    const list = EXAMPLES.map((e) => tx(locale, e[0], e[1]));
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setHint(list[0]);
-      return;
-    }
-    let i = 0, n = 0, dir = 1, t: number;
-    const step = () => {
-      const s = list[i];
-      n += dir;
-      setHint(s.slice(0, n));
-      let wait = dir > 0 ? 38 : 18;
-      if (dir > 0 && n >= s.length) { dir = -1; wait = 2200; }
-      else if (dir < 0 && n <= 0) { dir = 1; i = (i + 1) % list.length; wait = 400; }
-      t = window.setTimeout(step, wait);
-    };
-    t = window.setTimeout(step, 900);
-    return () => window.clearTimeout(t);
-  }, [locale]);
 
   // Compact bar: shown while the big one has scrolled up behind the header (not while it's still below the fold).
   useEffect(() => {
@@ -81,7 +53,8 @@ export function AskBar({ locale, className, sticky = false }: { locale: Locale; 
     return () => io.disconnect();
   }, [sticky]);
 
-  const go = async (raw: string) => {
+  const go = async (typed: string) => {
+    const raw = typed.trim();
     setBusy(true);
     let q = heuristicSearchParse(raw);
     if (raw.trim()) {
@@ -93,6 +66,8 @@ export function AskBar({ locale, className, sticky = false }: { locale: Locale; 
     if (!q.listingType) q.listingType = mode as never;
     router.push(`/${locale}/search?${queryToParams(q, raw).toString()}`);
   };
+
+  const suggest = usePlaceSuggest({ locale, text, setText });
 
   const compact = sticky && host
     ? createPortal(
@@ -137,18 +112,14 @@ export function AskBar({ locale, className, sticky = false }: { locale: Locale; 
       <div className="relative flex items-center gap-2 rounded-[22px] bg-white/85 py-1.5 pl-5 pr-1.5 ring-1 ring-black/[.04] focus-within:ring-2 focus-within:ring-ink/70">
         <input
           ref={input}
+          {...suggest.inputProps}
           value={text}
-          onChange={(e) => setText(e.target.value)}
+          enterKeyHint="search"
           aria-label={tx(locale, "Describe la casa que buscas", "Describe the home you're looking for")}
-          className="peer min-h-12 w-full bg-transparent font-display text-[16px] text-ink placeholder:text-transparent focus:outline-none sm:text-[17px]"
-          placeholder={tx(locale, "Describe la casa que buscas", "Describe the home you're looking for")}
+          className="min-h-12 w-full bg-transparent font-display text-[16px] text-ink placeholder:text-ink/60 focus:outline-none sm:text-[17px]"
+          placeholder={tx(locale, "Zona, tipo de casa o presupuesto", "Area, type of home or budget")}
         />
-        {!text && (
-          <span aria-hidden className="pointer-events-none absolute left-5 right-16 truncate font-display text-[16px] text-ink/60 sm:text-[17px]">
-            {hint}
-            <span className="np-caret" />
-          </span>
-        )}
+        {suggest.listbox}
         <button
           type="submit"
           aria-busy={busy}
@@ -204,6 +175,7 @@ function CompactAsk({
   onSubmit: () => void;
 }) {
   const id = useId();
+  const suggest = usePlaceSuggest({ locale, text, setText });
   const ring = "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink";
   return (
     <div
@@ -211,8 +183,8 @@ function CompactAsk({
       inert={!shown || undefined}
       aria-hidden={!shown || undefined}
       className={cn(
-        "pointer-events-none fixed inset-x-0 z-[39] px-2.5 transition-[opacity,transform] duration-500 ease-[cubic-bezier(.16,1,.3,1)] md:px-5 print:hidden",
-        "top-[calc(env(safe-area-inset-top)+80px)] md:top-[calc(env(safe-area-inset-top)+84px)]",
+        "pointer-events-none fixed inset-x-0 z-[39] px-2.5 transition-[opacity,transform,top] duration-500 ease-[cubic-bezier(.16,1,.3,1)] md:px-5 print:hidden",
+        "top-[calc(env(safe-area-inset-top)+var(--np-header-offset,80px))]",
         shown ? "translate-y-0 opacity-100" : "-translate-y-3 opacity-0",
       )}
     >
@@ -244,15 +216,18 @@ function CompactAsk({
           <ChevronDown size={15} aria-hidden className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-ivory opacity-80 [html.dark_&]:text-[#1E1A18]" />
         </span>
         <Search size={17} aria-hidden className="ml-2 shrink-0 text-ink/55" />
-        <input
-          id={`${id}-q`}
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          enterKeyHint="search"
-          aria-label={tx(locale, "Describe la casa que buscas", "Describe the home you're looking for")}
-          placeholder={tx(locale, "¿Qué casa buscas?", "What home are you after?")}
-          className="h-11 min-w-0 flex-1 bg-transparent px-1 font-display text-[16px] text-ink placeholder:text-ink/60 focus:outline-none"
-        />
+        <span className="relative flex min-w-0 flex-1">
+          <input
+            id={`${id}-q`}
+            {...suggest.inputProps}
+            value={text}
+            enterKeyHint="search"
+            aria-label={tx(locale, "Describe la casa que buscas", "Describe the home you're looking for")}
+            placeholder={tx(locale, "Zona, tipo de casa o presupuesto", "Area, type of home or budget")}
+            className="h-11 min-w-0 flex-1 bg-transparent px-1 font-display text-[16px] text-ink placeholder:text-ink/60 focus:outline-none"
+          />
+          {suggest.listbox}
+        </span>
         <button
           type="submit"
           aria-busy={busy}

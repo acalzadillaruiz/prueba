@@ -299,7 +299,7 @@ export function PublicHeader({ locale, variant = "light", autoHide = false }: { 
               )}
             </div>
           )}
-          <Button href={`/${locale}/owner/new`} variant={dark ? "dark-outline" : "outline"} size="sm" className="ml-1 hidden h-11 md:inline-flex">
+          <Button href={`/${locale}/sell`} variant={dark ? "dark-outline" : "outline"} size="sm" className="ml-1 hidden h-11 md:inline-flex">
             {t("sell")}
           </Button>
           <button
@@ -380,7 +380,7 @@ export function PublicHeader({ locale, variant = "light", autoHide = false }: { 
             )}
           </nav>
           <div className="shrink-0 space-y-3 border-t border-navy-line p-5">
-            <Link href={`/${locale}/owner/new`} className="flex min-h-12 items-center justify-center rounded-full border-[1.5px] border-ivory/60 font-display font-semibold text-ivory hover:bg-white/5">
+            <Link href={`/${locale}/sell`} className="flex min-h-12 items-center justify-center rounded-full border-[1.5px] border-ivory/60 font-display font-semibold text-ivory hover:bg-white/5">
               {t("sell")}
             </Link>
             {u ? (

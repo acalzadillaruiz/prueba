@@ -268,12 +268,26 @@ export function whereFromFilters(f: SearchFilters): Prisma.ListingWhereInput {
   return { AND: and };
 }
 
+/**
+ * Default order ("Lo más reciente"): newest first, but homes without photos and "Próximamente" ones go after the
+ * rest (still listed, never hidden) — a grey placeholder or a home you can't visit yet shouldn't open the list.
+ * 0 = complete and available, 1 = coming soon, 2 = no photos.
+ */
+export function listingRank(l: { status: string; photoCount: number }): number {
+  if (l.photoCount === 0) return 2;
+  return l.status === "COMING_SOON" ? 1 : 0;
+}
+
 export async function searchListings(f: SearchFilters): Promise<{ items: Listing[]; nextCursor: string | null; total: number }> {
   const where = whereFromFilters(f);
   const orderBy: Prisma.ListingOrderByWithRelationInput[] =
     f.sort === "price-asc" ? [{ priceAmount: "asc" }] : f.sort === "price-desc" ? [{ priceAmount: "desc" }] : [{ publishedAt: "desc" }];
   const take = Math.max(1, Math.min(Math.floor(f.take ?? 500), 500));
-  if (f.shape) return searchInShape(f, where, [...orderBy, { id: "asc" }], take);
+  const ranked = !f.sort || f.sort === "new";
+  if (f.shape || ranked) {
+    const res = await searchByIds(f, where, [...orderBy, { id: "asc" }], take, ranked);
+    if (res) return res;
+  }
   const [rows, total] = await Promise.all([
     prisma.listing.findMany({ where, include: cardInclude, orderBy: [...orderBy, { id: "asc" }], take: take + 1, ...(f.cursor ? { cursor: { id: f.cursor }, skip: 1 } : {}) }),
     prisma.listing.count({ where }),
@@ -283,17 +297,26 @@ export async function searchListings(f: SearchFilters): Promise<{ items: Listing
   return { items, nextCursor: rows.length > take ? rows[take - 1].id : null, total };
 }
 
-/** Upper bound of candidates inside a shape's bounding box (public inventory is far below this). */
+/** Upper bound of candidates ordered in memory (public inventory is far below this). */
 const SHAPE_CANDIDATES = 5000;
 
 /**
- * Polygon / radius search: candidates come from the database already limited to the shape's bounding box
- * (whereFromFilters), the exact point-in-shape test runs on their coordinates, and only then is the result paginated
- * — so every page is full, the cursor walks the exact set and `total` is the exact count.
+ * Search over the ordered candidate ids: the database returns the matching ids (polygon / radius already limited to
+ * the shape's bounding box by whereFromFilters); the exact point-in-shape test and the default ranking (photos and
+ * availability first, stable within each group) run on them, and only then is the result paginated — so every page
+ * is full, the cursor walks the exact set and `total` is the exact count. Returns null (caller uses the plain query)
+ * when a non-shape search has more candidates than can be ranked in memory.
  */
-async function searchInShape(f: SearchFilters, where: Prisma.ListingWhereInput, orderBy: Prisma.ListingOrderByWithRelationInput[], take: number) {
-  const candidates = await prisma.listing.findMany({ where, select: { id: true, lat: true, lng: true }, orderBy, take: SHAPE_CANDIDATES });
-  const ids = candidates.filter((c) => inShape(c, f.shape!)).map((c) => c.id);
+async function searchByIds(f: SearchFilters, where: Prisma.ListingWhereInput, orderBy: Prisma.ListingOrderByWithRelationInput[], take: number, ranked: boolean) {
+  const candidates = await prisma.listing.findMany({ where, select: { id: true, lat: true, lng: true, status: true, _count: { select: { photos: true } } }, orderBy, take: SHAPE_CANDIDATES });
+  if (!f.shape && candidates.length >= SHAPE_CANDIDATES) return null;
+  let list = f.shape ? candidates.filter((c) => inShape(c, f.shape!)) : candidates;
+  if (ranked) {
+    const rank = (c: (typeof candidates)[number]) => listingRank({ status: c.status, photoCount: c._count.photos });
+    // Array.prototype.sort is stable: the newest-first order holds inside each group.
+    list = [...list].sort((a, b) => rank(a) - rank(b));
+  }
+  const ids = list.map((c) => c.id);
   const start = f.cursor ? ids.indexOf(f.cursor) + 1 : 0;
   const pageIds = ids.slice(start, start + take);
   const rows = pageIds.length ? await prisma.listing.findMany({ where: { id: { in: pageIds } }, include: cardInclude }) : [];

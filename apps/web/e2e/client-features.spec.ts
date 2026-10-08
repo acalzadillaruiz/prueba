@@ -68,6 +68,8 @@ test.describe.serial("Cliente: búsqueda, Hub y precalificación", () => {
     for (const l of withM2.json.items as ApiListing[]) expect(l.areaM2).toBeGreaterThanOrEqual(200);
 
     await page.goto("/es/search?type=SALE");
+    // Price lives in the "Precio" popover (preset bands + exact min / max).
+    await page.getByRole("button", { name: /^Precio/ }).click();
     await page.getByRole("combobox", { name: "Precio mínimo" }).selectOption("250000");
     await expect(page).toHaveURL(/min=250000/);
     const withMin = await apiAs(page, "GET", "listings?type=SALE&min=250000");
@@ -100,7 +102,9 @@ test.describe.serial("Cliente: búsqueda, Hub y precalificación", () => {
   test("móvil 390 px: búsqueda y Hub sin scroll horizontal", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/es/search?type=SALE");
-    await page.getByRole("button", { name: /Más filtros/ }).click();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+    await page.getByRole("button", { name: /^Filtros/ }).first().click();
+    await expect(page.locator("#search-filters-sheet")).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
     await demoLogin(page, /Buscador/);
     await page.goto("/es/app");

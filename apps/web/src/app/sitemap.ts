@@ -13,6 +13,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...both("", undefined, 1),
     ...["SALE", "LONG_RENT", "SHORT_RENT", "COMMERCIAL"].flatMap((t) => both(`/search?type=${t}`, undefined, 0.8)),
     ...both("/luxury", undefined, 0.7),
+    ...both("/sell", undefined, 0.6),
     ...listings.flatMap((l) => both(`/listing/${l.slug}`, l.updatedAt)),
   ];
 }

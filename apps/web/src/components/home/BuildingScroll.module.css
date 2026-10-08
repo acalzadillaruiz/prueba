@@ -1,0 +1,85 @@
+/* Lite tower, refined: frosted-glass floors with hairline slabs, a soft contact shadow and a fainter blueprint.
+   Layered over the base .np-tower rules (globals.css) — only paint changes here; motion stays transform/opacity. */
+.tower {
+  --t-glass-hi: rgb(255 255 255 / 0.78);
+  --t-glass-lo: rgb(241 235 227 / 0.5);
+  --t-slab: #fbf8f3;
+  --t-mull: rgb(30 26 24 / 0.07);
+  --t-side-hi: rgb(233 223 209 / 0.95);
+  --t-side-lo: rgb(217 198 171 / 0.75);
+  --t-edge: rgb(30 26 24 / 0.1);
+  --t-shadow: rgb(30 26 24 / 0.16);
+  --t-grid: rgb(176 138 85 / 0.16);
+  --t-lit-hi: #f6dcb2;
+  --t-lit-lo: #d9a866;
+}
+:global(html.dark) .tower {
+  --t-glass-hi: rgb(255 255 255 / 0.14);
+  --t-glass-lo: rgb(255 255 255 / 0.05);
+  --t-slab: rgb(241 235 227 / 0.55);
+  --t-mull: rgb(255 255 255 / 0.06);
+  --t-side-hi: rgb(255 255 255 / 0.09);
+  --t-side-lo: rgb(255 255 255 / 0.03);
+  --t-edge: rgb(255 255 255 / 0.1);
+  --t-shadow: rgb(0 0 0 / 0.45);
+  --t-grid: rgb(201 165 116 / 0.14);
+  --t-lit-hi: #e9c98f;
+  --t-lit-lo: #b08a55;
+}
+.tower :global(.np-tower-grid) {
+  background-image: linear-gradient(var(--t-grid) 1px, transparent 1px), linear-gradient(90deg, var(--t-grid) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+/* Podium: a thin stone plinth with a soft, wide contact shadow (no hard drop). */
+.tower :global(.np-tower-podium) {
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--t-side-hi), var(--t-side-lo));
+  box-shadow: 0 0 0 1px var(--t-edge) inset;
+}
+.tower :global(.np-tower-podium)::after {
+  content: "";
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  top: 4px;
+  height: 22px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--t-shadow), transparent);
+  filter: blur(4px);
+}
+/* Floors: frosted glass between hairline slabs, faint mullions, a whisper of shadow under each slab. */
+.tower :global(.np-floor) {
+  height: calc(var(--fh) - 4px);
+  border-radius: 1.5px;
+  background-color: transparent;
+  background-image:
+    linear-gradient(var(--t-slab) 0 2px, transparent 2px),
+    repeating-linear-gradient(90deg, var(--t-mull) 0 1px, transparent 1px calc(var(--fw) / 6)),
+    linear-gradient(180deg, var(--t-glass-hi), var(--t-glass-lo));
+  box-shadow:
+    0 0 0 1px var(--t-edge) inset,
+    0 8px 14px -12px var(--t-shadow);
+}
+.tower :global(.np-floor)::after {
+  width: 20%;
+  background: linear-gradient(var(--t-slab) 0 2px, transparent 2px), linear-gradient(180deg, var(--t-side-hi), var(--t-side-lo));
+  box-shadow: 0 0 0 1px var(--t-edge) inset;
+}
+.tower :global(.np-floor[data-lit="1"]) {
+  background-color: transparent;
+  background-image:
+    linear-gradient(var(--t-slab) 0 2px, transparent 2px),
+    repeating-linear-gradient(90deg, rgb(142 59 34 / 0.12) 0 1px, transparent 1px calc(var(--fw) / 6)),
+    linear-gradient(180deg, var(--t-lit-hi), var(--t-lit-lo));
+  box-shadow:
+    0 0 0 1px rgb(176 138 85 / 0.35) inset,
+    0 0 26px 2px rgb(217 168 102 / 0.45);
+}
+.tower :global(.np-tower-halo) {
+  background: radial-gradient(closest-side, rgb(217 168 102 / 0.32), transparent);
+  filter: blur(14px);
+}
+.tower :global(.np-roof-cal) {
+  filter: drop-shadow(0 8px 14px rgb(30 26 24 / 0.14));
+}

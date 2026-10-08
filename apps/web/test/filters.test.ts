@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { filtersFromParams } from "@/server/listings";
+import { filtersFromParams, listingRank, searchListings } from "@/server/listings";
 
 describe("filtersFromParams", () => {
   it("parses numeric and boolean filters", () => {
@@ -28,5 +28,23 @@ describe("filtersFromParams hardening", () => {
     expect(f.take).toBeUndefined();
     expect(f.max).toBeUndefined();
     expect(f.beds).toBe(2);
+  });
+});
+
+describe("default order: photos and availability first", () => {
+  it("ranks complete homes, then coming soon, then homes without photos", () => {
+    expect(listingRank({ status: "ACTIVE", photoCount: 3 })).toBe(0);
+    expect(listingRank({ status: "UNDER_OFFER", photoCount: 1 })).toBe(0);
+    expect(listingRank({ status: "COMING_SOON", photoCount: 3 })).toBe(1);
+    expect(listingRank({ status: "ACTIVE", photoCount: 0 })).toBe(2);
+  });
+  it("search lists them last without hiding them, and the cursor walks the same order", async () => {
+    const all = await searchListings({ sort: "new" });
+    const ranks = all.items.map((l) => listingRank({ status: l.status, photoCount: l.photos?.length ?? 0 }));
+    expect(ranks).toEqual([...ranks].sort((a, b) => a - b));
+    expect(all.total).toBe(all.items.length);
+    const first = await searchListings({ sort: "new", take: 5 });
+    const next = await searchListings({ sort: "new", take: 5, cursor: first.nextCursor! });
+    expect([...first.items, ...next.items].map((l) => l.id)).toEqual(all.items.slice(0, 10).map((l) => l.id));
   });
 });

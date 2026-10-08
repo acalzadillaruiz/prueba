@@ -61,7 +61,8 @@ function Layers({ props, theme, mode, setMode, draft, setDraft }: { props: MapVi
     return () => c.clearMarkers();
   }, [map, listings, locale, selectedId, hoverId, onSelect]);
 
-  // fit to results
+  // fit to results (again whenever the set of results changes, not only its size)
+  const fitKey = listings.map((l) => l.id).join(",");
   useEffect(() => {
     if (!map || !listings.length || pin) return;
     const b = new google.maps.LatLngBounds();
@@ -71,7 +72,7 @@ function Layers({ props, theme, mode, setMode, draft, setDraft }: { props: MapVi
       map.setZoom(15);
     } else map.fitBounds(b, 60);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [map, listings.length]);
+  }, [map, fitKey]);
 
   // style
   useEffect(() => {

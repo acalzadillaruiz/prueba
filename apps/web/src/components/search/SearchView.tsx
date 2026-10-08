@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Bell, Check, Loader2, ChevronDown, SlidersHorizontal, Sparkles, X } from "lucide-react";
-import { heuristicSearchParse } from "@newplace/ai";
+import { Bell, Check, ChevronDown, List, Loader2, Map as MapIcon, SlidersHorizontal, Sparkles, X } from "lucide-react";
+import { closestPlaces, heuristicSearchParse, queryUnderstood } from "@newplace/ai";
 import type { Amenity, Listing, Locale } from "@/types/domain";
 import { MapView as NightMap } from "@/components/map/MapView";
 import { ListingCard, MapPreviewCard } from "@/components/listing/ListingCard";
@@ -16,39 +16,49 @@ import { api } from "@/lib/api";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { queryToParams } from "./HeroSearch";
 import { URL_CHANGE_EVENT } from "@/components/layout/PublicHeader";
-import { TANK_STEPS, essentialChips, essentialsFromParams } from "@/lib/essentials";
+import { essentialChips, essentialsFromParams } from "@/lib/essentials";
+import { placesFromGroups, usePlaceSuggest } from "./PlaceSuggest";
+import {
+  BedsFields,
+  FilterPopover,
+  FilterSheet,
+  KIND_CHIP,
+  KindFields,
+  MoreFields,
+  PriceFields,
+  SeeHomes,
+  TYPES,
+  ZoneSelect,
+  on,
+  pill,
+  priceLabel,
+  useDismiss,
+  type FilterValues,
+  type ZoneGroup,
+} from "./SearchFilters";
 
-const TYPES = [
-  ["SALE", "Comprar", "Buy"],
-  ["LONG_RENT", "Alquilar", "Rent"],
-  ["SHORT_RENT", "Vacacional", "Vacation"],
-  ["COMMERCIAL", "Comercial", "Commercial"],
-] as const;
+export type { ZoneGroup } from "./SearchFilters";
 
-// Tiers per operation, up to the top of the luxury market: sale (total), long rent (per month), vacation (per night), commercial (rent or sale).
-const PRICE_STEPS: Record<string, number[]> = {
-  SALE: [100000, 150000, 250000, 400000, 600000, 1000000, 1500000, 2000000, 3000000, 5000000],
-  LONG_RENT: [500, 800, 1200, 1800, 2500, 4000, 6000, 10000],
-  SHORT_RENT: [60, 100, 150, 250, 400, 600, 1000],
-  COMMERCIAL: [1000, 2500, 5000, 10000, 150000, 300000, 600000, 1000000, 2000000, 5000000],
-};
-
-/** The tiers, plus a value from the URL or the NL parser that isn't one of them (so the select still shows it). */
-const withValue = (steps: number[], v?: number) => (v && !steps.includes(v) ? [...steps, v].sort((a, b) => a - b) : steps);
-
-const KIND_OPTIONS = [
-  ["house", "Casa o villa", "House or villa"],
-  ["apartment", "Apartamento", "Apartment"],
-  ["penthouse", "Ático", "Penthouse"],
-  ["land", "Terreno", "Land"],
-] as const;
-
-/** Zones grouped by city (the city itself is a valid `zone` value: the API matches it on listing.city). */
-export type ZoneGroup = { city: string; zones: string[] };
-
-const MIN_M2_STEPS = [50, 80, 100, 150, 200, 300];
 const SORTS = ["new", "price-asc", "price-desc", "ppm"] as const;
 type Sort = (typeof SORTS)[number];
+
+/** sessionStorage: the phone view (list / map) the visitor last chose, kept across listing → Back. */
+const VIEW_KEY = "np-search-view";
+/** sessionStorage: the last search (path + query) and its result count, for the listing page's "← Resultados" pill. */
+export const LAST_SEARCH_KEY = "np-last-search";
+export const LAST_SEARCH_COUNT_KEY = "np-last-search-count";
+
+/** Every URL key that narrows the results (type, q and sort don't). */
+const FILTER_KEYS = ["zone", "city", "min", "max", "beds", "baths", "m2", "kind", "lux", "pub", "furnished", "pets", "verified", "am", "power", "well", "tank", "dock", "avila", "sea", "poly", "radius"];
+
+/** Ideas offered when the typed text meant nothing to the parser: each one runs as a search. */
+const TRY_INSTEAD: [string, string][] = [
+  ["Casa con piscina", "A house with a pool"],
+  ["Apartamento de 2 habitaciones", "A 2-bedroom apartment"],
+  ["Con terraza", "With a terrace"],
+];
+
+const useIsoLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 /** URL ⇄ drawn shape, in the exact format the API parses (`poly=lat,lng;lat,lng;…`, `radius=lat,lng,km`). */
 export function shapeToParams(shape: Shape): { poly: string | null; radius: string | null } {
@@ -69,15 +79,11 @@ export function shapeFromParams(poly: string | null, radius: string | null): Sha
   return null;
 }
 
-const KIND_CHIP: Record<string, [string, string]> = {
-  penthouse: ["Ático / PH", "Penthouse"],
-  house: ["Casa", "House"],
-  apartment: ["Apartamento", "Apartment"],
-  land: ["Terreno", "Land"],
-};
-
-// Power, water tank and views live in "Servicios esenciales" (with finer options), so they aren't repeated here.
-const FILTER_AMENITIES: Amenity[] = ["pool", "security", "gym", "terrace", "garden", "elevator", "ac"];
+/** Span of each illustrated map (degrees) and the zoom range used to fit the results in it. */
+const MAP_FIT = {
+  caracas: { lng: 0.185, lat: 0.14, min: 1.7, max: 5 },
+  venezuela: { lng: 13.9, lat: 11.9, min: 1, max: 8 },
+} as const;
 
 export function SearchView({ locale, initial, zones }: { locale: Locale; initial: { items: Listing[]; total: number }; zones: ZoneGroup[] }) {
   const sp = useSearchParams();
@@ -87,20 +93,37 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
   const [alertError, setAlertError] = useState<string | null>(null);
   const [sel, setSel] = useState<string | null>(null);
   const [hover, setHover] = useState<string | null>(null);
+  // Desktop: one filter popover (or the "Más filtros" panel) open at a time. Phones: one full-screen filter sheet.
+  const [pop, setPop] = useState<"price" | "kind" | "beds" | null>(null);
   const [moreOpen, setMoreOpen] = useState(false);
-  // Phones: results live in a bottom sheet over the map — "peek" (count + sort) or expanded (full list).
-  const [mobileList, setMobileList] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const sheetOpener = useRef<HTMLElement | null>(null);
+  const moreBtn = useRef<HTMLButtonElement>(null);
+  const morePanel = useRef<HTMLDivElement>(null);
+  // Phones: the list first (with a floating "Mapa" toggle); the choice survives a visit to a listing and Back.
+  const [view, setView] = useState<"list" | "map">("list");
   const [desktop, setDesktop] = useState(false);
-  const swipe = useRef<number | null>(null);
-  useEffect(() => {
+  useIsoLayoutEffect(() => {
+    try {
+      if (sessionStorage.getItem(VIEW_KEY) === "map") setView("map");
+    } catch {}
     const mq = window.matchMedia("(min-width: 1024px)");
-    const on = () => setDesktop(mq.matches);
-    on();
-    mq.addEventListener("change", on);
-    return () => mq.removeEventListener("change", on);
+    const onMq = () => setDesktop(mq.matches);
+    onMq();
+    mq.addEventListener("change", onMq);
+    return () => mq.removeEventListener("change", onMq);
   }, []);
+  const changeView = (v: "list" | "map") => {
+    setView(v);
+    try {
+      sessionStorage.setItem(VIEW_KEY, v);
+    } catch {}
+  };
   const [alertSaved, setAlertSaved] = useState(false);
-  const [nl, setNl] = useState(sp.get("q") ?? "");
+  const qText = sp.get("q") ?? "";
+  const [nl, setNl] = useState(qText);
+  // Back / forward to another search: the box shows that search's words.
+  useEffect(() => setNl(qText), [qText]);
 
   const type = sp.get("type") ?? "SALE";
   const zone = sp.get("zone");
@@ -122,7 +145,6 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
   const pub = sp.get("pub");
   const lux = sp.get("lux") === "1";
   const kind = sp.get("kind");
-  const knownZone = !zone || zones.some((g) => g.city === zone || g.zones.includes(zone));
   const furnished = sp.get("furnished") === "1";
   const pets = sp.get("pets") === "1";
   const verified = sp.get("verified") === "1";
@@ -130,6 +152,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
   // Venezuelan essentials (same parser as the API): power=full|partial, well, tank, dock, avila, sea
   const ess = essentialsFromParams(sp);
   const essCount = [ess.power, ess.well, ess.tank, ess.dock, ess.avila, ess.sea].filter(Boolean).length;
+  const f: FilterValues = { type, zone, min, max, beds, baths, minM2, kind, lux, pub, furnished, pets, verified, amen, ess };
 
   // Quick successive changes must stack: start from the last URL we asked for, not the (not yet updated) search params.
   const pending = useRef<string | null>(null);
@@ -148,6 +171,20 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
     setAlertError(null);
   };
   const setShape = (s: Shape) => set(shapeToParams(s));
+  const clearAll = () => set(Object.fromEntries([...FILTER_KEYS, "q"].map((k) => [k, null])));
+
+  /** Natural-language search (filter bar, "try instead" ideas): the parser turns the words into filters. */
+  const runNl = (text: string) => {
+    const raw = text.trim();
+    const q = heuristicSearchParse(raw);
+    const p = queryToParams(q, raw);
+    if (!q.listingType) p.set("type", type);
+    if (sort !== "new") p.set("sort", sort);
+    router.push(`/${locale}/search?${p.toString()}`);
+  };
+
+  const places = useMemo(() => placesFromGroups(zones), [zones]);
+  const suggest = usePlaceSuggest({ locale, text: nl, setText: setNl, places });
 
   // The page defaults to "Comprar"; the API must get the same default or other types leak into the results.
   const base = new URLSearchParams(sp.toString());
@@ -161,24 +198,75 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
     placeholderData: keepPreviousData,
     initialData: qs === initialQs ? initial : undefined,
   });
-  const results = query.data?.items ?? [];
+  const results = useMemo(() => query.data?.items ?? [], [query.data]);
+  const total = query.data?.total ?? results.length;
+  const hasResults = results.length > 0;
+
+  // Words the parser didn't understand (and no filter came out of them): say so instead of passing the whole
+  // catalogue off as matches.
+  const notUnderstood = !!qText.trim() && !FILTER_KEYS.some((k) => sp.get(k)) && !queryUnderstood(heuristicSearchParse(qText));
+  const didYouMean = useMemo(() => (notUnderstood ? closestPlaces(qText, places, 3) : []), [notUnderstood, qText, places]);
+  const placeIdeas = didYouMean.length ? didYouMean : zones.slice(0, 3).map((g) => ({ name: g.city }));
+
+  // The listing page offers "← Resultados" back to this exact search.
+  useEffect(() => {
+    if (query.isPlaceholderData) return;
+    try {
+      sessionStorage.setItem(LAST_SEARCH_KEY, window.location.pathname + window.location.search);
+      sessionStorage.setItem(LAST_SEARCH_COUNT_KEY, String(total));
+    } catch {}
+  }, [qs, total, query.isPlaceholderData]);
+
   // Coming back from a listing lands where you left the list (per search), like any good shop.
   const listRef = useRef<HTMLDivElement>(null);
   const scrollKey = `np-search-scroll:${qs}`;
+  const restoring = useRef(false);
   const saveListScroll = () => {
+    if (restoring.current) return;
     try {
       sessionStorage.setItem(scrollKey, String(listRef.current?.scrollTop ?? 0));
     } catch {}
   };
-  const restored = useRef<string | null>(null);
-  useEffect(() => {
-    if (!results.length || restored.current === qs || !listRef.current) return;
-    restored.current = qs;
+  const listVisible = desktop || view === "list";
+  // Restore before paint, then keep re-applying for a moment while the cards lay out (images, fonts) — the list may
+  // not be tall enough on the first frame, which used to clamp 1500 px to ~600. Any wheel/touch by the visitor wins.
+  useIsoLayoutEffect(() => {
+    const el = listRef.current;
+    if (!el || !hasResults || !listVisible) return;
+    let target = 0;
     try {
-      const y = Number(sessionStorage.getItem(scrollKey) ?? 0);
-      if (y > 0) listRef.current.scrollTop = y;
+      target = Number(sessionStorage.getItem(scrollKey) ?? 0) || 0;
     } catch {}
-  }, [results.length, qs, scrollKey]);
+    if (target <= 0) return;
+    restoring.current = true;
+    let tries = 0;
+    let raf = 0;
+    const stop = () => {
+      restoring.current = false;
+      cancelAnimationFrame(raf);
+      el.removeEventListener("wheel", stop);
+      el.removeEventListener("touchstart", stop);
+    };
+    const step = () => {
+      el.scrollTop = target;
+      if (Math.abs(el.scrollTop - target) <= 2 || ++tries > 90) return stop();
+      raf = requestAnimationFrame(step);
+    };
+    el.addEventListener("wheel", stop, { passive: true });
+    el.addEventListener("touchstart", stop, { passive: true });
+    step();
+    // A last check once everything settled (late images): only if the visitor hasn't scrolled since.
+    const late = window.setTimeout(() => {
+      try {
+        if (Math.abs(el.scrollTop - target) > 2 && el.scrollHeight - el.clientHeight >= target && Number(sessionStorage.getItem(scrollKey)) === target) el.scrollTop = target;
+      } catch {}
+    }, 1600);
+    return () => {
+      stop();
+      window.clearTimeout(late);
+    };
+  }, [scrollKey, hasResults, listVisible]);
+
   const createAlert = async () => {
     if (alertSaved || savingAlert) return;
     if (!requireLogin("alert")) return;
@@ -208,20 +296,26 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
     ["poly", "radius", "sort"].forEach((k) => p.delete(k));
     return p.toString();
   })();
+  // While new results load, the previous ones stay on screen: the map remounts (and fits) only once the fresh set for
+  // the new filters is in.
+  const [mapFilters, setMapFilters] = useState(filtersKey);
+  if (!query.isPlaceholderData && mapFilters !== filtersKey) setMapFilters(filtersKey);
   const [regionPick, setRegionPick] = useState<"caracas" | "venezuela" | null>(null);
-  const autoRegion = results.length > 0 && results.every((l) => l.city !== "Caracas") ? "venezuela" : "caracas";
+  const autoRegion = hasResults && results.every((l) => l.city !== "Caracas") ? "venezuela" : "caracas";
   const region = regionPick ?? autoRegion;
-  const mapListings = region === "caracas" ? results.filter((l) => l.city === "Caracas") : results;
+  const mapListings = useMemo(() => (region === "caracas" ? results.filter((l) => l.city === "Caracas") : results), [region, results]);
+  // Fit the view to the result pins (Lechería zooms on Lechería, not on the whole country).
   const fit = useMemo(() => {
-    if (region !== "caracas" || mapListings.length === 0) return { focus: undefined, scale: region === "caracas" ? 1.7 : 1 };
+    if (mapListings.length === 0) return { focus: undefined, scale: region === "caracas" ? 1.7 : 1 };
+    const span = MAP_FIT[region];
     const lats = mapListings.map((l) => l.lat);
     const lngs = mapListings.map((l) => l.lng);
     const dLat = Math.max(...lats) - Math.min(...lats);
     const dLng = Math.max(...lngs) - Math.min(...lngs);
-    const scale = Math.max(1.7, Math.min(5, Math.min(0.185 / (dLng * 1.8 || 0.01), 0.14 / (dLat * 2.2 || 0.01))));
+    const scale = Math.max(span.min, Math.min(span.max, Math.min(span.lng / (dLng * 1.8 || span.lng / span.max), span.lat / (dLat * 2.2 || span.lat / span.max))));
     return { focus: { lat: (Math.max(...lats) + Math.min(...lats)) / 2, lng: (Math.max(...lngs) + Math.min(...lngs)) / 2 }, scale };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [region, filtersKey]);
+  }, [region, mapFilters]);
   const activeChips: [string, string, Record<string, string | null>][] = [];
   if (zone) activeChips.push(["zone", zone, { zone: null }]);
   if (min) activeChips.push(["min", `≥ ${money(min, locale)}`, { min: null }]);
@@ -256,219 +350,127 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
       ).then((xs) => xs.filter((x) => x.total > 0).sort((a, b) => b.total - a.total)),
   });
 
-  const pill = "flex h-11 md:h-10 shrink-0 items-center gap-1.5 rounded-full border px-4 font-display text-sm transition-colors duration-np";
-  // Selected filter = navy tint + 2 px navy border (brand v4).
-  const on = "np-sel border-2 px-[15px]";
+  useDismiss(moreOpen, () => setMoreOpen(false), morePanel, moreBtn);
+  const openSheet = (e: React.MouseEvent<HTMLElement>) => {
+    sheetOpener.current = e.currentTarget;
+    setSheetOpen(true);
+  };
+  const filterCount = activeChips.length;
+  const filtersLabel = tx(locale, "Filtros", "Filters");
+  const filtersAria = filterCount ? tx(locale, `Filtros, ${filterCount} activos`, `Filters, ${filterCount} on`) : filtersLabel;
+  const countBadge = filterCount > 0 && <span aria-hidden className="rounded-full bg-navy px-1.5 text-xs font-semibold text-ivory [font-feature-settings:'lnum']">{filterCount}</span>;
+  const mapHidden = !desktop && view === "list";
+  const listHidden = !desktop && view === "map";
 
   return (
     <div className="flex h-[calc(100dvh-72px)] flex-col">
-      {/* filter bar */}
+      {/* search + filter bar */}
       <div className="relative z-30 border-b border-ink/[.06] bg-ivory/80 backdrop-blur-xl">
-        <div className="no-scrollbar flex items-center gap-2 overflow-x-auto px-4 py-2.5 md:flex-wrap md:overflow-visible md:px-5">
+        <div className="flex items-center gap-2 px-4 py-2.5 lg:flex-wrap lg:px-5">
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              const q = heuristicSearchParse(nl);
-              const p = queryToParams(q, nl);
-              if (q.minPrice && (!q.maxPrice || q.minPrice < q.maxPrice)) p.set("min", String(q.minPrice));
-              if (!q.listingType) p.set("type", type);
-              router.push(`/${locale}/search?${p.toString()}`);
+              runNl(nl);
             }}
-            className="flex h-11 min-w-[220px] shrink-0 items-center gap-2 rounded-full border border-ink/10 bg-white/75 backdrop-blur px-4 focus-within:border-navy md:h-10 md:flex-1 xl:max-w-[300px]"
+            className="relative flex h-11 min-w-0 flex-1 items-center gap-2 rounded-full border border-ink/10 bg-white/75 px-4 backdrop-blur focus-within:border-navy lg:h-10 lg:w-[280px] lg:flex-none"
           >
             <Sparkles size={15} className="shrink-0 text-gold-text" aria-hidden />
             <input
+              {...suggest.inputProps}
               value={nl}
-              onChange={(e) => setNl(e.target.value)}
+              enterKeyHint="search"
               placeholder={tx(locale, "Cuéntanos qué buscas…", "Tell us what you’re after…")}
               aria-label={tx(locale, "Cuéntanos con tus palabras qué buscas", "Describe what you’re after in your own words")}
-              className="min-w-0 flex-1 bg-transparent text-sm focus:outline-none"
+              className="min-w-0 flex-1 bg-transparent text-[16px] focus:outline-none lg:text-sm"
             />
+            {suggest.listbox}
           </form>
-          <div className="flex shrink-0 gap-0.5 rounded-full border border-ink/10 bg-white/75 backdrop-blur p-1">
-            {TYPES.map(([k, es, en]) => (
-              <button
-                key={k}
-                onClick={() => set({ type: k, max: null, min: null })}
-                aria-pressed={type === k}
-                className={cn("min-h-11 rounded-full border-2 px-3.5 font-display text-sm md:min-h-8", type === k ? "np-sel font-semibold" : "border-transparent text-ink/70 hover:text-ink")}
-              >
-                {tx(locale, es, en)}
-              </button>
-            ))}
+          {/* Phones: the operation as one compact select (the rest lives in "Filtros"). */}
+          <span className="relative shrink-0 lg:hidden">
+            <select value={type} onChange={(e) => set({ type: e.target.value, max: null, min: null })} aria-label={tx(locale, "Qué buscas", "What you're after")} className={cn(pill, "appearance-none pr-8 font-semibold", on)}>
+              {TYPES.map(([k, es, en]) => (
+                <option key={k} value={k}>{tx(locale, es, en)}</option>
+              ))}
+            </select>
+            <ChevronDown size={14} aria-hidden className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2" />
+          </span>
+          <div className="hidden lg:contents">
+            <div className="flex shrink-0 gap-0.5 rounded-full border border-ink/10 bg-white/75 p-1 backdrop-blur" role="group" aria-label={tx(locale, "Qué buscas", "What you're after")}>
+              {TYPES.map(([k, es, en]) => (
+                <button
+                  key={k}
+                  type="button"
+                  onClick={() => set({ type: k, max: null, min: null })}
+                  aria-pressed={type === k}
+                  className={cn("min-h-8 rounded-full border-2 px-3.5 font-display text-sm", type === k ? "np-sel font-semibold" : "border-transparent text-ink/70 hover:text-ink")}
+                >
+                  {tx(locale, es, en)}
+                </button>
+              ))}
+            </div>
+            <FilterPopover label={priceLabel(locale, min, max)} title={tx(locale, "Precio", "Price")} active={!!(min || max)} open={pop === "price"} onOpenChange={(o) => { setPop(o ? "price" : null); if (o) setMoreOpen(false); }} width="w-[360px]">
+              <PriceFields locale={locale} f={f} set={set} />
+            </FilterPopover>
+            <FilterPopover label={kind ? (KIND_CHIP[kind] ? tx(locale, ...KIND_CHIP[kind]) : kind) : tx(locale, "Tipo", "Type")} title={tx(locale, "Tipo de inmueble", "Property type")} active={!!kind} open={pop === "kind"} onOpenChange={(o) => { setPop(o ? "kind" : null); if (o) setMoreOpen(false); }}>
+              <KindFields locale={locale} f={f} set={set} />
+            </FilterPopover>
+            <FilterPopover label={beds ? `${beds}+ ${tx(locale, "hab.", "beds")}` : tx(locale, "Habitaciones", "Bedrooms")} title={tx(locale, "Habitaciones", "Bedrooms")} active={!!beds} open={pop === "beds"} onOpenChange={(o) => { setPop(o ? "beds" : null); if (o) setMoreOpen(false); }} width="w-auto">
+              <BedsFields locale={locale} f={f} set={set} />
+            </FilterPopover>
+            <ZoneSelect locale={locale} f={f} set={set} zones={zones} />
+            <button
+              ref={moreBtn}
+              type="button"
+              onClick={() => {
+                setPop(null);
+                setMoreOpen((o) => !o);
+              }}
+              aria-expanded={moreOpen}
+              aria-controls="search-more-filters"
+              className={cn(pill, "border-line bg-white", (moreOpen || baths || minM2 || essCount || pub || furnished || pets || verified || amen.length) && on)}
+            >
+              <SlidersHorizontal size={15} aria-hidden /> {tx(locale, "Más filtros", "More filters")}
+              {essCount > 0 && <span className="rounded-full bg-navy px-1.5 text-xs font-semibold text-ivory [font-feature-settings:'lnum']" aria-label={tx(locale, `${essCount} filtros de servicios esenciales activos`, `${essCount} essential-service filters on`)}>{essCount}</span>}
+              <ChevronDown size={14} aria-hidden />
+            </button>
+            <button type="button" onClick={() => set({ lux: lux ? null : "1" })} aria-pressed={lux} className={cn(pill, lux ? on : "border-line bg-white")}>
+              {tx(locale, "Colección Privada", "Private Collection")}
+            </button>
+            <button
+              type="button"
+              onClick={createAlert}
+              disabled={alertSaved || savingAlert}
+              aria-live="polite"
+              className={cn(pill, "ml-auto disabled:cursor-default", alertSaved ? "border-ok bg-ok text-white" : "np-btn-navy border-navy bg-navy font-semibold text-ivory hover:bg-navy-2")}
+            >
+              {alertSaved ? <Check size={15} /> : savingAlert ? <Loader2 size={15} className="animate-spin" /> : <Bell size={15} />} {alertSaved ? tx(locale, "Búsqueda guardada", "Search saved") : tx(locale, "Guardar búsqueda", "Save search")}
+            </button>
           </div>
-          <select
-            value={min ?? ""}
-            onChange={(e) => set({ min: e.target.value || null })}
-            className={cn(pill, "appearance-none border-line bg-white pr-8", min && on)}
-            aria-label={tx(locale, "Precio mínimo", "Min price")}
-          >
-            <option value="">{tx(locale, "Precio mín.", "Min price")}</option>
-            {withValue((PRICE_STEPS[type] ?? []).slice(0, -1), min).map((v) => (
-              <option key={v} value={v} disabled={!!max && v >= max}>≥ {money(v, locale)}</option>
-            ))}
-          </select>
-          <select
-            value={max ?? ""}
-            onChange={(e) => set({ max: e.target.value || null })}
-            className={cn(pill, "appearance-none border-line bg-white pr-8", max && on)}
-            aria-label={tx(locale, "Precio máximo", "Max price")}
-          >
-            <option value="">{tx(locale, "Precio máx.", "Max price")}</option>
-            {withValue(PRICE_STEPS[type] ?? [], max).map((v) => (
-              <option key={v} value={v} disabled={!!min && v <= min}>≤ {money(v, locale)}</option>
-            ))}
-          </select>
-          <select value={kind ?? ""} onChange={(e) => set({ kind: e.target.value || null })} className={cn(pill, "appearance-none border-line bg-white", kind && on)} aria-label={tx(locale, "Tipo de inmueble", "Property type")}>
-            <option value="">{tx(locale, "Cualquier tipo", "Any type")}</option>
-            {kind && !KIND_OPTIONS.some(([k]) => k === kind) && <option value={kind}>{KIND_CHIP[kind] ? tx(locale, ...KIND_CHIP[kind]) : kind}</option>}
-            {KIND_OPTIONS.map(([k, es, en]) => (
-              <option key={k} value={k}>{tx(locale, es, en)}</option>
-            ))}
-          </select>
-          <select value={beds ?? ""} onChange={(e) => set({ beds: e.target.value || null })} className={cn(pill, "appearance-none border-line bg-white", beds && on)} aria-label={tx(locale, "Habitaciones", "Bedrooms")}>
-            <option value="">{tx(locale, "Habitaciones", "Beds")}</option>
-            {[1, 2, 3, 4].map((b) => (
-              <option key={b} value={b}>{b}+ {tx(locale, "hab", "bd")}</option>
-            ))}
-          </select>
-          <select value={zone ?? ""} onChange={(e) => set({ zone: e.target.value || null })} className={cn(pill, "appearance-none border-line bg-white", zone && on)} aria-label={tx(locale, "Zona", "Area")}>
-            <option value="">{tx(locale, "Todas las zonas", "All areas")}</option>
-            {/* A zone that came from the URL or the NL parser (e.g. a city) stays selectable and visible. */}
-            {!knownZone && zone && <option value={zone}>{zone}</option>}
-            {zones.map((g) => (
-              <optgroup key={g.city} label={g.city}>
-                <option value={g.city}>{tx(locale, `${/^(El|Los|Puerto)\s/.test(g.city) ? "Todo" : "Toda"} ${g.city}`, `All of ${g.city}`)}</option>
-                {g.zones.map((z) => (
-                  <option key={z} value={z}>{z}</option>
-                ))}
-              </optgroup>
-            ))}
-          </select>
-          <button onClick={() => setMoreOpen((o) => !o)} aria-expanded={moreOpen} aria-controls="search-more-filters" className={cn(pill, "border-line bg-white", (moreOpen || baths || minM2 || essCount) && on)}>
-            <SlidersHorizontal size={15} /> {tx(locale, "Más filtros", "More filters")}
-            {essCount > 0 && <span className="rounded-full bg-navy px-1.5 text-xs font-semibold text-ivory [font-feature-settings:'lnum']" aria-label={tx(locale, `${essCount} filtros de servicios esenciales activos`, `${essCount} essential-service filters on`)}>{essCount}</span>}
-            <ChevronDown size={14} />
-          </button>
-          <button
-            onClick={() => set({ lux: lux ? null : "1" })}
-            aria-pressed={lux}
-            className={cn(pill, lux ? on : "border-line bg-white")}
-          >
-            {tx(locale, "Colección Privada", "Private Collection")}
-          </button>
-          <button
-            onClick={createAlert}
-            disabled={alertSaved || savingAlert}
-            aria-live="polite"
-            className={cn(pill, "ml-auto disabled:cursor-default", alertSaved ? "border-ok bg-ok text-white" : "np-btn-navy border-navy bg-navy font-semibold text-ivory hover:bg-navy-2")}
-          >
-            {alertSaved ? <Check size={15} /> : savingAlert ? <Loader2 size={15} className="animate-spin" /> : <Bell size={15} />} {alertSaved ? tx(locale, "Búsqueda guardada", "Search saved") : tx(locale, "Guardar búsqueda", "Save search")}
-          </button>
         </div>
         {alertError && (
           <div role="alert" className="border-t border-line bg-[#B3261E1A] px-4 py-2 text-sm text-danger md:px-5">{alertError}</div>
         )}
-        {moreOpen && (
-          <div id="search-more-filters" className="np-in absolute inset-x-0 top-full max-h-[70vh] overflow-y-auto border-b border-line bg-white px-4 py-4 shadow-np md:px-5">
-            <div className="mb-5 grid grid-cols-2 gap-3 sm:max-w-md">
-              <label className="block">
-                <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted">{tx(locale, "Baños", "Bathrooms")}</span>
-                <select value={baths ?? ""} onChange={(e) => set({ baths: e.target.value || null })} className={cn(pill, "w-full appearance-none border-line bg-white", baths && on)}>
-                  <option value="">{tx(locale, "Cualquiera", "Any")}</option>
-                  {[1, 2, 3, 4].map((b) => (
-                    <option key={b} value={b}>{b}+ {tx(locale, b === 1 ? "baño" : "baños", b === 1 ? "bath" : "baths")}</option>
-                  ))}
-                </select>
-              </label>
-              <label className="block">
-                <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted">{tx(locale, "Superficie mínima", "Min. area")}</span>
-                <select value={minM2 ?? ""} onChange={(e) => set({ m2: e.target.value || null })} className={cn(pill, "w-full appearance-none border-line bg-white", minM2 && on)}>
-                  <option value="">{tx(locale, "Cualquiera", "Any")}</option>
-                  {MIN_M2_STEPS.map((v) => (
-                    <option key={v} value={v}>≥ {num(v, locale)} m²</option>
-                  ))}
-                </select>
-              </label>
-            </div>
-            <div className="grid gap-6 md:grid-cols-4">
-              <div>
-                <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">{tx(locale, "Publicado", "Published")}</div>
-                <div className="flex gap-2">
-                  {[["24h", "24 h"], ["7d", tx(locale, "7 días", "7 days")]].map(([k, v]) => (
-                    <button key={k} onClick={() => set({ pub: pub === k ? null : k })} className={cn(pill, pub === k ? on : "border-line")}>{v}</button>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">{tx(locale, "Condiciones", "Conditions")}</div>
-                <div className="flex flex-wrap gap-2">
-                  <button onClick={() => set({ furnished: furnished ? null : "1" })} className={cn(pill, furnished ? on : "border-line")}>{tx(locale, "Amoblado", "Furnished")}</button>
-                  <button onClick={() => set({ pets: pets ? null : "1" })} className={cn(pill, pets ? on : "border-line")}>{tx(locale, "Mascotas", "Pets")}</button>
-                  <button onClick={() => set({ verified: verified ? null : "1" })} className={cn(pill, verified ? on : "border-line")}>{tx(locale, "Agencia verificada", "Verified agency")}</button>
-                </div>
-              </div>
-              <div className="md:col-span-2">
-                <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">{tx(locale, "Amenidades", "Amenities")}</div>
-                <div className="flex flex-wrap gap-2">
-                  {FILTER_AMENITIES.map((a) => {
-                    const sel = amen.includes(a);
-                    return (
-                      <button key={a} aria-pressed={sel} onClick={() => set({ am: (sel ? amen.filter((x) => x !== a) : [...amen, a]).join(",") || null })} className={cn(pill, "md:h-9", sel ? on : "border-line")}>
-                        {lbl(AMENITY_LABEL[a], locale)}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-            <div className="mt-6 border-t border-line pt-5" role="group" aria-labelledby="search-essentials-title">
-              <div id="search-essentials-title" className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted">{tx(locale, "Servicios esenciales", "Essential services")}</div>
-              <div className="grid gap-6 md:grid-cols-4">
-                <div>
-                  <div className="mb-2 text-sm font-semibold">{tx(locale, "Planta eléctrica", "Backup power")}</div>
-                  <div className="flex flex-wrap gap-2">
-                    {([["full", "100 %", "100%"], ["partial", "Al menos parcial", "At least partial"]] as const).map(([k, es, en]) => (
-                      <button key={k} aria-pressed={ess.power === k} onClick={() => set({ power: ess.power === k ? null : k })} className={cn(pill, "md:h-9", ess.power === k ? on : "border-line")}>{tx(locale, es, en)}</button>
-                    ))}
-                  </div>
-                </div>
-                <label className="block">
-                  <span className="mb-2 block text-sm font-semibold">{tx(locale, "Tanque de agua", "Water tank")}</span>
-                  <select value={ess.tank ?? ""} onChange={(e) => set({ tank: e.target.value || null })} className={cn(pill, "w-full appearance-none border-line bg-white md:h-9", ess.tank && on)}>
-                    <option value="">{tx(locale, "Cualquiera", "Any")}</option>
-                    {(ess.tank && !TANK_STEPS.includes(ess.tank) ? [...TANK_STEPS, ess.tank].sort((a, b) => a - b) : TANK_STEPS).map((v) => (
-                      <option key={v} value={v}>≥ {num(v, locale)} L</option>
-                    ))}
-                  </select>
-                </label>
-                <div className="md:col-span-2">
-                  <div className="mb-2 text-sm font-semibold">{tx(locale, "Agua, muelle y vistas", "Water, dock and views")}</div>
-                  <div className="flex flex-wrap gap-2">
-                    {([["well", "Pozo propio", "Own well"], ["dock", "Con muelle", "With dock"], ["avila", "Vista al Ávila", "Ávila view"], ["sea", "Vista al mar", "Sea view"]] as const).map(([k, es, en]) => (
-                      <button key={k} aria-pressed={!!ess[k]} onClick={() => set({ [k]: ess[k] ? null : "1" })} className={cn(pill, "md:h-9", ess[k] ? on : "border-line")}>{tx(locale, es, en)}</button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-            {/* The panel covers the map/list (full width on mobile): give it an explicit way out. */}
-            <div className="mt-5 flex justify-end border-t border-line pt-4">
-              <button onClick={() => setMoreOpen(false)} className="np-btn-navy min-h-11 rounded-full bg-navy px-5 font-display text-sm font-semibold text-ivory">
-                {query.isFetching ? <Loader2 size={14} className="mr-1.5 inline animate-spin" /> : null}
-                {tx(locale, `Ver ${plural(query.data?.total ?? results.length, locale, ["resultado", "resultados"], ["result", "results"])}`, `Show ${plural(query.data?.total ?? results.length, locale, ["resultado", "resultados"], ["result", "results"])}`)}
+        {moreOpen && desktop && (
+          <div ref={morePanel} id="search-more-filters" role="dialog" aria-label={tx(locale, "Más filtros", "More filters")} className="np-in absolute inset-x-0 top-full max-h-[70vh] overflow-y-auto border-b border-line bg-white px-5 py-5 shadow-np">
+            <MoreFields locale={locale} f={f} set={set} />
+            <div className="mt-5 flex items-center justify-end gap-4 border-t border-line pt-4">
+              <button type="button" onClick={() => setMoreOpen(false)} className="min-h-11 px-2 font-display text-sm font-semibold underline underline-offset-4">
+                {tx(locale, "Cerrar", "Close")}
               </button>
+              <SeeHomes locale={locale} total={total} fetching={query.isFetching} onClick={() => { setMoreOpen(false); moreBtn.current?.focus(); }} className="min-h-11 text-sm" />
             </div>
           </div>
         )}
       </div>
+      {/* "Más filtros" backdrop: dims the page; a click on it closes the panel (useDismiss). */}
+      {moreOpen && desktop && <div aria-hidden className="np-in fixed inset-0 z-20 bg-[#1E1A18]/35" />}
 
-      <div className="relative flex min-h-0 flex-1">
-        {/* map 60% */}
-        {/* Phones: the map stops just under the peeking sheet so its preview card and controls stay visible. */}
-        <div className="relative mb-[116px] min-h-0 flex-1 lg:mb-0 lg:basis-[60%]">
+      {/* Phones: room for the bottom tab bar. */}
+      <div className="relative mb-[calc(4rem+env(safe-area-inset-bottom))] flex min-h-0 flex-1 md:mb-0">
+        {/* map 40% (phones: full screen under the list, shown with the "Mapa" toggle) */}
+        <div className="relative min-h-0 flex-1 lg:min-w-0 lg:basis-[40%]" inert={mapHidden || undefined} aria-hidden={mapHidden || undefined}>
           <NightMap
-            key={region + filtersKey}
+            key={region + mapFilters}
             region={region}
             listings={mapListings}
             focus={fit.focus}
@@ -482,108 +484,162 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
             renderPreview={(l) => <MapPreviewCard l={l} locale={locale} />}
             initialScale={fit.scale}
           />
-          <div className="absolute bottom-8 right-3 z-10 flex gap-0.5 overflow-hidden rounded-full border border-[#E3D7C2] bg-[#ffffff] p-1 font-display text-sm text-[#1E1A18] shadow-np">
+          <div className="absolute bottom-[4.75rem] right-3 z-10 flex gap-0.5 overflow-hidden rounded-full border border-[#E3D7C2] bg-[#ffffff] p-1 font-display text-sm text-[#1E1A18] shadow-np lg:bottom-8">
             {(["caracas", "venezuela"] as const).map((r) => (
-              <button key={r} onClick={() => setRegionPick(r)} aria-pressed={region === r} className={cn("min-h-11 rounded-full border-2 px-3.5 md:min-h-8", region === r ? "np-sel font-semibold" : "border-transparent text-[#1E1A18]/70")}>
+              <button key={r} type="button" onClick={() => setRegionPick(r)} aria-pressed={region === r} className={cn("min-h-11 rounded-full border-2 px-3.5 md:min-h-8", region === r ? "np-sel font-semibold" : "border-transparent text-[#1E1A18]/70")}>
                 {r === "caracas" ? "Caracas" : "Venezuela"}
               </button>
             ))}
           </div>
         </div>
-        {/* list 40% */}
+        {/* list 60% (phones: covers the map) */}
         <div
-          data-search-sheet={mobileList ? "open" : "peek"}
+          data-search-sheet={view}
+          inert={listHidden || undefined}
           className={cn(
-            "absolute inset-x-0 bottom-0 z-20 flex flex-col overflow-hidden rounded-t-2xl bg-ivory shadow-[0_-10px_30px_rgba(30,26,24,.28)] transition-[height] duration-300 ease-np",
-            mobileList ? "h-[88%]" : "h-[132px]",
-            "lg:static lg:z-auto lg:h-auto lg:basis-[40%] lg:rounded-none lg:border-l lg:border-line lg:shadow-none lg:transition-none",
+            "absolute inset-0 z-20 flex flex-col bg-ivory",
+            "lg:static lg:z-auto lg:min-w-0 lg:flex-1 lg:basis-[60%] lg:border-l lg:border-line",
+            listHidden && "invisible",
           )}
         >
-          <button
-            type="button"
-            onClick={() => setMobileList((m) => !m)}
-            onTouchStart={(e) => (swipe.current = e.touches[0].clientY)}
-            onTouchEnd={(e) => {
-              if (swipe.current === null) return;
-              const dy = e.changedTouches[0].clientY - swipe.current;
-              swipe.current = null;
-              if (Math.abs(dy) < 24) return; // a tap: onClick toggles
-              e.preventDefault();
-              setMobileList(dy < 0);
-            }}
-            aria-expanded={mobileList}
-            aria-controls="search-results"
-            aria-label={mobileList ? tx(locale, "Volver al mapa", "Back to the map") : `${tx(locale, "Ver la lista", "See the list")} · ${plural(query.data?.total ?? results.length, locale, ["resultado", "resultados"], ["result", "results"])}`}
-            className="flex h-7 w-full shrink-0 touch-none items-center justify-center lg:hidden"
+          <div
+            ref={listRef}
+            id="search-results"
+            onScroll={saveListScroll}
+            onClickCapture={saveListScroll}
+            className="min-h-0 flex-1 overflow-y-auto overscroll-contain scrollbar-thin"
           >
-            <span className="h-1.5 w-12 rounded-full bg-ink/25" aria-hidden />
-          </button>
-          <div ref={listRef} onScroll={saveListScroll} className={cn("min-h-0 flex-1 scrollbar-thin lg:overflow-y-auto", mobileList ? "overflow-y-auto" : "overflow-hidden")}>
-          <div className="sticky top-0 z-10 border-b border-line bg-ivory/95 px-4 py-3 backdrop-blur">
-            <div className="flex items-center justify-between gap-2">
-              <div>
-                <div className="font-serif text-[26px] leading-tight">
-                  {plural(query.data?.total ?? results.length, locale, ["resultado", "resultados"], ["result", "results"])}{query.isFetching && <Loader2 size={15} className="ml-2 inline animate-spin text-muted" />}
-                  {shape && <span className="ml-2 inline-block rounded-full bg-[#C2A988] px-2.5 py-0.5 align-middle font-display text-xs font-semibold text-[#433B35]">{tx(locale, "en la zona que dibujaste", "in the area you drew")}</span>}
-                </div>
-                <div className="text-sm text-muted">{tx(locale, "Precios en dólares, siempre al día", "Prices in US dollars, always up to date")}</div>
+            {/* one row: count · sort · filters */}
+            <div className="sticky top-0 z-10 flex min-h-[52px] items-center gap-2 border-b border-line bg-ivory/95 px-4 py-1 backdrop-blur lg:px-5">
+              <div className="flex min-w-0 flex-1 items-center gap-2">
+                <p className="truncate font-serif text-[20px] leading-tight lg:text-[22px]" aria-live="polite">
+                  {notUnderstood ? tx(locale, `${total} casas en total`, `${total} homes in all`) : plural(total, locale, ["resultado", "resultados"], ["result", "results"])}
+                </p>
+                {query.isFetching && <Loader2 size={15} aria-hidden className="shrink-0 animate-spin text-muted" />}
+                {shape && <span className="hidden shrink-0 rounded-full bg-[#C2A988] px-2.5 py-0.5 font-display text-xs font-semibold text-[#433B35] sm:inline-block">{tx(locale, "en la zona que dibujaste", "in the area you drew")}</span>}
               </div>
-              <select value={sort} onChange={(e) => set({ sort: e.target.value === "new" ? null : e.target.value })} aria-label={tx(locale, "Ordenar por", "Sort by")} className="h-11 rounded-full border border-ink/10 bg-white/75 backdrop-blur px-3 text-sm md:h-9">
+              <select value={sort} onChange={(e) => set({ sort: e.target.value === "new" ? null : e.target.value })} aria-label={tx(locale, "Ordenar por", "Sort by")} className="h-11 max-w-[42vw] shrink-0 rounded-full border border-ink/10 bg-white/75 px-3 text-[13px] backdrop-blur lg:h-9 lg:max-w-none lg:text-sm">
                 <option value="new">{tx(locale, "Lo más reciente", "Newest first")}</option>
                 <option value="price-asc">{tx(locale, "Menor precio", "Lowest price")}</option>
                 <option value="price-desc">{tx(locale, "Mayor precio", "Highest price")}</option>
                 <option value="ppm">{tx(locale, "Mejor precio por m²", "Best value per m²")}</option>
               </select>
+              <button type="button" onClick={openSheet} aria-haspopup="dialog" aria-label={filtersAria} className={cn("flex h-11 shrink-0 items-center gap-1.5 rounded-full border px-3.5 font-display text-sm lg:hidden", filterCount ? on : "border-ink/10 bg-white/75")}>
+                <SlidersHorizontal size={15} aria-hidden /> {filtersLabel} {countBadge}
+              </button>
             </div>
             {activeChips.length > 0 && (
-              <div className="mt-2 flex flex-wrap gap-1.5">
+              <div className="no-scrollbar flex gap-1.5 overflow-x-auto px-4 pt-3 lg:flex-wrap lg:px-5">
                 {activeChips.map(([k, label, patch]) => (
-                  <button key={k} onClick={() => set(patch)} aria-label={`${tx(locale, "Quitar filtro", "Remove filter")}: ${label}`} className="np-sel inline-flex min-h-8 items-center gap-1 rounded-full px-3 text-[13px] font-semibold">
-                    {label} <X size={12} />
+                  <button key={k} type="button" onClick={() => set(patch)} aria-label={`${tx(locale, "Quitar filtro", "Remove filter")}: ${label}`} className="np-sel inline-flex min-h-9 shrink-0 items-center gap-1 rounded-full px-3 text-[13px] font-semibold">
+                    {label} <X size={12} aria-hidden />
                   </button>
                 ))}
               </div>
             )}
-          </div>
-          {/* Collapsed sheet on phones: the cards are off-screen, keep them out of the tab order. */}
-          <div id="search-results" inert={!desktop && !mobileList ? true : undefined}>
-          <div className="grid gap-5 p-4 sm:grid-cols-2">
-            {results.map((l) => (
-              <div key={l.id} onMouseEnter={() => setHover(l.id)} onMouseLeave={() => setHover(null)}>
-                <ListingCard l={l} locale={locale} compact />
+            {notUnderstood && (
+              <div className="px-4 pt-4 lg:px-5" data-testid="not-understood">
+                <div role="status" className="np-glass rounded-[22px] p-4">
+                  <p className="font-display text-[15px] leading-snug text-ink">
+                    {tx(locale, `No entendimos «${qText.trim()}». Prueba con una zona, un tipo de casa o un precio.`, `We didn’t catch «${qText.trim()}». Try an area, a type of home or a price.`)}
+                  </p>
+                  <p className="mt-3 text-[13px] text-muted">{didYouMean.length ? tx(locale, "¿Quizá quisiste decir…?", "Did you mean…?") : tx(locale, "Por ejemplo:", "For example:")}</p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {placeIdeas.map((p) => (
+                      <button key={p.name} type="button" onClick={() => set({ zone: p.name, q: null })} className={cn(pill, "border-line bg-white md:h-10")}>
+                        {p.name}
+                      </button>
+                    ))}
+                    {TRY_INSTEAD.map(([es, en]) => (
+                      <button key={es} type="button" onClick={() => runNl(tx(locale, es, en))} className={cn(pill, "border-line bg-white md:h-10")}>
+                        {tx(locale, es, en)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                {hasResults && <h2 className="mt-6 font-serif text-[20px]">{tx(locale, "Mientras tanto, todas las casas", "Meanwhile, every home")}</h2>}
               </div>
-            ))}
-          </div>
-          {results.length === 0 && !!relax.data?.length && (
-            <div className="px-4 pt-4" data-testid="relax">
-              <p className="font-display text-[15px] text-ink">{tx(locale, "Si aflojas un filtro, sí hay casas:", "Loosen one filter and there are homes:")}</p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {relax.data.map((r) => (
-                  <button key={r.key} onClick={() => set(r.patch)} className="np-glass inline-flex min-h-11 items-center gap-2 rounded-full px-4 font-display text-[14px] text-ink transition-transform hover:-translate-y-0.5">
-                    {tx(locale, "Sin", "Without")} «{r.label}» · <b>{plural(r.total, locale, ["casa", "casas"], ["home", "homes"])}</b>
-                  </button>
-                ))}
+            )}
+            {/* Phones in map view: the cards are hidden, keep them out of the tab order (the wrapper is inert). */}
+            <div className="grid gap-5 p-4 sm:grid-cols-2 lg:px-5 xl:grid-cols-3">
+              {results.map((l) => (
+                <div key={l.id} onMouseEnter={() => setHover(l.id)} onMouseLeave={() => setHover(null)}>
+                  <ListingCard l={l} locale={locale} compact />
+                </div>
+              ))}
+            </div>
+            {results.length === 0 && !!relax.data?.length && (
+              <div className="px-4 pt-4" data-testid="relax">
+                <p className="font-display text-[15px] text-ink">{tx(locale, "Si aflojas un filtro, sí hay casas:", "Loosen one filter and there are homes:")}</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {relax.data.map((r) => (
+                    <button key={r.key} type="button" onClick={() => set(r.patch)} className="np-glass inline-flex min-h-11 items-center gap-2 rounded-full px-4 font-display text-[14px] text-ink transition-transform hover:-translate-y-0.5">
+                      {tx(locale, "Sin", "Without")} «{r.label}» · <b>{plural(r.total, locale, ["casa", "casas"], ["home", "homes"])}</b>
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
-          {results.length === 0 && (
-            <div className="p-4">
-              <EmptyState
-                monogram
-                title={tx(locale, "Aún no hay casas con todo eso", "No homes match all of that yet")}
-                body={tx(locale, "Prueba a ampliar la zona o quitar algún filtro. O guarda la búsqueda y te avisamos en cuanto aparezca algo para ti.", "Try widening the area or removing a filter. Or save this search and we’ll let you know the moment something turns up.")}
-                cta={
-                  <button onClick={createAlert} disabled={alertSaved || savingAlert} className="np-btn-navy min-h-11 rounded-full bg-navy px-5 font-display font-semibold text-ivory disabled:opacity-60">
-                    {alertSaved ? tx(locale, "Búsqueda guardada", "Search saved") : tx(locale, "Avísame", "Let me know")}
-                  </button>
-                }
-              />
-            </div>
-          )}
+            )}
+            {results.length === 0 && (
+              <div className="p-4">
+                <EmptyState
+                  monogram
+                  title={tx(locale, "Aún no hay casas con todo eso", "No homes match all of that yet")}
+                  body={tx(locale, "Prueba a ampliar la zona o quitar algún filtro. O guarda la búsqueda y te avisamos en cuanto aparezca algo para ti.", "Try widening the area or removing a filter. Or save this search and we’ll let you know the moment something turns up.")}
+                  cta={
+                    <button type="button" onClick={createAlert} disabled={alertSaved || savingAlert} className="np-btn-navy min-h-11 rounded-full bg-navy px-5 font-display font-semibold text-ivory disabled:opacity-60">
+                      {alertSaved ? tx(locale, "Búsqueda guardada", "Search saved") : tx(locale, "Avísame", "Let me know")}
+                    </button>
+                  }
+                />
+              </div>
+            )}
+            {/* Phones: room so the last card clears the floating "Mapa" button. */}
+            <div aria-hidden className="h-20 lg:hidden" />
           </div>
+        </div>
+
+        {/* Phones: one floating toggle between list and map (plus filters while on the map). */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-4 z-30 flex justify-center lg:hidden" data-search-toggle>
+          <div className="pointer-events-auto flex overflow-hidden rounded-full bg-[#1E1A18] font-display text-[15px] font-semibold text-[#F1EBE3] shadow-[0_12px_30px_-8px_rgba(30,26,24,.55)] [html.dark_&]:bg-[#F1EBE3] [html.dark_&]:text-[#1E1A18]">
+            {view === "list" ? (
+              <button type="button" onClick={() => changeView("map")} className="flex h-12 items-center gap-2 px-5">
+                <MapIcon size={17} aria-hidden /> {tx(locale, "Mapa", "Map")}
+              </button>
+            ) : (
+              <>
+                <button type="button" onClick={() => changeView("list")} className="flex h-12 items-center gap-2 pl-5 pr-4">
+                  <List size={17} aria-hidden /> {tx(locale, `Lista · ${total}`, `List · ${total}`)}
+                </button>
+                <span aria-hidden className="my-3 w-px bg-current opacity-30" />
+                <button type="button" onClick={openSheet} aria-haspopup="dialog" aria-label={filtersAria} className="flex h-12 items-center gap-1.5 pl-4 pr-5">
+                  <SlidersHorizontal size={16} aria-hidden /> {filtersLabel}
+                  {filterCount > 0 && <span aria-hidden className="rounded-full bg-[#B08A55] px-1.5 text-xs text-[#1E1A18]">{filterCount}</span>}
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
+
+      {sheetOpen && !desktop && (
+        <FilterSheet
+          locale={locale}
+          f={f}
+          set={set}
+          zones={zones}
+          total={total}
+          fetching={query.isFetching}
+          activeCount={filterCount}
+          onClear={clearAll}
+          onClose={() => {
+            setSheetOpen(false);
+            changeView("list");
+            sheetOpener.current?.focus({ preventScroll: true });
+          }}
+          opener={sheetOpener}
+        />
+      )}
     </div>
   );
 }

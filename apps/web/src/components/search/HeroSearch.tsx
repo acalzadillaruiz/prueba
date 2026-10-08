@@ -7,6 +7,7 @@ import { heuristicSearchParse } from "@newplace/ai";
 import type { Locale } from "@/types/domain";
 import { money, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
+import { usePlaceSuggest } from "./PlaceSuggest";
 
 export function queryToParams(q: ReturnType<typeof heuristicSearchParse>, raw: string) {
   const p = new URLSearchParams();
@@ -22,14 +23,14 @@ export function queryToParams(q: ReturnType<typeof heuristicSearchParse>, raw: s
   if (am.length) p.set("am", am.join(","));
   if (q.keywords.includes("pets")) p.set("pets", "1");
   if (q.keywords.includes("sea")) p.set("sea", "1");
-  if (raw) p.set("q", raw);
+  if (raw.trim()) p.set("q", raw.trim());
   return p;
 }
 
 const TABS = [
   ["SALE", "Comprar", "Buy"],
   ["LONG_RENT", "Alquilar", "Rent"],
-  ["SHORT_RENT", "Vacacional", "Vacation"],
+  ["SHORT_RENT", "Vacacional", "Holiday rentals"],
 ] as const;
 type Tab = (typeof TABS)[number][0];
 
@@ -58,6 +59,7 @@ export function HeroSearch({ locale }: { locale: Locale }) {
   const [budget, setBudget] = useState("");
   const [busy, setBusy] = useState(false);
   const suffix = tab === "LONG_RENT" ? tx(locale, " / mes", " / mo") : tab === "SHORT_RENT" ? tx(locale, " / noche", " / night") : "";
+  const suggest = usePlaceSuggest({ locale, text, setText });
   const go = async () => {
     setBusy(true);
     let q = heuristicSearchParse(text);
@@ -105,15 +107,16 @@ export function HeroSearch({ locale }: { locale: Locale }) {
             </button>
           ))}
         </div>
-        <label className="flex min-h-[52px] min-w-0 flex-1 flex-col justify-center rounded-2xl border border-[#8F8370]/50 bg-[#ffffff99] px-4 focus-within:border-[#1E1A18] lg:rounded-none lg:border-0 lg:border-r lg:border-[#D8CBB7] lg:bg-transparent lg:px-5">
+        <label className="relative flex min-h-[52px] min-w-0 flex-1 flex-col justify-center rounded-2xl border border-[#8F8370]/50 bg-[#ffffff99] px-4 focus-within:border-[#1E1A18] lg:rounded-none lg:border-0 lg:border-r lg:border-[#D8CBB7] lg:bg-transparent lg:px-5">
           <span className={cn(label, "hidden lg:block")}>{tx(locale, "Ubicación", "Location")}</span>
           <input
+            {...suggest.inputProps}
             value={text}
-            onChange={(e) => setText(e.target.value)}
             className={field}
             placeholder={tx(locale, "El Morro, Lechería…", "El Morro, Lechería…")}
             aria-label={tx(locale, "Dónde, o qué buscas", "Where, or what you’re after")}
           />
+          {suggest.listbox}
         </label>
         <div className="hidden lg:contents">
           <label className="flex min-h-[52px] w-[170px] shrink-0 flex-col justify-center border-r border-[#D8CBB7] px-5">

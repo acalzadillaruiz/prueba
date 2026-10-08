@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ease, scrubSection, span, useReducedMotion } from "./motion";
+import { ease, scrubSection, ScrollTrigger, span, useReducedMotion } from "./motion";
 
 export type Chapter = { eyebrow: string; title: string; body: string };
 export type FloorPick = { href: string; title: string; meta: string; price: string };
@@ -20,23 +20,56 @@ const C = { sky: 0xe9e0d3, ground: 0xdccdb8, cal: 0xfbf8f3, arena: 0xd9c6ab, nav
  * "El edificio que se construye": a real-time 3D building (Three.js, loaded only when the section nears the
  * viewport) that rises floor by floor as you scroll, is crowned with the New Place double roof, and finally
  * lights the floors where the featured residences are, each with a label that links to its listing.
- * Four short chapters on the left tell how the agency works while it builds.
- * Reduced motion or no WebGL: the chapters and the residences as a plain, readable layout.
+ * Four short chapters on the left tell how the agency works while it builds; one chapter is always shown in full.
+ *
+ * The 3D scene is an enhancement for capable desktops only. Phones (< 768px), Save-Data, fewer than 6 CPU
+ * threads, reduced motion or no WebGL get the static layout (also what the server renders): three.js is never
+ * downloaded there.
  */
+type Mode = "static" | "scene";
+
+function canRunScene() {
+  if (typeof window === "undefined") return false;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
+  if (!window.matchMedia("(min-width: 768px)").matches) return false;
+  const nav = navigator as Navigator & { connection?: { saveData?: boolean } };
+  if (nav.connection?.saveData) return false;
+  if ((nav.hardwareConcurrency ?? 8) < 6) return false;
+  return true;
+}
+
 export function BuildingScroll({ chapters, picks, heading, cta }: { chapters: Chapter[]; picks: FloorPick[]; heading: string; cta: string }) {
   const reduced = useReducedMotion();
-  const [failed, setFailed] = useState(false);
+  const [mode, setMode] = useState<Mode>("static");
+  const failed = useRef(false);
   const root = useRef<HTMLElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const chapterEls = useRef<(HTMLDivElement | null)[]>([]);
   const dots = useRef<(HTMLSpanElement | null)[]>([]);
   const labels = useRef<(HTMLAnchorElement | null)[]>([]);
-  const floorTag = useRef<HTMLSpanElement>(null);
+  const counter = useRef<HTMLSpanElement>(null);
+
+  // Decide once mounted (and again if the window crosses the phone breakpoint or motion preference changes).
+  useEffect(() => {
+    if (reduced) return setMode("static");
+    const mq = window.matchMedia("(min-width: 768px)");
+    const sync = () => setMode(!failed.current && canRunScene() ? "scene" : "static");
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, [reduced]);
+
+  // The section changes height when switching layouts: every scroll trigger below it must be recomputed.
+  useEffect(() => {
+    const t = window.setTimeout(() => ScrollTrigger.refresh(), 60);
+    return () => window.clearTimeout(t);
+  }, [mode]);
 
   useEffect(() => {
-    if (reduced || failed || !root.current || !canvas.current) return;
+    if (mode !== "scene" || !root.current || !canvas.current) return;
     const section = root.current;
     const cv = canvas.current;
+    const n = chapters.length;
     let disposed = false;
     let raf = 0;
     let visible = false;
@@ -44,34 +77,40 @@ export function BuildingScroll({ chapters, picks, heading, cta }: { chapters: Ch
     let current = 0;
     let pointerX = 0;
     let pointerY = 0;
+    let active = -1;
+    let kick = () => {};
     let teardown: (() => void) | undefined;
 
-    // Chapters + labels follow the raw scroll so the copy never lags behind the wheel.
+    // One chapter at a time, swapped (CSS transition) at the chapter boundary: whatever the scroll position,
+    // the copy at rest is fully opaque — never a half-faded crossfade.
     const paint = (p: number) => {
-      const n = chapters.length;
+      const idx = Math.min(n - 1, Math.floor(p * n));
+      if (idx === active) return;
+      const prev = active;
+      active = idx;
       chapterEls.current.forEach((el, i) => {
         if (!el) return;
-        const a = i / n;
-        const b = (i + 1) / n;
-        // Sequential crossfade: the outgoing chapter is gone before the next one rises (no overlapping copy).
-        const fadeIn = i === 0 ? 1 : span(p, a + 0.004, a + 0.05);
-        const fadeOut = i === n - 1 ? 1 : 1 - span(p, b - 0.045, b - 0.002);
-        const k = Math.min(fadeIn, fadeOut);
-        el.style.opacity = String(k);
-        el.style.transform = `translateY(${(1 - k) * (p < a ? 30 : -30)}px)`;
-        el.style.visibility = k < 0.02 ? "hidden" : "visible";
-        dots.current[i]?.classList.toggle("is-on", p >= a - 0.03);
+        const on = i === idx;
+        el.style.opacity = on ? "1" : "0";
+        el.style.transform = on ? "translateY(0)" : `translateY(${i < idx ? -24 : 24}px)`;
+        el.style.visibility = on ? "visible" : "hidden";
+        el.setAttribute("aria-hidden", on ? "false" : "true");
+        // The incoming chapter waits for the outgoing one to clear (no overlapping copy).
+        el.style.transitionDelay = on && prev >= 0 ? "180ms" : "0ms";
+        dots.current[i]?.classList.toggle("is-on", i <= idx);
       });
-      if (floorTag.current) floorTag.current.textContent = String(Math.min(FLOORS, Math.max(0, Math.round(span(p, 0.06, 0.62) * FLOORS)))).padStart(2, "0");
+      if (counter.current) counter.current.textContent = String(idx + 1).padStart(2, "0");
     };
     const off = scrubSection(section, (p) => {
       target = p;
       paint(p);
+      kick();
     });
 
     const onPointer = (e: PointerEvent) => {
       pointerX = (e.clientX / window.innerWidth) * 2 - 1;
       pointerY = (e.clientY / window.innerHeight) * 2 - 1;
+      kick();
     };
     window.addEventListener("pointermove", onPointer, { passive: true });
 
@@ -82,10 +121,11 @@ export function BuildingScroll({ chapters, picks, heading, cta }: { chapters: Ch
       try {
         renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true, powerPreference: "high-performance" });
       } catch {
-        setFailed(true);
+        failed.current = true;
+        setMode("static");
         return;
       }
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
       renderer.outputColorSpace = THREE.SRGBColorSpace;
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
       renderer.toneMappingExposure = 1.05;
@@ -184,13 +224,16 @@ export function BuildingScroll({ chapters, picks, heading, cta }: { chapters: Ch
         camera.updateProjectionMatrix();
       };
       resize();
-      const ro = new ResizeObserver(resize);
+      const ro = new ResizeObserver(() => {
+        resize();
+        kick();
+      });
       ro.observe(cv);
 
       const v = new THREE.Vector3();
       let px = 0;
       let py = 0;
-      const frame = (time: number) => {
+      const frame = () => {
         raf = 0;
         current += (target - current) * 0.09;
         px += (pointerX - px) * 0.05;
@@ -198,24 +241,23 @@ export function BuildingScroll({ chapters, picks, heading, cta }: { chapters: Ch
         const p = current;
 
         floors.forEach((f, i) => {
-          const a = 0.06 + i * 0.055;
-          const k = ease(span(p, a, a + 0.12));
+          const a = 0.02 + i * 0.045;
+          const k = ease(span(p, a, a + 0.1));
           f.g.visible = k > 0.001;
           f.g.position.y = f.y + (1 - k) * 7;
           f.g.rotation.y = (1 - k) * 0.6;
           f.mats.forEach((m) => (m.opacity = k));
           // Warm night lights once placed; the featured floors glow terracotta at the end.
           const lit = PICK_FLOORS.includes(i);
-          const glow = span(p, 0.72, 0.84);
-          const pulse = 0.85 + 0.15 * Math.sin(time / 420 + i);
+          const glow = span(p, 0.6, 0.72);
           f.glass.emissive.setHex(lit && glow > 0 ? C.tejaLight : C.warm);
-          f.glass.emissiveIntensity = k * (lit ? 0.05 + glow * 1.1 * pulse : 0.05);
+          f.glass.emissiveIntensity = k * (lit ? 0.05 + glow : 0.05);
         });
-        const capK = ease(span(p, 0.58, 0.64));
+        const capK = ease(span(p, 0.46, 0.52));
         cap.visible = capK > 0.001;
         cap.position.y = top - 0.07 + (1 - capK) * 5;
-        const ro1 = ease(span(p, 0.6, 0.7));
-        const ro2 = ease(span(p, 0.65, 0.76));
+        const ro1 = ease(span(p, 0.48, 0.58));
+        const ro2 = ease(span(p, 0.53, 0.64));
         outer.visible = ro1 > 0.001;
         inner.visible = ro2 > 0.001;
         outer.position.y = top + (1 - ro1) * 6;
@@ -227,7 +269,7 @@ export function BuildingScroll({ chapters, picks, heading, cta }: { chapters: Ch
         const wide = camera.aspect > 1.1;
         const theta = -0.95 + p * 1.45 + px * 0.08;
         const radius = (wide ? 32 : 66) - p * 2;
-        const lookY = 1.6 + span(p, 0, 0.72) * 4.6;
+        const lookY = 1.6 + span(p, 0, 0.6) * 4.6;
         // Fog only softens the far side of the plinth, whatever the camera distance.
         fog.near = radius - 2;
         fog.far = radius + 26;
@@ -241,7 +283,7 @@ export function BuildingScroll({ chapters, picks, heading, cta }: { chapters: Ch
         renderer.render(scene, camera);
 
         // Residence labels pinned to the right edge of their floor.
-        const show = span(p, 0.76, 0.86);
+        const show = span(p, 0.62, 0.74);
         const rect = cv.getBoundingClientRect();
         labels.current.forEach((el, i) => {
           if (!el) return;
@@ -255,19 +297,23 @@ export function BuildingScroll({ chapters, picks, heading, cta }: { chapters: Ch
           el.tabIndex = show > 0.6 ? 0 : -1;
         });
 
-        if (visible && (Math.abs(target - current) > 0.0005 || Math.abs(pointerX - px) > 0.001 || Math.abs(pointerY - py) > 0.001 || span(p, 0.72, 1) > 0)) raf = requestAnimationFrame(frame);
+        // Render only while something still moves; a settled scene costs nothing.
+        if (visible && (Math.abs(target - current) > 0.0005 || Math.abs(pointerX - px) > 0.001 || Math.abs(pointerY - py) > 0.001)) raf = requestAnimationFrame(frame);
       };
-      const kick = () => {
+      kick = () => {
         if (!raf && visible) raf = requestAnimationFrame(frame);
       };
+      // The loop stops entirely while the (sticky) canvas is off screen.
       const io = new IntersectionObserver(([e]) => {
         visible = e.isIntersecting;
-        kick();
+        if (visible) kick();
+        else if (raf) {
+          cancelAnimationFrame(raf);
+          raf = 0;
+        }
       });
-      io.observe(section);
-      const wake = window.setInterval(kick, 120);
+      io.observe(cv);
       teardown = () => {
-        window.clearInterval(wake);
         io.disconnect();
         ro.disconnect();
         disposables.forEach((d) => d.dispose());
@@ -281,7 +327,10 @@ export function BuildingScroll({ chapters, picks, heading, cta }: { chapters: Ch
       ([e]) => {
         if (e.isIntersecting) {
           near.disconnect();
-          boot().catch(() => setFailed(true));
+          boot().catch(() => {
+            failed.current = true;
+            setMode("static");
+          });
         }
       },
       { rootMargin: "120% 0px" },
@@ -296,39 +345,46 @@ export function BuildingScroll({ chapters, picks, heading, cta }: { chapters: Ch
       if (raf) cancelAnimationFrame(raf);
       teardown?.();
     };
-  }, [reduced, failed, chapters.length]);
+  }, [mode, chapters.length]);
 
-  if (reduced || failed)
+  if (mode === "static")
     return (
-      <section className="bg-[#E9E0D3] text-ink">
-        <div className="mx-auto max-w-[1320px] px-4 py-20 md:px-8">
-          <h2 className="max-w-[760px] text-[36px] leading-tight text-ink md:text-[48px]">{heading}</h2>
-          <ol className="mt-10 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+      <section className="bg-[#E9E0D3] text-ink" aria-labelledby="np-how-we-work">
+        <div className="mx-auto max-w-[1320px] px-4 py-20 md:px-8 lg:py-28">
+          <h2 id="np-how-we-work" className="max-w-[760px] text-[36px] leading-[1.05] tracking-[-0.02em] text-ink md:text-[52px]">
+            {heading}
+          </h2>
+          <ol className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {chapters.map((c) => (
-              <li key={c.title}>
-                <p className="np-eyebrow text-gold-text">{c.eyebrow}</p>
-                <h3 className="mt-2 text-[26px] leading-tight text-ink">{c.title}</h3>
-                <p className="mt-2 text-[15px] text-ink/70">{c.body}</p>
+              <li key={c.title} className="np-glass flex flex-col rounded-[24px] p-6">
+                <p className="np-eyebrow text-[12px] tracking-[0.2em] text-gold-text">{c.eyebrow}</p>
+                <h3 className="mt-3 text-[26px] leading-[1.1] text-ink">{c.title}</h3>
+                <p className="mt-3 text-[15px] leading-relaxed text-ink/75">{c.body}</p>
               </li>
             ))}
           </ol>
-          <ul className="mt-12 grid gap-3 md:grid-cols-3">
-            {picks.map((k) => (
-              <li key={k.href}>
-                <Link href={k.href} className="block rounded-2xl np-glass p-5 hover:border-ink/30">
-                  <span className="block font-serif text-[22px] text-ink">{k.title}</span>
-                  <span className="block text-sm text-ink/60">{k.meta}</span>
-                  <span className="mt-2 block font-display font-semibold text-coral">{k.price}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
+          {picks.length > 0 && (
+            <ul className="mt-6 grid gap-3 md:grid-cols-3">
+              {picks.map((k) => (
+                <li key={k.href}>
+                  <Link href={k.href} className="np-glass group flex h-full flex-col rounded-[24px] p-5 transition-transform duration-300 hover:-translate-y-0.5">
+                    <span className="block font-serif text-[22px] leading-tight text-ink">{k.title}</span>
+                    <span className="mt-1 block text-sm text-ink/65">{k.meta}</span>
+                    <span className="mt-3 flex items-center justify-between font-display text-[15px] font-semibold text-coral">
+                      {k.price}
+                      <span className="font-normal text-ink/65 transition-transform group-hover:translate-x-0.5">{cta} →</span>
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </section>
     );
 
   return (
-    <section ref={root} className="relative h-[420vh] bg-[#E9E0D3] text-ink" aria-label={heading}>
+    <section ref={root} className="relative h-[240vh] bg-[#E9E0D3] text-ink" aria-label={heading}>
       <div className="sticky top-0 h-[100svh] overflow-hidden">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_65%_35%,rgba(255,250,242,.9),transparent_62%)]" aria-hidden />
         <canvas ref={canvas} className="absolute inset-0 h-full w-full" aria-hidden />
@@ -336,25 +392,30 @@ export function BuildingScroll({ chapters, picks, heading, cta }: { chapters: Ch
         {/* Copy column */}
         <div className="pointer-events-none relative mx-auto flex h-full max-w-[1320px] flex-col justify-end px-4 pb-24 md:px-8 lg:justify-center lg:pb-0">
           <h2 className="sr-only">{heading}</h2>
-          <div className="relative h-[220px] max-w-[440px] lg:h-[300px]">
+          <div className="relative h-[240px] max-w-[440px] lg:h-[300px]">
             {chapters.map((c, i) => (
-              <div key={c.title} ref={(el) => void (chapterEls.current[i] = el)} className="absolute inset-x-0 bottom-0 lg:top-0" style={{ opacity: i === 0 ? 1 : 0 }}>
+              <div
+                key={c.title}
+                ref={(el) => void (chapterEls.current[i] = el)}
+                aria-hidden={i !== 0}
+                className="absolute inset-x-0 bottom-0 transition-[opacity,transform] duration-300 ease-out lg:top-0"
+                style={{ opacity: i === 0 ? 1 : 0, visibility: i === 0 ? "visible" : "hidden" }}
+              >
                 <p className="np-eyebrow text-[12px] tracking-[0.2em] text-gold-text">{c.eyebrow}</p>
-                <h3 className="mt-3 text-[34px] leading-[1.05] text-ink sm:text-[44px] lg:text-[56px] tracking-[-0.015em]">{c.title}</h3>
-                <p className="mt-4 max-w-[400px] text-[16px] leading-relaxed text-ink/70">{c.body}</p>
+                <h3 className="mt-3 text-[34px] leading-[1.05] tracking-[-0.015em] text-ink sm:text-[44px] lg:text-[56px]">{c.title}</h3>
+                <p className="mt-4 max-w-[400px] text-[16px] leading-relaxed text-ink/80">{c.body}</p>
               </div>
             ))}
           </div>
           <div className="mt-8 flex items-center gap-3" aria-hidden>
             {chapters.map((c, i) => (
-              <span key={c.title} ref={(el) => void (dots.current[i] = el)} className="np-chapter-dot h-[2px] w-10 bg-ink/15 transition-colors duration-500" />
+              <span key={c.title} ref={(el) => void (dots.current[i] = el)} className={`np-chapter-dot h-[2px] w-10 bg-ink/15 transition-colors duration-500${i === 0 ? " is-on" : ""}`} />
             ))}
-            <span className="ml-3 font-display text-[12px] font-semibold uppercase tracking-[0.24em] text-ink/50">
-              <span ref={floorTag}>00</span> / {String(FLOORS).padStart(2, "0")}
+            <span className="ml-3 font-display text-[12px] font-semibold uppercase tracking-[0.24em] text-ink/60">
+              <span ref={counter}>01</span> / {String(chapters.length).padStart(2, "0")}
             </span>
           </div>
         </div>
-
         {/* Residence labels (positioned each frame next to their lit floor) */}
         {picks.map((k, i) => (
           <Link

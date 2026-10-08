@@ -103,10 +103,7 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
         </div>
       </div>
 
-      {/* THE BUILDING — 3D, rises floor by floor; the lit floors are the featured residences. */}
-      <BuildingScroll chapters={chapters} picks={floors} heading={tx(locale, "Así trabajamos", "How we work")} cta={tx(locale, "Entrar", "Step inside")} />
-
-      {/* COLECCIÓN PRIVADA — horizontal gallery */}
+      {/* COLECCIÓN PRIVADA — real homes right after the hero: horizontal gallery */}
       <CollectionRail
         eyebrow={tx(locale, "Colección Privada", "Private Collection")}
         title={tx(locale, "Las que no se olvidan.", "The ones you don't forget.")}
@@ -154,6 +151,12 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
           </ul>
         </div>
       </section>
+
+      {/* THE BUILDING — how we work. 3D on capable desktops (rises floor by floor, the lit floors are the featured
+          residences); a static, readable layout on phones, Save-Data, modest CPUs and reduced motion. */}
+      <div className="mt-24 lg:mt-32">
+        <BuildingScroll chapters={chapters} picks={floors} heading={tx(locale, "Así trabajamos", "How we work")} cta={tx(locale, "Entrar", "Step inside")} />
+      </div>
 
       {/* COMPRA A DISTANCIA — the diaspora's routes draw in to Lechería as the steps light up. */}
       <div className="pt-20 lg:pt-28">

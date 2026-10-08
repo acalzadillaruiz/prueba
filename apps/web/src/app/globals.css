@@ -75,7 +75,14 @@ h1, h2, h3 { text-wrap: balance; }
    so navy sections (hero, footer, trust strip) keep their Cal text. Committee dark panel:
    background #15120F, surfaces #2A2420, text Cal, accent terracotta-light #C9A574 (6.8:1 on navy). */
 html.dark body { background: #15120F; }
-html.dark { --np-muted-rgb: 181 170 160; }
+html.dark {
+  --np-muted-rgb: 181 170 160;
+  /* Danger as text ("Borrar", errors) on the dark surfaces: #F28B82 is 7.4:1 on #15120F and 6.2:1 on #2A2420
+     (the light-theme #B3261E was ~2.6:1). Filled danger chips/buttons then take dark text instead of white. */
+  --np-danger: #F28B82;
+  --np-danger-rgb: 242 139 130;
+}
+html.dark .bg-danger.text-white { color: #1E1A18; }
 html.dark .np-public {
   --np-ink: #F1EBE3;
   --np-ink-rgb: 248 245 239;

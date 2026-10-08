@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Check } from "lucide-react";
 import type { Listing, Locale } from "@/types/domain";
 import { PublicPage } from "@/components/layout/PublicPage";
 import { HomeMap } from "@/components/search/HomeMap";
@@ -13,7 +13,6 @@ import { CollectionRail } from "@/components/home/CollectionRail";
 import { RemoteRoute } from "@/components/home/RemoteRoute";
 import { listingHref } from "@/lib/listing-href";
 import { listingPhoto } from "@/lib/photos";
-import { RoofGlyph } from "@/components/brand/Logo";
 import { Button } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import { publicListings } from "@/server/listings";
@@ -149,12 +148,13 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
               {saleZones.map((z) => (
                 <li key={z.zone} className="w-[78%] shrink-0 snap-start sm:w-[46%] md:w-auto">
                   <Link href={z.href} data-spotlight className="np-glass group flex h-full min-h-[88px] items-stretch overflow-hidden rounded-[24px] transition-transform duration-500 hover:-translate-y-0.5 md:min-h-[104px]">
-                    <span className="relative m-2 w-[64px] shrink-0 overflow-hidden rounded-[18px] sm:w-[100px]">
+                    <span className="relative m-2 w-[56px] shrink-0 overflow-hidden rounded-[18px] sm:w-[84px] lg:w-[100px]">
                       <Image src={z.photo} alt="" fill sizes="112px" className="object-cover transition-transform duration-700 group-hover:scale-105" />
                     </span>
-                    <span className="flex min-w-0 flex-1 items-center justify-between gap-3 px-3 py-3 sm:px-5 sm:py-4">
+                    <span className="flex min-w-0 flex-1 items-center justify-between gap-2.5 px-2.5 py-3 sm:gap-3 sm:px-4 sm:py-4 lg:px-5">
                       <span className="min-w-0">
-                        <span className="block truncate font-serif text-[20px] leading-tight sm:text-[25px]">{z.zone}</span>
+                        {/* Up to two balanced lines: "Playa El Agua", "Country Club" read whole on a 390 px rail card and in the 768 px two-column grid. */}
+                        <span className="line-clamp-2 break-words font-serif text-[19px] leading-[1.12] [text-wrap:balance] sm:text-[22px] lg:text-[25px]">{z.zone}</span>
                         <span className="block text-sm text-muted">{zoneCount(z.stats.activeListings)}</span>
                       </span>
                       <span className="shrink-0 text-right">
@@ -238,7 +238,7 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
             <ul className="mt-5 space-y-2.5 md:mt-7 md:space-y-3">
               {owner.map((o) => (
                 <li key={o} className="flex items-center gap-3 text-[15px] text-ink/80">
-                  <RoofGlyph className="text-ink" /> {o}
+                  <Check size={16} strokeWidth={2.4} className="shrink-0 text-gold-text" aria-hidden /> {o}
                 </li>
               ))}
             </ul>

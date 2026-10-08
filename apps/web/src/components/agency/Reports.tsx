@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { Download, FileSpreadsheet } from "lucide-react";
 import type { Locale } from "@/types/domain";
@@ -60,6 +61,16 @@ function SourceBars({ locale, rows }: { locale: Locale; rows: ReportData["bySour
   );
 }
 
+/** Phone card cell: small uppercase label (may wrap to two lines) over the figure. */
+function Cell({ label, children, muted, className }: { label: ReactNode; children: ReactNode; muted?: boolean; className?: string }) {
+  return (
+    <div className={cn("min-w-0", className)}>
+      <dt className="text-[10px] font-semibold uppercase leading-tight tracking-[.1em] text-muted dark:text-mist">{label}</dt>
+      <dd className={cn("mt-0.5 font-display text-[15px] font-semibold [font-feature-settings:'lnum','tnum']", muted && k.muted)}>{children}</dd>
+    </div>
+  );
+}
+
 export function ReportsView({ locale, data, days }: { locale: Locale; data: ReportData; days: ReportPeriod }) {
   const d = `${days} d`;
   const period = tx(locale, `Últimos ${days} días`, `Last ${days} days`);
@@ -97,7 +108,26 @@ export function ReportsView({ locale, data, days }: { locale: Locale; data: Repo
           </Panel>
           <Panel title={tx(locale, `Por agente (${d})`, `By agent (${d})`)}>
             {data.byAgent.length ? (
-              <ScrollRegion label={tx(locale, "Por agente", "By agent")}>
+              <>
+              {/* Phones: one 2-row card per agent; tablets and up keep the table. */}
+              <ul className="space-y-2.5 md:hidden" aria-label={tx(locale, "Por agente", "By agent")} data-testid="report-agent-cards">
+                {data.byAgent.map((a) => (
+                  <li key={a.id} className={cn("rounded-xl border px-3.5 py-3", k.line)}>
+                    <div className="flex items-baseline justify-between gap-3">
+                      <span className="min-w-0 font-semibold leading-snug">{a.name}</span>
+                      <span className={cn("shrink-0 font-display text-[15px] font-semibold [font-feature-settings:'lnum','tnum']", !a.volume && k.muted)} title={tx(locale, "Volumen", "Volume")}>
+                        <span className="sr-only">{tx(locale, "Volumen", "Volume")}: </span>{a.volume ? money(a.volume, locale) : "—"}
+                      </span>
+                    </div>
+                    <dl className="mt-2 grid grid-cols-3 gap-2">
+                      <Cell label="Leads">{num(a.leads, locale)}</Cell>
+                      <Cell label={tx(locale, "Visitas", "Tours")}>{num(a.tours, locale)}</Cell>
+                      <Cell label={tx(locale, "Cierres", "Closings")}>{num(a.closings, locale)}</Cell>
+                    </dl>
+                  </li>
+                ))}
+              </ul>
+              <ScrollRegion label={tx(locale, "Por agente", "By agent")} className="hidden md:block">
               <table className="w-full min-w-[26rem] text-[14px]" data-testid="report-agents">
                 <thead className={cn("text-left", k.th, "text-[12px]")}>
                   <tr>
@@ -121,6 +151,7 @@ export function ReportsView({ locale, data, days }: { locale: Locale; data: Repo
                 </tbody>
               </table>
               </ScrollRegion>
+              </>
             ) : (
               <p className={cn("text-[14px]", k.muted)}>{tx(locale, "Aún no hay agentes en el equipo.", "No agents on the team yet.")}</p>
             )}
@@ -128,7 +159,24 @@ export function ReportsView({ locale, data, days }: { locale: Locale; data: Repo
           </Panel>
         </div>
         <Panel title={tx(locale, "Por zona", "By area")}>
-          <ScrollRegion label={tx(locale, "Por zona", "By area")}>
+          {/* Phones: one 2-row card per area; tablets and up keep the 6-column table. */}
+          <ul className="space-y-2.5 md:hidden" aria-label={tx(locale, "Por zona", "By area")} data-testid="report-zone-cards">
+            {data.byZone.map((z) => (
+              <li key={z.zone} className={cn("rounded-xl border px-3.5 py-3", k.line)}>
+                <div className="flex items-baseline justify-between gap-3">
+                  <span className="min-w-0 font-semibold leading-snug">{z.zone}</span>
+                  <span className={cn("shrink-0 text-[13px]", k.muted)}>{tx(locale, `${z.active} ${z.active === 1 ? "activo" : "activos"}`, `${z.active} active`)}</span>
+                </div>
+                <dl className="mt-2 grid grid-cols-2 gap-x-3 gap-y-2 min-[420px]:grid-cols-4">
+                  <Cell label="Leads">{z.leads}</Cell>
+                  <Cell label={<>{tx(locale, "Venta", "Sale")} <span className="normal-case tracking-normal">$/m²</span></>}>{z.salePpm != null ? num(Math.round(z.salePpm), locale) : "—"}</Cell>
+                  <Cell label={<>{tx(locale, "Alquiler", "Rent")} <span className="normal-case tracking-normal">$/m²·{tx(locale, "mes", "mo")}</span></>}>{z.rentPpm != null ? num(z.rentPpm, locale) : "—"}</Cell>
+                  <Cell label={tx(locale, "Días", "Days")} muted>{z.dom ?? "—"}</Cell>
+                </dl>
+              </li>
+            ))}
+          </ul>
+          <ScrollRegion label={tx(locale, "Por zona", "By area")} className="hidden md:block">
           <table className="w-full min-w-[34rem] text-[14px] [&_td+td]:whitespace-nowrap [&_td+td]:pl-4 [&_th+th]:pl-4">
             <thead className={cn("text-left", k.th, "text-[12px]")}>
               <tr>

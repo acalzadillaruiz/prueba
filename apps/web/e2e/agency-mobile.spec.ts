@@ -46,3 +46,43 @@ test.describe("Leads en el teléfono", () => {
     await expect(rows.first()).toBeVisible();
   });
 });
+
+// Phones: the wide back-office tables (860–970 px) become one card per row; nothing may be clipped or cut mid-word.
+test.describe("Tablas del panel como tarjetas en el teléfono", () => {
+  test.use({ viewport: { width: 390, height: 800 }, isMobile: true, hasTouch: true });
+
+  const PAGES: [string, string[]][] = [
+    ["/es/agency/capture", ["capture-cards"]],
+    ["/es/agency/team", ["team-cards"]],
+    ["/es/agency/reports", ["report-agent-cards", "report-zone-cards"]],
+  ];
+
+  test("Captación, Equipo e Informes: tarjetas en lugar de tablas y ningún contenido cortado a 390 px", async ({ page }) => {
+    await demoLogin(page, /Dueño de agencia/);
+    for (const [path, lists] of PAGES) {
+      await page.goto(path);
+      await page.waitForLoadState("networkidle");
+      for (const id of lists) {
+        await expect(page.getByTestId(id), `${path}: ${id}`).toBeVisible();
+        await expect(page.getByTestId(id).locator("li").first(), `${path}: ${id}`).toBeVisible();
+      }
+      await expect(page.locator("main table:visible"), `${path}: no visible table`).toHaveCount(0);
+      // Any element wider inside than its own box is cut (truncated text, a clipped column…). Intentional horizontal
+      // scrollers (overflow-x auto/scroll, ScrollRegion) and visually hidden helpers (sr-only, ≤ 2 px) are exempt.
+      const cut = await page.evaluate(() => {
+        const out: string[] = [];
+        for (const el of document.querySelectorAll<HTMLElement>("main *")) {
+          if (el.closest("[data-scroll-region]") || el instanceof SVGElement || ["SELECT", "INPUT", "TEXTAREA", "OPTION"].includes(el.tagName)) continue;
+          if (!el.offsetParent && getComputedStyle(el).position !== "fixed") continue;
+          const cs = getComputedStyle(el);
+          if (cs.overflowX === "auto" || cs.overflowX === "scroll") continue;
+          if (el.clientWidth <= 2) continue;
+          if (el.scrollWidth > el.clientWidth + 1) out.push(`${el.tagName.toLowerCase()}.${String(el.className).slice(0, 60)} «${(el.textContent ?? "").trim().slice(0, 40)}» ${el.scrollWidth}>${el.clientWidth}`);
+        }
+        return out;
+      });
+      expect(cut, `${path}: cut elements`).toEqual([]);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth), `${path}: page width`).toBeLessThanOrEqual(390);
+    }
+  });
+});

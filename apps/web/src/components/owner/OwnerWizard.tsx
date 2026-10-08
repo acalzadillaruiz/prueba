@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AlertTriangle, ArrowLeft, ArrowRight, Building2, Check, CheckCircle2, ImagePlus, Loader2, MapPin, ShieldCheck, Sparkles, Star, User, X } from "lucide-react";
@@ -724,7 +724,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               )}
               <div data-wiz="price" className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto]">
                 <Field label={tx(locale, `Tu precio (USD${priceUnit})`, `Your price (USD${priceUnit})`)} error={(showPriceErr && priceErr) || undefined}>
-                  <input className={inputCls} type="number" inputMode="numeric" min={1} step={1} value={d.price || ""} aria-invalid={showPriceErr} onBlur={() => setPriceTouched(true)} onChange={(e) => set({ price: Math.max(0, Math.round(+e.target.value || 0)) })} />
+                  <PriceInput locale={locale} value={d.price} invalid={showPriceErr} onBlur={() => setPriceTouched(true)} onChange={(price) => set({ price })} />
                 </Field>
                 {estimate && d.price > 0 && !priceOutlier && (
                   <div className="self-end pb-2.5 text-sm" data-testid="price-verdict">
@@ -908,5 +908,58 @@ function DupNotice({ locale, dup, override, onOverride, hasUnit }: { locale: Loc
         {tx(locale, "No es la misma casa — es otra unidad", "Not the same home — it’s another unit")}
       </button>
     </span>
+  );
+}
+
+/**
+ * The price with thousands separators while you type ("1.650.000" / "1,650,000"); state keeps the plain number. Only
+ * digits count: anything else typed or pasted is dropped, and the caret stays after the same digit it was after (the
+ * separators that appear or vanish never push it around).
+ */
+function PriceInput({ locale, value, invalid, onBlur, onChange }: { locale: Locale; value: number; invalid: boolean; onBlur: () => void; onChange: (n: number) => void }) {
+  const ref = useRef<HTMLInputElement>(null);
+  /** Digits left of the caret after the last edit; applied once the formatted value has rendered. */
+  const caret = useRef<number | null>(null);
+  const shown = value > 0 ? num(value, locale) : "";
+  useLayoutEffect(() => {
+    const el = ref.current;
+    const want = caret.current;
+    if (!el || want === null || document.activeElement !== el) return;
+    caret.current = null;
+    let pos = 0;
+    for (let seen = 0; pos < shown.length && seen < want; pos++) if (/\d/.test(shown[pos])) seen++;
+    el.setSelectionRange(pos, pos);
+  }, [shown]);
+  return (
+    <input
+      ref={ref}
+      className={inputCls}
+      type="text"
+      inputMode="numeric"
+      autoComplete="off"
+      value={shown}
+      aria-invalid={invalid}
+      onBlur={onBlur}
+      onChange={(e) => {
+        const raw = e.target.value;
+        const at = e.target.selectionStart ?? raw.length;
+        caret.current = raw.slice(0, at).replace(/\D/g, "").replace(/^0+/, "").length;
+        const digits = raw.replace(/\D/g, "").replace(/^0+/, "").slice(0, 12);
+        const next = digits ? Number(digits) : 0;
+        // A stray non-digit leaves the number as it was: React puts the old text back (caret to the end), so put it back too.
+        if (next === value) {
+          const el = e.target;
+          const want = caret.current;
+          caret.current = null;
+          requestAnimationFrame(() => {
+            let pos = 0;
+            for (let seen = 0; pos < el.value.length && seen < (want ?? 0); pos++) if (/\d/.test(el.value[pos])) seen++;
+            if (document.activeElement === el) el.setSelectionRange(pos, pos);
+          });
+          return;
+        }
+        onChange(next);
+      }}
+    />
   );
 }

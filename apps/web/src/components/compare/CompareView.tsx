@@ -32,6 +32,8 @@ type Row = {
   best?: "min" | "max";
   /** Hide the row when no compared home has data for it. */
   show?: (l: Listing) => boolean;
+  /** Yes/no row: the value is already a ✓, so a winning cell is just green (no second ✓). */
+  bool?: true;
 };
 
 /**
@@ -106,7 +108,7 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
     { label: tx(locale, "Operación", "Type"), render: (l) => lbl(TYPE_LABEL[l.listingType], locale) },
     // Venezuelan essentials
     { label: tx(locale, "Planta eléctrica", "Backup generator"), render: (l) => (l.powerBackup === "FULL" ? "100 %" : l.powerBackup === "PARTIAL" ? tx(locale, "Parcial", "Partial") : l.powerBackup === "NONE" ? tx(locale, "No tiene", "None") : "—"), val: (l) => POWER_RANK[l.powerBackup ?? ""] ?? NaN, best: "max" },
-    { label: tx(locale, "Pozo propio", "Own water well"), render: (l) => yes(l.ownWell, locale), val: (l) => (l.ownWell ? 1 : 0), best: "max" },
+    { label: tx(locale, "Pozo propio", "Own water well"), render: (l) => yes(l.ownWell, locale), val: (l) => (l.ownWell ? 1 : 0), best: "max", bool: true },
     { label: tx(locale, "Tanque de agua", "Water tank"), render: (l) => (l.waterTankLiters ? `${num(l.waterTankLiters, locale)} L` : "—"), val: (l) => l.waterTankLiters ?? 0, best: "max" },
     { label: tx(locale, "Muelle", "Private dock"), render: (l) => (l.dockFeet ? tx(locale, `${num(l.dockFeet, locale)} pies`, `${num(l.dockFeet, locale)} ft`) : "—"), show: (l) => !!l.dockFeet },
     { label: tx(locale, "Vista al Ávila", "Ávila view"), render: (l) => yes(l.viewAvila, locale), show: (l) => l.viewAvila },
@@ -117,11 +119,15 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
   ];
   const rows = allRows.filter((r) => !r.show || cmp.some(r.show));
   // Per row: which column wins (green), only when the values differ.
+  // Only the finite values take part: a home with no data for a row (NaN) neither wins nor wipes out the others' winner.
   const wins = rows.map(({ val, best }) => {
     const vals = val ? cmp.map(val) : [];
-    const target = val ? (best === "min" ? Math.min(...vals) : Math.max(...vals)) : null;
-    return (i: number) => !!val && cmp.length > 1 && Number.isFinite(vals[i]) && vals[i] === target && new Set(vals).size > 1;
+    const known = vals.filter(Number.isFinite);
+    const target = known.length ? (best === "min" ? Math.min(...known) : Math.max(...known)) : null;
+    return (i: number) => !!val && cmp.length > 1 && known.length > 1 && Number.isFinite(vals[i]) && vals[i] === target && new Set(known).size > 1;
   });
+  const bestMark = (bool: boolean | undefined, cls: string) =>
+    bool ? <span className="sr-only">{tx(locale, " (la mejor)", " (best)")}</span> : <Check size={13} className={cn(cls, "inline", OK)} aria-label={tx(locale, "La mejor", "Best")} />;
   const cols = { gridTemplateColumns: `repeat(${Math.max(2, cmp.length)}, minmax(0, 1fr))` };
   const removeLabel = (title: string) => tx(locale, `Quitar «${title}» de la comparación`, `Remove “${title}” from the comparison`);
 
@@ -212,13 +218,13 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
               </div>
             </div>
             <dl>
-              {rows.map(({ label, render }, r) => (
+              {rows.map(({ label, render, bool }, r) => (
                 <div key={label} className="border-t border-line px-3 py-2.5 first:border-t-0">
                   <dt className="text-[13px] font-semibold text-muted">{label}</dt>
                   <dd className="mt-1 grid gap-2" style={cols}>
                     {cmp.map((l, i) => (
                       <span key={l.id} className={cn("min-w-0 break-words rounded-md px-1.5 py-1 text-[14px] leading-snug", wins[r](i) && "bg-[#2F6B4F14] dark:bg-[#8FCBA61A]")}>
-                        {render(l)} {wins[r](i) && <Check size={13} className={cn("ml-0.5 inline", OK)} aria-label={tx(locale, "La mejor", "Best")} />}
+                        {render(l)} {wins[r](i) && bestMark(bool, "ml-0.5")}
                       </span>
                     ))}
                   </dd>
@@ -258,12 +264,12 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
                 </tr>
               </thead>
               <tbody>
-                {rows.map(({ label, render }, r) => (
+                {rows.map(({ label, render, bool }, r) => (
                   <tr key={label} className="border-t border-line">
                     <td className={cn("sticky left-0 z-[1] px-4 py-2.5 font-semibold text-muted", k.stickyCol)}>{label}</td>
                     {cmp.map((l, i) => (
                       <td key={l.id} className={cn("break-words px-4 py-2.5", wins[r](i) && "bg-[#2F6B4F0F] dark:bg-[#8FCBA614]")}>
-                        {render(l)} {wins[r](i) && <Check size={13} className={cn("ml-1 inline", OK)} aria-label={tx(locale, "La mejor", "Best")} />}
+                        {render(l)} {wins[r](i) && bestMark(bool, "ml-1")}
                       </td>
                     ))}
                   </tr>

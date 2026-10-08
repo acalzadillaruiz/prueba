@@ -10,7 +10,8 @@ import { Button, Field } from "@/components/ui";
 import { Chip, Pill, k } from "./kit";
 import { ScrollRegion } from "./ScrollRegion";
 import { api, type ApiClientError } from "@/lib/api";
-import { TYPE_LABEL, ago, lbl, money, tx } from "@/lib/i18n";
+import { TYPE_LABEL, lbl, money, tx } from "@/lib/i18n";
+import { TimeAgo } from "@/components/owner/TimeAgo";
 import { cn } from "@/lib/cn";
 
 const TONE: Record<CaptureLead["result"], "neutral" | "ok" | "danger" | "warn"> = { PENDING: "neutral", CAPTURED: "ok", REJECTED: "danger", DUPLICATE: "warn" };
@@ -79,11 +80,82 @@ export function CaptureView({ locale, rows: initialRows, zones, titles, canConve
     }
   };
 
+  const actions = (c: Row) => (
+    <>
+      {c.result === "PENDING" && (
+        <div className="flex flex-wrap items-center gap-1">
+          {canConvert && (
+            <button onClick={() => setConverting(converting?.id === c.id ? null : { id: c.id, listingType: "SALE" })} className={cn("flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-2.5 text-xs font-semibold md:py-1.5", "border-[1.5px]", k.outline)} aria-expanded={converting?.id === c.id}>
+              <Building2 size={14} /> {tx(locale, "Convertir en inmueble", "Convert to listing")}
+            </button>
+          )}
+          <button onClick={() => setResult(c.id, "CAPTURED")} className={cn("rounded-full p-3 hover:bg-[#2F6B4F14] md:p-1.5 dark:hover:bg-white/5", k.okText)} aria-label={tx(locale, "Marcar como captado", "Mark as captured")} title={tx(locale, "Marcar como captado", "Mark as captured")}><CheckCircle2 size={15} /></button>
+          <button onClick={() => setResult(c.id, "REJECTED")} className={cn("rounded-full p-3 hover:bg-[#B3261E12] md:p-1.5 dark:hover:bg-white/5", k.dangerText)} aria-label={tx(locale, "Rechazar", "Reject")} title={tx(locale, "Rechazar", "Reject")}><XCircle size={15} /></button>
+        </div>
+      )}
+      {c.listingId && (
+        <Link href={`/${locale}/agency/listings/${c.listingId}/edit`} className={cn("flex items-center gap-1 whitespace-nowrap text-xs", k.link)}>
+          <ExternalLink size={13} /> {tx(locale, "Ver inmueble", "Open listing")}
+        </Link>
+      )}
+    </>
+  );
+  const convertPanel = (c: Row) =>
+    converting?.id === c.id && (
+      <div className="flex flex-wrap items-end gap-3">
+        <div className="w-56">
+          <Field label={tx(locale, "Operación", "Listing type")}>
+            <select className={k.input} value={converting.listingType} onChange={(e) => setConverting({ ...converting, listingType: e.target.value as ListingType })}>
+              {(Object.keys(TYPE_LABEL) as ListingType[]).map((k) => <option key={k} value={k}>{lbl(TYPE_LABEL[k], locale)}</option>)}
+            </select>
+          </Field>
+        </div>
+        <p className={cn("max-w-sm flex-1 text-xs", k.muted)}>{tx(locale, "Se crea un borrador en tu agencia con la dirección, zona, m² y precio de la captación. Podrás completarlo antes de publicar.", "A draft is created in your agency with the capture’s address, area, m² and price. You can complete it before publishing.")}</p>
+        <Button size="sm" variant="navy" className={k.navy} disabled={rowBusy === c.id} onClick={convert}>
+          {rowBusy === c.id ? <Loader2 size={14} className="animate-spin" /> : <Building2 size={14} />} {tx(locale, "Crear borrador", "Create draft")}
+        </Button>
+        <Button size="sm" variant="ghost" className={k.ghost} type="button" onClick={() => setConverting(null)}>{tx(locale, "Cancelar", "Cancel")}</Button>
+      </div>
+    );
+
   return (
     <AdminShell locale={locale} area="agency" title={tx(locale, "Cola de captación", "Capture queue")}>
       {rowErr && <div role="alert" className={cn("mb-4", k.err)}>{rowErr}</div>}
       <div className="grid gap-6 [&>*]:min-w-0 xl:grid-cols-[1fr_380px]">
-        <ScrollRegion fade={false} label={tx(locale, "Cola de captación", "Capture queue")} className={cn("self-start", k.card)}>
+        {/* Phones: one card per capture (full address, owner, figures and actions); tablets and up keep the table. */}
+        <ul className="space-y-3 self-start md:hidden" aria-label={tx(locale, "Cola de captación", "Capture queue")} data-testid="capture-cards">
+          {rows.map((c) => (
+            <li key={c.id} className={cn(k.card, "p-4")}>
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="font-semibold leading-snug [overflow-wrap:anywhere]">{c.address}</div>
+                  <div className={cn("mt-0.5 text-xs", k.muted)}>{c.zone} · <TimeAgo iso={c.createdAt} locale={locale} /></div>
+                </div>
+                <Pill tone={TONE[c.result]} className="shrink-0">{label[c.result]}</Pill>
+              </div>
+              {c.duplicateOf && <div className={cn("mt-1.5 flex items-center gap-1 text-xs font-semibold", k.warnText)}><Fingerprint size={12} className="shrink-0" /> <span className="min-w-0 [overflow-wrap:anywhere]">= {titles[c.duplicateOf] ?? c.duplicateOf}</span></div>}
+              <dl className={cn("mt-3 grid grid-cols-[minmax(0,1fr)_auto_auto] gap-x-4 gap-y-2 rounded-xl px-3 py-2.5", k.soft)}>
+                <div className="min-w-0">
+                  <dt className={cn(k.label, "text-[10px]")}>{tx(locale, "Dueño", "Owner")}</dt>
+                  <dd className="mt-0.5 text-sm font-semibold leading-snug [overflow-wrap:anywhere]">{c.ownerName}</dd>
+                  <dd className={cn("text-xs [overflow-wrap:anywhere]", k.muted)}>{c.phone}</dd>
+                </div>
+                <div className="min-w-0">
+                  <dt className={cn(k.label, "text-[10px]")}>m²</dt>
+                  <dd className="mt-0.5 text-sm font-semibold">{c.areaM2}</dd>
+                </div>
+                <div className="min-w-0 text-right">
+                  <dt className={cn(k.label, "text-[10px]")}>{tx(locale, "Pide", "Asking")}</dt>
+                  <dd className={cn("mt-0.5 whitespace-nowrap text-sm tracking-normal", k.num)}>{money(c.askingPrice, locale)}</dd>
+                </div>
+              </dl>
+              {(c.result === "PENDING" || c.listingId) && <div className="mt-3">{actions(c)}</div>}
+              {converting?.id === c.id && <div className={cn("mt-3 rounded-xl p-3", k.soft)}>{convertPanel(c)}</div>}
+            </li>
+          ))}
+          {rows.length === 0 && <li className={cn(k.card, "px-4 py-10 text-center", k.muted)}>{tx(locale, "La cola está vacía. Registra la primera captación con el formulario.", "The queue is empty. Log the first capture with the form.")}</li>}
+        </ul>
+        <ScrollRegion fade={false} label={tx(locale, "Cola de captación", "Capture queue")} className={cn("hidden self-start md:block", k.card)}>
           <table className="np-sticky-last w-full min-w-[860px] text-sm">
             <thead className={cn("border-b text-left", k.line, k.th)}>
               <tr><th className="px-4 py-3">{tx(locale, "Dirección", "Address")}</th><th className="px-3 py-3">{tx(locale, "Dueño", "Owner")}</th><th className="px-3 py-3 text-right">m²</th><th className="px-3 py-3 text-right">{tx(locale, "Pide", "Asking")}</th><th className="px-3 py-3">{tx(locale, "Resultado", "Result")}</th><th className="px-3 py-3" /></tr>
@@ -94,49 +166,19 @@ export function CaptureView({ locale, rows: initialRows, zones, titles, canConve
                 <tr className={cn("border-t align-top first:border-t-0", k.line)}>
                   <td className="px-4 py-3">
                     <div className="font-semibold">{c.address}</div>
-                    <div className={cn("text-xs", k.muted)}>{c.zone} · {ago(c.createdAt, locale)}</div>
+                    <div className={cn("text-xs", k.muted)}>{c.zone} · <TimeAgo iso={c.createdAt} locale={locale} /></div>
                     {c.duplicateOf && <div className={cn("mt-1 flex items-center gap-1 text-xs font-semibold", k.warnText)}><Fingerprint size={12} /> = {titles[c.duplicateOf] ?? c.duplicateOf}</div>}
                   </td>
                   <td className="px-3 py-3"><div>{c.ownerName}</div><div className={cn("text-xs", k.muted)}>{c.phone}</div></td>
                   <td className="px-3 py-3 text-right">{c.areaM2}</td>
                   <td className={cn("whitespace-nowrap px-3 py-3 text-right tracking-normal", k.num)}>{money(c.askingPrice, locale)}</td>
                   <td className="px-3 py-3"><Pill tone={TONE[c.result]}>{label[c.result]}</Pill></td>
-                  <td className="px-3 py-3">
-                    {c.result === "PENDING" && (
-                      <div className="flex flex-wrap gap-1">
-                        {canConvert && (
-                          <button onClick={() => setConverting(converting?.id === c.id ? null : { id: c.id, listingType: "SALE" })} className={cn("flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold", "border-[1.5px]", k.outline)} aria-expanded={converting?.id === c.id}>
-                            <Building2 size={14} /> {tx(locale, "Convertir en inmueble", "Convert to listing")}
-                          </button>
-                        )}
-                        <button onClick={() => setResult(c.id, "CAPTURED")} className={cn("rounded-full p-1.5 hover:bg-[#2F6B4F14] dark:hover:bg-white/5", k.okText)} aria-label={tx(locale, "Marcar como captado", "Mark as captured")} title={tx(locale, "Marcar como captado", "Mark as captured")}><CheckCircle2 size={15} /></button>
-                        <button onClick={() => setResult(c.id, "REJECTED")} className={cn("rounded-full p-1.5 hover:bg-[#B3261E12] dark:hover:bg-white/5", k.dangerText)} aria-label={tx(locale, "Rechazar", "Reject")} title={tx(locale, "Rechazar", "Reject")}><XCircle size={15} /></button>
-                      </div>
-                    )}
-                    {c.listingId && (
-                      <Link href={`/${locale}/agency/listings/${c.listingId}/edit`} className={cn("flex items-center gap-1 whitespace-nowrap text-xs", k.link)}>
-                        <ExternalLink size={13} /> {tx(locale, "Ver inmueble", "Open listing")}
-                      </Link>
-                    )}
-                  </td>
+                  <td className="px-3 py-3">{actions(c)}</td>
                 </tr>
                 {converting?.id === c.id && (
                   <tr className={k.soft}>
                     <td colSpan={6} className="px-4 py-3">
-                      <div className="flex flex-wrap items-end gap-3">
-                        <div className="w-56">
-                          <Field label={tx(locale, "Operación", "Listing type")}>
-                            <select className={k.input} value={converting.listingType} onChange={(e) => setConverting({ ...converting, listingType: e.target.value as ListingType })}>
-                              {(Object.keys(TYPE_LABEL) as ListingType[]).map((k) => <option key={k} value={k}>{lbl(TYPE_LABEL[k], locale)}</option>)}
-                            </select>
-                          </Field>
-                        </div>
-                        <p className={cn("max-w-sm flex-1 text-xs", k.muted)}>{tx(locale, "Se crea un borrador en tu agencia con la dirección, zona, m² y precio de la captación. Podrás completarlo antes de publicar.", "A draft is created in your agency with the capture’s address, area, m² and price. You can complete it before publishing.")}</p>
-                        <Button size="sm" variant="navy" className={k.navy} disabled={rowBusy === c.id} onClick={convert}>
-                          {rowBusy === c.id ? <Loader2 size={14} className="animate-spin" /> : <Building2 size={14} />} {tx(locale, "Crear borrador", "Create draft")}
-                        </Button>
-                        <Button size="sm" variant="ghost" className={k.ghost} type="button" onClick={() => setConverting(null)}>{tx(locale, "Cancelar", "Cancel")}</Button>
-                      </div>
+                      {convertPanel(c)}
                     </td>
                   </tr>
                 )}

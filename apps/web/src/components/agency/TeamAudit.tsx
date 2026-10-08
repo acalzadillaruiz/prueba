@@ -11,7 +11,8 @@ import { ScrollRegion } from "./ScrollRegion";
 import type { AdvisorRow, ChatDetail, ChatSummary } from "@/server/team-audit";
 import { AUDIT_PERIODS, dash, formatMinutes, type AuditPeriod } from "@/lib/team-metrics";
 import { api } from "@/lib/api";
-import { ago, dateTime, tx } from "@/lib/i18n";
+import { dateTime, tx } from "@/lib/i18n";
+import { TimeAgo } from "@/components/owner/TimeAgo";
 import { cn } from "@/lib/cn";
 
 type SortKey = "name" | "captures" | "closings" | "leads" | "answered" | "respMedianMin" | "slaPct" | "toursBooked" | "toursDone" | "leadToTourPct" | "quality" | "lastSeenAt";
@@ -89,7 +90,7 @@ function Performance({ locale, days, rows }: { locale: Locale; days: AuditPeriod
   const n = (v: number) => <span className={cn(k.num, "tracking-normal")}>{v}</span>;
   const metric = (label: string, value: React.ReactNode) => (
     <div className="min-w-0">
-      <dt className="truncate text-[10px] font-semibold uppercase tracking-[.1em] text-muted dark:text-mist">{label}</dt>
+      <dt className="line-clamp-2 text-[10px] font-semibold uppercase leading-tight tracking-[.1em] text-muted dark:text-mist">{label}</dt>
       <dd className={cn("mt-0.5 text-[16px] leading-tight", tnum)}>{value}</dd>
     </div>
   );
@@ -151,11 +152,11 @@ function Performance({ locale, days, rows }: { locale: Locale; days: AuditPeriod
                       <div className={cn("truncate text-xs", k.muted)}>{r.role === "AGENCY_OWNER" ? tx(locale, "Dueño · con cartera asignada", "Owner · with assigned listings") : r.email}</div>
                       <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1">
                         {r.suspended ? <Pill tone="danger">{tx(locale, "Suspendido", "Suspended")}</Pill> : r.verified ? <Pill tone="ok">{tx(locale, "Verificado", "Verified")}</Pill> : <Pill tone="warn">{tx(locale, "Sin verificar", "Unverified")}</Pill>}
-                        <span className={cn("text-xs", k.muted)} title={dateTime(r.lastSeenAt, locale)}>{tx(locale, "Último acceso", "Last seen")} {ago(r.lastSeenAt, locale)}</span>
+                        <span className={cn("text-xs", k.muted)} title={dateTime(r.lastSeenAt, locale)}>{tx(locale, "Último acceso", "Last seen")} <TimeAgo iso={r.lastSeenAt} locale={locale} /></span>
                       </div>
                     </div>
                   </div>
-                  <dl className={cn("mt-3 grid grid-cols-3 gap-x-2 gap-y-3 rounded-xl px-3 py-3", k.soft)}>
+                  <dl className={cn("mt-3 grid grid-cols-2 gap-x-4 gap-y-3 rounded-xl px-3 py-3 min-[480px]:grid-cols-3", k.soft)}>
                     {metric(tx(locale, "Leads", "Leads"), n(r.leads))}
                     {metric(tx(locale, "Respondidos", "Answered"), n(r.answered))}
                     {metric(
@@ -215,7 +216,7 @@ function Performance({ locale, days, rows }: { locale: Locale; days: AuditPeriod
                         {r.suspended ? <Pill tone="danger">{tx(locale, "Suspendido", "Suspended")}</Pill> : r.verified ? <Pill tone="ok">{tx(locale, "Verificado", "Verified")}</Pill> : <Pill tone="warn">{tx(locale, "Sin verificar", "Unverified")}</Pill>}
                       </div>
                       <div className={cn("mt-1 whitespace-nowrap text-xs", k.muted)} title={dateTime(r.lastSeenAt, locale)}>
-                        {tx(locale, "Último acceso", "Last seen")} {ago(r.lastSeenAt, locale)}
+                        {tx(locale, "Último acceso", "Last seen")} <TimeAgo iso={r.lastSeenAt} locale={locale} />
                       </div>
                     </td>
                     <td className={cell}>{n(r.captures)}</td>
@@ -302,8 +303,8 @@ function Chats({ locale, advisors, threads, agentId, onAgent, pending }: { local
                 <li key={t.id}>
                   <button type="button" onClick={() => show(t.id)} aria-current={active ? "true" : undefined} className={cn("block w-full px-4 py-3 text-left transition-colors", active ? "bg-[#E6DDD2] dark:bg-white/10" : k.hover)}>
                     <div className="flex items-baseline justify-between gap-2">
-                      <span className="truncate font-semibold">{names(t.participants)}</span>
-                      <span className={cn("shrink-0 text-xs", k.muted)}>{t.last ? ago(t.last.at, locale) : ago(t.updatedAt, locale)}</span>
+                      <span className="min-w-0 font-semibold leading-snug">{names(t.participants)}</span>
+                      <span className={cn("shrink-0 text-xs", k.muted)}><TimeAgo iso={t.last ? t.last.at : t.updatedAt} locale={locale} /></span>
                     </div>
                     <div className={cn("mt-0.5 truncate text-xs", k.muted)}>{t.listing ? tx(locale, t.listing.titleEs, t.listing.titleEn) : t.subject ?? tx(locale, "Sin inmueble", "No listing")}</div>
                     <div className="mt-1.5 line-clamp-2 text-[13px]">

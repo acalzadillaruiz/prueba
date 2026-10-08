@@ -56,8 +56,8 @@ export function AgencyDashboard({ locale, stats, listings, newLeads, tours, agen
       </div>
 
       <div className="mt-6 grid gap-6 [&>*]:min-w-0 xl:grid-cols-[1.45fr_1fr]">
-        <Panel title={tx(locale, "Leads por día", "Leads per day")} action={<span className={cn("pt-2 text-[13px]", k.muted)}>{tx(locale, "Últimos 14 días", "Last 14 days")}</span>}>
-          <BarChart data={days} height={220} />
+        <Panel className="flex flex-col" bodyClass="flex min-h-0 flex-1 flex-col" title={tx(locale, "Leads por día", "Leads per day")} action={<span className={cn("pt-2 text-[13px]", k.muted)}>{tx(locale, "Últimos 14 días", "Last 14 days")}</span>}>
+          <BarChart data={days} height={220} fill />
         </Panel>
         <Panel title={tx(locale, "Leads sin responder", "Unanswered leads")} action={<Link href={`/${locale}/agency/leads`} className={cn("pt-2 text-[14px]", k.link)}>{tx(locale, "Bandeja", "Inbox")} <ArrowUpRight size={13} className="inline" /></Link>}>
           {newLeads.length === 0 && <p className={cn("text-[15px]", k.muted)}>{tx(locale, "Todos los leads tienen respuesta.", "Every lead has been answered.")}</p>}

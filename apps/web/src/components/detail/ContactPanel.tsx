@@ -416,7 +416,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
                 );
               })}
             </div>
-            <label htmlFor={`${uid}-when`} className={fieldLbl}>{tx(locale, "Día u hora que prefieres", "Preferred day or time")}</label>
+            <label htmlFor={`${uid}-when`} className={cn(fieldLbl, "mt-4")}>{tx(locale, "Día u hora que prefieres", "Preferred day or time")}</label>
             <input
               id={`${uid}-when`}
               className={field}

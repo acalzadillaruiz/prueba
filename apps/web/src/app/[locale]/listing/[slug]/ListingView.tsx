@@ -95,11 +95,17 @@ function Facts({ l, locale }: { l: Listing; locale: Locale }) {
     l.shortRent && [`${l.shortRent.maxGuests}`, tx(locale, "huéspedes", "guests")],
   ].filter(Boolean) as [string, string][];
   // Columns follow the left column's own width (a container query), not the viewport: at 1024 px the column is ~476 px
-  // wide, and viewport breakpoints squeezed four labels into it ("CONSTRUCCIÓNAÑO"). No lone fact on a last row: with an
-  // odd count on two columns the last one spans both; 7 facts go 2 → 4 (never 3 + 3 + 1).
+  // wide, and viewport breakpoints squeezed four labels into it ("CONSTRUCCIÓNAÑO"). No lone fact and no empty cell on a
+  // last row: on two columns an odd last one spans both; 5 facts go 2 → one row of 5 from 680 px (the widest label, «CONSTRUCCIÓN», is ~115 px; never 3 + 2); 6 go 2 → 3 + 3;
+  // 7 go 2 → 4 + 3 (with the wide last one).
   const n = items.length;
-  const cols = n <= 3 ? ["", "grid-cols-1", "grid-cols-2", "grid-cols-3"][n] : n === 4 ? "grid-cols-2 [@container(min-width:560px)]:grid-cols-4" : n === 7 ? "grid-cols-2 [@container(min-width:600px)]:grid-cols-4" : "grid-cols-2 [@container(min-width:420px)]:grid-cols-3";
-  const lastWide = n > 3 && n % 2 === 1 ? (n === 7 ? "col-span-2 [@container(min-width:600px)]:col-span-1" : "col-span-2 [@container(min-width:420px)]:col-span-1") : "";
+  const cols =
+    n <= 3 ? ["", "grid-cols-1", "grid-cols-2", "grid-cols-3"][n]
+    : n === 4 ? "grid-cols-2 [@container(min-width:560px)]:grid-cols-4"
+    : n === 5 ? "grid-cols-2 [@container(min-width:680px)]:grid-cols-5 [@container(min-width:680px)]:gap-x-4"
+    : n === 7 ? "grid-cols-2 [@container(min-width:600px)]:grid-cols-4"
+    : "grid-cols-2 [@container(min-width:420px)]:grid-cols-3";
+  const lastWide = n > 3 && n % 2 === 1 ? (n === 7 ? "col-span-2 [@container(min-width:600px)]:col-span-1" : "col-span-2 [@container(min-width:680px)]:col-span-1") : "";
   return (
     <div className="[container-type:inline-size]">
       <dl className={cn("grid gap-x-6 gap-y-5 border-y border-line py-6", cols)} data-testid="facts">
@@ -197,7 +203,9 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
                   <h1 className="mt-5 max-w-[760px] text-[38px] leading-[1.06] tracking-[-0.02em] md:text-[52px] lg:mt-4 lg:text-[48px]">{tx(locale, l.title_es, l.title_en)}</h1>
                   <p className="mt-2 text-[15px] text-muted">{l.address} · {l.zone}, {l.city}{l.state && l.state !== l.city ? `, ${l.state}` : ""}</p>
                 </div>
-                <div className="mt-7 shrink-0 lg:mt-0 lg:text-right">
+                {/* Desktop: aligned to the title's baseline, but never higher than the title's own top margin: with a one-line
+                    title the price block is the taller one, and it used to climb into the Compare/Share row. */}
+                <div className="mt-7 shrink-0 lg:mt-5 lg:pt-1 lg:text-right">
                   <div className="font-serif text-[48px] font-semibold leading-none text-ink md:text-[54px] lg:whitespace-nowrap">
                     {money(l.priceAmount, locale)}
                     <span className="font-display text-lg font-normal text-muted">{priceSuffix(l, locale)}</span>

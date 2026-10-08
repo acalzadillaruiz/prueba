@@ -14,7 +14,8 @@ import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import { useApp } from "@/lib/store";
 import type { Listing } from "@/types/domain";
-import { TYPE_LABEL, ago, lbl, money, num, priceSuffix, tx } from "@/lib/i18n";
+import { TYPE_LABEL, lbl, money, num, priceSuffix, tx } from "@/lib/i18n";
+import { TimeAgo } from "@/components/owner/TimeAgo";
 import { LISTING_PHASE_PLURAL, MANDATE_PHASE, canActivate, canPause, listingPhase, mandateHint, mandateLabel, mandatePhase, type ListingPhase } from "@/lib/lifecycle";
 import { cn } from "@/lib/cn";
 import { BulkResult, runSequential, type Bulk } from "./bulk";
@@ -194,7 +195,7 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
                 <div key={m.id} className="flex flex-wrap items-center gap-3 py-2.5 text-sm" data-mandate={m.id}>
                   <div className="min-w-0 flex-1 basis-60">
                     {m.status === "ASSIGNED" && m.listing ? <Link href={`/${locale}/agency/listings/${m.listing.id}/edit`} className="line-clamp-1 font-semibold underline-offset-4 hover:underline">{title}</Link> : <div className="line-clamp-1 font-semibold">{title}</div>}
-                    <div className={cn("text-xs", k.muted)}>{m.ownerName}{m.listing ? ` · ${m.listing.zone}, ${m.listing.city} · ${money(m.listing.priceAmount, locale)}` : ""} · {ago(m.createdAt, locale)}</div>
+                    <div className={cn("text-xs", k.muted)}>{m.ownerName}{m.listing ? ` · ${m.listing.zone}, ${m.listing.city} · ${money(m.listing.priceAmount, locale)}` : ""} · <TimeAgo iso={m.createdAt} locale={locale} /></div>
                   </div>
                   <Pill tone={MANDATE_PHASE[p].tone}><span title={mandateHint(p, locale)}>{mandateLabel(p, locale)}</span></Pill>
                   {manager && (
@@ -249,7 +250,7 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
               <div className="mt-3 flex flex-wrap items-center gap-1.5">
                 {statusPills(l)}
                 {l.luxury && <Pill tone="exclusive">{tx(locale, "Exclusiva", "Exclusive")}</Pill>}
-                <span className={cn("ml-auto text-xs", k.muted)} suppressHydrationWarning>{ago(l.updatedAt, locale)}</span>
+                <span className={cn("ml-auto text-xs", k.muted)}><TimeAgo iso={l.updatedAt} locale={locale} /></span>
               </div>
               <dl className={cn("mt-3 grid grid-cols-3 gap-2 rounded-xl px-3 py-2.5 text-center", k.soft)}>
                 <div className="min-w-0">
@@ -333,7 +334,7 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
                   </td>
                   <td className="px-3 text-right font-semibold">{l.stats.leads}</td>
                   <td className="px-3 text-right">{l.daysOnMarket}</td>
-                  <td className={cn("px-3 text-xs", k.muted)} suppressHydrationWarning>{ago(l.updatedAt, locale)}</td>
+                  <td className={cn("px-3 text-xs", k.muted)}><TimeAgo iso={l.updatedAt} locale={locale} /></td>
                   <td className={cn("sticky right-0 px-3", k.stickyCol)}>{action ?? (a && <span title={a.name}><Initials name={a.name} size={28} /></span>)}</td>
                 </tr>
               );

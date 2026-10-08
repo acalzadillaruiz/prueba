@@ -18,7 +18,8 @@ import { api, type ApiClientError } from "@/lib/api";
 import { AUDIT_PREFIXES, auditDetail, auditLabel } from "@/lib/audit-labels";
 import type { AuditPage } from "@/server/audit-log";
 import { listingPhoto } from "@/lib/photos";
-import { ago, dateTime, money, num, tx } from "@/lib/i18n";
+import { dateTime, money, num, tx } from "@/lib/i18n";
+import { TimeAgo } from "@/components/owner/TimeAgo";
 import { cn } from "@/lib/cn";
 import { listingHref } from "@/lib/listing-href";
 
@@ -73,8 +74,8 @@ export function PlatformHome({ locale, data }: { locale: Locale; data: PlatformH
         <Kpi label={tx(locale, "Tiempo 1ª respuesta", "First response")} value={data.firstResponseMin === null ? "—" : `${data.firstResponseMin} min`} hint={tx(locale, "mediana plataforma", "platform median")} />
       </div>
       <div className="mt-6 grid gap-6 [&>*]:min-w-0 xl:grid-cols-[1.45fr_1fr]">
-        <Panel title={tx(locale, "Leads por semana", "Weekly leads")} action={<span className={cn("pt-2 text-[13px]", k.muted)}>12 {tx(locale, "semanas · plataforma", "weeks · platform")}</span>}>
-          <BarChart data={data.weekly} height={220} />
+        <Panel className="flex flex-col" bodyClass="flex min-h-0 flex-1 flex-col" title={tx(locale, "Leads por semana", "Weekly leads")} action={<span className={cn("pt-2 text-[13px]", k.muted)}>12 {tx(locale, "semanas · plataforma", "weeks · platform")}</span>}>
+          <BarChart data={data.weekly} height={220} fill />
         </Panel>
         <Panel title={tx(locale, "Salud del sistema", "System health")}>
           <ul className={cn("divide-y", k.divide)}>
@@ -108,7 +109,7 @@ export function PlatformHome({ locale, data }: { locale: Locale; data: PlatformH
           <ul className={cn("divide-y", k.divide)}>
             {data.audit.map((a, i) => (
               <li key={i} className="flex flex-wrap items-center gap-x-3 gap-y-1 py-2.5 text-sm first:pt-0 sm:flex-nowrap">
-                <span className={cn("w-20 shrink-0 text-xs", k.muted)}>{ago(a.at, locale)}</span>
+                <span className={cn("w-20 shrink-0 text-xs", k.muted)}><TimeAgo iso={a.at} locale={locale} /></span>
                 <span className="shrink-0 font-semibold">{a.actor || tx(locale, "Sistema", "System")}</span>
                 <Chip className="shrink-0 py-0.5 text-[11px]">{auditLabel(a.action, locale)}</Chip>
                 <span className={cn("min-w-0 flex-1 basis-full truncate sm:basis-auto", k.muted)}>{a.target}</span>
@@ -278,7 +279,7 @@ export function PlatformUsers({ locale, users, providers }: { locale: Locale; us
                 <td className={cn("px-3", k.muted)}>{u.agencyName ?? "—"}</td>
                 <td className={cn("px-3 text-xs", k.muted)}>{providers[u.id]?.join(" · ") || "—"}</td>
                 {/* Relative time depends on "now": server and client may differ by a minute → no hydration error (#418). */}
-                <td className={cn("px-3 text-xs", k.muted)} suppressHydrationWarning>{u.suspended ? tx(locale, "Suspendido", "Suspended") : ago(u.lastSeen, locale)}</td>
+                <td className={cn("px-3 text-xs", k.muted)}>{u.suspended ? tx(locale, "Suspendido", "Suspended") : <TimeAgo iso={u.lastSeen} locale={locale} />}</td>
                 <td className="px-3">
                   {u.id !== me?.id && (
                     <button disabled={busy === u.id} onClick={() => {
@@ -339,7 +340,7 @@ export function PlatformModeration({ locale, reports, listings }: { locale: Loca
                   );
                 })()}
               </div>
-              <div className={cn("mt-0.5 text-sm", k.muted)}>{tx(locale, m.reason.es, m.reason.en)} · {m.agency} · {ago(m.at, locale)}</div>
+              <div className={cn("mt-0.5 text-sm", k.muted)}>{tx(locale, m.reason.es, m.reason.en)} · {m.agency} · <TimeAgo iso={m.at} locale={locale} /></div>
               <div className="mt-2 flex gap-2">
                 <Button size="sm" variant="outline" className={k.outline} disabled={busy === m.id} onClick={() => run(m.id, () => api(`platform/moderation/${m.id}`, { method: "PATCH", json: { resolved: true } }))}>{tx(locale, "Descartar", "Dismiss")}</Button>
                 {m.listingId && confirming !== `report-${m.id}` && (
@@ -480,7 +481,7 @@ export function PlatformAI({ locale, settings, fx, counts }: { locale: Locale; s
                     <td className="py-2.5 font-semibold">1 USD →</td>
                     <td><input className={cn(k.input, "h-9 w-32 md:h-9")} type="number" step="0.01" value={r.perUsd} onChange={(e) => setRates(rates.map((x, j) => (j === i ? { ...x, perUsd: +e.target.value } : x)))} aria-label={r.code} /></td>
                     <td className="font-display">{r.code}</td>
-                    <td className={cn("text-xs", k.muted)}>{tx(locale, "actualizada", "updated")} {ago(r.updatedAt, locale)}{/seed|manual/i.test(r.source) ? tx(locale, " · a mano", " · by hand") : ` · ${r.source}`}</td>
+                    <td className={cn("text-xs", k.muted)}>{tx(locale, "actualizada", "updated")} <TimeAgo iso={r.updatedAt} locale={locale} />{/seed|manual/i.test(r.source) ? tx(locale, " · a mano", " · by hand") : ` · ${r.source}`}</td>
                   </tr>
                 ))}
               </tbody>

@@ -13,7 +13,8 @@ import { listingPhoto } from "@/lib/photos";
 import { PropertyArt } from "@/components/art/PropertyArt";
 import { Button } from "@/components/ui";
 import { Chip, Count, Empty, Initials, Pill, k, tab } from "./kit";
-import { ago, dateTime, money, priceSuffix, tx } from "@/lib/i18n";
+import { dateTime, money, priceSuffix, tx } from "@/lib/i18n";
+import { TimeAgo } from "@/components/owner/TimeAgo";
 import { cn } from "@/lib/cn";
 import { caracasInputToIso, isoToCaracasInput } from "@/lib/caracas-time";
 import { HubMessages, type HubThread } from "@/components/seeker/HubMessages";
@@ -384,8 +385,12 @@ export function LeadsInbox({ locale, initial, listings, agents, assignable = [],
           {visible.map((l) => {
             const lst = byId.get(l.listingId);
             const score = l.score ?? 0;
+            // Tinted row = the open lead. Below xl nothing is open until tapped (the detail is a sheet there), so the
+            // default first lead is only tinted from xl; badges on a tinted row switch to white so they keep contrast.
+            const tint = selId === l.id ? "" : sel?.id === l.id ? "xl" : null;
+            const onTint = tint === "" ? "bg-white dark:bg-white/15" : tint === "xl" ? "xl:bg-white xl:dark:bg-white/15" : "";
             return (
-              <div key={l.id} className={cn("flex items-stretch border-b last:border-b-0", k.line, sel?.id === l.id ? "bg-[#E6DDD2] shadow-[inset_3px_0_0_#1E1A18] dark:bg-white/[.07] dark:shadow-[inset_3px_0_0_#C9A574]" : picked.has(l.id) ? k.soft : k.hover)}>
+              <div key={l.id} className={cn("flex items-stretch border-b last:border-b-0", k.line, tint === "" ? "bg-[#E6DDD2] shadow-[inset_3px_0_0_#1E1A18] dark:bg-white/[.07] dark:shadow-[inset_3px_0_0_#C9A574]" : picked.has(l.id) ? k.soft : k.hover, tint === "xl" && "xl:bg-[#E6DDD2] xl:shadow-[inset_3px_0_0_#1E1A18] xl:dark:bg-white/[.07] xl:dark:shadow-[inset_3px_0_0_#C9A574]")}>
               <label className="flex shrink-0 cursor-pointer items-start py-3.5 pl-4 pr-1">
                 <input type="checkbox" className={BOX} checked={picked.has(l.id)} onChange={() => toggle(l.id)} aria-label={tx(locale, `Seleccionar ${l.name}`, `Select ${l.name}`)} />
               </label>
@@ -402,18 +407,18 @@ export function LeadsInbox({ locale, initial, listings, agents, assignable = [],
                   <div className="flex items-center gap-2">
                     <span className="truncate font-semibold">{l.name}</span>
                     {l.priority && <Star size={13} className="shrink-0 fill-gold text-gold" />}
-                    {minsAgo(l.createdAt) < 60 && l.stage === "NEW" && <Pill tone="neutral" className="max-sm:hidden">{tx(locale, "Nuevo", "New")}</Pill>}
+                    {minsAgo(l.createdAt) < 60 && l.stage === "NEW" && <Pill tone="neutral" className={cn("max-sm:hidden", onTint)}>{tx(locale, "Nuevo", "New")}</Pill>}
                   </div>
                   <div className={cn("truncate text-xs", k.muted)}>{lst ? tx(locale, lst.title_es, lst.title_en) : ""}</div>
                   <div className="mt-1 truncate text-sm text-navy/75 dark:text-ivory/70">{l.message}</div>
                   <div className="mt-2 flex flex-wrap items-center gap-2 sm:hidden">
-                    {minsAgo(l.createdAt) < 60 && l.stage === "NEW" && <Pill tone="neutral">{tx(locale, "Nuevo", "New")}</Pill>}
-                    <Chip className={score < 45 ? "bg-transparent text-muted shadow-[inset_0_0_0_1px_#D8CBB7] dark:text-mist" : ""}>{tx(locale, "Interés", "Interest")} {score}</Chip>
+                    {minsAgo(l.createdAt) < 60 && l.stage === "NEW" && <Pill tone="neutral" className={onTint}>{tx(locale, "Nuevo", "New")}</Pill>}
+                    <Chip className={score < 45 ? "bg-transparent text-muted shadow-[inset_0_0_0_1px_#D8CBB7] dark:text-mist" : onTint}>{tx(locale, "Interés", "Interest")} {score}</Chip>
                     <Sla lead={l} locale={locale} />
                   </div>
                 </div>
                 <div className="hidden flex-col items-end gap-1.5 sm:flex">
-                  <Chip className={score < 45 ? "bg-transparent text-muted shadow-[inset_0_0_0_1px_#D8CBB7] dark:text-mist" : ""}>{tx(locale, "Interés", "Interest")} {score}</Chip>
+                  <Chip className={score < 45 ? "bg-transparent text-muted shadow-[inset_0_0_0_1px_#D8CBB7] dark:text-mist" : onTint}>{tx(locale, "Interés", "Interest")} {score}</Chip>
                   <Sla lead={l} locale={locale} />
                 </div>
               </button>
@@ -454,7 +459,7 @@ export function LeadsInbox({ locale, initial, listings, agents, assignable = [],
                   <div className="mt-2 flex flex-wrap gap-2 text-xs">
                     <Chip>{SOURCE_LABEL[sel.source]?.[locale] ?? sel.source}</Chip>
                     {sel.budget && <Chip>{tx(locale, "Presupuesto", "Budget")} {money(sel.budget, locale)}</Chip>}
-                    <Chip className="gap-1"><Clock size={11} /> {ago(sel.createdAt, locale)}</Chip>
+                    <Chip className="gap-1"><Clock size={11} /> <TimeAgo iso={sel.createdAt} locale={locale} /></Chip>
                     {sel.agentId && agents[sel.agentId] && <Chip>{agents[sel.agentId]}</Chip>}
                   </div>
                 </div>
@@ -528,7 +533,7 @@ export function LeadsInbox({ locale, initial, listings, agents, assignable = [],
                     <li key={i} className="relative">
                       <span className={cn("absolute -left-[21px] top-1.5 h-2 w-2 rounded-full", i === 0 ? "bg-navy dark:bg-ivory" : "bg-[#C9C1B2] dark:bg-mist")} />
                       {eventText(e)}{" "}
-                      <span className={k.muted}>· {ago(e.at, locale)}</span>
+                      <span className={k.muted}>· <TimeAgo iso={e.at} locale={locale} /></span>
                     </li>
                   ))}
                 </ol>
@@ -538,11 +543,11 @@ export function LeadsInbox({ locale, initial, listings, agents, assignable = [],
             <div className={k.card}>
               <div className={cn("flex items-center gap-2 border-b px-5 py-4", k.line)}><MessageCircle size={17} strokeWidth={1.6} /> <span className={k.titleSm}>{tx(locale, "Conversación", "Conversation")}</span></div>
               <div className="max-h-80 space-y-3 overflow-y-auto p-4 scrollbar-thin">
-                <div className={cn("max-w-[80%] rounded-2xl rounded-bl-md px-3.5 py-2 text-sm", k.soft)}>{sel.message}<div className={cn("mt-1 text-[10px]", k.muted)}>{ago(sel.createdAt, locale)}</div></div>
+                <div className={cn("max-w-[80%] rounded-2xl rounded-bl-md px-3.5 py-2 text-sm", k.soft)}>{sel.message}<div className={cn("mt-1 text-[10px]", k.muted)}><TimeAgo iso={sel.createdAt} locale={locale} /></div></div>
                 {(detail.data?.messages ?? []).filter((m) => m.body !== sel.message).map((m) => (
                   <div key={m.id} className={cn("max-w-[80%] rounded-2xl px-3.5 py-2 text-sm", m.mine ? "np-in ml-auto rounded-br-md bg-navy text-ivory dark:bg-ivory dark:text-navy" : cn("rounded-bl-md", k.soft))}>
                     {m.body}
-                    <div className={cn("mt-1 text-[10px]", m.mine ? "opacity-70" : k.muted)}>{ago(m.at, locale)} · {m.from}</div>
+                    <div className={cn("mt-1 text-[10px]", m.mine ? "opacity-70" : k.muted)}><TimeAgo iso={m.at} locale={locale} /> · {m.from}</div>
                   </div>
                 ))}
               </div>

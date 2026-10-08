@@ -555,7 +555,7 @@ export function NightMap({
             </div>
           )}
           <div className="pointer-events-none absolute bottom-2 left-3 z-10 text-xs" style={{ color: pal.note }}>
-            {tx(locale, "Mapa ilustrativo · ubicación aproximada", "Illustrative map · approximate location")}
+            {tx(locale, "Mapa ilustrativo · la ubicación es aproximada", "Illustrative map · locations are approximate")}
           </div>
         </>
       )}

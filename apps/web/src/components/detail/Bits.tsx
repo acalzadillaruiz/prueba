@@ -18,7 +18,7 @@ export function BilingualBody({ l, locale, dark }: { l: Listing; locale: Locale;
             <span className={cn("rounded-full border-2 px-2.5 py-0.5 text-[13px] font-semibold tracking-[0.1em]", lang === x ? "np-sel" : cn("border-transparent", dark ? "text-mist" : "text-muted"))}>{x.toUpperCase()}</span>
           </button>
         ))}
-        <span className={cn("text-sm", dark ? "text-mist" : "text-muted")}>{tx(locale, "Ficha bilingüe", "Bilingual listing")}</span>
+        <span className={cn("text-sm", dark ? "text-mist" : "text-muted")}>{tx(locale, "En español e inglés", "In Spanish and English")}</span>
       </div>
       <h2 lang={lang} className="font-serif text-[26px] leading-tight">{lang === "es" ? l.title_es : l.title_en}</h2>
       <p lang={lang} className={cn("mt-3 max-w-[680px] text-[16px] leading-[1.75]", dark ? "text-ivory/80" : "text-ink/80")}>{lang === "es" ? l.body_es : l.body_en}</p>

@@ -43,7 +43,7 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
         <div className="mt-4 flex items-center justify-between gap-2 text-sm text-ivory/70">
           <span>{compactMoney(e.low, locale).replace("$", "USD ")}</span>
           <span className={cn("text-center font-semibold", Math.abs(diff) > 4 && diff > 0 ? "text-[#E9C98F]" : "text-[#9ED7B8]")}>
-            {inRange ? tx(locale, "Precio publicado dentro del rango", "Asking price within the range") : verdict}
+            {inRange ? tx(locale, "El precio pedido está dentro de lo esperado", "The asking price sits within the range") : verdict}
           </span>
           <span>{compactMoney(e.high, locale).replace("$", "USD ")}</span>
         </div>
@@ -84,7 +84,7 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
               </tbody>
             </table>
           </div>
-          <p className={cn("mt-3 text-sm", muted)}>{tx(locale, "Método: m² × precio de zona, ajustado por antigüedad, amenidades y comparables cercanos.", "Method: m² × area price, adjusted for age, amenities and nearby comparables.")}</p>
+          <p className={cn("mt-3 text-sm", muted)}>{tx(locale, "Cómo lo calculamos: m² × precio de la zona, ajustado por antigüedad, amenidades y casas parecidas cerca.", "How we work it out: m² × area price, adjusted for age, amenities and similar homes nearby.")}</p>
         </div>
       )}
       </div>

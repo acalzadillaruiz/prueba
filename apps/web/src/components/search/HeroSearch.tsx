@@ -81,11 +81,11 @@ export function HeroSearch({ locale }: { locale: Locale }) {
         go();
       }}
       role="search"
-      aria-label={tx(locale, "Buscar propiedades", "Search properties")}
+      aria-label={tx(locale, "Busca tu casa", "Find your home")}
       className="w-full max-w-[980px] rounded-[22px] bg-[#F1EBE3] p-3 text-[#1E1A18] shadow-[0_24px_60px_rgba(21,18,15,.35)] lg:rounded-full lg:p-2"
     >
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:gap-0">
-        <div className="grid grid-cols-3 gap-1 rounded-full bg-[#EDE4D5] p-1 lg:flex lg:shrink-0" role="group" aria-label={tx(locale, "Operación", "Operation")}>
+        <div className="grid grid-cols-3 gap-1 rounded-full bg-[#EDE4D5] p-1 lg:flex lg:shrink-0" role="group" aria-label={tx(locale, "¿Qué quieres hacer?", "What are you looking to do?")}>
           {TABS.map(([k, es, en]) => (
             <button
               key={k}
@@ -111,13 +111,13 @@ export function HeroSearch({ locale }: { locale: Locale }) {
             onChange={(e) => setText(e.target.value)}
             className={field}
             placeholder={tx(locale, "El Morro, Lechería…", "El Morro, Lechería…")}
-            aria-label={tx(locale, "Ubicación o lo que busca", "Location or what you want")}
+            aria-label={tx(locale, "Dónde, o qué buscas", "Where, or what you’re after")}
           />
         </label>
         <div className="hidden lg:contents">
           <label className="flex min-h-[52px] w-[170px] shrink-0 flex-col justify-center border-r border-[#D8CBB7] px-5">
             <span className={label}>{tx(locale, "Tipo", "Type")}</span>
-            <select value={kind} onChange={(e) => setKind(e.target.value)} className={cn(field, "-ml-1 cursor-pointer appearance-none")} aria-label={tx(locale, "Tipo de propiedad", "Property type")}>
+            <select value={kind} onChange={(e) => setKind(e.target.value)} className={cn(field, "-ml-1 cursor-pointer appearance-none")} aria-label={tx(locale, "Tipo de casa o inmueble", "Type of home")}>
               <option value="">{tx(locale, "Cualquier tipo", "Any type")}</option>
               {KINDS.map(([v, es, en]) => (
                 <option key={v} value={v}>{tx(locale, es, en)}</option>
@@ -140,7 +140,7 @@ export function HeroSearch({ locale }: { locale: Locale }) {
           className="flex min-h-[52px] shrink-0 items-center justify-center gap-2 rounded-full bg-coral-cta px-8 font-display text-[15px] font-semibold text-white transition-colors duration-np hover:bg-coral-cta-hover lg:min-h-12"
         >
           <Search size={17} aria-hidden className="lg:hidden" />
-          <span className="lg:hidden">{tx(locale, "Buscar propiedades", "Search properties")}</span>
+          <span className="lg:hidden">{tx(locale, "Buscar casas", "Find homes")}</span>
           <span className="hidden lg:inline">{tx(locale, "Buscar", "Search")}</span>
         </button>
       </div>

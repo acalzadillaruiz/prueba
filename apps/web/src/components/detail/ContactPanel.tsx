@@ -39,7 +39,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
   type F = { name: string; email: string; phone?: string; message: string };
   const form = useForm<F>({
     resolver: zodResolver(leadSchema.pick({ name: true, email: true, phone: true, message: true })),
-    defaultValues: { name: user?.name ?? "", email: user?.email ?? "", phone: user?.phone ?? "", message: tx(locale, "Hola, me interesa este inmueble. ¿Sigue disponible?", "Hi, I’m interested in this property. Is it still available?") },
+    defaultValues: { name: user?.name ?? "", email: user?.email ?? "", phone: user?.phone ?? "", message: tx(locale, "Hola, vi este anuncio en New Place y me interesa. ¿Sigue disponible?", "Hi, I saw this on New Place and I’m interested. Is it still available?") },
     mode: "onTouched",
   });
   // The session arrives after first paint on cached pages: pre-fill whatever the visitor hasn't typed yet.
@@ -54,7 +54,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
     [
       ["name", errs.name && `${tx(locale, "Nombre", "Name")}: ${fieldError(errs.name, locale, "text")}`],
       ["email", errs.email && fieldError(errs.email, locale, "email")],
-      ["phone", errs.phone && tx(locale, "El teléfono admite hasta 30 caracteres.", "Phone allows up to 30 characters.")],
+      ["phone", errs.phone && tx(locale, "Revisa el teléfono: puede tener hasta 30 caracteres.", "Please check the phone number: 30 characters max.")],
       ["message", errs.message && `${tx(locale, "Mensaje", "Message")}: ${fieldError(errs.message, locale, "text")}`],
     ] as [string, string | false | undefined][]
   ).filter((e): e is [string, string] => !!e[1]);
@@ -95,7 +95,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
     } catch (e) {
       const conflict = e instanceof ApiClientError && e.code === "CONFLICT";
       if (conflict) setIso(null);
-      setErr(conflict ? tx(locale, "Ese horario acaba de ocuparse. Elige otro.", "That slot was just taken. Pick another.") : (e as Error).message);
+      setErr(conflict ? tx(locale, "Alguien acaba de reservar esa hora. Elige otra, por favor.", "Someone just booked that time. Please pick another.") : (e as Error).message);
       qc.invalidateQueries({ queryKey: ["slots", l.id] });
     } finally {
       setBusy(false);
@@ -114,14 +114,14 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
     return (
       <div id="contact-panel" tabIndex={-1} className={cn("np-in rounded-[28px] p-6 ring-1", box)} data-testid="lead-done">
         <CheckCircle2 className="text-ok" size={30} />
-        <div className="mt-3 font-serif text-[28px] leading-tight">{mode === "tour" && done ? tx(locale, "Visita solicitada", "Tour requested") : tx(locale, "Mensaje enviado", "Message sent")}</div>
+        <div className="mt-3 font-serif text-[28px] leading-tight">{mode === "tour" && done ? tx(locale, "Tu visita está pedida", "Your viewing is requested") : tx(locale, "Tu mensaje ya llegó", "Your message is on its way")}</div>
         {done && <div className="mt-1 font-display text-[17px] font-semibold first-letter:uppercase text-ink">{done}</div>}
         <p className={cn("mt-2 text-[15px]", muted)}>
-          {tx(locale, `${agent?.name.split(" ")[0] ?? "El agente"} suele responder en menos de 15 minutos. Te contactará en ${email}.`, `${agent?.name.split(" ")[0] ?? "The agent"} usually replies within 15 minutes and will contact you at ${email}.`)}
+          {tx(locale, `${agent?.name.split(" ")[0] ?? "Tu asesor"} suele contestar en menos de 15 minutos. Te escribirá a ${email}.`, `${agent?.name.split(" ")[0] ?? "Your advisor"} usually replies within 15 minutes and will write to you at ${email}.`)}
         </p>
         <div className="mt-5 flex flex-wrap gap-2">
           {user && <Button href={`/${locale}/app`} size="sm" variant="navy">{tx(locale, "Ver en mi Hub", "Open my Hub")}</Button>}
-          <Button size="sm" variant={dark ? "dark-outline" : "outline"} onClick={() => { setDone(null); setIso(null); setDay(null); }}>{tx(locale, "Nueva solicitud", "New request")}</Button>
+          <Button size="sm" variant={dark ? "dark-outline" : "outline"} onClick={() => { setDone(null); setIso(null); setDay(null); }}>{tx(locale, "Enviar otra", "Send another")}</Button>
         </div>
       </div>
     );
@@ -146,7 +146,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
       {(canChat || (agency?.verified && l.agencyId)) && (
         <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
           {canChat && (
-            <Button size="md" variant={dark ? "dark-outline" : "outline"} onClick={openChat} disabled={chatBusy} aria-label={tx(locale, `Contactar a ${agent!.name} por chat`, `Chat with ${agent!.name}`)}>
+            <Button size="md" variant={dark ? "dark-outline" : "outline"} onClick={openChat} disabled={chatBusy} aria-label={tx(locale, `Escribirle a ${agent!.name} por chat`, `Chat with ${agent!.name}`)}>
               {chatBusy ? <Loader2 size={16} className="animate-spin" aria-hidden /> : <MessagesSquare size={16} aria-hidden />} {tx(locale, "Contactar", "Contact")}
             </Button>
           )}
@@ -161,7 +161,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
           )}
         </div>
       )}
-      {!agent && !agency && <div className={cn("text-sm", muted)}>{tx(locale, "Propietario · publica directo", "Owner · listing directly")}</div>}
+      {!agent && !agency && <div className={cn("text-sm", muted)}>{tx(locale, "La publica su dueño, sin intermediarios", "Listed directly by the owner")}</div>}
       <div className={cn("mt-5 grid gap-1 rounded-full bg-[#F3EEE5] p-1 dark:bg-white/5", bookable ? "grid-cols-2" : "grid-cols-1")}>
         {bookable && (
           <button onClick={() => setMode("tour")} aria-pressed={mode === "tour"} className={seg(mode === "tour")}>
@@ -174,13 +174,13 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
       </div>
       {mode === "tour" && (
         <div className="mt-5">
-          <div className="np-eyebrow mb-3 text-gold-text">{tx(locale, "Agendar una visita privada", "Book a private viewing")}</div>
+          <div className="np-eyebrow mb-3 text-gold-text">{tx(locale, "Elige cuándo quieres verla", "Choose when to see it")}</div>
           {slots.isLoading && (
-            <div className="grid grid-cols-4 gap-2" aria-label={tx(locale, "Cargando agenda…", "Loading calendar…")}>
+            <div className="grid grid-cols-4 gap-2" aria-label={tx(locale, "Buscando horarios libres…", "Finding free times…")}>
               {[0, 1, 2, 3].map((i) => <div key={i} className="np-skeleton h-[86px] rounded-xl" />)}
             </div>
           )}
-          {!slots.isLoading && days.length === 0 && <div className={cn("text-sm", muted)}>{tx(locale, "Sin horarios esta semana. Envía un mensaje y te propondrán uno.", "No slots this week. Send a message and they’ll propose one.")}</div>}
+          {!slots.isLoading && days.length === 0 && <div className={cn("text-sm", muted)}>{tx(locale, "Esta semana no hay horarios abiertos. Escribe un mensaje y te proponemos otro momento.", "No open times this week. Send a message and we’ll suggest another.")}</div>}
           <div className="no-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
             {days.map((d, i) => {
               const label = fmt(d.date, { weekday: "short", day: "numeric" });
@@ -207,7 +207,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
           </div>
           {days.length > 0 && !days[day]?.hours.some((h) => h.available) && (
             <div className={cn("mt-3 text-sm", muted)} role="status">
-              {firstOpenDay === -1 ? tx(locale, "No quedan horarios libres esta semana. Envía un mensaje y te propondrán uno.", "No free slots left this week. Send a message and they’ll propose one.") : tx(locale, "Este día ya no tiene horarios libres. Elige otro día.", "No free slots left on this day. Pick another day.")}
+              {firstOpenDay === -1 ? tx(locale, "Esta semana ya está completa. Escribe un mensaje y te proponemos otro momento.", "This week is fully booked. Send a message and we’ll suggest another time.") : tx(locale, "Ese día ya está completo. Prueba con otro.", "That day is fully booked. Try another.")}
             </div>
           )}
           <div className="mt-3 grid grid-cols-3 gap-2">
@@ -231,7 +231,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
           </div>
           <label className={cn("mt-3 flex min-h-11 cursor-pointer items-center gap-2 text-sm", muted)}>
             <input type="checkbox" checked={virtual} onChange={(e) => setVirtual(e.target.checked)} className="h-5 w-5 accent-[#1E1A18]" />
-            <Video size={14} aria-hidden /> {tx(locale, "Prefiero visita por videollamada", "I prefer a video tour")}
+            <Video size={14} aria-hidden /> {tx(locale, "Prefiero verla por videollamada", "I’d rather see it on a video call")}
           </label>
         </div>
       )}
@@ -242,7 +242,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
             <span className="sr-only">{tx(locale, "(se abre en una pestaña nueva)", "(opens in a new tab)")}</span>
           </a>
           <div className={cn("my-4 flex items-center gap-3 text-sm", muted)}>
-            <span className="h-px flex-1 bg-line" aria-hidden /> {tx(locale, "o déjenos sus datos", "or leave your details")} <span className="h-px flex-1 bg-line" aria-hidden />
+            <span className="h-px flex-1 bg-line" aria-hidden /> {tx(locale, "o déjanos tus datos", "or leave us your details")} <span className="h-px flex-1 bg-line" aria-hidden />
           </div>
         </>
       )}
@@ -267,7 +267,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
         {mode === "tour" ? tx(locale, "Solicitar visita", "Request tour") : tx(locale, "Enviar mensaje", "Send message")}
       </Button>
       <p className={cn("mt-3 text-center text-sm", muted)}>
-        {bookable && mode === "tour" ? tx(locale, "Horarios reales de la agenda del asesor · Sin costo", "Real slots from the advisor’s calendar · Free") : tx(locale, "Suele responder en menos de 15 minutos", "Usually replies within 15 minutes")}
+        {bookable && mode === "tour" ? tx(locale, "Horarios reales de tu asesor · Sin costo", "Your advisor’s real availability · Free") : tx(locale, "Suele contestar en menos de 15 minutos", "Usually replies within 15 minutes")}
       </p>
     </div>
   );

@@ -9,10 +9,10 @@ import { pageMeta } from "@/lib/seo";
 export const dynamic = "force-dynamic";
 
 const SEARCH_TITLE: Record<string, [string, string]> = {
-  SALE: ["Inmuebles en venta", "Homes for sale"],
-  LONG_RENT: ["Inmuebles en alquiler", "Homes for rent"],
+  SALE: ["Casas y apartamentos en venta", "Homes for sale"],
+  LONG_RENT: ["Casas y apartamentos en alquiler", "Homes for rent"],
   SHORT_RENT: ["Alquiler vacacional", "Vacation rentals"],
-  COMMERCIAL: ["Inmuebles comerciales", "Commercial property"],
+  COMMERCIAL: ["Locales y espacios comerciales", "Commercial spaces"],
 };
 
 export async function generateMetadata({ params, searchParams }: { params: Promise<{ locale: Locale }>; searchParams: Promise<Record<string, string>> }) {
@@ -22,7 +22,7 @@ export async function generateMetadata({ params, searchParams }: { params: Promi
   const [es, en] = SEARCH_TITLE[type];
   const where = sp.zone ? ` · ${sp.zone}` : "";
   return pageMeta(locale, (locale === "es" ? es : en) + where, `/search?type=${type}${sp.zone ? `&zone=${encodeURIComponent(sp.zone)}` : ""}`, {
-    description: locale === "es" ? `${es} en Venezuela con mapa, precios verificados y PlaceEstimate.` : `${en} in Venezuela with map, verified prices and PlaceEstimate.`,
+    description: locale === "es" ? `${es} en Venezuela, sobre el mapa, con precios verificados y lo que vale cada una según PlaceEstimate.` : `${en} in Venezuela, on the map, with verified prices and what each one is really worth, by PlaceEstimate.`,
   });
 }
 
@@ -35,7 +35,7 @@ export default async function SearchPage({ params, searchParams }: { params: Pro
     <div className="np-public">
       <PublicHeader locale={locale} />
       <main id="main">
-      <h1 className="sr-only">{locale === "es" ? "Buscar inmuebles" : "Search properties"}</h1>
+      <h1 className="sr-only">{locale === "es" ? "Busca tu próxima casa" : "Find your next home"}</h1>
       <Suspense>
         <SearchView locale={locale} initial={{ items: initial.items, total: initial.total }} zones={zones.map((z) => z.zone)} />
       </Suspense>

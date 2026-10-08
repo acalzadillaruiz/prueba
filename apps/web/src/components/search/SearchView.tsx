@@ -230,8 +230,8 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
             <input
               value={nl}
               onChange={(e) => setNl(e.target.value)}
-              placeholder={tx(locale, "Escribe lo que buscas…", "Describe what you want…")}
-              aria-label={tx(locale, "Búsqueda en lenguaje natural", "Natural-language search")}
+              placeholder={tx(locale, "Cuéntanos qué buscas…", "Tell us what you’re after…")}
+              aria-label={tx(locale, "Cuéntanos con tus palabras qué buscas", "Describe what you’re after in your own words")}
               className="min-w-0 flex-1 bg-transparent text-sm focus:outline-none"
             />
           </form>
@@ -284,7 +284,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
           </select>
           <button onClick={() => setMoreOpen((o) => !o)} aria-expanded={moreOpen} aria-controls="search-more-filters" className={cn(pill, "border-line bg-white", (moreOpen || baths || minM2 || essCount) && on)}>
             <SlidersHorizontal size={15} /> {tx(locale, "Más filtros", "More filters")}
-            {essCount > 0 && <span className="rounded-full bg-navy px-1.5 text-xs font-semibold text-ivory [font-feature-settings:'lnum']" aria-label={tx(locale, `${essCount} servicios esenciales activos`, `${essCount} essential-service filters on`)}>{essCount}</span>}
+            {essCount > 0 && <span className="rounded-full bg-navy px-1.5 text-xs font-semibold text-ivory [font-feature-settings:'lnum']" aria-label={tx(locale, `${essCount} filtros de servicios esenciales activos`, `${essCount} essential-service filters on`)}>{essCount}</span>}
             <ChevronDown size={14} />
           </button>
           <button
@@ -300,7 +300,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
             aria-live="polite"
             className={cn(pill, "ml-auto disabled:cursor-default", alertSaved ? "border-ok bg-ok text-white" : "np-btn-navy border-navy bg-navy font-semibold text-ivory hover:bg-navy-2")}
           >
-            {alertSaved ? <Check size={15} /> : savingAlert ? <Loader2 size={15} className="animate-spin" /> : <Bell size={15} />} {alertSaved ? tx(locale, "Alerta creada", "Alert saved") : tx(locale, "Guardar búsqueda", "Save search")}
+            {alertSaved ? <Check size={15} /> : savingAlert ? <Loader2 size={15} className="animate-spin" /> : <Bell size={15} />} {alertSaved ? tx(locale, "Búsqueda guardada", "Search saved") : tx(locale, "Guardar búsqueda", "Save search")}
           </button>
         </div>
         {alertError && (
@@ -450,7 +450,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
             }}
             aria-expanded={mobileList}
             aria-controls="search-results"
-            aria-label={mobileList ? tx(locale, "Ocultar lista y ver el mapa", "Hide list and show the map") : `${tx(locale, "Ver lista", "Show list")} · ${plural(query.data?.total ?? results.length, locale, ["resultado", "resultados"], ["result", "results"])}`}
+            aria-label={mobileList ? tx(locale, "Volver al mapa", "Back to the map") : `${tx(locale, "Ver la lista", "See the list")} · ${plural(query.data?.total ?? results.length, locale, ["resultado", "resultados"], ["result", "results"])}`}
             className="flex h-7 w-full shrink-0 touch-none items-center justify-center lg:hidden"
           >
             <span className="h-1.5 w-12 rounded-full bg-ink/25" aria-hidden />
@@ -461,15 +461,15 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
               <div>
                 <div className="font-serif text-[26px] leading-tight">
                   {plural(query.data?.total ?? results.length, locale, ["resultado", "resultados"], ["result", "results"])}{query.isFetching && <Loader2 size={15} className="ml-2 inline animate-spin text-muted" />}
-                  {shape && <span className="ml-2 inline-block rounded-full bg-[#C2A988] px-2.5 py-0.5 align-middle font-display text-xs font-semibold text-[#433B35]">{tx(locale, "en tu zona dibujada", "in your drawn area")}</span>}
+                  {shape && <span className="ml-2 inline-block rounded-full bg-[#C2A988] px-2.5 py-0.5 align-middle font-display text-xs font-semibold text-[#433B35]">{tx(locale, "en la zona que dibujaste", "in the area you drew")}</span>}
                 </div>
                 <div className="text-sm text-muted">{tx(locale, "Precios en dólares, siempre al día", "Prices in US dollars, always up to date")}</div>
               </div>
               <select value={sort} onChange={(e) => set({ sort: e.target.value === "new" ? null : e.target.value })} aria-label={tx(locale, "Ordenar por", "Sort by")} className="h-11 rounded-full border border-ink/10 bg-white/75 backdrop-blur px-3 text-sm md:h-9">
-                <option value="new">{tx(locale, "Más nuevos", "Newest")}</option>
-                <option value="price-asc">{tx(locale, "Precio ↑", "Price ↑")}</option>
-                <option value="price-desc">{tx(locale, "Precio ↓", "Price ↓")}</option>
-                <option value="ppm">{tx(locale, "USD/m² ↑", "USD/m² ↑")}</option>
+                <option value="new">{tx(locale, "Lo más reciente", "Newest first")}</option>
+                <option value="price-asc">{tx(locale, "Menor precio", "Lowest price")}</option>
+                <option value="price-desc">{tx(locale, "Mayor precio", "Highest price")}</option>
+                <option value="ppm">{tx(locale, "Mejor precio por m²", "Best value per m²")}</option>
               </select>
             </div>
             {activeChips.length > 0 && (
@@ -495,11 +495,11 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
             <div className="p-4">
               <EmptyState
                 monogram
-                title={tx(locale, "Nada por aquí… todavía", "Nothing here… yet")}
-                body={tx(locale, "Guarda la búsqueda y te avisamos en cuanto aparezca algo que encaje.", "Save this search and we’ll tell you as soon as something matches.")}
+                title={tx(locale, "Aún no hay casas aquí", "No homes here yet")}
+                body={tx(locale, "Prueba a ampliar la zona o quitar algún filtro. O guarda la búsqueda y te avisamos en cuanto aparezca algo para ti.", "Try widening the area or removing a filter. Or save this search and we’ll let you know the moment something turns up.")}
                 cta={
                   <button onClick={createAlert} disabled={alertSaved || savingAlert} className="np-btn-navy min-h-11 rounded-full bg-navy px-5 font-display font-semibold text-ivory disabled:opacity-60">
-                    {alertSaved ? tx(locale, "Alerta creada", "Alert saved") : tx(locale, "Crear alerta", "Create alert")}
+                    {alertSaved ? tx(locale, "Búsqueda guardada", "Search saved") : tx(locale, "Avísame", "Let me know")}
                   </button>
                 }
               />

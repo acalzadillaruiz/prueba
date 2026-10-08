@@ -57,7 +57,7 @@ export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: bo
     ["street", MapPinned, tx(locale, "Vista de calle", "Street view"), !!GOOGLE_MAPS_KEY],
   ];
   const tag = illustrated && (
-    <span className="pointer-events-none absolute bottom-4 left-4 np-glass rounded-full px-3 py-1 font-display text-[13px] text-ink">{tx(locale, "Ilustración · sin fotos reales aún", "Illustration · no real photos yet")}</span>
+    <span className="pointer-events-none absolute bottom-4 left-4 np-glass rounded-full px-3 py-1 font-display text-[13px] text-ink">{tx(locale, "Ilustración · aún sin fotos reales", "Illustration · real photos to come")}</span>
   );
   const thumbs = shots.slice(1, 5);
   const allLabel = illustrated ? tx(locale, `Ver las ${total} ilustraciones`, `View all ${total} illustrations`) : tx(locale, `Ver las ${total} fotos`, `View all ${total} photos`);
@@ -138,7 +138,7 @@ export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: bo
             {tab === "plan" && (
               <figure className="w-full max-w-4xl">
                 <Floorplan seed={l.id} beds={l.beds} className="max-h-[70vh] w-full rounded-np" />
-                <figcaption className="mt-2 text-center text-sm text-mist">{tx(locale, "Plano orientativo: distribución aproximada, no a escala. Pide el plano definitivo al anunciante.", "Indicative floor plan: approximate layout, not to scale. Ask the lister for the final plan.")}</figcaption>
+                <figcaption className="mt-2 text-center text-sm text-mist">{tx(locale, "Plano orientativo: muestra la distribución aproximada y no está a escala. Pide el plano final a quien la publica.", "Indicative floor plan: an approximate layout, not to scale. Ask the lister for the final plan.")}</figcaption>
               </figure>
             )}
             {tab === "street" && GOOGLE_MAPS_KEY && (

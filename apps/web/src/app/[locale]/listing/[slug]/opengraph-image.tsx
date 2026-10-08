@@ -30,7 +30,7 @@ export default async function OgImage({ params }: { params: Promise<{ locale: Lo
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
           <div style={{ width: 120, height: 2, background: "#B08A55" }} />
-          <div style={{ fontSize: 66, lineHeight: 1.08, maxWidth: 1050 }}>{l ? title : tx(locale, "Pocas propiedades. Todas extraordinarias.", "Few properties. All extraordinary.")}</div>
+          <div style={{ fontSize: 66, lineHeight: 1.08, maxWidth: 1050 }}>{l ? title : tx(locale, "Hay casas que se visitan. Y otras que se quedan contigo.", "Some homes you visit. Others stay with you.")}</div>
           <div style={{ fontSize: 32, color: "#B5AAA0", fontFamily: "sans-serif" }}>{l ? where : tx(locale, "El Caribe, con alma mediterránea", "The Caribbean, with a Mediterranean soul")}</div>
         </div>
         <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>

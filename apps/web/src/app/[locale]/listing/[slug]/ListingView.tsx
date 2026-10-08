@@ -43,7 +43,7 @@ function Essentials({ l, locale, title }: { l: Listing; locale: Locale; title: R
           );
         })}
       </ul>
-      <p className="mt-3 text-sm text-muted">{tx(locale, "Datos declarados por el anunciante. Si un servicio no aparece, no fue informado.", "As declared by the lister. Services not shown were not reported.")}</p>
+      <p className="mt-3 text-sm text-muted">{tx(locale, "Lo indica quien publica la casa. Si un servicio no aparece, es porque no lo informó.", "As stated by the lister. If a service isn’t shown, it wasn’t reported.")}</p>
     </div>
   );
 }
@@ -134,7 +134,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
           </nav>
           {!isPublic && (
             <div className="mb-3 rounded-xl border border-warn/60 bg-[#8A5A001a] px-4 py-2.5 text-sm font-semibold text-[#8A5A00]">
-              {l.review === "PENDING" ? tx(locale, "Pendiente de aprobación: solo tu equipo ve esta ficha.", "Pending approval: only your team can see this listing.") : tx(locale, `No publicado (${l.status}). Solo tu equipo ve esta ficha.`, `Not public (${l.status}). Only your team can see this listing.`)}
+              {l.review === "PENDING" ? tx(locale, "En revisión: por ahora solo tu equipo puede verla.", "Under review: for now only your team can see it.") : tx(locale, `Aún no está publicada (${l.status}). Solo tu equipo puede verla.`, `Not public yet (${l.status}). Only your team can see it.`)}
               {l.takedownReason && ` · ${l.takedownReason}`}
             </div>
           )}
@@ -142,7 +142,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
           {isPublic && <ViewBeacon id={l.id} />}
           {l.luxury && l.brochurePdf && (
             <a href={l.brochurePdf} target="_blank" rel="noreferrer" className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-full border-[1.5px] border-navy px-5 font-display text-sm font-semibold text-navy hover:bg-navy/5">
-              {tx(locale, "Descargar brochure (PDF)", "Download brochure (PDF)")}
+              {tx(locale, "Descargar el folleto (PDF)", "Download the brochure (PDF)")}
             </a>
           )}
           {isPublic && (
@@ -183,7 +183,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
               <Freshness iso={l.updatedAt} locale={locale} />
               <span className="inline-flex items-center gap-1.5"><Eye size={15} aria-hidden /> {num(l.stats.impressions, locale)} {tx(locale, "vistas", "views")}</span>
               <span className="inline-flex items-center gap-1.5"><Heart size={15} aria-hidden /> {l.stats.saves} {tx(locale, "lo guardaron", "saves")}</span>
-              <span className="inline-flex items-center gap-1.5"><Clock size={15} aria-hidden /> {l.daysOnMarket === 0 ? tx(locale, "Publicado hoy", "Listed today") : plural(l.daysOnMarket, locale, ["día publicado", "días publicado"], ["day on New Place", "days on New Place"])}</span>
+              <span className="inline-flex items-center gap-1.5"><Clock size={15} aria-hidden /> {l.daysOnMarket === 0 ? tx(locale, "Publicado hoy", "Listed today") : plural(l.daysOnMarket, locale, ["día en New Place", "días en New Place"], ["day on New Place", "days on New Place"])}</span>
             </div>
 
             <div className="mt-8 py-6"><BilingualBody l={l} locale={locale} /></div>
@@ -216,7 +216,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
               <H>{tx(locale, "Ubicación", "Location")}</H>
               <DetailMap l={mapListing(l)} locale={locale} nearby={nearby.map(mapListing)} />
               <p className="mt-3 text-sm text-muted">
-                {tx(locale, "Colegios y trayectos se muestran solo cuando hay datos verificados para la zona.", "Schools and commute times appear only when verified data exists for the area.")}
+                {tx(locale, "Te mostramos colegios y tiempos de trayecto solo cuando los hemos verificado en la zona.", "We show schools and travel times only once we’ve verified them for the area.")}
               </p>
             </div>
 
@@ -226,8 +226,8 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
                 <PriceHistory events={l.priceHistory} locale={locale} />
               </div>
               <div>
-                <H>{tx(locale, `Informe de zona · ${l.zone}`, `Area report · ${l.zone}`)}</H>
-                <p className="-mt-3 mb-4 text-sm text-muted">{zone.live ? tx(locale, "Calculado con los anuncios publicados en New Place.", "Computed from listings published on New Place.") : tx(locale, "Pocos anuncios en la zona: valores de referencia.", "Few listings in this area: reference values.")}</p>
+                <H>{tx(locale, `La zona en cifras · ${l.zone}`, `The area in numbers · ${l.zone}`)}</H>
+                <p className="-mt-3 mb-4 text-sm text-muted">{zone.live ? tx(locale, "Calculado con las casas publicadas en New Place.", "Worked out from the homes listed on New Place.") : tx(locale, "Aún hay pocas casas publicadas aquí: tómalo como una referencia.", "Only a few homes listed here so far: treat these as a guide.")}</p>
                 <div className="grid grid-cols-2 gap-3">
                   {[
                     [money(zone.salePpm, locale), tx(locale, "USD/m² venta", "USD/m² sale")],
@@ -246,7 +246,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
 
             {soldNearby.length > 0 && (
               <div className={sec}>
-                <H>{tx(locale, "Vendidos cerca", "Sold nearby")}</H>
+                <H>{tx(locale, "Se vendieron cerca", "Recently sold nearby")}</H>
                 <div className="divide-y divide-line rounded-[20px] bg-white/70 ring-1 ring-black/[.04]">
                   {soldNearby.map((s) => (
                     <div key={s.t} className="flex items-center justify-between gap-3 px-4 py-3 text-[15px]">

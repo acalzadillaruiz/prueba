@@ -16,7 +16,7 @@ import { pageMeta } from "@/lib/seo";
 export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params;
   return pageMeta(locale, tx(locale, "Colección Privada", "Private Collection"), "/luxury", {
-    description: tx(locale, "Residencias exclusivas verificadas en Lechería, El Morro, Margarita y Caracas.", "Verified exclusive residences in Lechería, El Morro, Margarita and Caracas."),
+    description: tx(locale, "Casas excepcionales, revisadas una a una, en Lechería, El Morro, Margarita y Caracas.", "Exceptional homes, each one checked by hand, in Lechería, El Morro, Margarita and Caracas."),
   });
 }
 
@@ -63,7 +63,7 @@ export default async function LuxuryPage({ params }: { params: Promise<{ locale:
           <p className="max-w-md text-[15px] text-muted">{tx(locale, "Cada una con su asesor de confianza y lo que vale de verdad, según ventas reales.", "Each with a trusted advisor and what it\u2019s really worth, from real sales.")}</p>
         </div>
         {!hero ? (
-          <EmptyState monogram title={tx(locale, "La colección se está renovando", "The collection is being renewed")} body={tx(locale, "Pida acceso y le avisaremos de las nuevas residencias en privado.", "Request access and we’ll tell you privately about new residences.")} />
+          <EmptyState monogram title={tx(locale, "Estamos renovando la colección", "We’re refreshing the collection")} body={tx(locale, "Pide acceso y te contamos en privado cuando lleguen casas nuevas.", "Ask for access and we’ll tell you privately when new homes arrive.")} />
         ) : (
           <div className="grid gap-x-8 gap-y-16 md:grid-cols-2">
             {lux.map((l, i) => {
@@ -93,23 +93,23 @@ export default async function LuxuryPage({ params }: { params: Promise<{ locale:
           <div>
             <p className="np-eyebrow text-[#D4B98C]">{tx(locale, "Acceso privado", "Private access")}</p>
             <h2 className="mt-3 text-[36px] leading-tight md:text-[48px]">
-              {tx(locale, `${privateCount} ${privateCount === 1 ? "residencia privada disponible" : "residencias privadas disponibles"}`, `${privateCount} private residence${privateCount === 1 ? "" : "s"} available`)}
+              {tx(locale, `${privateCount} ${privateCount === 1 ? "casa privada disponible" : "casas privadas disponibles"}`, `${privateCount} private home${privateCount === 1 ? "" : "s"} available`)}
             </h2>
             <ul className="mt-6 space-y-3 text-[15px] text-ivory/80">
               {[
-                tx(locale, "Se comparten solo con enlace, tras una precalificación breve", "Shared by link only, after a short pre-qualification"),
-                tx(locale, "Visitas privadas en la agenda real del asesor", "Private viewings on the advisor’s real calendar"),
-                tx(locale, "Videovisita si compra desde el exterior", "Video tour if you buy from abroad"),
+                tx(locale, "Solo por enlace, después de una breve charla para conocerte", "By link only, after a short chat to get to know you"),
+                tx(locale, "Visitas privadas, con la agenda real de tu asesor", "Private viewings, on your advisor’s real calendar"),
+                tx(locale, "Videovisita si compras desde fuera del país", "Video tours if you’re buying from abroad"),
               ].map((x) => (
                 <li key={x} className="flex items-center gap-3"><RoofGlyph className="text-[#C9A574]" /> {x}</li>
               ))}
             </ul>
           </div>
           <div className="rounded-[24px] border border-[#B08A55]/40 p-8 text-center">
-            <p className="mx-auto max-w-sm text-[15px] text-ivory/80">{tx(locale, "Escriba a un asesor de la colección: le enviamos el enlace tras una precalificación breve.", "Write to a collection advisor: we’ll send the link after a short pre-qualification.")}</p>
+            <p className="mx-auto max-w-sm text-[15px] text-ivory/80">{tx(locale, "Escríbele a un asesor de la colección. Tras una breve charla, te enviamos el enlace.", "Write to a collection advisor. After a short chat, we’ll send you the link.")}</p>
             {hero && (
               <Button href={`/${locale}/listing/${hero.slug}#contact`} variant="primary" size="lg" className="mt-6">
-                {tx(locale, "Solicitar acceso", "Request access")}
+                {tx(locale, "Pedir acceso", "Ask for access")}
               </Button>
             )}
           </div>

@@ -48,7 +48,7 @@ export function CompareButton({ id, locale, dark, className }: { id: string; loc
         className,
       )}
     >
-      <Scale size={13} /> <span aria-live="polite">{full ? tx(locale, "Máximo 3: quita uno", "Max 3: remove one") : on ? tx(locale, "Comparando", "Comparing") : tx(locale, "Comparar", "Compare")}</span>
+      <Scale size={13} /> <span aria-live="polite">{full ? tx(locale, "Máx. 3: quita una", "Max 3: remove one") : on ? tx(locale, "Comparando", "Comparing") : tx(locale, "Comparar", "Compare")}</span>
     </button>
   );
 }

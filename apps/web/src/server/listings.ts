@@ -165,13 +165,14 @@ export interface SearchFilters extends EssentialsFilters {
   amenities?: string[];
   bbox?: [number, number, number, number]; // south, west, north, east
   shape?: Shape;
-  sort?: "new" | "price-asc" | "price-desc" | "ppm";
+  sort?: "rec" | "new" | "price-asc" | "price-desc" | "ppm";
   cursor?: string;
   take?: number;
 }
 
 const TYPES = ["SALE", "LONG_RENT", "SHORT_RENT", "COMMERCIAL_SALE", "COMMERCIAL_RENT", "COMMERCIAL"];
-const SORTS = ["new", "price-asc", "price-desc", "ppm"];
+/** "rec" (Recomendados) is the default; "new" (Lo más reciente) is plain newest first. */
+const SORTS = ["rec", "new", "price-asc", "price-desc", "ppm"];
 const PUBS = ["24h", "7d"];
 /** Friendly aliases people type or share: ?type=rent, ?type=venta… */
 const TYPE_ALIASES: Record<string, string> = { BUY: "SALE", VENTA: "SALE", RENT: "LONG_RENT", ALQUILER: "LONG_RENT", VACATION: "SHORT_RENT", VACACIONAL: "SHORT_RENT", COMERCIAL: "COMMERCIAL" };
@@ -218,7 +219,7 @@ export function filtersFromParams(sp: URLSearchParams): SearchFilters {
     ...essentialsFromParams(sp),
     bbox: bbox?.length === 4 && bbox.every(Number.isFinite) ? (bbox as SearchFilters["bbox"]) : undefined,
     shape,
-    sort: oneOf<NonNullable<SearchFilters["sort"]>>("sort", SORTS) ?? "new",
+    sort: oneOf<NonNullable<SearchFilters["sort"]>>("sort", SORTS) ?? "rec",
     cursor: sp.get("cursor") ?? undefined,
     take: num("take"),
   };
@@ -269,13 +270,46 @@ export function whereFromFilters(f: SearchFilters): Prisma.ListingWhereInput {
 }
 
 /**
- * Default order ("Lo más reciente"): newest first, but homes without photos and "Próximamente" ones go after the
- * rest (still listed, never hidden) — a grey placeholder or a home you can't visit yet shouldn't open the list.
- * 0 = complete and available, 1 = coming soon, 2 = no photos.
+ * Availability tier of the default order: 0 = has photos and can be visited, 1 = coming soon, 2 = no photos. A grey
+ * placeholder or a home you can't visit yet shouldn't open the list (still listed, never hidden).
  */
 export function listingRank(l: { status: string; photoCount: number }): number {
   if (l.photoCount === 0) return 2;
   return l.status === "COMING_SOON" ? 1 : 0;
+}
+
+/** Photos beyond this many don't rank a home higher (the card shows 5). */
+export const RANK_PHOTO_CAP = 5;
+
+export interface RankFacts {
+  status: string;
+  photoCount: number;
+  bodyLength: number;
+  beds: number;
+  baths: number;
+  amenityCount: number;
+  media: boolean;
+  essentials: boolean;
+}
+
+/** How complete a listing is, 0–6: a real description, rooms, bathrooms, amenities, a plan/video/tour, essentials. */
+export function completeness(l: RankFacts): number {
+  return [l.bodyLength >= 120, l.beds > 0, l.baths > 0, l.amenityCount >= 3, l.media, l.essentials].filter(Boolean).length;
+}
+
+/**
+ * "Recomendados" (default order): homes with photos first (available before coming soon), then more photos (capped),
+ * then more complete listings, then the newest — `items` must come newest first; the sort is stable, so recency
+ * breaks every tie.
+ */
+export function recommendedOrder<T extends RankFacts>(items: T[]): T[] {
+  const key = (l: T) => [listingRank(l), -Math.min(l.photoCount, RANK_PHOTO_CAP), -completeness(l)];
+  const keys = new Map(items.map((l) => [l, key(l)]));
+  return [...items].sort((a, b) => {
+    const ka = keys.get(a)!;
+    const kb = keys.get(b)!;
+    return ka[0] - kb[0] || ka[1] - kb[1] || ka[2] - kb[2];
+  });
 }
 
 export async function searchListings(f: SearchFilters): Promise<{ items: Listing[]; nextCursor: string | null; total: number }> {
@@ -283,7 +317,7 @@ export async function searchListings(f: SearchFilters): Promise<{ items: Listing
   const orderBy: Prisma.ListingOrderByWithRelationInput[] =
     f.sort === "price-asc" ? [{ priceAmount: "asc" }] : f.sort === "price-desc" ? [{ priceAmount: "desc" }] : [{ publishedAt: "desc" }];
   const take = Math.max(1, Math.min(Math.floor(f.take ?? 500), 500));
-  const ranked = !f.sort || f.sort === "new";
+  const ranked = !f.sort || f.sort === "rec";
   if (f.shape || ranked) {
     const res = await searchByIds(f, where, [...orderBy, { id: "asc" }], take, ranked);
     if (res) return res;
@@ -302,19 +336,49 @@ const SHAPE_CANDIDATES = 5000;
 
 /**
  * Search over the ordered candidate ids: the database returns the matching ids (polygon / radius already limited to
- * the shape's bounding box by whereFromFilters); the exact point-in-shape test and the default ranking (photos and
- * availability first, stable within each group) run on them, and only then is the result paginated — so every page
+ * the shape's bounding box by whereFromFilters); the exact point-in-shape test and the default "Recomendados" ranking
+ * (recommendedOrder, stable: recency breaks ties) run on them, and only then is the result paginated — so every page
  * is full, the cursor walks the exact set and `total` is the exact count. Returns null (caller uses the plain query)
  * when a non-shape search has more candidates than can be ranked in memory.
  */
 async function searchByIds(f: SearchFilters, where: Prisma.ListingWhereInput, orderBy: Prisma.ListingOrderByWithRelationInput[], take: number, ranked: boolean) {
-  const candidates = await prisma.listing.findMany({ where, select: { id: true, lat: true, lng: true, status: true, _count: { select: { photos: true } } }, orderBy, take: SHAPE_CANDIDATES });
+  const candidates = await prisma.listing.findMany({
+    where,
+    select: {
+      id: true,
+      lat: true,
+      lng: true,
+      status: true,
+      _count: { select: { photos: true } },
+      // What the "Recomendados" order weighs (the body only for its length).
+      bodyEs: ranked,
+      beds: true,
+      baths: true,
+      amenities: true,
+      hasFloorplan: true,
+      hasVideo: true,
+      hasVirtualTour: true,
+      powerBackup: true,
+    },
+    orderBy,
+    take: SHAPE_CANDIDATES,
+  });
   if (!f.shape && candidates.length >= SHAPE_CANDIDATES) return null;
   let list = f.shape ? candidates.filter((c) => inShape(c, f.shape!)) : candidates;
   if (ranked) {
-    const rank = (c: (typeof candidates)[number]) => listingRank({ status: c.status, photoCount: c._count.photos });
-    // Array.prototype.sort is stable: the newest-first order holds inside each group.
-    list = [...list].sort((a, b) => rank(a) - rank(b));
+    const facts = list.map((c) => ({
+      id: c.id,
+      status: c.status,
+      photoCount: c._count.photos,
+      bodyLength: c.bodyEs?.trim().length ?? 0,
+      beds: c.beds,
+      baths: c.baths,
+      amenityCount: c.amenities.length,
+      media: !!(c.hasFloorplan || c.hasVideo || c.hasVirtualTour),
+      essentials: !!c.powerBackup,
+    }));
+    const order = new Map(recommendedOrder(facts).map((x, i) => [x.id, i]));
+    list = [...list].sort((a, b) => order.get(a.id)! - order.get(b.id)!);
   }
   const ids = list.map((c) => c.id);
   const start = f.cursor ? ids.indexOf(f.cursor) + 1 : 0;

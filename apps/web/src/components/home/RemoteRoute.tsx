@@ -57,7 +57,7 @@ export function RemoteRoute({ eyebrow, title, steps, children }: { eyebrow: stri
   return (
     <section ref={root} id="compra-a-distancia" className={reduced ? "scroll-mt-24 bg-ivory" : "relative scroll-mt-24 bg-ivory lg:h-[240vh]"}>
       <div className={reduced ? "" : "lg:sticky lg:top-0 lg:flex lg:h-[100svh] lg:items-center lg:overflow-hidden"}>
-        <div className="mx-auto grid w-full max-w-[1320px] items-center gap-10 px-4 py-16 md:px-8 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
+        <div className="mx-auto grid w-full max-w-[1320px] items-center gap-6 px-4 py-10 md:gap-10 md:px-8 md:py-16 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
           <div className="relative overflow-hidden rounded-[28px] bg-[#D9C6AB]">
             <svg viewBox="0 0 1000 460" className="block h-auto w-full" role="img" aria-label="Madrid, Miami, Panamá → Lechería">
               <defs>
@@ -94,14 +94,15 @@ export function RemoteRoute({ eyebrow, title, steps, children }: { eyebrow: stri
           </div>
           <div>
             <p className="np-eyebrow text-gold-text">{eyebrow}</p>
-            <h2 className="mt-3 max-w-[560px] text-[34px] leading-[1.08] md:text-[46px]">{title}</h2>
-            <ol className="np-steps mt-8">
+            <h2 className="mt-2 max-w-[560px] text-[28px] leading-[1.08] md:mt-3 md:text-[46px]">{title}</h2>
+            <ol className="np-steps mt-5 md:mt-8">
               {steps.map(([t, b], i) => (
-                <li key={t} ref={(el) => void (items.current[i] = el)} data-on={reduced ? "1" : "0"} className="flex gap-6 border-b border-line py-4">
-                  <span className="np-step-n w-6 shrink-0 font-serif text-[28px] leading-none">{i + 1}</span>
+                <li key={t} ref={(el) => void (items.current[i] = el)} data-on={reduced ? "1" : "0"} className="flex items-baseline gap-5 border-b border-line py-2.5 md:items-start md:gap-6 md:py-4">
+                  <span className="np-step-n w-6 shrink-0 font-serif text-[22px] leading-none md:text-[28px]">{i + 1}</span>
                   <span>
                     <span className="block text-[15px] font-semibold text-ink">{t}</span>
-                    <span className="block text-sm text-muted">{b}</span>
+                    {/* Phones: the five headlines carry the story; the detail lines join from sm. */}
+                    <span className="hidden text-sm text-muted sm:block">{b}</span>
                   </span>
                 </li>
               ))}

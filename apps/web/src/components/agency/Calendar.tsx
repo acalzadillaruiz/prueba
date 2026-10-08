@@ -88,7 +88,8 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
   const [pick, setPick] = useState<{ week: string; day: number } | null>(null);
   const day = pick?.week === weekStart ? pick.day : defaultDay;
   const byDay = days.map((_, i) => inWeek.filter((e) => dayIdx(Date.parse(e.start)) === i).sort((a, b) => Date.parse(a.start) - Date.parse(b.start)));
-  const time = (iso: string) => fmt(new Date(iso), { hour: "2-digit", minute: "2-digit" });
+  // 24-hour "12:48" on every locale: a "p. m." suffix would wrap under the time in the narrow agenda tile.
+  const time = (iso: string) => fmt(new Date(iso), { hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
   const weekNav = (
     <>
       <Link href={`?w=${week - 1}`} className={cn("rounded-full p-1.5 shadow-[inset_0_0_0_1px_#D8CBB7] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,.18)]", k.hover)} aria-label={tx(locale, "Semana anterior", "Previous week")}><ChevronLeft size={18} /></Link>
@@ -139,7 +140,7 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
                     <div className="flex items-start gap-3">
                       <div className={cn("flex w-14 shrink-0 flex-col items-center rounded-xl py-1.5", e.kind === "tour" ? "bg-navy text-ivory dark:bg-ivory dark:text-navy" : e.kind === "media" ? "bg-egeo/70 text-[#3D3530] dark:bg-egeo/25 dark:text-[#EEE7DE]" : "bg-[#F1ECE3] text-navy dark:bg-white/[.06] dark:text-ivory")}>
                         <Clock size={12} aria-hidden className="opacity-70" />
-                        <time dateTime={e.start} className="mt-0.5 font-display text-[15px] font-semibold leading-none [font-feature-settings:'lnum','tnum']">{time(e.start)}</time>
+                        <time dateTime={e.start} className="mt-0.5 whitespace-nowrap font-display text-[15px] font-semibold leading-none [font-feature-settings:'lnum','tnum']">{time(e.start)}</time>
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
@@ -226,7 +227,7 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
                 <div className={k.titleSm}>{sel.title}</div>
                 <button onClick={() => setSel(null)} className={cn("rounded-full p-1", k.hover)} aria-label={tx(locale, "Cerrar", "Close")}><X size={16} /></button>
               </div>
-              <div className={cn("text-sm first-letter:uppercase", k.muted)}>{fmt(new Date(sel.start), { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" })}</div>
+              <div className={cn("text-sm first-letter:uppercase", k.muted)}>{fmt(new Date(sel.start), { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit", hourCycle: "h23" })}</div>
               <div className="mt-1 text-sm">{sel.sub} · {sel.agentName}</div>
               {sel.listing && <div className={cn("mt-1 text-sm", k.muted)}>{sel.listingHref ? <Link href={sel.listingHref} className={k.link}>{sel.listing}</Link> : sel.listing}</div>}
               {sel.tourId && sel.kind !== "done" && sel.kind !== "cancelled" && <TourActions key={sel.id} locale={locale} ev={sel} onSet={setTour} className="mt-3" />}

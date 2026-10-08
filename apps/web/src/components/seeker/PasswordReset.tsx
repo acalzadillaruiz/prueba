@@ -38,7 +38,7 @@ function Shell({ eyebrow, title, lead, children }: { eyebrow: string; title: str
 
 /** "¿Olvidaste tu contraseña?": asks for the email and always answers the same way (never says whether it exists). */
 export function ForgotPasswordForm({ locale, initialEmail = "" }: { locale: Locale; initialEmail?: string }) {
-  const { register, handleSubmit, formState, getValues } = useForm<{ email: string }>({ resolver: zodResolver(forgotSchema), mode: "onTouched", defaultValues: { email: initialEmail } });
+  const { register, handleSubmit, formState, getValues } = useForm<{ email: string }>({ resolver: zodResolver(forgotSchema), mode: "onTouched", defaultValues: { email: forgotSchema.safeParse({ email: initialEmail }).success ? initialEmail : "" } });
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
   const [err, setErr] = useState<string | null>(null);

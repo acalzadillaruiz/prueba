@@ -27,7 +27,7 @@ export function HeroAura({
         <i />
         <i />
       </div>
-      <div className="relative mx-auto grid max-w-[1320px] grid-cols-1 items-center gap-9 px-4 pb-14 sm:gap-12 sm:pb-16 md:px-8 lg:grid-cols-[1.08fr_.92fr] lg:gap-10 lg:pb-24">
+      <div className="relative mx-auto grid max-w-[1320px] grid-cols-1 items-center gap-7 px-4 pb-10 sm:gap-12 sm:pb-16 md:px-8 lg:grid-cols-[1.08fr_.92fr] lg:gap-10 lg:pb-24">
         <div data-reveal="stagger" className="relative z-10 min-w-0">
           <p className="np-glass inline-flex items-center gap-2.5 rounded-full px-3.5 py-1 font-display text-[13px] text-ink/80 sm:py-1.5">
             <span className="np-live" aria-hidden />
@@ -65,7 +65,7 @@ export function HeroAura({
         {/* Phones: the search comes first (whole bar visible on first paint, clear of the tab bar); the arch follows
             as a calmer band right below it. */}
         <div className="relative mx-auto w-full max-w-[360px] sm:max-w-[520px] lg:mr-0" data-tilt="5" style={{ transformStyle: "preserve-3d" }}>
-          <div className="np-arch relative aspect-[5/6] w-full bg-arena shadow-[0_40px_90px_-30px_rgba(30,26,24,.45)] sm:aspect-[4/5]">
+          <div className="np-arch relative aspect-[6/5] w-full bg-arena shadow-[0_40px_90px_-30px_rgba(30,26,24,.45)] sm:aspect-[4/5]">
             <Image
               src="/brand/hero-arco.jpg"
               alt={tx(locale, "Arco abierto a una terraza frente al mar", "An arch opening onto a terrace by the sea")}

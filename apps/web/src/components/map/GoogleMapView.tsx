@@ -12,7 +12,7 @@ import { GOOGLE_MAPS_KEY, GOOGLE_MAP_ID } from "./config";
 import { LIGHT_STYLE, NIGHT_STYLE } from "./nightStyle";
 import type { MapViewProps } from "./MapView";
 import { FIT_PADDING } from "./NightMap";
-import { ShapeTools } from "./ShapeTools";
+import { ShapeTools, UnderMapTools } from "./ShapeTools";
 
 const CARACAS = { lat: 10.4806, lng: -66.9036 };
 
@@ -192,18 +192,21 @@ function SearchArea({ locale, onArea }: { locale: MapViewProps["locale"]; onArea
   }, [map]);
   if (!moved) return null;
   return (
-    <button
-      type="button"
-      onClick={() => {
-        const b = map?.getBounds();
-        if (!b) return;
-        setMoved(false);
-        onArea([b.getSouthWest().lat(), b.getSouthWest().lng(), b.getNorthEast().lat(), b.getNorthEast().lng()]);
-      }}
-      className="absolute left-1/2 top-[66px] z-10 flex min-h-11 -translate-x-1/2 items-center gap-2 whitespace-nowrap rounded-full bg-[#1E1A18] px-4 font-display text-sm font-semibold text-[#F1EBE3] shadow-np"
-    >
-      <Search size={15} aria-hidden /> {tx(locale, "Buscar en esta zona", "Search this area")}
-    </button>
+    <UnderMapTools>
+      <button
+        type="button"
+        data-search-area
+        onClick={() => {
+          const b = map?.getBounds();
+          if (!b) return;
+          setMoved(false);
+          onArea([b.getSouthWest().lat(), b.getSouthWest().lng(), b.getNorthEast().lat(), b.getNorthEast().lng()]);
+        }}
+        className="pointer-events-auto flex min-h-11 items-center gap-2 whitespace-nowrap rounded-full bg-[#1E1A18] px-4 font-display text-sm font-semibold text-[#F1EBE3] shadow-np"
+      >
+        <Search size={15} aria-hidden /> {tx(locale, "Buscar en esta zona", "Search this area")}
+      </button>
+    </UnderMapTools>
   );
 }
 

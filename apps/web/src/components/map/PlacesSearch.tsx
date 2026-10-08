@@ -50,12 +50,12 @@ export function PlacesSearch({ locale, zones, value, onPick, describedBy }: { lo
   };
 
   return (
-    <div className="flex gap-2">
+    <div className="flex flex-col gap-2 sm:flex-row">
       {/* Stacked on phones so the address field gets the full width (its placeholder used to be cut). */}
       <select className={cn(inputCls, "w-full sm:w-40 sm:shrink-0")} value={country} onChange={(e) => setCountry(e.target.value)} aria-label={tx(locale, "País", "Country")}>
         <option value="VE">🇻🇪 Venezuela</option>
       </select>
-      <div className="relative flex-1">
+      <div className="relative min-w-0 flex-1">
         <Search size={17} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
         <input
           className={cn(inputCls, "pl-10")}

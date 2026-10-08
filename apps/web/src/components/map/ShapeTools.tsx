@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState, type ReactNode } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { ChevronDown, Circle, PenLine, X } from "lucide-react";
 import type { Locale } from "@/types/domain";
 import { tx } from "@/lib/i18n";
@@ -66,7 +66,7 @@ export function ShapeTools({
   ] as const;
 
   return (
-    <div className="absolute left-3 top-3 z-10 flex flex-wrap items-start gap-2 pr-16">
+    <div data-map-tools className="absolute left-3 top-3 z-10 flex flex-wrap items-start gap-2 pr-16">
       {enabled && (
         <div ref={ref} className="relative">
           {mode === "pan" ? (
@@ -159,6 +159,40 @@ export function ShapeTools({
         </button>
       )}
       {mode === "pan" && toolbar}
+    </div>
+  );
+}
+
+/**
+ * A floating map action ("Buscar en esta zona") centred across the map, just under the top-left tool row — wherever
+ * that row ends (it wraps on narrow maps), so it never sits on the row nor on the zoom buttons at the right. Children
+ * get their own pointer events (the strip itself lets the map be dragged through it).
+ */
+export function UnderMapTools({ children }: { children: ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [top, setTop] = useState(66);
+  useLayoutEffect(() => {
+    const el = ref.current;
+    let host: HTMLElement | null = el?.parentElement ?? null;
+    while (host && !host.querySelector("[data-map-tools]")) host = host.parentElement;
+    const tools = host?.querySelector<HTMLElement>("[data-map-tools]");
+    if (!el || !tools) return;
+    const update = () => {
+      const base = (el.offsetParent as HTMLElement | null)?.getBoundingClientRect().top ?? 0;
+      setTop(Math.round(tools.getBoundingClientRect().bottom - base + 10));
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(tools);
+    window.addEventListener("resize", update);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", update);
+    };
+  }, []);
+  return (
+    <div ref={ref} data-map-under-tools className="pointer-events-none absolute inset-x-0 z-10 flex justify-center px-16" style={{ top }}>
+      {children}
     </div>
   );
 }

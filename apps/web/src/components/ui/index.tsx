@@ -60,7 +60,7 @@ export function Badge({ children, tone = "neutral", className }: { children: Rea
     coral: "bg-[#8E3B221F] text-coral-hover dark:bg-[#C9A57426] dark:text-[#C9A574]",
     gold: "bg-[#B08A5529] text-gold-text dark:text-[#D4B98C]",
     ok: "bg-[#2F6B4F1F] text-ok dark:bg-[#7FC8A426] dark:text-[#7FC8A4]",
-    warn: "bg-[#8A5A0024] text-[#8A5A00] dark:bg-[#F2B86626] dark:text-[#F2B866]",
+    warn: "bg-[#8A5A0024] text-[#7A4F00] dark:bg-[#F2B86626] dark:text-[#F2B866]",
     danger: "bg-[#B3261E1A] text-danger dark:bg-[#F2A09A26] dark:text-[#F2A09A]",
     navy: "bg-navy text-ivory",
     mist: "bg-[#B5AAA02E] text-[#4E453F] dark:text-[#DECEB9]",

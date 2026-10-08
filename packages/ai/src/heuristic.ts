@@ -160,6 +160,8 @@ const KEYWORD_RES: [RegExp, string][] = [
   [/piscina|\bpool\b/, "pool"],
   [/terraza|terrace/, "terrace"],
   [/mascota|\bpets?\b|pet[- ]friendly/, "pets"],
+  // "amoblado / amueblada / furnished" → the Furnished filter (not "unfurnished" / "sin amoblar").
+  [/(?<!sin )\b(amoblad[oa]s?|amueblad[oa]s?|furnished)\b/, "furnished"],
 ];
 
 export function heuristicSearchParse(nl: string): SearchQuery {

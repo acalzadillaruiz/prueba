@@ -23,7 +23,7 @@ export function compactPrice(amount: number, locale: Locale) {
 }
 
 /**
- * Mobile-only bottom bar on the listing detail: price + "Request a tour" that jumps to the contact panel.
+ * Phone + tablet (below lg, where the contact card is not beside the content) bottom bar on the listing detail: price + "Request a tour" that jumps to the contact panel.
  * Hidden while the panel itself or the footer is on screen, so it never covers them. On listing pages it also carries the
  * comparator (a slim chip on top) instead of a floating tray over the form, and the floating contact buttons stay
  * hidden while it is up ([data-hide-fab-mobile]).
@@ -77,7 +77,7 @@ export function StickyContactBar({ locale, price, amount, meta, suffix, tour, da
       data-hide-fab-mobile
       aria-hidden={!shown}
       className={cn(
-        "fixed inset-x-0 bottom-0 z-40 border-t px-4 pt-3 shadow-[0_-10px_30px_rgba(30,26,24,.12)] transition-transform duration-np ease-out md:hidden print:hidden",
+        "fixed inset-x-0 bottom-0 z-40 border-t px-4 pt-3 shadow-[0_-10px_30px_rgba(30,26,24,.12)] transition-transform duration-np ease-out lg:hidden print:hidden",
         dark ? "border-navy-line bg-navy text-ivory" : "border-line bg-white text-ink",
         !shown && "pointer-events-none translate-y-full",
       )}

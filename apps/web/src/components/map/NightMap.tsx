@@ -7,7 +7,7 @@ import type { LatLng, Shape } from "@/lib/geo";
 import { compactMoney, plural, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import { VE_RINGS } from "./venezuela";
-import { ShapeTools } from "./ShapeTools";
+import { ShapeTools, UnderMapTools } from "./ShapeTools";
 
 type Region = "caracas" | "venezuela";
 type Theme = "night" | "light";
@@ -672,16 +672,17 @@ export function NightMap({
         </div>
       )}
       {onArea && moved && controls && (
-        <button
-          type="button"
-          onClick={searchHere}
-          // Phones: under the tool row (the bottom belongs to the sheet and the docked bar). Wider: bottom centre,
-          // clear of the tool row that wraps on a narrow desktop map.
-          style={wide ? { bottom: previewInset + 24 } : { top: 66 }}
-          className="np-in absolute left-1/2 z-10 flex min-h-11 -translate-x-1/2 items-center gap-2 whitespace-nowrap rounded-full bg-[#1E1A18] px-4 font-display text-sm font-semibold text-[#F1EBE3] shadow-[0_12px_30px_-8px_rgba(30,26,24,.55)] [html.dark_&]:bg-[#F1EBE3] [html.dark_&]:text-[#1E1A18]"
-        >
-          <Search size={15} aria-hidden /> {tx(locale, "Buscar en esta zona", "Search this area")}
-        </button>
+        // Centred under the tool row (it wraps on narrow maps), clear of the zoom buttons at the right.
+        <UnderMapTools>
+          <button
+            type="button"
+            onClick={searchHere}
+            data-search-area
+            className="np-in pointer-events-auto flex min-h-11 items-center gap-2 whitespace-nowrap rounded-full bg-[#1E1A18] px-4 font-display text-sm font-semibold text-[#F1EBE3] shadow-[0_12px_30px_-8px_rgba(30,26,24,.55)] [html.dark_&]:bg-[#F1EBE3] [html.dark_&]:text-[#1E1A18]"
+          >
+            <Search size={15} aria-hidden /> {tx(locale, "Buscar en esta zona", "Search this area")}
+          </button>
+        </UnderMapTools>
       )}
 
       {controls && (

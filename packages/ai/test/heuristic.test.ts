@@ -90,6 +90,19 @@ describe("zones · partial names and typeahead", () => {
   });
 });
 
+describe("searchParse · furnished", () => {
+  it("maps amoblado / amueblado / amueblada / furnished to the furnished keyword", () => {
+    for (const t of ["apartamento amoblado en Chacao", "casa amueblada", "estudio Amueblado", "furnished flat in Altamira", "apartamentos amoblados"]) {
+      expect(heuristicSearchParse(t).keywords, t).toContain("furnished");
+    }
+  });
+  it("leaves «unfurnished» and «sin amoblar» alone, and counts the word as understood", () => {
+    expect(heuristicSearchParse("unfurnished apartment").keywords).not.toContain("furnished");
+    expect(heuristicSearchParse("apartamento sin amoblar").keywords).not.toContain("furnished");
+    expect(splitUnderstood("apartamento amoblado en Chacao")).toEqual({ understood: ["apartamento", "amoblado", "Chacao"], unknown: [] });
+  });
+});
+
 describe("splitUnderstood · mixed queries", () => {
   it("separates the understood words from the ignored ones", () => {
     expect(splitUnderstood("zzqx casa rara")).toEqual({ understood: ["casa"], unknown: ["zzqx", "rara"] });

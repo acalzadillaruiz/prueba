@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Anchor, Clock, Droplet, Droplets, Eye, Heart, Mountain, Waves, Zap, type LucideIcon } from "lucide-react";
+import { Anchor, Clock, Droplet, Droplets, Eye, Heart, Mountain, Waves, X, Zap, type LucideIcon } from "lucide-react";
 import type { Listing, Locale } from "@/types/domain";
 import { PublicPage } from "@/components/layout/PublicPage";
 import { Gallery } from "@/components/detail/Gallery";
@@ -56,6 +56,14 @@ function Essentials({ l, locale, title }: { l: Listing; locale: Locale; title: R
       {title}
       <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {items.map(({ key, label }) => {
+          // A declared absence ("no backup power") is information, not a perk: muted, dashed, with an "x" — never styled like a feature.
+          if (key === "power" && l.powerBackup === "NONE")
+            return (
+              <li key={key} data-absent className="flex items-center gap-3 rounded-[20px] border border-dashed border-muted/40 px-4 py-3 text-[15px] text-muted">
+                <X size={18} strokeWidth={1.7} className="shrink-0" aria-hidden />
+                <span>{tx(locale, "Planta eléctrica: no tiene", "Backup power: none")}</span>
+              </li>
+            );
           const Icon = ESSENTIAL_ICON[key];
           return (
             <li key={key} className="flex items-center gap-3 rounded-[20px] bg-white/70 ring-1 ring-black/[.04] px-4 py-3 text-[15px] font-semibold text-ink [font-feature-settings:'lnum']">
@@ -131,8 +139,8 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
 
   return (
     <PublicPage locale={locale}>
-      {/* Bottom padding on phones: the sticky contact bar (and its compare chip) never hides the last section. */}
-      <div className="pb-36 md:pb-0">
+      {/* Bottom padding below lg (phones + tablets): the sticky contact bar (and its compare chip) never hides the last section. */}
+      <div className="pb-36 lg:pb-0">
         <div className="mx-auto max-w-[1320px] px-4 pt-5 md:px-8">
           <div className="mb-3 flex flex-wrap items-center gap-x-4 gap-y-2">
             <BackToResults locale={locale} />
@@ -239,7 +247,8 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
             )}
           </div>
 
-          <aside id="contact" className="scroll-mt-24 lg:sticky lg:top-24 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-start">
+          {/* Desktop: the sticky card never outgrows the viewport (it scrolls inside if a long form opens). */}
+          <aside id="contact" className="scroll-mt-24 lg:sticky lg:top-24 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:-m-2 lg:max-h-[calc(100dvh-7rem)] lg:self-start lg:overflow-y-auto lg:overscroll-contain lg:p-2">
             <ContactPanel l={l} locale={locale} />
           </aside>
 

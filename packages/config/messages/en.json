@@ -1,6 +1,6 @@
 {
   "brand": { "tagline": "The Caribbean, with a Mediterranean soul.", "sub": "Real estate" },
-  "nav": { "buy": "Buy", "rent": "Rent", "vacation": "Vacation", "commercial": "Commercial", "luxury": "Luxury", "saved": "Saved", "publish": "List a property", "signIn": "Sign in", "signOut": "Sign out", "menu": "Menu", "privateCollection": "Private Collection", "remoteBuying": "Buy from abroad", "sell": "Sell with us", "home": "Home", "map": "Map", "account": "Account" },
+  "nav": { "buy": "Buy", "rent": "Rent", "vacation": "Holiday rentals", "commercial": "Commercial", "luxury": "Luxury", "saved": "Saved", "publish": "List a property", "signIn": "Sign in", "signOut": "Sign out", "menu": "Menu", "privateCollection": "Private Collection", "remoteBuying": "Buy from abroad", "sell": "Sell with us", "home": "Home", "map": "Map", "account": "Account" },
   "footer": {
     "about": "We help you find home in Lechería, El Morro, Margarita and Caracas.",
     "search": "Search", "owners": "Owners", "agencies": "Agencies",

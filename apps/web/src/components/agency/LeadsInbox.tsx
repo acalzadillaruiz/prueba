@@ -268,11 +268,25 @@ export function LeadsInbox({ locale, initial, listings, agents, assignable = [],
         </div>
         {needle && <span className={cn("text-sm", k.muted)}>{found.length} / {leads.length}</span>}
       </div>
-      <div className="mb-4 flex flex-wrap gap-2">
+      {/* Phones: one horizontally scrolling row (snap + faded edges, like Inmuebles) instead of chips wrapping onto 3 rows. */}
+      <div
+        role="group"
+        aria-label={tx(locale, "Filtrar por etapa", "Filter by stage")}
+        data-testid="stage-chips"
+        className="-mx-4 mb-4 flex snap-x snap-mandatory scroll-px-4 gap-2 overflow-x-auto px-4 py-0.5 [mask-image:linear-gradient(to_right,transparent,#000_14px,#000_calc(100%-28px),transparent)] [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:[mask-image:none] [&::-webkit-scrollbar]:hidden"
+      >
         {[["ALL", "Todos", "All"] as const, ...STAGES].map(([key, es, en]) => {
           const n = key === "ALL" ? found.length : found.filter((l) => l.stage === key).length;
           return (
-            <button key={key} onClick={() => setStage(key)} aria-pressed={stage === key} className={tab(stage === key)}>
+            <button
+              key={key}
+              onClick={(e) => {
+                setStage(key);
+                e.currentTarget.scrollIntoView({ block: "nearest", inline: "nearest" });
+              }}
+              aria-pressed={stage === key}
+              className={cn(tab(stage === key), "shrink-0 snap-start whitespace-nowrap max-sm:min-h-10")}
+            >
               {tx(locale, es, en)} <Count>{n}</Count>
             </button>
           );
@@ -306,15 +320,21 @@ export function LeadsInbox({ locale, initial, listings, agents, assignable = [],
                   {l.stage === "NEW" && <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-white bg-navy dark:border-navy-card dark:bg-[#C9A574]" />}
                 </div>
                 <div className="min-w-0 flex-1">
+                  {/* Phones: the name gets the full row; the badges (Nuevo / Interés / SLA) drop to a line of their own. */}
                   <div className="flex items-center gap-2">
                     <span className="truncate font-semibold">{l.name}</span>
-                    {l.priority && <Star size={13} className="fill-gold text-gold" />}
-                    {minsAgo(l.createdAt) < 60 && l.stage === "NEW" && <Pill tone="neutral">{tx(locale, "Nuevo", "New")}</Pill>}
+                    {l.priority && <Star size={13} className="shrink-0 fill-gold text-gold" />}
+                    {minsAgo(l.createdAt) < 60 && l.stage === "NEW" && <Pill tone="neutral" className="max-sm:hidden">{tx(locale, "Nuevo", "New")}</Pill>}
                   </div>
                   <div className={cn("truncate text-xs", k.muted)}>{lst ? tx(locale, lst.title_es, lst.title_en) : ""}</div>
                   <div className="mt-1 truncate text-sm text-navy/75 dark:text-ivory/70">{l.message}</div>
+                  <div className="mt-2 flex flex-wrap items-center gap-2 sm:hidden">
+                    {minsAgo(l.createdAt) < 60 && l.stage === "NEW" && <Pill tone="neutral">{tx(locale, "Nuevo", "New")}</Pill>}
+                    <Chip className={score < 45 ? "bg-transparent text-muted shadow-[inset_0_0_0_1px_#D8CBB7] dark:text-mist" : ""}>{tx(locale, "Interés", "Interest")} {score}</Chip>
+                    <Sla lead={l} locale={locale} />
+                  </div>
                 </div>
-                <div className="flex flex-col items-end gap-1.5">
+                <div className="hidden flex-col items-end gap-1.5 sm:flex">
                   <Chip className={score < 45 ? "bg-transparent text-muted shadow-[inset_0_0_0_1px_#D8CBB7] dark:text-mist" : ""}>{tx(locale, "Interés", "Interest")} {score}</Chip>
                   <Sla lead={l} locale={locale} />
                 </div>

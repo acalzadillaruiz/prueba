@@ -78,6 +78,11 @@ export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: bo
     setI((x) => (dx < 0 ? (x + 1) % total : (x - 1 + total) % total));
   };
   const [tab, setTab] = useState<Tab>("photos");
+  // Phone hero carousel: the photo on screen, and how many are mounted (the first up front, then one step ahead).
+  const track = useRef<HTMLDivElement>(null);
+  const [idx, setIdx] = useState(0);
+  const [loaded, setLoaded] = useState(1);
+  const ahead = (n: number) => setLoaded((v) => Math.max(v, Math.min(total, n + 2)));
   const show = (n: number, t: Tab = "photos") => {
     opener.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     setI(n);
@@ -100,14 +105,62 @@ export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: bo
   const chip = "inline-flex min-h-11 items-center gap-1.5 rounded-full border border-ink/10 bg-white/75 px-4 font-display text-sm text-ink transition-colors duration-np hover:border-navy/40";
   return (
     <>
-      {/* Main photo with the brand's arched top-left corner; four thumbnails on the right (desktop). */}
+      {/* Main photo with the brand's arched top-left corner; four thumbnails on the right (desktop). Phones: the main photo
+          is a swipeable scroll-snap carousel of every picture (dots + "1 / N"); a tap opens the viewer on the photo shown. */}
       <div className={cn("grid h-[320px] gap-3 sm:h-[420px] md:h-[min(540px,60vh)] lg:h-[clamp(380px,55vh,600px)]", thumbs.length > 0 && "md:grid-cols-2")}>
-        <button onClick={() => show(0)} className="relative block overflow-hidden rounded-[32px] bg-arena">
-          <span className="sr-only">{view(1)}</span>
-          <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} label={alt} sizes="(max-width: 768px) 100vw, 50vw" priority className="h-full w-full transition-transform duration-700 hover:scale-[1.02]" />
-          {tag}
-          {showAll && <span className="absolute right-3 top-3 np-glass rounded-full px-3.5 py-1.5 font-display text-[13px] font-semibold text-ink md:hidden">{allLabel}</span>}
-        </button>
+        <div className="relative overflow-hidden rounded-[32px] bg-arena" data-testid="gallery-hero">
+          <div
+            ref={track}
+            onTouchStart={() => ahead(idx)}
+            onScroll={(e) => {
+              const el = e.currentTarget;
+              const n = Math.round(el.scrollLeft / Math.max(1, el.clientWidth));
+              if (n !== idx) setIdx(n);
+              ahead(n);
+            }}
+            className="no-scrollbar flex h-full w-full snap-x snap-mandatory overflow-x-auto overscroll-x-contain md:overflow-hidden"
+          >
+            {shots.map((sc, n) => (
+              <button
+                key={n}
+                type="button"
+                onClick={() => show(n)}
+                // Only the photo on screen is in the tab order; from md up only the first one exists (thumbnails do the rest).
+                tabIndex={n === idx ? 0 : -1}
+                className={cn("relative block h-full w-full shrink-0 snap-start snap-always overflow-hidden", n > 0 && "md:hidden")}
+              >
+                <span className="sr-only">{view(n + 1)}</span>
+                {n < loaded && (
+                  <PropertyArt
+                    scene={sc}
+                    seed={n === 0 ? l.id : l.id + (n - 1)}
+                    photo={listingPhoto(l, n)}
+                    label={n === 0 ? alt : `${alt} · ${what(n + 1)}`}
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    priority={n === 0}
+                    className="h-full w-full transition-transform duration-700 hover:scale-[1.02]"
+                  />
+                )}
+              </button>
+            ))}
+          </div>
+          {illustrated && (
+            <span className="pointer-events-none absolute left-4 top-4 np-glass rounded-full px-3 py-1 font-display text-[13px] text-ink md:bottom-4 md:top-auto">{tx(locale, "Ilustración · aún sin fotos reales", "Illustration · real photos to come")}</span>
+          )}
+          {total > 1 && (
+            <>
+              <span aria-hidden data-testid="gallery-hero-counter" className="pointer-events-none absolute right-3 top-3 np-glass rounded-full px-3 py-1 font-display text-[13px] font-semibold tabular-nums text-ink md:hidden">
+                {idx + 1} / {total}
+              </span>
+              <div aria-hidden className="pointer-events-none absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-1.5 md:hidden">
+                {shots.map((_, n) => (
+                  <span key={n} className={cn("h-1.5 rounded-full shadow-[0_0_2px_rgba(30,26,24,.5)] transition-all duration-np", n === idx ? "w-3 bg-white" : "w-1.5 bg-white/60")} />
+                ))}
+              </div>
+              <span className="sr-only md:hidden" aria-live="polite">{What(idx + 1)}</span>
+            </>
+          )}
+        </div>
         {thumbs.length > 0 && (
           <div className={cn("hidden gap-3 md:grid", thumbs.length > 1 ? "grid-cols-2" : "grid-cols-1", thumbs.length > 2 ? "grid-rows-2" : "grid-rows-1")}>
             {thumbs.map((sc, n, arr) => (

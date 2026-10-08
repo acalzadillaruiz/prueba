@@ -92,6 +92,8 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
   const [err, setErr] = useState<string | null>(null);
   const [done, setDone] = useState<string | null>(null);
   const [chatBusy, setChatBusy] = useState(false);
+  const [noteOpen, setNoteOpen] = useState(false);
+  const actions = useRef<HTMLDivElement>(null);
   // In-app chat with the listing's advisor. Anonymous visitors go to login and come back here.
   const canChat = !!agent && !!l.agentId && user?.id !== l.agentId;
   const openChat = async () => {
@@ -157,6 +159,21 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
     setMode(next);
     tabRefs.current[next]?.focus();
   };
+
+  // Booking: the personal details show once there is something to book (a time, or the FSBO owner's preferred times).
+  const reveal = mode === "msg" || !!chosen || (askMode && askReady) || Object.keys(errs).length > 0;
+  // While booking, the (pre-written) message stays folded behind "Añadir un mensaje" unless the visitor opens it.
+  const showNote = mode === "msg" || noteOpen || !!errs.message;
+
+  // When the details appear after a pick, keep the main button on screen (scrolls the sticky card or the page just enough).
+  const wasRevealed = useRef(reveal);
+  useEffect(() => {
+    if (reveal && !wasRevealed.current && mode === "tour") {
+      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      actions.current?.scrollIntoView({ block: "nearest", behavior: reduce ? "auto" : "smooth" });
+    }
+    wasRevealed.current = reveal;
+  }, [reveal, mode]);
 
   if (done !== null) {
     const tour = mode === "tour" && !!done;
@@ -225,7 +242,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
           </div>
         </div>
       )}
-      {!agent && !agency && <div className={cn("text-sm", muted)}>{tx(locale, "La publica su dueño, sin intermediarios", "Listed directly by the owner")}</div>}
+      {!agent && !agency && <div className={cn("text-sm", muted)}>{tx(locale, "Publicada por su dueño/a · sin intermediarios", "Listed by the owner · no middlemen")}</div>}
       <div role="tablist" aria-label={tx(locale, "Cómo quieres contactar", "How to get in touch")} className={cn("mt-5 grid gap-1 rounded-full bg-[#F3EEE5] p-1 dark:bg-white/5", bookable ? "grid-cols-2" : "grid-cols-1")} onKeyDown={onTabKey}>
         {modes.map((m) => (
           <button
@@ -348,10 +365,6 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
                 </button>
               ))}
             </div>
-            <label className={cn("mt-3 flex min-h-11 cursor-pointer items-center gap-2 text-sm", muted)}>
-              <input type="checkbox" checked={virtual} onChange={(e) => setVirtual(e.target.checked)} className="h-5 w-5 accent-[#1E1A18]" />
-              <Video size={14} aria-hidden /> {tx(locale, "Prefiero verla por videollamada", "I’d rather see it on a video call")}
-            </label>
           </div>
         )}
         <form
@@ -360,30 +373,64 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
           className="mt-4 space-y-2"
           aria-label={mode === "tour" ? tx(locale, "Tus datos para la visita", "Your details for the viewing") : tx(locale, "Tu mensaje", "Your message")}
         >
-          <div>
-            <input className={field} placeholder={tx(locale, "Nombre", "Name")} autoComplete="name" {...form.register("name")} {...a11y("name")} aria-label={tx(locale, "Nombre", "Name")} />
-            {fieldErr("name")}
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            <div>
-              <input className={field} type="email" placeholder="Email" autoComplete="email" {...form.register("email")} {...a11y("email")} aria-label="Email" />
-              {fieldErr("email")}
+          {/* Progressive: while booking, name / email / phone appear once a time (or, FSBO, a preference) is chosen, so the
+              calendar and the main action stay on the first screen. The message tab shows them right away. */}
+          {reveal && (
+            <div className="np-in space-y-2" data-testid="contact-fields">
+              {mode === "tour" && !askMode && (
+                <label className={cn("flex min-h-11 cursor-pointer items-center gap-2 text-sm", muted)}>
+                  <input type="checkbox" checked={virtual} onChange={(e) => setVirtual(e.target.checked)} className="h-5 w-5 accent-[#1E1A18]" />
+                  <Video size={14} aria-hidden /> {tx(locale, "Prefiero verla por videollamada", "I’d rather see it on a video call")}
+                </label>
+              )}
+              <div>
+                <input className={field} placeholder={tx(locale, "Nombre", "Name")} autoComplete="name" {...form.register("name")} {...a11y("name")} aria-label={tx(locale, "Nombre", "Name")} />
+                {fieldErr("name")}
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <input className={field} type="email" placeholder="Email" autoComplete="email" {...form.register("email")} {...a11y("email")} aria-label="Email" />
+                  {fieldErr("email")}
+                </div>
+                <div>
+                  <input className={field} type="tel" placeholder={tx(locale, "Teléfono", "Phone")} autoComplete="tel" {...form.register("phone")} {...a11y("phone")} aria-label={tx(locale, "Teléfono", "Phone")} />
+                  {fieldErr("phone")}
+                </div>
+              </div>
+              {showNote ? (
+                <div>
+                  <textarea className={cn(field, mode === "tour" ? "h-16 py-2" : "h-20 py-2.5")} {...form.register("message")} {...a11y("message")} aria-label={tx(locale, "Mensaje", "Message")} />
+                  {fieldErr("message")}
+                </div>
+              ) : (
+                <button type="button" onClick={() => setNoteOpen(true)} className={cn(quietLink, "font-normal")}>
+                  <MessageSquare size={15} aria-hidden /> {tx(locale, "Añadir un mensaje (opcional)", "Add a message (optional)")}
+                </button>
+              )}
             </div>
-            <div>
-              <input className={field} type="tel" placeholder={tx(locale, "Teléfono", "Phone")} autoComplete="tel" {...form.register("phone")} {...a11y("phone")} aria-label={tx(locale, "Teléfono", "Phone")} />
-              {fieldErr("phone")}
-            </div>
-          </div>
-          <div>
-            <textarea className={cn(field, "h-20 py-2.5")} {...form.register("message")} {...a11y("message")} aria-label={tx(locale, "Mensaje", "Message")} />
-            {fieldErr("message")}
-          </div>
+          )}
           {err && <div role="alert" className="rounded-xl bg-[#B3261E1A] px-3 py-2 text-sm text-danger">{err}</div>}
           {/* The one terracotta action of each tab: confirm the visit (naming the chosen time) or send the message. */}
-          <Button type="submit" className="!mt-3 h-[52px] w-full disabled:text-[#5E5650] md:h-[52px] dark:disabled:bg-white/10 dark:disabled:text-[#CFC4B8]" size="lg" disabled={busy || (mode === "tour" && !chosen && !(askMode && askReady))} variant="primary">
-            {busy && <Loader2 size={16} className="animate-spin" aria-hidden />}
-            {primaryLabel}
-          </Button>
+          <div ref={actions} className="!mt-3 flex items-center gap-2">
+            <Button type="submit" className="h-[52px] min-w-0 flex-1 disabled:text-[#5E5650] md:h-[52px] dark:disabled:bg-white/10 dark:disabled:text-[#CFC4B8]" size="lg" disabled={busy || (mode === "tour" && !chosen && !(askMode && askReady))} variant="primary">
+              {busy && <Loader2 size={16} className="animate-spin" aria-hidden />}
+              {primaryLabel}
+            </Button>
+            {/* WhatsApp next to the main action (round, glyph only) so both sit above the fold. */}
+            {wa && (
+              <a
+                href={wa}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={tx(locale, `WhatsApp con ${first} (se abre en una pestaña nueva)`, `WhatsApp ${first} (opens in a new tab)`)}
+                title={tx(locale, `WhatsApp con ${first}`, `WhatsApp ${first}`)}
+                data-testid="contact-whatsapp"
+                className={cn("flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full border-[1.5px] transition-colors duration-np focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2", dark ? "border-ivory/60 text-ivory hover:border-ivory hover:bg-white/5 focus-visible:outline-ivory" : "np-btn-outline border-navy text-navy hover:bg-navy/5 focus-visible:outline-navy")}
+              >
+                <WhatsAppIcon size={21} />
+              </a>
+            )}
+          </div>
           {mode === "tour" && askMode && !askReady && (
             <p className={cn("text-center text-sm", muted)}>{tx(locale, "Elige cuándo te viene bien para pedir la visita", "Pick when suits you to request the visit")}</p>
           )}
@@ -396,12 +443,6 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
                   : tx(locale, "Ese día ya no quedan horas: elige otro día", "No times left that day: pick another day")}</p>
           )}
         </form>
-        {wa && (
-          <a href={wa} target="_blank" rel="noopener noreferrer" className={cn("mt-2 flex min-h-12 w-full items-center justify-center gap-2 rounded-full border-[1.5px] font-display text-[15px] font-semibold transition-colors duration-np focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2", dark ? "border-ivory/60 text-ivory hover:border-ivory hover:bg-white/5 focus-visible:outline-ivory" : "np-btn-outline border-navy text-navy hover:bg-navy/5 focus-visible:outline-navy")}>
-            <WhatsAppIcon size={19} /> {tx(locale, `WhatsApp con ${first}`, `WhatsApp ${first}`)}
-            <span className="sr-only">{tx(locale, "(se abre en una pestaña nueva)", "(opens in a new tab)")}</span>
-          </a>
-        )}
       </div>
       {(canChat || (agency?.verified && l.agencyId)) && (
         <div className="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1">

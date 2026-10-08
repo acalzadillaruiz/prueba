@@ -47,13 +47,16 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
   const schema = mode === "login" ? registerSchema.pick({ email: true, password: true }) : agency ? registerSchema.required({ agencyName: true }) : registerSchema;
   type FormValues = { name?: string; email: string; password: string; agencyName?: string };
   // shouldUnregister: when "¿Eres agencia?" is unticked the hidden agencyName leaves the form (it used to block submit silently).
-  const { register, handleSubmit, formState, setValue } = useForm<FormValues>({ resolver: zodResolver(schema as never), mode: "onTouched", shouldUnregister: true });
+  const { register, handleSubmit, formState, setValue, watch } = useForm<FormValues>({ resolver: zodResolver(schema as never), mode: "onTouched", shouldUnregister: true });
   const errs = formState.errors;
   const [busy, setBusy] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const router = useRouter();
   const sp = useSearchParams();
   const invite = sp.get("invite");
+  // "¿Olvidaste tu contraseña?" carries the email already typed (only when it looks like one), so it isn't typed twice.
+  const typed = (watch("email") ?? "").trim();
+  const forgotHref = `/${locale}/forgot-password${typed.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(typed) ? `?email=${encodeURIComponent(typed)}` : ""}`;
   const [inv, setInv] = useState<{ agencyName: string; role: string; email: string } | null>(null);
   useEffect(() => {
     if (!invite) return;
@@ -185,7 +188,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
             </Field>
             {mode === "login" && (
               <div className="-mt-1 text-right">
-                <Link className={cn(k.link, "text-[14px]")} href={`/${locale}/forgot-password`}>{tx(locale, "¿Olvidaste tu contraseña?", "Forgot your password?")}</Link>
+                <Link className={cn(k.link, "text-[14px]")} href={forgotHref}>{tx(locale, "¿Olvidaste tu contraseña?", "Forgot your password?")}</Link>
               </div>
             )}
             {mode === "register" && !inv && (

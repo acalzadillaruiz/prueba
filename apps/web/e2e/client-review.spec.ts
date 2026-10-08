@@ -105,6 +105,23 @@ test.describe("Cliente · regresiones de la revisión", () => {
     await page.evaluate(() => sessionStorage.clear());
   });
 
+  test("asistente a 360 px: el campo de dirección ocupa el ancho (país encima, no al lado)", async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 780 });
+    await signIn(page, "owner.priv@gmail.com");
+    await page.goto("/es/owner/new");
+    await page.evaluate(() => sessionStorage.clear());
+    await page.reload();
+    await page.getByRole("button", { name: "Alquiler", exact: true }).click();
+    await page.getByRole("button", { name: "Continuar" }).click();
+    await expect(page.getByText("¿Dónde está?").first()).toBeVisible();
+    const address = page.getByRole("textbox", { name: "Dirección" });
+    await expect(address).toBeVisible();
+    const box = await address.boundingBox();
+    expect(box!.width).toBeGreaterThanOrEqual(280);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(360);
+    await page.evaluate(() => sessionStorage.clear());
+  });
+
   test("propietario FSBO ve la consulta de un visitante anónimo con sus datos de contacto", async ({ page }) => {
     await signIn(page, "owner.priv@gmail.com");
     const lat = 10.49 + Math.random() * 0.01;

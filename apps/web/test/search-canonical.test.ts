@@ -19,6 +19,14 @@ describe("canonicalQueryUrl (?q= links)", () => {
     expect(p.get("view")).toBe("map");
     expect(new URLSearchParams(canon("type=SALE&q=alquiler en caracas")!).get("type")).toBe("LONG_RENT");
   });
+  it("maps «amoblado» / «furnished» to the Furnished filter", () => {
+    const p = new URLSearchParams(canon("q=apartamento amoblado en chacao")!);
+    expect(p.get("furnished")).toBe("1");
+    expect(p.get("kind")).toBe("apartment");
+    expect(new URLSearchParams(canon("q=amueblada")!).get("furnished")).toBe("1");
+    expect(new URLSearchParams(canon("type=LONG_RENT&q=furnished flat")!).get("furnished")).toBe("1");
+    expect(canon("q=apartamento sin amoblar")).not.toContain("furnished");
+  });
   it("never redirects a canonical URL, words it can't read or an empty q", () => {
     expect(canon("type=SALE&kind=house&q=zzqx casa rara")).toBeNull();
     expect(canon("type=SALE&q=xyzzy castillo")).toBeNull();

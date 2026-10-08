@@ -35,7 +35,7 @@ const AVAILABLE = ["ACTIVE", "COMING_SOON", "UNDER_OFFER"];
 
 /** What a rentals-only zone offers, shown in its own group under the sale zones (es, en). */
 const RENT_LABEL: Record<string, [string, string]> = {
-  SHORT_RENT: ["Vacacional", "Vacation"],
+  SHORT_RENT: ["Vacacional", "Holiday rentals"],
   LONG_RENT: ["Alquiler", "Long-term rent"],
   COMMERCIAL: ["Comercial", "Commercial"],
 };
@@ -108,10 +108,10 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
       <HeroAura locale={locale} available={available.length} featured={featured || undefined} />
 
       {/* ZONES — they glide by, endlessly. */}
-      <div className="relative overflow-hidden border-y border-ink/[.07] bg-ivory py-6" aria-label={tx(locale, "Dónde estamos", "Where we are")}>
+      <div className="relative overflow-hidden border-y border-ink/[.07] bg-ivory py-4 md:py-6" aria-label={tx(locale, "Dónde estamos", "Where we are")}>
         <div className="np-marquee gap-12 pr-12">
           {[...marquee, ...marquee].map((z, i) => (
-            <span key={i} aria-hidden={i >= marquee.length || undefined} className="flex shrink-0 items-center gap-12 font-serif text-[30px] text-ink/80 md:text-[40px]">
+            <span key={i} aria-hidden={i >= marquee.length || undefined} className="flex shrink-0 items-center gap-12 font-serif text-[24px] text-ink/80 md:text-[40px]">
               {z}
               <span className="h-1.5 w-1.5 rounded-full bg-gold" aria-hidden />
             </span>
@@ -129,29 +129,31 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
 
       {/* EXPLORE EN EL MAPA */}
       <section id="explorar" className="mx-auto max-w-[1320px] px-4 pt-6 md:px-8 md:pt-20 lg:pt-24">
-        <div data-reveal className="mb-8 grid items-end gap-4 md:grid-cols-[1fr_auto] lg:mb-10">
-          <div><p className="np-kicker text-gold-text">{tx(locale, "El mapa", "The map")}</p><h2 className="mt-3 text-[36px] leading-[1.05] tracking-[-0.02em] md:text-[52px]">{tx(locale, "Elige primero el lugar.", "Choose the place first.")}</h2></div>
+        <div data-reveal className="mb-5 grid items-end gap-2 md:mb-8 md:grid-cols-[1fr_auto] md:gap-4 lg:mb-10">
+          <div><p className="np-kicker text-gold-text">{tx(locale, "El mapa", "The map")}</p><h2 className="mt-2 text-[30px] leading-[1.05] tracking-[-0.02em] md:mt-3 md:text-[52px]">{tx(locale, "Elige primero el lugar.", "Choose the place first.")}</h2></div>
           <p className="max-w-[380px] text-[15px] leading-relaxed text-muted md:text-right">
-            {tx(locale, "Lo que cuesta el metro cuadrado en cada zona, con casas reales. Dibuja la tuya y te avisamos cuando aparezca algo.", "What a square metre costs in each area, from real homes. Draw yours and we\u2019ll tell you when something turns up.")}
+            {tx(locale, "Lo que cuesta el metro cuadrado en cada zona, con casas reales.", "What a square metre costs in each area, from real homes.")}
+            <span className="hidden md:inline">{tx(locale, " Dibuja la tuya y te avisamos cuando aparezca algo.", " Draw yours and we\u2019ll tell you when something turns up.")}</span>
           </p>
         </div>
-        <div className="grid gap-6 lg:grid-cols-[1.55fr_1fr]">
+        <div className="grid gap-4 md:gap-6 lg:grid-cols-[1.55fr_1fr]">
           {/* Framed on the coast from Los Roques / Caracas to Margarita, with room for the edge clusters and price pills. */}
-          <HomeMap listings={pins} locale={locale} focus={{ lat: 10.95, lng: -65.45 }} initialScale={2.9} phoneScale={2.15} />
+          <HomeMap listings={pins} locale={locale} focus={{ lat: 10.95, lng: -65.45 }} initialScale={2.9} phoneScale={2.15} className="h-[340px] sm:h-[420px]" />
           <div className="flex flex-col gap-3">
             {/* One metric per list: the sale zones show the price per m²; zones that today only have rentals (Lechería:
                 vacation homes) go in their own small group, with their "from" price per night / month. */}
             {saleZones.length > 0 && <p className="font-display text-[13px] font-semibold uppercase tracking-[.16em] text-muted">{tx(locale, "En venta · precio por m²", "For sale · price per m²")}</p>}
-            <ul data-reveal="stagger" className="flex flex-col gap-3">
+            {/* Phones: a sideways rail (one row, swipe) instead of a tall stack; md+: the stacked list. */}
+            <ul data-reveal="stagger" data-zone-rail className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 md:mx-0 md:snap-none md:flex-col md:overflow-visible md:px-0">
               {saleZones.map((z) => (
-                <li key={z.zone}>
-                  <Link href={z.href} data-spotlight className="np-glass group flex h-full min-h-[104px] items-stretch overflow-hidden rounded-[24px] transition-transform duration-500 hover:-translate-y-0.5">
-                    <span className="relative m-2 w-[76px] shrink-0 overflow-hidden rounded-[18px] sm:w-[100px]">
+                <li key={z.zone} className="w-[78%] shrink-0 snap-start sm:w-[46%] md:w-auto">
+                  <Link href={z.href} data-spotlight className="np-glass group flex h-full min-h-[88px] items-stretch overflow-hidden rounded-[24px] transition-transform duration-500 hover:-translate-y-0.5 md:min-h-[104px]">
+                    <span className="relative m-2 w-[64px] shrink-0 overflow-hidden rounded-[18px] sm:w-[100px]">
                       <Image src={z.photo} alt="" fill sizes="112px" className="object-cover transition-transform duration-700 group-hover:scale-105" />
                     </span>
-                    <span className="flex min-w-0 flex-1 items-center justify-between gap-3 px-4 py-4 sm:px-5">
+                    <span className="flex min-w-0 flex-1 items-center justify-between gap-3 px-3 py-3 sm:px-5 sm:py-4">
                       <span className="min-w-0">
-                        <span className="block font-serif text-[22px] leading-tight sm:text-[25px]">{z.zone}</span>
+                        <span className="block truncate font-serif text-[20px] leading-tight sm:text-[25px]">{z.zone}</span>
                         <span className="block text-sm text-muted">{zoneCount(z.stats.activeListings)}</span>
                       </span>
                       <span className="shrink-0 text-right">
@@ -165,7 +167,7 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
             </ul>
             {otherZones.length > 0 && (
               <>
-                <p className={cn("font-display text-[13px] font-semibold uppercase tracking-[.16em] text-muted", saleZones.length > 0 && "mt-3")}>{tx(locale, "Solo en alquiler · desde", "Rentals only · from")}</p>
+                <p className={cn("font-display text-[13px] font-semibold uppercase tracking-[.16em] text-muted", saleZones.length > 0 && "mt-1 md:mt-3")}>{tx(locale, "Solo en alquiler · desde", "Rentals only · from")}</p>
                 <ul className="flex flex-col gap-2">
                   {otherZones.map((z) => (
                     <li key={z.zone}>
@@ -205,7 +207,7 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
 
       {/* THE BUILDING — how we work. Plays by itself when it comes into view (pause / step bars, no scroll pinning):
           3D on capable desktops, a light CSS tower on phones and modest devices, a plain list under reduced motion. */}
-      <div className="mt-14 lg:mt-24">
+      <div className="mt-10 md:mt-14 lg:mt-24">
         <BuildingScroll locale={locale} chapters={chapters} picks={floors} heading={tx(locale, "Así trabajamos", "How we work")} cta={tx(locale, "Ver casa", "See home")} />
       </div>
 
@@ -216,36 +218,36 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
           title={tx(locale, "Tu casa en Venezuela, sin subirte a un avión.", "Your home in Venezuela, without boarding a plane.")}
           steps={steps as [string, string][]}
         >
-          <Button href={`/${locale}/search?type=SALE`} variant="outline" className="mt-8">
+          <Button href={`/${locale}/search?type=SALE`} variant="outline" className="mt-6 md:mt-8">
             {tx(locale, "Ver casas disponibles", "See available homes")}
           </Button>
         </RemoteRoute>
       </div>
 
       {/* VENDA EN PRIVADO */}
-      <section className="np-grain relative mx-3 mt-2 overflow-hidden rounded-[40px] bg-[#E9E0D3] md:mx-6 lg:mt-16">
-        <div className="relative mx-auto grid max-w-[1320px] items-center gap-10 px-5 pt-16 md:px-10 lg:grid-cols-2 lg:gap-16 lg:pt-12">
-          <div data-reveal className="pb-4 lg:pb-12">
+      <section className="np-grain relative mx-3 mt-2 overflow-hidden rounded-[32px] bg-[#E9E0D3] md:mx-6 md:rounded-[40px] lg:mt-16">
+        <div className="relative mx-auto grid max-w-[1320px] items-center gap-6 px-5 pt-10 md:gap-10 md:px-10 md:pt-16 lg:grid-cols-2 lg:gap-16 lg:pt-12">
+          <div data-reveal className="pb-0 md:pb-4 lg:pb-12">
             <p className="np-kicker text-gold-text">{tx(locale, "Si vas a vender", "If you\u2019re selling")}</p>
-            <h2 className="mt-3 text-[38px] leading-[1.05] md:text-[52px]">
+            <h2 className="mt-3 text-[32px] leading-[1.05] md:text-[52px]">
               {tx(locale, "Tu casa merece", "Your home deserves")}
               <br />
               <span className="text-gold-text">{tx(locale, "que la cuenten bien.", "to be told well.")}</span>
             </h2>
-            <ul className="mt-7 space-y-3">
+            <ul className="mt-5 space-y-2.5 md:mt-7 md:space-y-3">
               {owner.map((o) => (
                 <li key={o} className="flex items-center gap-3 text-[15px] text-ink/80">
                   <RoofGlyph className="text-ink" /> {o}
                 </li>
               ))}
             </ul>
-            <span data-magnetic className="mt-9 inline-block">
+            <span data-magnetic className="mt-6 inline-block md:mt-9">
               <Button href={`/${locale}/sell`} variant="navy" size="lg">
                 {tx(locale, "¿Cuánto vale mi casa?", "What\u2019s my home worth?")} <ArrowUpRight size={18} aria-hidden />
               </Button>
             </span>
           </div>
-          <div data-unveil className="relative mx-auto mb-6 aspect-[5/6] w-full max-w-[520px] overflow-hidden rounded-[32px] bg-[#D9CDB8] lg:mb-12 lg:mr-0">
+          <div data-unveil className="relative mx-auto mb-5 aspect-[16/10] w-full max-w-[520px] overflow-hidden rounded-[24px] bg-[#D9CDB8] sm:aspect-[5/6] sm:rounded-[32px] md:mb-6 lg:mb-12 lg:mr-0">
             <div data-parallax="40" className="absolute -inset-y-[8%] inset-x-0">
               <Image src="/brand/oficina.jpg" alt={tx(locale, "Despacho con ventanal en arco", "Study with an arched window")} fill sizes="(max-width: 1024px) 90vw, 520px" className="object-cover" />
             </div>

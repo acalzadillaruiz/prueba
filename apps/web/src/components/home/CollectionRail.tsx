@@ -55,11 +55,11 @@ export function CollectionRail({ eyebrow, title, items, more }: { eyebrow: strin
   return (
     // data-hide-fab: the floating contact button steps away while the cards glide under its corner.
     <section ref={root} data-hide-fab className="relative bg-ivory" aria-label={title}>
-      <div className="flex flex-col justify-center overflow-hidden py-20 md:sticky md:top-0 md:h-[100svh] md:py-0">
-        <div className="mx-auto mb-8 flex w-full max-w-[1320px] items-end justify-between gap-6 px-4 md:mb-12 md:px-8">
+      <div className="flex flex-col justify-center overflow-hidden py-10 md:sticky md:top-0 md:h-[100svh] md:py-0">
+        <div className="mx-auto mb-5 flex w-full max-w-[1320px] items-end justify-between gap-6 px-4 md:mb-12 md:px-8">
           <div>
             <p className="np-kicker text-gold-text">{eyebrow}</p>
-            <h2 className="mt-3 text-[38px] leading-[1.02] tracking-[-0.02em] md:text-[60px]">{title}</h2>
+            <h2 className="mt-2 text-[32px] leading-[1.02] tracking-[-0.02em] md:mt-3 md:text-[60px]">{title}</h2>
           </div>
           <div className="hidden items-center gap-4 md:flex" aria-hidden>
             <span className="font-display text-[13px] font-semibold tracking-[0.2em] text-muted">
@@ -75,7 +75,7 @@ export function CollectionRail({ eyebrow, title, items, more }: { eyebrow: strin
           className="no-scrollbar flex snap-x snap-mandatory gap-5 overflow-x-auto px-4 will-change-transform md:snap-none md:gap-8 md:overflow-visible md:px-8 md:pl-[max(2rem,calc((100vw-1320px)/2+2rem))]"
         >
           {items.map((it, i) => (
-            <Link key={it.href} href={it.href} data-spotlight className="group relative w-[78vw] shrink-0 snap-start overflow-hidden rounded-[32px] bg-arena sm:w-[46vw] md:w-[34vw] lg:w-[28vw] xl:w-[420px]">
+            <Link key={it.href} href={it.href} data-spotlight className="group relative w-[72vw] shrink-0 snap-start overflow-hidden rounded-[32px] bg-arena sm:w-[46vw] md:w-[34vw] lg:w-[28vw] xl:w-[420px]">
               <span className="relative block aspect-[4/5] overflow-hidden">
                 {it.photo && (
                   <span data-drift className="absolute inset-0 block scale-[1.25] will-change-transform">
@@ -99,7 +99,7 @@ export function CollectionRail({ eyebrow, title, items, more }: { eyebrow: strin
               </span>
             </Link>
           ))}
-          <Link href={more.href} className="group flex w-[60vw] shrink-0 snap-start items-center justify-center sm:w-[36vw] md:w-[26vw] lg:w-[300px]">
+          <Link href={more.href} className="group flex w-[52vw] shrink-0 snap-start items-center justify-center sm:w-[36vw] md:w-[26vw] lg:w-[300px]">
             <span className="flex aspect-[4/5] w-full flex-col items-center justify-center gap-3 rounded-[32px] border border-ink/15 text-center transition-colors group-hover:border-ink group-hover:bg-white/50">
               <span className="font-serif text-[30px] leading-tight text-ink">{more.label}</span>
               <span className="text-[22px] text-ink transition-transform group-hover:translate-x-1" aria-hidden>

@@ -55,9 +55,10 @@ test.describe.serial("FSBO · horario de visitas y reserva", () => {
     await logout(page);
     await page.goto(`/es/listing/${id}`);
     await expect(page.getByText("Horarios que puso su dueño · Sin costo")).toBeVisible();
+    // Name / email appear once a time is picked (progressive contact card).
+    await page.locator("button:not([disabled])", { hasText: /^\d\d:\d\d$/ }).first().click();
     await page.getByLabel("Nombre").fill(`E2E Visita ${stamp}`);
     await page.getByLabel("Email").fill(`e2e-visit-${stamp}@example.com`);
-    await page.locator("button:not([disabled])", { hasText: /^\d\d:\d\d$/ }).first().click();
     await page.getByRole("button", { name: /^Pedir visita · / }).click();
     await expect(page.getByTestId("lead-done")).toContainText(/Pendiente de que .+ la confirme/, { timeout: 15_000 });
     const tour = await db.tour.findFirstOrThrow({ where: { listingId: id } });

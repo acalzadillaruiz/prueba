@@ -23,7 +23,7 @@ const MODES = [
   ["SHORT_RENT", "Vacacional", "Holiday rentals"],
 ] as const;
 
-/** Compact bar's mode chip: an icon and a short word (the full name stays in the native select's options). */
+/** Compact bar's mode chip: a short word (+ icon from sm); the full name stays in the native select's options. */
 const MODE_CHIP = {
   SALE: { Icon: House, es: "Compra", en: "Buy" },
   LONG_RENT: { Icon: KeyRound, es: "Alquila", en: "Rent" },
@@ -194,6 +194,15 @@ function CompactAsk({
   const suggest = usePlaceSuggest({ locale, text, setText });
   const { saved, user, ready } = useApp();
   const chip = MODE_CHIP[mode];
+  // Phones get the short placeholder ("Zona…"): the field is ~80 px wide at 360 once the mode word is shown.
+  const [wide, setWide] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 640px)");
+    const on = () => setWide(mq.matches);
+    on();
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, []);
   // Contract with the header: while this bar is shown the header steps away (one bar at the top, not two).
   useEffect(() => {
     const el = document.documentElement;
@@ -228,11 +237,11 @@ function CompactAsk({
         <label htmlFor={`${id}-mode`} className="sr-only">
           {tx(locale, "Qué buscas", "What you're after")}
         </label>
-        {/* Narrow chip (icon only on phones, icon + short word from sm) so the text field keeps its room at 360 px.
-            The native select sits invisibly on top: one tap opens the system picker with the full names. */}
-        <span className="relative flex h-11 shrink-0 items-center gap-1.5 rounded-full bg-ink pl-3 pr-2 font-display text-[14px] font-medium text-ivory has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ink sm:pl-3.5 sm:pr-2.5 [html.dark_&]:text-[#1E1A18]">
-          <chip.Icon size={16} strokeWidth={1.8} aria-hidden />
-          <span aria-hidden className="hidden sm:inline">{tx(locale, chip.es, chip.en)}</span>
+        {/* Mode chip: always the short word ("Compra", "Alquila", "Vaca.") so it never reads as a "home" button; the icon
+            joins it from sm. The native select sits invisibly on top: one tap opens the system picker with the full names. */}
+        <span data-mode-chip className="relative flex h-11 shrink-0 items-center gap-1 rounded-full bg-ink pl-3 pr-2 font-display text-[14px] font-medium text-ivory has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ink sm:gap-1.5 sm:pl-3.5 sm:pr-2.5 [html.dark_&]:text-[#1E1A18]">
+          <chip.Icon size={16} strokeWidth={1.8} aria-hidden className="hidden sm:block" />
+          <span aria-hidden>{tx(locale, chip.es, chip.en)}</span>
           <ChevronDown size={14} aria-hidden className="opacity-80" />
           <select
             id={`${id}-mode`}
@@ -255,7 +264,7 @@ function CompactAsk({
             value={text}
             enterKeyHint="search"
             aria-label={tx(locale, "Describe la casa que buscas", "Describe the home you're looking for")}
-            placeholder={tx(locale, "Buscar zona…", "Search area…")}
+            placeholder={wide ? tx(locale, "Buscar zona…", "Search area…") : tx(locale, "Zona…", "Area…")}
             className="h-11 min-w-0 flex-1 bg-transparent px-1.5 font-display text-[16px] text-ink placeholder:text-ink/60 focus:outline-none"
           />
         </span>

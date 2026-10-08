@@ -14,10 +14,11 @@ export function queryToParams(q: ReturnType<typeof heuristicSearchParse>, raw: s
   if (q.minBeds) p.set("beds", String(q.minBeds));
   if (q.luxury) p.set("lux", "1");
   if (q.propertyKind) p.set("kind", q.propertyKind);
-  // "con piscina / terraza / vista" → amenity filters; "acepta mascotas" → pets
+  // "con piscina / terraza / vista" → amenity filters; "acepta mascotas" → pets; "amoblado" → furnished
   const am = q.keywords.filter((k) => ["pool", "terrace", "view"].includes(k));
   if (am.length) p.set("am", am.join(","));
   if (q.keywords.includes("pets")) p.set("pets", "1");
+  if (q.keywords.includes("furnished")) p.set("furnished", "1");
   if (q.keywords.includes("sea")) p.set("sea", "1");
   if (raw.trim()) p.set("q", raw.trim());
   return p;

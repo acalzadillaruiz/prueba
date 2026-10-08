@@ -42,13 +42,16 @@ export function HubSectionNav({ locale, sections }: { locale: Locale; sections: 
     els.forEach((el) => io.observe(el));
     return () => io.disconnect();
   }, [sections]);
-  // Keep the active chip visible inside the sideways-scrolling row (phones), without moving the page.
+  // Keep the active chip visible inside the sideways-scrolling row (phones). "nearest" on both axes: the row scrolls
+  // sideways only as far as needed and the page never jumps vertically (the chip is already on screen, pinned).
   useEffect(() => {
     const chip = document.querySelector<HTMLElement>(`[data-hub-chip="${active}"]`);
-    const row = chip?.parentElement?.parentElement;
-    if (!chip || !row || row.scrollWidth <= row.clientWidth) return;
-    const left = chip.offsetLeft - (row.clientWidth - chip.offsetWidth) / 2;
-    row.scrollTo({ left, behavior: "smooth" });
+    if (!chip) return;
+    // Belt and braces: never let it scroll the page (e.g. the row still below the fold on a deep link).
+    const r = chip.getBoundingClientRect();
+    if (r.top < 0 || r.bottom > window.innerHeight) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    chip.scrollIntoView({ inline: "nearest", block: "nearest", behavior: reduce ? "auto" : "smooth" });
   }, [active]);
   if (sections.length < 2) return null;
   return (

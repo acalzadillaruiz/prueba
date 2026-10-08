@@ -41,7 +41,7 @@ test.describe("Cliente · regresiones de la revisión", () => {
 
   test("búsqueda NL: el área («más de 100 m²») no se toma como precio", async ({ page }) => {
     await page.goto("/en/search");
-    await nlSearch(page, "Natural-language search", "apartment over 100 m2 in Altamira", /zone=Altamira/);
+    await nlSearch(page, "Describe what you’re after in your own words", "apartment over 100 m2 in Altamira", /zone=Altamira/);
     const url = new URL(page.url());
     expect(url.searchParams.get("min")).toBeNull();
     expect(url.searchParams.get("max")).toBeNull();

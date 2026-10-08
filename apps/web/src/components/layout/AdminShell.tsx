@@ -33,12 +33,13 @@ import { useQuery } from "@tanstack/react-query";
 import { logout } from "@/lib/logout";
 import { useTranslations } from "next-intl";
 import { useApp } from "@/lib/store";
-import { AGENCY_PAGE_PATH, AGENCY_PAGE_ROLES } from "@/lib/agency-pages";
+import { AGENCY_PAGE_PATH, AGENCY_PAGE_ROLES, type AgencyPage } from "@/lib/agency-pages";
+import { AgencyMobileNav } from "@/components/agency/MobileNav";
 import { api } from "@/lib/api";
 import { tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 
-type Item = { href: string; icon: React.ElementType; label: string; roles?: Role[] };
+type Item = { href: string; icon: React.ElementType; label: string; roles?: Role[]; page?: AgencyPage };
 
 const AGENCY_NAV: Item[] = (
   [
@@ -53,7 +54,10 @@ const AGENCY_NAV: Item[] = (
     ["auditoria", ShieldCheck, "teamAudit"],
     ["settings", Settings, "settings"],
   ] as const
-).map(([page, icon, label]) => ({ href: AGENCY_PAGE_PATH[page], icon, label, roles: AGENCY_PAGE_ROLES[page] }));
+).map(([page, icon, label]) => ({ href: AGENCY_PAGE_PATH[page], icon, label, roles: AGENCY_PAGE_ROLES[page], page }));
+
+/** Phone bottom bar: the first 4 sections the role may open, in this order (agents live in listings, leads and the calendar). */
+const MOBILE_PRIMARY: AgencyPage[] = ["dashboard", "listings", "leads", "calendar", "capture", "media", "team", "reports", "auditoria", "settings"];
 
 const PLATFORM_NAV: Item[] = [
   { href: "", icon: Gauge, label: "globalMetrics" },
@@ -111,6 +115,8 @@ export function AdminShell({ locale, area, children, title, actions, eyebrow }: 
     const href = base + i.href;
     return i.href === "" ? pathname === href : pathname.startsWith(href);
   };
+  const mobilePrimary = area === "agency" ? MOBILE_PRIMARY.map((p) => items.find((i) => i.page === p)).filter((i): i is Item => !!i).slice(0, 4) : [];
+  const toMobile = (i: Item) => ({ href: base + i.href, icon: i.icon, label: t(i.label), active: isActive(i), badge: badges[i.href] });
   const themeLabel = theme.dark ? tx(locale, "Modo claro", "Light mode") : tx(locale, "Modo oscuro", "Dark mode");
   const bell = canLeads && (
     // Bell = new leads waiting (real count, polled); opens the inbox.
@@ -184,7 +190,7 @@ export function AdminShell({ locale, area, children, title, actions, eyebrow }: 
             </button>
             <Avatar initials={u.initials} hue={u.hue} size={30} />
           </div>
-          <nav className="no-scrollbar flex gap-1 overflow-x-auto px-3 pb-2.5" aria-label={tx(locale, "Secciones", "Sections")}>
+          {area !== "agency" && <nav className="no-scrollbar flex gap-1 overflow-x-auto px-3 pb-2.5" aria-label={tx(locale, "Secciones", "Sections")}>
             {items.map((i) => {
               const active = isActive(i);
               return (
@@ -201,8 +207,18 @@ export function AdminShell({ locale, area, children, title, actions, eyebrow }: 
             })}
             <Link href={`/${locale}`} className="flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-2 text-[14px] text-ivory/60"><ExternalLink size={15} strokeWidth={1.6} /> {t("publicSite")}</Link>
             <button type="button" onClick={() => logout(locale)} className="flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-2 text-[14px] text-ivory/60"><LogOut size={15} strokeWidth={1.6} /> {tx(locale, "Salir", "Sign out")}</button>
-          </nav>
+          </nav>}
         </div>
+        {area === "agency" && (
+          <AgencyMobileNav
+            locale={locale}
+            primary={mobilePrimary.map(toMobile)}
+            more={items.filter((i) => !mobilePrimary.includes(i)).map(toMobile)}
+            agency={agency}
+            superadmin={u.role === "SUPERADMIN"}
+            onLogout={() => logout(locale)}
+          />
+        )}
 
         {area === "agency" && u.role === "SUPERADMIN" && (
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-[#E9D2C6] bg-rosa/60 px-4 py-2.5 text-sm text-navy md:px-10 dark:border-white/10 dark:bg-[#2A2420] dark:text-ivory">
@@ -228,7 +244,7 @@ export function AdminShell({ locale, area, children, title, actions, eyebrow }: 
             </div>
           </div>
         </header>
-        <main id="main" className="mx-auto min-w-0 max-w-[1360px] px-4 pb-16 pt-5 md:px-10 md:pt-7">{children}</main>
+        <main id="main" className={cn("mx-auto min-w-0 max-w-[1360px] px-4 pt-5 md:px-10 md:pt-7", area === "agency" ? "pb-[calc(6.5rem+env(safe-area-inset-bottom))] lg:pb-16" : "pb-16")}>{children}</main>
       </div>
     </div>
   );

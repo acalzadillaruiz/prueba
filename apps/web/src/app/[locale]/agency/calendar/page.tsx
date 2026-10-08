@@ -21,12 +21,12 @@ export default async function Page({ params, searchParams }: { params: Promise<{
   const end = new Date(start.getTime() + 7 * 864e5);
   const mineOnly = user.role === "AGENT" || user.role === "PHOTOGRAPHER";
   const [tours, jobs, slots] = await Promise.all([
-    user.role === "PHOTOGRAPHER" ? [] : prisma.tour.findMany({ where: { start: { gte: start, lt: end }, listing: { agencyId: user.agencyId }, ...(mineOnly ? { agentId: user.id } : {}) }, include: { listing: { select: { zone: true } }, agent: { select: { name: true } } } }),
+    user.role === "PHOTOGRAPHER" ? [] : prisma.tour.findMany({ where: { start: { gte: start, lt: end }, listing: { agencyId: user.agencyId }, ...(mineOnly ? { agentId: user.id } : {}) }, include: { listing: { select: { id: true, zone: true, titleEs: true, titleEn: true } }, agent: { select: { name: true } } } }),
     prisma.mediaJob.findMany({ where: { date: { gte: start, lt: end }, listing: { agencyId: user.agencyId }, ...(user.role === "PHOTOGRAPHER" ? { photographerId: user.id } : {}) }, include: { listing: { select: { zone: true } }, photographer: { select: { name: true } } } }),
     getSlots(user.id),
   ]);
   const events: CalEvent[] = [
-    ...tours.map((t) => ({ id: t.id, tourId: t.id, start: t.start.toISOString(), title: t.seekerName, sub: t.listing.zone, kind: (t.status === "DONE" ? "done" : t.status === "CANCELLED" ? "cancelled" : t.status === "REQUESTED" ? "req" : "tour") as CalEvent["kind"], agentName: t.agent.name ?? "" })),
+    ...tours.map((t) => ({ id: t.id, tourId: t.id, start: t.start.toISOString(), title: t.seekerName, sub: t.listing.zone, kind: (t.status === "DONE" ? "done" : t.status === "CANCELLED" ? "cancelled" : t.status === "REQUESTED" ? "req" : "tour") as CalEvent["kind"], agentName: t.agent.name ?? "", listing: locale === "es" ? t.listing.titleEs : t.listing.titleEn, listingHref: `/${locale}/agency/listings/${t.listing.id}/edit` })),
     ...jobs.map((m) => ({ id: m.id, start: m.date.toISOString(), title: locale === "es" ? "Sesión de fotos" : "Photo shoot", sub: m.listing.zone, kind: "media" as const, agentName: m.photographer.name ?? "" })),
   ];
   const allDays = [0, 1, 2, 3, 4, 5, 6].map((d) => slots.find((s) => s.day === d) ?? { day: d, hours: [] });

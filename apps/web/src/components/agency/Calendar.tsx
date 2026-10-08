@@ -1,18 +1,18 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Camera, Check, ChevronLeft, ChevronRight, Loader2, X } from "lucide-react";
+import { Camera, Check, ChevronLeft, ChevronRight, Clock, Loader2, MapPin, User, X } from "lucide-react";
 import type { Locale } from "@/types/domain";
 import { AdminShell } from "@/components/layout/AdminShell";
 import { Button } from "@/components/ui";
 import { api } from "@/lib/api";
 import { plural, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
-import { k, tab } from "./kit";
+import { Pill, k, tab } from "./kit";
 
-export type CalEvent = { id: string; start: string; title: string; sub: string; kind: "tour" | "req" | "done" | "media" | "cancelled"; agentName: string; tourId?: string };
+export type CalEvent = { id: string; start: string; title: string; sub: string; kind: "tour" | "req" | "done" | "media" | "cancelled"; agentName: string; tourId?: string; /** Listing title (localized) and its back-office link, when known. */ listing?: string; listingHref?: string };
 
 const TZ = -4; // America/Caracas
 
@@ -71,29 +71,99 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
       setSaving(false);
     }
   };
-  const setTour = async (status: "CONFIRMED" | "DONE" | "CANCELLED") => {
-    if (!sel?.tourId) return;
+  const setTour = async (tourId: string, status: TourStatus) => {
     setError(null);
     try {
-      await api(`tours/${sel.tourId}`, { method: "PATCH", json: { status } });
-      setSel(null);
+      await api(`tours/${tourId}`, { method: "PATCH", json: { status } });
+      if (sel?.tourId === tourId) setSel(null);
       router.refresh();
+      return true;
     } catch (e) {
       setError((e as Error).message);
+      return false;
     }
   };
+  // Phones: day agenda. Defaults to today in the current week (Monday otherwise); the pick resets when the week changes.
+  const defaultDay = todayIdx >= 0 && todayIdx <= 6 ? todayIdx : 0;
+  const [pick, setPick] = useState<{ week: string; day: number } | null>(null);
+  const day = pick?.week === weekStart ? pick.day : defaultDay;
+  const byDay = days.map((_, i) => inWeek.filter((e) => dayIdx(Date.parse(e.start)) === i).sort((a, b) => Date.parse(a.start) - Date.parse(b.start)));
+  const time = (iso: string) => fmt(new Date(iso), { hour: "2-digit", minute: "2-digit" });
+  const weekNav = (
+    <>
+      <Link href={`?w=${week - 1}`} className={cn("rounded-full p-1.5 shadow-[inset_0_0_0_1px_#D8CBB7] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,.18)]", k.hover)} aria-label={tx(locale, "Semana anterior", "Previous week")}><ChevronLeft size={18} /></Link>
+      <Link href={`?w=${week + 1}`} className={cn("rounded-full p-1.5 shadow-[inset_0_0_0_1px_#D8CBB7] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,.18)]", k.hover)} aria-label={tx(locale, "Semana siguiente", "Next week")}><ChevronRight size={18} /></Link>
+      <span className={cn(k.titleSm, "inline-block first-letter:uppercase")}>{fmt(days[0], { day: "numeric", month: "short" })} – {fmt(days[6], { day: "numeric", month: "short", year: "numeric" })}</span>
+      {week !== 0 && <Link href="?w=0" className={cn("text-sm", k.link)}>{tx(locale, "Hoy", "Today")}</Link>}
+    </>
+  );
 
   return (
     <AdminShell locale={locale} area="agency" title={tx(locale, "Calendario", "Calendar")}>
       {error && <div className={cn("mb-3", k.err)} role="alert">{error}</div>}
       <div className="grid gap-6 [&>*]:min-w-0 xl:grid-cols-[1fr_300px]">
-        <div ref={scroller} className={cn("overflow-x-auto", k.card)}>
+        {/* Phones: agenda for one day with a horizontal day picker (the week grid needs ~760 px). */}
+        <section className={cn("md:hidden", k.card)} aria-label={tx(locale, "Agenda del día", "Day agenda")}>
+          <div className={cn("flex flex-wrap items-center gap-2.5 border-b px-4 py-3.5", k.line)}>{weekNav}</div>
+          <div className="no-scrollbar flex snap-x gap-1.5 overflow-x-auto px-3 py-3" role="group" aria-label={tx(locale, "Elige un día", "Pick a day")}>
+            {days.map((d, i) => {
+              const on = i === day;
+              const count = byDay[i].filter((e) => e.kind !== "cancelled").length;
+              return (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => setPick({ week: weekStart, day: i })}
+                  aria-pressed={on}
+                  aria-label={`${fmt(d, { weekday: "long", day: "numeric", month: "long" })}${i === todayIdx ? tx(locale, " (hoy)", " (today)") : ""}: ${plural(count, locale, ["cita", "citas"], ["appointment", "appointments"])}`}
+                  className={cn(
+                    "flex min-w-[48px] flex-1 shrink-0 snap-start flex-col items-center gap-0.5 rounded-2xl px-1.5 py-2 transition-colors duration-np",
+                    on ? "bg-navy text-ivory dark:bg-ivory dark:text-navy" : i === todayIdx ? "bg-[#E6DDD2] text-navy dark:bg-white/10 dark:text-ivory" : cn("text-navy dark:text-ivory", k.hover),
+                  )}
+                >
+                  <span className={cn("text-[11px] font-semibold uppercase tracking-[.08em]", on ? "opacity-80" : k.muted)}>{fmt(d, { weekday: "short" }).replace(".", "")}</span>
+                  <span className="font-display text-[18px] font-semibold leading-none [font-feature-settings:'lnum']">{fmt(d, { day: "numeric" })}</span>
+                  <span aria-hidden className={cn("mt-0.5 h-1.5 w-1.5 rounded-full", count > 0 ? (on ? "bg-[#D4B98C]" : "bg-gold-text dark:bg-[#D4B98C]") : "bg-transparent")} />
+                </button>
+              );
+            })}
+          </div>
+          <div className={cn("border-t px-4 pb-4 pt-3", k.line)}>
+            <h2 className={cn(k.label, "first-letter:uppercase")}>{fmt(days[day], { weekday: "long", day: "numeric", month: "long" })}</h2>
+            {byDay[day].length === 0 ? (
+              <p className={cn("py-8 text-center text-sm", k.muted)}>{tx(locale, "No tienes visitas este día. Elige otro en la barra de arriba.", "No tours this day. Pick another one above.")}</p>
+            ) : (
+              <ol className="mt-2 space-y-2.5">
+                {byDay[day].map((e) => (
+                  <li key={e.id} className={cn("rounded-2xl border p-3.5", k.line, e.kind === "req" && "border-dashed border-navy/40 dark:border-ivory/30", (e.kind === "done" || e.kind === "cancelled") && "opacity-75")}>
+                    <div className="flex items-start gap-3">
+                      <div className={cn("flex w-14 shrink-0 flex-col items-center rounded-xl py-1.5", e.kind === "tour" ? "bg-navy text-ivory dark:bg-ivory dark:text-navy" : e.kind === "media" ? "bg-egeo/70 text-[#3D3530] dark:bg-egeo/25 dark:text-[#EEE7DE]" : "bg-[#F1ECE3] text-navy dark:bg-white/[.06] dark:text-ivory")}>
+                        <Clock size={12} aria-hidden className="opacity-70" />
+                        <time dateTime={e.start} className="mt-0.5 font-display text-[15px] font-semibold leading-none [font-feature-settings:'lnum','tnum']">{time(e.start)}</time>
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                          <span className={cn("font-semibold", (e.kind === "done" || e.kind === "cancelled") && "line-through")}>{e.kind === "media" && <Camera size={13} className="mr-1 inline" aria-hidden />}{e.title}</span>
+                          <KindPill kind={e.kind} locale={locale} />
+                        </div>
+                        <div className={cn("mt-1 flex items-start gap-1.5 text-[13px]", k.muted)}>
+                          <MapPin size={13} className="mt-[3px] shrink-0" aria-hidden />
+                          <span className="min-w-0">{e.listing ? e.listingHref ? <Link href={e.listingHref} className={k.link}>{e.listing}</Link> : e.listing : null}{e.listing ? " · " : ""}{e.sub}</span>
+                        </div>
+                        <div className={cn("mt-0.5 flex items-center gap-1.5 text-[13px]", k.muted)}><User size={13} className="shrink-0" aria-hidden /> {e.agentName}</div>
+                      </div>
+                    </div>
+                    {e.tourId && e.kind !== "done" && e.kind !== "cancelled" && <TourActions locale={locale} ev={e} onSet={setTour} className="mt-3" />}
+                  </li>
+                ))}
+              </ol>
+            )}
+          </div>
+        </section>
+        <div ref={scroller} className={cn("hidden overflow-x-auto md:block", k.card)}>
           <div className="min-w-[760px]">
             <div className={cn("flex flex-wrap items-center gap-3 border-b px-5 py-4", k.line)}>
-              <Link href={`?w=${week - 1}`} className={cn("rounded-full p-1.5 shadow-[inset_0_0_0_1px_#D8CBB7] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,.18)]", k.hover)} aria-label={tx(locale, "Semana anterior", "Previous week")}><ChevronLeft size={18} /></Link>
-              <Link href={`?w=${week + 1}`} className={cn("rounded-full p-1.5 shadow-[inset_0_0_0_1px_#D8CBB7] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,.18)]", k.hover)} aria-label={tx(locale, "Semana siguiente", "Next week")}><ChevronRight size={18} /></Link>
-              <span className={cn(k.titleSm, "inline-block first-letter:uppercase")}>{fmt(days[0], { day: "numeric", month: "short" })} – {fmt(days[6], { day: "numeric", month: "short", year: "numeric" })}</span>
-              {week !== 0 && <Link href="?w=0" className={cn("text-sm", k.link)}>{tx(locale, "Hoy", "Today")}</Link>}
+              {weekNav}
               <div className={cn("ml-auto flex gap-3 text-xs", k.muted)}>
                 <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-navy dark:bg-ivory" /> {tx(locale, "Visita", "Tour")}</span>
                 <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm border border-dashed border-navy/60 bg-[#E6DDD2] dark:border-ivory/60 dark:bg-white/10" /> {tx(locale, "Solicitada", "Requested")}</span>
@@ -158,13 +228,8 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
               </div>
               <div className={cn("text-sm first-letter:uppercase", k.muted)}>{fmt(new Date(sel.start), { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" })}</div>
               <div className="mt-1 text-sm">{sel.sub} · {sel.agentName}</div>
-              {sel.tourId && sel.kind !== "done" && sel.kind !== "cancelled" && (
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {sel.kind === "req" && <Button size="sm" className={k.primary} onClick={() => setTour("CONFIRMED")}><Check size={14} /> {tx(locale, "Confirmar", "Confirm")}</Button>}
-                  <Button size="sm" variant="outline" className={k.outline} onClick={() => setTour("DONE")}>{tx(locale, "Marcar realizada", "Mark done")}</Button>
-                  <Button size="sm" variant="ghost" className={k.ghost} onClick={() => setTour("CANCELLED")}>{tx(locale, "Cancelar", "Cancel")}</Button>
-                </div>
-              )}
+              {sel.listing && <div className={cn("mt-1 text-sm", k.muted)}>{sel.listingHref ? <Link href={sel.listingHref} className={k.link}>{sel.listing}</Link> : sel.listing}</div>}
+              {sel.tourId && sel.kind !== "done" && sel.kind !== "cancelled" && <TourActions key={sel.id} locale={locale} ev={sel} onSet={setTour} className="mt-3" />}
             </div>
           )}
           {canEditSlots && (
@@ -204,5 +269,80 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
         </div>
       </div>
     </AdminShell>
+  );
+}
+
+type TourStatus = "CONFIRMED" | "DONE" | "CANCELLED";
+
+function KindPill({ kind, locale }: { kind: CalEvent["kind"]; locale: Locale }) {
+  if (kind === "tour") return <Pill tone="egeo">{tx(locale, "Confirmada", "Confirmed")}</Pill>;
+  if (kind === "req") return <Pill tone="warn">{tx(locale, "Solicitada", "Requested")}</Pill>;
+  if (kind === "done") return <Pill tone="ok">{tx(locale, "Realizada", "Done")}</Pill>;
+  if (kind === "cancelled") return <Pill tone="muted">{tx(locale, "Cancelada", "Cancelled")}</Pill>;
+  return <Pill tone="neutral">{tx(locale, "Fotos", "Media")}</Pill>;
+}
+
+/** Confirm / mark done / cancel a tour. Cancelling asks first, inline (no browser dialog). */
+function TourActions({ locale, ev, onSet, className }: { locale: Locale; ev: CalEvent; onSet: (tourId: string, status: TourStatus) => Promise<boolean>; className?: string }) {
+  const [confirming, setConfirming] = useState(false);
+  const [busy, setBusy] = useState<TourStatus | null>(null);
+  const box = useRef<HTMLDivElement>(null);
+  const promptId = useId();
+  useEffect(() => {
+    if (confirming) box.current?.querySelector<HTMLElement>("[data-keep]")?.focus();
+  }, [confirming]);
+  if (!ev.tourId) return null;
+  const tourId = ev.tourId;
+  const run = async (status: TourStatus) => {
+    setBusy(status);
+    const ok = await onSet(tourId, status);
+    setBusy(null);
+    if (ok) setConfirming(false);
+  };
+  const back = () => {
+    setConfirming(false);
+    requestAnimationFrame(() => box.current?.querySelector<HTMLElement>("[data-cancel]")?.focus());
+  };
+  if (confirming)
+    return (
+      <div
+        ref={box}
+        role="group"
+        aria-labelledby={promptId}
+        className={cn("rounded-xl border border-danger/25 bg-[#B3261E0A] p-3 dark:border-[#F3A493]/30 dark:bg-[#B3261E1F]", className)}
+        onKeyDown={(e) => {
+          if (e.key === "Escape") {
+            e.stopPropagation();
+            back();
+          }
+        }}
+      >
+        <p id={promptId} className="text-sm text-navy dark:text-ivory">
+          {tx(locale, `¿Cancelar la visita con ${ev.title}? Ya no aparecerá como pendiente y no se puede reactivar desde aquí.`, `Cancel the tour with ${ev.title}? It will no longer show as pending and can't be reactivated from here.`)}
+        </p>
+        <div className="mt-2.5 flex flex-wrap gap-2">
+          <Button size="sm" variant="ghost" className={cn(k.ghost, "min-h-10 text-danger dark:text-[#F3A493]")} disabled={busy !== null} onClick={() => run("CANCELLED")}>
+            {busy === "CANCELLED" ? <Loader2 size={14} className="animate-spin" aria-hidden /> : <X size={14} aria-hidden />} {tx(locale, "Sí, cancelar visita", "Yes, cancel tour")}
+          </Button>
+          <Button data-keep size="sm" variant="outline" className={cn(k.outline, "min-h-10")} disabled={busy !== null} onClick={back}>
+            {tx(locale, "No, mantenerla", "No, keep it")}
+          </Button>
+        </div>
+      </div>
+    );
+  return (
+    <div ref={box} className={cn("flex flex-wrap gap-2", className)}>
+      {ev.kind === "req" && (
+        <Button size="sm" className={cn(k.primary, "min-h-10")} disabled={busy !== null} onClick={() => run("CONFIRMED")}>
+          {busy === "CONFIRMED" ? <Loader2 size={14} className="animate-spin" aria-hidden /> : <Check size={14} />} {tx(locale, "Confirmar", "Confirm")}
+        </Button>
+      )}
+      <Button size="sm" variant="outline" className={cn(k.outline, "min-h-10")} disabled={busy !== null} onClick={() => run("DONE")}>
+        {busy === "DONE" && <Loader2 size={14} className="animate-spin" aria-hidden />} {tx(locale, "Marcar realizada", "Mark done")}
+      </Button>
+      <Button data-cancel size="sm" variant="ghost" className={cn(k.ghost, "min-h-10")} disabled={busy !== null} onClick={() => setConfirming(true)}>
+        {tx(locale, "Cancelar", "Cancel")}
+      </Button>
+    </div>
   );
 }

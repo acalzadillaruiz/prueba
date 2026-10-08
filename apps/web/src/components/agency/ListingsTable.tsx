@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { CheckCircle2, FileSignature, Filter, Plus, Rocket, UserPlus, XCircle } from "lucide-react";
+import { CheckCircle2, FileSignature, Filter, Pencil, Plus, Rocket, UserPlus, XCircle } from "lucide-react";
 import type { ListingStatus, Locale } from "@/types/domain";
 import { AdminShell } from "@/components/layout/AdminShell";
 import { listingPhoto } from "@/lib/photos";
@@ -89,7 +89,66 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
           </div>
         </section>
       )}
-      <div className={cn("overflow-x-auto", k.card)}>
+      {/* Phones: one card per listing (every column + the row actions stay visible). Tablets and up: the table. */}
+      <ul className="space-y-3 md:hidden" aria-label={tx(locale, "Inmuebles", "Listings")}>
+        {rows.map((l) => {
+          const title = tx(locale, l.title_es, l.title_en);
+          const inReview = review.includes(l.id);
+          const edit = `/${locale}/agency/listings/${l.id}/edit`;
+          return (
+            <li key={l.id} className={cn(k.card, "p-4")} data-listing={l.id}>
+              <Link href={edit} className="flex items-start gap-3">
+                <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="h-[68px] w-[88px] shrink-0 rounded-xl" />
+                <div className="min-w-0 flex-1">
+                  <div className="line-clamp-2 font-semibold leading-snug">{title}</div>
+                  <div className={cn("mt-0.5 text-xs", k.muted)}>{lbl(TYPE_LABEL[l.listingType], locale)} · {l.zone} · {num(l.areaM2, locale)} m²</div>
+                  <div className={cn("mt-1 text-[17px] leading-tight", k.num, "tracking-normal")}>{money(l.priceAmount, locale)}<span className={cn("text-xs font-normal", k.muted)}>{priceSuffix(l, locale)}</span></div>
+                </div>
+              </Link>
+              <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                {inReview ? <Pill tone="warn">{tx(locale, "En revisión", "In review")}</Pill> : l.review === "REJECTED" ? <Pill tone="danger">{tx(locale, "Rechazado", "Rejected")}</Pill> : <StatusPill status={l.status} locale={locale} />}
+                {l.luxury && <Pill tone="exclusive">{tx(locale, "Exclusiva", "Exclusive")}</Pill>}
+                <span className={cn("ml-auto text-xs", k.muted)} suppressHydrationWarning>{ago(l.updatedAt, locale)}</span>
+              </div>
+              <dl className={cn("mt-3 grid grid-cols-3 gap-2 rounded-xl px-3 py-2.5 text-center", k.soft)}>
+                <div className="min-w-0">
+                  <dt className={cn(k.label, "text-[10px]")}>{tx(locale, "Calidad", "Quality")}</dt>
+                  <dd className="mt-1 flex items-center justify-center gap-1.5">
+                    <span className="h-1.5 w-10 rounded-full bg-[#ECE6DA] dark:bg-white/10" aria-hidden><span className={cn("block h-full rounded-full", l.quality >= 85 ? "bg-ok" : l.quality >= 65 ? "bg-warn" : "bg-danger")} style={{ width: `${l.quality}%` }} /></span>
+                    <span className="text-xs font-semibold">{l.quality}</span>
+                  </dd>
+                </div>
+                <div>
+                  <dt className={cn(k.label, "text-[10px]")}>Leads</dt>
+                  <dd className="mt-0.5 font-semibold">{l.stats.leads}</dd>
+                </div>
+                <div>
+                  <dt className={cn(k.label, "text-[10px]")}>{tx(locale, "Días", "Days")}</dt>
+                  <dd className="mt-0.5 font-semibold">{l.daysOnMarket}</dd>
+                </div>
+              </dl>
+              <label className="mt-3 flex items-center gap-3 text-sm">
+                <span className={cn("shrink-0", k.muted)}>{tx(locale, "Agente", "Agent")}</span>
+                <select value={l.agentId ?? ""} disabled={!manager || busy === l.id} onChange={(e) => patch(l.id, { agentId: e.target.value || null })} className={cn(k.select, "h-10 min-w-0 flex-1")} aria-label={tx(locale, `Agente de ${title}`, `Agent for ${title}`)}>
+                  <option value="">—</option>
+                  {agents.map((ag) => <option key={ag.id} value={ag.id}>{ag.name}</option>)}
+                </select>
+              </label>
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                {inReview && manager && (
+                  <>
+                    <Button size="sm" variant="navy" className={cn(k.navy, "min-h-10")} disabled={busy === l.id} onClick={() => patch(l.id, { review: "APPROVED" })}><CheckCircle2 size={14} /> {tx(locale, "Aprobar", "Approve")}</Button>
+                    <Button size="sm" variant="ghost" className={cn(k.ghost, "min-h-10")} disabled={busy === l.id} onClick={() => patch(l.id, { review: "REJECTED" })} aria-label={tx(locale, `Rechazar publicación de ${title}`, `Reject listing ${title}`)}><XCircle size={14} /> {tx(locale, "Rechazar", "Reject")}</Button>
+                  </>
+                )}
+                <Link href={edit} className={cn("ml-auto inline-flex min-h-10 items-center gap-1.5 rounded-full px-3 text-sm", k.link)} aria-label={tx(locale, `Editar ${title}`, `Edit ${title}`)}><Pencil size={14} aria-hidden /> {tx(locale, "Editar", "Edit")}</Link>
+              </div>
+            </li>
+          );
+        })}
+        {rows.length === 0 && <li className={cn(k.card, "px-4 py-10 text-center text-sm", k.muted)}>{tx(locale, "No hay inmuebles con este filtro.", "No listings match this filter.")}</li>}
+      </ul>
+      <div className={cn("hidden overflow-x-auto md:block", k.card)}>
         <table className="w-full min-w-[1120px] text-sm">
           <thead className={cn("border-b text-left", k.line, k.th)}>
             <tr>

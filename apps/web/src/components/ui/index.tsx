@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { cn } from "@/lib/cn";
-import type { ReactNode } from "react";
+import type { HTMLAttributes, ReactNode } from "react";
 import { Monogram, RoofGlyph } from "@/components/brand/Logo";
 
 /**
@@ -78,9 +78,9 @@ export function Badge({ children, tone = "neutral", className }: { children: Rea
   );
 }
 
-export function Card({ children, className, dark }: { children: ReactNode; className?: string; dark?: boolean }) {
+export function Card({ children, className, dark, ...rest }: { children: ReactNode; className?: string; dark?: boolean } & Omit<HTMLAttributes<HTMLDivElement>, "className" | "children">) {
   return (
-    <div className={cn(dark ? "rounded-np border border-navy-line bg-navy-card text-ivory" : "rounded-np border border-line bg-white", className)}>
+    <div {...rest} className={cn(dark ? "rounded-np border border-navy-line bg-navy-card text-ivory" : "rounded-np border border-line bg-white", className)}>
       {children}
     </div>
   );

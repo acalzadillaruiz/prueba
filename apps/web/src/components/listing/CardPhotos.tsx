@@ -72,10 +72,10 @@ export function CardPhotos({ l, locale, label, href }: { l: Listing; locale: Loc
           </div>
         ))}
       </div>
-      <button type="button" tabIndex={-1} disabled={idx === 0} onClick={(e) => go(e, -1)} aria-label={tx(locale, "Foto anterior", "Previous photo")} className={cn(arrow, "left-2.5")}>
+      <button type="button" tabIndex={-1} disabled={idx === 0} onClick={(e) => go(e, -1)} onPointerEnter={() => ahead(idx)} aria-label={tx(locale, "Foto anterior", "Previous photo")} className={cn(arrow, "left-2.5")}>
         <ChevronLeft size={18} aria-hidden />
       </button>
-      <button type="button" tabIndex={-1} disabled={idx === n - 1} onClick={(e) => go(e, 1)} aria-label={tx(locale, "Foto siguiente", "Next photo")} className={cn(arrow, "right-2.5")}>
+      <button type="button" tabIndex={-1} disabled={idx === n - 1} onClick={(e) => go(e, 1)} onPointerEnter={() => ahead(idx)} aria-label={tx(locale, "Foto siguiente", "Next photo")} className={cn(arrow, "right-2.5")}>
         <ChevronRight size={18} aria-hidden />
       </button>
       <div aria-hidden data-photo-dots className="pointer-events-none absolute bottom-3 left-1/2 z-[2] flex -translate-x-1/2 items-center gap-1.5">

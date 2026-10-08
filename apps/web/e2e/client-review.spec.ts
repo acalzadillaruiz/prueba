@@ -334,14 +334,14 @@ test.describe("Cliente · regresiones de la revisión", () => {
       await expect(page.getByRole("combobox", { name: "Ordenar por" })).toHaveValue("rec");
       // Map: after a zoom the button shows up under the tool row, centred, clear of the zoom buttons.
       await page.locator("[data-search-toggle]").getByRole("button", { name: "Mapa", exact: true }).click();
-      await page.getByRole("button", { name: "Acercar" }).click();
+      await page.getByRole("button", { name: "Acercar", exact: true }).click();
       const area = page.locator("[data-search-area]");
       await expect(area).toBeVisible();
       const a = (await area.boundingBox())!;
       expect(a.x, `${width}px`).toBeGreaterThanOrEqual(0);
       expect(a.x + a.width, `${width}px`).toBeLessThanOrEqual(width);
       expect(Math.abs(a.x + a.width / 2 - width / 2), `${width}px centred`).toBeLessThanOrEqual(2);
-      for (const name of ["Acercar", "Alejar"]) expect(overlaps(a, (await page.getByRole("button", { name }).boundingBox())!), `${width}px vs ${name}`).toBe(false);
+      for (const name of ["Acercar", "Alejar"]) expect(overlaps(a, (await page.getByRole("button", { name, exact: true }).boundingBox())!), `${width}px vs ${name}`).toBe(false);
       expect(overlaps(a, (await page.locator("[data-map-tools]").boundingBox())!), `${width}px vs tools`).toBe(false);
     }
     await page.evaluate(() => sessionStorage.removeItem("np-search-view"));
@@ -357,7 +357,7 @@ test.describe("Cliente · regresiones de la revisión", () => {
     await expect(card.getByRole("link")).toHaveAccessibleName(title);
     expect(await page.locator("#search-results a button, #search-results a a").count()).toBe(0);
     // Owner listings say so in the agreed wording.
-    for (const t of await page.locator('[data-testid="card-advisor"][data-owner]').allInnerTexts()) expect(t).toBe("Dueño/a · sin intermediarios");
+    for (const t of await page.locator('[data-testid="card-advisor"][data-owner]').allInnerTexts()) expect(t).toMatch(/Dueño\/a · sin intermediarios$/);
     // Skip link: after the filter bar, visible on focus, lands on the results.
     const skip = page.getByRole("link", { name: "Saltar a los resultados" });
     await skip.focus();

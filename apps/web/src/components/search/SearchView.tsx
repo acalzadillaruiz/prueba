@@ -611,9 +611,10 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
                 </select>
                 <ChevronDown size={14} aria-hidden className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-muted lg:right-3" />
               </span>
-              {/* Phones with filters on: icon + count (the chips below name them), so the sort keeps its room. */}
-              <button type="button" onClick={openSheet} aria-haspopup="dialog" aria-label={filtersAria} className={cn("flex h-11 shrink-0 items-center gap-1.5 rounded-full border px-3 font-display text-sm lg:hidden", filterCount ? on : "border-ink/10 bg-white/75")}>
-                <SlidersHorizontal size={15} aria-hidden /> <span className={cn(filterCount > 0 && "max-[389px]:hidden")}>{filtersLabel}</span> {countBadge}
+              {/* Small phones (and phones with filters on): icon + count — the chips below name them, the button keeps its
+                  aria-label — so the sort keeps its room. */}
+              <button type="button" onClick={openSheet} aria-haspopup="dialog" aria-label={filtersAria} className={cn("flex h-11 min-w-11 shrink-0 items-center justify-center gap-1.5 rounded-full border px-3 font-display text-sm max-[389px]:px-2.5 lg:hidden", filterCount ? on : "border-ink/10 bg-white/75")}>
+                <SlidersHorizontal size={15} aria-hidden /> <span className={cn("max-[389px]:hidden", filterCount > 0 && "max-sm:hidden")}>{filtersLabel}</span> {countBadge}
               </button>
             </div>
             {activeChips.length > 0 && (

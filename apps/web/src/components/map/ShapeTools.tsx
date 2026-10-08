@@ -66,7 +66,7 @@ export function ShapeTools({
   ] as const;
 
   return (
-    <div data-map-tools className="absolute left-3 top-3 z-10 flex flex-wrap items-start gap-2 pr-16">
+    <div data-map-tools className="pointer-events-none absolute left-3 right-[68px] top-3 z-10 flex flex-wrap items-start gap-2 [&>*]:pointer-events-auto">
       {enabled && (
         <div ref={ref} className="relative">
           {mode === "pan" ? (

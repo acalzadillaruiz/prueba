@@ -54,7 +54,7 @@ export default async function SellPage({ params }: { params: Promise<{ locale: L
     [tx(locale, "Publica y recibe visitas", "Go live and get visits"), tx(locale, "Tú atiendes en tu horario, o una agencia verificada lo hace por ti.", "You host them on your schedule, or a verified agency does it for you.")],
   ];
   return (
-    <PublicPage locale={locale}>
+    <PublicPage locale={locale} tabbar>
       <section className="np-grain relative overflow-hidden">
         <div className="mx-auto grid max-w-[1320px] items-start gap-10 px-4 pb-16 pt-10 md:px-8 lg:grid-cols-[1.1fr_480px] lg:gap-16 lg:pb-24 lg:pt-20">
           <div className="lg:pt-6">

@@ -352,6 +352,19 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
     </div>
   );
 
+  // The address search is a shared component: flag its text input as invalid (and point it at the inline error) from here.
+  const addrInvalid = step === 1 && (!!streetErr || (tried && !d.addr));
+  useEffect(() => {
+    const input = formRef.current?.querySelector<HTMLInputElement>('[data-wiz="addr"] input:not([type=hidden])');
+    if (!input) return;
+    if (addrInvalid) {
+      input.setAttribute("aria-invalid", "true");
+      input.setAttribute("aria-describedby", "wizard-street-error");
+    } else {
+      input.removeAttribute("aria-invalid");
+      input.removeAttribute("aria-describedby");
+    }
+  }, [addrInvalid]);
   if (done)
     return (
       <div className="mx-auto max-w-xl px-4 py-20 text-center" data-testid="owner-published">
@@ -383,41 +396,57 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
       </div>
     );
 
-  /** What still blocks "Continuar" on step n, in plain words (the fields themselves show their own messages). */
-  const issues = (n: number): string[] =>
+  /**
+   * What still blocks "Continuar" on step n, in plain words, each tied to the [data-wiz] zone of the field it is about
+   * (the fields themselves show their own inline messages and aria-invalid).
+   */
+  type Issue = [text: string, zone: string];
+  const issues = (n: number): Issue[] =>
     (n === 1
       ? [
-          !d.addr && tx(locale, "Escribe la dirección y elige una opción de la lista.", "Type the address and pick an option from the list."),
-          d.addr && streetErr && tx(locale, "Añade la calle o el edificio, no solo la urbanización.", "Add the street or building, not just the neighborhood."),
-          d.addr && !streetErr && dup && !dupOverride && tx(locale, "Parece que ya está publicada: si es otra unidad, pulsa «No es la misma casa».", "It seems to be listed already: if it’s another unit, tap “Not the same home”."),
+          !d.addr && ([tx(locale, "Escribe la dirección y elige una opción de la lista.", "Type the address and pick an option from the list."), "addr"] as Issue),
+          d.addr && streetErr && ([tx(locale, "Añade la calle o el edificio, no solo la urbanización.", "Add the street or building, not just the neighborhood."), "addr"] as Issue),
+          d.addr && !streetErr && dup && !dupOverride && ([tx(locale, "Parece que ya está publicada: si es otra unidad, pulsa «No es la misma casa».", "It seems to be listed already: if it’s another unit, tap “Not the same home”."), "dup"] as Issue),
         ]
       : n === 2
         ? [
-            detailsErr.m2 && tx(locale, "La superficie, en m².", "The area, in m²."),
-            detailsErr.year && tx(locale, "Un año de construcción válido.", "A valid year built."),
-            !extras.ok && tx(locale, "Revisa los datos marcados en rojo más abajo.", "Check the fields marked in red below."),
-            extras.ok && !ess.ok && tx(locale, "Revisa los servicios esenciales marcados en rojo.", "Check the essential services marked in red."),
+            detailsErr.m2 && ([tx(locale, "La superficie, en m².", "The area, in m²."), "m2"] as Issue),
+            detailsErr.year && ([tx(locale, "Un año de construcción válido.", "A valid year built."), "year"] as Issue),
+            !extras.ok && ([tx(locale, "Revisa los datos marcados en rojo más abajo.", "Check the fields marked in red below."), "extras"] as Issue),
+            extras.ok && !ess.ok && ([tx(locale, "Revisa los servicios esenciales marcados en rojo.", "Check the essential services marked in red."), "ess"] as Issue),
           ]
         : n === 4
-          ? [priceErr && tx(locale, "Tu precio en USD (un número entero).", "Your price in USD (a whole number).")]
+          ? [priceErr && ([tx(locale, "Tu precio en USD (un número entero).", "Your price in USD (a whole number)."), "price"] as Issue)]
           : []
-    ).filter((x): x is string => !!x);
+    ).filter((x): x is Issue => !!x);
   // Live list: items disappear as the owner fixes them.
   const blocked = tried ? issues(step) : [];
+  /** Scroll to a field zone and focus its first invalid control (or its first control). */
+  const focusZone = (zone: string) => {
+    const box = formRef.current?.querySelector<HTMLElement>(`[data-wiz="${zone}"]`);
+    if (!box) return false;
+    const ctl =
+      box.querySelector<HTMLElement>('[aria-invalid="true"]') ??
+      box.querySelector<HTMLElement>("input:not([type=hidden]):not([disabled]):not([readonly]), select, textarea, button:not([disabled])");
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    (ctl ?? box).scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
+    ctl?.focus({ preventScroll: true });
+    return !!ctl;
+  };
   const next = () => {
-    if (!issues(step).length) return setStep(step + 1);
+    const now = issues(step);
+    if (!now.length) return setStep(step + 1);
     if (step === 2) {
       setShowExtrasErr(true);
       setShowDetailsErr(true);
     }
     setTried(true);
-    // Take the owner to the first field that needs them, or to the summary.
+    // Take the owner to the first field that needs them (after the errors render), or to the summary.
     window.setTimeout(() => {
-      const bad = formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"], [data-testid="street-error"]');
+      if (focusZone(now[0][1])) return;
       const box = document.getElementById("wizard-blocked");
-      (bad ?? box)?.scrollIntoView({ behavior: "smooth", block: "center" });
-      if (bad?.matches("input, select, textarea")) bad.focus({ preventScroll: true });
-      else box?.focus({ preventScroll: true });
+      box?.scrollIntoView({ behavior: "smooth", block: "center" });
+      box?.focus({ preventScroll: true });
     }, 0);
   };
   const facts = [
@@ -502,8 +531,11 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
         {step === 1 && (
           <div className="np-in space-y-5">
             <h1 className="font-serif text-[36px] font-medium leading-[1.05] md:text-[44px]">{tx(locale, "¿Dónde está?", "Where is it?")}</h1>
-            <PlacesSearch locale={locale} zones={zones} value={d.addr} onPick={(p) => set({ addr: p })} />
-            {streetErr && <p role="alert" className="-mt-2 text-sm text-danger" data-testid="street-error">{streetErr}</p>}
+            <div data-wiz="addr" className="space-y-3">
+              <PlacesSearch locale={locale} zones={zones} value={d.addr} onPick={(p) => set({ addr: p })} />
+              {streetErr && <p role="alert" id="wizard-street-error" className="-mt-1 text-sm text-danger" data-testid="street-error">{streetErr}</p>}
+              {tried && !d.addr && <p role="alert" id="wizard-street-error" className="-mt-1 text-sm font-semibold text-danger">{tx(locale, "Falta la dirección: escríbela y elige una opción.", "Address missing: type it and pick an option.")}</p>}
+            </div>
             <div className="grid gap-3 sm:grid-cols-3">
               <Field label={tx(locale, "Piso / apto / casa", "Floor / unit")}><input className={inputCls} value={d.unit} onChange={(e) => set({ unit: e.target.value })} placeholder="Piso 6, apto 6-B" /></Field>
               <Field label={tx(locale, "Urbanización", "Neighborhood")}><input className={inputCls} value={d.addr?.zone ?? ""} readOnly /></Field>
@@ -523,7 +555,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
             />
             {d.addr && <p className="text-xs text-muted">{tx(locale, "Toca el mapa para ajustar el punto exacto.", "Tap the map to fine-tune the exact point.")}</p>}
             {d.addr && !streetErr && (
-              <div className={cn("np-in flex flex-wrap items-center gap-3 rounded-np border p-3 text-sm", dup && !dupOverride ? "border-warn/60 bg-[#8A5A0014]" : "border-[#2F6B4F55] bg-[#2F6B4F0D]")}>
+              <div data-wiz="dup" className={cn("np-in flex flex-wrap items-center gap-3 rounded-np border p-3 text-sm", dup && !dupOverride ? "border-warn/60 bg-[#8A5A0014]" : "border-[#2F6B4F55] bg-[#2F6B4F0D]")}>
                 {checking ? <Loader2 size={18} className="animate-spin" /> : dup && !dupOverride ? <AlertTriangle size={18} className="text-warn" /> : <CheckCircle2 size={18} className="text-ok" />}
                 <span className="font-semibold">{tx(locale, "Ubicación marcada en el mapa", "Location marked on the map")}</span>
                 {dup ? (
@@ -543,12 +575,16 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
             <h1 className="font-serif text-[36px] font-medium leading-[1.05] md:text-[44px]">{tx(locale, "Cuéntanos cómo es", "Tell us about it")}</h1>
             <div className="grid gap-3 sm:grid-cols-2">
               {/* Empty while typing is allowed (0); the step can't continue until the value is valid. */}
+              <div data-wiz="m2">
               <Field label={d.kind === "land" ? tx(locale, "Superficie del terreno (m²)", "Plot area (m²)") : tx(locale, "Superficie construida (m²)", "Built area (m²)")} error={showDetailsErr ? detailsErr.m2 ?? undefined : undefined}>
                 <input className={inputCls} type="number" inputMode="numeric" min={1} step={1} value={d.m2 || ""} aria-invalid={showDetailsErr && !!detailsErr.m2} onChange={(e) => set({ m2: Math.max(0, Math.round(+e.target.value || 0)) })} />
               </Field>
+              </div>
+              <div data-wiz="year">
               <Field label={tx(locale, "Año de construcción", "Year built")} error={showDetailsErr ? detailsErr.year ?? undefined : undefined}>
                 <input className={inputCls} type="number" inputMode="numeric" min={1800} max={THIS_YEAR + 5} value={d.year || ""} aria-invalid={showDetailsErr && !!detailsErr.year} onChange={(e) => set({ year: Math.max(0, Math.round(+e.target.value || 0)) })} />
               </Field>
+              </div>
               {hasBeds && stepper(tx(locale, "Habitaciones", "Bedrooms"), d.beds, (v) => set({ beds: v }))}
               {hasBaths && stepper(tx(locale, "Baños", "Bathrooms"), d.baths, (v) => set({ baths: v }))}
               {d.kind !== "land" && stepper(tx(locale, "Puestos", "Parking"), d.parking, (v) => set({ parking: v }))}
@@ -566,7 +602,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                 })}
               </div>
             </div>
-            <div className="rounded-[18px] bg-white p-5 shadow-[0_8px_24px_rgba(30,26,24,.06)]">
+            <div data-wiz="ess" className="rounded-[18px] bg-white p-5 shadow-[0_8px_24px_rgba(30,26,24,.06)]">
               <EssentialsFields locale={locale} value={d.ess} onChange={(x) => set({ ess: x })} showErrors={showExtrasErr} />
             </div>
             {!listingType.startsWith("COMMERCIAL") && RESIDENTIAL_KINDS.includes(d.kind) && (
@@ -575,7 +611,9 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                 {tx(locale, "Inmueble de lujo", "Luxury property")}
               </label>
             )}
-            <ListingTypeFields locale={locale} listingType={listingType} luxury={luxury} value={d.extras} onChange={(x) => set({ extras: x })} showErrors={showExtrasErr} />
+            <div data-wiz="extras">
+              <ListingTypeFields locale={locale} listingType={listingType} luxury={luxury} value={d.extras} onChange={(x) => set({ extras: x })} showErrors={showExtrasErr} />
+            </div>
             {luxury && (
               <label className="flex items-start gap-2 text-sm">
                 <input type="checkbox" checked={d.privateListing} onChange={(e) => set({ privateListing: e.target.checked })} className="mt-0.5 h-4 w-4 shrink-0 accent-navy dark:accent-[#C9A574]" />
@@ -662,7 +700,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               ) : (
                 <div className="mt-2 flex items-center gap-2 text-muted"><Loader2 size={16} className="animate-spin" /> {tx(locale, "Calculando…", "Calculating…")}</div>
               )}
-              <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto]">
+              <div data-wiz="price" className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto]">
                 <Field label={tx(locale, `Tu precio (USD${priceUnit})`, `Your price (USD${priceUnit})`)} error={priceErr ?? undefined}>
                   <input className={inputCls} type="number" inputMode="numeric" min={1} step={1} value={d.price || ""} aria-invalid={!!priceErr} onChange={(e) => set({ price: Math.max(0, Math.round(+e.target.value || 0)) })} />
                 </Field>
@@ -753,8 +791,12 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
           <div id="wizard-blocked" tabIndex={-1} role="alert" data-testid="wizard-blocked" className="mt-8 rounded-[18px] border border-[#8E3B22]/30 bg-[#8E3B220D] px-4 py-3 text-sm outline-none">
             <div className="font-display font-semibold text-ink">{tx(locale, "Para continuar, te falta:", "To continue, you still need:")}</div>
             <ul className="mt-1.5 list-disc space-y-1 pl-5 text-ink/80">
-              {blocked.map((b) => (
-                <li key={b}>{b}</li>
+              {blocked.map(([b, zone]) => (
+                <li key={b}>
+                  <button type="button" onClick={() => focusZone(zone)} className="text-left underline decoration-[#8E3B22]/40 underline-offset-4 hover:decoration-[#8E3B22] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8E3B22]">
+                    {b}
+                  </button>
+                </li>
               ))}
             </ul>
           </div>

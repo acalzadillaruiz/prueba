@@ -120,11 +120,17 @@ html.dark .np-public .text-coral { color: var(--np-coral-light); }
 :root { --np-header-offset: 80px; }
 @media (min-width: 768px) { :root { --np-header-offset: 84px; } }
 html[data-np-header="hidden"] { --np-header-offset: 8px; }
+/* While the compact search is pinned (CompactAsk sets html[data-np-compact="on"]; it carries its own logo mark and a
+   menu button that opens the header's drawer via the "np:open-menu" event), the header steps aside completely so the
+   two bars never stack. The drawer is outside <header>, so it still opens. */
+html[data-np-compact="on"] { --np-header-offset: 8px; }
+html[data-np-compact="on"] [data-public-header] { transform: translateY(calc(-100% - 12px)); pointer-events: none; visibility: hidden; transition: transform .3s cubic-bezier(.2,.7,.2,1), visibility 0s .3s; }
 
 /* Demo mode lives inside the public header (drawer / header button): no floating pill over public pages. */
 body:has([data-public-header]) [data-demobar] { display: none; }
 
-/* "Guardada" toast: above the phone tab bar and the listing's sticky contact bar. */
+/* "Guardada" toast: above the phone tab bar and the listing's sticky contact bar. SavedToast also measures every
+   floating control pinned to the bottom (search Mapa/Lista toggle, compare tray, contact button) and climbs above them. */
 @media (max-width: 767px) {
   body:has([data-tabbar]) [data-np-toast], body:has([data-sticky-cta="shown"]) [data-np-toast] { bottom: calc(5rem + env(safe-area-inset-bottom)); }
 }
@@ -267,6 +273,21 @@ h1 em, h2 em, h3 em, .np-hero-title em { font-style: normal; }
   box-shadow: 0 1px 0 rgb(255 255 255 / .6) inset, 0 20px 50px -18px rgb(30 26 24 / .22);
 }
 html.dark .np-public .np-glass { background: rgb(42 36 32 / .62); border-color: rgb(255 255 255 / .08); box-shadow: 0 20px 50px -18px rgb(0 0 0 / .6); }
+/* Navigation glass: chrome that floats over moving content (header pill, compact search, menus, toasts, trays) must
+   stay readable, so it is near-opaque Lino with the same blur. The lighter `.np-glass` above is for decorative chips
+   and cards sitting on photos. The compact search sets `--np-glass` inline, so it is pinned here too. */
+:root { --np-glass-nav: rgb(251 248 244 / .93); }
+html.dark { --np-glass-nav: rgb(36 31 27 / .94); }
+.np-glass-nav, [data-public-header] .np-glass, [data-sticky-search] .np-glass, [data-compare-tray] .np-glass {
+  background: var(--np-glass-nav);
+  -webkit-backdrop-filter: blur(22px) saturate(1.4);
+          backdrop-filter: blur(22px) saturate(1.4);
+  border: 1px solid rgb(30 26 24 / .07);
+  box-shadow: 0 1px 0 rgb(255 255 255 / .6) inset, 0 20px 50px -18px rgb(30 26 24 / .22);
+}
+html.dark .np-public :is(.np-glass-nav, [data-public-header] .np-glass, [data-sticky-search] .np-glass, [data-compare-tray] .np-glass) {
+  background: var(--np-glass-nav); border-color: rgb(255 255 255 / .08); box-shadow: 0 20px 50px -18px rgb(0 0 0 / .6);
+}
 .np-hairline { border-color: var(--np-hair); }
 /* Aurora: three slow, blurred light pools in Arena, Rosa and Bronce over Lino. */
 .np-aura { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }

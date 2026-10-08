@@ -1,12 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
-import { Circle, Minus, Moon, PenLine, Plus, Sun, X } from "lucide-react";
+import { Minus, Moon, Plus, Sun } from "lucide-react";
 import type { Listing, Locale } from "@/types/domain";
 import type { LatLng, Shape } from "@/lib/geo";
 import { compactMoney, plural, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import { VE_RINGS } from "./venezuela";
+import { ShapeTools } from "./ShapeTools";
 
 type Region = "caracas" | "venezuela";
 type Theme = "night" | "light";
@@ -88,7 +89,21 @@ export interface NightMapProps {
   pin?: LatLng;
   /** Click on the map (pan mode) returns the lat/lng. */
   onPick?: (p: LatLng) => void;
+  /**
+   * Fit the first view to these points once the map knows its size, keeping them clear of the overlays (px of
+   * padding per side: the tool row on top, the zoom column on the right, a docked bar at the bottom). Re-fits on
+   * resize until the visitor pans or zooms.
+   */
+  fitPoints?: LatLng[];
+  fitPadding?: { top: number; right: number; bottom: number; left: number };
+  /** Highest zoom a fit may reach (one listing must not zoom to the street). */
+  fitMaxScale?: number;
+  /** Extra controls in the top-left tool row (e.g. the Caracas / Venezuela switch). */
+  toolbar?: ReactNode;
 }
+
+/** Default room for the overlays, in px: tool row on top (+ a price label's height), zoom column on the right. */
+export const FIT_PADDING = { top: 108, right: 72, bottom: 40, left: 48 };
 
 export function NightMap({
   listings,
@@ -107,6 +122,10 @@ export function NightMap({
   focus,
   pin,
   onPick,
+  fitPoints,
+  fitPadding = FIT_PADDING,
+  fitMaxScale = 8,
+  toolbar,
 }: NightMapProps) {
   const B = BOUNDS[region];
   const uid = useId().replace(/:/g, "");
@@ -136,19 +155,43 @@ export function NightMap({
   // px → svg units (so pins keep a constant on-screen size)
   const [k, setK] = useState(1.4);
   const [box, setBox] = useState({ w: 0, h: 0 });
+  // Once the visitor pans or zooms, the map stops fitting itself to the results.
+  const touched = useRef(false);
+  const fitRef = useRef({ fitPoints, fitPadding, fitMaxScale });
+  fitRef.current = { fitPoints, fitPadding, fitMaxScale };
   useEffect(() => {
     const el = svgRef.current;
     if (!el) return;
     const ro = new ResizeObserver(() => {
       const r = el.getBoundingClientRect();
-      if (r.width) {
-        setK(Math.min(B.W / r.width, B.H / r.height));
+      if (r.width && r.height) {
+        const kk = Math.min(B.W / r.width, B.H / r.height);
+        setK(kk);
         setBox({ w: r.width, h: r.height });
+        const { fitPoints: pts, fitPadding: pad, fitMaxScale: maxS } = fitRef.current;
+        if (!touched.current && pts?.length) {
+          // Visible part of the (sliced) viewBox, then the padded box the points must fit in — all in svg units.
+          const x0 = (B.W - r.width * kk) / 2;
+          const y0 = (B.H - r.height * kk) / 2;
+          const availW = Math.max(40, r.width - pad.left - pad.right) * kk;
+          const availH = Math.max(40, r.height - pad.top - pad.bottom) * kk;
+          const ps = pts.map((p) => P(p.lat, p.lng));
+          const xs = ps.map((p) => p.x);
+          const ys = ps.map((p) => p.y);
+          const dx = Math.max(...xs) - Math.min(...xs);
+          const dy = Math.max(...ys) - Math.min(...ys);
+          const s = Math.max(0.9, Math.min(maxS, dx ? availW / dx : maxS, dy ? availH / dy : maxS));
+          const cx = x0 + (pad.left * kk + availW / 2);
+          const cy = y0 + (pad.top * kk + availH / 2);
+          const mx = (Math.max(...xs) + Math.min(...xs)) / 2;
+          const my = (Math.max(...ys) + Math.min(...ys)) / 2;
+          setView({ s, x: cx - mx * s, y: cy - my * s });
+        }
       }
     });
     ro.observe(el);
     return () => ro.disconnect();
-  }, [B]);
+  }, [B, P]);
 
   // Map labels keep a fixed on-screen size (CSS px) whatever the zoom or map size: the text is laid out at its
   // font size and scaled by (svg units per px) / zoom, so it stays legible on a 390 px phone instead of ~5 px.
@@ -162,12 +205,14 @@ export function NightMap({
     return { x: (e.clientX - r.left) * scale - offX, y: (e.clientY - r.top) * scale - offY, k: scale };
   };
 
-  const zoom = (factor: number, cx = B.W / 2, cy = B.H / 2) =>
+  const zoom = (factor: number, cx = B.W / 2, cy = B.H / 2) => {
+    touched.current = true;
     setView((v) => {
       const s = Math.max(0.9, Math.min(8, v.s * factor));
       const k = s / v.s;
       return { s, x: cx - (cx - v.x) * k, y: cy - (cy - v.y) * k };
     });
+  };
 
   const onPointerDown = (e: React.PointerEvent) => {
     if (mode !== "pan") return;
@@ -179,7 +224,10 @@ export function NightMap({
     const { k } = toSvg(e);
     const dx = (e.clientX - drag.current.x) * k;
     const dy = (e.clientY - drag.current.y) * k;
-    if (Math.abs(dx) + Math.abs(dy) > 4) drag.current.moved = true;
+    if (Math.abs(dx) + Math.abs(dy) > 4) {
+      drag.current.moved = true;
+      touched.current = true;
+    }
     setView((v) => ({ ...v, x: drag.current!.vx + dx, y: drag.current!.vy + dy }));
   };
   // The click event fires after pointerup: remember whether this gesture was a drag so panning never drops a pin.
@@ -533,47 +581,21 @@ export function NightMap({
               {theme === "night" ? <Sun size={16} /> : <Moon size={16} />}
             </button>
           </div>
-          {onShape && (
-            <div className="absolute left-3 top-3 z-10 flex flex-wrap gap-2 pr-16">
-              <button
-                aria-pressed={mode === "draw"}
-                className={cn("flex min-h-11 items-center gap-1.5 rounded-full border px-3.5 font-display text-sm shadow-np transition-colors duration-np", mode === "draw" ? "np-sel" : cn(ctl, ctlHover))}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setDraft([]);
-                  setMode(mode === "draw" ? "pan" : "draw");
-                }}
-              >
-                <PenLine size={14} /> {mode === "draw" ? tx(locale, "Toca para dibujar…", "Tap to draw…") : tx(locale, "Dibujar zona", "Draw area")}
-              </button>
-              <button
-                aria-pressed={mode === "radius"}
-                className={cn("flex min-h-11 items-center gap-1.5 rounded-full border px-3.5 font-display text-sm shadow-np transition-colors duration-np", mode === "radius" ? "np-sel" : cn(ctl, ctlHover))}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setMode(mode === "radius" ? "pan" : "radius");
-                }}
-              >
-                <Circle size={14} /> {tx(locale, "Radio 1,2 km", "1.2 km radius")}
-              </button>
-              {mode === "draw" && draft.length >= 3 && (
-                <button className="np-btn-navy min-h-11 rounded-full bg-navy px-4 font-display text-sm font-semibold text-ivory shadow-np" onClick={(e) => { e.stopPropagation(); closePoly(); }}>
-                  {tx(locale, "Cerrar zona", "Close area")} ({draft.length})
-                </button>
-              )}
-              {shape && (
-                <button
-                  className={cn("flex min-h-11 items-center gap-1 rounded-full border px-3.5 font-display text-sm shadow-np", ctl, ctlHover)}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onShape(null);
-                  }}
-                >
-                  <X size={14} /> {tx(locale, "Quitar zona", "Clear area")}
-                </button>
-              )}
-            </div>
-          )}
+          <ShapeTools
+            locale={locale}
+            mode={mode}
+            onMode={(m) => {
+              setDraft([]);
+              setMode(m);
+            }}
+            draftCount={draft.length}
+            onClosePoly={closePoly}
+            onClear={onShape && shape ? () => onShape(null) : undefined}
+            enabled={!!onShape}
+            ctl={ctl}
+            ctlHover={ctlHover}
+            toolbar={toolbar}
+          />
           <div className="pointer-events-none absolute bottom-2 left-3 z-10 text-xs" style={{ color: pal.note }}>
             {tx(locale, "Mapa ilustrativo · la ubicación es aproximada", "Illustrative map · locations are approximate")}
           </div>

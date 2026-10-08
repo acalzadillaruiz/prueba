@@ -5,7 +5,7 @@ import { Box, Camera, ChevronLeft, ChevronRight, ExternalLink, LayoutPanelTop, M
 import type { Listing, Locale } from "@/types/domain";
 import { listingPhoto } from "@/lib/photos";
 import { Floorplan, PropertyArt } from "@/components/art/PropertyArt";
-import { tx } from "@/lib/i18n";
+import { plural, tx } from "@/lib/i18n";
 import { GOOGLE_MAPS_KEY } from "@/components/map/config";
 import { cn } from "@/lib/cn";
 
@@ -29,12 +29,29 @@ export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: bo
   // Descriptive alt for the photos shown on their own (title + zone); thumbnails inside labelled buttons stay decorative.
   const alt = `${tx(locale, l.title_es, l.title_en)}, ${l.zone}`;
   const tour = safeTour(l.virtualTourUrl);
+  const dialog = useRef<HTMLDivElement>(null);
+  const swipe = useRef<{ x: number; y: number } | null>(null);
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false);
       else if (e.key === "ArrowRight") setI((x) => (x + 1) % total);
       else if (e.key === "ArrowLeft") setI((x) => (x - 1 + total) % total);
+      else if (e.key === "Tab" && dialog.current) {
+        // Focus trap: Tab / Shift+Tab cycle inside the viewer.
+        const f = Array.from(dialog.current.querySelectorAll<HTMLElement>('button:not([disabled]), a[href], iframe, [tabindex]:not([tabindex="-1"])')).filter((el) => el.offsetParent !== null);
+        if (!f.length) return;
+        const first = f[0];
+        const last = f[f.length - 1];
+        const inside = dialog.current.contains(document.activeElement);
+        if (e.shiftKey && (document.activeElement === first || !inside)) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && (document.activeElement === last || !inside)) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
     };
     document.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
@@ -45,6 +62,21 @@ export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: bo
       opener.current?.focus();
     };
   }, [open, total]);
+  const onTouchStart = (e: React.TouchEvent) => {
+    const t = e.touches[0];
+    swipe.current = t ? { x: t.clientX, y: t.clientY } : null;
+  };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    const s0 = swipe.current;
+    const t = e.changedTouches[0];
+    swipe.current = null;
+    if (!s0 || !t || total < 2) return;
+    const dx = t.clientX - s0.x;
+    const dy = t.clientY - s0.y;
+    // A clear horizontal flick only (vertical drags and taps do nothing).
+    if (Math.abs(dx) < 45 || Math.abs(dx) < Math.abs(dy) * 1.3) return;
+    setI((x) => (dx < 0 ? (x + 1) % total : (x - 1 + total) % total));
+  };
   const [tab, setTab] = useState<Tab>("photos");
   const show = (n: number, t: Tab = "photos") => {
     opener.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
@@ -54,7 +86,7 @@ export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: bo
   };
   // Only media that really exists: no video player without a video, Street View only with a Maps key.
   const tabs: [Tab, React.ElementType, string, boolean][] = [
-    ["photos", Camera, illustrated ? tx(locale, "Ilustraciones", "Illustrations") : `${total} ${tx(locale, "fotos", "photos")}`, true],
+    ["photos", Camera, illustrated ? tx(locale, "Ilustraciones", "Illustrations") : plural(total, locale, ["foto", "fotos"], ["photo", "photos"]), true],
     ["plan", LayoutPanelTop, tx(locale, "Plano orientativo", "Indicative floor plan"), l.hasFloorplan],
     ["street", MapPinned, tx(locale, "Vista de calle", "Street view"), !!GOOGLE_MAPS_KEY],
   ];
@@ -116,26 +148,38 @@ export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: bo
       </div>
 
       {open && (
-        <div className="fixed inset-0 z-[60] flex flex-col bg-navy/97 bg-[#1E1A18F7] text-ivory" role="dialog" aria-modal="true" aria-label={tx(locale, l.title_es, l.title_en)}>
+        <div ref={dialog} className="fixed inset-0 z-[60] flex flex-col bg-[#0d0b0a] text-ivory" role="dialog" aria-modal="true" aria-label={tx(locale, l.title_es, l.title_en)} data-testid="gallery-lightbox">
           <div className="no-scrollbar flex items-center gap-2 overflow-x-auto px-4 py-3">
             {tabs.filter((t) => t[3]).map(([k, Icon, label]) => (
               <button key={k} onClick={() => setTab(k)} aria-pressed={tab === k} className={cn("inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full px-3 font-display text-sm", tab === k ? "border-2 border-ivory bg-white/15 text-ivory" : "border-2 border-transparent text-ivory/75 hover:bg-white/10")}>
                 <Icon size={15} aria-hidden /> {label}
               </button>
             ))}
-            <button autoFocus onClick={() => setOpen(false)} className="ml-auto flex h-11 w-11 shrink-0 items-center justify-center rounded-full hover:bg-white/10" aria-label={tx(locale, "Cerrar", "Close")}>
+            {tab === "photos" && total > 1 && (
+              <span className="ml-auto shrink-0 px-2 font-display text-sm tabular-nums text-ivory/80" aria-hidden data-testid="gallery-counter">
+                {i + 1} / {total}
+              </span>
+            )}
+            <button autoFocus onClick={() => setOpen(false)} className={cn(!(tab === "photos" && total > 1) && "ml-auto", "flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/10 hover:bg-white/20")} aria-label={tx(locale, "Cerrar", "Close")}>
               <X aria-hidden />
             </button>
           </div>
-          <div className="relative flex min-h-0 flex-1 items-center justify-center px-4 md:px-16">
+          <div className={cn("relative flex min-h-0 flex-1 items-center justify-center", tab === "photos" ? "md:px-20" : "px-4 md:px-16")}>
             {tab === "photos" && (
               <>
-                <div className="relative max-h-full w-full max-w-5xl">
-                  <PropertyArt scene={shots[i]} seed={i === 0 ? l.id : l.id + (i - 1)} photo={listingPhoto(l, i)} label={`${alt} · ${what(i + 1)}`} className="max-h-full w-full rounded-np" />
-                  {tag}
+                {/* Photos: object-contain at the full available height. Illustrations (SVG, 4:3) keep their frame. */}
+                <div className="flex h-full w-full touch-pan-y select-none items-center justify-center" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+                  <div className={cn("relative", listingPhoto(l, i) ? "h-full w-full" : "aspect-[4/3] w-[min(100%,calc((100dvh-180px)*4/3))]")}>
+                    <PropertyArt scene={shots[i]} seed={i === 0 ? l.id : l.id + (i - 1)} photo={listingPhoto(l, i)} label={`${alt} · ${what(i + 1)}`} sizes="100vw" className="h-full w-full !object-contain" />
+                    {tag}
+                  </div>
                 </div>
-                <button onClick={() => setI((i - 1 + total) % total)} aria-label={tx(locale, "Foto anterior", "Previous photo")} className="absolute left-3 rounded-full bg-white/10 p-3 hover:bg-white/20"><ChevronLeft aria-hidden /></button>
-                <button onClick={() => setI((i + 1) % total)} aria-label={tx(locale, "Foto siguiente", "Next photo")} className="absolute right-3 rounded-full bg-white/10 p-3 hover:bg-white/20"><ChevronRight aria-hidden /></button>
+                {total > 1 && (
+                  <>
+                    <button onClick={() => setI((i - 1 + total) % total)} aria-label={tx(locale, "Foto anterior", "Previous photo")} className="absolute left-3 hidden h-12 w-12 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 sm:flex"><ChevronLeft aria-hidden /></button>
+                    <button onClick={() => setI((i + 1) % total)} aria-label={tx(locale, "Foto siguiente", "Next photo")} className="absolute right-3 hidden h-12 w-12 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 sm:flex"><ChevronRight aria-hidden /></button>
+                  </>
+                )}
                 <span className="sr-only" aria-live="polite">{What(i + 1)}</span>
               </>
             )}

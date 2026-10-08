@@ -132,15 +132,45 @@ function amount(raw: string, unit: string | undefined): number {
 
 const NUM_WORDS: Record<string, number> = { un: 1, una: 1, uno: 1, one: 1, dos: 2, two: 2, tres: 3, three: 3, cuatro: 4, four: 4, cinco: 5, five: 5 };
 
+// An amount is never an area ("100 m²") nor a room count ("2 habitaciones").
+const NUM = "([\\d.,]+)(?![\\d.,]*\\s*(?:m2|m²|mts?\\b|metros|sq|hab|cuarto|dormitorio|bed|br\\b|bd\\b|bano|bath|noche|night|huesped|guest))";
+const UNIT = "\\s*(millones|millon|millions?|thousands?|mil|mm|mn|k|m)?\\b";
+const CUR = "\\s*(?:usd|us\\$|\\$)?\\s*";
+const MAX_RE = `(menos de|por debajo de|under|below|less than|max(?:imo)?|hasta|up to)${CUR}${NUM}${UNIT}`;
+const MIN_RE = `(mas de|desde|minimo|over|above|more than|at least|from)${CUR}${NUM}${UNIT}`;
+const RANGE_RE = `entre${CUR}${NUM}${UNIT}\\s*y${CUR}${NUM}${UNIT}|between${CUR}${NUM}${UNIT}\\s*and${CUR}${NUM}${UNIT}`;
+const BEDS_RE = /\b(\d{1,2}|un|una|uno|one|dos|two|tres|three|cuatro|four|cinco|five)\s*\+?\s*-?\s*(o mas\s*|or more\s*)?(hab|habitaciones|habitacion|cuartos|cuarto|dormitorios|dormitorio|beds?|bedrooms?|bd|br)\b/;
+const TYPE_RES = {
+  LONG_RENT: /alquil|\brent(al|s|ing)?\b|\bfor rent\b|arriendo/,
+  SHORT_RENT: /vacacion|vacation|holiday|\bnoches?\b|\bnights?\b|airbnb|temporada/,
+  COMMERCIAL: /\blocal(es)?\b|oficina|\boffices?\b|galpon|warehouse|comercial|commercial/,
+  SALE: /compr|\bventa\b|\bbuy\b|\bfor sale\b|\bsale\b/,
+} as const;
+const LUX_RE = /lujo|luxury|exclusiv/;
+const KIND_RES: [RegExp, string][] = [
+  [/atico|penthouse|\bph\b/, "penthouse"],
+  [/\bcasas?\b|\bhouses?\b|townhouse|quinta/, "house"],
+  [/apartamento|\bapto\b|apartment|\bflat\b/, "apartment"],
+  [/terreno|\bland\b|\blotes?\b|\bplots?\b/, "land"],
+];
+const KEYWORD_RES: [RegExp, string][] = [
+  [/\bluz\b|\blight\b|luminos|\bbright\b/, "light"],
+  [/\bvistas?\b|\bviews?\b/, "view"],
+  [/\bal mar\b|frente al mar|\bplaya\b|\bsea\b|\bocean\b|\bbeach/, "sea"],
+  [/piscina|\bpool\b/, "pool"],
+  [/terraza|terrace/, "terrace"],
+  [/mascota|\bpets?\b|pet[- ]friendly/, "pets"],
+];
+
 export function heuristicSearchParse(nl: string): SearchQuery {
   const t = norm(nl);
   const q: SearchQuery = { keywords: [] };
   // Word boundaries: "parent"/"current" are not "rent", "Petare" is not "pet", "Island" is not "land".
-  if (/alquil|\brent(al|s|ing)?\b|\bfor rent\b|arriendo/.test(t)) q.listingType = "LONG_RENT";
-  if (/vacacion|vacation|holiday|\bnoches?\b|\bnights?\b|airbnb|temporada/.test(t)) q.listingType = "SHORT_RENT";
-  if (/\blocal(es)?\b|oficina|\boffices?\b|galpon|warehouse|comercial|commercial/.test(t)) q.listingType = "COMMERCIAL";
-  if (/compr|\bventa\b|\bbuy\b|\bfor sale\b|\bsale\b/.test(t) && !q.listingType) q.listingType = "SALE";
-  if (/lujo|luxury|exclusiv/.test(t)) q.luxury = true;
+  if (TYPE_RES.LONG_RENT.test(t)) q.listingType = "LONG_RENT";
+  if (TYPE_RES.SHORT_RENT.test(t)) q.listingType = "SHORT_RENT";
+  if (TYPE_RES.COMMERCIAL.test(t)) q.listingType = "COMMERCIAL";
+  if (TYPE_RES.SALE.test(t) && !q.listingType) q.listingType = "SALE";
+  if (LUX_RE.test(t)) q.luxury = true;
   for (const z of ZONE_ALIASES) if (t.includes(norm(z))) q.zone = ZONE_CANONICAL[z] ?? z;
   // Half-typed place names count too ("Lech" → Lechería, "casa en marg" → Isla de Margarita).
   if (!q.zone) {
@@ -148,15 +178,11 @@ export function heuristicSearchParse(nl: string): SearchQuery {
     if (z) q.zone = ZONE_CANONICAL[z] ?? z;
   }
 
-  // An amount is never an area ("100 m²") nor a room count ("2 habitaciones").
-  const num = "([\\d.,]+)(?![\\d.,]*\\s*(?:m2|m²|mts?\\b|metros|sq|hab|cuarto|dormitorio|bed|br\\b|bd\\b|bano|bath|noche|night|huesped|guest))";
-  const unit = "\\s*(millones|millon|millions?|thousands?|mil|mm|mn|k|m)?\\b";
-  const cur = "\\s*(?:usd|us\\$|\\$)?\\s*";
-  const max = t.match(new RegExp(`(menos de|por debajo de|under|below|less than|max(?:imo)?|hasta|up to)${cur}${num}${unit}`));
+  const max = t.match(new RegExp(MAX_RE));
   if (max) q.maxPrice = amount(max[2], max[3]);
-  const min = t.match(new RegExp(`(mas de|desde|minimo|over|above|more than|at least|from)${cur}${num}${unit}`));
+  const min = t.match(new RegExp(MIN_RE));
   if (min) q.minPrice = amount(min[2], min[3]);
-  const range = t.match(new RegExp(`entre${cur}${num}${unit}\\s*y${cur}${num}${unit}|between${cur}${num}${unit}\\s*and${cur}${num}${unit}`));
+  const range = t.match(new RegExp(RANGE_RE));
   if (range) {
     const [a, au, b, bu] = range[1] ? [range[1], range[2], range[3], range[4]] : [range[5], range[6], range[7], range[8]];
     // "entre 100 y 200 mil": the unit written once applies to both ends.
@@ -168,19 +194,64 @@ export function heuristicSearchParse(nl: string): SearchQuery {
     if (q.maxPrice !== undefined && q.maxPrice < MIN_SALE_PRICE) delete q.maxPrice;
     if (q.minPrice !== undefined && q.minPrice < MIN_SALE_PRICE) delete q.minPrice;
   }
-  const beds = t.match(/\b(\d{1,2}|un|una|uno|one|dos|two|tres|three|cuatro|four|cinco|five)\s*\+?\s*-?\s*(o mas\s*|or more\s*)?(hab|habitaciones|habitacion|cuartos|cuarto|dormitorios|dormitorio|beds?|bedrooms?|bd|br)\b/);
+  const beds = t.match(BEDS_RE);
   if (beds) q.minBeds = NUM_WORDS[beds[1]] ?? parseInt(beds[1], 10);
 
-  const kinds: [RegExp, string][] = [
-    [/atico|penthouse|\bph\b/, "penthouse"],
-    [/\bcasas?\b|\bhouses?\b|townhouse|quinta/, "house"],
-    [/apartamento|\bapto\b|apartment|\bflat\b/, "apartment"],
-    [/terreno|\bland\b|\blotes?\b|\bplots?\b/, "land"],
-  ];
-  for (const [re, k] of kinds) if (re.test(t)) { q.propertyKind = k; break; }
-  for (const [re, k] of [[/\bluz\b|\blight\b|luminos|\bbright\b/, "light"], [/\bvistas?\b|\bviews?\b/, "view"], [/\bal mar\b|frente al mar|\bplaya\b|\bsea\b|\bocean\b|\bbeach/, "sea"], [/piscina|\bpool\b/, "pool"], [/terraza|terrace/, "terrace"], [/mascota|\bpets?\b|pet[- ]friendly/, "pets"]] as [RegExp, string][])
-    if (re.test(t)) q.keywords.push(k);
+  for (const [re, k] of KIND_RES) if (re.test(t)) { q.propertyKind = k; break; }
+  for (const [re, k] of KEYWORD_RES) if (re.test(t)) q.keywords.push(k);
   return q;
+}
+
+/** Little words that carry no filter of their own: never reported as "not understood". */
+const FILLER_WORDS = new Set([
+  "a", "al", "algo", "and", "an", "area", "at", "busco", "buscando", "buscamos", "cerca", "con", "de", "del", "el", "en", "for", "i", "im", "in", "la", "las", "lo",
+  "los", "me", "mi", "near", "necesito", "of", "on", "or", "o", "para", "please", "por", "que", "quiero", "queremos", "sector", "some", "something", "the", "to",
+  "un", "una", "unos", "unas", "want", "looking", "need", "with", "y", "zona", "favor", "porfa", "tipo", "u",
+]);
+
+/**
+ * Which of the typed words the heuristic parser turned into a filter, and which it ignored ("zzqx casa rara" →
+ * understood ["casa"], unknown ["zzqx", "rara"]). Connectors ("en", "con", "the"…) are in neither list. Words keep
+ * the visitor's spelling (punctuation trimmed), in their original order.
+ */
+export function splitUnderstood(nl: string): { understood: string[]; unknown: string[] } {
+  const words = nl.trim().split(/\s+/).filter(Boolean);
+  const spans: [number, number][] = [];
+  let t = "";
+  for (const w of words) {
+    if (t) t += " ";
+    const n = norm(w);
+    spans.push([t.length, t.length + n.length]);
+    t += n;
+  }
+  const covered = words.map(() => false);
+  const mark = (re: RegExp) => {
+    const g = new RegExp(re.source, "g");
+    for (const m of t.matchAll(g)) {
+      if (!m[0]) continue;
+      const a = m.index ?? 0;
+      const b = a + m[0].length;
+      spans.forEach(([s, e], i) => {
+        if (s < b && e > a) covered[i] = true;
+      });
+    }
+  };
+  [...Object.values(TYPE_RES), LUX_RE, BEDS_RE, ...KIND_RES.map(([re]) => re), ...KEYWORD_RES.map(([re]) => re)].forEach(mark);
+  [MAX_RE, MIN_RE, RANGE_RE].forEach((src) => mark(new RegExp(src)));
+  for (const z of ZONE_ALIASES) mark(new RegExp(norm(z).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  // Half-typed places ("Lech").
+  words.forEach((w, i) => {
+    if (!covered[i] && partialPlace(w, ZONE_ALIASES)) covered[i] = true;
+  });
+  const understood: string[] = [];
+  const unknown: string[] = [];
+  words.forEach((w, i) => {
+    const clean = w.replace(/^[^\p{L}\p{N}$]+|[^\p{L}\p{N}²]+$/gu, "");
+    if (!clean) return;
+    if (covered[i]) understood.push(clean);
+    else if (!FILLER_WORDS.has(norm(clean))) unknown.push(clean);
+  });
+  return { understood, unknown };
 }
 
 const KIND_LABEL: Record<string, { es: string; en: string }> = {

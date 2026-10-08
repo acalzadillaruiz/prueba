@@ -582,7 +582,8 @@ export function BuildingScroll({ locale, chapters, picks, heading, cta }: { loca
 }
 
 /**
- * The light tower (no WebGL): nine CSS floors with an isometric side face rise out of a blueprint grid, the
+ * The light tower (no WebGL), styled as a quiet architectural render: a warm daylight sky, bronze-mullioned glass
+ * floors with soft reflections and ambient occlusion under each slab. Nine CSS floors with an isometric side face rise out of a blueprint grid, the
  * double roof settles on top, a light line scans the facade at every chapter, and in the last chapter the
  * featured floors glow and their labels slide in. Everything is transform/opacity (compositor only).
  */
@@ -591,7 +592,8 @@ function LiteTower({ step, picks, cta }: { step: number; picks: FloorPick[]; cta
   const roof = step >= 2;
   const lit = step >= 3;
   return (
-    <div className={cn("np-tower", styles.tower, "relative mx-auto h-[220px] w-full max-w-[520px] md:h-[500px]")}>
+    <div className={cn("np-tower", styles.tower, "relative mx-auto h-[220px] w-full max-w-[520px] md:h-[500px]")} data-step={step}>
+      <div className={styles.sky} aria-hidden />
       <div className="np-tower-grid" aria-hidden />
       <div className="np-tower-halo" data-on={lit ? "1" : "0"} aria-hidden />
       <div className="absolute inset-y-0 left-[9%] w-[var(--fw)] md:left-[12%]">

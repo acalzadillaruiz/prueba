@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, CalendarCheck, MessageSquare, Scale } from "lucide-react";
 import type { Locale } from "@/types/domain";
@@ -11,13 +11,24 @@ import { useApp } from "@/lib/store";
 import { compareHref } from "@/components/compare/CompareTray";
 import { useListingWhatsApp } from "./useListingWhatsApp";
 
+/** Short price for narrow bars: "USD 265k" / "USD 1,2 M" (es), "$265k" / "$1.2M" (en). Never cut with an ellipsis. */
+export function compactPrice(amount: number, locale: Locale) {
+  const es = locale === "es";
+  const pre = es ? "USD " : "$";
+  const fmt = (n: number, digits: number) => new Intl.NumberFormat(es ? "es-VE" : "en-US", { maximumFractionDigits: digits }).format(n);
+  if (amount >= 1_000_000) return `${pre}${fmt(amount / 1_000_000, amount >= 10_000_000 ? 0 : 1)}${es ? " M" : "M"}`;
+  if (amount >= 10_000) return `${pre}${fmt(Math.round(amount / 1000), 0)}k`;
+  if (amount >= 1000) return `${pre}${fmt(amount / 1000, 1)}k`;
+  return `${pre}${fmt(amount, 0)}`;
+}
+
 /**
  * Mobile-only bottom bar on the listing detail: price + "Request a tour" that jumps to the contact panel.
  * Hidden while the panel itself or the footer is on screen, so it never covers them. On listing pages it also carries the
  * comparator (a slim chip on top) instead of a floating tray over the form, and the floating contact buttons stay
  * hidden while it is up ([data-hide-fab-mobile]).
  */
-export function StickyContactBar({ locale, price, suffix, tour, dark, whatsapp: waBase, agentFirst }: { locale: Locale; price: string; suffix: string; tour: boolean; dark?: boolean; whatsapp?: string | null; agentFirst?: string }) {
+export function StickyContactBar({ locale, price, amount, meta, suffix, tour, dark, whatsapp: waBase, agentFirst }: { locale: Locale; price: string; /** Raw amount: lets the bar fall back to "USD 265k" when the full price doesn't fit. */ amount?: number; /** Second line, e.g. "Venta · 160 m²". */ meta?: string; suffix: string; tour: boolean; dark?: boolean; whatsapp?: string | null; agentFirst?: string }) {
   // Prefilled WhatsApp text carries this listing's URL.
   const whatsapp = useListingWhatsApp(waBase);
   const { compare } = useApp();
@@ -44,6 +55,19 @@ export function StickyContactBar({ locale, price, suffix, tour, dark, whatsapp: 
     // Move keyboard / screen-reader focus to the panel without a second scroll jump.
     document.getElementById("contact-panel")?.focus({ preventScroll: true });
   };
+  // The price is never truncated: if the full figure doesn't fit the space left by the buttons, show the compact one.
+  const box = useRef<HTMLDivElement>(null);
+  const probe = useRef<HTMLSpanElement>(null);
+  const [compact, setCompact] = useState(false);
+  useEffect(() => {
+    if (amount == null || !box.current || !probe.current || typeof ResizeObserver === "undefined") return;
+    const fit = () => setCompact(!!box.current && !!probe.current && probe.current.offsetWidth > box.current.clientWidth);
+    const ro = new ResizeObserver(fit);
+    ro.observe(box.current);
+    fit();
+    return () => ro.disconnect();
+  }, [amount, price, suffix]);
+  const shownPrice = compact && amount != null ? compactPrice(amount, locale) : price;
   const label = tour ? tx(locale, "Pedir visita", "Request a tour") : tx(locale, "Contactar", "Contact");
   const short = tour ? tx(locale, "Visitar", "Visit") : tx(locale, "Contactar", "Contact");
   return (
@@ -74,20 +98,29 @@ export function StickyContactBar({ locale, price, suffix, tour, dark, whatsapp: 
         </Link>
       )}
       <div className="flex items-center gap-2">
-        <div className="min-w-0 flex-1 truncate font-serif text-[clamp(19px,5.6vw,24px)] font-semibold leading-tight">
-          {price}
-          <span className={cn("font-display text-sm font-normal", dark ? "text-mist" : "text-muted")}>{suffix}</span>
+        <div ref={box} className="relative min-w-0 flex-1">
+          {/* Off-screen copy of the full price + suffix, measured to decide whether the compact figure is needed. */}
+          <span ref={probe} aria-hidden className="pointer-events-none invisible absolute left-0 top-0 whitespace-nowrap font-serif text-[clamp(19px,5.6vw,24px)] font-semibold leading-tight">
+            {price}
+            <span className="font-display text-sm font-normal">{suffix}</span>
+          </span>
+          <div className="whitespace-nowrap font-serif text-[clamp(19px,5.6vw,24px)] font-semibold leading-tight" data-sticky-price>
+            {compact && <span className="sr-only">{price}{suffix}</span>}
+            <span aria-hidden={compact || undefined}>{shownPrice}</span>
+            <span aria-hidden={compact || undefined} className={cn("font-display text-sm font-normal", dark ? "text-mist" : "text-muted")}>{suffix}</span>
+          </div>
+          {meta && <div className={cn("truncate font-display text-[13px] leading-snug", dark ? "text-mist" : "text-muted")}>{meta}</div>}
         </div>
         {whatsapp ? (
           <>
             {/* One terracotta action: WhatsApp with the advisor. The tour form stays one tap away (navy outline). */}
-            <button onClick={go} tabIndex={shown ? 0 : -1} className={cn("np-btn-outline inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border-[1.5px] px-3.5 font-display text-sm font-semibold", dark ? "border-ivory text-ivory" : "border-navy text-navy")}>
+            <button onClick={go} tabIndex={shown ? 0 : -1} className={cn("np-btn-outline inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-1.5 rounded-full border-[1.5px] px-3.5 font-display text-sm font-semibold max-[399px]:px-0", dark ? "border-ivory text-ivory" : "border-navy text-navy")}>
               {tour ? <CalendarCheck size={17} aria-hidden /> : <MessageSquare size={17} aria-hidden />}
-              {short}
+              <span className="max-[399px]:sr-only">{short}</span>
               {tour && <span className="sr-only">{tx(locale, ": pedir visita", ": request a tour")}</span>}
             </button>
-            <a href={whatsapp} target="_blank" rel="noopener noreferrer" tabIndex={shown ? 0 : -1} className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full bg-coral-cta px-3.5 font-display text-sm font-semibold text-white hover:bg-coral-cta-hover">
-              <WhatsAppIcon size={17} /> <span className="max-[379px]:sr-only">WhatsApp</span>
+            <a href={whatsapp} target="_blank" rel="noopener noreferrer" tabIndex={shown ? 0 : -1} className="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-2 rounded-full bg-coral-cta px-3.5 font-display text-sm font-semibold text-white hover:bg-coral-cta-hover max-[399px]:px-0">
+              <WhatsAppIcon size={17} /> <span className="max-[399px]:sr-only">WhatsApp</span>
               {agentFirst && <span className="sr-only">{tx(locale, ` con ${agentFirst}`, ` ${agentFirst}`)}</span>}
             </a>
           </>

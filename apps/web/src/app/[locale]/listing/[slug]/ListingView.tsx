@@ -28,6 +28,20 @@ import { essentialLabels } from "@/lib/essentials";
 
 const ESSENTIAL_ICON: Record<string, LucideIcon> = { power: Zap, well: Droplet, tank: Droplets, dock: Anchor, avila: Mountain, sea: Waves };
 
+/**
+ * Amenities minus whatever the "Servicios esenciales" block (or the commercial tiles) already shows: no "Planta
+ * eléctrica" under a "Planta eléctrica 100 %", no "Tanque de agua" under "Tanque de 5.000 L", no bare "Vista" next to
+ * "Vista al Ávila", no second "Andén de carga".
+ */
+export function amenitiesBeyondEssentials(l: Pick<Listing, "amenities" | "powerBackup" | "waterTankLiters" | "viewAvila" | "viewSea" | "commercial">) {
+  const shown = new Set<string>();
+  if (l.powerBackup) shown.add("generator");
+  if (l.waterTankLiters) shown.add("waterTank");
+  if (l.viewAvila || l.viewSea) shown.add("view");
+  if (l.commercial?.loadingDock) shown.add("loadingDock");
+  return l.amenities.filter((a) => !shown.has(a));
+}
+
 /** "Servicios esenciales": backup power, water and dock/views — only values the listing actually declares. */
 function Essentials({ l, locale, title }: { l: Listing; locale: Locale; title: React.ReactNode }) {
   const items = essentialLabels(l, locale);
@@ -102,6 +116,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
   const soldNearby = soldRows.map((r) => toCard(toDomain(r))).map((o) => ({ t: `${tx(locale, o.title_es, o.title_en)} · ${o.areaM2} m²`, p: o.priceAmount, d: tx(locale, o.status === "SOLD" ? "Vendido" : "Alquilado", o.status === "SOLD" ? "Sold" : "Rented") }));
   const H = ({ children }: { children: React.ReactNode }) => <h3 className="mb-5 font-serif text-[28px] leading-tight">{children}</h3>;
   const sec = "border-t border-line py-10";
+  const amenities = amenitiesBeyondEssentials(l);
   const tile = "rounded-[20px] bg-white/70 ring-1 ring-black/[.04] px-4 py-3 text-[15px]";
   const searchType = l.listingType.startsWith("COMMERCIAL") ? "COMMERCIAL" : l.listingType;
 
@@ -186,10 +201,11 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
 
             <Essentials l={l} locale={locale} title={<H>{tx(locale, "Servicios esenciales", "Essential services")}</H>} />
 
-            <div className={sec}>
+            {(amenities.length > 0 || l.commercial || l.shortRent) && (
+            <div className={sec} data-testid="amenities">
               <H>{tx(locale, "Amenidades", "Amenities")}</H>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                {l.amenities.map((a) => (
+                {amenities.map((a) => (
                   <div key={a} className={cn(tile, "font-semibold")}>{lbl(AMENITY_LABEL[a], locale)}</div>
                 ))}
                 {l.commercial && (
@@ -205,6 +221,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
                 )}
               </div>
             </div>
+            )}
           </div>
 
           <aside id="contact" className="scroll-mt-24 lg:sticky lg:top-24 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-start">
@@ -268,6 +285,8 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
         <StickyContactBar
           locale={locale}
           price={money(l.priceAmount, locale)}
+          amount={l.priceAmount}
+          meta={[lbl(TYPE_LABEL[l.listingType], locale), l.areaM2 > 0 && `${num(l.areaM2, locale)} m²`].filter(Boolean).join(" · ")}
           suffix={priceSuffix(l, locale)}
           tour={takesTours(l)}
           whatsapp={whatsappHref(l, locale)}

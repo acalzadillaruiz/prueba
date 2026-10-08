@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Heart, Home, Map as MapIcon, MessageCircle, Phone, PhoneCall, ShieldCheck, User, X } from "lucide-react";
+import { Heart, Home, MessageCircle, Phone, PhoneCall, Search, ShieldCheck, User, X } from "lucide-react";
 import { useHideOnScroll } from "./useScrollChrome";
 import type { Locale } from "@/types/domain";
 import type { OnCallAdvisor } from "@/lib/on-call";
@@ -242,7 +242,7 @@ export function FloatingContact({ href, label, whatsapp = false, tabbar = false,
       )}
     >
       {open && (
-        <div id={menuId} role="group" aria-label={tx(locale, "Hablar con una persona", "Talk to a person")} className="np-glass np-in w-[min(300px,calc(100vw-2rem))] rounded-[24px] p-2 shadow-[0_18px_40px_rgba(30,26,24,.22)]">
+        <div id={menuId} role="group" aria-label={tx(locale, "Hablar con una persona", "Talk to a person")} className="np-glass-nav np-in w-[min(300px,calc(100vw-2rem))] rounded-[24px] p-2 shadow-[0_18px_40px_rgba(30,26,24,.22)]">
           <button
             type="button"
             aria-haspopup="dialog"
@@ -294,8 +294,9 @@ export function roleHome(role: string | undefined) {
 }
 
 /**
- * Phones: bottom tab bar (Inicio · Mapa · Guardados · Cuenta). The active item carries the roof glyph. "Cuenta" opens
- * the user's own space when signed in (seekers: /app "Tu espacio"), the sign-in page otherwise.
+ * Phones: bottom tab bar (Inicio · Buscar · Guardados · Cuenta). The active item carries the roof glyph. "Buscar" opens
+ * the search (list first; its own floating toggle switches to the map). "Cuenta" opens the user's own space when signed
+ * in (seekers: /app "Tu espacio"), the sign-in page otherwise.
  */
 export function MobileTabBar({ locale }: { locale: Locale }) {
   const pathname = usePathname();
@@ -303,7 +304,7 @@ export function MobileTabBar({ locale }: { locale: Locale }) {
   const t = msg(locale, "nav");
   const items = [
     { href: `/${locale}`, label: t("home"), Icon: Home, active: pathname === `/${locale}` },
-    { href: `/${locale}/search?type=SALE`, label: t("map"), Icon: MapIcon, active: pathname.endsWith("/search") },
+    { href: `/${locale}/search?type=SALE`, label: tx(locale, "Buscar", "Search"), Icon: Search, active: pathname.endsWith("/search") },
     { href: `/${locale}/saved`, label: t("saved"), Icon: Heart, active: pathname.endsWith("/saved"), badge: saved.length },
     {
       href: user ? `/${locale}${roleHome(user.role)}` : `/${locale}/login`,

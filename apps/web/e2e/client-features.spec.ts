@@ -112,14 +112,17 @@ test.describe.serial("Cliente: búsqueda, Hub y precalificación", () => {
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
   });
 
-  test("móvil 390 px: barra inferior en login, guardados, Hub y 404; «Cuenta» lleva a Tu espacio", async ({ page }) => {
+  test("móvil 390 px: barra inferior en login, guardados, vender, Hub y 404; «Cuenta» lleva a Tu espacio", async ({ page }) => {
     await logout(page);
     await page.setViewportSize({ width: 390, height: 844 });
     const tabbar = page.getByRole("navigation", { name: "Navegación inferior" });
-    for (const path of ["/es/login", "/es/saved", "/es/no-existe-esta-pagina"]) {
+    for (const path of ["/es/login", "/es/saved", "/es/sell", "/es/no-existe-esta-pagina"]) {
       await page.goto(path);
       await expect(tabbar, path).toBeVisible();
     }
+    // "Buscar" (not a second "Mapa"): opens the search, list first.
+    await expect(tabbar.getByRole("link", { name: "Buscar" })).toHaveAttribute("href", "/es/search?type=SALE");
+    await expect(tabbar.getByRole("link", { name: "Mapa" })).toHaveCount(0);
     await expect(tabbar.getByRole("link", { name: "Cuenta" })).toHaveAttribute("href", "/es/login");
     await demoLogin(page, /Buscador/);
     await page.goto("/es/saved");

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { heuristicLeadScore, heuristicSearchParse } from "../src/heuristic";
+import { heuristicLeadScore, heuristicSearchParse, splitUnderstood } from "../src/heuristic";
 import { closestPlaces, queryUnderstood, suggestPlaces } from "../src/zones";
 
 describe("heuristicSearchParse", () => {
@@ -87,5 +87,23 @@ describe("zones · partial names and typeahead", () => {
     expect(closestPlaces("Lecheira").map((p) => p.name)).toContain("Lechería");
     expect(closestPlaces("chaco").map((p) => p.name)).toContain("Chacao");
     expect(closestPlaces("xyzzy castillo")).toEqual([]);
+  });
+});
+
+describe("splitUnderstood · mixed queries", () => {
+  it("separates the understood words from the ignored ones", () => {
+    expect(splitUnderstood("zzqx casa rara")).toEqual({ understood: ["casa"], unknown: ["zzqx", "rara"] });
+  });
+  it("keeps prices, rooms, places and connectors out of the unknown list", () => {
+    expect(splitUnderstood("apartamento de 2 habitaciones en Lechería por menos de 200 mil")).toEqual({
+      understood: ["apartamento", "2", "habitaciones", "Lechería", "menos", "de", "200", "mil"],
+      unknown: [],
+    });
+    expect(splitUnderstood("casa frente al mar, en Lech").unknown).toEqual([]);
+    expect(splitUnderstood("A house with a pool").unknown).toEqual([]);
+  });
+  it("reports everything when nothing is understood", () => {
+    expect(splitUnderstood("xyzzy castillo")).toEqual({ understood: [], unknown: ["xyzzy", "castillo"] });
+    expect(splitUnderstood("   ")).toEqual({ understood: [], unknown: [] });
   });
 });

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { APIProvider, InfoWindow, Map, useMap } from "@vis.gl/react-google-maps";
 import { MarkerClusterer } from "@googlemaps/markerclusterer";
-import { Circle as CircleIcon, Minus, Moon, PenLine, Plus, Sun, X } from "lucide-react";
+import { Minus, Moon, Plus, Sun } from "lucide-react";
 import type { Listing } from "@/types/domain";
 import type { LatLng } from "@/lib/geo";
 import { compactMoney, tx } from "@/lib/i18n";
@@ -11,6 +11,8 @@ import { cn } from "@/lib/cn";
 import { GOOGLE_MAPS_KEY, GOOGLE_MAP_ID } from "./config";
 import { LIGHT_STYLE, NIGHT_STYLE } from "./nightStyle";
 import type { MapViewProps } from "./MapView";
+import { FIT_PADDING } from "./NightMap";
+import { ShapeTools } from "./ShapeTools";
 
 const CARACAS = { lat: 10.4806, lng: -66.9036 };
 
@@ -70,7 +72,7 @@ function Layers({ props, theme, mode, setMode, draft, setDraft }: { props: MapVi
     if (listings.length === 1) {
       map.setCenter(b.getCenter());
       map.setZoom(15);
-    } else map.fitBounds(b, 60);
+    } else map.fitBounds(b, props.fitPadding ?? FIT_PADDING);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map, fitKey]);
 
@@ -147,26 +149,25 @@ export function GoogleMapView(props: MapViewProps) {
               {theme === "night" ? <Sun size={16} /> : <Moon size={16} />}
             </button>
           </div>
-          {onShape && (
-            <div className="absolute left-3 top-3 z-10 flex flex-wrap gap-2">
-              <button className={cn("flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-display text-sm shadow-np", mode === "draw" ? "np-sel" : ctl)} aria-pressed={mode === "draw"} onClick={() => { setDraft([]); setMode(mode === "draw" ? "pan" : "draw"); }}>
-                <PenLine size={14} /> {mode === "draw" ? tx(locale, "Toca para dibujar…", "Tap to draw…") : tx(locale, "Dibujar zona", "Draw area")}
-              </button>
-              <button className={cn("flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-display text-sm shadow-np", mode === "radius" ? "np-sel" : ctl)} aria-pressed={mode === "radius"} onClick={() => setMode(mode === "radius" ? "pan" : "radius")}>
-                <CircleIcon size={14} /> {tx(locale, "Radio 1,2 km", "1.2 km radius")}
-              </button>
-              {mode === "draw" && draft.length >= 3 && (
-                <button className="rounded-full bg-navy px-4 py-1.5 font-display text-sm font-semibold text-ivory shadow-np" onClick={() => { onShape({ type: "poly", pts: draft }); setDraft([]); setMode("pan"); }}>
-                  {tx(locale, "Cerrar zona", "Close area")} ({draft.length})
-                </button>
-              )}
-              {shape && (
-                <button className={cn("flex items-center gap-1 rounded-full border px-3 py-1.5 font-display text-sm shadow-np", ctl)} onClick={() => onShape(null)}>
-                  <X size={14} /> {tx(locale, "Quitar zona", "Clear area")}
-                </button>
-              )}
-            </div>
-          )}
+          <ShapeTools
+            locale={locale}
+            mode={mode}
+            onMode={(m) => {
+              setDraft([]);
+              setMode(m);
+            }}
+            draftCount={draft.length}
+            onClosePoly={() => {
+              if (draft.length >= 3) onShape?.({ type: "poly", pts: draft });
+              setDraft([]);
+              setMode("pan");
+            }}
+            onClear={onShape && shape ? () => onShape(null) : undefined}
+            enabled={!!onShape}
+            ctl={ctl}
+            ctlHover="hover:bg-black/5"
+            toolbar={props.toolbar}
+          />
         </>
       )}
     </div>

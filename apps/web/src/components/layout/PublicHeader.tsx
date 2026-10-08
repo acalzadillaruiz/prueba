@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bell, CalendarCheck, ChevronDown, FlaskConical, Heart, LogIn, Map as MapIcon, Menu, MessageCircle, Moon, Settings, Sun, User, X } from "lucide-react";
+import { Bell, CalendarCheck, ChevronDown, FlaskConical, Heart, LogIn, Menu, MessageCircle, Moon, Settings, Sun, User, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import type { Locale } from "@/types/domain";
@@ -22,6 +22,12 @@ let roofPlayed = false;
 /** Search pages update their query with history.replaceState: they announce it so the active nav item follows. */
 export const URL_CHANGE_EVENT = "np:urlchange";
 
+/**
+ * The compact search (CompactAsk) carries its own menu button while it replaces the header (html[data-np-compact="on"]
+ * hides the header, see globals.css): it dispatches this event and the header's drawer opens.
+ */
+export const OPEN_MENU_EVENT = "np:open-menu";
+
 /** Theme: the visitor's explicit choice (np-theme) wins; without one, the device setting (applied before paint in layout.tsx). */
 function storedTheme() {
   try {
@@ -35,7 +41,8 @@ function storedTheme() {
  * Public header (floating glass pill). `autoHide`: it slides away while the reader scrolls down and comes back on
  * scroll-up. It publishes its state as `html[data-np-header="hidden"]`, which switches the CSS custom property
  * `--np-header-offset` (globals.css: 80px phones / 84px from md when shown, 8px when hidden) so bars pinned under
- * it (the compact search) can follow.
+ * it (the compact search) can follow. While the compact search is pinned (html[data-np-compact="on"]) the header is
+ * hidden altogether and its drawer opens on the `np:open-menu` event.
  */
 export function PublicHeader({ locale, variant = "light", autoHide = false }: { locale: Locale; variant?: "light" | "dark" | "transparent"; autoHide?: boolean }) {
   const pathname = usePathname();
@@ -48,10 +55,14 @@ export function PublicHeader({ locale, variant = "light", autoHide = false }: { 
   // and to mark the active section on /search.
   const [qs, setQs] = useState("");
   const [animate] = useState(() => !roofPlayed);
+  // What opened the drawer (header menu button or the compact search's), to give focus back on close.
+  const opener = useRef<HTMLElement | null>(null);
   useEffect(() => {
     roofPlayed = true;
   }, []);
   useEffect(() => {
+    // A navigation closes the drawer without pulling focus back to its opener.
+    opener.current = null;
     setMenuOpen(false);
     setDeskDemo(false);
     const read = () => setQs(window.location.search.replace(/^\?/, ""));
@@ -63,9 +74,22 @@ export function PublicHeader({ locale, variant = "light", autoHide = false }: { 
       window.removeEventListener("popstate", read);
     };
   }, [pathname]);
+  // The compact search's menu button (the header is hidden while it is pinned) opens this drawer.
+  useEffect(() => {
+    const open = () => {
+      opener.current = document.activeElement as HTMLElement | null;
+      setMenuOpen(true);
+    };
+    window.addEventListener(OPEN_MENU_EVENT, open);
+    return () => window.removeEventListener(OPEN_MENU_EVENT, open);
+  }, []);
   useEffect(() => {
     if (!menuOpen) {
       setDrawerDemo(false);
+      // Back to whatever opened it (the compact search's menu button), when it is still there.
+      const el = opener.current;
+      opener.current = null;
+      if (el?.isConnected && el !== document.body) el.focus({ preventScroll: true });
       return;
     }
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMenuOpen(false);
@@ -127,19 +151,15 @@ export function PublicHeader({ locale, variant = "light", autoHide = false }: { 
   const float = variant !== "dark";
   const type = new URLSearchParams(qs).get("type") ?? "SALE";
   const onSearch = /\/search$/.test(pathname);
-  const nav = [
-    { href: `/${locale}/search?type=SALE`, label: t("buy"), active: onSearch && type === "SALE" },
-    { href: `/${locale}/search?type=LONG_RENT`, label: t("rent"), active: onSearch && type === "LONG_RENT" },
-    { href: `/${locale}/luxury`, label: t("privateCollection"), active: /\/luxury$/.test(pathname) },
-    { href: `/${locale}#compra-a-distancia`, label: t("remoteBuying"), active: false },
-  ];
+  const buy = { href: `/${locale}/search?type=SALE`, label: t("buy"), active: onSearch && type === "SALE" };
+  const rent = { href: `/${locale}/search?type=LONG_RENT`, label: t("rent"), active: onSearch && type === "LONG_RENT" };
+  const vacation = { href: `/${locale}/search?type=SHORT_RENT`, label: t("vacation"), active: onSearch && type === "SHORT_RENT" };
+  const luxury = { href: `/${locale}/luxury`, label: t("privateCollection"), active: /\/luxury$/.test(pathname) };
+  const remote = { href: `/${locale}#compra-a-distancia`, label: t("remoteBuying"), active: false };
+  // Desktop: "Vacacional" joins from 1400 px (below that the pill has no room for it; it stays in the search filters).
+  const nav = [buy, rent, { ...vacation, wide: true }, luxury, remote];
   // Drawer: every way to search (the four search types the search page understands), then the rest.
-  const searchTypes = [
-    nav[0],
-    nav[1],
-    { href: `/${locale}/search?type=SHORT_RENT`, label: t("vacation"), active: onSearch && type === "SHORT_RENT" },
-    { href: `/${locale}/search?type=COMMERCIAL`, label: t("commercial"), active: onSearch && type === "COMMERCIAL" },
-  ];
+  const searchTypes = [buy, rent, vacation, { href: `/${locale}/search?type=COMMERCIAL`, label: t("commercial"), active: onSearch && type === "COMMERCIAL" }];
   const home = u ? roleHome(u.role) : "/app";
   const seeker = !!u && home === "/app";
   // Unread messages for the drawer's "Tu espacio" block: fetched only while the drawer is open.
@@ -222,6 +242,7 @@ export function PublicHeader({ locale, variant = "light", autoHide = false }: { 
               aria-current={n.active ? "page" : undefined}
               className={cn(
                 "flex min-h-11 items-center px-3 font-display text-[15px] transition-colors duration-np",
+                "wide" in n && "hidden min-[1400px]:flex",
                 n.active ? (dark ? "text-ivory" : "text-ink") : dark ? "text-ivory/85 hover:text-ivory" : "text-ink/80 hover:text-ink",
               )}
             >
@@ -303,7 +324,10 @@ export function PublicHeader({ locale, variant = "light", autoHide = false }: { 
             {t("sell")}
           </Button>
           <button
-            onClick={() => setMenuOpen(true)}
+            onClick={(e) => {
+              opener.current = e.currentTarget;
+              setMenuOpen(true);
+            }}
             className={cn("flex h-11 w-11 items-center justify-center rounded-full lg:hidden", dark ? "bg-white/15 backdrop-blur hover:bg-white/25" : "hover:bg-black/5")}
             aria-label={t("menu")}
             aria-expanded={menuOpen}
@@ -315,7 +339,8 @@ export function PublicHeader({ locale, variant = "light", autoHide = false }: { 
       </div>
     </header>
     {menuOpen && (
-      <div className="fixed inset-0 z-[65] lg:hidden" role="dialog" aria-modal="true" aria-label={t("menu")} id="np-mobile-menu">
+      // Not lg:hidden: on desktop it only opens from the compact search's menu button (np:open-menu).
+      <div className="fixed inset-0 z-[65]" role="dialog" aria-modal="true" aria-label={t("menu")} id="np-mobile-menu">
         <button className="absolute inset-0 bg-navy/60" aria-label={locale === "es" ? "Cerrar menú" : "Close menu"} onClick={() => setMenuOpen(false)} />
         <div className="np-in absolute inset-y-0 right-0 flex w-[min(340px,88vw)] flex-col bg-navy text-ivory shadow-np" style={{ paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}>
           <div className="flex h-[72px] items-center justify-between px-5">
@@ -332,14 +357,11 @@ export function PublicHeader({ locale, variant = "light", autoHide = false }: { 
               </Link>
             ))}
             <div className="mx-3 my-3 h-px bg-[#B08A55]/40" aria-hidden />
-            <Link href={`/${locale}/search?type=SALE`} onClick={() => setMenuOpen(false)} className={drawerItem}>
-              <MapIcon size={18} aria-hidden /> {t("map")}
+            <Link href={luxury.href} onClick={() => setMenuOpen(false)} aria-current={luxury.active ? "page" : undefined} className={drawerItem}>
+              <RoofGlyph className="w-[18px] text-[#C9A574]" /> {luxury.label}
             </Link>
-            <Link href={nav[2].href} onClick={() => setMenuOpen(false)} aria-current={nav[2].active ? "page" : undefined} className={drawerItem}>
-              <RoofGlyph className="w-[18px] text-[#C9A574]" /> {nav[2].label}
-            </Link>
-            <Link href={nav[3].href} onClick={() => setMenuOpen(false)} className={drawerItem}>
-              <span aria-hidden className="w-[18px] text-center text-[#C9A574]">↗</span> {nav[3].label}
+            <Link href={remote.href} onClick={() => setMenuOpen(false)} className={drawerItem}>
+              <span aria-hidden className="w-[18px] text-center text-[#C9A574]">↗</span> {remote.label}
             </Link>
             <Link href={`/${locale}/saved`} onClick={() => setMenuOpen(false)} className={drawerItem}>
               <Heart size={18} aria-hidden /> {t("saved")} {saved.length > 0 && <span className="text-sm text-mist">({saved.length})</span>}

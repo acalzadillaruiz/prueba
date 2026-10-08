@@ -15,6 +15,7 @@ import { listingHref } from "@/lib/listing-href";
 import { listingPhoto } from "@/lib/photos";
 import { RoofGlyph } from "@/components/brand/Logo";
 import { Button } from "@/components/ui";
+import { cn } from "@/lib/cn";
 import { publicListings } from "@/server/listings";
 import { zoneStats } from "@/server/zone-stats";
 import { money, plural, priceSuffix, tx } from "@/lib/i18n";
@@ -31,6 +32,13 @@ const FEATURED_ZONES: { zone: string; photo: string }[] = [
 ];
 
 const AVAILABLE = ["ACTIVE", "COMING_SOON", "UNDER_OFFER"];
+
+/** What a rentals-only zone offers, shown in its own group under the sale zones (es, en). */
+const RENT_LABEL: Record<string, [string, string]> = {
+  SHORT_RENT: ["Vacacional", "Vacation"],
+  LONG_RENT: ["Alquiler", "Long-term rent"],
+  COMMERCIAL: ["Comercial", "Commercial"],
+};
 
 /**
  * The search tab where a zone's listings live (Lechería today is vacation rentals only, for example), and the figure
@@ -68,6 +76,9 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
   const floors = ranked.slice(0, 3).map((l) => ({ href: listingHref(locale, l), title: tx(locale, l.title_es, l.title_en), meta: `${l.zone} · ${factsLine(l, locale).join(" · ")}`, price: price(l) }));
   const pins = available.map(mapListing);
   const zones = await Promise.all(FEATURED_ZONES.map(async (z) => ({ ...z, stats: await zoneStats(z.zone), ...zoneCard(locale, z.zone, available) })));
+  const saleZones = zones.filter((z) => z.type === "SALE");
+  const otherZones = zones.filter((z) => z.type !== "SALE");
+  const zoneCount = (n: number) => (n > 0 ? plural(n, locale, ["propiedad", "propiedades"], ["property", "properties"]) : tx(locale, "Próximamente", "Coming soon"));
 
   const chapters = [
     { eyebrow: tx(locale, "01 · Antes de firmar", "01 · Before you sign"), title: tx(locale, "Papeles en regla, sin sorpresas.", "Paperwork in order, no surprises."), body: tx(locale, "Nuestro equipo legal revisa títulos, solvencias y gravámenes antes de que pongas un dólar. Si algo no cuadra, te lo decimos primero.", "Our legal team checks titles, tax clearances and liens before you put down a dollar. If something doesn't add up, you hear it from us first.") },
@@ -126,44 +137,68 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
         </div>
         <div className="grid gap-6 lg:grid-cols-[1.55fr_1fr]">
           <HomeMap listings={pins} locale={locale} focus={{ lat: 10.62, lng: -65.45 }} initialScale={2.9} />
-          <ul data-reveal="stagger" className="flex flex-col gap-3">
-            {zones.map((z) => (
-              <li key={z.zone}>
-                <Link href={z.href} data-spotlight className="np-glass group flex h-full min-h-[104px] items-stretch overflow-hidden rounded-[24px] transition-transform duration-500 hover:-translate-y-0.5">
-                  <span className="relative m-2 w-[76px] shrink-0 overflow-hidden rounded-[18px] sm:w-[100px]">
-                    <Image src={z.photo} alt="" fill sizes="112px" className="object-cover transition-transform duration-700 group-hover:scale-105" />
-                  </span>
-                  <span className="flex min-w-0 flex-1 items-center justify-between gap-3 px-4 py-4 sm:px-5">
-                    <span className="min-w-0">
-                      <span className="block font-serif text-[22px] leading-tight sm:text-[25px]">{z.zone}</span>
-                      <span className="block text-sm text-muted">
-                        {z.stats.activeListings > 0 ? plural(z.stats.activeListings, locale, ["propiedad", "propiedades"], ["property", "properties"]) : tx(locale, "Próximamente", "Coming soon")}
-                      </span>
+          <div className="flex flex-col gap-3">
+            {/* One metric per list: the sale zones show the price per m²; zones that today only have rentals (Lechería:
+                vacation homes) go in their own small group, with their "from" price per night / month. */}
+            {saleZones.length > 0 && <p className="font-display text-[13px] font-semibold uppercase tracking-[.16em] text-muted">{tx(locale, "En venta · precio por m²", "For sale · price per m²")}</p>}
+            <ul data-reveal="stagger" className="flex flex-col gap-3">
+              {saleZones.map((z) => (
+                <li key={z.zone}>
+                  <Link href={z.href} data-spotlight className="np-glass group flex h-full min-h-[104px] items-stretch overflow-hidden rounded-[24px] transition-transform duration-500 hover:-translate-y-0.5">
+                    <span className="relative m-2 w-[76px] shrink-0 overflow-hidden rounded-[18px] sm:w-[100px]">
+                      <Image src={z.photo} alt="" fill sizes="112px" className="object-cover transition-transform duration-700 group-hover:scale-105" />
                     </span>
-                    {z.from ? (
-                      <span className="shrink-0 text-right">
-                        <span className="block text-sm text-muted">{tx(locale, "desde", "from")}</span>
-                        <span className="block font-display text-[15px] font-semibold text-ink">
-                          {z.from.price}
-                          <span className="font-normal text-muted">{z.from.suffix}</span>
-                        </span>
+                    <span className="flex min-w-0 flex-1 items-center justify-between gap-3 px-4 py-4 sm:px-5">
+                      <span className="min-w-0">
+                        <span className="block font-serif text-[22px] leading-tight sm:text-[25px]">{z.zone}</span>
+                        <span className="block text-sm text-muted">{zoneCount(z.stats.activeListings)}</span>
                       </span>
-                    ) : z.type === "SALE" ? (
                       <span className="shrink-0 text-right">
                         <span className="block font-display text-[15px] font-semibold text-ink">{money(z.stats.salePpm, locale)}</span>
                         <span className="block text-sm text-muted">{tx(locale, "por m²", "per m²")}</span>
                       </span>
-                    ) : null}
-                  </span>
-                </Link>
-              </li>
-            ))}
-            <li className="pt-1">
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            {otherZones.length > 0 && (
+              <>
+                <p className={cn("font-display text-[13px] font-semibold uppercase tracking-[.16em] text-muted", saleZones.length > 0 && "mt-3")}>{tx(locale, "Solo en alquiler · desde", "Rentals only · from")}</p>
+                <ul className="flex flex-col gap-2">
+                  {otherZones.map((z) => (
+                    <li key={z.zone}>
+                      <Link href={z.href} className="np-glass group flex min-h-[64px] items-center gap-3 rounded-[20px] p-1.5 pr-4 transition-transform duration-500 hover:-translate-y-0.5">
+                        <span className="relative h-[52px] w-[52px] shrink-0 overflow-hidden rounded-[14px]">
+                          <Image src={z.photo} alt="" fill sizes="56px" className="object-cover" />
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block truncate font-serif text-[19px] leading-tight">{z.zone}</span>
+                          <span className="block truncate text-[13px] text-muted">
+                            {RENT_LABEL[z.type] ? tx(locale, RENT_LABEL[z.type][0], RENT_LABEL[z.type][1]) : ""}
+                            {RENT_LABEL[z.type] ? " · " : ""}
+                            {zoneCount(z.stats.activeListings)}
+                          </span>
+                        </span>
+                        {z.from && (
+                          <span className="shrink-0 font-display text-[15px] font-semibold text-ink">
+                            <span className="sr-only">{tx(locale, "desde ", "from ")}</span>
+                            {z.from.price}
+                            <span className="font-normal text-muted">{z.from.suffix}</span>
+                          </span>
+                        )}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+            <div className="pt-1">
               <Button href={`/${locale}/search?type=SALE`} variant="outline" className="w-full">
                 {tx(locale, "Abrir el mapa", "Open the map")} <ArrowRight size={16} aria-hidden />
               </Button>
-            </li>
-          </ul>
+            </div>
+          </div>
         </div>
       </section>
 

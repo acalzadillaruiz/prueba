@@ -12,7 +12,7 @@ import { Avatar, Badge, Button, Card } from "@/components/ui";
 import { useApp } from "@/lib/store";
 import { Empty, StatusPill, k } from "@/components/agency/kit";
 import { api } from "@/lib/api";
-import { money, num, priceSuffix, tx } from "@/lib/i18n";
+import { money, num, plural, priceSuffix, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import { TimeAgo } from "./TimeAgo";
 import { listingHref } from "@/lib/listing-href";
@@ -157,12 +157,16 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
             return (
               <Card key={l.id} className={cn(k.card, "border-0 overflow-hidden")}>
                 <div className="grid sm:grid-cols-[220px_1fr]">
-                  <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="aspect-[4/3] h-full w-full" />
+                  {listingPhoto(l, 0) ? (
+                    <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="aspect-[4/3] h-full w-full" />
+                  ) : (
+                    <NoPhotos locale={locale} busy={busy === `photos-${l.id}`} onAdd={takenDown ? undefined : () => { setUploadFor(l.id); fileRef.current?.click(); }} />
+                  )}
                   <div className="p-5">
                     <div className="flex flex-wrap items-center gap-2">
                       <StatusPill status={l.status} review={l.review} takedownReason={l.takedownReason} locale={locale} />
                       <span className="text-xs font-semibold text-muted">{isMandate ? tx(locale, "Encargo", "Mandate") : tx(locale, "Publicado por ti", "Listed by you")}</span>
-                      <span className="text-xs text-muted">· {l.photos?.length ?? 0} {tx(locale, "fotos", "photos")} · {tx(locale, "calidad", "quality")} {l.quality}</span>
+                      <span className="text-xs text-muted">· {plural(l.photos?.length ?? 0, locale, ["foto", "fotos"], ["photo", "photos"])} · {tx(locale, "calidad", "quality")} {l.quality}</span>
                     </div>
                     <Link href={listingHref(locale, l)} className="mt-1 block font-serif text-[24px] font-medium leading-tight underline-offset-4 hover:underline">{tx(locale, l.title_es, l.title_en)}</Link>
                     {editing === l.id ? (
@@ -398,6 +402,32 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
         </Card>
         </div>
       </div>
+    </div>
+  );
+}
+
+/**
+ * Calm stand-in for a listing that has no photos yet: a soft Lino → Arena wash with the brand's double roof drawn in
+ * hairlines, and one clear action to add photos (none while the listing is taken down).
+ */
+function NoPhotos({ locale, busy, onAdd }: { locale: Locale; busy: boolean; onAdd?: () => void }) {
+  return (
+    <div data-testid="owner-no-photos" className="relative flex aspect-[4/3] h-full w-full flex-col items-center justify-center gap-3 overflow-hidden bg-[linear-gradient(160deg,#F6F1EA_0%,#F1EBE3_45%,#E6D8C4_100%)] p-5 text-center dark:bg-[linear-gradient(160deg,#2A2420_0%,#241F1C_55%,#1E1A18_100%)]">
+      <svg viewBox="0 0 128 60" className="w-24 text-[#B08A55] opacity-70 dark:text-[#C9A574]" aria-hidden fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round">
+        <path d="M6 44 64 4l58 40" />
+        <path d="M30 44 64 20l34 24" className="text-[#8E3B22] dark:text-[#C9A574]" stroke="currentColor" />
+        <path d="M18 44v14h92V44" opacity=".55" />
+        <path d="M56 58V46h16v12" opacity=".55" />
+      </svg>
+      <div>
+        <div className="font-serif text-[19px] leading-tight text-ink dark:text-ivory">{tx(locale, "Aún sin fotos", "No photos yet")}</div>
+        <p className="mt-0.5 text-xs text-muted dark:text-mist">{tx(locale, "Con fotos, tu anuncio recibe muchas más visitas.", "With photos, your listing gets far more views.")}</p>
+      </div>
+      {onAdd && (
+        <button type="button" onClick={onAdd} disabled={busy} className="inline-flex min-h-10 items-center gap-1.5 rounded-full bg-[#1E1A18] px-4 font-display text-sm font-semibold text-[#F1EBE3] transition-colors duration-np hover:bg-[#2A2420] disabled:opacity-60 dark:bg-[#F1EBE3] dark:text-[#1E1A18] dark:hover:bg-white">
+          {busy ? <Loader2 size={14} className="animate-spin" aria-hidden /> : <ImagePlus size={14} aria-hidden />} {tx(locale, "Añade fotos", "Add photos")}
+        </button>
+      )}
     </div>
   );
 }

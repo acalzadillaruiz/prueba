@@ -380,7 +380,12 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
             <p className={cn("text-center text-sm", muted)}>{tx(locale, "Elige cuándo te viene bien para pedir la visita", "Pick when suits you to request the visit")}</p>
           )}
           {mode === "tour" && !chosen && days.some((d) => d.hours.some((h) => h.available)) && (
-            <p className={cn("text-center text-sm", muted)}>{tx(locale, "Elige un día y una hora para pedir la visita", "Pick a day and a time to request the viewing")}</p>
+            <p className={cn("text-center text-sm", muted)}>{/* A day is always preselected (the first with free slots): ask only for what's still missing. */}
+              {!days[day]
+                ? tx(locale, "Elige un día y una hora para pedir la visita", "Pick a day and a time to request the viewing")
+                : days[day].hours.some((h) => h.available)
+                  ? tx(locale, "Elige una hora para pedir la visita", "Pick a time to request the viewing")
+                  : tx(locale, "Ese día ya no quedan horas: elige otro día", "No times left that day: pick another day")}</p>
           )}
         </form>
         {wa && (

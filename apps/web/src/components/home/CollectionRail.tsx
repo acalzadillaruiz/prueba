@@ -52,7 +52,8 @@ export function CollectionRail({ eyebrow, title, items, more }: { eyebrow: strin
   }, [reduced, items.length]);
 
   return (
-    <section ref={root} className="relative bg-ivory" aria-label={title}>
+    // data-hide-fab: the floating contact button steps away while the cards glide under its corner.
+    <section ref={root} data-hide-fab className="relative bg-ivory" aria-label={title}>
       <div className="flex flex-col justify-center overflow-hidden py-20 md:sticky md:top-0 md:h-[100svh] md:py-0">
         <div className="mx-auto mb-8 flex w-full max-w-[1320px] items-end justify-between gap-6 px-4 md:mb-12 md:px-8">
           <div>

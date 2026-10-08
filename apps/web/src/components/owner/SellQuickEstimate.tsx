@@ -87,7 +87,8 @@ export function SellQuickEstimate({ locale, zones }: { locale: Locale; zones: { 
         </Field>
         <Field label={tx(locale, "Superficie (m²)", "Area (m²)")} error={err && !areaOk ? err : undefined}>
           <input
-            className={inputCls}
+            // The hint must never read as a typed value: "p. ej." prefix, lighter and italic.
+            className={cn(inputCls, "placeholder:font-normal placeholder:italic placeholder:text-muted/60")}
             type="number"
             inputMode="numeric"
             min={1}
@@ -98,7 +99,7 @@ export function SellQuickEstimate({ locale, zones }: { locale: Locale; zones: { 
               setM2(e.target.value);
               setRes(null);
             }}
-            placeholder="110"
+            placeholder={tx(locale, "p. ej. 110", "e.g. 110")}
           />
         </Field>
       </div>

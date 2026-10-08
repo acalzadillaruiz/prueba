@@ -71,17 +71,18 @@ export function HeroSearch({ locale }: { locale: Locale }) {
     if (budget && !q.maxPrice) q.maxPrice = Number(budget);
     router.push(`/${locale}/search?${queryToParams(q, text).toString()}`);
   };
-  const label = "np-eyebrow block text-[10.5px] tracking-[0.18em] text-[#735829]";
-  const field = "w-full bg-transparent font-display text-[15px] text-[#162638] placeholder:text-[#162638]/50 focus:outline-none";
+  const label = "np-eyebrow block text-[10.5px] tracking-[0.18em] text-[#6B4F2C]";
+  const field = "w-full bg-transparent font-display text-[15px] text-[#1E1A18] placeholder:text-[#1E1A18]/50 focus:outline-none";
   return (
     <form
+      data-hide-fab-mobile
       onSubmit={(e) => {
         e.preventDefault();
         go();
       }}
       role="search"
       aria-label={tx(locale, "Buscar propiedades", "Search properties")}
-      className="w-full max-w-[980px] rounded-[22px] bg-[#F8F5EF] p-3 text-[#162638] shadow-[0_24px_60px_rgba(10,18,30,.35)] lg:rounded-full lg:p-2"
+      className="w-full max-w-[980px] rounded-[22px] bg-[#F1EBE3] p-3 text-[#1E1A18] shadow-[0_24px_60px_rgba(21,18,15,.35)] lg:rounded-full lg:p-2"
     >
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:gap-0">
         <div className="grid grid-cols-3 gap-1 rounded-full bg-[#EDE4D5] p-1 lg:flex lg:shrink-0" role="group" aria-label={tx(locale, "Operación", "Operation")}>
@@ -96,14 +97,14 @@ export function HeroSearch({ locale }: { locale: Locale }) {
               aria-pressed={tab === k}
               className={cn(
                 "min-h-11 rounded-full border-2 px-4 font-display text-[15px] transition-colors duration-np",
-                tab === k ? "border-[#162638] bg-[#E6EBF1] font-semibold text-[#162638]" : "border-transparent text-[#162638]/70 hover:text-[#162638]",
+                tab === k ? "border-[#1E1A18] bg-[#E6DDD2] font-semibold text-[#1E1A18]" : "border-transparent text-[#1E1A18]/70 hover:text-[#1E1A18]",
               )}
             >
               {tx(locale, es, en)}
             </button>
           ))}
         </div>
-        <label className="flex min-h-[52px] min-w-0 flex-1 flex-col justify-center rounded-2xl border border-[#8F8370]/50 bg-[#ffffff99] px-4 focus-within:border-[#162638] lg:rounded-none lg:border-0 lg:border-r lg:border-[#DDD3C2] lg:bg-transparent lg:px-5">
+        <label className="flex min-h-[52px] min-w-0 flex-1 flex-col justify-center rounded-2xl border border-[#8F8370]/50 bg-[#ffffff99] px-4 focus-within:border-[#1E1A18] lg:rounded-none lg:border-0 lg:border-r lg:border-[#D8CBB7] lg:bg-transparent lg:px-5">
           <span className={cn(label, "hidden lg:block")}>{tx(locale, "Ubicación", "Location")}</span>
           <input
             value={text}
@@ -114,7 +115,7 @@ export function HeroSearch({ locale }: { locale: Locale }) {
           />
         </label>
         <div className="hidden lg:contents">
-          <label className="flex min-h-[52px] w-[170px] shrink-0 flex-col justify-center border-r border-[#DDD3C2] px-5">
+          <label className="flex min-h-[52px] w-[170px] shrink-0 flex-col justify-center border-r border-[#D8CBB7] px-5">
             <span className={label}>{tx(locale, "Tipo", "Type")}</span>
             <select value={kind} onChange={(e) => setKind(e.target.value)} className={cn(field, "-ml-1 cursor-pointer appearance-none")} aria-label={tx(locale, "Tipo de propiedad", "Property type")}>
               <option value="">{tx(locale, "Cualquier tipo", "Any type")}</option>

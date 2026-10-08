@@ -75,14 +75,14 @@ export function OnCallDialog({ locale, listingSlug, onClose }: { locale: Locale;
   const list = q.data?.advisors ?? [];
   const ring = "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy";
   return createPortal(
-    <div className="fixed inset-0 z-[70] flex items-end justify-center bg-[#162638]/55 p-0 sm:items-center sm:p-6 print:hidden" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+    <div className="fixed inset-0 z-[70] flex items-end justify-center bg-[#1E1A18]/55 p-0 sm:items-center sm:p-6 print:hidden" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
       <div
         ref={panel}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descId}
-        className="np-in max-h-[88vh] w-full overflow-y-auto rounded-t-[24px] bg-ivory p-6 text-ink shadow-[0_24px_60px_rgba(22,38,56,.25)] sm:max-w-[480px] sm:rounded-[24px]"
+        className="np-in max-h-[88vh] w-full overflow-y-auto rounded-t-[24px] bg-ivory p-6 text-ink shadow-[0_24px_60px_rgba(30,26,24,.25)] sm:max-w-[480px] sm:rounded-[24px]"
         style={{ paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))" }}
       >
         <div className="flex items-start justify-between gap-4">
@@ -167,17 +167,19 @@ export function OnCallButton({ locale, listingSlug, className, children, ...rest
 }
 
 /**
- * Floating contact button (brand: navy with a 2 px #E79A7F ring). Opens WhatsApp only when a real number exists;
+ * Floating contact button (brand: navy with a 2 px #C9A574 ring). Opens WhatsApp only when a real number exists;
  * otherwise it links to the contact flow. A quiet "Guardia 24/7" pill above it opens today's on-call advisors.
  * Sits above the mobile tab bar and hides while the footer or any [data-hide-fab] block (e.g. a contact panel)
- * is on screen, so it never covers content.
+ * (or, on phones, [data-hide-fab-mobile]) is on screen, so it never covers content.
  */
 export function FloatingContact({ href, label, whatsapp = false, tabbar = false, locale: localeProp }: { href: string; label: string; whatsapp?: boolean; tabbar?: boolean; locale?: Locale }) {
   const pathname = usePathname();
   const locale: Locale = localeProp ?? (pathname?.startsWith("/en") ? "en" : "es");
   const [hidden, setHidden] = useState(false);
   useEffect(() => {
-    const targets = [...document.querySelectorAll("footer, [data-hide-fab]")];
+    // Phones also hide them over [data-hide-fab-mobile] blocks (the hero search spans the full width there).
+    const phone = window.matchMedia("(max-width: 767px)").matches;
+    const targets = [...document.querySelectorAll(phone ? "footer, [data-hide-fab], [data-hide-fab-mobile]" : "footer, [data-hide-fab]")];
     if (!targets.length || typeof IntersectionObserver === "undefined") return;
     const visible = new Set<Element>();
     const io = new IntersectionObserver((entries) => {
@@ -203,7 +205,7 @@ export function FloatingContact({ href, label, whatsapp = false, tabbar = false,
       <OnCallButton
         locale={locale}
         tabIndex={hidden ? -1 : undefined}
-        className="flex min-h-11 items-center gap-2 rounded-full bg-ivory/95 px-4 font-display text-sm font-semibold text-navy shadow-[0_0_0_1.5px_#162638,0_10px_24px_rgba(22,38,56,.18)] backdrop-blur transition-colors duration-np hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy"
+        className="flex min-h-11 items-center gap-2 rounded-full bg-ivory/95 px-4 font-display text-sm font-semibold text-navy shadow-[0_0_0_1.5px_#1E1A18,0_10px_24px_rgba(30,26,24,.18)] backdrop-blur transition-colors duration-np hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy"
       >
         <PhoneCall size={16} strokeWidth={1.8} aria-hidden /> {tx(locale, "Guardia 24/7", "24/7 on-call")}
       </OnCallButton>
@@ -213,7 +215,7 @@ export function FloatingContact({ href, label, whatsapp = false, tabbar = false,
         title={label}
         {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
         tabIndex={hidden ? -1 : undefined}
-        className="flex h-14 w-14 items-center justify-center rounded-full bg-navy text-ivory shadow-[0_0_0_2px_#E79A7F,0_14px_30px_rgba(22,38,56,.35)] hover:bg-navy-2"
+        className="flex h-14 w-14 items-center justify-center rounded-full bg-navy text-ivory shadow-[0_0_0_2px_#C9A574,0_14px_30px_rgba(30,26,24,.35)] hover:bg-navy-2"
       >
         {whatsapp ? <WhatsAppIcon size={24} /> : <MessageCircle size={23} aria-hidden />}
       </Link>

@@ -71,7 +71,7 @@ function fullAddress(parts: (string | undefined | null)[]) {
  * "Av. San Juan Bosco, Res. Las Lomas, Altamira"). Picking only the zone leaves this empty, so the pin
  * would land at the zone centre and collide with every other "Altamira" listing.
  */
-export function streetPart(main: string, drop: (string | undefined | null)[]) {
+function streetPart(main: string, drop: (string | undefined | null)[]) {
   let t = ` ${norm(main).replace(/[^a-z0-9]+/g, " ")} `;
   for (const x of [...drop, "venezuela"]) {
     const w = norm(x ?? "").replace(/[^a-z0-9]+/g, " ").trim();
@@ -160,7 +160,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
   /** Address line sent to the API (and to the duplicate check): street/building + unit. */
   const apiAddress = d.addr ? `${d.addr.main}${d.unit.trim() ? `, ${d.unit.trim()}` : ""}` : "";
   const streetErr =
-    d.addr && streetPart(d.addr.main, [d.addr.zone, d.addr.city, d.addr.state]).length < 8
+    d.addr && streetPart(d.addr.main, [d.addr.zone, d.addr.city, d.addr.state]).length < 7
       ? tx(locale, "Escribe la calle o el edificio, no solo la urbanización (por ejemplo «Av. San Juan Bosco, Res. Los Pinos»), y vuelve a elegir la zona en la lista.", "Write the street or building, not just the neighborhood (for example “Av. San Juan Bosco, Res. Los Pinos”), then pick the area from the list again.")
       : null;
   const hasBeds = !NO_BEDS.includes(d.kind);

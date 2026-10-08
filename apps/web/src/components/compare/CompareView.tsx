@@ -265,10 +265,10 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
                 const title = tx(locale, l.title_es, l.title_en);
                 return (
                   <div key={l.id} className="flex min-w-0 flex-col gap-2">
-                    <Link href={listingUrl(l, locale)} className={cn(STACK_BTN, "np-btn-outline border-[1.5px] border-navy text-navy", k.outline)}>
+                    <Link href={listingUrl(l, locale)} aria-label={fichaName(title)} className={cn(STACK_BTN, "np-btn-outline border-[1.5px] border-navy text-navy", k.outline)}>
                       {tx(locale, "Ver ficha", "View listing")}{named(title)}
                     </Link>
-                    <Link href={contactUrl(l, locale)} className={cn(STACK_BTN, "np-btn-navy bg-navy text-ivory")}>
+                    <Link href={contactUrl(l, locale)} aria-label={visitName(l, title)} className={cn(STACK_BTN, "np-btn-navy bg-navy text-ivory")}>
                       {visitText(l, locale)}{named(title)}
                     </Link>
                   </div>
@@ -329,10 +329,10 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
                     return (
                       <td key={l.id} className="px-4 py-4">
                         <div className="flex flex-wrap gap-2">
-                          <Button href={listingUrl(l, locale)} variant="outline" size="sm" className={k.outline}>
+                          <Button href={listingUrl(l, locale)} aria-label={fichaName(title)} variant="outline" size="sm" className={k.outline}>
                             <FileText size={15} aria-hidden /> {tx(locale, "Ver ficha", "View listing")}{named(title)}
                           </Button>
-                          <Button href={contactUrl(l, locale)} variant="navy" size="sm">
+                          <Button href={contactUrl(l, locale)} aria-label={visitName(l, title)} variant="navy" size="sm">
                             <CalendarCheck size={15} aria-hidden /> {visitText(l, locale)}{named(title)}
                           </Button>
                         </div>

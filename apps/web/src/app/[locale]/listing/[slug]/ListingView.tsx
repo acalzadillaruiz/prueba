@@ -20,7 +20,6 @@ import { cn } from "@/lib/cn";
 import { ViewBeacon } from "@/components/detail/ViewBeacon";
 import { StickyContactBar } from "@/components/detail/StickyContactBar";
 import { zoneStats } from "@/server/zone-stats";
-import { SITE_URL } from "@/lib/seo";
 import { essentialLabels } from "@/lib/essentials";
 
 const ESSENTIAL_ICON: Record<string, LucideIcon> = { power: Zap, well: Droplet, tank: Droplets, dock: Anchor, avila: Mountain, sea: Waves };
@@ -48,25 +47,6 @@ function Essentials({ l, locale, title }: { l: Listing; locale: Locale; title: R
   );
 }
 
-function jsonLd(l: Listing, locale: Locale) {
-  const url = `${SITE_URL}/${locale}/listing/${l.slug}`;
-  return JSON.stringify({
-    "@context": "https://schema.org",
-    "@type": "RealEstateListing",
-    name: tx(locale, l.title_es, l.title_en),
-    url,
-    datePosted: l.publishedAt,
-    image: l.photos?.length ? l.photos.map((p) => (p.startsWith("http") ? p : `${SITE_URL}${p}`)) : [`${url}/opengraph-image`],
-    offers: { "@type": "Offer", price: l.priceAmount, priceCurrency: l.priceCurrency, availability: l.status === "SOLD" || l.status === "RENTED" ? "https://schema.org/SoldOut" : "https://schema.org/InStock" },
-    about: {
-      "@type": l.kind === "house" || l.kind === "villa" || l.kind === "townhouse" || l.kind === "chalet" ? "House" : l.kind === "land" ? "Place" : "Apartment",
-      floorSize: { "@type": "QuantitativeValue", value: l.areaM2, unitCode: "MTK" },
-      ...(l.beds ? { numberOfRooms: l.beds } : {}),
-      address: { "@type": "PostalAddress", addressLocality: l.zone, addressRegion: l.state, addressCountry: "VE" },
-      geo: { "@type": "GeoCoordinates", latitude: l.lat, longitude: l.lng },
-    },
-  });
-}
 
 /** Published and approved: visible to everyone (the rest only through the authenticated preview). */
 export function isPublicListing(l: Pick<Listing, "status" | "review" | "privateListing">) {
@@ -144,13 +124,6 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
             <a href={l.brochurePdf} target="_blank" rel="noreferrer" className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-full border-[1.5px] border-navy px-5 font-display text-sm font-semibold text-navy hover:bg-navy/5">
               {tx(locale, "Descargar el folleto (PDF)", "Download the brochure (PDF)")}
             </a>
-          )}
-          {isPublic && (
-            <script
-              type="application/ld+json"
-              // schema.org structured data for search engines (rich results)
-              dangerouslySetInnerHTML={{ __html: jsonLd(l, locale).replace(/</g, "\\u003c") }}
-            />
           )}
         </div>
 

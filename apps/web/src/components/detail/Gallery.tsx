@@ -63,16 +63,18 @@ export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: bo
   );
   const thumbs = shots.slice(1, 5);
   const allLabel = illustrated ? tx(locale, `Ver las ${total} ilustraciones`, `View all ${total} illustrations`) : tx(locale, `Ver las ${total} fotos`, `View all ${total} photos`);
+  // With three pictures or fewer every one is already on screen: no "Ver las 3 fotos" overlay.
+  const showAll = total > 3;
   const chip = "inline-flex min-h-11 items-center gap-1.5 rounded-full border border-ink/10 bg-white/75 px-4 font-display text-sm text-ink transition-colors duration-np hover:border-navy/40";
   return (
     <>
       {/* Main photo with the brand's arched top-left corner; four thumbnails on the right (desktop). */}
-      <div className={cn("grid h-[320px] gap-3 sm:h-[420px] md:h-[540px] lg:h-[600px]", thumbs.length > 0 && "md:grid-cols-2")}>
+      <div className={cn("grid h-[320px] gap-3 sm:h-[420px] md:h-[min(540px,60vh)] lg:h-[clamp(380px,55vh,600px)]", thumbs.length > 0 && "md:grid-cols-2")}>
         <button onClick={() => show(0)} className="relative block overflow-hidden rounded-[32px] bg-arena">
           <span className="sr-only">{view(1)}</span>
           <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} label={alt} sizes="(max-width: 768px) 100vw, 50vw" priority className="h-full w-full transition-transform duration-700 hover:scale-[1.02]" />
           {tag}
-          <span className="absolute right-3 top-3 np-glass rounded-full px-3.5 py-1.5 font-display text-[13px] font-semibold text-ink md:hidden">{allLabel}</span>
+          {showAll && <span className="absolute right-3 top-3 np-glass rounded-full px-3.5 py-1.5 font-display text-[13px] font-semibold text-ink md:hidden">{allLabel}</span>}
         </button>
         {thumbs.length > 0 && (
           <div className={cn("hidden gap-3 md:grid", thumbs.length > 1 ? "grid-cols-2" : "grid-cols-1", thumbs.length > 2 ? "grid-rows-2" : "grid-rows-1")}>
@@ -88,7 +90,7 @@ export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: bo
               >
                 {n === arr.length - 1 && <span className="sr-only">{view(n + 2)}</span>}
                 <PropertyArt scene={sc} seed={l.id + n} photo={listingPhoto(l, n + 1)} className="h-full w-full transition-transform duration-700 hover:scale-[1.03]" />
-                {n === arr.length - 1 && (
+                {showAll && n === arr.length - 1 && (
                   <span className="absolute bottom-4 right-4 np-glass rounded-full px-4 py-2 font-display text-[14px] font-semibold text-ink">
                     {allLabel}
                   </span>

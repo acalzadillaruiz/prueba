@@ -139,11 +139,11 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
       ? tx(locale, "Retoma tus casas guardadas, compáralas con calma y agenda tus visitas.", "Pick up where you left off: your saved homes, side by side, and your tours.")
       : tx(locale, "Es gratis y no te pedimos tarjeta.", "It’s free, and no card is needed.");
   return (
-    <div className="np-public grid min-h-screen bg-ivory lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
-      <main id="main" className="flex flex-col px-5 pb-10 pt-8 sm:px-10 lg:px-16">
-        <Link href={`/${locale}`} className="self-center rounded-md lg:self-start" aria-label="New Place"><Logo className="lg:hidden" size="lg" /><Logo className="hidden lg:inline-flex" /></Link>
-        <div className="mx-auto my-auto w-full max-w-[440px] pt-10 lg:pt-14">
-          <div className={k.eyebrow}>{mode === "login" ? tx(locale, "Tu espacio", "Your space") : tx(locale, "Te damos la bienvenida", "Welcome to New Place")}</div>
+    // Rendered inside the public layout (PublicPage: header with the logo, tab bar on phones), so no own <main> or logo.
+    <div className="grid lg:min-h-[calc(100svh-84px)] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
+      <div className="flex flex-col px-5 pb-12 pt-6 sm:px-10 lg:px-16">
+        <div className="mx-auto my-auto w-full max-w-[440px] pt-4 lg:pt-10">
+          <div className={k.eyebrow}>{mode === "login" ? tx(locale, "Entrar", "Sign in") : tx(locale, "Te damos la bienvenida", "Welcome to New Place")}</div>
           <h1 className="mt-2 font-serif text-[44px] font-medium leading-[1.02] text-navy md:text-[52px]">{title}</h1>
           {inv && (
             <div className="mt-5 rounded-[18px] bg-rosa/60 p-4 text-sm text-navy" role="status">
@@ -226,8 +226,8 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
             </div>
           )}
         </div>
-      </main>
-      <aside className="relative hidden overflow-hidden bg-arena/60 lg:block" aria-hidden>
+      </div>
+      <aside className="relative m-4 hidden overflow-hidden rounded-[32px] bg-arena/60 lg:block" aria-hidden>
         <div className="absolute inset-0 bg-[radial-gradient(120%_80%_at_50%_0%,#F2DDD3_0%,transparent_60%)]" />
         <div className="relative flex h-full flex-col items-center justify-center px-12 py-16">
           <Logo size="lg" className="mb-10" />

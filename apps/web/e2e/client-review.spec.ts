@@ -75,7 +75,10 @@ test.describe("Cliente · regresiones de la revisión", () => {
     const price = page.getByLabel("Tu precio (USD)");
     await price.fill("");
     await expect(page.getByText("Escribe un precio en USD mayor que 0, sin decimales.")).toBeVisible();
-    await expect(page.getByRole("button", { name: "Continuar" })).toBeDisabled();
+    // "Continuar" stays tappable: it says what's missing and keeps the owner on this step.
+    await page.getByRole("button", { name: "Continuar" }).click();
+    await expect(page.getByTestId("wizard-blocked")).toContainText("Tu precio en USD");
+    await expect(page.getByText("Paso 5 de 6")).toBeVisible();
     await price.fill("95000");
     await page.getByRole("button", { name: /Redactar con IA/ }).click();
     await expect(page.getByLabel("Título")).toHaveValue(/Terreno/);

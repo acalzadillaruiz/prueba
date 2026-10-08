@@ -8,6 +8,7 @@ import type {
   NextAction,
   SearchQuery,
 } from "./types";
+import { partialPlace } from "./zones";
 
 const AMENITY_WEIGHT: Record<string, number> = {
   pool: 0.02,
@@ -75,7 +76,7 @@ export function heuristicEstimate(input: EstimateInput): EstimateResult {
 }
 
 // Later entries win, so the city ("Caracas") goes first and neighbourhoods inside it override it.
-const ZONE_ALIASES = [
+export const ZONE_ALIASES = [
   "Caracas",
   "Los Palos Grandes",
   "Altamira",
@@ -107,6 +108,7 @@ const ZONE_ALIASES = [
   "Los Roques",
   "El Viñedo",
   "Tierra Negra",
+  "El Trigaleño",
 ];
 
 /** Short names people type → the city/zone name used in listings. */
@@ -140,6 +142,11 @@ export function heuristicSearchParse(nl: string): SearchQuery {
   if (/compr|\bventa\b|\bbuy\b|\bfor sale\b|\bsale\b/.test(t) && !q.listingType) q.listingType = "SALE";
   if (/lujo|luxury|exclusiv/.test(t)) q.luxury = true;
   for (const z of ZONE_ALIASES) if (t.includes(norm(z))) q.zone = ZONE_CANONICAL[z] ?? z;
+  // Half-typed place names count too ("Lech" → Lechería, "casa en marg" → Isla de Margarita).
+  if (!q.zone) {
+    const z = partialPlace(t, ZONE_ALIASES);
+    if (z) q.zone = ZONE_CANONICAL[z] ?? z;
+  }
 
   // An amount is never an area ("100 m²") nor a room count ("2 habitaciones").
   const num = "([\\d.,]+)(?![\\d.,]*\\s*(?:m2|m²|mts?\\b|metros|sq|hab|cuarto|dormitorio|bed|br\\b|bd\\b|bano|bath|noche|night|huesped|guest))";

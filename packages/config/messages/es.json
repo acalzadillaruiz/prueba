@@ -5,7 +5,7 @@
     "about": "Te acompañamos a encontrar casa en Lechería, El Morro, Margarita y Caracas.",
     "search": "Buscar", "owners": "Propietarios", "agencies": "Agencias",
     "listFree": "Publicar gratis", "hireAgency": "Encargar a agencia", "myProperties": "Mis inmuebles",
-    "forAgencies": "New Place para agencias", "legal": "Precios en USD. La conversión a VES/EUR es solo una referencia.", "listedOn": "Listed on New Place", "sellWithUs": "Vender con nosotros", "valuation": "Valorar mi propiedad"
+    "forAgencies": "New Place para agencias", "legal": "Precios en USD. La conversión a VES/EUR es solo una referencia.", "listedOn": "Publicado en New Place", "sellWithUs": "Vender con nosotros", "valuation": "Valorar mi propiedad"
   },
   "admin": {
     "dashboard": "Panel", "leads": "Leads", "listings": "Inmuebles", "calendar": "Calendario", "capture": "Captación", "media": "Fotografía", "team": "Equipo", "reports": "Informes", "teamAudit": "Auditoría", "settings": "Ajustes",

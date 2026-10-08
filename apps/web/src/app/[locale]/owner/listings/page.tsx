@@ -31,7 +31,7 @@ export default async function OwnerListings({ params }: { params: Promise<{ loca
     openAppeals(listings.filter((l) => l.takedownReason).map((l) => l.id)),
   ]);
   return (
-    <PublicPage locale={locale}>
+    <PublicPage locale={locale} tabbar>
       <OwnerListingsView
         locale={locale}
         listings={listings}

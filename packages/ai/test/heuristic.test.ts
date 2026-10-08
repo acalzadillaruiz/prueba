@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { heuristicLeadScore, heuristicSearchParse } from "../src/heuristic";
+import { closestPlaces, queryUnderstood, suggestPlaces } from "../src/zones";
 
 describe("heuristicSearchParse", () => {
   it("parses the reference query", () => {
@@ -44,5 +45,47 @@ describe("searchParse · real phrases (2035 review)", () => {
   it("recognises El Morro and holiday rentals", () => {
     expect(heuristicSearchParse("casa con piscina en El Morro").zone).toBe("El Morro");
     expect(heuristicSearchParse("A holiday villa in Margarita")).toMatchObject({ listingType: "SHORT_RENT", zone: "Isla de Margarita" });
+  });
+});
+
+describe("zones · partial names and typeahead", () => {
+  it("reads a half-typed place, accent-insensitive", () => {
+    expect(heuristicSearchParse("Lech").zone).toBe("Lechería");
+    expect(heuristicSearchParse("casa en lecher").zone).toBe("Lechería");
+    expect(heuristicSearchParse("apartamento en marg").zone).toBe("Isla de Margarita");
+    expect(heuristicSearchParse("algo en el hati").zone).toBe("El Hatillo");
+  });
+  it("never turns ordinary words into a zone", () => {
+    expect(heuristicSearchParse("casa en la playa").zone).toBeUndefined();
+    expect(heuristicSearchParse("una casa que vale la pena").zone).toBeUndefined();
+    expect(heuristicSearchParse("casa en la costa").zone).toBeUndefined();
+  });
+  it("flags text it did not understand", () => {
+    expect(queryUnderstood(heuristicSearchParse("xyzzy castillo"))).toBe(false);
+    expect(queryUnderstood(heuristicSearchParse("Lech"))).toBe(true);
+    expect(queryUnderstood(heuristicSearchParse("con piscina"))).toBe(true);
+    expect(queryUnderstood(heuristicSearchParse(""))).toBe(false);
+  });
+  it("suggests places for the end of the text", () => {
+    expect(suggestPlaces("Lech").map((s) => s.name)).toEqual(["Lechería"]);
+    const s = suggestPlaces("casa en lech")[0];
+    expect(s).toMatchObject({ name: "Lechería", replace: "lech" });
+    expect(suggestPlaces("morro").map((s) => s.name)).toEqual(expect.arrayContaining(["El Morro", "Cerro El Morro", "Canales de El Morro"]));
+    expect(suggestPlaces("el mo").map((s) => s.name)).toContain("El Morro");
+    expect(suggestPlaces("san rom")[0]).toMatchObject({ name: "Lomas de San Román", replace: "san rom" });
+  });
+  it("does not re-offer a place already written in full, nor suggest from one letter", () => {
+    expect(suggestPlaces("Chacao").map((s) => s.name)).not.toContain("Chacao");
+    expect(suggestPlaces("c")).toEqual([]);
+    expect(suggestPlaces("xyzzy")).toEqual([]);
+  });
+  it("works with the inventory's own list", () => {
+    const places = [{ name: "Caracas" }, { name: "Altamira", city: "Caracas" }];
+    expect(suggestPlaces("alt", places)).toEqual([{ name: "Altamira", city: "Caracas", replace: "alt" }]);
+  });
+  it("finds places close to a typo", () => {
+    expect(closestPlaces("Lecheira").map((p) => p.name)).toContain("Lechería");
+    expect(closestPlaces("chaco").map((p) => p.name)).toContain("Chacao");
+    expect(closestPlaces("xyzzy castillo")).toEqual([]);
   });
 });

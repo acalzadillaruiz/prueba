@@ -32,7 +32,8 @@ export function HeroAura({
           <p className="np-glass inline-flex items-center gap-2.5 rounded-full px-3.5 py-1 font-display text-[13px] text-ink/80 sm:py-1.5">
             <span className="np-live" aria-hidden />
             <span>
-              <span data-count={available}>{available}</span> {tx(locale, "casas disponibles hoy", "homes available today")}
+              {/* The real figure from the first frame (no count-up here: a climbing number reads as "still loading"). */}
+              {available} {tx(locale, "casas disponibles hoy", "homes available today")}
             </span>
           </p>
           <h1 id="hero-title" className="mt-4 max-w-[680px] text-[31px] leading-[1.06] tracking-[-0.02em] text-ink sm:mt-7 sm:text-[60px] sm:leading-[1.04] lg:text-[76px]">

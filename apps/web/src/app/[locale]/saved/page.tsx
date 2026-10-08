@@ -19,7 +19,7 @@ export default async function SavedPage({ params }: { params: Promise<{ locale: 
   const user = await getAppUser();
   const ids = user ? (await prisma.savedListing.findMany({ where: { userId: user.id }, orderBy: { createdAt: "desc" }, select: { listingId: true } })).map((s) => s.listingId) : [];
   return (
-    <PublicPage locale={locale}>
+    <PublicPage locale={locale} tabbar>
       <SavedView locale={locale} all={await listingsByIds(ids)} />
     </PublicPage>
   );

@@ -19,7 +19,7 @@ export default async function AlertsPage({ params }: { params: Promise<{ locale:
   const user = (await getAppUser())!;
   const [searches, emails] = await Promise.all([prisma.savedSearch.findMany({ where: { userId: user.id }, orderBy: { createdAt: "desc" } }), getEmails(user.email)]);
   return (
-    <PublicPage locale={locale}>
+    <PublicPage locale={locale} tabbar>
       <AlertsView
         locale={locale}
         searches={searches.map((s) => ({ id: s.id, name: s.name, query: s.query, polygon: s.polygon, frequency: s.frequency, newCount: s.newCount, lastSentAt: s.lastSentAt?.toISOString() ?? null }))}

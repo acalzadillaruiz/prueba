@@ -84,7 +84,17 @@ function streetPart(main: string, drop: (string | undefined | null)[]) {
 export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: { locale: Locale; zones: Zone[]; agencies: Agency[]; fxVes: number; staff?: boolean }) {
   const router = useRouter();
   const { user, requireLogin } = useApp();
-  const [step, setStep] = useState(0);
+  const [step, setStepRaw] = useState(0);
+  /** Set when the owner moves between steps (not on draft restore), so the page scrolls up and focus lands on the new heading. */
+  const moved = useRef(false);
+  const formRef = useRef<HTMLDivElement>(null);
+  const setStep = (n: number) => {
+    moved.current = true;
+    setTried(false);
+    setStepRaw(n);
+  };
+  /** Set when the owner taps "Continuar" on an incomplete step: the missing items show (never a silent disabled button). */
+  const [tried, setTried] = useState(false);
   const [d, setD] = useState<Draft>({
     mode: staff ? "AGENCY" : "FSBO",
     op: "SALE",
@@ -141,10 +151,35 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
         const saved = JSON.parse(raw) as { d: Partial<Draft>; step: number };
         // Drafts saved by an older version may lack newer fields: keep the defaults for those.
         setD((x) => ({ ...x, ...saved.d, extras: { ...x.extras, ...saved.d.extras }, ess: { ...x.ess, ...saved.d.ess } }));
-        setStep(saved.step);
+        setStepRaw(saved.step);
+      } else {
+        // Coming from the sell landing ("/sell"): operation, type and area typed there are carried over.
+        const q = new URLSearchParams(window.location.search);
+        const m2 = Math.round(Number(q.get("m2")));
+        const op = q.get("op");
+        const kind = q.get("kind") as Kind | null;
+        const kinds: Kind[] = [...RESIDENTIAL_KINDS, ...NO_BEDS];
+        setD((x) => ({
+          ...x,
+          ...(m2 > 0 && m2 <= 1_000_000 ? { m2 } : {}),
+          ...(op && ["SALE", "LONG_RENT", "SHORT_RENT", "COMMERCIAL_SALE", "COMMERCIAL_RENT"].includes(op) ? { op } : {}),
+          ...(kind && kinds.includes(kind) ? { kind } : {}),
+        }));
       }
     } catch {}
   }, [DRAFT_KEY]);
+  // Each step starts at the top, with focus on its heading (screen readers announce the new step).
+  useEffect(() => {
+    if (!moved.current) return;
+    moved.current = false;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+    const h = formRef.current?.querySelector<HTMLElement>("h1");
+    if (h) {
+      h.tabIndex = -1;
+      h.focus({ preventScroll: true });
+    }
+  }, [step]);
   useEffect(() => {
     try {
       sessionStorage.setItem(DRAFT_KEY, JSON.stringify({ d, step }));
@@ -348,7 +383,43 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
       </div>
     );
 
-  const canNext = step === 1 ? !!d.addr && !streetErr && (!dup || dupOverride) : step === 4 ? !priceErr : true;
+  /** What still blocks "Continuar" on step n, in plain words (the fields themselves show their own messages). */
+  const issues = (n: number): string[] =>
+    (n === 1
+      ? [
+          !d.addr && tx(locale, "Escribe la dirección y elige una opción de la lista.", "Type the address and pick an option from the list."),
+          d.addr && streetErr && tx(locale, "Añade la calle o el edificio, no solo la urbanización.", "Add the street or building, not just the neighborhood."),
+          d.addr && !streetErr && dup && !dupOverride && tx(locale, "Parece que ya está publicada: si es otra unidad, pulsa «No es la misma casa».", "It seems to be listed already: if it’s another unit, tap “Not the same home”."),
+        ]
+      : n === 2
+        ? [
+            detailsErr.m2 && tx(locale, "La superficie, en m².", "The area, in m²."),
+            detailsErr.year && tx(locale, "Un año de construcción válido.", "A valid year built."),
+            !extras.ok && tx(locale, "Revisa los datos marcados en rojo más abajo.", "Check the fields marked in red below."),
+            extras.ok && !ess.ok && tx(locale, "Revisa los servicios esenciales marcados en rojo.", "Check the essential services marked in red."),
+          ]
+        : n === 4
+          ? [priceErr && tx(locale, "Tu precio en USD (un número entero).", "Your price in USD (a whole number).")]
+          : []
+    ).filter((x): x is string => !!x);
+  // Live list: items disappear as the owner fixes them.
+  const blocked = tried ? issues(step) : [];
+  const next = () => {
+    if (!issues(step).length) return setStep(step + 1);
+    if (step === 2) {
+      setShowExtrasErr(true);
+      setShowDetailsErr(true);
+    }
+    setTried(true);
+    // Take the owner to the first field that needs them, or to the summary.
+    window.setTimeout(() => {
+      const bad = formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"], [data-testid="street-error"]');
+      const box = document.getElementById("wizard-blocked");
+      (bad ?? box)?.scrollIntoView({ behavior: "smooth", block: "center" });
+      if (bad?.matches("input, select, textarea")) bad.focus({ preventScroll: true });
+      else box?.focus({ preventScroll: true });
+    }, 0);
+  };
   const facts = [
     beds > 0 && plural(beds, locale, ["habitación", "habitaciones"], ["bedroom", "bedrooms"]),
     baths > 0 && plural(baths, locale, ["baño", "baños"], ["bathroom", "bathrooms"]),
@@ -365,7 +436,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
 
   return (
     <div className="mx-auto grid max-w-[1200px] gap-8 px-4 py-8 md:px-6 lg:grid-cols-[1fr_340px]">
-      <div>
+      <div ref={formRef}>
         <div className="mb-6">
           <div className="mb-3 flex items-center justify-between text-sm">
             <span className="font-display font-semibold">{tx(locale, `Paso ${step + 1} de 6`, `Step ${step + 1} of 6`)} · {tx(locale, STEPS[step][0], STEPS[step][1])}</span>
@@ -586,7 +657,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               {estimate ? (
                 <>
                   <div className="mt-2 font-serif text-[36px] font-medium leading-[1.05] md:text-[44px]">{money(estimate.low, locale)} – {money(estimate.high, locale)}</div>
-                  <div className="text-sm text-muted">{tx(locale, "Valor medio", "Mid value")} {money(estimate.mid, locale)} · {tx(locale, "confianza", "confidence")} {Math.round(estimate.confidence * 100)} % · {estimate.comparables.length} {tx(locale, "comparables", "comparables")}</div>
+                  <div className="text-sm text-muted">{tx(locale, "Valor medio", "Mid value")} {money(estimate.mid, locale)} · {estimate.comparables.length < 2 ? tx(locale, "estimación orientativa", "indicative estimate") : plural(estimate.comparables.length, locale, ["comparable", "comparables"], ["comparable", "comparables"])}</div>
                 </>
               ) : (
                 <div className="mt-2 flex items-center gap-2 text-muted"><Loader2 size={16} className="animate-spin" /> {tx(locale, "Calculando…", "Calculating…")}</div>
@@ -678,20 +749,20 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
           </div>
         )}
 
+        {blocked.length > 0 && step < 5 && (
+          <div id="wizard-blocked" tabIndex={-1} role="alert" data-testid="wizard-blocked" className="mt-8 rounded-[18px] border border-[#8E3B22]/30 bg-[#8E3B220D] px-4 py-3 text-sm outline-none">
+            <div className="font-display font-semibold text-ink">{tx(locale, "Para continuar, te falta:", "To continue, you still need:")}</div>
+            <ul className="mt-1.5 list-disc space-y-1 pl-5 text-ink/80">
+              {blocked.map((b) => (
+                <li key={b}>{b}</li>
+              ))}
+            </ul>
+          </div>
+        )}
         <div className="mt-8 flex items-center justify-between border-t border-line pt-5">
           <Button variant="ghost" onClick={() => setStep(Math.max(0, step - 1))} disabled={step === 0}><ArrowLeft size={16} /> {tx(locale, "Atrás", "Back")}</Button>
           {step < 5 ? (
-            <Button
-              onClick={() => {
-                if (step === 2 && (!extras.ok || !ess.ok || !detailsOk)) {
-                  setShowExtrasErr(true);
-                  setShowDetailsErr(true);
-                  return;
-                }
-                setStep(step + 1);
-              }}
-              disabled={!canNext}
-            >{tx(locale, "Continuar", "Continue")} <ArrowRight size={16} /></Button>
+            <Button onClick={next} aria-describedby={blocked.length ? "wizard-blocked" : undefined}>{tx(locale, "Continuar", "Continue")} <ArrowRight size={16} /></Button>
           ) : (
             <Button size="lg" onClick={publish} disabled={!!busy || !confirm || !d.addr}>
               {busy && <Loader2 size={16} className="animate-spin" />}

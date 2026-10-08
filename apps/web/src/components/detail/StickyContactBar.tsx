@@ -1,20 +1,26 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CalendarCheck, MessageSquare } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, CalendarCheck, MessageSquare, Scale } from "lucide-react";
 import type { Locale } from "@/types/domain";
 import { tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import { WhatsAppIcon } from "@/components/brand/PublicChrome";
+import { useApp } from "@/lib/store";
+import { compareHref } from "@/components/compare/CompareTray";
 import { useListingWhatsApp } from "./useListingWhatsApp";
 
 /**
  * Mobile-only bottom bar on the listing detail: price + "Request a tour" that jumps to the contact panel.
- * Hidden while the panel itself or the footer is on screen, so it never covers them.
+ * Hidden while the panel itself or the footer is on screen, so it never covers them. On listing pages it also carries the
+ * comparator (a slim chip on top) instead of a floating tray over the form, and the floating contact buttons stay
+ * hidden while it is up ([data-hide-fab-mobile]).
  */
 export function StickyContactBar({ locale, price, suffix, tour, dark, whatsapp: waBase, agentFirst }: { locale: Locale; price: string; suffix: string; tour: boolean; dark?: boolean; whatsapp?: string | null; agentFirst?: string }) {
   // Prefilled WhatsApp text carries this listing's URL.
   const whatsapp = useListingWhatsApp(waBase);
+  const { compare } = useApp();
   const [shown, setShown] = useState(true);
   useEffect(() => {
     const targets = [document.getElementById("contact"), document.querySelector("footer")].filter((el): el is HTMLElement => !!el);
@@ -39,9 +45,11 @@ export function StickyContactBar({ locale, price, suffix, tour, dark, whatsapp: 
     document.getElementById("contact-panel")?.focus({ preventScroll: true });
   };
   const label = tour ? tx(locale, "Pedir visita", "Request a tour") : tx(locale, "Contactar", "Contact");
+  const short = tour ? tx(locale, "Visitar", "Visit") : tx(locale, "Contactar", "Contact");
   return (
     <div
       data-sticky-cta={shown ? "shown" : "hidden"}
+      data-hide-fab-mobile
       aria-hidden={!shown}
       className={cn(
         "fixed inset-x-0 bottom-0 z-40 border-t px-4 pt-3 shadow-[0_-10px_30px_rgba(30,26,24,.12)] transition-transform duration-np ease-out md:hidden print:hidden",
@@ -50,19 +58,36 @@ export function StickyContactBar({ locale, price, suffix, tour, dark, whatsapp: 
       )}
       style={{ paddingBottom: "calc(0.75rem + env(safe-area-inset-bottom))" }}
     >
+      {compare.length > 0 && (
+        <Link
+          href={compareHref(locale, compare)}
+          tabIndex={shown ? 0 : -1}
+          data-compare-chip
+          className={cn(
+            "-mt-1 mb-2.5 flex min-h-9 items-center gap-2 rounded-full px-3 font-display text-[13px] font-semibold",
+            dark ? "bg-white/10 text-ivory" : "bg-[#F1EBE3] text-ink",
+          )}
+        >
+          <Scale size={14} aria-hidden className={dark ? "text-[#D4B98C]" : "text-[#8E3B22]"} />
+          <span className="flex-1">{tx(locale, `Comparando ${compare.length} de 3`, `Comparing ${compare.length} of 3`)}</span>
+          <span className="inline-flex items-center gap-1 underline-offset-4">{tx(locale, "Ver comparación", "View comparison")} <ArrowRight size={14} aria-hidden /></span>
+        </Link>
+      )}
       <div className="flex items-center gap-2">
-        <div className="min-w-0 flex-1 font-serif text-[24px] font-semibold leading-tight">
+        <div className="min-w-0 flex-1 truncate font-serif text-[clamp(19px,5.6vw,24px)] font-semibold leading-tight">
           {price}
           <span className={cn("font-display text-sm font-normal", dark ? "text-mist" : "text-muted")}>{suffix}</span>
         </div>
         {whatsapp ? (
           <>
             {/* One terracotta action: WhatsApp with the advisor. The tour form stays one tap away (navy outline). */}
-            <button onClick={go} tabIndex={shown ? 0 : -1} aria-label={label} className="np-btn-outline flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-[1.5px] border-navy text-navy">
-              {tour ? <CalendarCheck size={18} aria-hidden /> : <MessageSquare size={18} aria-hidden />}
+            <button onClick={go} tabIndex={shown ? 0 : -1} className={cn("np-btn-outline inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border-[1.5px] px-3.5 font-display text-sm font-semibold", dark ? "border-ivory text-ivory" : "border-navy text-navy")}>
+              {tour ? <CalendarCheck size={17} aria-hidden /> : <MessageSquare size={17} aria-hidden />}
+              {short}
+              {tour && <span className="sr-only">{tx(locale, ": pedir visita", ": request a tour")}</span>}
             </button>
-            <a href={whatsapp} target="_blank" rel="noopener noreferrer" tabIndex={shown ? 0 : -1} className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full bg-coral-cta px-4 font-display text-sm font-semibold text-white hover:bg-coral-cta-hover">
-              <WhatsAppIcon size={17} /> WhatsApp
+            <a href={whatsapp} target="_blank" rel="noopener noreferrer" tabIndex={shown ? 0 : -1} className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full bg-coral-cta px-3.5 font-display text-sm font-semibold text-white hover:bg-coral-cta-hover">
+              <WhatsAppIcon size={17} /> <span className="max-[379px]:sr-only">WhatsApp</span>
               {agentFirst && <span className="sr-only">{tx(locale, ` con ${agentFirst}`, ` ${agentFirst}`)}</span>}
             </a>
           </>

@@ -1,5 +1,5 @@
 import type { Locale } from "@/types/domain";
-import { PublicHeader } from "@/components/layout/PublicHeader";
+import { PublicPage } from "@/components/layout/PublicPage";
 import { OwnerWizard } from "@/components/owner/OwnerWizard";
 import { getAgencies, getFx, getZones } from "@/server/data";
 import { pageMeta } from "@/lib/seo";
@@ -17,11 +17,8 @@ export default async function OwnerNew({ params }: { params: Promise<{ locale: L
   const { locale } = await params;
   const [zones, agencies, fx] = await Promise.all([getZones(), getAgencies(), getFx()]);
   return (
-    <div className="np-public min-h-screen">
-      <PublicHeader locale={locale} />
-      <main id="main">
-        <OwnerWizard locale={locale} zones={zones} agencies={agencies.filter((a) => a.status !== "SUSPENDED")} fxVes={fx.find((f) => f.code === "VES")?.perUsd ?? 0} />
-      </main>
-    </div>
+    <PublicPage locale={locale} footer={false} tabbar>
+      <OwnerWizard locale={locale} zones={zones} agencies={agencies.filter((a) => a.status !== "SUSPENDED")} fxVes={fx.find((f) => f.code === "VES")?.perUsd ?? 0} />
+    </PublicPage>
   );
 }

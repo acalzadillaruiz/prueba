@@ -6,6 +6,7 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Heart, Home, Map as MapIcon, MessageCircle, Phone, PhoneCall, ShieldCheck, User, X } from "lucide-react";
+import { useHideOnScroll } from "./useScrollChrome";
 import type { Locale } from "@/types/domain";
 import type { OnCallAdvisor } from "@/lib/on-call";
 import { Avatar } from "@/components/ui";
@@ -175,17 +176,25 @@ export function OnCallButton({ locale, listingSlug, className, children, ...rest
 }
 
 /**
- * Floating contact button (brand: navy with a 2 px #C9A574 ring). Opens WhatsApp only when a real number exists;
- * otherwise it links to the contact flow. A quiet "Guardia 24/7" pill above it opens today's on-call advisors.
- * Sits above the mobile tab bar and hides while the footer or any [data-hide-fab] block (e.g. a contact panel)
- * (or, on phones, [data-hide-fab-mobile]) is on screen, so it never covers content.
+ * Floating contact: ONE round button (brand: Obsidiana with a 2 px Bronce ring). It opens a small menu with both ways
+ * to reach a person: today's on-call advisor (Guardia 24/7 dialog: phone + WhatsApp) and the chat (WhatsApp when a real
+ * number exists, otherwise the contact flow). Sits above the mobile tab bar, slides away while the reader scrolls
+ * down (back on scroll-up or after a short pause), and hides while the footer or any [data-hide-fab] block (on phones
+ * also [data-hide-fab-mobile]) is on screen, so it never covers content.
  */
 export function FloatingContact({ href, label, whatsapp = false, tabbar = false, locale: localeProp }: { href: string; label: string; whatsapp?: boolean; tabbar?: boolean; locale?: Locale }) {
   const pathname = usePathname();
   const locale: Locale = localeProp ?? (pathname?.startsWith("/en") ? "en" : "es");
-  const [hidden, setHidden] = useState(false);
+  const [covering, setCovering] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [onCall, setOnCall] = useState(false);
+  const closeOnCall = useCallback(() => setOnCall(false), []);
+  const scrolledAway = useHideOnScroll({ from: 240, idleMs: 1400 });
+  const root = useRef<HTMLDivElement>(null);
+  const trigger = useRef<HTMLButtonElement>(null);
+  const menuId = useId();
   useEffect(() => {
-    // Phones also hide them over [data-hide-fab-mobile] blocks (the hero search spans the full width there).
+    // Phones also hide it over [data-hide-fab-mobile] blocks (the hero search spans the full width there).
     const phone = window.matchMedia("(max-width: 767px)").matches;
     const targets = [...document.querySelectorAll(phone ? "footer, [data-hide-fab], [data-hide-fab-mobile]" : "footer, [data-hide-fab]")];
     if (!targets.length || typeof IntersectionObserver === "undefined") return;
@@ -195,16 +204,35 @@ export function FloatingContact({ href, label, whatsapp = false, tabbar = false,
         if (e.isIntersecting) visible.add(e.target);
         else visible.delete(e.target);
       }
-      setHidden(visible.size > 0);
+      setCovering(visible.size > 0);
     });
     targets.forEach((t) => io.observe(t));
     return () => io.disconnect();
   }, []);
+  const hidden = !open && (covering || scrolledAway);
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (e: PointerEvent) => !root.current?.contains(e.target as Node) && setOpen(false);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      setOpen(false);
+      trigger.current?.focus();
+    };
+    document.addEventListener("pointerdown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
   const external = /^https?:/.test(href);
   // On a listing page the Guardia shows only that listing's agency (same as the contact panel's link).
   const listingSlug = pathname?.match(/^\/(?:es|en)\/listing\/([^/?#]+)/)?.[1];
+  const item = "flex min-h-12 w-full items-center gap-3 rounded-2xl px-3 text-left font-display text-[15px] text-ink transition-colors hover:bg-black/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy";
+  const glyph = "flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-ink text-ivory";
   return (
     <div
+      ref={root}
       data-fab
       aria-hidden={hidden || undefined}
       className={cn(
@@ -213,29 +241,62 @@ export function FloatingContact({ href, label, whatsapp = false, tabbar = false,
         hidden && "pointer-events-none translate-y-3 opacity-0",
       )}
     >
-      <OnCallButton
-        locale={locale}
-        listingSlug={listingSlug}
-        tabIndex={hidden ? -1 : undefined}
-        className="flex min-h-11 items-center gap-2 rounded-full bg-ivory/95 px-4 font-display text-sm font-semibold text-navy shadow-[0_0_0_1.5px_#1E1A18,0_10px_24px_rgba(30,26,24,.18)] backdrop-blur transition-colors duration-np hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy"
-      >
-        <PhoneCall size={16} strokeWidth={1.8} aria-hidden /> {tx(locale, "Guardia 24/7", "24/7 on-call")}
-      </OnCallButton>
-      <Link
-        href={href}
-        aria-label={label}
+      {open && (
+        <div id={menuId} role="group" aria-label={tx(locale, "Hablar con una persona", "Talk to a person")} className="np-glass np-in w-[min(300px,calc(100vw-2rem))] rounded-[24px] p-2 shadow-[0_18px_40px_rgba(30,26,24,.22)]">
+          <button
+            type="button"
+            aria-haspopup="dialog"
+            onClick={() => {
+              setOpen(false);
+              setOnCall(true);
+            }}
+            className={item}
+          >
+            <span className={glyph}><PhoneCall size={16} strokeWidth={1.8} aria-hidden /></span>
+            <span className="min-w-0">
+              <span className="block font-semibold">{tx(locale, "Llamar a un asesor", "Call an advisor")}</span>
+              <span className="block text-[13px] text-ink/65">{tx(locale, "De guardia 24/7, también hoy", "On call 24/7, today too")}</span>
+            </span>
+          </button>
+          <Link href={href} onClick={() => setOpen(false)} {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})} className={item}>
+            <span className={glyph}>{whatsapp ? <WhatsAppIcon size={17} /> : <MessageCircle size={16} aria-hidden />}</span>
+            <span className="min-w-0">
+              <span className="block font-semibold">{whatsapp ? tx(locale, "Escribir por WhatsApp", "Message on WhatsApp") : tx(locale, "Escríbenos", "Write to us")}</span>
+              <span className="block text-[13px] text-ink/65">{tx(locale, "Te responde una persona, no un robot", "A person replies, not a bot")}</span>
+            </span>
+          </Link>
+        </div>
+      )}
+      <button
+        ref={trigger}
+        type="button"
+        aria-label={open ? tx(locale, "Cerrar", "Close") : label}
         title={label}
-        {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+        aria-expanded={open}
+        aria-controls={open ? menuId : undefined}
         tabIndex={hidden ? -1 : undefined}
-        className="flex h-14 w-14 items-center justify-center rounded-full bg-navy text-ivory shadow-[0_0_0_2px_#C9A574,0_14px_30px_rgba(30,26,24,.35)] hover:bg-navy-2"
+        onClick={() => setOpen((o) => !o)}
+        className="flex h-14 w-14 items-center justify-center rounded-full bg-navy text-ivory shadow-[0_0_0_2px_#C9A574,0_14px_30px_rgba(30,26,24,.35)] transition-colors hover:bg-navy-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-navy"
       >
-        {whatsapp ? <WhatsAppIcon size={24} /> : <MessageCircle size={23} aria-hidden />}
-      </Link>
+        {open ? <X size={22} aria-hidden /> : <MessageCircle size={23} aria-hidden />}
+      </button>
+      {onCall && <OnCallDialog locale={locale} listingSlug={listingSlug} onClose={closeOnCall} />}
     </div>
   );
 }
 
-/** Phones: bottom tab bar (Inicio · Mapa · Guardados · Cuenta). The active item carries the roof glyph. */
+/** Where a signed-in user's own space lives, by role (seekers: the hub "Tu espacio" at /app). */
+export function roleHome(role: string | undefined) {
+  if (role === "SUPERADMIN") return "/platform";
+  if (["AGENT", "AGENCY_OWNER", "CAPTOR", "PHOTOGRAPHER", "BACKOFFICE"].includes(role ?? "")) return "/agency";
+  if (role === "OWNER_PRIVATE") return "/owner/listings";
+  return "/app";
+}
+
+/**
+ * Phones: bottom tab bar (Inicio · Mapa · Guardados · Cuenta). The active item carries the roof glyph. "Cuenta" opens
+ * the user's own space when signed in (seekers: /app "Tu espacio"), the sign-in page otherwise.
+ */
 export function MobileTabBar({ locale }: { locale: Locale }) {
   const pathname = usePathname();
   const { saved, user } = useApp();
@@ -244,7 +305,12 @@ export function MobileTabBar({ locale }: { locale: Locale }) {
     { href: `/${locale}`, label: t("home"), Icon: Home, active: pathname === `/${locale}` },
     { href: `/${locale}/search?type=SALE`, label: t("map"), Icon: MapIcon, active: pathname.endsWith("/search") },
     { href: `/${locale}/saved`, label: t("saved"), Icon: Heart, active: pathname.endsWith("/saved"), badge: saved.length },
-    { href: user ? `/${locale}/account` : `/${locale}/login`, label: t("account"), Icon: User, active: pathname.endsWith("/account") || pathname.endsWith("/login") },
+    {
+      href: user ? `/${locale}${roleHome(user.role)}` : `/${locale}/login`,
+      label: t("account"),
+      Icon: User,
+      active: /^\/(es|en)\/(app|account|alerts|login|register|owner\/listings)(\/|$)/.test(pathname),
+    },
   ];
   return (
     <nav

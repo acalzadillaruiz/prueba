@@ -114,6 +114,21 @@ html:not(.dark) .np-public .text-coral { color: rgb(var(--np-coral-cta-rgb)); }
 html:not(.dark) .np-public :is(.bg-navy, .bg-navy-2, .bg-navy-card) .text-coral { color: var(--np-coral-light); }
 html.dark .np-public .text-coral { color: var(--np-coral-light); }
 
+/* Header offset contract: bars pinned under the public header (the compact search) use
+   `top: calc(env(safe-area-inset-top) + var(--np-header-offset, 80px))` and transition `top` (300ms, same curve as the
+   header). PublicHeader sets html[data-np-header="hidden"] while it is scrolled away. */
+:root { --np-header-offset: 80px; }
+@media (min-width: 768px) { :root { --np-header-offset: 84px; } }
+html[data-np-header="hidden"] { --np-header-offset: 8px; }
+
+/* Demo mode lives inside the public header (drawer / header button): no floating pill over public pages. */
+body:has([data-public-header]) [data-demobar] { display: none; }
+
+/* "Guardada" toast: above the phone tab bar and the listing's sticky contact bar. */
+@media (max-width: 767px) {
+  body:has([data-tabbar]) [data-np-toast], body:has([data-sticky-cta="shown"]) [data-np-toast] { bottom: calc(5rem + env(safe-area-inset-bottom)); }
+}
+
 /* Listing detail on large phones / small tablets: keep the demo pill above the sticky "Request a tour" bar.
    Below 640px the pill is an edge tab at mid-height (DemoBar.tsx), so no `bottom` there (it would stretch the box). */
 @media (min-width: 640px) and (max-width: 767px) {

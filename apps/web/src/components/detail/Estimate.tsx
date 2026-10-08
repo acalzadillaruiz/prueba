@@ -1,7 +1,7 @@
 // No state or handlers: rendered on the server in the listing page (no hydration cost); client parents can use it too.
 import { Info } from "lucide-react";
 import type { Listing, Locale } from "@/types/domain";
-import { compactMoney, money, num, priceSuffix, tx } from "@/lib/i18n";
+import { compactMoney, money, num, plural, priceSuffix, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 
 export function EstimateCard({ l, locale, dark, showComparables = true }: { l: Listing; locale: Locale; dark?: boolean; showComparables?: boolean }) {
@@ -16,6 +16,10 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
   const muted = dark ? "text-mist" : "text-muted";
   const conf = e.confidence >= 0.75 ? tx(locale, "Confianza alta", "High confidence") : e.confidence >= 0.5 ? tx(locale, "Confianza media", "Medium confidence") : tx(locale, "Confianza baja", "Low confidence");
   const inRange = l.priceAmount >= e.low && l.priceAmount <= e.high;
+  // With fewer than two comparable homes a range would look more precise than it is: one indicative figure instead.
+  const nComp = e.comparables.length;
+  const rough = nComp < 2;
+  const source = nComp > 0 ? plural(nComp, locale, ["comparable", "comparables"], ["comparable", "comparables"]) : aiProvider === "heuristic" ? tx(locale, "modelo local", "local model") : tx(locale, "IA externa", "external AI");
   return (
     <div className={cn("overflow-hidden rounded-[20px]", dark ? "border border-navy-line bg-navy-card" : "border border-line bg-white")}>
       {/* Navy valuation panel (brand): range in Cormorant, gold fillet scale, the asking price as a dot. */}
@@ -23,15 +27,32 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="np-eyebrow text-[#D4B98C]">PlaceEstimate · {tx(locale, "Valor estimado", "Estimated value")}</div>
           <div className="text-sm text-ivory/70">
-            {conf} · {e.comparables.length > 0 ? `${e.comparables.length} ${tx(locale, "comparables", "comparables")}` : aiProvider === "heuristic" ? tx(locale, "modelo local", "local model") : tx(locale, "IA externa", "external AI")}
+            {rough ? tx(locale, "Estimación orientativa", "Indicative estimate") : conf} · {source}
           </div>
         </div>
+        {rough ? (
+          <>
+            <div className="mt-4 font-serif text-[36px] font-semibold leading-tight md:text-[46px]">
+              ≈ {money(e.mid, locale)}
+              <span className="font-display text-base font-normal text-ivory/60">{priceSuffix(l, locale)}</span>
+            </div>
+            <p className="mt-2 max-w-[520px] text-sm leading-relaxed text-ivory/70">
+              {nComp === 1
+                ? tx(locale, "Estimación orientativa: por ahora solo hay una casa comparable cerca, así que no te damos un rango.", "Indicative estimate: there’s only one comparable home nearby for now, so we don’t show a range.")
+                : tx(locale, "Estimación orientativa: aún no hay casas comparables cerca, así que no te damos un rango.", "Indicative estimate: there are no comparable homes nearby yet, so we don’t show a range.")}
+            </p>
+            <div className="mt-4 text-sm font-semibold text-ivory/85">
+              {tx(locale, "Precio pedido", "Asking")} · {money(l.priceAmount, locale)} · <span className={cn(Math.abs(diff) > 4 && diff > 0 ? "text-[#E9C98F]" : "text-[#9ED7B8]")}>{verdict}</span>
+            </div>
+          </>
+        ) : (
+          <>
         <div className="mt-4 font-serif text-[36px] font-semibold leading-tight md:text-[46px]">
           {money(e.low, locale)} – {money(e.high, locale)}
           <span className="font-display text-base font-normal text-ivory/60">{priceSuffix(l, locale)}</span>
         </div>
         <div className="mt-1 text-sm text-ivory/70">
-          {tx(locale, "Valor central", "Mid value")} {money(e.mid, locale)} · {tx(locale, "confianza", "confidence")} {Math.round(e.confidence * 100)} %
+          {tx(locale, "Valor central", "Mid value")} {money(e.mid, locale)}
         </div>
         <div className="relative mt-9 h-[3px] rounded-full bg-white/15">
           <div className="absolute inset-y-0 rounded-full bg-gradient-to-r from-[#B08A55]/60 via-[#D4B98C] to-[#B08A55]/60" style={{ left: `${at(e.low)}%`, right: `${100 - at(e.high)}%` }} />
@@ -48,12 +69,14 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
           <span>{compactMoney(e.high, locale).replace("$", "USD ")}</span>
         </div>
         {inRange && <div className="mt-1 text-center text-[13px] text-ivory/55">{verdict}</div>}
+          </>
+        )}
       </div>
       <div className={cn("px-6 pb-6 md:px-8", !(showComparables && e.comparables.length > 0) && "hidden")}>
       {showComparables && e.comparables.length > 0 && (
         <div className="mt-6">
           <div className="mb-3 flex items-center gap-1.5 text-[15px] font-semibold">
-            {tx(locale, "Comparables usados", "Comparables used")} <Info size={14} className={muted} />
+            {nComp === 1 ? tx(locale, "Comparable usado", "Comparable used") : tx(locale, "Comparables usados", "Comparables used")} <Info size={14} className={muted} />
           </div>
           <div className="overflow-x-auto rounded-lg border border-inherit">
             <table className="w-full whitespace-nowrap text-sm">

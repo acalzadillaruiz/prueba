@@ -6,8 +6,9 @@ import { PublicHeader } from "./PublicHeader";
 import { PublicFooter } from "./PublicFooter";
 
 /**
- * Public page shell. `tabbar` adds the phone bottom navigation; `contact` adds the floating contact button
- * (WhatsApp only when a real number is passed, otherwise a link to the contact flow).
+ * Public page shell. `tabbar` adds the phone bottom navigation (and bottom padding so nothing ends under it);
+ * `contact` adds the floating contact button (WhatsApp only when a real number is passed, otherwise a link to the
+ * contact flow). The header hides on scroll-down and returns on scroll-up (see PublicHeader `autoHide`).
  */
 export function PublicPage({
   locale,
@@ -26,7 +27,7 @@ export function PublicPage({
 }) {
   return (
     <div className={cn("np-public min-h-screen", tabbar && "pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0")}>
-      <PublicHeader locale={locale} variant={header} />
+      <PublicHeader locale={locale} variant={header} autoHide />
       <main id="main">{children}</main>
       {footer && <PublicFooter locale={locale} />}
       {contact && <FloatingContact {...contact} tabbar={tabbar} />}

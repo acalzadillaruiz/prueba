@@ -19,6 +19,9 @@ import { AMENITY_LABEL, TYPE_LABEL, lbl, money, num, priceSuffix, tx, plural } f
 import { cn } from "@/lib/cn";
 import { ViewBeacon } from "@/components/detail/ViewBeacon";
 import { StickyContactBar } from "@/components/detail/StickyContactBar";
+import { BackToResults } from "@/components/detail/BackToResults";
+import { Fold } from "@/components/detail/Fold";
+import { CompareLink } from "@/components/compare/CompareTray";
 import { takesTours } from "@/lib/visit-hours";
 import { zoneStats } from "@/server/zone-stats";
 import { essentialLabels } from "@/lib/essentials";
@@ -102,57 +105,76 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
   const tile = "rounded-[20px] bg-white/70 ring-1 ring-black/[.04] px-4 py-3 text-[15px]";
   const searchType = l.listingType.startsWith("COMMERCIAL") ? "COMMERCIAL" : l.listingType;
 
+  const estimateHint = tx(locale, `Valor estimado ≈ ${money(l.estimate.mid, locale)}`, `Estimated value ≈ ${money(l.estimate.mid, locale)}`);
+  const historyHint = [plural(l.priceHistory.length, locale, ["movimiento de precio", "movimientos de precio"], ["price event", "price events"]), ppm ? tx(locale, `${money(zone.salePpm, locale)}/m² en ${l.zone}`, `${money(zone.salePpm, locale)}/m² in ${l.zone}`) : tx(locale, `${usd1(zone.rentPpm)}/m² al mes en ${l.zone}`, `${usd1(zone.rentPpm)}/m² a month in ${l.zone}`)].join(" · ");
+
   return (
     <PublicPage locale={locale}>
-      {/* Bottom padding on phones: the sticky contact bar never hides the last section. */}
-      <div className="pb-28 md:pb-0">
+      {/* Bottom padding on phones: the sticky contact bar (and its compare chip) never hides the last section. */}
+      <div className="pb-36 md:pb-0">
         <div className="mx-auto max-w-[1320px] px-4 pt-5 md:px-8">
-          <nav aria-label={tx(locale, "Ruta de navegación", "Breadcrumb")} className="mb-3 flex flex-wrap items-center text-[15px] text-muted">
-            <Link className="inline-flex min-h-11 items-center underline-offset-4 hover:text-ink hover:underline" href={`/${locale}/search?type=${searchType}`}>{lbl(TYPE_LABEL[l.listingType], locale)}</Link>
-            {[l.state, l.city, l.zone].filter((x, i, a) => x && a.indexOf(x) === i).map((x) => (
-              <span key={x}><span aria-hidden className="px-1.5">·</span>{x}</span>
-            ))}
-          </nav>
+          <div className="mb-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+            <BackToResults locale={locale} />
+            <nav aria-label={tx(locale, "Ruta de navegación", "Breadcrumb")} className="flex flex-wrap items-center text-[15px] text-muted">
+              <Link className="inline-flex min-h-11 items-center underline-offset-4 hover:text-ink hover:underline" href={`/${locale}/search?type=${searchType}`}>{lbl(TYPE_LABEL[l.listingType], locale)}</Link>
+              {[l.state, l.city, l.zone].filter((x, i, a) => x && a.indexOf(x) === i).map((x) => (
+                <span key={x}><span aria-hidden className="px-1.5">·</span>{x}</span>
+              ))}
+            </nav>
+          </div>
           {!isPublic && (
             <div className="mb-3 rounded-xl border border-warn/60 bg-[#8A5A001a] px-4 py-2.5 text-sm font-semibold text-[#8A5A00]">
               {l.review === "PENDING" ? tx(locale, "En revisión: por ahora solo tu equipo puede verla.", "Under review: for now only your team can see it.") : tx(locale, `Aún no está publicada (${l.status}). Solo tu equipo puede verla.`, `Not public yet (${l.status}). Only your team can see it.`)}
               {l.takedownReason && ` · ${l.takedownReason}`}
             </div>
           )}
-          <Gallery l={l} locale={locale} />
-          {isPublic && <ViewBeacon id={l.id} />}
-          {l.luxury && l.brochurePdf && (
-            <a href={l.brochurePdf} target="_blank" rel="noreferrer" className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-full border-[1.5px] border-navy px-5 font-display text-sm font-semibold text-navy hover:bg-navy/5">
-              {tx(locale, "Descargar el folleto (PDF)", "Download the brochure (PDF)")}
-            </a>
-          )}
+          {/* Phones: photos first, then title and price. Desktop: title and price above a shorter gallery, so both are on the first screen. */}
+          <div className="flex flex-col">
+            <header className="order-2 mt-6 lg:order-1 lg:mb-6 lg:mt-1">
+              <div className="flex flex-wrap items-center gap-2">
+                {l.luxury && <Badge tone="exclusive">{tx(locale, "Exclusiva New Place", "New Place exclusive")}</Badge>}
+                {l.status !== "ACTIVE" && <StatusBadge status={l.status} locale={locale} />}
+                {(l.viewSea || l.viewAvila || l.amenities.includes("view")) && <Badge tone="egeo">{l.viewSea ? tx(locale, "Vista al mar", "Sea view") : l.viewAvila ? tx(locale, "Vista al Ávila", "Ávila view") : tx(locale, "Con vista", "With a view")}</Badge>}
+                {l.furnished && <Badge tone="arena">{tx(locale, "Amoblado", "Furnished")}</Badge>}
+                <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
+                  <CompareLink locale={locale} className="hidden md:inline-flex" />
+                  <CompareButton id={l.id} locale={locale} className="min-h-11 px-3.5 text-[13px]" />
+                  <ShareButton locale={locale} title={tx(locale, l.title_es, l.title_en)} className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-line bg-white px-3.5 text-[13px] font-semibold" />
+                  <SaveButton id={l.id} locale={locale} className="border border-line" />
+                </div>
+              </div>
+              <div className="lg:flex lg:items-end lg:justify-between lg:gap-12">
+                <div className="min-w-0">
+                  <h1 className="mt-5 max-w-[760px] text-[38px] leading-[1.06] tracking-[-0.02em] md:text-[52px] lg:mt-4 lg:text-[48px]">{tx(locale, l.title_es, l.title_en)}</h1>
+                  <p className="mt-2 text-[15px] text-muted">{l.address} · {l.zone}, {l.city}{l.state && l.state !== l.city ? `, ${l.state}` : ""}</p>
+                </div>
+                <div className="mt-7 shrink-0 lg:mt-0 lg:text-right">
+                  <div className="font-serif text-[48px] font-semibold leading-none text-ink md:text-[54px] lg:whitespace-nowrap">
+                    {money(l.priceAmount, locale)}
+                    <span className="font-display text-lg font-normal text-muted">{priceSuffix(l, locale)}</span>
+                  </div>
+                  <div className="mt-1.5 text-[15px] text-muted">
+                    {ppm ? `${money(ppm, locale)} / m² · ` : ""}≈ Bs. {num(Math.round(l.priceAmount * ves), locale)} · € {num(Math.round(l.priceAmount * eur), locale)} <span>({tx(locale, "tasa referencial", "reference rate")})</span>
+                  </div>
+                </div>
+              </div>
+            </header>
+            <div className="order-1 lg:order-2">
+              <Gallery l={l} locale={locale} />
+              {isPublic && <ViewBeacon id={l.id} />}
+              {l.luxury && l.brochurePdf && (
+                <a href={l.brochurePdf} target="_blank" rel="noreferrer" className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-full border-[1.5px] border-navy px-5 font-display text-sm font-semibold text-navy hover:bg-navy/5">
+                  {tx(locale, "Descargar el folleto (PDF)", "Download the brochure (PDF)")}
+                </a>
+              )}
+            </div>
+          </div>
         </div>
 
-        <div className="mx-auto grid max-w-[1320px] grid-cols-[minmax(0,1fr)] gap-12 px-4 pt-8 md:px-8 lg:grid-cols-[minmax(0,1fr)_420px] lg:gap-16">
-          <div>
-            <div className="flex flex-wrap items-center gap-2">
-              {l.luxury && <Badge tone="exclusive">{tx(locale, "Exclusiva New Place", "New Place exclusive")}</Badge>}
-              {l.status !== "ACTIVE" && <StatusBadge status={l.status} locale={locale} />}
-              {(l.viewSea || l.viewAvila || l.amenities.includes("view")) && <Badge tone="egeo">{l.viewSea ? tx(locale, "Vista al mar", "Sea view") : l.viewAvila ? tx(locale, "Vista al Ávila", "Ávila view") : tx(locale, "Con vista", "With a view")}</Badge>}
-              {l.furnished && <Badge tone="arena">{tx(locale, "Amoblado", "Furnished")}</Badge>}
-              <div className="ml-auto flex items-center gap-2">
-                <CompareButton id={l.id} locale={locale} className="min-h-11 px-3.5 text-[13px]" />
-                <ShareButton locale={locale} title={tx(locale, l.title_es, l.title_en)} className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-line bg-white px-3.5 text-[13px] font-semibold" />
-                <SaveButton id={l.id} locale={locale} className="border border-line" />
-              </div>
-            </div>
-            <h1 className="mt-5 max-w-[760px] text-[38px] leading-[1.06] tracking-[-0.02em] md:text-[56px]">{tx(locale, l.title_es, l.title_en)}</h1>
-            <p className="mt-2 text-[15px] text-muted">{l.address} · {l.zone}, {l.city}{l.state && l.state !== l.city ? `, ${l.state}` : ""}</p>
-            <div className="mt-7 flex flex-wrap items-baseline gap-x-5 gap-y-1">
-              <div className="font-serif text-[48px] font-semibold leading-none text-ink md:text-[58px]">
-                {money(l.priceAmount, locale)}
-                <span className="font-display text-lg font-normal text-muted">{priceSuffix(l, locale)}</span>
-              </div>
-              <div className="text-[15px] text-muted">
-                {ppm ? `${money(ppm, locale)} / m² · ` : ""}≈ Bs. {num(Math.round(l.priceAmount * ves), locale)} · € {num(Math.round(l.priceAmount * eur), locale)} <span>({tx(locale, "tasa referencial", "reference rate")})</span>
-              </div>
-            </div>
-            <div className="mt-8"><Facts l={l} locale={locale} /></div>
+        {/* Phones: the essentials, then the contact card, then the secondary sections (folded). Desktop: the card sticks on the right. */}
+        <div className="mx-auto grid max-w-[1320px] grid-cols-[minmax(0,1fr)] gap-12 px-4 pt-8 md:px-8 lg:grid-cols-[minmax(0,1fr)_420px] lg:gap-x-16 lg:gap-y-0">
+          <div className="lg:col-start-1 lg:row-start-1">
+            <Facts l={l} locale={locale} />
             <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted">
               <Freshness iso={l.updatedAt} locale={locale} />
               <span className="inline-flex items-center gap-1.5"><Eye size={15} aria-hidden /> {num(l.stats.impressions, locale)} {tx(locale, "vistas", "views")}</span>
@@ -183,8 +205,16 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
                 )}
               </div>
             </div>
+          </div>
 
-            <div className={sec}><EstimateCard l={l} locale={locale} /></div>
+          <aside id="contact" className="scroll-mt-24 lg:sticky lg:top-24 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-start">
+            <ContactPanel l={l} locale={locale} />
+          </aside>
+
+          <div className="lg:col-start-1 lg:row-start-2">
+            <Fold className={sec} testId="estimate-section" title={tx(locale, "¿Es un buen precio?", "Is it a fair price?")} hint={estimateHint}>
+              <EstimateCard l={l} locale={locale} />
+            </Fold>
 
             <div className={sec}>
               <H>{tx(locale, "Ubicación", "Location")}</H>
@@ -194,33 +224,34 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
               </p>
             </div>
 
-            <div className={cn(sec, "grid grid-cols-1 gap-10 md:grid-cols-2")}>
-              <div>
-                <H>{tx(locale, "Historial de precio", "Price history")}</H>
-                <PriceHistory events={l.priceHistory} locale={locale} />
-              </div>
-              <div>
-                <H>{tx(locale, `La zona en cifras · ${l.zone}`, `The area in numbers · ${l.zone}`)}</H>
-                <p className="-mt-3 mb-4 text-sm text-muted">{zone.live ? tx(locale, "Calculado con las casas publicadas en New Place.", "Worked out from the homes listed on New Place.") : tx(locale, "Aún hay pocas casas publicadas aquí: tómalo como una referencia.", "Only a few homes listed here so far: treat these as a guide.")}</p>
-                <div className="grid grid-cols-2 gap-3">
-                  {[
-                    [money(zone.salePpm, locale), tx(locale, "USD/m² venta", "USD/m² sale")],
-                    [usd1(zone.rentPpm), tx(locale, "USD/m² alquiler/mes", "USD/m² rent/mo")],
-                    [num(zone.activeListings, locale), tx(locale, "en oferta en New Place", "available on New Place")],
-                    [zone.daysOnMarket, tx(locale, "días en mercado (mediana)", "median days on market")],
-                  ].map(([v, t]) => (
-                    <div key={String(t)} className="rounded-[20px] bg-white/70 ring-1 ring-black/[.04] p-4">
-                      <div className="font-serif text-[26px] font-semibold leading-none">{v}</div>
-                      <div className="mt-1.5 text-sm text-muted">{t}</div>
-                    </div>
-                  ))}
+            <Fold className={sec} testId="history-section" title={tx(locale, "Historial de precio y la zona", "Price history and the area")} hint={historyHint}>
+              <div className="grid grid-cols-1 gap-10 md:grid-cols-2">
+                <div>
+                  <h4 className="mb-4 font-serif text-[22px] leading-tight">{tx(locale, "Historial de precio", "Price history")}</h4>
+                  <PriceHistory events={l.priceHistory} locale={locale} />
+                </div>
+                <div>
+                  <h4 className="mb-4 font-serif text-[22px] leading-tight">{tx(locale, `La zona en cifras · ${l.zone}`, `The area in numbers · ${l.zone}`)}</h4>
+                  <p className="-mt-2 mb-4 text-sm text-muted">{zone.live ? tx(locale, "Calculado con las casas publicadas en New Place.", "Worked out from the homes listed on New Place.") : tx(locale, "Aún hay pocas casas publicadas aquí: tómalo como una referencia.", "Only a few homes listed here so far: treat these as a guide.")}</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      [money(zone.salePpm, locale), tx(locale, "USD/m² venta", "USD/m² sale")],
+                      [usd1(zone.rentPpm), tx(locale, "USD/m² alquiler/mes", "USD/m² rent/mo")],
+                      [num(zone.activeListings, locale), tx(locale, "en oferta en New Place", "available on New Place")],
+                      [zone.daysOnMarket, tx(locale, "días en mercado (mediana)", "median days on market")],
+                    ].map(([v, t]) => (
+                      <div key={String(t)} className="rounded-[20px] bg-white/70 ring-1 ring-black/[.04] p-4">
+                        <div className="font-serif text-[26px] font-semibold leading-none">{v}</div>
+                        <div className="mt-1.5 text-sm text-muted">{t}</div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
+            </Fold>
 
             {soldNearby.length > 0 && (
-              <div className={sec}>
-                <H>{tx(locale, "Se vendieron cerca", "Recently sold nearby")}</H>
+              <Fold className={sec} testId="sold-nearby" title={tx(locale, "Se vendieron cerca", "Recently sold nearby")} hint={plural(soldNearby.length, locale, ["operación reciente en la zona", "operaciones recientes en la zona"], ["recent deal in the area", "recent deals in the area"])}>
                 <div className="divide-y divide-line rounded-[20px] bg-white/70 ring-1 ring-black/[.04]">
                   {soldNearby.map((s) => (
                     <div key={s.t} className="flex items-center justify-between gap-3 px-4 py-3 text-[15px]">
@@ -230,32 +261,31 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
                     </div>
                   ))}
                 </div>
-              </div>
+              </Fold>
             )}
           </div>
-
-          <aside id="contact" className="scroll-mt-24 lg:sticky lg:top-24 lg:self-start">
-            <ContactPanel l={l} locale={locale} />
-          </aside>
-          <StickyContactBar
-            locale={locale}
-            price={money(l.priceAmount, locale)}
-            suffix={priceSuffix(l, locale)}
-            tour={takesTours(l)}
-            whatsapp={whatsappHref(l, locale)}
-            agentFirst={l.agent?.name.split(" ")[0]}
-          />
         </div>
+        <StickyContactBar
+          locale={locale}
+          price={money(l.priceAmount, locale)}
+          suffix={priceSuffix(l, locale)}
+          tour={takesTours(l)}
+          whatsapp={whatsappHref(l, locale)}
+          agentFirst={l.agent?.name.split(" ")[0]}
+        />
 
         {similar.length > 0 && (
-          <div className="mx-auto max-w-[1320px] px-4 pb-20 pt-10 md:px-8">
-            <h2 className="mb-8 text-[34px] leading-tight tracking-[-0.02em] md:text-[46px]">{tx(locale, "También te pueden gustar", "You might also like")}</h2>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <section className="mx-auto max-w-[1320px] pb-20 pt-10 md:px-8" aria-labelledby="similar-title" data-testid="similar">
+            <h2 id="similar-title" className="mb-6 px-4 text-[30px] leading-tight tracking-[-0.02em] md:mb-8 md:px-0 md:text-[46px]">{tx(locale, "También te pueden gustar", "You might also like")}</h2>
+            {/* Phones: a swipe row (snap per card, the next one peeking). From sm up: a grid. */}
+            <ul className="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-px-4 px-4 pb-2 sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:px-4 md:px-0 lg:grid-cols-4">
               {similar.map((s) => (
-                <ListingCard key={s.id} l={s} locale={locale} compact />
+                <li key={s.id} className="w-[78%] max-w-[320px] shrink-0 snap-start sm:w-auto sm:max-w-none">
+                  <ListingCard l={s} locale={locale} compact />
+                </li>
               ))}
-            </div>
-          </div>
+            </ul>
+          </section>
         )}
       </div>
     </PublicPage>

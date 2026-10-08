@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params;
-  return pageMeta(locale, tx(locale, "Mi cuenta", "My account"), "/account", { index: false });
+  return pageMeta(locale, tx(locale, "Ajustes", "Settings"), "/account", { index: false });
 }
 
 export default async function Account({ params }: { params: Promise<{ locale: Locale }> }) {
@@ -18,7 +18,7 @@ export default async function Account({ params }: { params: Promise<{ locale: Lo
   const me = (await getAppUser())!;
   const u = await prisma.user.findUniqueOrThrow({ where: { id: me.id }, include: { accounts: { select: { provider: true } } } });
   return (
-    <PublicPage locale={locale}>
+    <PublicPage locale={locale} tabbar>
       <AccountView
         locale={locale}
         data={{ name: u.name ?? "", email: u.email, phone: u.phone ?? "", budget: u.budget, interests: u.interests ?? "", verified: !!u.emailVerified, initials: me.initials, hue: u.hue, providers: u.accounts.map((a) => a.provider), hasPassword: !!u.passwordHash, locale: (u.locale as "es" | "en") ?? "es" }}

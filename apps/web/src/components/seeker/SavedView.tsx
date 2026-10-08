@@ -32,7 +32,7 @@ export function SavedView({ locale, all }: { locale: Locale; all: Listing[] }) {
     <div className="mx-auto max-w-[1280px] px-4 pb-32 pt-10 md:px-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <div className={k.eyebrow}>{user ? tx(locale, "Tu colección privada", "Your private collection") : tx(locale, "Guardadas en este dispositivo", "Saved on this device")}</div>
+          <div className={k.eyebrow}>{user ? tx(locale, "Tus favoritas", "Your favourites") : tx(locale, "Guardadas en este dispositivo", "Saved on this device")}</div>
           <h1 className="mt-1 font-serif text-[40px] font-medium leading-[1.05] md:text-[48px]">{tx(locale, "Guardados", "Saved homes")}</h1>
           <p className="mt-1 text-muted">{tx(locale, `${items.length} ${items.length === 1 ? "casa" : "casas"} · elige hasta 3 para compararlas`, `${items.length} ${items.length === 1 ? "home" : "homes"} · pick up to 3 to compare`)}</p>
         </div>

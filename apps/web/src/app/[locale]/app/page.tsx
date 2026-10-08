@@ -52,7 +52,7 @@ export default async function Hub({ params }: { params: Promise<{ locale: Locale
   const prequal = prequalSchema.safeParse(me?.prequal);
   const tourDto = (t: (typeof tours)[number]) => ({ id: t.id, listingId: t.listingId, leadId: t.leadId ?? undefined, agentId: t.agentId, seekerName: t.seekerName, start: t.start.toISOString(), status: t.status, agentName: t.agent.name ?? "", agentHue: t.agent.hue });
   return (
-    <PublicPage locale={locale}>
+    <PublicPage locale={locale} tabbar>
       <HubView
         locale={locale}
         emailOn={emailConfigured()}

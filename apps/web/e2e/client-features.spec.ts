@@ -108,6 +108,25 @@ test.describe.serial("Cliente: búsqueda, Hub y precalificación", () => {
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
   });
 
+  test("móvil 390 px: barra inferior en login, guardados, Hub y 404; «Cuenta» lleva a Tu espacio", async ({ page }) => {
+    await logout(page);
+    await page.setViewportSize({ width: 390, height: 844 });
+    const tabbar = page.getByRole("navigation", { name: "Navegación inferior" });
+    for (const path of ["/es/login", "/es/saved", "/es/no-existe-esta-pagina"]) {
+      await page.goto(path);
+      await expect(tabbar, path).toBeVisible();
+    }
+    await expect(tabbar.getByRole("link", { name: "Cuenta" })).toHaveAttribute("href", "/es/login");
+    await demoLogin(page, /Buscador/);
+    await page.goto("/es/saved");
+    await expect(page.getByText("Tus favoritas", { exact: true })).toBeVisible();
+    await expect(tabbar.getByRole("link", { name: "Cuenta" })).toHaveAttribute("href", "/es/app");
+    await page.goto("/es/app");
+    await expect(tabbar).toBeVisible();
+    await page.goto("/es/account");
+    await expect(page.getByRole("heading", { level: 1, name: "Ajustes" })).toBeVisible();
+  });
+
   test("1 · guardar búsqueda dos veces no duplica y el radio se guarda en la consulta", async ({ page }) => {
     await demoLogin(page, /Buscador/);
     const query = `type=SALE&beds=2&radius=10.49000,-66.85000,1.${stamp.length}&zone=E2E-${stamp}`;

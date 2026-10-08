@@ -17,8 +17,12 @@ export const viewport: Viewport = {
   ],
   width: "device-width", initialScale: 1, viewportFit: "cover" };
 
-/** Applies the saved theme before first paint (no flash). */
-const THEME_SCRIPT = "try{if(localStorage.getItem('np-theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}";
+/**
+ * Applies the theme before first paint (no flash): the visitor's explicit choice (np-theme) wins; without one, the
+ * device's light/dark setting. PublicHeader follows later device changes while no choice is stored.
+ */
+const THEME_SCRIPT =
+  "try{var t=localStorage.getItem('np-theme');if(t==='dark'||(!t&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.classList.add('dark')}catch(e){}";
 
 export function generateStaticParams() {
   return [{ locale: "es" }, { locale: "en" }];

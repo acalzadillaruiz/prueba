@@ -7,6 +7,7 @@ import type { Role } from "@newplace/config";
 import type { Agency } from "@/types/domain";
 import { api, ApiClientError } from "./api";
 import { SignupPrompt } from "@/components/seeker/SignupPrompt";
+import { SavedToast } from "@/components/brand/SavedToast";
 
 export interface AppUser {
   id: string;
@@ -107,6 +108,9 @@ export function AppStateProvider({ children, user: initialUser, agency: initialA
   // Visitor without an account: hearts live on the device until they sign in.
   const [localSaved, setLocalSaved] = useState<string[]>([]);
   const [prompt, setPrompt] = useState<LoginReason | null>(null);
+  // "Guardada · Ver guardadas" feedback after a heart (a new nonce per save restarts its timer).
+  const [toast, setToast] = useState<number | null>(null);
+  const closeToast = useCallback(() => setToast(null), []);
   const refresh = useCallback(async () => {
     try {
       const r = await fetch("/api/v1/me/session", { credentials: "same-origin", cache: "no-store" });
@@ -192,21 +196,28 @@ export function AppStateProvider({ children, user: initialUser, agency: initialA
 
   const toggleSaved = useCallback(
     (id: string) => {
+      // Saving (not un-saving) anywhere but the saved page itself gets a small confirmation with a way there.
+      const confirm = (on: boolean) => {
+        if (on && !/^\/(es|en)\/saved\/?$/.test(pathname)) setToast(Date.now());
+        else if (!on) setToast(null);
+      };
       if (!user) {
         // No account (or session still loading): keep it on the device; it moves into the account on sign-in.
         const cur = readIds(SAVED_LOCAL);
         const next = cur.includes(id) ? cur.filter((x) => x !== id) : [id, ...cur].slice(0, MAX_LOCAL_SAVED);
         writeIds(SAVED_LOCAL, next);
         setLocalSaved(next);
+        confirm(!cur.includes(id));
         return;
       }
       const on = !saved.includes(id);
+      confirm(on);
       setSaved((s) => (on ? [id, ...s] : s.filter((x) => x !== id)));
       api<{ ids: string[] }>("me/saved", { method: "POST", json: { listingId: id, saved: on } })
         .then((r) => setSaved(r.ids))
         .catch(() => setSaved((s) => (on ? s.filter((x) => x !== id) : [id, ...s])));
     },
-    [saved, user],
+    [saved, user, pathname],
   );
 
   const toggleCompare = useCallback(
@@ -234,6 +245,7 @@ export function AppStateProvider({ children, user: initialUser, agency: initialA
       <AppCtx.Provider value={value}>
         {children}
         {prompt && <SignupPrompt locale={locale} reason={prompt} onClose={() => setPrompt(null)} />}
+        {toast !== null && <SavedToast locale={locale} nonce={toast} onClose={closeToast} />}
       </AppCtx.Provider>
     </QueryClientProvider>
   );

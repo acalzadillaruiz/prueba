@@ -32,15 +32,20 @@ const FEATURED_ZONES: { zone: string; photo: string }[] = [
 
 const AVAILABLE = ["ACTIVE", "COMING_SOON", "UNDER_OFFER"];
 
-/** The search tab where a zone's listings live (Lechería today is vacation rentals only, for example). */
-function zoneLink(locale: Locale, zone: string, all: Listing[]) {
+/**
+ * The search tab where a zone's listings live (Lechería today is vacation rentals only, for example), and the figure
+ * shown on its card for that same tab: the sale price per m² for SALE, otherwise the lowest price of that type
+ * ("desde $220/noche"). Card figure and link always speak about the same kind of home.
+ */
+function zoneCard(locale: Locale, zone: string, all: Listing[]) {
   const counts = new Map<string, number>();
-  for (const l of all) if (l.zone === zone) {
-    const t = l.listingType.startsWith("COMMERCIAL") ? "COMMERCIAL" : l.listingType;
-    counts.set(t, (counts.get(t) ?? 0) + 1);
-  }
+  const kindOf = (l: Listing) => (l.listingType.startsWith("COMMERCIAL") ? "COMMERCIAL" : l.listingType);
+  for (const l of all) if (l.zone === zone) counts.set(kindOf(l), (counts.get(kindOf(l)) ?? 0) + 1);
   const type = [...counts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? "SALE";
-  return `/${locale}/search?type=${type}&zone=${encodeURIComponent(zone)}`;
+  const href = `/${locale}/search?type=${type}&zone=${encodeURIComponent(zone)}`;
+  if (type === "SALE") return { href, type, from: null };
+  const cheapest = all.filter((l) => l.zone === zone && kindOf(l) === type).sort((a, b) => a.priceAmount - b.priceAmount)[0];
+  return { href, type, from: cheapest ? { price: money(cheapest.priceAmount, locale), suffix: priceSuffix(cheapest, locale) } : null };
 }
 
 export default async function Home({ params }: { params: Promise<{ locale: Locale }> }) {
@@ -62,7 +67,7 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
   }));
   const floors = ranked.slice(0, 3).map((l) => ({ href: listingHref(locale, l), title: tx(locale, l.title_es, l.title_en), meta: `${l.zone} · ${factsLine(l, locale).join(" · ")}`, price: price(l) }));
   const pins = available.map(mapListing);
-  const zones = await Promise.all(FEATURED_ZONES.map(async (z) => ({ ...z, stats: await zoneStats(z.zone), href: zoneLink(locale, z.zone, available) })));
+  const zones = await Promise.all(FEATURED_ZONES.map(async (z) => ({ ...z, stats: await zoneStats(z.zone), ...zoneCard(locale, z.zone, available) })));
 
   const chapters = [
     { eyebrow: tx(locale, "01 · Antes de firmar", "01 · Before you sign"), title: tx(locale, "Papeles en regla, sin sorpresas.", "Paperwork in order, no surprises."), body: tx(locale, "Nuestro equipo legal revisa títulos, solvencias y gravámenes antes de que pongas un dólar. Si algo no cuadra, te lo decimos primero.", "Our legal team checks titles, tax clearances and liens before you put down a dollar. If something doesn't add up, you hear it from us first.") },
@@ -135,10 +140,20 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
                         {z.stats.activeListings > 0 ? plural(z.stats.activeListings, locale, ["propiedad", "propiedades"], ["property", "properties"]) : tx(locale, "Próximamente", "Coming soon")}
                       </span>
                     </span>
-                    <span className="shrink-0 text-right">
-                      <span className="block font-display text-[15px] font-semibold text-ink">{money(z.stats.salePpm, locale)}</span>
-                      <span className="block text-sm text-muted">{tx(locale, "por m²", "per m²")}</span>
-                    </span>
+                    {z.from ? (
+                      <span className="shrink-0 text-right">
+                        <span className="block text-sm text-muted">{tx(locale, "desde", "from")}</span>
+                        <span className="block font-display text-[15px] font-semibold text-ink">
+                          {z.from.price}
+                          <span className="font-normal text-muted">{z.from.suffix}</span>
+                        </span>
+                      </span>
+                    ) : z.type === "SALE" ? (
+                      <span className="shrink-0 text-right">
+                        <span className="block font-display text-[15px] font-semibold text-ink">{money(z.stats.salePpm, locale)}</span>
+                        <span className="block text-sm text-muted">{tx(locale, "por m²", "per m²")}</span>
+                      </span>
+                    ) : null}
                   </span>
                 </Link>
               </li>
@@ -155,7 +170,7 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
       {/* THE BUILDING — how we work. Plays by itself when it comes into view (pause / step bars, no scroll pinning):
           3D on capable desktops, a light CSS tower on phones and modest devices, a plain list under reduced motion. */}
       <div className="mt-24 lg:mt-32">
-        <BuildingScroll locale={locale} chapters={chapters} picks={floors} heading={tx(locale, "Así trabajamos", "How we work")} cta={tx(locale, "Entrar", "Step inside")} />
+        <BuildingScroll locale={locale} chapters={chapters} picks={floors} heading={tx(locale, "Así trabajamos", "How we work")} cta={tx(locale, "Ver casa", "See home")} />
       </div>
 
       {/* COMPRA A DISTANCIA — the diaspora's routes draw in to Lechería as the steps light up. */}

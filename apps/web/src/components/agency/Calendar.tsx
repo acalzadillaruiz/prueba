@@ -16,6 +16,15 @@ export type CalEvent = { id: string; start: string; title: string; sub: string; 
 
 const TZ = -4; // America/Caracas
 
+/** Event subtitles: a solid muted tone per event surface (opacity fell to ~4:1); every pair is ≥ 4.5:1 in both themes. */
+const SUB_CLS: Record<CalEvent["kind"], string> = {
+  tour: "text-[#D9CFC2] dark:text-[#5E5248]",
+  req: "text-[#5E5248] dark:text-[#D9CFC2]",
+  done: "",
+  cancelled: "",
+  media: "text-[#4A4038] dark:text-[#D9CFC2]",
+};
+
 export function CalendarView({ locale, weekStart, week, events, slots, canEditSlots }: { locale: Locale; weekStart: string; week: number; events: CalEvent[]; slots: { day: number; hours: number[] }[]; canEditSlots: boolean }) {
   const router = useRouter();
   const [mySlots, setMySlots] = useState(slots);
@@ -122,7 +131,7 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
                     on ? "bg-navy text-ivory dark:bg-ivory dark:text-navy" : i === todayIdx ? "bg-[#E6DDD2] text-navy dark:bg-white/10 dark:text-ivory" : cn("text-navy dark:text-ivory", k.hover),
                   )}
                 >
-                  <span className={cn("text-[11px] font-semibold uppercase tracking-[.08em]", on ? "opacity-80" : k.muted)}>{fmt(d, { weekday: "short" }).replace(".", "")}</span>
+                  <span className={cn("text-[11px] font-semibold uppercase tracking-[.08em]", on ? "text-[#D9CFC2] dark:text-[#5E5248]" : k.muted)}>{fmt(d, { weekday: "short" }).replace(".", "")}</span>
                   <span className="font-display text-[18px] font-semibold leading-none [font-feature-settings:'lnum']">{fmt(d, { day: "numeric" })}</span>
                   <span aria-hidden className={cn("mt-0.5 h-1.5 w-1.5 rounded-full", count > 0 ? (on ? "bg-[#D4B98C]" : "bg-gold-text dark:bg-[#D4B98C]") : "bg-transparent")} />
                 </button>
@@ -212,7 +221,7 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
                       title={`${e.title} · ${e.sub}`}
                     >
                       <div className="flex items-center gap-1 font-semibold">{e.kind === "media" && <Camera size={11} />}{e.title}</div>
-                      <div className="truncate opacity-80">{e.sub} · {e.agentName.split(" ")[0]}</div>
+                      <div className={cn("truncate", SUB_CLS[e.kind])}>{e.sub} · {e.agentName.split(" ")[0]}</div>
                     </button>
                   );
                 })}
@@ -244,11 +253,11 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
                 {mySlots.map((s) => (
                   <div key={s.day}>
                     <div className="mb-1 text-sm font-semibold">{[tx(locale, "Lunes", "Monday"), tx(locale, "Martes", "Tuesday"), tx(locale, "Miércoles", "Wednesday"), tx(locale, "Jueves", "Thursday"), tx(locale, "Viernes", "Friday"), tx(locale, "Sábado", "Saturday"), tx(locale, "Domingo", "Sunday")][s.day]}</div>
-                    <div className="flex flex-wrap gap-1">
+                    <div className="grid grid-cols-7 gap-1">
                       {[9, 10, 11, 14, 15, 16, 17].map((h) => {
                         const on = s.hours.includes(h);
                         return (
-                          <button key={h} onClick={() => saveSlots(mySlots.map((x) => (x.day === s.day ? { ...x, hours: on ? x.hours.filter((y) => y !== h) : [...x.hours, h].sort((a, b) => a - b) } : x)))} aria-pressed={on} className={cn(tab(on), "px-2.5 py-1 text-xs")}>
+                          <button key={h} onClick={() => saveSlots(mySlots.map((x) => (x.day === s.day ? { ...x, hours: on ? x.hours.filter((y) => y !== h) : [...x.hours, h].sort((a, b) => a - b) } : x)))} aria-pressed={on} className={cn(tab(on), "min-w-0 justify-center px-0 py-1.5 text-center text-xs")}>
                             {h}h
                           </button>
                         );

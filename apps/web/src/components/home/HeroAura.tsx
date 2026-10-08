@@ -21,7 +21,7 @@ export function HeroAura({
   featured?: { href: string; title: string; zone: string; price: string; photo?: string };
 }) {
   return (
-    <section data-hide-fab className="np-grain relative overflow-hidden bg-ivory pt-[calc(env(safe-area-inset-top)+80px)] sm:pt-[104px] lg:pt-[120px]" aria-labelledby="hero-title">
+    <section data-hide-fab className="np-grain relative overflow-hidden bg-ivory pt-[calc(env(safe-area-inset-top)+80px)] sm:pt-[104px] lg:pt-[100px] min-[1440px]:pt-[120px]" aria-labelledby="hero-title">
       <div className="np-aura" aria-hidden>
         <i />
         <i />
@@ -36,12 +36,14 @@ export function HeroAura({
               {available} {tx(locale, "casas disponibles hoy", "homes available today")}
             </span>
           </p>
-          <h1 id="hero-title" className="mt-4 max-w-[680px] text-[31px] leading-[1.06] tracking-[-0.02em] text-ink sm:mt-7 sm:text-[60px] sm:leading-[1.04] lg:text-[76px]">
+          {/* Short laptops (1024×768, 1280×800, 1366×768): a smaller headline and tighter spacing, so the search is on
+              the first screen; the full 76 px from 1440. */}
+          <h1 id="hero-title" className="mt-4 max-w-[680px] text-[31px] leading-[1.06] tracking-[-0.02em] text-ink sm:mt-7 sm:text-[60px] sm:leading-[1.04] lg:mt-5 lg:text-[54px] xl:text-[64px] min-[1440px]:mt-7 min-[1440px]:text-[76px]">
             {tx(locale, "Hay casas que se visitan.", "Some homes you visit.")}{" "}
             {/* Second line in Bronce text (6.6:1 on Lino, AA in dark too): quieter than the first, never faint. */}
             <span className="text-gold-text">{tx(locale, "Y otras que se quedan contigo.", "Others stay with you.")}</span>
           </h1>
-          <p className="mt-3 max-w-[540px] text-[15px] leading-normal text-ink/75 sm:mt-6 sm:text-[17px] sm:leading-relaxed">
+          <p className="mt-3 max-w-[540px] text-[15px] leading-normal text-ink/75 sm:mt-6 sm:text-[17px] sm:leading-relaxed lg:mt-4 lg:text-[16px] min-[1440px]:mt-6 min-[1440px]:text-[17px]">
             <span className="sm:hidden">
               {tx(
                 locale,
@@ -57,7 +59,7 @@ export function HeroAura({
               )}
             </span>
           </p>
-          <div className="mt-5 sm:mt-9">
+          <div className="mt-5 sm:mt-9 lg:mt-6 min-[1440px]:mt-9">
             <AskBar locale={locale} sticky />
           </div>
         </div>
@@ -79,7 +81,9 @@ export function HeroAura({
           {/* Advisors on call: opens today's rota. */}
           <OnCallButton
             locale={locale}
-            className="np-glass absolute -right-2 top-[14%] hidden items-center sm:flex gap-3 rounded-2xl px-4 py-3 text-left transition-transform duration-300 hover:-translate-y-0.5 sm:-right-8"
+            // Hangs over the arch's edge only where the page has a margin to spare (tablets, wide screens); on laptops
+            // (the arch runs to the page edge) it sits inside the arch, never clipped.
+            className="np-glass absolute -right-2 top-[14%] hidden items-center sm:flex gap-3 rounded-2xl px-4 py-3 text-left transition-transform duration-300 hover:-translate-y-0.5 sm:-right-8 lg:right-4 min-[1400px]:-right-8"
           >
             <span className="relative flex h-10 w-10 items-center justify-center rounded-full bg-ink text-ivory">
               <PhoneCall size={17} aria-hidden />

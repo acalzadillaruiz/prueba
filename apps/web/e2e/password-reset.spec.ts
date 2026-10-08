@@ -23,10 +23,10 @@ test.describe.serial("Recuperar contraseña", () => {
 
   test("pedir enlace → correo → nueva contraseña → entrar", async ({ page }) => {
     await page.goto("/es/login");
-    // The email typed on the login form travels with the link and pre-fills the request.
+    // The email typed on the login form pre-fills the request (handed over in sessionStorage, never in the URL).
     await page.getByLabel("Email").fill(email);
     await page.getByRole("link", { name: "¿Olvidaste tu contraseña?" }).click();
-    await expect(page).toHaveURL(/\/es\/forgot-password\?email=/);
+    await expect(page).toHaveURL(/\/es\/forgot-password$/);
     await expect(page.getByLabel("Email")).toHaveValue(email);
     await page.getByRole("button", { name: "Enviarme el enlace" }).click();
     await expect(page.getByTestId("forgot-sent")).toContainText("Si existe una cuenta");

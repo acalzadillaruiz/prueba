@@ -57,8 +57,8 @@ export default async function SearchPage({ params, searchParams }: { params: Pro
   const { locale } = await params;
   const sp = new URLSearchParams(await searchParams);
   // `?q=` links (shared, bookmarked, the JSON-LD SearchAction) must search what the words say: same parser as the
-  // search boxes, then a temporary redirect to the canonical URL with structured filters (the words stay in q, so the
-  // page can say which ones it used). Temporary: the parser improves, and the same words may map differently later.
+  // search boxes, then a temporary redirect to the canonical URL with structured filters (only the words the parser
+  // did not understand stay in q, so the page can say which ones it left out). Temporary: the parser improves, and the same words may map differently later.
   const canonical = canonicalQueryUrl(sp);
   if (canonical) redirect(`/${locale}/search?${canonical.toString()}`);
   if (!sp.get("type")) sp.set("type", "SALE");

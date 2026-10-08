@@ -7,16 +7,17 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { leadSchema } from "@newplace/config";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { CalendarCheck, CheckCircle2, Clock, Loader2, MessageSquare, MessagesSquare, PhoneCall, ShieldCheck, Video } from "lucide-react";
+import { CalendarCheck, CalendarDays, CheckCircle2, Clock, Loader2, MessageSquare, MessagesSquare, Minus, PhoneCall, Plus, ShieldCheck, Video } from "lucide-react";
 import type { Listing, Locale } from "@/types/domain";
 import { Button, inputCls } from "@/components/ui";
 import { OnCallButton, WhatsAppIcon } from "@/components/brand/PublicChrome";
 import { whatsappHref } from "@/lib/listing-href";
 import { useApp } from "@/lib/store";
 import { api, ApiClientError } from "@/lib/api";
-import { tx } from "@/lib/i18n";
+import { money, plural, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
-import { isFsbo, takesTours, VISIT_PREF_LABEL, VISIT_PREFS, type VisitPref } from "@/lib/visit-hours";
+import { isFsbo, OPEN_FOR_TOURS, takesTours, VISIT_PREF_LABEL, VISIT_PREFS, type VisitPref } from "@/lib/visit-hours";
+import { addDays, stayDay, stayEstimate, todayCaracas, validateStay, type StayError } from "@/lib/stay";
 import { useListingWhatsApp } from "./useListingWhatsApp";
 
 /** GET listings/:id/slots — the agent's calendar, or (owner: true) the FSBO owner's visit hours. */
@@ -40,12 +41,26 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
   const agency = l.agency;
   // Tours only while the property is available: on the agent's calendar, or with the owner (FSBO) — their visit hours,
   // or, when they have none or they're full, a request with preferred times that the owner answers.
-  const bookable = takesTours(l);
+  // Vacation rentals are booked by dates, not visited: "Consultar disponibilidad" (arrival, departure, guests) replaces the visit flow.
+  const stay = l.listingType === "SHORT_RENT" && OPEN_FOR_TOURS.includes(l.status);
+  const bookable = takesTours(l) && !stay;
   const fsbo = isFsbo(l);
   const slots = useQuery({ queryKey: ["slots", l.id], queryFn: () => api<Slots>(`listings/${l.id}/slots`), enabled: bookable, refetchInterval: 15_000 });
   const days = slots.data?.days ?? [];
-  const [mode, setMode] = useState<"tour" | "msg">(bookable ? "tour" : "msg");
-  const tabRefs = useRef<Record<"tour" | "msg", HTMLButtonElement | null>>({ tour: null, msg: null });
+  type Mode = "tour" | "stay" | "msg";
+  const [mode, setMode] = useState<Mode>(stay ? "stay" : bookable ? "tour" : "msg");
+  const tabRefs = useRef<Record<Mode, HTMLButtonElement | null>>({ tour: null, stay: null, msg: null });
+  // Stay request: arrival / departure (calendar days, Venezuela time), party size and an optional note.
+  const minNights = Math.max(1, l.shortRent?.minNights ?? 1);
+  const maxGuests = Math.max(1, l.shortRent?.maxGuests ?? 16);
+  const today = todayCaracas();
+  const [checkIn, setCheckIn] = useState("");
+  const [checkOut, setCheckOut] = useState("");
+  const [guests, setGuests] = useState(Math.min(2, maxGuests));
+  const [stayNote, setStayNote] = useState("");
+  const stayCheck = validateStay(checkIn, checkOut, { today, minNights });
+  const stayOk = stay && !stayCheck.error;
+  const est = stayEstimate(l.pricePeriod === "night" ? l.priceAmount : null, stayCheck.nights, l.shortRent?.cleaningFee ?? 0);
   // Open on the first day that still has a free slot (a fully booked "today" used to leave the button disabled with no hint).
   const [dayPick, setDay] = useState<number | null>(null);
   const firstOpenDay = days.findIndex((d) => d.hours.some((h) => h.available));
@@ -119,17 +134,23 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
     setErr(null);
     setBusy(true);
     const ask = mode === "tour" && askMode && !chosen;
+    const asksStay = mode === "stay" && stayOk;
+    // The dates also travel in the message itself, so whoever answers reads them in the inbox, the thread and the email.
+    const stayLine = asksStay
+      ? `${tx(locale, "Consulta de disponibilidad", "Availability request")}: ${stayDay(checkIn, locale)} → ${stayDay(checkOut, locale)} (${plural(stayCheck.nights, locale, ["noche", "noches"], ["night", "nights"])}) · ${plural(guests, locale, ["huésped", "huéspedes"], ["guest", "guests"])}`
+      : "";
     try {
       await api("leads", {
         method: "POST",
         json: {
-          listingId: l.id, name, email, phone, message: msg, budget: undefined,
+          listingId: l.id, name, email, phone, message: asksStay ? [stayLine, stayNote.trim()].filter(Boolean).join("\n\n") : msg, budget: undefined,
+          ...(asksStay ? { checkIn, checkOut, guests } : {}),
           ...(mode === "tour" && chosen ? { tourStart: chosen, virtual } : {}),
           ...(ask ? { visitPrefs: prefs, visitNote: visitNote.trim() || undefined, virtual } : {}),
         },
       });
       setAsked(ask);
-      setDone(mode === "tour" && chosen ? fmt(chosen, { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }) : "");
+      setDone(asksStay ? `${stayDay(checkIn, locale)} → ${stayDay(checkOut, locale)} · ${plural(guests, locale, ["huésped", "huéspedes"], ["guest", "guests"])}` : mode === "tour" && chosen ? fmt(chosen, { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }) : "");
       qc.invalidateQueries({ queryKey: ["slots", l.id] });
     } catch (e) {
       const conflict = e instanceof ApiClientError && e.code === "CONFLICT";
@@ -150,7 +171,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
   const box = dark ? "bg-navy-card text-ivory ring-navy-line" : "np-glass ring-0";
   const seg = (active: boolean) => cn("flex min-h-11 items-center justify-center gap-1.5 rounded-full border-2 font-display text-sm transition-colors duration-np focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2", dark ? "focus-visible:outline-ivory" : "focus-visible:outline-ink", active ? "np-sel font-semibold" : "border-transparent text-muted hover:text-ink");
   const quietLink = cn("inline-flex min-h-11 items-center gap-1.5 rounded-full px-1 text-sm font-semibold underline decoration-current/30 underline-offset-4 hover:decoration-current focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-60", dark ? "text-ivory focus-visible:outline-ivory" : "text-navy focus-visible:outline-navy");
-  const modes: ("tour" | "msg")[] = bookable ? ["tour", "msg"] : ["msg"];
+  const modes: Mode[] = stay ? ["stay", "msg"] : bookable ? ["tour", "msg"] : ["msg"];
   const onTabKey = (e: React.KeyboardEvent) => {
     if (e.key !== "ArrowRight" && e.key !== "ArrowLeft" && e.key !== "Home" && e.key !== "End") return;
     e.preventDefault();
@@ -161,14 +182,14 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
   };
 
   // Booking: the personal details show once there is something to book (a time, or the FSBO owner's preferred times).
-  const reveal = mode === "msg" || !!chosen || (askMode && askReady) || Object.keys(errs).length > 0;
+  const reveal = mode === "msg" || (mode === "stay" && stayOk) || (mode === "tour" && (!!chosen || (askMode && askReady))) || Object.keys(errs).length > 0;
   // While booking, the (pre-written) message stays folded behind "Añadir un mensaje" unless the visitor opens it.
   const showNote = mode === "msg" || noteOpen || !!errs.message;
 
   // When the details appear after a pick, keep the main button on screen (scrolls the sticky card or the page just enough).
   const wasRevealed = useRef(reveal);
   useEffect(() => {
-    if (reveal && !wasRevealed.current && mode === "tour") {
+    if (reveal && !wasRevealed.current && mode !== "msg") {
       const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       actions.current?.scrollIntoView({ block: "nearest", behavior: reduce ? "auto" : "smooth" });
     }
@@ -177,13 +198,19 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
 
   if (done !== null) {
     const tour = mode === "tour" && !!done;
+    const stayDone = mode === "stay" && !!done;
     const replier = agent ? agent.name.split(" ")[0] : fsbo ? tx(locale, "Su dueño", "The owner") : tx(locale, "Tu asesor", "Your advisor");
     return (
       <div id="contact-panel" tabIndex={-1} className={cn("np-in rounded-[28px] p-6 ring-1", box)} data-testid="lead-done" role="status">
         <CheckCircle2 className="text-ok" size={30} aria-hidden />
         <div className="mt-3 font-serif text-[28px] leading-tight">
-          {tour ? tx(locale, "Visita pedida", "Viewing requested") : asked ? tx(locale, "Tu pedido de visita ya llegó", "Your visit request is in") : tx(locale, "Tu mensaje ya llegó", "Your message is on its way")}
+          {tour ? tx(locale, "Visita pedida", "Viewing requested") : stayDone ? tx(locale, "Tu consulta ya llegó", "Your availability request is in") : asked ? tx(locale, "Tu pedido de visita ya llegó", "Your visit request is in") : tx(locale, "Tu mensaje ya llegó", "Your message is on its way")}
         </div>
+        {stayDone && (
+          <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-[#F3EEE5] px-3 py-1 font-display text-[15px] font-semibold text-ink first-letter:uppercase">
+            <CalendarDays size={15} aria-hidden /> {done}
+          </div>
+        )}
         {tour && (
           <>
             <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-[#F3EEE5] px-3 py-1 font-display text-[15px] font-semibold text-ink">
@@ -205,14 +232,27 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
           ) : (
             user && <Button href={`/${locale}/app`} size="sm" variant="navy">{tx(locale, "Ver en mi Hub", "Open my Hub")}</Button>
           )}
-          <Button size="sm" variant={dark ? "dark-outline" : "outline"} onClick={() => { setDone(null); setIso(null); setDay(null); setAsked(false); setPrefs([]); setVisitNote(""); }}>{tx(locale, "Enviar otra", "Send another")}</Button>
+          <Button size="sm" variant={dark ? "dark-outline" : "outline"} onClick={() => { setDone(null); setIso(null); setDay(null); setAsked(false); setPrefs([]); setVisitNote(""); setStayNote(""); }}>{tx(locale, "Enviar otra", "Send another")}</Button>
         </div>
       </div>
     );
   }
 
+  // Date problems are shown once both dates are in (a lone arrival is just work in progress), except a past arrival.
+  const stayErrMsg: Partial<Record<StayError, string>> = {
+    "bad-date": tx(locale, "Revisa las fechas", "Check the dates"),
+    past: tx(locale, "La llegada no puede ser antes de hoy", "Arrival can’t be before today"),
+    order: tx(locale, "La salida tiene que ser después de la llegada", "Departure must be after arrival"),
+    min: tx(locale, `La estancia mínima es de ${plural(minNights, locale, ["noche", "noches"], ["night", "nights"])}`, `Minimum stay is ${plural(minNights, locale, ["night", "nights"], ["night", "nights"])}`),
+    max: tx(locale, "Para estancias de más de un año, escríbele un mensaje", "For stays longer than a year, send a message"),
+  };
+  const stayMsg = mode === "stay" && stayCheck.error && (checkOut || stayCheck.error === "past") ? stayErrMsg[stayCheck.error] : undefined;
+  const stayErrIn = !!stayMsg && stayCheck.error === "past";
+  const stayErrOut = !!stayMsg && !stayErrIn;
   const primaryLabel =
-    mode === "tour"
+    mode === "stay"
+      ? tx(locale, "Consultar disponibilidad", "Check availability")
+      : mode === "tour"
       ? askMode
         ? tx(locale, "Pedir una visita", "Request a visit")
         : chosen
@@ -243,7 +283,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
         </div>
       )}
       {!agent && !agency && <div className={cn("text-sm", muted)}>{tx(locale, "Publicada por su dueño/a · sin intermediarios", "Listed by the owner · no middlemen")}</div>}
-      <div role="tablist" aria-label={tx(locale, "Cómo quieres contactar", "How to get in touch")} className={cn("mt-5 grid gap-1 rounded-full bg-[#F3EEE5] p-1 dark:bg-white/5", bookable ? "grid-cols-2" : "grid-cols-1")} onKeyDown={onTabKey}>
+      <div role="tablist" aria-label={tx(locale, "Cómo quieres contactar", "How to get in touch")} className={cn("mt-5 grid gap-1 rounded-full bg-[#F3EEE5] p-1 dark:bg-white/5", modes.length > 1 ? "grid-cols-2" : "grid-cols-1")} onKeyDown={onTabKey}>
         {modes.map((m) => (
           <button
             key={m}
@@ -259,12 +299,80 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
             onClick={() => setMode(m)}
             className={seg(mode === m)}
           >
-            {m === "tour" ? <CalendarCheck size={15} aria-hidden /> : <MessageSquare size={15} aria-hidden />}
-            {m === "tour" ? tx(locale, "Pedir visita", "Book a tour") : tx(locale, "Mensaje", "Message")}
+            {m === "tour" ? <CalendarCheck size={15} aria-hidden /> : m === "stay" ? <CalendarDays size={15} aria-hidden /> : <MessageSquare size={15} aria-hidden />}
+            {m === "tour" ? tx(locale, "Pedir visita", "Book a tour") : m === "stay" ? tx(locale, "Disponibilidad", "Availability") : tx(locale, "Mensaje", "Message")}
           </button>
         ))}
       </div>
       <div role="tabpanel" id={`${uid}-panel`} aria-labelledby={`${uid}-tab-${mode}`}>
+        {mode === "stay" && (
+          <div className="mt-5" data-testid="stay-ask">
+            <div className="np-eyebrow mb-3 text-gold-text">{tx(locale, "¿Cuándo quieres venir?", "When would you like to stay?")}</div>
+            <div className="grid grid-cols-2 gap-2">
+              <label className="min-w-0">
+                <span className={cn("mb-1 block px-1 text-sm font-semibold", muted)}>{tx(locale, "Llegada", "Arrival")}</span>
+                <input
+                  type="date"
+                  className={cn(field, "min-w-0 px-2.5")}
+                  min={today}
+                  value={checkIn}
+                  aria-invalid={stayErrIn || undefined}
+                  aria-describedby={stayErrIn ? `${uid}-stay-err` : undefined}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    setCheckIn(v);
+                    // Departure follows: kept when it still works, otherwise moved to the earliest valid night.
+                    if (v && (!checkOut || validateStay(v, checkOut, { today: v, minNights }).error)) setCheckOut(addDays(v, minNights));
+                  }}
+                />
+              </label>
+              <label className="min-w-0">
+                <span className={cn("mb-1 block px-1 text-sm font-semibold", muted)}>{tx(locale, "Salida", "Departure")}</span>
+                <input
+                  type="date"
+                  className={cn(field, "min-w-0 px-2.5")}
+                  min={addDays(checkIn || today, minNights)}
+                  value={checkOut}
+                  aria-invalid={stayErrOut || undefined}
+                  aria-describedby={stayErrOut ? `${uid}-stay-err` : undefined}
+                  onChange={(e) => setCheckOut(e.target.value)}
+                />
+              </label>
+            </div>
+            {stayMsg && <p id={`${uid}-stay-err`} role="alert" className="mt-1.5 px-1 text-sm font-semibold text-danger">{stayMsg}</p>}
+            <div className="mt-3 flex items-center justify-between gap-3">
+              <span id={`${uid}-guests`} className="text-sm font-semibold">
+                {tx(locale, "Huéspedes", "Guests")}
+                {l.shortRent?.maxGuests ? <span className={cn("block text-[13px] font-normal", muted)}>{tx(locale, `Hasta ${maxGuests}`, `Up to ${maxGuests}`)}</span> : null}
+              </span>
+              <div className="flex items-center gap-1" role="group" aria-labelledby={`${uid}-guests`}>
+                <button type="button" onClick={() => setGuests(Math.max(1, guests - 1))} disabled={guests <= 1} aria-label={tx(locale, "Un huésped menos", "One guest fewer")} className={cn("flex h-11 w-11 items-center justify-center rounded-full border disabled:opacity-40", dark ? "border-navy-line" : "border-[#D8CBB7]")}><Minus size={16} aria-hidden /></button>
+                <output aria-live="polite" className="w-8 text-center font-display text-[17px] font-semibold" data-testid="stay-guests">{guests}</output>
+                <button type="button" onClick={() => setGuests(Math.min(maxGuests, guests + 1))} disabled={guests >= maxGuests} aria-label={tx(locale, "Un huésped más", "One guest more")} className={cn("flex h-11 w-11 items-center justify-center rounded-full border disabled:opacity-40", dark ? "border-navy-line" : "border-[#D8CBB7]")}><Plus size={16} aria-hidden /></button>
+              </div>
+            </div>
+            {stayOk && (
+              <div className={cn("np-in mt-3 rounded-xl px-3.5 py-3 text-[15px]", dark ? "bg-white/5" : "bg-[#F3EEE5]")} data-testid="stay-summary" aria-live="polite">
+                <div className="flex justify-between gap-3">
+                  <span>{est ? `${money(l.priceAmount, locale)} × ${plural(stayCheck.nights, locale, ["noche", "noches"], ["night", "nights"])}` : plural(stayCheck.nights, locale, ["noche", "noches"], ["night", "nights"])}</span>
+                  {est && <span className="whitespace-nowrap">{money(est.subtotal, locale)}</span>}
+                </div>
+                {est && est.cleaning > 0 && (
+                  <div className={cn("flex justify-between gap-3", muted)}>
+                    <span>{tx(locale, "Limpieza", "Cleaning")}</span>
+                    <span className="whitespace-nowrap">{money(est.cleaning, locale)}</span>
+                  </div>
+                )}
+                {est && (
+                  <div className="mt-1 flex justify-between gap-3 border-t border-black/10 pt-1 font-semibold dark:border-white/10">
+                    <span>{tx(locale, "Total estimado", "Estimated total")}</span>
+                    <span className="whitespace-nowrap" data-testid="stay-total">{money(est.total, locale)}</span>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
         {mode === "tour" && askMode && (
           <div className="mt-5" data-testid="visit-ask">
             <div className="np-eyebrow mb-2 text-gold-text">{tx(locale, "Pide una visita", "Ask for a visit")}</div>
@@ -371,7 +479,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
           noValidate
           onSubmit={form.handleSubmit(submit)}
           className="mt-4 space-y-2"
-          aria-label={mode === "tour" ? tx(locale, "Tus datos para la visita", "Your details for the viewing") : tx(locale, "Tu mensaje", "Your message")}
+          aria-label={mode === "tour" ? tx(locale, "Tus datos para la visita", "Your details for the viewing") : mode === "stay" ? tx(locale, "Tus datos para la consulta", "Your details for the request") : tx(locale, "Tu mensaje", "Your message")}
         >
           {/* Progressive: while booking, name / email / phone appear once a time (or, FSBO, a preference) is chosen, so the
               calendar and the main action stay on the first screen. The message tab shows them right away. */}
@@ -397,7 +505,16 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
                   {fieldErr("phone")}
                 </div>
               </div>
-              {showNote ? (
+              {mode === "stay" ? (
+                <textarea
+                  className={cn(field, "h-16 py-2")}
+                  maxLength={800}
+                  value={stayNote}
+                  onChange={(e) => setStayNote(e.target.value)}
+                  placeholder={tx(locale, "¿Algo que deba saber? (opcional)", "Anything they should know? (optional)")}
+                  aria-label={tx(locale, "Mensaje (opcional)", "Message (optional)")}
+                />
+              ) : showNote ? (
                 <div>
                   <textarea className={cn(field, mode === "tour" ? "h-16 py-2" : "h-20 py-2.5")} {...form.register("message")} {...a11y("message")} aria-label={tx(locale, "Mensaje", "Message")} />
                   {fieldErr("message")}
@@ -412,7 +529,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
           {err && <div role="alert" className="rounded-xl bg-[#B3261E1A] px-3 py-2 text-sm text-danger">{err}</div>}
           {/* The one terracotta action of each tab: confirm the visit (naming the chosen time) or send the message. */}
           <div ref={actions} className="!mt-3 flex items-center gap-2">
-            <Button type="submit" className="h-[52px] min-w-0 flex-1 disabled:text-[#5E5650] md:h-[52px] dark:disabled:bg-white/10 dark:disabled:text-[#CFC4B8]" size="lg" disabled={busy || (mode === "tour" && !chosen && !(askMode && askReady))} variant="primary">
+            <Button type="submit" className="h-[52px] min-w-0 flex-1 disabled:text-[#5E5650] md:h-[52px] dark:disabled:bg-white/10 dark:disabled:text-[#CFC4B8]" size="lg" disabled={busy || (mode === "tour" && !chosen && !(askMode && askReady)) || (mode === "stay" && !stayOk)} variant="primary">
               {busy && <Loader2 size={16} className="animate-spin" aria-hidden />}
               {primaryLabel}
             </Button>
@@ -431,6 +548,9 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
               </a>
             )}
           </div>
+          {mode === "stay" && !stayOk && !stayMsg && (
+            <p className={cn("text-center text-sm", muted)}>{tx(locale, "Elige tus fechas para consultar la disponibilidad", "Pick your dates to check availability")}</p>
+          )}
           {mode === "tour" && askMode && !askReady && (
             <p className={cn("text-center text-sm", muted)}>{tx(locale, "Elige cuándo te viene bien para pedir la visita", "Pick when suits you to request the visit")}</p>
           )}
@@ -462,7 +582,9 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
         </div>
       )}
       <p className={cn("mt-3 text-center text-sm", muted)}>
-        {bookable && mode === "tour"
+        {mode === "stay"
+          ? tx(locale, "Sin costo ni compromiso · Te confirma fechas y precio final", "Free, no commitment · They confirm dates and final price")
+          : bookable && mode === "tour"
           ? fsbo
             ? askMode
               ? tx(locale, "Le llega directo a su dueño · Sin costo", "Goes straight to the owner · Free")

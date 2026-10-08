@@ -122,7 +122,7 @@ export function ReportsView({ locale, data, days }: { locale: Locale; data: Repo
           </Panel>
         </div>
         <Panel title={tx(locale, "Por zona", "By area")} bodyClass="overflow-x-auto">
-          <table className="w-full text-[14px]">
+          <table className="w-full text-[14px] [&_td+td]:whitespace-nowrap [&_td+td]:pl-3 [&_th+th]:pl-3">
             <thead className={cn("text-left", k.th, "text-[12px]")}><tr><th className="pb-2">{tx(locale, "Zona", "Area")}</th><th className="pb-2 text-right">{tx(locale, "Activos", "Active")}</th><th className="pb-2 text-right" title={tx(locale, "Leads acumulados de los inmuebles de la zona", "All-time leads of the area's listings")}>Leads</th><th className="pb-2 text-right" title={tx(locale, "Media de venta", "Sale average")}>{tx(locale, "Venta USD/m²", "Sale USD/m²")}</th><th className="pb-2 text-right" title={tx(locale, "Alquiler de larga estancia", "Long-term rent")}>{tx(locale, "Alquiler USD/m²/mes", "Rent USD/m²/mo")}</th><th className="pb-2 text-right">{tx(locale, "Días", "Days")}</th></tr></thead>
             <tbody>
               {data.byZone.map((z) => (

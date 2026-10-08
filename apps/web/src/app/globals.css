@@ -153,6 +153,14 @@ body:has([data-public-header]) [data-demobar] { display: none; }
 
 .sr-only-focusable:not(:focus) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
+/* Listing card price: sized by the card's width (container query units), not by its digits. --np-pk: the price's
+   length in em, --np-sfx: room for "/ mes", --np-pmax: the cap (set inline by ListingCard). */
+.np-card-meta { container-type: inline-size; }
+.np-card-price { font-size: var(--np-pmax, 24px); }
+@supports (width: 1cqi) {
+  .np-card-price { font-size: clamp(16px, calc((100cqi - var(--np-sfx, 0px)) / var(--np-pk, 7)), var(--np-pmax, 24px)); }
+}
+
 .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
 .scrollbar-thin::-webkit-scrollbar-thumb { background: #A9B4C266; border-radius: 6px; }
 .no-scrollbar::-webkit-scrollbar { display: none; }

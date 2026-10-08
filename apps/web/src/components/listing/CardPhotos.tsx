@@ -55,6 +55,12 @@ export function CardPhotos({ l, locale, label, href }: { l: Listing; locale: Loc
         }}
         // Touch only (with a mouse the stretched link is on top and gets the click).
         onClick={href ? () => router.push(href) : undefined}
+        // Not a Tab stop (browsers make scrollers focusable): the keyboard opens the listing through the title link,
+        // and the strip is named for screen readers.
+        tabIndex={-1}
+        role="group"
+        aria-roledescription={tx(locale, "carrusel", "carousel")}
+        aria-label={tx(locale, `Fotos de ${label}`, `Photos of ${label}`)}
         className="no-scrollbar flex h-full w-full snap-x snap-mandatory overflow-x-auto overscroll-x-contain [@media(hover:none)]:relative [@media(hover:none)]:z-[2]"
       >
         {Array.from({ length: n }, (_, i) => (

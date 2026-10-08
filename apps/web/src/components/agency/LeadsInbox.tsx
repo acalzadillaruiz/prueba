@@ -268,12 +268,12 @@ export function LeadsInbox({ locale, initial, listings, agents, assignable = [],
         </div>
         {needle && <span className={cn("text-sm", k.muted)}>{found.length} / {leads.length}</span>}
       </div>
-      {/* Phones: one horizontally scrolling row (snap + faded edges, like Inmuebles) instead of chips wrapping onto 3 rows. */}
+      {/* Up to lg (1024 px included): one horizontally scrolling row (snap + faded edges, like Inmuebles) instead of chips wrapping onto 3 rows. */}
       <div
         role="group"
         aria-label={tx(locale, "Filtrar por etapa", "Filter by stage")}
         data-testid="stage-chips"
-        className="-mx-4 mb-4 flex snap-x snap-mandatory scroll-px-4 gap-2 overflow-x-auto px-4 py-0.5 [mask-image:linear-gradient(to_right,transparent,#000_14px,#000_calc(100%-28px),transparent)] [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:[mask-image:none] [&::-webkit-scrollbar]:hidden"
+        className="-mx-4 mb-4 flex snap-x snap-mandatory scroll-px-4 gap-2 overflow-x-auto px-4 py-0.5 [mask-image:linear-gradient(to_right,transparent,#000_14px,#000_calc(100%-28px),transparent)] [scrollbar-width:none] xl:mx-0 xl:flex-wrap xl:overflow-visible xl:px-0 xl:[mask-image:none] [&::-webkit-scrollbar]:hidden"
       >
         {[["ALL", "Todos", "All"] as const, ...STAGES].map(([key, es, en]) => {
           const n = key === "ALL" ? found.length : found.filter((l) => l.stage === key).length;

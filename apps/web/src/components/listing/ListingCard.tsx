@@ -6,7 +6,7 @@ import { PropertyArt } from "@/components/art/PropertyArt";
 import { Avatar, Badge } from "@/components/ui";
 import { TYPE_LABEL, lbl, money, num, priceSuffix, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
-import { CardCompareToggle, CompareButton, SaveButton, StatusBadge } from "./bits";
+import { CardCompareToggle, SaveButton, StatusBadge } from "./bits";
 import { CardPhotos } from "./CardPhotos";
 
 /** "5 hab. · 6 baños · 620 m²" (metadata line, ≥ 14 px). */
@@ -74,12 +74,17 @@ export function CardAdvisor({ agent, locale, owner }: { agent: NonNullable<Listi
   );
 }
 
-/** Price size by length: seven digits or more ("USD 2.300.000") step down so the price never wraps. */
-const priceSize = (amount: number, compact?: boolean) => {
-  const digits = String(Math.round(Math.abs(amount))).length;
-  if (digits >= 7) return compact ? "text-[20px]" : "text-[23px]";
-  return compact ? "text-[24px]" : "text-[28px]";
-};
+/**
+ * Price size by the card's own width (container query units, see .np-card-price in globals.css): the price fills the
+ * row it has — a 3-column grid at 1280 px gets a smaller "USD 2.300.000" than a phone's full-width card — and never
+ * wraps or runs into what follows. The vars give the text's length (in em at ~0.66 em a glyph) and the suffix's room.
+ */
+const priceVars = (price: string, suffix: string, compact?: boolean) =>
+  ({
+    "--np-pk": (price.length * 0.66).toFixed(2),
+    "--np-sfx": `${Math.ceil(suffix.length * 6.6)}px`,
+    "--np-pmax": compact ? "24px" : "28px",
+  }) as React.CSSProperties;
 
 /**
  * Listing card, "stretched link" pattern: an <article> whose ONLY link is the title; its ::after covers the whole
@@ -88,10 +93,13 @@ const priceSize = (amount: number, compact?: boolean) => {
  * place come through aria-describedby). On touch screens the photo strip sits above the link too (so it can be
  * swiped) and a tap on it opens the listing.
  *
- * `compareToggle` (search results): a compare button on the photo (icon next to the heart on touch, "Comparar" on
- * hover with a mouse). `showCompare`: the older footer pill (saved homes).
+ * `compareToggle`: a compare button on the photo (icon next to the heart on touch, "Comparar" on hover with a
+ * mouse) — search results and saved homes alike. Compact cards (search, similar homes) leave out the operation
+ * ("Venta"): the search already filters by it, and the price gets the whole row.
  */
-export function ListingCard({ l, locale, compact, className, showCompare, compareToggle }: { l: Listing; locale: Locale; compact?: boolean; className?: string; showCompare?: boolean; compareToggle?: boolean }) {
+export function ListingCard({ l, locale, compact, className, compareToggle }: { l: Listing; locale: Locale; compact?: boolean; className?: string; compareToggle?: boolean }) {
+  const price = money(l.priceAmount, locale);
+  const suffix = priceSuffix(l, locale);
   const title = tx(locale, l.title_es, l.title_en);
   const label = `${title}, ${l.zone}`;
   const href = `/${locale}/listing/${l.slug}`;
@@ -116,13 +124,13 @@ export function ListingCard({ l, locale, compact, className, showCompare, compar
         )}
       </div>
       <div className={cn("px-3.5 pb-3 pt-4", compact && "px-3 pb-2.5 pt-3.5")}>
-        <div className="flex items-baseline justify-between gap-2" id={metaId}>
-          <div className={cn("min-w-0 whitespace-nowrap font-serif leading-none tracking-[-0.01em] text-ink", priceSize(l.priceAmount, compact))}>
-            {money(l.priceAmount, locale)}
-            <span className="font-display text-sm font-normal text-muted">{priceSuffix(l, locale)}</span>
+        <div className="np-card-meta flex flex-wrap items-baseline justify-between gap-x-2 gap-y-1" id={metaId}>
+          <div className="np-card-price min-w-0 whitespace-nowrap font-serif leading-none tracking-[-0.01em] text-ink" style={priceVars(price, suffix, compact)}>
+            {price}
+            <span className="font-display text-sm font-normal text-muted">{suffix}</span>
             <span className="sr-only">, {l.zone}, {l.city}</span>
           </div>
-          <span className="shrink-0 text-sm text-muted">{lbl(TYPE_LABEL[l.listingType], locale)}</span>
+          {!compact && <span className="shrink-0 text-sm text-muted">{lbl(TYPE_LABEL[l.listingType], locale)}</span>}
         </div>
         <div className="mt-2.5 line-clamp-1 text-[15px] font-semibold text-ink">
           <Link
@@ -140,7 +148,6 @@ export function ListingCard({ l, locale, compact, className, showCompare, compar
               <span key={f}>{f}</span>
             ))}
           </span>
-          {showCompare && <CompareButton id={l.id} locale={locale} className="z-[2]" />}
         </div>
         {l.agent?.name && <CardAdvisor agent={l.agent} locale={locale} owner={isOwnerListing(l)} />}
       </div>

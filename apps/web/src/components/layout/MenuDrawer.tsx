@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Bell, CalendarCheck, ChevronDown, FlaskConical, Heart, LogIn, MessageCircle, Moon, Settings, Sun, X } from "lucide-react";
+import { Bell, CalendarCheck, ChevronDown, FlaskConical, Gem, Heart, LogIn, MessageCircle, Moon, Settings, Sun, X } from "lucide-react";
 import type { Locale } from "@/types/domain";
-import { Logo, RoofGlyph } from "@/components/brand/Logo";
+import { Logo } from "@/components/brand/Logo";
 import { Avatar } from "@/components/ui";
 import { useUnreadMessages } from "@/components/brand/PublicChrome";
 import { useApp } from "@/lib/store";
@@ -73,13 +73,14 @@ export function MenuDrawer({
         <nav className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 pb-4 pt-1" aria-label={locale === "es" ? "Principal" : "Main"}>
           {searchTypes.map((n) => (
             <Link key={n.href} href={n.href} onClick={() => onClose()} aria-current={n.active ? "page" : undefined} className="flex min-h-[50px] items-center gap-3 rounded-lg px-3 font-serif text-[23px] hover:bg-white/5">
-              {n.label}
-              {n.active && <RoofGlyph className="text-[#C9A574]" />}
+              {/* Current section: a gold underline (a chevron-like mark read as "expand"). */}
+              <span className={cn(n.active && "underline decoration-[#C9A574] decoration-2 underline-offset-[7px]")}>{n.label}</span>
             </Link>
           ))}
           <div className="mx-3 my-3 h-px bg-[#B08A55]/40" aria-hidden />
           <Link href={luxury.href} onClick={() => onClose()} aria-current={luxury.active ? "page" : undefined} className={drawerItem}>
-            <RoofGlyph className="w-[18px] text-[#C9A574]" /> {luxury.label}
+            <Gem size={18} strokeWidth={1.6} aria-hidden className="text-[#C9A574]" />
+            <span className={cn(luxury.active && "underline decoration-[#C9A574] decoration-2 underline-offset-[6px]")}>{luxury.label}</span>
           </Link>
           <Link href={remote.href} onClick={() => onClose()} className={drawerItem}>
             <span aria-hidden className="w-[18px] text-center text-[#C9A574]">↗</span> {remote.label}

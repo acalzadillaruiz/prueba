@@ -1,8 +1,9 @@
-import { heuristicSearchParse } from "@newplace/ai";
+import { heuristicSearchParse, queryUnderstood, splitUnderstood } from "@newplace/ai";
 
 /**
- * Parsed natural-language query → the search page's URL params (type, zone, price, beds, kind, amenities…), with the
- * typed words kept in `q` for the "we searched for…" note. Shared by the client search boxes and the server page (a
+ * Parsed natural-language query → the search page's URL params (type, zone, price, beds, kind, amenities…). Once the
+ * words are filters (chips) they leave `q`: it keeps only what the parser did not understand (the "no entendimos…"
+ * note), or the whole text when nothing was understood (the "we didn't catch…" panel). Shared by the client search boxes and the server page (a
  * plain module: no "use client", so the server can call it to canonicalise `?q=` links).
  */
 export function queryToParams(q: ReturnType<typeof heuristicSearchParse>, raw: string) {
@@ -20,8 +21,20 @@ export function queryToParams(q: ReturnType<typeof heuristicSearchParse>, raw: s
   if (q.keywords.includes("pets")) p.set("pets", "1");
   if (q.keywords.includes("furnished")) p.set("furnished", "1");
   if (q.keywords.includes("sea")) p.set("sea", "1");
-  if (raw.trim()) p.set("q", raw.trim());
+  const left = leftoverWords(raw, q);
+  if (left) p.set("q", left);
   return p;
+}
+
+/**
+ * The words of `raw` that became no filter: "" when everything was understood, the whole text when nothing was, else
+ * the unknown words ("casa en lechería con helipuerto" → "helipuerto"). Connectors ("en", "con"…) never count.
+ */
+export function leftoverWords(raw: string, q: ReturnType<typeof heuristicSearchParse> = heuristicSearchParse(raw)) {
+  const text = raw.trim();
+  if (!text) return "";
+  if (!queryUnderstood(q)) return text;
+  return splitUnderstood(text).unknown.join(" ");
 }
 
 /** Every URL key that narrows the results (type, q, sort and view don't). */

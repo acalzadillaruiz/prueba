@@ -62,7 +62,7 @@ export function SavedView({ locale, all }: { locale: Locale; all: Listing[] }) {
       )}
       <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {items.map((l) => (
-          <ListingCard key={l.id} l={l} locale={locale} showCompare />
+          <ListingCard key={l.id} l={l} locale={locale} compareToggle />
         ))}
       </div>
       {!loading && items.length === 0 && (

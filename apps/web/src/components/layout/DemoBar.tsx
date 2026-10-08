@@ -26,22 +26,23 @@ export function DemoBar({ locale }: { locale: Locale }) {
   const gate = /^\/(es|en)\/acceso\/?$/.test(path);
   if (!visible || gate) return null;
   // Back-office below lg: its own bottom bar (Panel · Inmuebles · Leads · Calendario · Más) owns the screen's foot, so
-  // the demo switch is a small round button parked just above that bar on the right (never mid-screen over the
-  // content, never over the bar). From lg: the pill, bottom-left, clear of the sidebar.
+  // the demo switch is a slim tab on the LEFT edge just above that bar: it covers only the page gutter (the lists'
+  // badges and actions sit on the right, their checkboxes start past the gutter), never the bar. From lg: the pill,
+  // bottom-left, clear of the sidebar.
   if (admin)
     return (
-      <div className="fixed bottom-[calc(4.75rem+env(safe-area-inset-bottom))] right-3 z-50 print:hidden lg:bottom-4 lg:left-64 lg:right-auto lg:mb-[env(safe-area-inset-bottom)]" data-demobar data-demobar-admin>
+      <div className="fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom))] left-0 z-50 print:hidden lg:bottom-4 lg:left-64 lg:mb-[env(safe-area-inset-bottom)]" data-demobar data-demobar-admin>
         {open && (
-          <div className="absolute bottom-full right-0 mb-2 lg:static lg:mb-0">
+          <div className="absolute bottom-full left-2 mb-2 lg:static lg:mb-0">
             <div className="np-in max-h-[70svh] w-64 overflow-y-auto rounded-np border border-navy-line bg-navy py-1 text-ivory shadow-np lg:mb-2">
               <div className="border-b border-navy-line px-3 py-2 text-xs font-semibold uppercase tracking-wide text-mist">{tx(locale, "Entrar como… (modo demo)", "Sign in as… (demo mode)")}</div>
               <DemoLoginList locale={locale} onDone={() => setOpen(false)} className="p-1" />
             </div>
           </div>
         )}
-        <button onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label={tx(locale, "Modo demo: entrar como…", "Demo mode: sign in as…")} className="flex h-11 w-11 items-center justify-center rounded-full border border-navy-line bg-navy/90 text-sm text-ivory opacity-80 shadow-np backdrop-blur transition-opacity hover:opacity-100 lg:h-auto lg:min-h-11 lg:w-auto lg:min-w-11 lg:gap-2 lg:p-1.5 lg:pr-3.5 lg:opacity-100">
+        <button onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label={tx(locale, "Modo demo: entrar como…", "Demo mode: sign in as…")} className="relative flex h-10 w-6 items-center justify-center rounded-r-full border border-l-0 border-navy-line bg-navy/90 text-sm text-ivory opacity-75 shadow-np backdrop-blur transition-opacity after:absolute after:-inset-y-1 after:-right-2 after:left-0 after:content-[''] hover:opacity-100 lg:h-auto lg:min-h-11 lg:w-auto lg:min-w-11 lg:gap-2 lg:rounded-full lg:border-l lg:p-1.5 lg:pr-3.5 lg:opacity-100 lg:after:hidden">
           <span className="hidden lg:contents">{user ? <Avatar initials={user.initials} hue={user.hue} size={26} /> : <span className="flex h-[26px] w-[26px] items-center justify-center rounded-full bg-white/10"><LogIn size={14} /></span>}</span>
-          <FlaskConical size={15} className="text-[#C9A574]" aria-hidden />
+          <FlaskConical size={13} className="text-[#C9A574] lg:h-[15px] lg:w-[15px]" aria-hidden />
           <span className="hidden font-display lg:inline">Demo</span>
         </button>
       </div>

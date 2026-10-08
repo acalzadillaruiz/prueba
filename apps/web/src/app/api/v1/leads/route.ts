@@ -11,6 +11,7 @@ import { publicWhere } from "@/server/listings";
 import { assertBookableSlot, assertOwnerVisitSlot, lockAgentAndCheck } from "@/server/tours";
 import { isFsbo, OPEN_FOR_TOURS, parseVisitHours, VISIT_PREF_LABEL } from "@/lib/visit-hours";
 import { bump } from "@/server/counters";
+import { addDays, todayCaracas, validateStay } from "@/lib/stay";
 import { recipientLocale, requestLocale, tourWhen, type Loc } from "@/server/email-locale";
 
 const Create = leadSchema;
@@ -27,6 +28,18 @@ export const POST = handler(async (req: NextRequest) => {
   // Only published listings take enquiries; tours only while the property is still available.
   const l = await prisma.listing.findFirst({ where: { AND: [{ id: b.listingId }, publicWhere({ byLink: true })] }, include: { agent: true, owner: true } });
   if (!l) throw new ApiError("NOT_FOUND");
+  // Vacation rentals: the stay asked about (optional, structured). Same rules as the contact panel: both dates, departure
+  // after arrival, the listing's minimum nights and party size. A day of slack on "today" covers time-zone edges.
+  const stayAsked = !!(b.checkIn || b.checkOut || b.guests);
+  if (stayAsked) {
+    if (l.listingType !== "SHORT_RENT") throw new ApiError("VALIDATION", { checkIn: "only vacation rentals take stay dates" });
+    const sr = (l.shortRent ?? null) as { minNights?: number; maxGuests?: number } | null;
+    if (b.checkIn || b.checkOut) {
+      const v = validateStay(b.checkIn, b.checkOut, { today: addDays(todayCaracas(), -1), minNights: sr?.minNights });
+      if (v.error) throw new ApiError("VALIDATION", { [v.error === "missing-out" || v.error === "order" || v.error === "min" || v.error === "max" ? "checkOut" : "checkIn"]: v.error });
+    }
+    if (b.guests && sr?.maxGuests && b.guests > sr.maxGuests) throw new ApiError("VALIDATION", { guests: "more guests than the listing takes" });
+  }
   const tourStart = b.tourStart ? new Date(b.tourStart) : null;
   const fsbo = isFsbo(l);
   const ownerHours = fsbo ? parseVisitHours(l.visitHours) : null;
@@ -69,7 +82,7 @@ export const POST = handler(async (req: NextRequest) => {
       score: score.score,
       nextAction: score.nextAction,
       reason: score.reason,
-      events: { create: { type: "CREATED", data: { source, provider: provider.id, ...(visitRequest ? { visitPrefs: prefs, visitNote } : {}) }, actorId: u?.id } },
+      events: { create: { type: "CREATED", data: { source, provider: provider.id, ...(visitRequest ? { visitPrefs: prefs, visitNote } : {}), ...(stayAsked ? { stay: { checkIn: b.checkIn ?? null, checkOut: b.checkOut ?? null, guests: b.guests ?? null } } : {}) }, actorId: u?.id } },
     },
     });
     if (tourStart && host) await tx.tour.create({ data: { listingId: l.id, leadId: created.id, agentId: host, seekerUserId: u?.id, seekerName: b.name, start: tourStart, virtual: !!b.virtual } });

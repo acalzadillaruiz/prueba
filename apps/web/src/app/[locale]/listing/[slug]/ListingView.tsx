@@ -22,7 +22,7 @@ import { StickyContactBar } from "@/components/detail/StickyContactBar";
 import { BackToResults } from "@/components/detail/BackToResults";
 import { Fold } from "@/components/detail/Fold";
 import { CompareLink } from "@/components/compare/CompareTray";
-import { takesTours } from "@/lib/visit-hours";
+import { OPEN_FOR_TOURS, takesTours } from "@/lib/visit-hours";
 import { zoneStats } from "@/server/zone-stats";
 import { essentialLabels } from "@/lib/essentials";
 
@@ -94,10 +94,12 @@ function Facts({ l, locale }: { l: Listing; locale: Locale }) {
     l.kind !== "land" && [`${l.yearBuilt}`, tx(locale, "año", "year built")],
     l.shortRent && [`${l.shortRent.maxGuests}`, tx(locale, "huéspedes", "guests")],
   ].filter(Boolean) as [string, string][];
+  // Even rows at every width (a lone "1996 AÑO" on a second row read as a mistake): 6 facts → 2 / 3 per row, 4 → 2 / 4.
+  const cols = items.length <= 3 ? ["", "grid-cols-1", "grid-cols-2", "grid-cols-3"][items.length] : items.length === 4 ? "grid-cols-2 sm:grid-cols-4" : items.length >= 7 ? "grid-cols-2 sm:grid-cols-4" : "grid-cols-2 sm:grid-cols-3";
   return (
-    <dl className="flex flex-wrap gap-x-12 gap-y-5 border-y border-line py-6 lg:gap-x-14">
+    <dl className={cn("grid gap-x-8 gap-y-5 border-y border-line py-6", cols)}>
       {items.map(([v, t]) => (
-        <div key={t} className="flex flex-col-reverse">
+        <div key={t} className="flex min-w-0 flex-col-reverse">
           <dt className="mt-1 text-[13px] font-semibold uppercase tracking-[0.14em] text-muted">{t}</dt>
           <dd className="font-serif text-[30px] font-semibold leading-none text-ink">{v}</dd>
         </div>
@@ -247,8 +249,9 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
             )}
           </div>
 
-          {/* Desktop: the sticky card never outgrows the viewport (it scrolls inside if a long form opens). */}
-          <aside id="contact" className="scroll-mt-24 lg:sticky lg:top-24 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:-m-2 lg:max-h-[calc(100dvh-7rem)] lg:self-start lg:overflow-y-auto lg:overscroll-contain lg:p-2">
+          {/* Desktop: the sticky card never outgrows the viewport (it scrolls inside if a long form opens). The scroller's
+              padding is as wide as the card's soft shadow (0 20px 50px -18px), so overflow never clips it into a hard edge. */}
+          <aside id="contact" className="scroll-mt-24 lg:sticky lg:top-[84px] lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:-mx-8 lg:-mb-12 lg:-mt-3 lg:max-h-[calc(100dvh-84px)] lg:self-start lg:overflow-y-auto lg:overscroll-contain lg:px-8 lg:pb-12 lg:pt-3">
             <ContactPanel l={l} locale={locale} />
           </aside>
 
@@ -313,6 +316,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
           meta={[lbl(TYPE_LABEL[l.listingType], locale), l.areaM2 > 0 && `${num(l.areaM2, locale)} m²`].filter(Boolean).join(" · ")}
           suffix={priceSuffix(l, locale)}
           tour={takesTours(l)}
+          stay={l.listingType === "SHORT_RENT" && OPEN_FOR_TOURS.includes(l.status)}
           whatsapp={whatsappHref(l, locale)}
           agentFirst={l.agent?.name.split(" ")[0]}
         />

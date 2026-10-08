@@ -71,12 +71,15 @@ test.describe("Cliente · regresiones de la revisión", () => {
     await page.getByRole("button", { name: "Continuar" }).click();
     await expect(page.getByText("Paso 4 de 6")).toBeVisible();
     await page.getByRole("button", { name: "Continuar" }).click();
-    // Price accepts being cleared while typing; an empty price blocks with a message.
+    // Price accepts being cleared while typing; no red error on arrival or while typing (only after leaving the field or
+    // pressing "Continuar"); an empty price then blocks with a message.
     const price = page.getByLabel("Tu precio (USD)");
+    await expect(page.getByText("Escribe un precio en USD mayor que 0, sin decimales.")).toHaveCount(0);
     await price.fill("");
-    await expect(page.getByText("Escribe un precio en USD mayor que 0, sin decimales.")).toBeVisible();
+    await expect(page.getByText("Escribe un precio en USD mayor que 0, sin decimales.")).toHaveCount(0);
     // "Continuar" stays tappable: it says what's missing and keeps the owner on this step.
     await page.getByRole("button", { name: "Continuar" }).click();
+    await expect(page.getByText("Escribe un precio en USD mayor que 0, sin decimales.")).toBeVisible();
     await expect(page.getByTestId("wizard-blocked")).toContainText("Tu precio en USD");
     await expect(page.getByText("Paso 5 de 6")).toBeVisible();
     await price.fill("95000");
@@ -228,6 +231,28 @@ test.describe("Cliente · regresiones de la revisión", () => {
     expect(dupKeys).toEqual([]);
     await page.evaluate(() => localStorage.removeItem("np-compare-v1"));
   });
+  test("comparador en móvil: las 3 casas a la vista a la vez, cada fila con su nombre encima", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    const some = await apiAs(page, "GET", "listings?type=SALE&take=3");
+    const ids = (some.json.items as { id: string }[]).map((l) => l.id);
+    expect(ids).toHaveLength(3);
+    await page.goto(`/es/compare?ids=${ids.join(",")}`);
+    const stack = page.locator("[data-compare-stack]");
+    await expect(stack).toBeVisible();
+    await expect(page.getByRole("table")).toBeHidden();
+    // Three columns side by side, all inside the screen (no sideways scroll).
+    const cols = await stack.locator(":scope > div").first().locator(":scope > div").evaluateAll((els) => els.map((e) => [e.getBoundingClientRect().left, e.getBoundingClientRect().right]));
+    expect(cols).toHaveLength(3);
+    for (const [l, r] of cols) {
+      expect(l).toBeGreaterThanOrEqual(0);
+      expect(r).toBeLessThanOrEqual(390);
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+    // The row's name sits above its values.
+    const term = stack.getByRole("term").filter({ hasText: /^Superficie$/ });
+    const value = term.locator("xpath=following-sibling::dd[1]");
+    expect((await term.boundingBox())!.y).toBeLessThan((await value.boundingBox())!.y);
+  });
 
   test("móvil: la búsqueda abre en lista y la hoja «Filtros» se cierra con «Ver N casas»", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
@@ -358,9 +383,11 @@ test.describe("Cliente · regresiones de la revisión", () => {
     expect(await page.locator("#search-results a button, #search-results a a").count()).toBe(0);
     // Owner listings say so in the agreed wording.
     for (const t of await page.locator('[data-testid="card-advisor"][data-owner]').allInnerTexts()) expect(t).toMatch(/Dueño\/a · sin intermediarios$/);
-    // Skip link: after the filter bar, visible on focus, lands on the results.
+    // Skip link: the very first Tab stop on /search (the header's), visible on focus, lands on the results.
+    await page.locator("body").focus();
+    await page.keyboard.press("Tab");
     const skip = page.getByRole("link", { name: "Saltar a los resultados" });
-    await skip.focus();
+    await expect(skip).toBeFocused();
     await expect(skip).toBeVisible();
     await skip.press("Enter");
     await expect(page.locator("#search-results-grid")).toBeFocused();
@@ -370,8 +397,27 @@ test.describe("Cliente · regresiones de la revisión", () => {
 
   test("búsqueda: una frase entendida a medias dice qué palabras no entendimos", async ({ page }) => {
     await page.goto("/es/search?type=SALE&kind=house&q=zzqx+casa+rara");
-    await expect(page.locator('[data-testid="partly-understood"]:visible')).toHaveText("Buscamos «casa»; no entendimos «zzqx rara».");
+    await expect(page.locator('[data-testid="partly-understood"]:visible')).toHaveText("No entendimos «zzqx rara»; buscamos con el resto.");
     await expect(page.getByTestId("not-understood")).toHaveCount(0);
+    // The box keeps only the leftover words (the rest is the «Casa» chip).
+    await expect(page.getByRole("combobox", { name: "Cuéntanos con tus palabras qué buscas" })).toHaveValue("zzqx rara");
+  });
+  test("búsqueda: lo entendido pasa a filtros y sale de la caja; añadir palabras suma filtros", async ({ page }) => {
+    await page.goto("/es/search?type=SALE");
+    const box = page.getByRole("combobox", { name: "Cuéntanos con tus palabras qué buscas" });
+    await nlSearch(page, "Cuéntanos con tus palabras qué buscas", "casa con piscina", /kind=house/);
+    expect(new URL(page.url()).searchParams.get("q")).toBeNull();
+    await expect(box).toHaveValue("");
+    await expect(page.getByRole("button", { name: "Quitar filtro: Casa" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Quitar filtro: Piscina" })).toBeVisible();
+    await expect(page.getByTestId("partly-understood")).toHaveCount(0);
+    // Refining from the (empty) box keeps the chips already on.
+    await nlSearch(page, "Cuéntanos con tus palabras qué buscas", "con terraza", /am=pool%2Cterrace|am=pool,terrace/);
+    await expect(page.getByRole("button", { name: "Quitar filtro: Casa" })).toBeVisible();
+    // Removing a chip leaves no stale text behind.
+    await page.getByRole("button", { name: "Quitar filtro: Casa" }).click();
+    await expect(page).not.toHaveURL(/kind=house/);
+    await expect(box).toHaveValue("");
   });
   test("búsqueda: un enlace ?q= aplica lo que entendimos (redirige a filtros) y la nota es verdad", async ({ page }) => {
     await page.goto("/es/search?q=" + encodeURIComponent("casa en lechería con helipuerto"));
@@ -379,14 +425,16 @@ test.describe("Cliente · regresiones de la revisión", () => {
     const url = new URL(page.url());
     expect(url.searchParams.get("kind")).toBe("house");
     expect(url.searchParams.get("type")).toBe("SALE");
-    expect(url.searchParams.get("q")).toBe("casa en lechería con helipuerto");
-    await expect(page.locator('[data-testid="partly-understood"]:visible')).toHaveText("Buscamos «casa lechería»; no entendimos «helipuerto».");
+    expect(url.searchParams.get("q")).toBe("helipuerto");
+    await expect(page.locator('[data-testid="partly-understood"]:visible')).toHaveText("No entendimos «helipuerto»; buscamos con el resto.");
     await expect(page.getByRole("button", { name: "Quitar filtro: Lechería" })).toBeVisible();
     const api = await apiAs(page, "GET", "listings?type=SALE&zone=Lecher%C3%ADa&kind=house");
     await expect(page.getByText(/^\d+ resultados?$/).first()).toHaveText(new RegExp(`^${api.json.total} resultados?$`));
-    // Removing what we understood makes the note untrue: it goes.
+    // Removing a chip keeps the note true (we still didn't catch «helipuerto»); the box holds just that word.
     await page.getByRole("button", { name: "Quitar filtro: Lechería" }).click();
-    await expect(page.locator('[data-testid="partly-understood"]:visible')).toHaveCount(0);
+    await expect(page).not.toHaveURL(/zone=/);
+    await expect(page.locator('[data-testid="partly-understood"]:visible')).toHaveText("No entendimos «helipuerto»; buscamos con el resto.");
+    await expect(page.getByRole("combobox", { name: "Cuéntanos con tus palabras qué buscas" })).toHaveValue("helipuerto");
   });
   test("móvil: el mapa es un paso del historial; «Atrás» lo cierra sin salir de la búsqueda", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });

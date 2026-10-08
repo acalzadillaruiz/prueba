@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -17,7 +17,7 @@ import { useApp } from "@/lib/store";
 import { tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import { k } from "@/components/agency/kit";
-import { homeFor } from "./AuthForm";
+import { FORGOT_EMAIL_KEY, homeFor } from "./AuthForm";
 
 const forgotSchema = registerSchema.pick({ email: true });
 // Same rules as sign-up (min 8, max 100) plus a confirmation that must match.
@@ -38,7 +38,16 @@ function Shell({ eyebrow, title, lead, children }: { eyebrow: string; title: str
 
 /** "¿Olvidaste tu contraseña?": asks for the email and always answers the same way (never says whether it exists). */
 export function ForgotPasswordForm({ locale, initialEmail = "" }: { locale: Locale; initialEmail?: string }) {
-  const { register, handleSubmit, formState, getValues } = useForm<{ email: string }>({ resolver: zodResolver(forgotSchema), mode: "onTouched", defaultValues: { email: forgotSchema.safeParse({ email: initialEmail }).success ? initialEmail : "" } });
+  const { register, handleSubmit, formState, getValues, setValue } = useForm<{ email: string }>({ resolver: zodResolver(forgotSchema), mode: "onTouched", defaultValues: { email: forgotSchema.safeParse({ email: initialEmail }).success ? initialEmail : "" } });
+  // The login form hands over the email it already had through sessionStorage (one shot), not the URL; ?email= still works.
+  useEffect(() => {
+    let stored: string | null = null;
+    try {
+      stored = sessionStorage.getItem(FORGOT_EMAIL_KEY);
+      sessionStorage.removeItem(FORGOT_EMAIL_KEY);
+    } catch {}
+    if (stored && !getValues("email") && forgotSchema.safeParse({ email: stored }).success) setValue("email", stored);
+  }, [getValues, setValue]);
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
   const [err, setErr] = useState<string | null>(null);

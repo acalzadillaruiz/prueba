@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, CalendarCheck, MessageSquare, Scale } from "lucide-react";
+import { ArrowRight, CalendarCheck, CalendarDays, MessageSquare, Scale } from "lucide-react";
 import type { Locale } from "@/types/domain";
 import { tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
@@ -28,7 +28,7 @@ export function compactPrice(amount: number, locale: Locale) {
  * comparator (a slim chip on top) instead of a floating tray over the form, and the floating contact buttons stay
  * hidden while it is up ([data-hide-fab-mobile]).
  */
-export function StickyContactBar({ locale, price, amount, meta, suffix, tour, dark, whatsapp: waBase, agentFirst }: { locale: Locale; price: string; /** Raw amount: lets the bar fall back to "USD 265k" when the full price doesn't fit. */ amount?: number; /** Second line, e.g. "Venta · 160 m²". */ meta?: string; suffix: string; tour: boolean; dark?: boolean; whatsapp?: string | null; agentFirst?: string }) {
+export function StickyContactBar({ locale, price, amount, meta, suffix, tour, stay, dark, whatsapp: waBase, agentFirst }: { locale: Locale; price: string; /** Raw amount: lets the bar fall back to "USD 265k" when the full price doesn't fit. */ amount?: number; /** Second line, e.g. "Venta · 160 m²". */ meta?: string; suffix: string; tour: boolean; /** Vacation rental: the panel asks for dates ("Consultar disponibilidad"), not a visit. */ stay?: boolean; dark?: boolean; whatsapp?: string | null; agentFirst?: string }) {
   // Prefilled WhatsApp text carries this listing's URL.
   const whatsapp = useListingWhatsApp(waBase);
   const { compare } = useApp();
@@ -68,9 +68,10 @@ export function StickyContactBar({ locale, price, amount, meta, suffix, tour, da
     return () => ro.disconnect();
   }, [amount, price, suffix]);
   const shownPrice = compact && amount != null ? compactPrice(amount, locale) : price;
-  const label = tour ? tx(locale, "Pedir visita", "Request a tour") : tx(locale, "Contactar", "Contact");
+  const label = stay ? tx(locale, "Consultar disponibilidad", "Check availability") : tour ? tx(locale, "Pedir visita", "Request a tour") : tx(locale, "Contactar", "Contact");
   // Short visible word on every width (the accessible name, `label`, contains it: "Pedir visita" ⊃ "visita").
-  const short = tour ? tx(locale, "Visita", "Tour") : tx(locale, "Contactar", "Contact");
+  const short = stay ? tx(locale, "Disponibilidad", "Availability") : tour ? tx(locale, "Visita", "Tour") : tx(locale, "Contactar", "Contact");
+  const Icon = stay ? CalendarDays : tour ? CalendarCheck : MessageSquare;
   return (
     <div
       data-sticky-cta={shown ? "shown" : "hidden"}
@@ -116,19 +117,21 @@ export function StickyContactBar({ locale, price, amount, meta, suffix, tour, da
           <>
             {/* One terracotta action: WhatsApp with the advisor. The tour form stays one tap away (navy outline). */}
             <button onClick={go} tabIndex={shown ? 0 : -1} aria-label={label} className={cn("np-btn-outline inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-1.5 rounded-full border-[1.5px] px-3.5 font-display text-sm font-semibold max-[399px]:gap-1 max-[399px]:px-2.5", dark ? "border-ivory text-ivory" : "border-navy text-navy")}>
-              {tour ? <CalendarCheck size={17} aria-hidden /> : <MessageSquare size={17} aria-hidden />}
+              <Icon size={17} aria-hidden />
               <span>{short}</span>
             </button>
-            {/* Below 380 px WhatsApp keeps only its (universally known) glyph; the name stays for screen readers. */}
-            <a href={whatsapp} target="_blank" rel="noopener noreferrer" tabIndex={shown ? 0 : -1} className="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-2 rounded-full bg-coral-cta px-3.5 font-display text-sm font-semibold text-white hover:bg-coral-cta-hover max-[399px]:px-3 max-[379px]:px-0">
-              <WhatsAppIcon size={17} /> <span className="max-[379px]:sr-only">WhatsApp</span>
+            {/* Below 380 px WhatsApp keeps only its (universally known) glyph; the name stays for screen readers.
+                "Disponibilidad" (vacation rentals) is longer than "Visita", so there the glyph-only button starts at 420 px. */}
+            <a href={whatsapp} target="_blank" rel="noopener noreferrer" tabIndex={shown ? 0 : -1} className={cn("inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-2 rounded-full bg-coral-cta px-3.5 font-display text-sm font-semibold text-white hover:bg-coral-cta-hover max-[399px]:px-3 max-[379px]:px-0", stay && "max-[419px]:px-0")}>
+              <WhatsAppIcon size={17} /> <span className={stay ? "max-[419px]:sr-only" : "max-[379px]:sr-only"}>WhatsApp</span>
               {agentFirst && <span className="sr-only">{tx(locale, ` con ${agentFirst}`, ` ${agentFirst}`)}</span>}
             </a>
           </>
         ) : (
-          <button onClick={go} tabIndex={shown ? 0 : -1} className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full bg-coral-cta px-5 font-display text-sm font-semibold text-white hover:bg-coral-cta-hover">
-            {tour ? <CalendarCheck size={16} aria-hidden /> : <MessageSquare size={16} aria-hidden />}
-            {label}
+          <button onClick={go} tabIndex={shown ? 0 : -1} aria-label={stay ? label : undefined} className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full bg-coral-cta px-5 font-display text-sm font-semibold text-white hover:bg-coral-cta-hover">
+            <Icon size={16} aria-hidden />
+            {/* "Consultar disponibilidad" doesn't fit beside the price on phones: the bar shows "Disponibilidad". */}
+            {stay ? short : label}
           </button>
         )}
       </div>

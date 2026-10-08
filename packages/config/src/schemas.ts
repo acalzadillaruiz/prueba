@@ -28,6 +28,10 @@ export const leadSchema = z.object({
   /** FSBO without a free slot: when the visitor would like to come (the owner then proposes a time). */
   visitPrefs: z.array(z.enum(["WEEKDAY_AM", "WEEKDAY_PM", "WEEKEND"])).max(3).optional(),
   visitNote: z.string().trim().max(200).optional(),
+  /** Vacation rentals (SHORT_RENT): the stay asked about, as calendar days ("YYYY-MM-DD"), and the party size. */
+  checkIn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  checkOut: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  guests: z.number().int().min(1).max(50).optional(),
 });
 
 export const captureSchema = z.object({

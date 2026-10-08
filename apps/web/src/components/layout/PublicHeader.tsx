@@ -265,7 +265,32 @@ export function PublicHeader({ locale, variant = "light", autoHide = false }: { 
   };
   return (
     <>
-    <a href="#main" className="sr-only-focusable fixed left-3 top-3 z-[70] rounded-full bg-navy px-4 py-2 font-display text-ivory">{locale === "es" ? "Saltar al contenido" : "Skip to content"}</a>
+    {/* First Tab stop. On /search it skips the filter bar too: straight to the results grid (when it is on screen —
+        no results, or the phone map view: the main content). */}
+    <a
+      href={onSearch ? "#search-results-grid" : "#main"}
+      onClick={
+        onSearch
+          ? (e) => {
+              const grid = document.getElementById("search-results-grid");
+              if (!grid || !grid.childElementCount || !grid.offsetParent) {
+                e.preventDefault();
+                const main = document.getElementById("main");
+                if (main && !main.hasAttribute("tabindex")) main.tabIndex = -1;
+                main?.focus({ preventScroll: true });
+                main?.scrollIntoView({ block: "start" });
+                return;
+              }
+              e.preventDefault();
+              grid.focus({ preventScroll: true });
+              grid.scrollIntoView({ block: "start" });
+            }
+          : undefined
+      }
+      className="sr-only-focusable fixed left-3 top-3 z-[70] rounded-full bg-navy px-4 py-2 font-display text-ivory"
+    >
+      {onSearch ? tx(locale, "Saltar a los resultados", "Skip to results") : tx(locale, "Saltar al contenido", "Skip to content")}
+    </a>
     <header
       data-public-header
       style={{ paddingTop: "env(safe-area-inset-top)" }}

@@ -14,7 +14,10 @@ import { cn } from "@/lib/cn";
 import { useListingsByIds } from "./useListingsByIds";
 
 const isSale = (l: Listing) => l.listingType === "SALE" || l.listingType === "COMMERCIAL_SALE";
-const yes = (on: boolean, locale: Locale) => (on ? <Check size={16} className="text-ok" aria-label={tx(locale, "Sí", "Yes")} /> : <Minus size={16} className="text-muted" aria-label={tx(locale, "No", "No")} />);
+/** Green / amber that keep ≥ 4.5:1 on the dark card (#2A2420) too. */
+const OK = "text-ok dark:text-[#8FCBA6]";
+const WARN = "text-warn dark:text-[#E0A84A]";
+const yes = (on: boolean, locale: Locale) => (on ? <Check size={16} className={OK} aria-label={tx(locale, "Sí", "Yes")} /> : <Minus size={16} className="text-muted" aria-label={tx(locale, "No", "No")} />);
 
 type Row = {
   label: string;
@@ -50,14 +53,14 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
   const unit = (l: Listing) => <span className="text-xs font-normal text-muted">{priceSuffix(l, locale)}</span>;
   const ppm = (l: Listing) => (l.areaM2 > 0 ? l.priceAmount / l.areaM2 : NaN);
   const allRows: Row[] = [
-    { label: tx(locale, "Precio", "Price"), render: (l) => <span className="font-serif text-[22px] font-medium leading-tight">{money(l.priceAmount, locale)}{unit(l)}</span>, val: sameUnit ? (l) => l.priceAmount : undefined, best: "min" },
+    { label: tx(locale, "Precio", "Price"), render: (l) => <span className="font-serif text-[17px] font-medium leading-tight md:text-[22px]">{money(l.priceAmount, locale)}{unit(l)}</span>, val: sameUnit ? (l) => l.priceAmount : undefined, best: "min" },
     { label: tx(locale, "Precio por m²", "Price per m²"), render: (l) => (Number.isFinite(ppm(l)) ? <>{num(Math.round(ppm(l) * (l.pricePeriod ? 10 : 1)) / (l.pricePeriod ? 10 : 1), locale)} USD/m²{unit(l)}</> : "—"), val: sameUnit ? ppm : undefined, best: "min" },
     { label: "PlaceEstimate", render: (l) => <>{money(l.estimate.mid, locale)}{unit(l)}</> },
     {
       label: tx(locale, "Vs. estimación", "Vs. estimate"),
       render: (l) => {
         const d = ((l.priceAmount - l.estimate.mid) / l.estimate.mid) * 100;
-        return <span className={d <= 0 ? "font-semibold text-ok" : "font-semibold text-warn"}>{d > 0 ? "+" : ""}{d.toFixed(0)} %</span>;
+        return <span className={cn("font-semibold", d <= 0 ? OK : WARN)}>{d > 0 ? "+" : ""}{d.toFixed(0)} %</span>;
       },
       val: (l) => (l.priceAmount - l.estimate.mid) / l.estimate.mid,
       best: "min",
@@ -81,6 +84,14 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
     { label: tx(locale, "Días publicado", "Days listed"), render: (l) => l.daysOnMarket, val: (l) => l.daysOnMarket, best: "min" },
   ];
   const rows = allRows.filter((r) => !r.show || cmp.some(r.show));
+  // Per row: which column wins (green), only when the values differ.
+  const wins = rows.map(({ val, best }) => {
+    const vals = val ? cmp.map(val) : [];
+    const target = val ? (best === "min" ? Math.min(...vals) : Math.max(...vals)) : null;
+    return (i: number) => !!val && cmp.length > 1 && Number.isFinite(vals[i]) && vals[i] === target && new Set(vals).size > 1;
+  });
+  const cols = { gridTemplateColumns: `repeat(${Math.max(2, cmp.length)}, minmax(0, 1fr))` };
+  const removeLabel = (title: string) => tx(locale, `Quitar «${title}» de la comparación`, `Remove “${title}” from the comparison`);
 
   return (
     <div className="mx-auto max-w-[1280px] px-4 pb-32 pt-10 md:px-6">
@@ -116,26 +127,67 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
       {loading && cmp.length === 0 && <div className="np-skeleton mt-8 h-[420px] rounded-[18px]" aria-label={tx(locale, "Un momento…", "One moment…")} />}
 
       {cmp.length > 0 && (
-        <section className={cn("np-in mt-8 overflow-hidden", k.card)} aria-label={tx(locale, "Comparación", "Comparison")}>
+        <section className={cn("np-in mt-8 overflow-clip", k.card)} aria-label={tx(locale, "Comparación", "Comparison")}>
           <div className="flex items-center gap-2 border-b border-line bg-navy px-5 py-3 text-ivory">
             <Scale size={18} strokeWidth={1.6} className="text-[#C9A574]" aria-hidden />
             <span className="font-serif text-[20px] font-medium">{tx(locale, `${cmp.length} ${cmp.length === 1 ? "casa" : "casas"}`, `${cmp.length} ${cmp.length === 1 ? "home" : "homes"}`)}</span>
             <span className="text-sm text-mist">{cmp.length}/3</span>
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm" style={{ minWidth: `${9 + cmp.length * 13}rem` }}>
+          {/* Phones and small tablets: every home in view at once (a column each, 33–50 %), each row's label above its
+              values, and the photos + titles pinned under the header while the rows scroll. */}
+          <div className="md:hidden" data-compare-stack>
+            <div className="sticky top-[calc(env(safe-area-inset-top)+var(--np-header-offset,80px)_-_8px)] z-[2] grid gap-2 border-b border-line bg-white p-3 transition-[top] duration-300 ease-[cubic-bezier(.2,.7,.2,1)] dark:bg-navy-card" style={cols}>
+              {cmp.map((l) => {
+                const title = tx(locale, l.title_es, l.title_en);
+                return (
+                  <div key={l.id} className="min-w-0">
+                    <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-arena">
+                      <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} sizes="50vw" className="h-full w-full" />
+                      <button type="button" onClick={() => remove(l.id)} aria-label={removeLabel(title)} className="absolute right-1 top-1 flex h-7 w-7 items-center justify-center rounded-full bg-white text-[#1E1A18] shadow after:absolute after:-inset-2 after:content-['']">
+                        <X size={13} aria-hidden />
+                      </button>
+                    </div>
+                    <Link href={`/${locale}/listing/${l.slug}`} className="mt-1.5 line-clamp-2 block break-words font-serif text-[14px] font-medium leading-tight underline-offset-4 hover:underline">
+                      {title}
+                    </Link>
+                  </div>
+                );
+              })}
+            </div>
+            <dl>
+              {rows.map(({ label, render }, r) => (
+                <div key={label} className="border-t border-line px-3 py-2.5 first:border-t-0">
+                  <dt className="text-[13px] font-semibold text-muted">{label}</dt>
+                  <dd className="mt-1 grid gap-2" style={cols}>
+                    {cmp.map((l, i) => (
+                      <span key={l.id} className={cn("min-w-0 break-words rounded-md px-1.5 py-1 text-[14px] leading-snug", wins[r](i) && "bg-[#2F6B4F14] dark:bg-[#8FCBA61A]")}>
+                        {render(l)} {wins[r](i) && <Check size={13} className={cn("ml-0.5 inline", OK)} aria-label={tx(locale, "La mejor", "Best")} />}
+                      </span>
+                    ))}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+          {/* md and up: a table, every home's column the same width. */}
+          <div className="hidden overflow-x-auto md:block">
+            <table className="w-full table-fixed text-sm" style={{ minWidth: `${9 + cmp.length * 11.5}rem` }}>
+              <colgroup>
+                <col className="w-36 lg:w-48" />
+                {cmp.map((l) => <col key={l.id} />)}
+              </colgroup>
               <thead>
                 <tr>
-                  <th className={cn("sticky left-0 z-[1] w-36", k.stickyCol)}>
+                  <th className={cn("sticky left-0 z-[1]", k.stickyCol)}>
                     <span className="sr-only">{tx(locale, "Característica", "Feature")}</span>
                   </th>
                   {cmp.map((l) => {
                     const title = tx(locale, l.title_es, l.title_en);
                     return (
                       <th key={l.id} scope="col" className="p-4 text-left align-top font-normal">
-                        <div className="relative">
-                          <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} sizes="(max-width: 768px) 60vw, 25vw" className="aspect-[4/3] w-full overflow-hidden rounded-lg" />
-                          <button type="button" onClick={() => remove(l.id)} aria-label={tx(locale, `Quitar «${title}» de la comparación`, `Remove “${title}” from the comparison`)} className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-white shadow after:absolute after:-inset-1.5 after:content-['']">
+                        <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-arena">
+                          <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} sizes="(max-width: 1280px) 30vw, 380px" className="h-full w-full" />
+                          <button type="button" onClick={() => remove(l.id)} aria-label={removeLabel(title)} className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-white text-[#1E1A18] shadow after:absolute after:-inset-1.5 after:content-['']">
                             <X size={14} aria-hidden />
                           </button>
                         </div>
@@ -148,21 +200,16 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
                 </tr>
               </thead>
               <tbody>
-                {rows.map(({ label, render, val, best }) => {
-                  const vals = val ? cmp.map(val) : [];
-                  const target = val ? (best === "min" ? Math.min(...vals) : Math.max(...vals)) : null;
-                  const win = (i: number) => !!val && cmp.length > 1 && Number.isFinite(vals[i]) && vals[i] === target && new Set(vals).size > 1;
-                  return (
-                    <tr key={label} className="border-t border-line">
-                      <td className={cn("sticky left-0 z-[1] px-4 py-2.5 font-semibold text-muted", k.stickyCol)}>{label}</td>
-                      {cmp.map((l, i) => (
-                        <td key={l.id} className={cn("px-4 py-2.5", win(i) && "bg-[#2F6B4F0F]")}>
-                          {render(l)} {win(i) && <Check size={13} className="ml-1 inline text-ok" aria-label={tx(locale, "La mejor", "Best")} />}
-                        </td>
-                      ))}
-                    </tr>
-                  );
-                })}
+                {rows.map(({ label, render }, r) => (
+                  <tr key={label} className="border-t border-line">
+                    <td className={cn("sticky left-0 z-[1] px-4 py-2.5 font-semibold text-muted", k.stickyCol)}>{label}</td>
+                    {cmp.map((l, i) => (
+                      <td key={l.id} className={cn("break-words px-4 py-2.5", wins[r](i) && "bg-[#2F6B4F0F] dark:bg-[#8FCBA614]")}>
+                        {render(l)} {wins[r](i) && <Check size={13} className={cn("ml-1 inline", OK)} aria-label={tx(locale, "La mejor", "Best")} />}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>

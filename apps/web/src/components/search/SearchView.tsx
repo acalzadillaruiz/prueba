@@ -4,7 +4,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowRight, Bell, Check, ChevronDown, List, Loader2, Map as MapIcon, Scale, SlidersHorizontal, Sparkles, X } from "lucide-react";
-import { closestPlaces, heuristicSearchParse, queryUnderstood, splitUnderstood } from "@newplace/ai";
+import { closestPlaces, heuristicSearchParse, queryUnderstood } from "@newplace/ai";
 import type { Amenity, Listing, Locale } from "@/types/domain";
 import { MapView as NightMap } from "@/components/map/MapView";
 import { FIT_PADDING } from "@/components/map/NightMap";
@@ -17,7 +17,7 @@ import { cn } from "@/lib/cn";
 import { useApp } from "@/lib/store";
 import { api } from "@/lib/api";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { FILTER_KEYS, queryToParams } from "./queryParams";
+import { FILTER_KEYS, leftoverWords, queryToParams } from "./queryParams";
 import { URL_CHANGE_EVENT } from "@/components/layout/PublicHeader";
 import { essentialChips, essentialsFromParams } from "@/lib/essentials";
 import { placesFromGroups, usePlaceSuggest } from "./PlaceSuggest";
@@ -157,9 +157,12 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
   }, [view]);
   const [alertSaved, setAlertSaved] = useState(false);
   const qText = sp.get("q") ?? "";
-  const [nl, setNl] = useState(qText);
-  // Back / forward to another search: the box shows that search's words.
-  useEffect(() => setNl(qText), [qText]);
+  // Words the parser turned into filters live on as chips; the box keeps only the words it did not understand (older
+  // links may still carry the whole sentence in `q`).
+  const leftover = useMemo(() => leftoverWords(qText), [qText]);
+  const [nl, setNl] = useState(leftover);
+  // Back / forward to another search: the box shows that search's leftover words.
+  useEffect(() => setNl(leftover), [leftover]);
 
   const type = sp.get("type") ?? "SALE";
   const zone = sp.get("zone");
@@ -211,14 +214,26 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
   const searchArea = (b: [number, number, number, number]) => set({ bbox: b.map((v) => v.toFixed(5)).join(","), poly: null, radius: null });
   const clearAll = () => set(Object.fromEntries([...FILTER_KEYS, "q"].map((k) => [k, null])));
 
-  /** Natural-language search (filter bar, "try instead" ideas): the parser turns the words into filters. */
+  /**
+   * Natural-language search (filter bar, "try instead" ideas): the parser turns the words into filters, added to the
+   * ones already on (the box holds no chip's words, so typing "con piscina" refines the search instead of wiping it).
+   * A new operation drops the price (rent and sale prices differ). `q` keeps only the words not understood.
+   */
   const runNl = (text: string) => {
     const raw = text.trim();
     const q = heuristicSearchParse(raw);
-    const p = queryToParams(q, raw);
-    if (!q.listingType) p.set("type", type);
-    if (sort !== "rec") p.set("sort", sort);
-    if (view === "map") p.set("view", "map");
+    const parsed = queryToParams(q, raw);
+    const p = new URLSearchParams(sp.toString());
+    p.delete("q");
+    if (q.listingType && q.listingType !== type) ["min", "max"].forEach((k) => p.delete(k));
+    for (const [k, v] of parsed.entries()) {
+      if (k === "am") p.set("am", [...new Set([...(p.get("am") ?? "").split(","), ...v.split(",")])].filter(Boolean).join(","));
+      else p.set(k, v);
+    }
+    if (parsed.get("zone")) p.delete("city");
+    if (!p.get("type")) p.set("type", type);
+    // The understood words leave the box at once (the effect below only fires when the leftovers change).
+    setNl(parsed.get("q") ?? "");
     router.push(`/${locale}/search?${p.toString()}`);
   };
 
@@ -247,16 +262,9 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
   const notUnderstood = !!qText.trim() && !FILTER_KEYS.some((k) => sp.get(k)) && !queryUnderstood(heuristicSearchParse(qText));
   const didYouMean = useMemo(() => (notUnderstood ? closestPlaces(qText, places, 3) : []), [notUnderstood, qText, places]);
   const placeIdeas = didYouMean.length ? didYouMean : zones.slice(0, 3).map((g) => ({ name: g.city }));
-  // Partly understood ("zzqx casa rara"): the understood words became filters; say which words were left out. Only
-  // while those filters are really applied (a removed chip makes "we searched for…" untrue, so the note goes).
-  const partly = useMemo(() => {
-    if (!qText.trim() || notUnderstood) return null;
-    const parsed = queryToParams(heuristicSearchParse(qText), qText);
-    const p = new URLSearchParams(qs);
-    if (![...parsed.entries()].every(([k, v]) => k === "q" || p.get(k) === v)) return null;
-    const r = splitUnderstood(qText);
-    return r.understood.length && r.unknown.length ? r : null;
-  }, [qText, notUnderstood, qs]);
+  // Partly understood ("casa en lechería con helipuerto"): the understood words are chips; the note names only the
+  // words left out (still true when a chip is removed).
+  const partly = !notUnderstood && leftover ? leftover : null;
 
   // The listing page offers "← Resultados" back to this exact search.
   useEffect(() => {
@@ -548,21 +556,6 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
           </div>
         )}
       </div>
-      {/* Keyboard: straight from the filters to the first result (hidden until focused). */}
-      {hasResults && !listHidden && (
-        <a
-          href="#search-results-grid"
-          onClick={(e) => {
-            e.preventDefault();
-            const grid = document.getElementById("search-results-grid");
-            grid?.focus({ preventScroll: true });
-            grid?.scrollIntoView({ block: "start" });
-          }}
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-[calc(var(--np-header-offset,80px)+64px)] focus:z-[60] focus:rounded-full focus:bg-[#1E1A18] focus:px-5 focus:py-3 focus:font-display focus:text-sm focus:font-semibold focus:text-[#F1EBE3] focus:shadow-np lg:focus:top-[136px]"
-        >
-          {tx(locale, "Saltar a los resultados", "Skip to results")}
-        </a>
-      )}
       {/* "Más filtros" backdrop: dims the page; a click on it closes the panel (useDismiss). */}
       {moreOpen && desktop && <div aria-hidden className="np-in fixed inset-0 z-20 bg-[#1E1A18]/35" />}
 
@@ -620,7 +613,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
             {activeChips.length > 0 && (
               <div className="no-scrollbar flex gap-1.5 overflow-x-auto px-4 pt-3 lg:flex-wrap lg:px-5">
                 {activeChips.map(([k, label, patch]) => (
-                  <button key={k} type="button" onClick={() => set(patch)} aria-label={`${tx(locale, "Quitar filtro", "Remove filter")}: ${label}`} className="np-sel inline-flex min-h-9 shrink-0 items-center gap-1 rounded-full px-3 text-[13px] font-semibold">
+                  <button key={k} type="button" onClick={() => set(qText.trim() !== leftover ? { ...patch, q: leftover || null } : patch)} aria-label={`${tx(locale, "Quitar filtro", "Remove filter")}: ${label}`} className="np-sel inline-flex min-h-9 shrink-0 items-center gap-1 rounded-full px-3 text-[13px] font-semibold">
                     {label} <X size={12} aria-hidden />
                   </button>
                 ))}
@@ -628,7 +621,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
             )}
             {partly && (
               <p role="status" data-testid="partly-understood" className="px-4 pt-3 text-[13px] leading-snug text-muted lg:px-5">
-                {tx(locale, `Buscamos «${partly.understood.join(" ")}»; no entendimos «${partly.unknown.join(" ")}».`, `We searched for «${partly.understood.join(" ")}»; we didn’t catch «${partly.unknown.join(" ")}».`)}
+                {tx(locale, `No entendimos «${partly}»; buscamos con el resto.`, `We didn’t catch «${partly}»; we searched with the rest.`)}
               </p>
             )}
             {notUnderstood && (

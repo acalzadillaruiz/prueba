@@ -19,6 +19,8 @@ import { tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import { k } from "@/components/agency/kit";
 
+/** One-shot hand-off of the email typed on login to "¿Olvidaste tu contraseña?" (read once and removed there). */
+export const FORGOT_EMAIL_KEY = "np-forgot-email";
 const GOOGLE = process.env.NEXT_PUBLIC_GOOGLE_AUTH === "true";
 const ROLE_LABEL: Record<string, [string, string]> = { AGENT: ["agente", "an agent"], CAPTOR: ["captador", "a listings scout"], PHOTOGRAPHER: ["fotógrafo", "a photographer"], BACKOFFICE: ["backoffice", "backoffice"] };
 
@@ -55,8 +57,15 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
   const sp = useSearchParams();
   const invite = sp.get("invite");
   // "¿Olvidaste tu contraseña?" carries the email already typed (only when it looks like one), so it isn't typed twice.
+  // It travels in sessionStorage, never in the URL (URLs end up in history, logs and referrers).
   const typed = (watch("email") ?? "").trim();
-  const forgotHref = `/${locale}/forgot-password${typed.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(typed) ? `?email=${encodeURIComponent(typed)}` : ""}`;
+  const forgotHref = `/${locale}/forgot-password`;
+  const rememberForgotEmail = () => {
+    try {
+      if (typed.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(typed)) sessionStorage.setItem(FORGOT_EMAIL_KEY, typed);
+      else sessionStorage.removeItem(FORGOT_EMAIL_KEY);
+    } catch {}
+  };
   const [inv, setInv] = useState<{ agencyName: string; role: string; email: string } | null>(null);
   useEffect(() => {
     if (!invite) return;
@@ -188,7 +197,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
             </Field>
             {mode === "login" && (
               <div className="-mt-1 text-right">
-                <Link className={cn(k.link, "text-[14px]")} href={forgotHref}>{tx(locale, "¿Olvidaste tu contraseña?", "Forgot your password?")}</Link>
+                <Link className={cn(k.link, "text-[14px]")} href={forgotHref} onClick={rememberForgotEmail}>{tx(locale, "¿Olvidaste tu contraseña?", "Forgot your password?")}</Link>
               </div>
             )}
             {mode === "register" && !inv && (

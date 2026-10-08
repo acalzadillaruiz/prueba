@@ -117,7 +117,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
         <div className="mt-3 font-serif text-[28px] leading-tight">{mode === "tour" && done ? tx(locale, "Visita solicitada", "Tour requested") : tx(locale, "Mensaje enviado", "Message sent")}</div>
         {done && <div className="mt-1 font-display text-[17px] font-semibold first-letter:uppercase text-ink">{done}</div>}
         <p className={cn("mt-2 text-[15px]", muted)}>
-          {tx(locale, `${agent?.name.split(" ")[0] ?? "El agente"} suele responder en menos de 15 minutos. Te enviamos la confirmación a ${email}.`, `${agent?.name.split(" ")[0] ?? "The agent"} usually replies within 15 minutes. Confirmation sent to ${email}.`)}
+          {tx(locale, `${agent?.name.split(" ")[0] ?? "El agente"} suele responder en menos de 15 minutos. Te contactará en ${email}.`, `${agent?.name.split(" ")[0] ?? "The agent"} usually replies within 15 minutes and will contact you at ${email}.`)}
         </p>
         <div className="mt-5 flex flex-wrap gap-2">
           {user && <Button href={`/${locale}/app`} size="sm" variant="navy">{tx(locale, "Ver en mi Hub", "Open my Hub")}</Button>}

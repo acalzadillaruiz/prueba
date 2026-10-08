@@ -30,6 +30,8 @@ const ACTIONS: Record<string, [string, string]> = {
   "listing.withdraw": ["Inmueble retirado", "Listing withdrawn"],
   "listing.takedown": ["Inmueble retirado por moderación", "Listing taken down"],
   "listing.restore": ["Inmueble restaurado", "Listing restored"],
+  "listing.delete": ["Inmueble borrado por su dueño", "Listing deleted by owner"],
+  "listing.appeal": ["Dueño pidió revisar un retiro", "Owner appealed a takedown"],
   "mandate.update": ["Mandato actualizado", "Mandate updated"],
   "media.create": ["Sesión de fotos creada", "Photo shoot created"],
   "media.status": ["Estado de sesión de fotos", "Photo shoot status"],

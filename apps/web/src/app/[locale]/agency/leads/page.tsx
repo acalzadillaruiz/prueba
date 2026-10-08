@@ -18,11 +18,14 @@ export default async function Page({ params }: { params: Promise<{ locale: Local
   const [leads, listings, members, threads] = await Promise.all([
     getLeads({ agencyId: user.agencyId, agentId }),
     agencyListings(user.agencyId),
-    prisma.agencyMember.findMany({ where: { agencyId: user.agencyId }, include: { user: { select: { id: true, name: true } } } }),
+    prisma.agencyMember.findMany({ where: { agencyId: user.agencyId }, include: { user: { select: { id: true, name: true, email: true, suspended: true } } } }),
     // This user's own direct conversations (e.g. a buyer's "Contactar" chat); lead threads are read through each lead.
     getThreadsFor(user.id),
   ]);
   const direct = threads.filter((t) => !t.leadId);
+  // Bulk "Asignar a…": same rule as PATCH /leads/:id (managers only, to a non-suspended AGENT of the agency).
+  const manager = ["AGENCY_OWNER", "BACKOFFICE", "SUPERADMIN"].includes(user.role);
+  const assignable = manager ? members.filter((m) => m.role === "AGENT" && !m.user.suspended).map((m) => ({ id: m.userId, name: m.user.name ?? m.user.email })) : [];
   const unread = await unreadByThread(user.id, direct.map((t) => t.id));
   return (
     <LeadsInbox
@@ -30,6 +33,7 @@ export default async function Page({ params }: { params: Promise<{ locale: Local
       initial={leads}
       listings={listings}
       agents={Object.fromEntries(members.map((m) => [m.userId, m.user.name ?? ""]))}
+      assignable={assignable}
       threads={direct.map((t) => ({ ...t, unread: unread[t.id] ?? 0 }))}
       meId={user.id}
     />

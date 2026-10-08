@@ -1,9 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { CalendarPlus, Clock, Loader2, Mail, MessageCircle, Phone, RefreshCw, Search, Send, Sparkles, Star, UserRoundCog, X } from "lucide-react";
+import { Archive, CalendarPlus, Clock, Loader2, Mail, MessageCircle, MessageSquareText, Phone, RefreshCw, Search, Send, Sparkles, Star, UserRoundCog, X } from "lucide-react";
 import type { NextAction } from "@newplace/ai";
 import type { Lead, LeadStage, Listing, Locale } from "@/types/domain";
 import { api } from "@/lib/api";
@@ -17,6 +17,9 @@ import { ago, dateTime, money, priceSuffix, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import { caracasInputToIso, isoToCaracasInput } from "@/lib/caracas-time";
 import { HubMessages, type HubThread } from "@/components/seeker/HubMessages";
+import { useApp } from "@/lib/store";
+import { BulkResult, runSequential, type Bulk } from "./bulk";
+import { QUICK_REPLIES, fillReply } from "@/lib/quick-replies";
 
 const STAGES: [LeadStage, string, string][] = [
   ["NEW", "Nuevo", "New"],
@@ -123,6 +126,16 @@ function TourPicker({ locale, listingId, agentId, busy, onPropose, onClose }: { 
   );
 }
 
+const BOX = "mt-0.5 h-[18px] w-[18px] shrink-0 cursor-pointer accent-navy dark:accent-[#C9A574]";
+
+function SelectAll({ checked, indeterminate, onChange, label }: { checked: boolean; indeterminate: boolean; onChange: () => void; label: string }) {
+  const ref = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (ref.current) ref.current.indeterminate = indeterminate;
+  }, [indeterminate]);
+  return <input ref={ref} type="checkbox" className={cn(BOX, "mt-0")} checked={checked} onChange={onChange} aria-label={label} />;
+}
+
 const stageLabel = (locale: Locale, st: string) => {
   const s = STAGES.find(([k]) => k === st);
   return s ? (locale === "es" ? s[1] : s[2]) : st;
@@ -136,7 +149,9 @@ const SOURCE_LABEL: Record<string, Record<Locale, string>> = {
   ALERT: { es: "Alerta de búsqueda", en: "Search alert" },
 };
 
-export function LeadsInbox({ locale, initial, listings, agents, threads, meId }: { locale: Locale; initial: ScoredLead[]; listings: Listing[]; agents: Record<string, string>; threads?: HubThread[]; meId?: string }) {
+export function LeadsInbox({ locale, initial, listings, agents, assignable = [], threads, meId }: { locale: Locale; initial: ScoredLead[]; listings: Listing[]; agents: Record<string, string>; /** Agents a manager can hand leads to (empty for agents). */ assignable?: { id: string; name: string }[]; threads?: HubThread[]; meId?: string }) {
+  const { user } = useApp();
+  const manager = user?.role === "AGENCY_OWNER" || user?.role === "BACKOFFICE" || user?.role === "SUPERADMIN";
   const stageName = (st: string) => stageLabel(locale, st);
   const qc = useQueryClient();
   const router = useRouter();
@@ -148,6 +163,7 @@ export function LeadsInbox({ locale, initial, listings, agents, threads, meId }:
   const [busy, setBusy] = useState<string | null>(null);
   const [q, setQ] = useState("");
   const [tourOpen, setTourOpen] = useState(false);
+  const replyRef = useRef<HTMLInputElement>(null);
   const leads = list.data;
   const needle = fold(q.trim());
   const matches = (l: ScoredLead) => {
@@ -159,7 +175,8 @@ export function LeadsInbox({ locale, initial, listings, agents, threads, meId }:
   const visible = found
     .filter((l) => stage === "ALL" || l.stage === stage)
     .sort((a, b) => (a.stage === "NEW" ? 0 : 1) - (b.stage === "NEW" ? 0 : 1) || Number(!!b.priority) - Number(!!a.priority) || (b.score ?? 0) - (a.score ?? 0));
-  const sel = leads.find((l) => l.id === (selId ?? visible[0]?.id));
+  // The open detail is always one of the listed leads: when the search or the stage filter hides it, it closes.
+  const sel = visible.find((l) => l.id === selId) ?? visible[0];
   const detail = useQuery({ queryKey: ["lead", sel?.id], queryFn: () => api<Detail>(`leads/${sel!.id}`), enabled: !!sel, refetchInterval: 15_000 });
   const listing = sel ? byId.get(sel.listingId) : undefined;
   const A = ACTION[(sel?.nextAction as NextAction) ?? "NURSE"] ?? ACTION.NURSE;
@@ -170,6 +187,36 @@ export function LeadsInbox({ locale, initial, listings, agents, threads, meId }:
     router.refresh();
   };
   const [error, setError] = useState<string | null>(null);
+  const [picked, setPicked] = useState<Set<string>>(new Set());
+  const [bulk, setBulk] = useState<Bulk | null>(null);
+  const [archiveAsk, setArchiveAsk] = useState(false);
+  const visibleKey = visible.map((l) => l.id).join(",");
+  useEffect(() => {
+    // Selection only holds listed leads (search / stage filter changes drop the hidden ones).
+    setPicked((cur) => {
+      const ids = new Set(visibleKey.split(","));
+      const keep = new Set([...cur].filter((id) => ids.has(id)));
+      return keep.size === cur.size ? cur : keep;
+    });
+  }, [visibleKey]);
+  const chosen = visible.filter((l) => picked.has(l.id));
+  const allOn = visible.length > 0 && chosen.length === visible.length;
+  const toggle = (id: string) => setPicked((cur) => {
+    const n = new Set(cur);
+    if (n.has(id)) n.delete(id);
+    else n.add(id);
+    return n;
+  });
+  const runBulk = async (label: string, call: (l: ScoredLead) => Promise<unknown> | null) => {
+    setError(null);
+    setArchiveAsk(false);
+    const ok = await runSequential(label, chosen, (l) => l.name, call, setBulk);
+    setPicked((cur) => new Set([...cur].filter((id) => !ok.includes(id))));
+    qc.invalidateQueries({ queryKey: ["leads"] });
+    qc.invalidateQueries({ queryKey: ["lead"] });
+    router.refresh();
+  };
+  const patchLead = (id: string, json: object) => api(`leads/${id}`, { method: "PATCH", json });
   const run = async (key: string, fn: () => Promise<unknown>) => {
     setBusy(key);
     setError(null);
@@ -234,17 +281,26 @@ export function LeadsInbox({ locale, initial, listings, agents, threads, meId }:
       {error && <div className={cn("mb-3", k.err)} role="alert">{error}</div>}
       <div className="grid gap-4 [&>*]:min-w-0 xl:grid-cols-[420px_1fr]">
         <div className={cn("overflow-hidden self-start", k.card)}>
+          {visible.length > 0 && (
+            <label className={cn("flex min-h-11 cursor-pointer items-center gap-2.5 border-b px-4 py-2 text-sm", k.line, k.soft)}>
+              <SelectAll checked={allOn} indeterminate={chosen.length > 0 && !allOn} onChange={() => setPicked(allOn ? new Set() : new Set(visible.map((l) => l.id)))} label={tx(locale, `Seleccionar los ${visible.length} visibles`, `Select all ${visible.length} visible`)} />
+              <span className={k.muted}>{chosen.length ? tx(locale, `${chosen.length} de ${visible.length} seleccionados`, `${chosen.length} of ${visible.length} selected`) : tx(locale, `Seleccionar los ${visible.length} visibles`, `Select all ${visible.length} visible`)}</span>
+            </label>
+          )}
           {visible.map((l) => {
             const lst = byId.get(l.listingId);
             const score = l.score ?? 0;
             return (
+              <div key={l.id} className={cn("flex items-stretch border-b last:border-b-0", k.line, sel?.id === l.id ? "bg-[#E6DDD2] shadow-[inset_3px_0_0_#1E1A18] dark:bg-white/[.07] dark:shadow-[inset_3px_0_0_#C9A574]" : picked.has(l.id) ? k.soft : k.hover)}>
+              <label className="flex shrink-0 cursor-pointer items-start py-3.5 pl-4 pr-1">
+                <input type="checkbox" className={BOX} checked={picked.has(l.id)} onChange={() => toggle(l.id)} aria-label={tx(locale, `Seleccionar ${l.name}`, `Select ${l.name}`)} />
+              </label>
               <button
-                key={l.id}
                 onClick={() => {
                   setSelId(l.id);
                   // On phones/tablets the detail sits under the list: bring it into view.
                   if (window.innerWidth < 1280) requestAnimationFrame(() => document.getElementById("lead-detail")?.scrollIntoView({ behavior: "smooth", block: "start" }));
-                }} className={cn("flex w-full items-start gap-3 border-b px-4 py-3.5 text-left transition-colors duration-np last:border-b-0", k.line, sel?.id === l.id ? "bg-[#E6DDD2] shadow-[inset_3px_0_0_#1E1A18] dark:bg-white/[.07] dark:shadow-[inset_3px_0_0_#C9A574]" : k.hover)}>
+                }} className="flex min-w-0 flex-1 items-start gap-3 py-3.5 pl-2 pr-4 text-left transition-colors duration-np">
                 <div className="relative">
                   <Initials name={l.name} size={40} />
                   {l.stage === "NEW" && <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-white bg-navy dark:border-navy-card dark:bg-[#C9A574]" />}
@@ -263,6 +319,7 @@ export function LeadsInbox({ locale, initial, listings, agents, threads, meId }:
                   <Sla lead={l} locale={locale} />
                 </div>
               </button>
+              </div>
             );
           })}
           {visible.length === 0 && <div className={cn("p-8 text-center text-sm", k.muted)}>{needle ? tx(locale, "Ningún lead coincide con la búsqueda", "No leads match your search") : tx(locale, "Sin leads en esta etapa", "No leads in this stage")}</div>}
@@ -308,9 +365,9 @@ export function LeadsInbox({ locale, initial, listings, agents, threads, meId }:
 
             <div className="grid gap-4 [&>*]:min-w-0 2xl:grid-cols-[1fr_1.2fr]">
               <div className={cn(k.card, "p-5 md:p-6")}>
-                <div className={cn("flex items-center gap-2", k.label)}><Sparkles size={14} /> {tx(locale, "Score IA · siguiente mejor acción", "AI score · next best action")}</div>
+                <div className={cn("flex items-center gap-2", k.label)}><Sparkles size={14} /> {tx(locale, "Interés · siguiente mejor acción", "Interest · next best action")}</div>
                 <div className="mt-3 flex items-center gap-4">
-                  <ScoreRing score={sel.score ?? 0} />
+                  <span title={tx(locale, "Interés del cliente (0–100), estimado por la IA", "Client interest (0–100), estimated by AI")}><ScoreRing score={sel.score ?? 0} /></span>
                   <div>
                     <div className={k.title} data-testid="next-action" data-action={sel.nextAction ?? ""}>{tx(locale, A[0], A[1])}</div>
                     <div className={cn("text-sm", k.muted)}>{sel.reason}</div>
@@ -371,8 +428,26 @@ export function LeadsInbox({ locale, initial, listings, agents, threads, meId }:
                   </div>
                 ))}
               </div>
+              <div className={cn("flex flex-wrap items-center gap-1.5 border-t px-3 pt-3", k.line)} role="group" aria-label={tx(locale, "Respuestas rápidas", "Quick replies")}>
+                <MessageSquareText size={14} className={k.muted} aria-hidden />
+                {QUICK_REPLIES.map((r) => (
+                  <button
+                    key={r.id}
+                    type="button"
+                    className={cn(tab(false), "px-3 py-1 text-[13px]")}
+                    title={fillReply(tx(locale, r.es, r.en), sel.name)}
+                    onClick={() => {
+                      const text = fillReply(tx(locale, r.es, r.en), sel.name);
+                      setDraft((d) => (d.trim() ? `${d.trimEnd()} ${text}` : text));
+                      requestAnimationFrame(() => replyRef.current?.focus());
+                    }}
+                  >
+                    {tx(locale, r.label[0], r.label[1])}
+                  </button>
+                ))}
+              </div>
               <form
-                className={cn("flex gap-2 border-t p-3", k.line)}
+                className={cn("flex gap-2 p-3", k.line)}
                 onSubmit={(e) => {
                   e.preventDefault();
                   if (!draft.trim()) return;
@@ -382,15 +457,67 @@ export function LeadsInbox({ locale, initial, listings, agents, threads, meId }:
                   run("msg", () => api(`leads/${sel.id}/messages`, { method: "POST", json: { body } }).catch((e) => { setDraft(body); throw e; }));
                 }}
               >
-                <input value={draft} onChange={(e) => setDraft(e.target.value)} className={cn(k.input, "h-11 flex-1 rounded-full px-4 md:h-11")} placeholder={tx(locale, "Responder… (se envía también por email)", "Reply… (also sent by email)")} aria-label={tx(locale, "Respuesta", "Reply")} />
+                <input ref={replyRef} value={draft} onChange={(e) => setDraft(e.target.value)} className={cn(k.input, "h-11 flex-1 rounded-full px-4 md:h-11")} placeholder={tx(locale, "Responder… (se envía también por email)", "Reply… (also sent by email)")} aria-label={tx(locale, "Respuesta", "Reply")} />
                 <button className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-navy text-ivory hover:bg-navy-2 dark:bg-ivory dark:text-navy" aria-label={tx(locale, "Enviar", "Send")}><Send size={16} /></button>
               </form>
             </div>
           </div>
         ) : (
-          <div className={k.card}><Empty title={tx(locale, "Sin leads todavía", "No leads yet")} body={tx(locale, "Cuando alguien escriba o pida una visita desde una ficha, aparecerá aquí con su score.", "When someone writes or books a tour from a listing, it shows up here with its score.")} /></div>
+          <div className={k.card}>
+            {leads.length ? (
+              <Empty title={tx(locale, "Ningún lead abierto", "No lead open")} body={needle ? tx(locale, "Ningún lead coincide con la búsqueda. Prueba con otro nombre, email o teléfono.", "No leads match your search. Try another name, email or phone.") : tx(locale, "No hay leads en esta etapa.", "There are no leads in this stage.")} />
+            ) : (
+              <Empty title={tx(locale, "Sin leads todavía", "No leads yet")} body={tx(locale, "Cuando alguien escriba o pida una visita desde una ficha, aparecerá aquí con su nivel de interés.", "When someone writes or books a tour from a listing, it shows up here with its interest level.")} />
+            )}
+          </div>
         )}
       </div>
+      {bulk && !chosen.length && (
+        <div className={cn("mt-4", bulk.failed.length ? k.warnBox : k.okBox)} role="status" aria-live="polite">
+          <BulkResult locale={locale} bulk={bulk} onClose={() => setBulk(null)} />
+        </div>
+      )}
+      {chosen.length > 0 && (
+        <div className="sticky bottom-3 z-20 mt-4" role="region" aria-label={tx(locale, "Acciones en lote", "Bulk actions")}>
+          <div className={cn(k.card, "flex flex-wrap items-center gap-2 p-3 shadow-[0_12px_32px_rgba(30,26,24,.18)] ring-1 ring-[#E6DDD2] md:gap-3 md:px-4")}>
+            <span className="text-sm font-semibold">{tx(locale, `${chosen.length} ${chosen.length === 1 ? "lead seleccionado" : "leads seleccionados"}`, `${chosen.length} ${chosen.length === 1 ? "lead" : "leads"} selected`)}</span>
+            {manager && assignable.length > 0 && (
+              <select value="" disabled={bulk?.running} onChange={(e) => {
+                const to = e.target.value;
+                const name = assignable.find((a) => a.id === to)?.name ?? "";
+                if (to) runBulk(tx(locale, `Asignar a ${name}`, `Assign to ${name}`), (l) => (l.agentId === to ? null : patchLead(l.id, { agentId: to })));
+              }} className={cn(k.select, "h-10")} aria-label={tx(locale, "Asignar los leads seleccionados a…", "Assign selected leads to…")}>
+                <option value="" disabled>{tx(locale, "Asignar a…", "Assign to…")}</option>
+                {assignable.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
+              </select>
+            )}
+            <select value="" disabled={bulk?.running} onChange={(e) => {
+              const to = e.target.value as LeadStage;
+              if (to) runBulk(tx(locale, `Cambiar a ${stageName(to)}`, `Move to ${stageName(to)}`), (l) => (l.stage === to ? null : patchLead(l.id, { stage: to })));
+            }} className={cn(k.select, "h-10")} aria-label={tx(locale, "Cambiar el estado de los seleccionados a…", "Change status of selected to…")}>
+              <option value="" disabled>{tx(locale, "Cambiar estado a…", "Change status to…")}</option>
+              {STAGES.map(([key, es, en]) => <option key={key} value={key}>{tx(locale, es, en)}</option>)}
+            </select>
+            {!archiveAsk ? (
+              <Button size="sm" variant="outline" className={cn(k.outline, "min-h-10")} disabled={bulk?.running} onClick={() => setArchiveAsk(true)} title={tx(locale, "Los marca como perdidos y salen de la bandeja activa", "Marks them as lost so they leave the active inbox")}>
+                <Archive size={14} /> {tx(locale, "Archivar", "Archive")}
+              </Button>
+            ) : (
+              <span role="group" aria-label={tx(locale, "Confirmar archivo", "Confirm archive")} className="flex flex-wrap items-center gap-2 text-sm">
+                <span className="font-semibold">{tx(locale, `¿Archivar ${chosen.length}? Pasan a «Perdido».`, `Archive ${chosen.length}? They move to "Lost".`)}</span>
+                <Button size="sm" variant="navy" className={cn(k.navy, "min-h-10")} disabled={bulk?.running} onClick={() => runBulk(tx(locale, "Archivar", "Archive"), (l) => (l.stage === "LOST" ? null : patchLead(l.id, { stage: "LOST" })))}>{tx(locale, "Sí, archivar", "Yes, archive")}</Button>
+                <Button size="sm" variant="ghost" className={cn(k.ghost, "min-h-10")} onClick={() => setArchiveAsk(false)}>{tx(locale, "Cancelar", "Cancel")}</Button>
+              </span>
+            )}
+            <Button size="sm" variant="ghost" className={cn(k.ghost, "ml-auto min-h-10")} disabled={bulk?.running} onClick={() => setPicked(new Set())}><X size={14} /> {tx(locale, "Quitar selección", "Clear selection")}</Button>
+            {bulk && (
+              <div className="w-full text-sm" role="status" aria-live="polite">
+                <BulkResult locale={locale} bulk={bulk} onClose={() => setBulk(null)} />
+              </div>
+            )}
+          </div>
+        </div>
+      )}
       {/* Direct chats ("Contactar" on a listing) with this advisor; lead conversations stay in the inbox above. */}
       {threads && meId && <HubMessages locale={locale} threads={threads} meId={meId} listings={listings} direct className="mt-6 block" />}
     </AdminShell>

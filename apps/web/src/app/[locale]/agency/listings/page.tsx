@@ -16,11 +16,11 @@ export default async function Page({ params }: { params: Promise<{ locale: Local
   const [listings, agents, mandates] = await Promise.all([
     agencyListings(user.agencyId, { agentId: user.role === "AGENT" ? user.id : undefined }),
     prisma.agencyMember.findMany({ where: { agencyId: user.agencyId, role: "AGENT" }, include: { user: { select: { id: true, name: true, hue: true } } } }),
-    // Owner mandates (brief §6.2 REQUESTED → ASSIGNED → ACTIVE): managers assign and publish; the assigned agent publishes.
+    // Owner mandates (brief §6.2 REQUESTED → ASSIGNED → ACTIVE; labels in @/lib/lifecycle): managers assign; managers or the assigned agent review & publish.
     manager || user.role === "AGENT"
       ? prisma.mandate.findMany({
           where: { agencyId: user.agencyId, status: { in: ["REQUESTED", "ASSIGNED"] }, ...(manager ? {} : { agentId: user.id }) },
-          include: { owner: { select: { name: true, email: true } }, listing: { select: { id: true, titleEs: true, titleEn: true, zone: true, city: true, priceAmount: true } } },
+          include: { owner: { select: { name: true, email: true } }, listing: { select: { id: true, titleEs: true, titleEn: true, zone: true, city: true, priceAmount: true, updatedAt: true } } },
           orderBy: { createdAt: "desc" },
         })
       : Promise.resolve([]),
@@ -36,7 +36,8 @@ export default async function Page({ params }: { params: Promise<{ locale: Local
         agentId: m.agentId,
         ownerName: m.owner.name ?? m.owner.email,
         createdAt: m.createdAt.toISOString(),
-        listing: m.listing ? { id: m.listing.id, title_es: m.listing.titleEs, title_en: m.listing.titleEn || m.listing.titleEs, zone: m.listing.zone, city: m.listing.city, priceAmount: m.listing.priceAmount } : null,
+        updatedAt: m.updatedAt.toISOString(),
+        listing: m.listing ? { id: m.listing.id, title_es: m.listing.titleEs, title_en: m.listing.titleEn || m.listing.titleEs, zone: m.listing.zone, city: m.listing.city, priceAmount: m.listing.priceAmount, updatedAt: m.listing.updatedAt.toISOString() } : null,
       }))}
     />
   );

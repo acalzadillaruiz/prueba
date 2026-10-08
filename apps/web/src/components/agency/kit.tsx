@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import type { ListingStatus, Locale } from "@/types/domain";
 import { Monogram, RoofMark } from "@/components/brand/Logo";
-import { STATUS_LABEL, lbl, tx } from "@/lib/i18n";
+import { LISTING_PHASE, listingPhase, phaseHint, phaseLabel } from "@/lib/lifecycle";
 import { cn } from "@/lib/cn";
 
 /**
@@ -81,13 +81,14 @@ export function Panel({ title, eyebrow, action, children, className, bodyClass, 
   );
 }
 
-export function Kpi({ label, value, delta, hint, down, className }: { label: string; value: ReactNode; delta?: string; hint?: string; down?: boolean; className?: string }) {
+export function Kpi({ label, value, delta, hint, down, deltaNote, className }: { label: string; value: ReactNode; delta?: string; hint?: string; down?: boolean; /** Shown as a muted "—" with this tooltip instead of a delta (e.g. too little data to compare). */ deltaNote?: string; className?: string }) {
   return (
     <div className={cn(k.card, "min-w-0 px-4 pb-4 pt-4 sm:px-5 sm:pb-5 sm:pt-[18px] md:px-6", className)}>
       <div className={cn(k.label, "line-clamp-2 min-h-[2.5em] leading-[1.25] sm:line-clamp-1 sm:min-h-0 xl:line-clamp-2 xl:min-h-[2.5em]")}>{label}</div>
       <div className={cn(k.num, "mt-2 text-[30px] leading-none sm:text-[34px] md:text-[40px]")}>{value}</div>
-      {(delta || hint) && (
+      {(delta || hint || deltaNote) && (
         <div className="mt-2.5 flex flex-wrap items-baseline gap-x-1.5 text-[13px] sm:text-[14px]">
+          {!delta && deltaNote && <span className={cn("cursor-help font-semibold", k.muted)} title={deltaNote}><span aria-hidden>—</span><span className="sr-only">{deltaNote}</span></span>}
           {delta && <span className={cn("font-semibold", down ? k.dangerText : k.okText)}>{down ? "▼" : "▲"}&#8239;{delta}</span>}
           {hint && <span className={delta ? k.muted : cn(k.muted)}>{hint}</span>}
         </div>
@@ -124,13 +125,14 @@ export function Chip({ children, className }: { children: ReactNode; className?:
   return <span className={cn("inline-flex items-center whitespace-nowrap rounded-full bg-[#E6DDD2] px-2.5 py-1 text-[12px] font-semibold text-navy [font-feature-settings:'lnum','pnum'] dark:bg-white/10 dark:text-ivory", className)}>{children}</span>;
 }
 
-const STATUS_TONE: Record<ListingStatus, Tone> = { ACTIVE: "egeo", UNDER_OFFER: "arena", COMING_SOON: "neutral", SOLD: "navy", RENTED: "navy", DRAFT: "muted", WITHDRAWN: "muted", EXPIRED: "muted" };
-
-/** Listing status for the private areas (review state wins while it isn't approved). */
-export function StatusPill({ status, review, locale, className }: { status: ListingStatus; review?: "PENDING" | "APPROVED" | "REJECTED"; locale: Locale; className?: string }) {
-  if (review && review !== "APPROVED" && status !== "DRAFT" && status !== "WITHDRAWN")
-    return <Pill tone={review === "PENDING" ? "warn" : "danger"} className={className}>{review === "PENDING" ? tx(locale, "En revisión", "In review") : tx(locale, "Rechazado", "Rejected")}</Pill>;
-  return <Pill tone={STATUS_TONE[status]} className={className}>{lbl(STATUS_LABEL[status], locale)}</Pill>;
+/** Listing status for the private areas, with the shared lifecycle labels (@/lib/lifecycle): review wins while it isn't approved. */
+export function StatusPill({ status, review, takedownReason, locale, className }: { status: ListingStatus; review?: "PENDING" | "APPROVED" | "REJECTED"; takedownReason?: string | null; locale: Locale; className?: string }) {
+  const p = listingPhase({ status, review, takedownReason });
+  return (
+    <Pill tone={LISTING_PHASE[p].tone} className={className}>
+      <span title={phaseHint(p, locale)}>{phaseLabel(p, locale)}</span>
+    </Pill>
+  );
 }
 
 /** Initials on an arena disc, serif (lead lists, as in the approved dashboard). */

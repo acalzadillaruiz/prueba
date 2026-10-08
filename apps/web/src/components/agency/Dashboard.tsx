@@ -49,7 +49,7 @@ export function AgencyDashboard({ locale, stats, listings, newLeads, tours, agen
     >
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-5 [&>*]:min-w-0">
         <Kpi label={tx(locale, "Inmuebles activos", "Active listings")} value={stats.activeListings} delta={stats.activeDelta ? sign(stats.activeDelta) : undefined} down={stats.activeDelta < 0} hint={tx(locale, "nuevos en 30 días", "new in 30 days")} />
-        <Kpi label={tx(locale, "Leads · 7 días", "Leads · 7 days")} value={stats.leads7d} delta={`${sign(stats.leadsDeltaPct)} %`} down={stats.leadsDeltaPct < 0} hint={tx(locale, "vs. semana anterior", "vs. previous week")} />
+        <Kpi label={tx(locale, "Leads · 7 días", "Leads · 7 days")} value={stats.leads7d} delta={stats.leadsDeltaPct === null ? undefined : `${sign(stats.leadsDeltaPct)} %`} deltaNote={tx(locale, "Aún hay pocos datos para comparar", "Not enough data to compare yet")} down={(stats.leadsDeltaPct ?? 0) < 0} hint={tx(locale, "vs. semana anterior", "vs. previous week")} />
         <Kpi label={tx(locale, "Conversión lead → visita", "Lead → tour")} value={`${stats.convTourPct} %`} hint={tx(locale, "últimos 30 días", "last 30 days")} />
         <Kpi label={tx(locale, "Tiempo medio a visita", "Avg. time to tour")} value={stats.avgDaysToTour === null ? "—" : `${String(stats.avgDaysToTour).replace(".", locale === "es" ? "," : ".")} d`} hint={tx(locale, "desde el lead", "from lead")} />
         <Kpi label={tx(locale, "Respondidos en 15 min", "Answered within 15 min")} value={stats.slaPct === null ? "—" : `${stats.slaPct} %`} hint={tx(locale, "primera respuesta", "first response")} />
@@ -99,7 +99,7 @@ export function AgencyDashboard({ locale, stats, listings, newLeads, tours, agen
                   </div>
                 </div>
                 <div className="flex w-full items-center justify-between gap-4 pl-24 sm:w-auto sm:justify-end sm:pl-0">
-                  {l.luxury ? <Pill tone="exclusive">{tx(locale, "Exclusiva", "Exclusive")}</Pill> : <StatusPill status={l.status} review={l.review} locale={locale} />}
+                  {l.luxury ? <Pill tone="exclusive">{tx(locale, "Exclusiva", "Exclusive")}</Pill> : <StatusPill status={l.status} review={l.review} takedownReason={l.takedownReason} locale={locale} />}
                   <span className={cn(k.num, "text-right text-[15px] tracking-normal sm:min-w-[120px]")}>USD {num(l.priceAmount, locale)}</span>
                 </div>
               </Link>
@@ -110,9 +110,9 @@ export function AgencyDashboard({ locale, stats, listings, newLeads, tours, agen
 
       <div className="mt-6 grid gap-6 [&>*]:min-w-0 lg:grid-cols-2 2xl:grid-cols-3">
         <Panel title={tx(locale, "Embudo (30 días)", "Funnel (30 days)")}>
-          <Funnel steps={[{ label: tx(locale, "Leads", "Leads"), value: stats.funnel.NEW }, { label: tx(locale, "Contactados", "Contacted"), value: stats.funnel.CONTACTED }, { label: tx(locale, "Visitas", "Tours"), value: stats.funnel.TOUR }, { label: tx(locale, "Ofertas", "Offers"), value: stats.funnel.OFFER }, { label: tx(locale, "Cerrados", "Won"), value: stats.funnel.WON }]} />
+          <Funnel steps={[{ label: tx(locale, "Leads", "Leads"), value: stats.funnel.NEW }, { label: tx(locale, "Contactados", "Contacted"), value: stats.funnel.CONTACTED }, { label: tx(locale, "Visitas", "Tours"), value: stats.funnel.TOUR }, { label: tx(locale, "Ofertas", "Offers"), value: stats.funnel.OFFER }, { label: tx(locale, "Ganados", "Won"), value: stats.funnel.WON }]} />
         </Panel>
-        <Panel title={isAgent ? tx(locale, "Mis resultados", "My results") : tx(locale, "Ranking de agentes", "Agent ranking")}>
+        <Panel title={isAgent ? tx(locale, "Mis resultados", "My results") : tx(locale, "Ranking de agentes", "Agent ranking")} action={<span className={cn("pt-2 text-[13px]", k.muted)} title={tx(locale, "Cierres: inmuebles vendidos o alquilados en el periodo, igual que en Auditoría e Informes", "Closings: listings sold or rented in the period, same as Audit and Reports")}>{tx(locale, "Últimos 30 días", "Last 30 days")}</span>}>
           {stats.ranking.length === 0 && <p className={cn("text-[15px]", k.muted)}>{tx(locale, "Aún no hay agentes en el equipo.", "No agents on the team yet.")}</p>}
           <ul className="space-y-3.5">
             {stats.ranking.map(({ id, name, leads: n, won, respMin, gmv }, i) => (

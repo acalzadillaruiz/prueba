@@ -4,16 +4,55 @@ import { slaPct } from "@/lib/team-metrics";
 
 const DAY = 864e5;
 
+/** Below this many leads in the previous period a % change is noise ("+1000 %" against 1 lead): no % is shown. */
+export const MIN_DELTA_BASE = 5;
+
+/** Whole-% change vs. the previous period, or null when the base is too small to compare (shown as "—"). */
+export function deltaPct(current: number, previous: number, minBase = MIN_DELTA_BASE): number | null {
+  if (previous < minBase) return null;
+  return Math.round(((current - previous) / previous) * 100);
+}
+
+export const CLOSED_STATUSES = ["SOLD", "RENTED"] as const;
+export type AgentClosings = { count: number; volume: number; listingIds: string[] };
+
+/**
+ * THE definition of a "cierre" (closing), shared by the dashboard ranking, the reports and the owner's audit page:
+ * a listing of the agency in SOLD / RENTED whose closing date falls in [since, until], attributed to the listing's agent.
+ * Closing date = latest SOLD/RENTED status event (ListingPriceHistory); listings closed without one fall back to updatedAt.
+ * Volume = the amount recorded on that event (else the listing price).
+ */
+export async function closingsByAgent(agencyId: string, since: Date, until: Date = new Date(), agentIds?: string[]): Promise<Map<string, AgentClosings>> {
+  const listings = await prisma.listing.findMany({
+    where: { agencyId, status: { in: [...CLOSED_STATUSES] }, agentId: agentIds ? { in: agentIds } : { not: null } },
+    select: { id: true, agentId: true, priceAmount: true, updatedAt: true, priceHistory: { where: { kind: { in: [...CLOSED_STATUSES] } }, select: { date: true, amount: true } } },
+  });
+  const out = new Map<string, AgentClosings>();
+  for (const l of listings) {
+    const last = l.priceHistory.reduce<{ date: Date; amount: number } | null>((a, h) => (!a || h.date > a.date ? h : a), null);
+    const at = (last?.date ?? l.updatedAt).getTime();
+    if (at < since.getTime() || at > until.getTime() || !l.agentId) continue;
+    const row = out.get(l.agentId) ?? { count: 0, volume: 0, listingIds: [] };
+    row.count += 1;
+    row.volume += last?.amount ?? l.priceAmount;
+    row.listingIds.push(l.id);
+    out.set(l.agentId, row);
+  }
+  return out;
+}
+
 export interface DashboardStats {
   activeListings: number;
   activeDelta: number;
   leads7d: number;
-  leadsDeltaPct: number;
+  /** null = previous week had fewer than MIN_DELTA_BASE leads: too little data to compare. */
+  leadsDeltaPct: number | null;
   convTourPct: number;
   avgDaysToTour: number | null;
   slaPct: number | null;
   perDay: { date: string; value: number }[];
   funnel: { NEW: number; CONTACTED: number; TOUR: number; OFFER: number; WON: number };
+  /** Last 30 days. `won` / `gmv` come from closingsByAgent (same definition as Auditoría and Informes). */
   ranking: { id: string; name: string; hue: number; leads: number; won: number; respMin: number | null; gmv: number }[];
 }
 
@@ -48,7 +87,7 @@ export async function dashboardStats(agencyId: string, agentId?: string): Promis
   const gaps = allLeads.map((l) => (firstTour.get(l.id)! - l.createdAt.getTime()) / DAY).filter((g) => g >= 0);
   // SLA over every lead old enough to judge: unanswered leads past 15 min count as breached (not ignored).
   const sla = slaPct(leads30, now);
-  const won = await prisma.commissionEntry.findMany({ where: { agencyId, ...(agentId ? { agentId } : {}) }, include: { listing: { select: { priceAmount: true } } } });
+  const closed = await closingsByAgent(agencyId, since30, new Date(now), members.map((m) => m.userId));
   const ranking = members
     .map((m) => {
       const mine = leads30.filter((l) => l.agentId === m.userId);
@@ -58,9 +97,9 @@ export async function dashboardStats(agencyId: string, agentId?: string): Promis
         name: m.user.name ?? "",
         hue: m.user.hue,
         leads: mine.length,
-        won: won.filter((w) => w.agentId === m.userId).length,
+        won: closed.get(m.userId)?.count ?? 0,
         respMin: resp.length ? Math.round(resp.reduce((a, b) => a + b, 0) / resp.length) : null,
-        gmv: won.filter((w) => w.agentId === m.userId).reduce((s, w) => s + w.listing.priceAmount, 0),
+        gmv: closed.get(m.userId)?.volume ?? 0,
       };
     })
     .sort((a, b) => b.won - a.won || b.leads - a.leads);
@@ -68,7 +107,7 @@ export async function dashboardStats(agencyId: string, agentId?: string): Promis
     activeListings: active,
     activeDelta: active - activeOld,
     leads7d,
-    leadsDeltaPct: leadsPrev ? Math.round(((leads7d - leadsPrev) / leadsPrev) * 100) : leads7d ? 100 : 0,
+    leadsDeltaPct: deltaPct(leads7d, leadsPrev),
     convTourPct: leads30.length ? Math.round((funnel.TOUR / leads30.length) * 100) : 0,
     avgDaysToTour: gaps.length ? Math.round((gaps.reduce((a, b) => a + b, 0) / gaps.length) * 10) / 10 : null,
     slaPct: sla,

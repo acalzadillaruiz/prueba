@@ -132,7 +132,7 @@ test.describe("Revisión admin: regresiones", () => {
     await row.getByRole("button", { name: "Rechazar publicación" }).click();
     await expect.poll(async () => (await db.listing.findUniqueOrThrow({ where: { id } })).review).toBe("REJECTED");
     await page.getByRole("button", { name: "Todos" }).click();
-    await expect(page.getByRole("row").filter({ has: page.locator(`a[href="/es/agency/listings/${id}/edit"]`) }).getByText("Rechazado")).toBeVisible();
+    await expect(page.getByRole("row").filter({ has: page.locator(`a[href="/es/agency/listings/${id}/edit"]`) }).getByText("Rechazada")).toBeVisible();
     await logout(page);
     await demoLogin(page, /Agente/);
     expect((await apiAs(page, "PATCH", `listings/${id}`, { priceAmount: 149_000 })).status).toBe(200);
@@ -153,7 +153,7 @@ test.describe("Revisión admin: regresiones", () => {
     await expect(row.getByText("Solicitado")).toBeVisible();
     await row.getByRole("combobox").selectOption(agent.id);
     await expect(row.getByText("Asignado")).toBeVisible();
-    await row.getByRole("button", { name: "Publicar" }).click();
+    await row.getByRole("button", { name: "Revisar y publicar" }).click();
     await expect(row).toHaveCount(0);
     const [m, l] = await Promise.all([db.mandate.findUniqueOrThrow({ where: { id: mandate.id } }), db.listing.findUniqueOrThrow({ where: { id } })]);
     expect(m).toMatchObject({ status: "ACTIVE", agentId: agent.id });

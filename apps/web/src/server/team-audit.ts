@@ -4,6 +4,7 @@ import { AGENCY_PAGE_ROLES } from "@/lib/agency-pages";
 import { mean, median, pct, responseMinutes, slaPct, type AuditPeriod } from "@/lib/team-metrics";
 import { ApiError, requireUser, type SessionUser } from "./api";
 import { audit } from "./data";
+import { closingsByAgent } from "./agency-stats";
 
 /**
  * "Auditoría del gerente": per-advisor performance and read-only access to the team's chats.
@@ -43,7 +44,6 @@ export type AdvisorRow = {
   quality: number | null;
 };
 
-const CLOSED = ["SOLD", "RENTED"] as const;
 const PAST_TOUR = ["TOUR", "OFFER", "WON"];
 
 /** One row per AGENT member (plus owners who have listings assigned), with metrics computed from live data only. */
@@ -56,9 +56,10 @@ export async function advisorPerformance(agencyId: string, days: AuditPeriod, no
   });
   const ids = members.map((m) => m.userId);
   if (!ids.length) return [];
-  const [listings, closedHist, leads, tours, captures] = await Promise.all([
-    prisma.listing.findMany({ where: { agencyId, agentId: { in: ids } }, select: { id: true, agentId: true, createdAt: true, status: true, updatedAt: true, quality: true } }),
-    prisma.listingPriceHistory.findMany({ where: { kind: { in: [...CLOSED] }, listing: { agencyId, agentId: { in: ids } } }, select: { listingId: true, date: true } }),
+  const [listings, closed, leads, tours, captures] = await Promise.all([
+    prisma.listing.findMany({ where: { agencyId, agentId: { in: ids } }, select: { id: true, agentId: true, createdAt: true, status: true, quality: true } }),
+    // Same definition as the dashboard ranking and the reports (agency-stats.closingsByAgent).
+    closingsByAgent(agencyId, since, until, ids),
     prisma.lead.findMany({ where: { agencyId, agentId: { in: ids }, createdAt: { gte: since, lte: until } }, select: { id: true, agentId: true, stage: true, createdAt: true, firstResponseAt: true } }),
     prisma.tour.findMany({ where: { agentId: { in: ids }, listing: { agencyId }, OR: [{ createdAt: { gte: since, lte: until } }, { start: { gte: since, lte: until } }] }, select: { agentId: true, status: true, createdAt: true, start: true } }),
     // Captures logged by the advisor and converted into a listing of the agency (CaptureLead links to its captor).
@@ -67,9 +68,6 @@ export async function advisorPerformance(agencyId: string, days: AuditPeriod, no
   const toured = new Set(
     (await prisma.tour.findMany({ where: { leadId: { in: leads.map((l) => l.id) }, status: { not: "CANCELLED" } }, select: { leadId: true } })).map((t) => t.leadId),
   );
-  // Closing date: the latest SOLD/RENTED status event (ListingPriceHistory); listings closed without one fall back to updatedAt.
-  const closedAt = new Map<string, number>();
-  for (const h of closedHist) closedAt.set(h.listingId, Math.max(closedAt.get(h.listingId) ?? 0, h.date.getTime()));
   const inPeriod = (t: number) => t >= since.getTime() && t <= now;
 
   return members
@@ -78,7 +76,7 @@ export async function advisorPerformance(agencyId: string, days: AuditPeriod, no
       if (m.role === "AGENCY_OWNER" && !mine.length) return null;
       const captured = new Set(mine.filter((l) => inPeriod(l.createdAt.getTime())).map((l) => l.id));
       for (const c of captures) if (c.captorId === m.userId && c.listingId) captured.add(c.listingId);
-      const closings = mine.filter((l) => (CLOSED as readonly string[]).includes(l.status) && inPeriod(closedAt.get(l.id) ?? l.updatedAt.getTime())).length;
+      const closings = closed.get(m.userId)?.count ?? 0;
       const myLeads = leads.filter((l) => l.agentId === m.userId);
       const resp = responseMinutes(myLeads);
       const myTours = tours.filter((t) => t.agentId === m.userId);

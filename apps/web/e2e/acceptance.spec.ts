@@ -48,7 +48,7 @@ test.describe.serial("Criterios de aceptación §15", () => {
     const row = page.getByRole("button", { name: new RegExp(`E2E Visitante ${stamp}`) });
     await expect(row).toBeVisible();
     await row.click();
-    await expect(page.getByText(/Score IA/)).toBeVisible();
+    await expect(page.getByText(/Interés · siguiente mejor acción/)).toBeVisible();
     await expect(page.getByTestId("next-action")).toHaveAttribute("data-action", "PROPOSE_TOUR");
   });
 

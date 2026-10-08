@@ -19,16 +19,11 @@ import { listingHref } from "@/lib/listing-href";
 import { OwnerInbox, type OwnerLead, type OwnerTour } from "./OwnerInbox";
 import { OwnerEditForm } from "./OwnerEditForm";
 import { OwnerTakedown } from "./OwnerTakedown";
+import { mandateLabel, mandatePhase } from "@/lib/lifecycle";
 
 type Thread = { id: string; subject: string | null; listingId: string | null; leadId?: string | null; participants: { id: string; name: string; hue: number }[]; messages: Message[] };
 type Mandate = { id: string; status: "REQUESTED" | "ASSIGNED" | "ACTIVE" | "CANCELLED"; listingId: string | null; agencyName: string; agentName: string | null; createdAt: string };
 
-const MANDATE_LABEL: Record<Mandate["status"], [string, string]> = {
-  REQUESTED: ["Solicitado", "Requested"],
-  ASSIGNED: ["Agente asignado", "Agent assigned"],
-  ACTIVE: ["Publicado", "Live"],
-  CANCELLED: ["Cancelado", "Cancelled"],
-};
 const OFFER_LABEL: Record<Offer["status"], [string, string]> = {
   RECEIVED: ["Recibida", "Received"],
   COUNTERED: ["Contraofertada", "Countered"],
@@ -125,7 +120,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
             <Card key={m.id} className={cn(k.card, "border-0 p-5")}>
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="font-serif text-[24px] font-medium leading-tight">{tx(locale, `Encargo a ${m.agencyName}`, `Mandate with ${m.agencyName}`)}</div>
-                <Badge tone={m.status === "ACTIVE" ? "ok" : m.status === "CANCELLED" ? "danger" : "warn"}>{tx(locale, ...MANDATE_LABEL[m.status])}</Badge>
+                <Badge tone={m.status === "ACTIVE" ? "ok" : m.status === "CANCELLED" ? "danger" : "warn"}>{mandateLabel(mandatePhase(m), locale)}</Badge>
               </div>
               <div className="mt-1 text-sm text-muted">{listings.find((l) => l.id === m.listingId)?.[locale === "es" ? "title_es" : "title_en"]}</div>
               <ol className="mt-5 grid grid-cols-3 gap-2">

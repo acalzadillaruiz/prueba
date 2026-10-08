@@ -22,7 +22,9 @@ test.describe("Smoke: login, mapa, crear inmueble · RBAC duro", () => {
 
   test("mapa: dibujar polígono filtra resultados", async ({ page }) => {
     await page.goto("/es/search?type=SALE");
-    await page.getByRole("button", { name: /Dibujar zona/ }).click();
+    // One "Delimitar zona" tool with a small menu (draw / radius) instead of two pills over the pins.
+    await page.getByRole("button", { name: "Delimitar zona" }).click();
+    await page.getByRole("menuitem", { name: /Dibujar zona/ }).click();
     const box = (await page.locator('[role="application"]').boundingBox())!;
     for (const [x, y] of [[0.5, 0.25], [0.82, 0.27], [0.84, 0.56], [0.55, 0.62]]) await page.mouse.click(box.x + box.width * x, box.y + box.height * y);
     await page.getByRole("button", { name: /Cerrar zona/ }).click();

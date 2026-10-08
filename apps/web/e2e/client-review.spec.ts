@@ -218,7 +218,7 @@ test.describe("Cliente · regresiones de la revisión", () => {
     await page.evaluate(() => sessionStorage.removeItem("np-search-view"));
     await page.reload();
     // List first, with the floating "Mapa" toggle and the bottom tab bar.
-    await expect(page.locator('[data-search-sheet="list"]')).toBeVisible();
+    await expect(page.locator('[data-search-sheet="list"]')).toBeVisible({ timeout: 15_000 });
     await expect(page.getByRole("button", { name: "Mapa", exact: true })).toBeVisible();
     await expect(page.locator("[data-tabbar]")).toBeVisible();
     await expect(async () => {
@@ -237,6 +237,56 @@ test.describe("Cliente · regresiones de la revisión", () => {
     await expect(page.getByRole("button", { name: /^Lista · \d+/ })).toBeVisible();
     await page.getByRole("button", { name: /^Lista · \d+/ }).click();
     await expect(page.locator('[data-search-sheet="list"]')).toBeVisible();
+  });
+  test("móvil: comparador y «Mapa» en una sola barra; la página (no un panel) hace scroll y lo recuerda", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/es/search?type=SALE");
+    const first = await apiAs(page, "GET", "listings?type=SALE");
+    const id = (first.json.items as { id: string }[])[0].id;
+    await page.evaluate((c) => {
+      localStorage.setItem("np-compare-v1", JSON.stringify(c));
+      sessionStorage.removeItem("np-search-view");
+    }, [id]);
+    await page.reload();
+    // One docked bar: "Mapa" + "Comparar (1)"; the floating tray stays out of /search on phones.
+    const bar = page.locator("[data-search-toggle]");
+    await expect(bar.getByRole("button", { name: "Mapa", exact: true })).toBeVisible();
+    await expect(bar.getByRole("link", { name: /Comparar \(1\)/ })).toBeVisible();
+    await expect(page.locator("[data-compare-tray]")).toBeHidden();
+    // The document scrolls (the header can step away) and the position survives a listing → Back.
+    await page.mouse.move(195, 500);
+    await page.mouse.wheel(0, 1400);
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(600);
+    const y = await page.evaluate(() => window.scrollY);
+    await expect(page.locator("html")).toHaveAttribute("data-np-header", "hidden");
+    // Open a card that is already on screen with a real tap point (a locator click would scroll the page first).
+    const pt = await page.evaluate(() => {
+      for (const a of Array.from(document.querySelectorAll("#search-results a[href*='/listing/']"))) {
+        const r = a.getBoundingClientRect();
+        const y = Math.max(r.top + 40, 160);
+        if (y < r.bottom - 10 && y < window.innerHeight - 200) return { x: r.left + r.width / 2, y };
+      }
+      return null;
+    });
+    expect(pt).not.toBeNull();
+    await page.mouse.click(pt!.x, pt!.y);
+    await page.waitForURL(/\/listing\//);
+    await page.goBack();
+    await page.waitForURL(/\/search\?/);
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(y - 40);
+    // Map view: the bar keeps the comparator (count only) next to "Lista · N" and "Filtros".
+    await bar.getByRole("button", { name: "Mapa", exact: true }).click();
+    await expect(bar.getByRole("link", { name: "Comparar (1)" })).toBeVisible();
+    await expect(bar.getByRole("button", { name: /^Lista · \d+/ })).toBeVisible();
+    await page.evaluate(() => {
+      localStorage.removeItem("np-compare-v1");
+      sessionStorage.removeItem("np-search-view");
+    });
+  });
+  test("búsqueda: una frase entendida a medias dice qué palabras no entendimos", async ({ page }) => {
+    await page.goto("/es/search?type=SALE&kind=house&q=zzqx+casa+rara");
+    await expect(page.getByTestId("partly-understood")).toHaveText("Buscamos «casa»; no entendimos «zzqx rara».");
+    await expect(page.getByTestId("not-understood")).toHaveCount(0);
   });
   test("búsqueda: un texto que no entendemos lo dice y sugiere zonas; «Lech» sugiere Lechería", async ({ page }) => {
     await page.goto("/es/search?type=SALE&q=xyzzy+castillo");

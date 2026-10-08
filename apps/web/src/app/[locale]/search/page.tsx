@@ -58,7 +58,9 @@ export default async function SearchPage({ params, searchParams }: { params: Pro
   const [initial, zones] = await Promise.all([searchListings(filtersFromParams(sp)), prisma.listing.findMany({ where: { status: { in: ["ACTIVE", "COMING_SOON", "UNDER_OFFER"] } }, distinct: ["zone", "city"], select: { zone: true, city: true } })]);
   return (
     <div className="np-public">
-      <PublicHeader locale={locale} />
+      {/* autoHide: on phones the results scroll the document, so the header steps away on scroll-down (desktop keeps
+          the list in its own panel: the page never scrolls there). */}
+      <PublicHeader locale={locale} autoHide />
       <main id="main">
       <h1 className="sr-only">{locale === "es" ? "Busca tu próxima casa" : "Find your next home"}</h1>
       <Suspense>

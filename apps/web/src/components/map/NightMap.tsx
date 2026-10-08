@@ -555,7 +555,7 @@ export function NightMap({
             </div>
           )}
           <div className="pointer-events-none absolute bottom-2 left-3 z-10 text-xs" style={{ color: pal.note }}>
-            {tx(locale, "Mapa ilustrativo · Google Maps en producción", "Illustrative map · Google Maps in production")}
+            {tx(locale, "Mapa ilustrativo · ubicación aproximada", "Illustrative map · approximate location")}
           </div>
         </>
       )}

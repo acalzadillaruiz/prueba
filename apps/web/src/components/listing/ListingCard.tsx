@@ -77,11 +77,11 @@ export function CardAdvisor({ agent, locale, owner }: { agent: NonNullable<Listi
 /**
  * Price size by the card's own width (container query units, see .np-card-price in globals.css): the price fills the
  * row it has — a 3-column grid at 1280 px gets a smaller "USD 2.300.000" than a phone's full-width card — and never
- * wraps or runs into what follows. The vars give the text's length (in em at ~0.66 em a glyph) and the suffix's room.
+ * wraps or runs into what follows. The vars give the text's length (in em at ~0.7 em a glyph — NP Digits figures are 0.7 em) and the suffix's room.
  */
 const priceVars = (price: string, suffix: string, compact?: boolean) =>
   ({
-    "--np-pk": (price.length * 0.66).toFixed(2),
+    "--np-pk": (price.length * 0.7).toFixed(2),
     "--np-sfx": `${Math.ceil(suffix.length * 6.6)}px`,
     "--np-pmax": compact ? "24px" : "28px",
   }) as React.CSSProperties;
@@ -125,7 +125,7 @@ export function ListingCard({ l, locale, compact, className, compareToggle }: { 
       </div>
       <div className={cn("px-3.5 pb-3 pt-4", compact && "px-3 pb-2.5 pt-3.5")}>
         <div className="np-card-meta flex flex-wrap items-baseline justify-between gap-x-2 gap-y-1" id={metaId}>
-          <div className="np-card-price min-w-0 whitespace-nowrap font-serif leading-none tracking-[-0.01em] text-ink" style={priceVars(price, suffix, compact)}>
+          <div className="np-card-price np-num min-w-0 whitespace-nowrap leading-none tracking-[-0.01em] text-ink" style={priceVars(price, suffix, compact)}>
             {price}
             <span className="font-display text-sm font-normal text-muted">{suffix}</span>
             <span className="sr-only">, {l.zone}, {l.city}</span>
@@ -176,7 +176,7 @@ export function MapPreviewCard({ l, locale, variant = "card" }: { l: Listing; lo
           <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="h-full w-full" label={label} sizes="160px" />
         </div>
         <div className="min-w-0 flex-1 py-1.5 pr-12">
-          <div id={metaId} className="whitespace-nowrap font-serif text-[20px] leading-none text-ink [font-feature-settings:'lnum']">
+          <div id={metaId} className="np-num whitespace-nowrap text-[20px] leading-none text-ink">
             {money(l.priceAmount, locale)}
             <span className="font-display text-[13px] font-normal text-muted">{priceSuffix(l, locale)}</span>
           </div>
@@ -193,7 +193,7 @@ export function MapPreviewCard({ l, locale, variant = "card" }: { l: Listing; lo
         <SaveButton id={l.id} locale={locale} className="absolute right-2 top-2 z-[2]" />
       </div>
       <div className="p-3.5">
-        <div id={metaId} className="whitespace-nowrap font-serif text-[22px] leading-none text-ink">
+        <div id={metaId} className="np-num whitespace-nowrap text-[22px] leading-none text-ink">
           {money(l.priceAmount, locale)}
           <span className="font-display text-sm font-normal text-muted">{priceSuffix(l, locale)}</span>
         </div>

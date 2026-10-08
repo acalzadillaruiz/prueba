@@ -80,11 +80,12 @@ export function AskBar({ locale, className, sticky = false }: { locale: Locale; 
     router.push(`/${locale}/search?${queryToParams(q, raw).toString()}`);
   };
 
-  const suggest = usePlaceSuggest({ locale, text, setText });
+  // Picking a suggested place searches straight away (Enter or click), like submitting the box.
+  const suggest = usePlaceSuggest({ locale, text, setText, onPick: (next) => void go(next) });
 
   const compact = sticky && host
     ? createPortal(
-        <CompactAsk locale={locale} shown={stuck} mode={mode} setMode={setMode} text={text} setText={setText} busy={busy} onSubmit={() => void go(text)} />,
+        <CompactAsk locale={locale} shown={stuck} mode={mode} setMode={setMode} text={text} setText={setText} busy={busy} onSubmit={(typed) => void go(typed ?? text)} />,
         host,
       )
     : null;
@@ -188,10 +189,11 @@ function CompactAsk({
   text: string;
   setText: (v: string) => void;
   busy: boolean;
-  onSubmit: () => void;
+  /** `typed`: the completed text when a suggested place was picked (the parent's state isn't updated yet). */
+  onSubmit: (typed?: string) => void;
 }) {
   const id = useId();
-  const suggest = usePlaceSuggest({ locale, text, setText });
+  const suggest = usePlaceSuggest({ locale, text, setText, onPick: (next) => onSubmit(next) });
   const { saved, user, ready } = useApp();
   const chip = MODE_CHIP[mode];
   // Phones get the short placeholder ("Zona…"): the field is ~80 px wide at 360 once the mode word is shown.

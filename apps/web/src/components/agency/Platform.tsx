@@ -11,6 +11,7 @@ import { AdminShell } from "@/components/layout/AdminShell";
 import { PropertyArt } from "@/components/art/PropertyArt";
 import { Button, Field } from "@/components/ui";
 import { Chip, Count, Initials, Kpi, Panel, Pill, StatusPill, k } from "./kit";
+import { ScrollRegion } from "./ScrollRegion";
 import { BarChart } from "./charts";
 import { useApp } from "@/lib/store";
 import { api, type ApiClientError } from "@/lib/api";
@@ -78,10 +79,14 @@ export function PlatformHome({ locale, data }: { locale: Locale; data: PlatformH
         <Panel title={tx(locale, "Salud del sistema", "System health")}>
           <ul className={cn("divide-y", k.divide)}>
             {data.health.map((h) => (
-              <li key={h.k} className="flex items-center gap-2.5 py-2.5 text-sm first:pt-0">
-                {h.ok ? <CheckCircle2 size={16} strokeWidth={1.7} className={k.okText} /> : <AlertTriangle size={16} strokeWidth={1.7} className={k.warnText} />}
-                <span className="flex-1">{h.k}</span>
-                <span className={cn("text-right text-xs", k.muted)}>{h.v}</span>
+              // Label on line 1; status chip + detail on line 2 (the 3-column row wrapped to 3 lines on phones).
+              <li key={h.k} className="grid grid-cols-[16px_minmax(0,1fr)] items-center gap-x-2.5 gap-y-1 py-2.5 text-sm first:pt-0">
+                {h.ok ? <CheckCircle2 size={16} strokeWidth={1.7} className={k.okText} aria-hidden /> : <AlertTriangle size={16} strokeWidth={1.7} className={k.warnText} aria-hidden />}
+                <span className="font-semibold">{h.k}</span>
+                <span className="col-start-2 flex flex-wrap items-center gap-x-2 gap-y-1">
+                  <Pill tone={h.ok ? "ok" : "warn"} className="px-2 py-0.5 text-[10px]">{h.ok ? tx(locale, "Operativo", "OK") : tx(locale, "Revisar", "Check")}</Pill>
+                  <span className={cn("min-w-0 text-xs", k.muted)}>{h.v}</span>
+                </span>
               </li>
             ))}
           </ul>
@@ -148,7 +153,7 @@ export function PlatformAgencies({ locale, agencies }: { locale: Locale; agencie
           <Button variant="navy" className={k.navy} disabled={busy === "create"}>{busy === "create" && <Loader2 size={14} className="animate-spin" />} {tx(locale, "Crear", "Create")}</Button>
         </form>
       )}
-      <div className={cn("overflow-x-auto", k.card)}>
+      <ScrollRegion fade={false} label={tx(locale, "Agencias", "Agencies")} className={k.card}>
         <table className="np-sticky-last w-full min-w-[980px] text-sm">
           <thead className={cn("border-b text-left", k.line, k.th)}>
             <tr><th className="px-4 py-3">{tx(locale, "Agencia", "Agency")}</th><th className="px-3 py-3">{tx(locale, "Estado", "Status")}</th><th className="px-3 py-3">{tx(locale, "Verificación", "Verification")}</th><th className="px-3 py-3">{tx(locale, "Plan", "Plan")}</th><th className="px-3 py-3 text-right">{tx(locale, "Anuncios", "Listings")}</th><th className="px-3 py-3 text-right">{tx(locale, "Miembros", "Members")}</th><th className="px-3 py-3 text-right">Leads 30 d</th><th className="px-3 py-3" /></tr>
@@ -206,7 +211,7 @@ export function PlatformAgencies({ locale, agencies }: { locale: Locale; agencie
             ))}
           </tbody>
         </table>
-      </div>
+      </ScrollRegion>
     </AdminShell>
   );
 }
@@ -247,7 +252,7 @@ export function PlatformUsers({ locale, users, providers }: { locale: Locale; us
         <div className="relative w-80 max-w-full"><Search size={15} className={cn("absolute left-3.5 top-1/2 -translate-y-1/2", k.muted)} /><input value={q} onChange={(e) => setQ(e.target.value)} className={cn(k.input, "rounded-full pl-10")} placeholder={tx(locale, "Nombre, email, rol o agencia…", "Name, email, role or agency…")} aria-label={tx(locale, "Buscar", "Search")} /></div>
         <span className={cn("text-sm", k.muted)}>{rows.length} / {users.length}</span>
       </div>
-      <div className={cn("overflow-x-auto", k.card)}>
+      <ScrollRegion fade={false} label={tx(locale, "Usuarios", "Users")} className={k.card}>
         <table className="np-sticky-last w-full min-w-[860px] text-sm">
           <thead className={cn("border-b text-left", k.line, k.th)}><tr><th className="px-4 py-3">{tx(locale, "Usuario", "User")}</th><th className="px-3 py-3">{tx(locale, "Rol", "Role")}</th><th className="px-3 py-3">{tx(locale, "Agencia", "Agency")}</th><th className="px-3 py-3">{tx(locale, "Acceso", "Sign-in")}</th><th className="px-3 py-3">{tx(locale, "Actividad", "Activity")}</th><th className="px-3 py-3" /></tr></thead>
           <tbody>
@@ -302,7 +307,7 @@ export function PlatformUsers({ locale, users, providers }: { locale: Locale; us
             ))}
           </tbody>
         </table>
-      </div>
+      </ScrollRegion>
     </AdminShell>
   );
 }
@@ -560,7 +565,7 @@ export function PlatformAudit({
         </div>
         {(filters.action || filters.actor) && <Link href={base} className={cn("pb-2.5 text-sm", k.link)}>{tx(locale, "Quitar filtros", "Clear filters")}</Link>}
       </div>
-      <div className={cn("overflow-x-auto", k.card)}>
+      <ScrollRegion fade={false} label={tx(locale, "Registro de auditoría", "Audit log")} className={k.card}>
         <table className="np-sticky-last w-full min-w-[860px] text-sm">
           <thead className={cn("border-b text-left", k.line, k.th)}>
             <tr><th className="px-4 py-3">{tx(locale, "Fecha", "Date")}</th><th className="px-3 py-3">{tx(locale, "Autor", "Actor")}</th><th className="px-3 py-3">{tx(locale, "Acción", "Action")}</th><th className="px-3 py-3">{tx(locale, "Sobre", "Target")}</th><th className="px-3 py-3">{tx(locale, "Detalle", "Details")}</th></tr>
@@ -580,7 +585,7 @@ export function PlatformAudit({
             )}
           </tbody>
         </table>
-      </div>
+      </ScrollRegion>
       <nav className="mt-4 flex items-center justify-between gap-3 text-sm" aria-label={tx(locale, "Paginación", "Pagination")}>
         {filters.cursor ? (
           <button type="button" onClick={() => router.back()} className={cn("flex items-center gap-1", k.link)}><ChevronLeft size={15} /> {tx(locale, "Anterior", "Previous")}</button>

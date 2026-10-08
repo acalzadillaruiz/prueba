@@ -11,6 +11,7 @@ import { api } from "@/lib/api";
 import { plural, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import { Pill, k, tab } from "./kit";
+import { ScrollRegion } from "./ScrollRegion";
 
 export type CalEvent = { id: string; start: string; title: string; sub: string; kind: "tour" | "req" | "done" | "media" | "cancelled"; agentName: string; tourId?: string; /** Listing title (localized) and its back-office link, when known. */ listing?: string; listingHref?: string };
 
@@ -170,7 +171,7 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
             )}
           </div>
         </section>
-        <div ref={scroller} className={cn("hidden overflow-x-auto md:block", k.card)}>
+        <ScrollRegion scrollRef={scroller} label={tx(locale, "Semana", "Week")} className={cn("hidden md:block", k.card)}>
           <div className="min-w-[760px]">
             <div className={cn("flex flex-wrap items-center gap-3 border-b px-5 py-4", k.line)}>
               {weekNav}
@@ -228,7 +229,7 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
               </div>
             </div>
           </div>
-        </div>
+        </ScrollRegion>
         <div className="space-y-4">
           {sel && (
             <div className={cn("np-in p-5 shadow-[inset_0_0_0_2px_#1E1A18] dark:shadow-[inset_0_0_0_2px_#C9A574]", k.card)}>

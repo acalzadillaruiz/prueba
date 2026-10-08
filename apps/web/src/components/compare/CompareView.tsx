@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AlertTriangle, Check, Minus, Plus, Scale, X } from "lucide-react";
@@ -17,6 +18,10 @@ const isSale = (l: Listing) => l.listingType === "SALE" || l.listingType === "CO
 /** Green / amber that keep ≥ 4.5:1 on the dark card (#2A2420) too. */
 const OK = "text-ok dark:text-[#8FCBA6]";
 const WARN = "text-warn dark:text-[#E0A84A]";
+/** Remove ("×") on a photo: its own light/dark colours (not the remapped bg-white, which turned it dark-on-dark). */
+const REMOVE_BTN = "absolute flex items-center justify-center rounded-full bg-[#F1EBE3] text-[#1E1A18] shadow ring-1 ring-black/10 after:absolute after:content-[''] dark:bg-[#15120F]/85 dark:text-[#F1EBE3] dark:ring-[#F1EBE3]/45";
+/** Backup power ranked for the "best" mark: full > partial > none; unknown isn't ranked. */
+const POWER_RANK: Record<string, number> = { FULL: 2, PARTIAL: 1, NONE: 0 };
 const yes = (on: boolean, locale: Locale) => (on ? <Check size={16} className={OK} aria-label={tx(locale, "Sí", "Yes")} /> : <Minus size={16} className="text-muted" aria-label={tx(locale, "No", "No")} />);
 
 type Row = {
@@ -39,6 +44,32 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
   const ids = urlIds ?? compare;
   const { items: cmp, loading } = useListingsByIds(ids, initial);
 
+  // Phones: the photos + titles header scrolls away like the rest; once it's gone a slim row (thumbnail + price per
+  // home) pins under the site header instead (~60 px, not ~180). Zero-height sticky host → no layout jump.
+  const fullHead = useRef<HTMLDivElement>(null);
+  const pin = useRef<HTMLDivElement>(null);
+  const [stuck, setStuck] = useState(false);
+  useEffect(() => {
+    let raf = 0;
+    const check = () => {
+      raf = 0;
+      const a = fullHead.current?.getBoundingClientRect();
+      const b = pin.current?.getBoundingClientRect();
+      if (a && b) setStuck(a.height > 0 && a.bottom < b.top - 1);
+    };
+    const on = () => {
+      if (!raf) raf = requestAnimationFrame(check);
+    };
+    check();
+    window.addEventListener("scroll", on, { passive: true });
+    window.addEventListener("resize", on);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", on);
+      window.removeEventListener("resize", on);
+    };
+  }, [cmp.length]);
+
   const remove = (id: string) => {
     if (compare.includes(id)) toggleCompare(id);
     if (urlIds) {
@@ -54,7 +85,8 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
   const ppm = (l: Listing) => (l.areaM2 > 0 ? l.priceAmount / l.areaM2 : NaN);
   const allRows: Row[] = [
     { label: tx(locale, "Precio", "Price"), render: (l) => <span className="font-serif text-[17px] font-medium leading-tight md:text-[22px]">{money(l.priceAmount, locale)}{unit(l)}</span>, val: sameUnit ? (l) => l.priceAmount : undefined, best: "min" },
-    { label: tx(locale, "Precio por m²", "Price per m²"), render: (l) => (Number.isFinite(ppm(l)) ? <>{num(Math.round(ppm(l) * (l.pricePeriod ? 10 : 1)) / (l.pricePeriod ? 10 : 1), locale)} USD/m²{unit(l)}</> : "—"), val: sameUnit ? ppm : undefined, best: "min" },
+    // A rent per m² next to a sale per m² (or a nightly next to a monthly one) isn't comparable: "—" for the rents.
+    { label: tx(locale, "Precio por m²", "Price per m²"), render: (l) => (Number.isFinite(ppm(l)) && (sameUnit || !l.pricePeriod) ? <>{num(Math.round(ppm(l) * (l.pricePeriod ? 10 : 1)) / (l.pricePeriod ? 10 : 1), locale)} USD/m²{unit(l)}</> : <span aria-label={tx(locale, "No comparable", "Not comparable")}>—</span>), val: sameUnit ? ppm : undefined, best: "min" },
     { label: "PlaceEstimate", render: (l) => <>{money(l.estimate.mid, locale)}{unit(l)}</> },
     {
       label: tx(locale, "Vs. estimación", "Vs. estimate"),
@@ -73,8 +105,8 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
     { label: tx(locale, "Zona", "Location"), render: (l) => `${l.zone}, ${l.city}` },
     { label: tx(locale, "Operación", "Type"), render: (l) => lbl(TYPE_LABEL[l.listingType], locale) },
     // Venezuelan essentials
-    { label: tx(locale, "Planta eléctrica", "Backup generator"), render: (l) => (l.powerBackup === "FULL" ? "100 %" : l.powerBackup === "PARTIAL" ? tx(locale, "Parcial", "Partial") : l.powerBackup === "NONE" ? tx(locale, "No tiene", "None") : "—") },
-    { label: tx(locale, "Pozo propio", "Own water well"), render: (l) => yes(l.ownWell, locale) },
+    { label: tx(locale, "Planta eléctrica", "Backup generator"), render: (l) => (l.powerBackup === "FULL" ? "100 %" : l.powerBackup === "PARTIAL" ? tx(locale, "Parcial", "Partial") : l.powerBackup === "NONE" ? tx(locale, "No tiene", "None") : "—"), val: (l) => POWER_RANK[l.powerBackup ?? ""] ?? NaN, best: "max" },
+    { label: tx(locale, "Pozo propio", "Own water well"), render: (l) => yes(l.ownWell, locale), val: (l) => (l.ownWell ? 1 : 0), best: "max" },
     { label: tx(locale, "Tanque de agua", "Water tank"), render: (l) => (l.waterTankLiters ? `${num(l.waterTankLiters, locale)} L` : "—"), val: (l) => l.waterTankLiters ?? 0, best: "max" },
     { label: tx(locale, "Muelle", "Private dock"), render: (l) => (l.dockFeet ? tx(locale, `${num(l.dockFeet, locale)} pies`, `${num(l.dockFeet, locale)} ft`) : "—"), show: (l) => !!l.dockFeet },
     { label: tx(locale, "Vista al Ávila", "Ávila view"), render: (l) => yes(l.viewAvila, locale), show: (l) => l.viewAvila },
@@ -136,14 +168,14 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
           {/* Phones and small tablets: every home in view at once (a column each, 33–50 %), each row's label above its
               values, and the photos + titles pinned under the header while the rows scroll. */}
           <div className="md:hidden" data-compare-stack>
-            <div className="sticky top-[calc(env(safe-area-inset-top)+var(--np-header-offset,80px)_-_8px)] z-[2] grid gap-2 border-b border-line bg-white p-3 transition-[top] duration-300 ease-[cubic-bezier(.2,.7,.2,1)] dark:bg-navy-card" style={cols}>
+            <div ref={fullHead} className="grid gap-2 border-b border-line bg-white p-3 dark:bg-navy-card" style={cols}>
               {cmp.map((l) => {
                 const title = tx(locale, l.title_es, l.title_en);
                 return (
                   <div key={l.id} className="min-w-0">
                     <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-arena">
                       <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} sizes="50vw" className="h-full w-full" />
-                      <button type="button" onClick={() => remove(l.id)} aria-label={removeLabel(title)} className="absolute right-1 top-1 flex h-7 w-7 items-center justify-center rounded-full bg-white text-[#1E1A18] shadow after:absolute after:-inset-2 after:content-['']">
+                      <button type="button" onClick={() => remove(l.id)} aria-label={removeLabel(title)} className={cn(REMOVE_BTN, "right-1 top-1 h-7 w-7 after:-inset-2")}>
                         <X size={13} aria-hidden />
                       </button>
                     </div>
@@ -153,6 +185,31 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
                   </div>
                 );
               })}
+            </div>
+            {/* the slim pinned row (decorative repeat of the header above: hidden from assistive tech) */}
+            <div ref={pin} className="sticky top-[calc(env(safe-area-inset-top)+var(--np-header-offset,80px)_-_8px)] z-[2] h-0 transition-[top] duration-300 ease-[cubic-bezier(.2,.7,.2,1)]">
+              <div
+                aria-hidden
+                inert
+                data-compare-pinned={stuck ? "on" : "off"}
+                className={cn(
+                  "absolute inset-x-0 top-0 grid gap-2 border-b border-line bg-white/95 px-3 py-2 shadow-[0_8px_18px_-12px_rgba(30,26,24,.35)] backdrop-blur transition-[opacity,transform] duration-200 dark:bg-navy-card",
+                  stuck ? "opacity-100" : "pointer-events-none invisible -translate-y-1 opacity-0",
+                )}
+                style={cols}
+              >
+                {cmp.map((l) => (
+                  <div key={l.id} className="flex min-w-0 items-center gap-2">
+                    <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-md bg-arena">
+                      <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} sizes="40px" className="h-full w-full" />
+                    </div>
+                    <span className="np-num min-w-0 truncate text-[14px] leading-tight">
+                      {money(l.priceAmount, locale)}
+                      <span className="block truncate font-display text-[11px] text-muted">{priceSuffix(l, locale) || tx(locale, l.title_es, l.title_en)}</span>
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
             <dl>
               {rows.map(({ label, render }, r) => (
@@ -185,9 +242,10 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
                     const title = tx(locale, l.title_es, l.title_en);
                     return (
                       <th key={l.id} scope="col" className="p-4 text-left align-top font-normal">
-                        <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-arena">
+                        {/* 16:10 and capped, so two homes side by side at 1024 don't fill the screen with photo */}
+                        <div className="relative aspect-[16/10] max-h-[240px] w-full overflow-hidden rounded-lg bg-arena">
                           <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} sizes="(max-width: 1280px) 30vw, 380px" className="h-full w-full" />
-                          <button type="button" onClick={() => remove(l.id)} aria-label={removeLabel(title)} className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-white text-[#1E1A18] shadow after:absolute after:-inset-1.5 after:content-['']">
+                          <button type="button" onClick={() => remove(l.id)} aria-label={removeLabel(title)} className={cn(REMOVE_BTN, "right-2 top-2 h-8 w-8 after:-inset-1.5")}>
                             <X size={14} aria-hidden />
                           </button>
                         </div>

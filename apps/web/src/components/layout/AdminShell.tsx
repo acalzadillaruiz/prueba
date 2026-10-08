@@ -35,6 +35,7 @@ import { useTranslations } from "next-intl";
 import { useApp } from "@/lib/store";
 import { AGENCY_PAGE_PATH, AGENCY_PAGE_ROLES, type AgencyPage } from "@/lib/agency-pages";
 import { AgencyMobileNav } from "@/components/agency/MobileNav";
+import { DemoSidebarSlot } from "@/components/layout/DemoBarSlot";
 import { api } from "@/lib/api";
 import { tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
@@ -176,6 +177,7 @@ export function AdminShell({ locale, area, children, title, actions, eyebrow }: 
           <button type="button" onClick={() => logout(locale)} className="flex w-full items-center gap-3 rounded-lg px-4 py-2 text-[13px] text-ivory/65 hover:bg-white/[.04] hover:text-ivory">
             <LogOut size={15} strokeWidth={1.6} /> {tx(locale, "Cerrar sesión", "Sign out")}
           </button>
+          <DemoSidebarSlot locale={locale} />
         </div>
       </aside>
 

@@ -238,7 +238,8 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
   };
 
   const places = useMemo(() => placesFromGroups(zones), [zones]);
-  const suggest = usePlaceSuggest({ locale, text: nl, setText: setNl, places });
+  // Picking a place searches at once (same path as submitting the box), so the box, chips and results never disagree.
+  const suggest = usePlaceSuggest({ locale, text: nl, setText: setNl, places, onPick: (next) => runNl(next) });
 
   // The page defaults to "Comprar"; the API must get the same default or other types leak into the results.
   const base = new URLSearchParams(sp.toString());
@@ -459,13 +460,15 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
     <div className={cn("lg:flex lg:h-[calc(100dvh-72px)] lg:flex-col", phoneMap && "flex h-[calc(100dvh-72px)] flex-col")}>
       {/* search + filter bar */}
       <div className="relative z-30 border-b border-ink/[.06] bg-ivory/80 backdrop-blur-xl">
-        <div className="flex items-center gap-2 px-4 py-2.5 lg:flex-wrap lg:px-5 min-[1440px]:flex-nowrap">
+        {/* Below 1440 (lg): row 1 = the words box (≥ 240 px, takes the room left) + operation; row 2 = the filters. From
+            1440 it's one row. The box is never squeezed to "Cuéntanos qué b". */}
+        <div className="flex items-center gap-2 px-4 py-2.5 lg:flex-wrap lg:gap-y-1 lg:px-5 min-[1440px]:flex-nowrap min-[1440px]:gap-y-2">
           <form
             onSubmit={(e) => {
               e.preventDefault();
               runNl(nl);
             }}
-            className="relative flex h-11 min-w-0 flex-1 items-center gap-2 rounded-full border border-ink/10 bg-white/75 px-4 backdrop-blur focus-within:border-navy lg:h-10 lg:min-w-[140px] lg:max-w-[320px]"
+            className="relative flex h-11 min-w-0 flex-1 items-center gap-2 rounded-full border border-ink/10 bg-white/75 px-4 backdrop-blur focus-within:border-navy lg:h-10 lg:min-w-[240px]"
           >
             <Sparkles size={15} className="shrink-0 text-gold-text" aria-hidden />
             <input
@@ -501,6 +504,8 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
                 </button>
               ))}
             </div>
+            {/* line break before the filters (lg up to 1440) */}
+            <div aria-hidden className="hidden h-0 basis-full lg:block min-[1440px]:hidden" />
             <FilterPopover label={priceLabel(locale, min, max)} title={tx(locale, "Precio", "Price")} active={!!(min || max)} open={pop === "price"} onOpenChange={(o) => { setPop(o ? "price" : null); if (o) setMoreOpen(false); }} width="w-[360px]">
               <PriceFields locale={locale} f={f} set={set} />
             </FilterPopover>
@@ -526,7 +531,8 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
               {essCount > 0 && <span className="rounded-full bg-navy px-1.5 text-xs font-semibold text-ivory [font-feature-settings:'lnum']" aria-label={tx(locale, `${essCount} filtros de servicios esenciales activos`, `${essCount} essential-service filters on`)}>{essCount}</span>}
               <ChevronDown size={14} aria-hidden />
             </button>
-            {/* Secondary (outline): the filters are the bar's main job. Below xl only the bell shows; the name stays. */}
+            {/* Secondary (outline): the filters are the bar's main job. Below 1536 only the bell shows (the words box keeps
+                ≥ 240 px on one row at 1440); the name stays. */}
             <button
               type="button"
               onClick={createAlert}
@@ -537,7 +543,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
               className={cn(pill, "ml-auto px-3 disabled:cursor-default xl:px-4", alertSaved ? "border-ok text-ok" : "np-btn-outline border-navy bg-transparent font-semibold text-navy hover:bg-navy/5")}
             >
               {alertSaved ? <Check size={15} aria-hidden /> : savingAlert ? <Loader2 size={15} aria-hidden className="animate-spin" /> : <Bell size={15} aria-hidden />}
-              <span aria-hidden className="hidden min-[1440px]:inline">{alertSaved ? tx(locale, "Búsqueda guardada", "Search saved") : tx(locale, "Guardar búsqueda", "Save search")}</span>
+              <span aria-hidden className="hidden min-[1536px]:inline">{alertSaved ? tx(locale, "Búsqueda guardada", "Search saved") : tx(locale, "Guardar búsqueda", "Save search")}</span>
             </button>
           </div>
         </div>

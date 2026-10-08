@@ -5,6 +5,7 @@ import { Download, FileSpreadsheet } from "lucide-react";
 import type { Locale } from "@/types/domain";
 import { AdminShell } from "@/components/layout/AdminShell";
 import { Kpi, Panel, k, tab } from "./kit";
+import { ScrollRegion } from "./ScrollRegion";
 import { cn } from "@/lib/cn";
 import { money, num, tx } from "@/lib/i18n";
 
@@ -61,6 +62,7 @@ function SourceBars({ locale, rows }: { locale: Locale; rows: ReportData["bySour
 
 export function ReportsView({ locale, data, days }: { locale: Locale; data: ReportData; days: ReportPeriod }) {
   const d = `${days} d`;
+  const period = tx(locale, `Últimos ${days} días`, `Last ${days} days`);
   return (
     <AdminShell
       locale={locale}
@@ -81,19 +83,22 @@ export function ReportsView({ locale, data, days }: { locale: Locale; data: Repo
         ))}
       </nav>
       <div className="grid gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4 [&>*]:min-w-0">
-        <Kpi label={tx(locale, `Volumen cerrado (${d})`, `Closed volume (${d})`)} value={money(data.closedVolume, locale)} hint={tx(locale, `${data.closings} ${data.closings === 1 ? "cierre" : "cierres"} · vendidos o alquilados`, `${data.closings} ${data.closings === 1 ? "closing" : "closings"} · sold or rented`)} />
-        <Kpi label={tx(locale, `Comisiones estimadas (${d})`, `Est. commissions (${d})`)} value={money(data.commissions, locale)} hint={tx(locale, "según reglas de la agencia", "per agency rules")} />
-        <Kpi label={tx(locale, `Leads (${d})`, `Leads (${d})`)} value={num(data.leads, locale)} hint={tx(locale, "todas las fuentes", "all sources")} />
-        <Kpi label={tx(locale, "Días en mercado (mediana)", "Median days on market")} value={data.medianDom ?? "—"} hint={tx(locale, "inmuebles activos hoy", "listings active today")} />
+        {/* Short one-line labels: the period goes in the line under the figure (it read "(30 D)" alone on a 2nd line). */}
+        <Kpi label={tx(locale, "Volumen cerrado", "Closed volume")} value={money(data.closedVolume, locale)} hint={tx(locale, `${period} · ${data.closings} ${data.closings === 1 ? "cierre" : "cierres"} (vendidos o alquilados)`, `${period} · ${data.closings} ${data.closings === 1 ? "closing" : "closings"} (sold or rented)`)} />
+        <Kpi label={tx(locale, "Comisiones", "Commissions")} value={money(data.commissions, locale)} hint={tx(locale, `${period} · estimadas según reglas de la agencia`, `${period} · estimated per agency rules`)} />
+        <Kpi label="Leads" value={num(data.leads, locale)} hint={tx(locale, `${period} · todas las fuentes`, `${period} · all sources`)} />
+        <Kpi label={tx(locale, "Días en mercado", "Days on market")} value={data.medianDom ?? "—"} hint={tx(locale, "mediana · inmuebles activos hoy", "median · listings active today")} />
       </div>
-      <div className="mt-6 grid gap-6 [&>*]:min-w-0 xl:grid-cols-[1fr_1.15fr]">
-        <div className="grid content-start gap-6 [&>*]:min-w-0">
+      {/* Source + agent side by side from xl; the 6-column zone table gets the full width below, so nothing is clipped at 1024–1440. */}
+      <div className="mt-6 grid gap-6 [&>*]:min-w-0">
+        <div className="grid content-start gap-6 [&>*]:min-w-0 xl:grid-cols-2">
           <Panel title={tx(locale, `Leads por origen (${d})`, `Leads by source (${d})`)}>
             {data.bySource.length ? <SourceBars locale={locale} rows={data.bySource} /> : <p className={cn("text-[14px]", k.muted)}>{tx(locale, "Sin leads en este periodo.", "No leads in this period.")}</p>}
           </Panel>
-          <Panel title={tx(locale, `Por agente (${d})`, `By agent (${d})`)} bodyClass="overflow-x-auto">
+          <Panel title={tx(locale, `Por agente (${d})`, `By agent (${d})`)}>
             {data.byAgent.length ? (
-              <table className="w-full text-[14px]" data-testid="report-agents">
+              <ScrollRegion label={tx(locale, "Por agente", "By agent")}>
+              <table className="w-full min-w-[26rem] text-[14px]" data-testid="report-agents">
                 <thead className={cn("text-left", k.th, "text-[12px]")}>
                   <tr>
                     <th className="pb-2">{tx(locale, "Agente", "Agent")}</th>
@@ -115,28 +120,40 @@ export function ReportsView({ locale, data, days }: { locale: Locale; data: Repo
                   ))}
                 </tbody>
               </table>
+              </ScrollRegion>
             ) : (
               <p className={cn("text-[14px]", k.muted)}>{tx(locale, "Aún no hay agentes en el equipo.", "No agents on the team yet.")}</p>
             )}
             <p className={cn("mt-3 text-[13px]", k.muted)}>{tx(locale, "Los cierres se cuentan igual que en el panel y en Auditoría.", "Closings are counted the same way as on the dashboard and in Audit.")}</p>
           </Panel>
         </div>
-        <Panel title={tx(locale, "Por zona", "By area")} bodyClass="overflow-x-auto">
-          <table className="w-full text-[14px] [&_td+td]:whitespace-nowrap [&_td+td]:pl-3 [&_th+th]:pl-3">
-            <thead className={cn("text-left", k.th, "text-[12px]")}><tr><th className="pb-2">{tx(locale, "Zona", "Area")}</th><th className="pb-2 text-right">{tx(locale, "Activos", "Active")}</th><th className="pb-2 text-right" title={tx(locale, "Leads acumulados de los inmuebles de la zona", "All-time leads of the area's listings")}>Leads</th><th className="pb-2 text-right" title={tx(locale, "Media de venta", "Sale average")}>{tx(locale, "Venta USD/m²", "Sale USD/m²")}</th><th className="pb-2 text-right" title={tx(locale, "Alquiler de larga estancia", "Long-term rent")}>{tx(locale, "Alquiler USD/m²/mes", "Rent USD/m²/mo")}</th><th className="pb-2 text-right">{tx(locale, "Días", "Days")}</th></tr></thead>
+        <Panel title={tx(locale, "Por zona", "By area")}>
+          <ScrollRegion label={tx(locale, "Por zona", "By area")}>
+          <table className="w-full min-w-[34rem] text-[14px] [&_td+td]:whitespace-nowrap [&_td+td]:pl-4 [&_th+th]:pl-4">
+            <thead className={cn("text-left", k.th, "text-[12px]")}>
+              <tr>
+                <th className="w-[34%] pb-2">{tx(locale, "Zona", "Area")}</th>
+                <th className="pb-2 text-right">{tx(locale, "Activos", "Active")}</th>
+                <th className="pb-2 text-right" title={tx(locale, "Leads acumulados de los inmuebles de la zona", "All-time leads of the area's listings")}>Leads</th>
+                <th className="pb-2 text-right" title={tx(locale, "Media de venta, USD por m²", "Sale average, USD per m²")}>{tx(locale, "Venta", "Sale")} <span className="normal-case tracking-normal">USD/m²</span></th>
+                <th className="pb-2 text-right" title={tx(locale, "Alquiler de larga estancia, USD por m² al mes", "Long-term rent, USD per m² per month")}>{tx(locale, "Alquiler", "Rent")} <span className="normal-case tracking-normal">USD/m²·{tx(locale, "mes", "mo")}</span></th>
+                <th className="pb-2 text-right" title={tx(locale, "Mediana de días en mercado", "Median days on market")}>{tx(locale, "Días", "Days")}</th>
+              </tr>
+            </thead>
             <tbody>
               {data.byZone.map((z) => (
                 <tr key={z.zone} className={cn("border-t", k.line)}>
-                  <td className="py-2 font-semibold">{z.zone}</td>
+                  <td className="py-2 pr-2 font-semibold">{z.zone}</td>
                   <td className="text-right">{z.active}</td>
                   <td className="text-right">{z.leads}</td>
                   <td className="text-right">{z.salePpm != null ? num(Math.round(z.salePpm), locale) : "—"}</td>
                   <td className="text-right">{z.rentPpm != null ? num(z.rentPpm, locale) : "—"}</td>
-                  <td className={cn("text-right", k.muted)}>{z.dom ?? "—"}</td>
+                  <td className={cn("pr-1 text-right", k.muted)}>{z.dom ?? "—"}</td>
                 </tr>
               ))}
             </tbody>
           </table>
+          </ScrollRegion>
           <p className={cn("mt-3 text-[13px]", k.muted)}>{tx(locale, "Foto de hoy (no depende del periodo). Vacacional (precio por noche) y comercial no se promedian por m².", "Today's snapshot (not tied to the period). Vacation rentals (nightly price) and commercial listings are not averaged per m².")}</p>
         </Panel>
       </div>

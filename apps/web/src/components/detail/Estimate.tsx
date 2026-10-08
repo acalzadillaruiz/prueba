@@ -74,19 +74,32 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
       </div>
       <div className={cn("px-6 pb-6 md:px-8", !(showComparables && e.comparables.length > 0) && "hidden")}>
       {showComparables && e.comparables.length > 0 && (
-        <div className="mt-6">
+        <div className="mt-6 [container-type:inline-size]">
           <div className="mb-3 flex items-center gap-1.5 text-[15px] font-semibold">
             {nComp === 1 ? tx(locale, "Comparable usado", "Comparable used") : tx(locale, "Comparables usados", "Comparables used")} <Info size={14} className={muted} />
           </div>
-          <div className="overflow-x-auto rounded-lg border border-inherit">
+          {/* Columns drop by the card's own width (a container query), not the viewport: at 1024 px the card sits in a
+              ~476 px column. Whatever still overflows scrolls inside a focusable region with a soft edge fade on the side
+              that has more (background-attachment: local covers the fade once you reach that edge). */}
+          <div
+            tabIndex={0}
+            role="region"
+            aria-label={tx(locale, "Casas comparables", "Comparable homes")}
+            className="overflow-x-auto rounded-lg border border-inherit [--np-fade:255_255_255] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 [html.dark_.np-public_&]:[--np-fade:42_36_32]"
+            style={{
+              ...(dark ? { ["--np-fade" as string]: "42 36 32" } : {}),
+              background:
+                "linear-gradient(to right, rgb(var(--np-fade)) 30%, rgb(var(--np-fade) / 0)) left / 32px 100% no-repeat local, linear-gradient(to left, rgb(var(--np-fade)) 30%, rgb(var(--np-fade) / 0)) right / 32px 100% no-repeat local, linear-gradient(to right, rgb(0 0 0 / .14), rgb(0 0 0 / 0)) left / 14px 100% no-repeat scroll, linear-gradient(to left, rgb(0 0 0 / .14), rgb(0 0 0 / 0)) right / 14px 100% no-repeat scroll",
+            }}
+          >
             <table className="w-full whitespace-nowrap text-sm">
               <thead className={cn("text-left text-xs", dark ? "bg-white/5 text-mist" : "bg-ivory text-muted")}>
                 <tr>
                   <th className="px-3 py-2 font-semibold">{tx(locale, "Inmueble", "Property")}</th>
                   <th className="px-3 py-2 text-right font-semibold">m²</th>
                   <th className="px-3 py-2 text-right font-semibold">{tx(locale, "Precio", "Price")}</th>
-                  <th className="hidden px-3 py-2 text-right font-semibold sm:table-cell">USD/m²</th>
-                  {!dark && <th className="hidden px-3 py-2 text-right font-semibold sm:table-cell">{tx(locale, "Dist.", "Dist.")}</th>}
+                  <th className="hidden px-3 py-2 text-right font-semibold [@container(min-width:480px)]:table-cell">USD/m²</th>
+                  {!dark && <th className="hidden px-3 py-2 text-right font-semibold [@container(min-width:560px)]:table-cell">{tx(locale, "Dist.", "Dist.")}</th>}
                 </tr>
               </thead>
               <tbody>
@@ -94,13 +107,13 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
                   return (
                     <tr key={c.id} className={cn("border-t", dark ? "border-navy-line" : "border-line")}>
                       <td className="px-3 py-2">
-                        <div className="max-w-[180px] truncate font-semibold">{(locale === "en" && (c as { title_en?: string }).title_en) || c.title}</div>
+                        <div className="max-w-[160px] truncate font-semibold">{(locale === "en" && (c as { title_en?: string }).title_en) || c.title}</div>
                         <div className={cn("text-xs", muted)}>{c.zone}</div>
                       </td>
                       <td className="px-3 py-2 text-right">{num(c.areaM2, locale)}</td>
                       <td className="px-3 py-2 text-right">{dark ? compactMoney(c.priceAmount, locale) : money(c.priceAmount, locale)}</td>
-                      <td className="hidden px-3 py-2 text-right sm:table-cell">{num(c.pricePerM2, locale)}</td>
-                      {!dark && <td className="hidden px-3 py-2 text-right sm:table-cell">{c.distanceKm} km</td>}
+                      <td className="hidden px-3 py-2 text-right [@container(min-width:480px)]:table-cell">{num(c.pricePerM2, locale)}</td>
+                      {!dark && <td className="hidden px-3 py-2 text-right [@container(min-width:560px)]:table-cell">{c.distanceKm} km</td>}
                     </tr>
                   );
                 })}

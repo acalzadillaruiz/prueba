@@ -7,6 +7,7 @@ import { ArrowDown, ArrowUp, ArrowUpDown, Eye, Loader2, Lock, MessageSquare } fr
 import type { Locale } from "@/types/domain";
 import { AdminShell } from "@/components/layout/AdminShell";
 import { Empty, Initials, Panel, Pill, k, tab } from "./kit";
+import { ScrollRegion } from "./ScrollRegion";
 import type { AdvisorRow, ChatDetail, ChatSummary } from "@/server/team-audit";
 import { AUDIT_PERIODS, dash, formatMinutes, type AuditPeriod } from "@/lib/team-metrics";
 import { api } from "@/lib/api";
@@ -178,7 +179,7 @@ function Performance({ locale, days, rows }: { locale: Locale; days: AuditPeriod
               ))}
             </ul>
           </div>
-          <div className="hidden overflow-x-auto md:block">
+          <ScrollRegion fade={false} label={tx(locale, "Desempeño por asesor", "Performance by advisor")} className="hidden md:block">
             <table className="np-sticky-last w-full min-w-[1180px] text-sm">
               <caption className="sr-only">{tx(locale, `Desempeño por asesor, últimos ${days} días. Pulse un encabezado para ordenar.`, `Performance by advisor, last ${days} days. Press a header to sort.`)}</caption>
               <thead className={cn("border-b text-left", k.line, k.th)}>
@@ -236,7 +237,7 @@ function Performance({ locale, days, rows }: { locale: Locale; days: AuditPeriod
                 ))}
               </tbody>
             </table>
-          </div>
+          </ScrollRegion>
           <p className={cn("mt-4 px-5 text-[13px] md:px-6", k.muted)}>
             {tx(
               locale,

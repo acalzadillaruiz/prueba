@@ -27,23 +27,21 @@ export function DemoBar({ locale }: { locale: Locale }) {
   if (!visible || gate) return null;
   // Back-office below lg: its own bottom bar (Panel · Inmuebles · Leads · Calendario · Más) owns the screen's foot, so
   // the demo switch is a slim tab on the LEFT edge just above that bar: it covers only the page gutter (the lists'
-  // badges and actions sit on the right, their checkboxes start past the gutter), never the bar. From lg: the pill,
-  // bottom-left, clear of the sidebar.
+  // badges and actions sit on the right, their checkboxes start past the gutter), never the bar. From lg the switch
+  // is docked in the sidebar footer instead (DemoSidebarItem): a floating pill there covered the footer and table rows.
   if (admin)
     return (
-      <div className="fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom))] left-0 z-50 print:hidden lg:bottom-4 lg:left-64 lg:mb-[env(safe-area-inset-bottom)]" data-demobar data-demobar-admin>
+      <div className="fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom))] left-0 z-50 print:hidden lg:hidden" data-demobar data-demobar-admin>
         {open && (
-          <div className="absolute bottom-full left-2 mb-2 lg:static lg:mb-0">
-            <div className="np-in max-h-[70svh] w-64 overflow-y-auto rounded-np border border-navy-line bg-navy py-1 text-ivory shadow-np lg:mb-2">
+          <div className="absolute bottom-full left-2 mb-2">
+            <div className="np-in max-h-[70svh] w-64 overflow-y-auto rounded-np border border-navy-line bg-navy py-1 text-ivory shadow-np">
               <div className="border-b border-navy-line px-3 py-2 text-xs font-semibold uppercase tracking-wide text-mist">{tx(locale, "Entrar como… (modo demo)", "Sign in as… (demo mode)")}</div>
               <DemoLoginList locale={locale} onDone={() => setOpen(false)} className="p-1" />
             </div>
           </div>
         )}
-        <button onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label={tx(locale, "Modo demo: entrar como…", "Demo mode: sign in as…")} className="relative flex h-10 w-6 items-center justify-center rounded-r-full border border-l-0 border-navy-line bg-navy/90 text-sm text-ivory opacity-75 shadow-np backdrop-blur transition-opacity after:absolute after:-inset-y-1 after:-right-2 after:left-0 after:content-[''] hover:opacity-100 lg:h-auto lg:min-h-11 lg:w-auto lg:min-w-11 lg:gap-2 lg:rounded-full lg:border-l lg:p-1.5 lg:pr-3.5 lg:opacity-100 lg:after:hidden">
-          <span className="hidden lg:contents">{user ? <Avatar initials={user.initials} hue={user.hue} size={26} /> : <span className="flex h-[26px] w-[26px] items-center justify-center rounded-full bg-white/10"><LogIn size={14} /></span>}</span>
-          <FlaskConical size={13} className="text-[#C9A574] lg:h-[15px] lg:w-[15px]" aria-hidden />
-          <span className="hidden font-display lg:inline">Demo</span>
+        <button onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label={tx(locale, "Modo demo: entrar como…", "Demo mode: sign in as…")} className="relative flex h-10 w-6 items-center justify-center rounded-r-full border border-l-0 border-navy-line bg-navy/90 text-sm text-ivory opacity-75 shadow-np backdrop-blur transition-opacity after:absolute after:-inset-y-1 after:-right-2 after:left-0 after:content-[''] hover:opacity-100">
+          <FlaskConical size={13} className="text-[#C9A574]" aria-hidden />
         </button>
       </div>
     );
@@ -62,6 +60,29 @@ export function DemoBar({ locale }: { locale: Locale }) {
         <span className="hidden sm:contents">{user ? <Avatar initials={user.initials} hue={user.hue} size={26} /> : <span className="flex h-[26px] w-[26px] items-center justify-center rounded-full bg-white/10"><LogIn size={14} /></span>}</span>
         <FlaskConical size={14} className="text-[#C9A574]" />
         <span className="hidden font-display sm:inline">Demo</span>
+      </button>
+    </div>
+  );
+}
+
+/**
+ * Back-office sidebar (lg+): the demo switch as one more footer row ("Demo · Entrar como…"), opening its list upwards
+ * over the nav. Docked here so nothing floats over the sidebar footer or the page's tables.
+ */
+export function DemoSidebarItem({ locale }: { locale: Locale }) {
+  const [open, setOpen] = useState(false);
+  const visible = useDemoVisible();
+  if (!visible) return null;
+  return (
+    <div className="relative print:hidden" data-demobar-sidebar>
+      {open && (
+        <div className="np-in absolute bottom-full left-0 z-10 mb-2 max-h-[70svh] w-full overflow-y-auto rounded-np border border-navy-line bg-navy py-1 text-ivory shadow-np">
+          <div className="border-b border-navy-line px-3 py-2 text-xs font-semibold uppercase tracking-wide text-mist">{tx(locale, "Entrar como… (modo demo)", "Sign in as… (demo mode)")}</div>
+          <DemoLoginList locale={locale} onDone={() => setOpen(false)} className="p-1" />
+        </div>
+      )}
+      <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label={tx(locale, "Modo demo: entrar como…", "Demo mode: sign in as…")} className="flex w-full items-center gap-3 rounded-lg px-4 py-2 text-[13px] text-ivory/65 hover:bg-white/[.04] hover:text-ivory">
+        <FlaskConical size={15} strokeWidth={1.6} className="text-[#C9A574]" aria-hidden /> {tx(locale, "Demo · cambiar de rol", "Demo · switch role")}
       </button>
     </div>
   );

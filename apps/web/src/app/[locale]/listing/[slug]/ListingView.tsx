@@ -94,17 +94,23 @@ function Facts({ l, locale }: { l: Listing; locale: Locale }) {
     l.kind !== "land" && [`${l.yearBuilt}`, tx(locale, "año", "year built")],
     l.shortRent && [`${l.shortRent.maxGuests}`, tx(locale, "huéspedes", "guests")],
   ].filter(Boolean) as [string, string][];
-  // Even rows at every width (a lone "1996 AÑO" on a second row read as a mistake): 6 facts → 2 / 3 per row, 4 → 2 / 4.
-  const cols = items.length <= 3 ? ["", "grid-cols-1", "grid-cols-2", "grid-cols-3"][items.length] : items.length === 4 ? "grid-cols-2 sm:grid-cols-4" : items.length >= 7 ? "grid-cols-2 sm:grid-cols-4" : "grid-cols-2 sm:grid-cols-3";
+  // Columns follow the left column's own width (a container query), not the viewport: at 1024 px the column is ~476 px
+  // wide, and viewport breakpoints squeezed four labels into it ("CONSTRUCCIÓNAÑO"). No lone fact on a last row: with an
+  // odd count on two columns the last one spans both; 7 facts go 2 → 4 (never 3 + 3 + 1).
+  const n = items.length;
+  const cols = n <= 3 ? ["", "grid-cols-1", "grid-cols-2", "grid-cols-3"][n] : n === 4 ? "grid-cols-2 [@container(min-width:560px)]:grid-cols-4" : n === 7 ? "grid-cols-2 [@container(min-width:600px)]:grid-cols-4" : "grid-cols-2 [@container(min-width:420px)]:grid-cols-3";
+  const lastWide = n > 3 && n % 2 === 1 ? (n === 7 ? "col-span-2 [@container(min-width:600px)]:col-span-1" : "col-span-2 [@container(min-width:420px)]:col-span-1") : "";
   return (
-    <dl className={cn("grid gap-x-8 gap-y-5 border-y border-line py-6", cols)}>
-      {items.map(([v, t]) => (
-        <div key={t} className="flex min-w-0 flex-col-reverse">
-          <dt className="mt-1 text-[13px] font-semibold uppercase tracking-[0.14em] text-muted">{t}</dt>
-          <dd className="font-serif text-[30px] font-semibold leading-none text-ink">{v}</dd>
-        </div>
-      ))}
-    </dl>
+    <div className="[container-type:inline-size]">
+      <dl className={cn("grid gap-x-6 gap-y-5 border-y border-line py-6", cols)} data-testid="facts">
+        {items.map(([v, t], i) => (
+          <div key={t} className={cn("flex min-w-0 flex-col-reverse", i === n - 1 && lastWide)}>
+            <dt className="mt-1 break-words text-[13px] font-semibold uppercase leading-snug tracking-[0.06em] text-muted">{t}</dt>
+            <dd className="break-words font-serif text-[30px] font-semibold leading-none text-ink">{v}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
   );
 }
 
@@ -136,6 +142,15 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
   const tile = "rounded-[20px] bg-white/70 ring-1 ring-black/[.04] px-4 py-3 text-[15px]";
   const searchType = l.listingType.startsWith("COMMERCIAL") ? "COMMERCIAL" : l.listingType;
 
+  const crumbs: { key: string; label: string; href?: string }[] = [
+    { key: "type", label: lbl(TYPE_LABEL[l.listingType], locale), href: `/${locale}/search?type=${searchType}` },
+    ...[l.state, l.city, l.zone].filter((x, i, a): x is string => !!x && a.indexOf(x) === i).map((x) => ({ key: x, label: x })),
+  ];
+  // Vacation rentals: the stay terms belong with the nightly price (and the availability card), not among the amenities.
+  const stayTerms = l.shortRent
+    ? [`${tx(locale, "Mín.", "Min.")} ${plural(Math.max(1, l.shortRent.minNights), locale, ["noche", "noches"], ["night", "nights"])}`, l.shortRent.cleaningFee > 0 && `${tx(locale, "limpieza", "cleaning")} ${money(l.shortRent.cleaningFee, locale)}`].filter(Boolean).join(" · ")
+    : "";
+
   const estimateHint = tx(locale, `Valor estimado ≈ ${money(l.estimate.mid, locale)}`, `Estimated value ≈ ${money(l.estimate.mid, locale)}`);
   const historyHint = [plural(l.priceHistory.length, locale, ["movimiento de precio", "movimientos de precio"], ["price event", "price events"]), ppm ? tx(locale, `${money(zone.salePpm, locale)}/m² en ${l.zone}`, `${money(zone.salePpm, locale)}/m² in ${l.zone}`) : tx(locale, `${usd1(zone.rentPpm)}/m² al mes en ${l.zone}`, `${usd1(zone.rentPpm)}/m² a month in ${l.zone}`)].join(" · ");
 
@@ -146,10 +161,13 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
         <div className="mx-auto max-w-[1320px] px-4 pt-5 md:px-8">
           <div className="mb-3 flex flex-wrap items-center gap-x-4 gap-y-2">
             <BackToResults locale={locale} />
-            <nav aria-label={tx(locale, "Ruta de navegación", "Breadcrumb")} className="flex flex-wrap items-center text-[15px] text-muted">
-              <Link className="inline-flex min-h-11 items-center underline-offset-4 hover:text-ink hover:underline" href={`/${locale}/search?type=${searchType}`}>{lbl(TYPE_LABEL[l.listingType], locale)}</Link>
-              {[l.state, l.city, l.zone].filter((x, i, a) => x && a.indexOf(x) === i).map((x) => (
-                <span key={x}><span aria-hidden className="px-1.5">·</span>{x}</span>
+            {/* One line at every width: phones show only the last two crumbs; anything longer scrolls sideways, never wraps. */}
+            <nav aria-label={tx(locale, "Ruta de navegación", "Breadcrumb")} className="no-scrollbar flex min-w-0 max-w-full items-center overflow-x-auto whitespace-nowrap text-[15px] text-muted">
+              {crumbs.map((c, i) => (
+                <span key={c.key} className={cn("inline-flex shrink-0 items-center", i < crumbs.length - 2 && "max-sm:hidden")}>
+                  {i > 0 && <span aria-hidden className={cn("px-1.5", i === crumbs.length - 2 && "max-sm:hidden")}>·</span>}
+                  {c.href ? <Link className="inline-flex min-h-11 items-center underline-offset-4 hover:text-ink hover:underline" href={c.href}>{c.label}</Link> : c.label}
+                </span>
               ))}
             </nav>
           </div>
@@ -185,6 +203,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
                     <span className="font-display text-lg font-normal text-muted">{priceSuffix(l, locale)}</span>
                   </div>
                   <div className="mt-1.5 text-[15px] text-muted">
+                    {stayTerms && <div className="font-semibold text-ink" data-testid="stay-terms">{stayTerms}</div>}
                     {ppm ? `${money(ppm, locale)} / m² · ` : ""}≈ Bs. {num(Math.round(l.priceAmount * ves), locale)} · € {num(Math.round(l.priceAmount * eur), locale)} <span>({tx(locale, "tasa referencial", "reference rate")})</span>
                   </div>
                 </div>
@@ -217,7 +236,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
 
             <Essentials l={l} locale={locale} title={<H>{tx(locale, "Servicios esenciales", "Essential services")}</H>} />
 
-            {(amenities.length > 0 || views.length > 0 || l.commercial || l.shortRent) && (
+            {(amenities.length > 0 || views.length > 0 || l.commercial) && (
             <div className={sec} data-testid="amenities">
               <H>{views.length ? tx(locale, "Vistas y amenidades", "Views and amenities") : tx(locale, "Amenidades", "Amenities")}</H>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -240,9 +259,6 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
                     {l.commercial.capRate && <div className={tile}>Cap rate <b>{l.commercial.capRate} %</b></div>}
                     {l.commercial.loadingDock && <div className={tile}><b>{tx(locale, "Andén de carga", "Loading dock")}</b></div>}
                   </>
-                )}
-                {l.shortRent && (
-                  <div className={tile}>{tx(locale, "Mín.", "Min.")} <b>{l.shortRent.minNights} {tx(locale, "noches", "nights")}</b> · {tx(locale, "limpieza", "cleaning")} {money(l.shortRent.cleaningFee, locale)}</div>
                 )}
               </div>
             </div>

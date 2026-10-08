@@ -53,6 +53,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
   // Stay request: arrival / departure (calendar days, Venezuela time), party size and an optional note.
   const minNights = Math.max(1, l.shortRent?.minNights ?? 1);
   const maxGuests = Math.max(1, l.shortRent?.maxGuests ?? 16);
+  const cleaningFee = l.shortRent?.cleaningFee ?? 0;
   const today = todayCaracas();
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
@@ -164,6 +165,10 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
 
   const muted = dark ? "text-mist" : "text-muted";
   const field = cn(inputCls, "h-12 rounded-xl border-[#D8CBB7]", dark && "border-navy-line bg-navy-2 text-ivory");
+  const fieldLbl = cn("mb-1 block px-1 text-[13px] font-semibold", muted);
+  // Native date pickers follow the input's language where the browser supports it (dd/mm in Spanish); the chosen day is
+  // also spelled out next to the label ("jue 18 oct"), so a mm/dd field never leaves the dates ambiguous.
+  const dateLang = locale === "es" ? "es-VE" : "en";
   const wa = useListingWhatsApp(whatsappHref(l, locale));
   const first = agent?.name.split(" ")[0] ?? agency?.name ?? "";
   const confirmer = first || (fsbo ? tx(locale, "su dueño", "the owner") : tx(locale, "el anunciante", "the lister"));
@@ -307,12 +312,21 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
       <div role="tabpanel" id={`${uid}-panel`} aria-labelledby={`${uid}-tab-${mode}`}>
         {mode === "stay" && (
           <div className="mt-5" data-testid="stay-ask">
-            <div className="np-eyebrow mb-3 text-gold-text">{tx(locale, "¿Cuándo quieres venir?", "When would you like to stay?")}</div>
+            <div className="np-eyebrow text-gold-text">{tx(locale, "¿Cuándo quieres venir?", "When would you like to stay?")}</div>
+            <p className={cn("mb-3 mt-1 text-sm", muted)} data-testid="stay-card-terms">
+              {tx(locale, "Mín.", "Min.")} {plural(minNights, locale, ["noche", "noches"], ["night", "nights"])}
+              {cleaningFee > 0 && ` · ${tx(locale, "limpieza", "cleaning")} ${money(cleaningFee, locale)}`}
+            </p>
             <div className="grid grid-cols-2 gap-2">
-              <label className="min-w-0">
-                <span className={cn("mb-1 block px-1 text-sm font-semibold", muted)}>{tx(locale, "Llegada", "Arrival")}</span>
+              <div className="min-w-0">
+                <div className="mb-1 flex items-baseline justify-between gap-1 px-1 text-sm">
+                  <label htmlFor={`${uid}-in`} className={cn("font-semibold", muted)}>{tx(locale, "Llegada", "Arrival")}</label>
+                  {checkIn && <span className="truncate font-semibold" data-testid="stay-in-words">{stayDay(checkIn, locale)}</span>}
+                </div>
                 <input
+                  id={`${uid}-in`}
                   type="date"
+                  lang={dateLang}
                   className={cn(field, "min-w-0 px-2.5")}
                   min={today}
                   value={checkIn}
@@ -325,11 +339,16 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
                     if (v && (!checkOut || validateStay(v, checkOut, { today: v, minNights }).error)) setCheckOut(addDays(v, minNights));
                   }}
                 />
-              </label>
-              <label className="min-w-0">
-                <span className={cn("mb-1 block px-1 text-sm font-semibold", muted)}>{tx(locale, "Salida", "Departure")}</span>
+              </div>
+              <div className="min-w-0">
+                <div className="mb-1 flex items-baseline justify-between gap-1 px-1 text-sm">
+                  <label htmlFor={`${uid}-out`} className={cn("font-semibold", muted)}>{tx(locale, "Salida", "Departure")}</label>
+                  {checkOut && <span className="truncate font-semibold" data-testid="stay-out-words">{stayDay(checkOut, locale)}</span>}
+                </div>
                 <input
+                  id={`${uid}-out`}
                   type="date"
+                  lang={dateLang}
                   className={cn(field, "min-w-0 px-2.5")}
                   min={addDays(checkIn || today, minNights)}
                   value={checkOut}
@@ -337,7 +356,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
                   aria-describedby={stayErrOut ? `${uid}-stay-err` : undefined}
                   onChange={(e) => setCheckOut(e.target.value)}
                 />
-              </label>
+              </div>
             </div>
             {stayMsg && <p id={`${uid}-stay-err`} role="alert" className="mt-1.5 px-1 text-sm font-semibold text-danger">{stayMsg}</p>}
             <div className="mt-3 flex items-center justify-between gap-3">
@@ -397,13 +416,14 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
                 );
               })}
             </div>
+            <label htmlFor={`${uid}-when`} className={fieldLbl}>{tx(locale, "Día u hora que prefieres", "Preferred day or time")}</label>
             <input
-              className={cn(field, "mt-2")}
+              id={`${uid}-when`}
+              className={field}
               maxLength={200}
               value={visitNote}
               onChange={(e) => setVisitNote(e.target.value)}
-              placeholder={tx(locale, "¿Algún día u hora en concreto? (opcional)", "Any particular day or time? (optional)")}
-              aria-label={tx(locale, "Día u hora que prefieres", "Preferred day or time")}
+              placeholder={tx(locale, "Opcional: p. ej. sábado por la mañana", "Optional: e.g. Saturday morning")}
             />
             <label className={cn("mt-2 flex min-h-11 cursor-pointer items-center gap-2 text-sm", muted)}>
               <input type="checkbox" checked={virtual} onChange={(e) => setVirtual(e.target.checked)} className="h-5 w-5 accent-[#1E1A18]" />
@@ -491,32 +511,40 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
                   <Video size={14} aria-hidden /> {tx(locale, "Prefiero verla por videollamada", "I’d rather see it on a video call")}
                 </label>
               )}
+              {/* Visible labels above every field (a placeholder vanishes as soon as you type). */}
               <div>
-                <input className={field} placeholder={tx(locale, "Nombre", "Name")} autoComplete="name" {...form.register("name")} {...a11y("name")} aria-label={tx(locale, "Nombre", "Name")} />
+                <label htmlFor={`${uid}-name`} className={fieldLbl}>{tx(locale, "Nombre", "Name")}</label>
+                <input id={`${uid}-name`} className={field} autoComplete="name" {...form.register("name")} {...a11y("name")} />
                 {fieldErr("name")}
               </div>
               <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <input className={field} type="email" placeholder="Email" autoComplete="email" {...form.register("email")} {...a11y("email")} aria-label="Email" />
+                <div className="min-w-0">
+                  <label htmlFor={`${uid}-email`} className={fieldLbl}>Email</label>
+                  <input id={`${uid}-email`} className={field} type="email" placeholder={tx(locale, "tu@correo.com", "you@example.com")} autoComplete="email" {...form.register("email")} {...a11y("email")} />
                   {fieldErr("email")}
                 </div>
-                <div>
-                  <input className={field} type="tel" placeholder={tx(locale, "Teléfono", "Phone")} autoComplete="tel" {...form.register("phone")} {...a11y("phone")} aria-label={tx(locale, "Teléfono", "Phone")} />
+                <div className="min-w-0">
+                  <label htmlFor={`${uid}-phone`} className={fieldLbl}>{tx(locale, "Teléfono", "Phone")} <span className="font-normal">{tx(locale, "(opcional)", "(optional)")}</span></label>
+                  <input id={`${uid}-phone`} className={field} type="tel" placeholder="+58 412…" autoComplete="tel" {...form.register("phone")} {...a11y("phone")} />
                   {fieldErr("phone")}
                 </div>
               </div>
               {mode === "stay" ? (
-                <textarea
-                  className={cn(field, "h-16 py-2")}
-                  maxLength={800}
-                  value={stayNote}
-                  onChange={(e) => setStayNote(e.target.value)}
-                  placeholder={tx(locale, "¿Algo que deba saber? (opcional)", "Anything they should know? (optional)")}
-                  aria-label={tx(locale, "Mensaje (opcional)", "Message (optional)")}
-                />
+                <div>
+                  <label htmlFor={`${uid}-note`} className={fieldLbl}>{tx(locale, "Mensaje (opcional)", "Message (optional)")}</label>
+                  <textarea
+                    id={`${uid}-note`}
+                    className={cn(field, "h-16 py-2")}
+                    maxLength={800}
+                    value={stayNote}
+                    onChange={(e) => setStayNote(e.target.value)}
+                    placeholder={tx(locale, "¿Algo que deba saber?", "Anything they should know?")}
+                  />
+                </div>
               ) : showNote ? (
                 <div>
-                  <textarea className={cn(field, mode === "tour" ? "h-16 py-2" : "h-20 py-2.5")} {...form.register("message")} {...a11y("message")} aria-label={tx(locale, "Mensaje", "Message")} />
+                  <label htmlFor={`${uid}-msg`} className={fieldLbl}>{tx(locale, "Mensaje", "Message")}</label>
+                  <textarea id={`${uid}-msg`} className={cn(field, mode === "tour" ? "h-16 py-2" : "h-20 py-2.5")} {...form.register("message")} {...a11y("message")} />
                   {fieldErr("message")}
                 </div>
               ) : (

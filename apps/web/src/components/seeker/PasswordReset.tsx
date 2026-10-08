@@ -87,7 +87,7 @@ export function ForgotPasswordForm({ locale, initialEmail = "" }: { locale: Loca
     >
       <form className="space-y-4" onSubmit={handleSubmit(submit)} noValidate>
         <Field label="Email" error={fieldError(formState.errors.email, locale, "email")}>
-          <input className={inputCls} type="email" {...register("email")} aria-invalid={!!formState.errors.email} autoComplete="email" placeholder="tu@gmail.com" autoFocus />
+          <input className={inputCls} type="email" {...register("email")} aria-invalid={!!formState.errors.email} autoComplete="email" placeholder={tx(locale, "tu@correo.com", "you@example.com")} autoFocus />
         </Field>
         {err && <div className={k.err} role="alert">{err}</div>}
         <Button className="w-full rounded-full" size="lg" disabled={busy}>

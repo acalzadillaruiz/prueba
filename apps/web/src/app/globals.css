@@ -27,7 +27,9 @@
   --np-map-dark: #1E1A18;
   --font-display: var(--font-jost), ui-sans-serif, system-ui;   /* interface (buttons, labels) */
   --font-body: var(--font-jost), ui-sans-serif, system-ui;
-  --font-serif: var(--font-prata), Georgia, "Times New Roman", serif;  /* titles and prices */
+  /* titles and prices. "NP Digits" (src/app/fonts.ts) only covers 0–9, so it goes first: every serif number gets a
+     flagged "1" (Prata's reads as "l") while letters stay Prata. */
+  --font-serif: var(--font-np-digits), var(--font-prata), Georgia, "Times New Roman", serif;
   --font-logo: var(--font-cinzel), Georgia, serif;
   /* rgb channels for Tailwind opacity modifiers (text-ink/60, bg-ivory/90…) */
   --np-navy-rgb: 30 26 24;
@@ -64,6 +66,9 @@ body { font-family: var(--font-body); background: var(--np-ivory); color: var(--
 h1, h2, h3, h1.font-display, h2.font-display, h3.font-display, .font-serif { font-family: var(--font-serif); font-weight: 500; letter-spacing: -0.005em; font-feature-settings: "lnum", "pnum"; }
 h1, h2, h3 { text-wrap: balance; }
 .font-logo { font-family: var(--font-logo); }
+/* Numbers that must read unambiguously (prices, counts, m², nights): serif stack whose digits come from "NP Digits"
+   (flagged 1), lining + tabular so columns of prices align. Use on any number outside an h1–h3/.font-serif. */
+.np-num { font-family: var(--font-serif); font-variant-numeric: lining-nums tabular-nums; font-feature-settings: "lnum", "tnum"; }
 *:focus-visible { outline: 2px solid var(--np-navy); outline-offset: 3px; }
 
 /* Public dark mode (toggle). Admin is always dark; only light surfaces of the public scope are remapped,

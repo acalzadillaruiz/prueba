@@ -188,7 +188,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
             {mode === "register" && (
               <Field label={tx(locale, "Nombre completo", "Full name")} error={fieldError(errs.name, locale, "name")}><input className={inputCls} {...register("name")} aria-invalid={!!errs.name} autoComplete="name" /></Field>
             )}
-            <Field label="Email" error={fieldError(errs.email, locale, "email")}><input className={inputCls} type="email" readOnly={!!inv} {...register("email")} aria-invalid={!!errs.email} autoComplete="email" placeholder="tu@gmail.com" /></Field>
+            <Field label="Email" error={fieldError(errs.email, locale, "email")}><input className={inputCls} type="email" readOnly={!!inv} {...register("email")} aria-invalid={!!errs.email} autoComplete="email" placeholder={tx(locale, "tu@correo.com", "you@example.com")} /></Field>
             <Field label={tx(locale, "Contraseña", "Password")} error={fieldError(errs.password, locale, "password")} hint={(mode === "register" ? tx(locale, "Usa al menos 8 caracteres.", "Use at least 8 characters.") : undefined)}>
               <div className="relative">
                 <input className={inputCls} type={show ? "text" : "password"} {...register("password")} aria-invalid={!!errs.password} autoComplete={mode === "login" ? "current-password" : "new-password"} />

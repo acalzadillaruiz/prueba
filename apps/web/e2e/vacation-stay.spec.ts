@@ -34,6 +34,21 @@ test("alquiler vacacional: consultar disponibilidad por fechas (no «Pedir visit
   await page.goto(`/es/listing/${l.slug}`);
   const panel = page.locator("#contact-panel");
   await expect(panel.getByTestId("stay-ask")).toBeVisible();
+  // The stay terms sit with the nightly price and in the availability card, never as an "amenity".
+  await expect(page.getByTestId("stay-terms")).toContainText(`Mín. ${sr.minNights} noches`);
+  await expect(panel.getByTestId("stay-card-terms")).toContainText(`Mín. ${sr.minNights} noches`);
+  await expect(page.getByTestId("amenities").getByText(/Mín\./)).toHaveCount(0);
+  // Facts: no lone item on the last row at phone width (an odd count spans the last one across both columns).
+  const facts = await page.getByTestId("facts").evaluate((dl) => {
+    const tops = [...dl.children].map((c) => Math.round(c.getBoundingClientRect().top));
+    const last = tops.filter((t) => t === tops[tops.length - 1]).length;
+    const w = [...dl.children].map((c) => Math.round(c.getBoundingClientRect().width));
+    return { last, lastWide: w[w.length - 1] > w[0] * 1.5 };
+  });
+  expect(facts.last > 1 || facts.lastWide).toBeTruthy();
+  // Breadcrumb: one line at phone width.
+  const crumb = page.getByRole("navigation", { name: "Ruta de navegación" });
+  expect((await crumb.boundingBox())!.height).toBeLessThanOrEqual(48);
   await expect(panel.getByRole("tab", { name: "Disponibilidad" })).toHaveAttribute("aria-selected", "true");
   await expect(panel.getByRole("tab", { name: "Pedir visita" })).toHaveCount(0);
   // The phone bar names the same action.
@@ -46,6 +61,9 @@ test("alquiler vacacional: consultar disponibilidad por fechas (no «Pedir visit
   const arrival = day(10);
   await panel.getByLabel("Llegada").fill(arrival);
   await expect(panel.getByLabel("Salida")).toHaveValue(new Date(Date.parse(`${arrival}T00:00:00Z`) + sr.minNights * 86_400_000).toISOString().slice(0, 10));
+  // The chosen dates are also spelled out in words (no mm/dd vs dd/mm doubt), and the inputs carry the page language.
+  await expect(panel.getByTestId("stay-in-words")).toHaveText(new Intl.DateTimeFormat("es-VE", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${arrival}T00:00:00Z`)).replace(/\./g, ""));
+  await expect(panel.getByLabel("Llegada")).toHaveAttribute("lang", "es-VE");
   await expect(send).toBeEnabled();
 
   // Departure on the arrival day, then one night short of the minimum: plain errors, button off.

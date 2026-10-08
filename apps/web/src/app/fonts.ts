@@ -20,6 +20,34 @@ export const prata = localFont({
   adjustFontFallback: "Times New Roman",
 });
 
+/**
+ * "NP Digits": Prata's "1" has no flag and reads as a lowercase "l" ("USD ll8.000", "l resultado"), which hurts trust
+ * in prices. This face carries only the digits 0–9 (unicode-range) from Gilda Display, a high-contrast display serif
+ * with a flagged 1 and lining figures (SIL OFL 1.1, see ../fonts/gilda-display-OFL.txt). It is listed FIRST in
+ * --font-serif (globals.css), so every serif number in the app — prices, counts, years — picks it up automatically,
+ * while letters, punctuation and separators still come from Prata. size-adjust scales Gilda's digits up to Prata's
+ * figure height (65 → 83 units per 100px); the ascent/descent overrides keep it from growing line boxes.
+ * Mapped to 400/500/600 like Prata so the browser never synthesises bold digits next to Prata's single weight.
+ */
+export const npDigits = localFont({
+  src: [
+    { path: "../fonts/gilda-display-latin-400-normal.woff2", weight: "400" },
+    { path: "../fonts/gilda-display-latin-400-normal.woff2", weight: "500" },
+    { path: "../fonts/gilda-display-latin-400-normal.woff2", weight: "600" },
+  ],
+  variable: "--font-np-digits",
+  display: "swap",
+  fallback: [],
+  adjustFontFallback: false,
+  declarations: [
+    { prop: "unicode-range", value: "U+0030-0039" },
+    { prop: "size-adjust", value: "127%" },
+    { prop: "ascent-override", value: "72%" },
+    { prop: "descent-override", value: "18%" },
+    { prop: "line-gap-override", value: "0%" },
+  ],
+});
+
 export const jost = localFont({
   src: [
     { path: "../fonts/jost-latin-400-normal.woff2", weight: "400" },
@@ -42,4 +70,4 @@ export const cinzel = localFont({
   preload: false,
 });
 
-export const fontVars = `${prata.variable} ${jost.variable} ${cinzel.variable}`;
+export const fontVars = `${prata.variable} ${npDigits.variable} ${jost.variable} ${cinzel.variable}`;

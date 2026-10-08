@@ -97,6 +97,8 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
   const [tried, setTried] = useState(false);
   /** The price field was left (blurred) once: only then (or after "Continuar") does its error show, never on arrival. */
   const [priceTouched, setPriceTouched] = useState(false);
+  /** The price the owner already confirmed past the "far outside the estimate" warning (second "Continuar"). */
+  const [outlierAck, setOutlierAck] = useState<number | null>(null);
   const [d, setD] = useState<Draft>({
     mode: staff ? "AGENCY" : "FSBO",
     op: "SALE",
@@ -421,6 +423,9 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
           ? [priceErr && ([tx(locale, "Tu precio en USD (un número entero).", "Your price in USD (a whole number)."), "price"] as Issue)]
           : []
     ).filter((x): x is Issue => !!x);
+  /** A price far outside the estimate: under half its low end (a missing zero?) or over twice its high end. */
+  const priceOutlier: "low" | "high" | null = estimate && d.price > 0 ? (d.price < estimate.low * 0.5 ? "low" : d.price > estimate.high * 2 ? "high" : null) : null;
+  const outlierPending = step === 4 && !!priceOutlier && outlierAck === d.price;
   // Live list: items disappear as the owner fixes them.
   const blocked = tried ? issues(step) : [];
   const showPriceErr = !!priceErr && (tried || priceTouched);
@@ -438,6 +443,16 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
   };
   const next = () => {
     const now = issues(step);
+    // An absurd price (a missing or extra zero) isn't blocked, but the first "Continuar" stops on the warning; pressing
+    // again with the same figure confirms it.
+    if (!now.length && step === 4 && priceOutlier && outlierAck !== d.price) {
+      setOutlierAck(d.price);
+      window.setTimeout(() => {
+        const box = document.getElementById("price-outlier");
+        box?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "center" });
+      }, 0);
+      return;
+    }
     if (!now.length) return setStep(step + 1);
     if (step === 2) {
       setShowExtrasErr(true);
@@ -559,16 +574,19 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
             />
             {d.addr && <p className="text-xs text-muted">{tx(locale, "Toca el mapa para ajustar el punto exacto.", "Tap the map to fine-tune the exact point.")}</p>}
             {d.addr && !streetErr && (
-              <div data-wiz="dup" className={cn("np-in flex flex-wrap items-center gap-3 rounded-np border p-3 text-sm", dup && !dupOverride ? "border-warn/60 bg-[#8A5A0014]" : "border-[#2F6B4F55] bg-[#2F6B4F0D]")}>
-                {checking ? <Loader2 size={18} className="animate-spin" /> : dup && !dupOverride ? <AlertTriangle size={18} className="text-warn" /> : <CheckCircle2 size={18} className="text-ok" />}
-                <span className="font-semibold">{tx(locale, "Ubicación marcada en el mapa", "Location marked on the map")}</span>
-                {dup ? (
-                  <DupNotice locale={locale} dup={dup} override={dupOverride} onOverride={() => setDupOverride(true)} hasUnit={!!d.unit.trim()} />
-                ) : dupError ? (
-                  <span className="text-muted">· {tx(locale, "Ahora no pudimos comprobar si ya está publicado; lo revisaremos cuando publiques.", "We couldn’t check for duplicates right now; we’ll check again when you publish.")}</span>
-                ) : (
-                  <span className="text-muted">· {tx(locale, "Sin duplicados: no encontramos otro anuncio igual", "No duplicates: we found no matching listing")}</span>
-                )}
+              <div data-wiz="dup" className={cn("np-in flex items-start gap-3 rounded-np border p-3 text-sm", dup && !dupOverride ? "border-warn/60 bg-[#8A5A0014]" : "border-[#2F6B4F55] bg-[#2F6B4F0D]")}>
+                {checking ? <Loader2 size={18} className="mt-px shrink-0 animate-spin" /> : dup && !dupOverride ? <AlertTriangle size={18} className="mt-px shrink-0 text-warn" /> : <CheckCircle2 size={18} className="mt-px shrink-0 text-ok" />}
+                {/* Title, then the duplicate check on its own line (an inline "·" separator wrapped to a stray leading dot). */}
+                <div className="min-w-0 flex-1 space-y-1">
+                  <div className="font-semibold">{tx(locale, "Ubicación marcada en el mapa", "Location marked on the map")}</div>
+                  {dup ? (
+                    <DupNotice locale={locale} dup={dup} override={dupOverride} onOverride={() => setDupOverride(true)} hasUnit={!!d.unit.trim()} />
+                  ) : dupError ? (
+                    <div className="text-muted">{tx(locale, "Ahora no pudimos comprobar si ya está publicado; lo revisaremos cuando publiques.", "We couldn’t check for duplicates right now; we’ll check again when you publish.")}</div>
+                  ) : (
+                    <div className="text-muted">{tx(locale, "Sin duplicados: no encontramos otro anuncio igual", "No duplicates: we found no matching listing")}</div>
+                  )}
+                </div>
               </div>
             )}
           </div>
@@ -658,7 +676,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                 setFileNote(all.length > list.length ? tx(locale, `${all.length - list.length} foto(s) pesan más de 12 MB y no pudimos añadirlas.`, `${all.length - list.length} photo(s) are over 12 MB, so we left them out.`) : null);
                 setFiles((prev) => [...prev, ...list].slice(0, 30));
               }}
-              className="flex w-full flex-col items-center rounded-np border-2 border-dashed border-line bg-white py-10 hover:border-navy"
+              className="flex w-full flex-col items-center rounded-np border-2 border-dashed border-line bg-white px-4 py-10 text-center hover:border-navy"
             >
               <ImagePlus size={30} strokeWidth={1.5} className="text-navy dark:text-ivory" />
               <span className="mt-2 font-display font-semibold">{tx(locale, "Arrastra tus fotos o elígelas", "Drop your photos or browse")}</span>
@@ -708,13 +726,28 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                 <Field label={tx(locale, `Tu precio (USD${priceUnit})`, `Your price (USD${priceUnit})`)} error={(showPriceErr && priceErr) || undefined}>
                   <input className={inputCls} type="number" inputMode="numeric" min={1} step={1} value={d.price || ""} aria-invalid={showPriceErr} onBlur={() => setPriceTouched(true)} onChange={(e) => set({ price: Math.max(0, Math.round(+e.target.value || 0)) })} />
                 </Field>
-                {estimate && d.price > 0 && (
-                  <div className="self-end pb-2.5 text-sm">
+                {estimate && d.price > 0 && !priceOutlier && (
+                  <div className="self-end pb-2.5 text-sm" data-testid="price-verdict">
                     {d.price > estimate.high ? <span className="font-semibold text-warn">{tx(locale, "Por encima del rango", "Above range")}</span> : d.price < estimate.low ? <span className="font-semibold text-ok">{tx(locale, "Por debajo: venta rápida", "Below: quick sale")}</span> : <span className="font-semibold text-ok">{tx(locale, "Dentro del rango ✓", "Within range ✓")}</span>}
                   </div>
                 )}
               </div>
-              {fxVes > 0 && <div className="mt-2 text-xs text-muted">≈ Bs. {num(Math.round(d.price * fxVes), locale)} ({tx(locale, "tasa referencial", "reference rate")})</div>}
+              {priceOutlier && (
+                <div id="price-outlier" role="status" data-testid="price-outlier" className="np-in mt-3 flex gap-2.5 rounded-np border border-warn/60 bg-[#8A5A0014] px-3.5 py-3 text-sm">
+                  <AlertTriangle size={18} className="mt-0.5 shrink-0 text-warn" aria-hidden />
+                  <div>
+                    <div className="font-semibold text-ink">
+                      {priceOutlier === "low" ? tx(locale, "Muy por debajo del rango estimado — ¿faltan ceros?", "Far below the estimated range — missing a zero?") : tx(locale, "Muy por encima del rango — revisa la cifra", "Far above the range — check the figure")}
+                    </div>
+                    <div className="mt-0.5 text-muted">
+                      {outlierPending
+                        ? tx(locale, `Si ${money(d.price, locale)} es correcto, pulsa «Continuar igualmente».`, `If ${money(d.price, locale)} is right, tap “Continue anyway”.`)
+                        : tx(locale, `Escribiste ${money(d.price, locale)}; el rango va de ${money(estimate?.low ?? 0, locale)} a ${money(estimate?.high ?? 0, locale)}.`, `You wrote ${money(d.price, locale)}; the range is ${money(estimate?.low ?? 0, locale)} to ${money(estimate?.high ?? 0, locale)}.`)}
+                    </div>
+                  </div>
+                </div>
+              )}
+              {fxVes > 0 && d.price > 0 && <div className="mt-2 text-xs text-muted">≈ Bs. {num(Math.round(d.price * fxVes), locale)} ({tx(locale, "tasa referencial", "reference rate")})</div>}
             </div>
             <div className="rounded-[18px] bg-white shadow-[0_8px_24px_rgba(30,26,24,.06)] p-5">
               <div className="flex flex-wrap items-center justify-between gap-2">
@@ -752,7 +785,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
           <div className="np-in space-y-5">
             <h1 className="font-serif text-[36px] font-medium leading-[1.05] md:text-[44px]">{tx(locale, "Revisa y publica", "Review & publish")}</h1>
             {dup && (
-              <div className={cn("flex flex-wrap items-center gap-2 rounded-np border p-3 text-sm", dupOverride ? "border-[#2F6B4F55] bg-[#2F6B4F0D]" : "border-warn/60 bg-[#8A5A0014]")} role="alert">
+              <div className={cn("flex items-start gap-2 rounded-np border p-3 text-sm [&>svg]:mt-px [&>svg]:shrink-0", dupOverride ? "border-[#2F6B4F55] bg-[#2F6B4F0D]" : "border-warn/60 bg-[#8A5A0014]")} role="alert">
                 {dupOverride ? <CheckCircle2 size={18} className="text-ok" /> : <AlertTriangle size={18} className="text-warn" />}
                 <DupNotice locale={locale} dup={dup} override={dupOverride} onOverride={() => { setDupOverride(true); setErr(null); }} hasUnit={!!d.unit.trim()} />
               </div>
@@ -818,7 +851,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
         >
           <Button variant="ghost" onClick={() => setStep(Math.max(0, step - 1))} disabled={step === 0} aria-hidden={step === 0 || undefined} tabIndex={step === 0 ? -1 : undefined} className={cn(step === 0 && "invisible")}><ArrowLeft size={16} /> {tx(locale, "Atrás", "Back")}</Button>
           {step < 5 ? (
-            <Button onClick={next} aria-describedby={blocked.length ? "wizard-blocked" : undefined}>{tx(locale, "Continuar", "Continue")} <ArrowRight size={16} /></Button>
+            <Button onClick={next} aria-describedby={blocked.length ? "wizard-blocked" : undefined}>{outlierPending ? tx(locale, "Continuar igualmente", "Continue anyway") : tx(locale, "Continuar", "Continue")} <ArrowRight size={16} /></Button>
           ) : (
             <Button size="lg" onClick={publish} disabled={!!busy || !confirm || !d.addr} className="disabled:text-[#5E5650] dark:disabled:bg-white/10 dark:disabled:text-[#CFC4B8]">
               {busy && <Loader2 size={16} className="animate-spin" />}
@@ -862,13 +895,13 @@ function DupNotice({ locale, dup, override, onOverride, hasUnit }: { locale: Loc
   if (override)
     return (
       <span data-testid="dup-override">
-        · {tx(locale, "Entendido: es otra unidad. Alguien de nuestro equipo lo revisará antes de publicarlo.", "Got it: it’s a different unit. Someone from our team will check it before it goes live.")}
+        {tx(locale, "Entendido: es otra unidad. Alguien de nuestro equipo lo revisará antes de publicarlo.", "Got it: it’s a different unit. Someone from our team will check it before it goes live.")}
       </span>
     );
   return (
     <span className="flex flex-1 flex-wrap items-center gap-x-3 gap-y-2">
       <span>
-        · {tx(locale, "Puede que ya esté publicado:", "It may already be listed:")} {link}
+        {tx(locale, "Puede que ya esté publicado:", "It may already be listed:")} {link}
         {!hasUnit && <span className="block text-xs text-muted">{tx(locale, "Si es otro apartamento o casa, escribe arriba el piso / apto / casa.", "If it’s another flat or house, add the floor / unit above.")}</span>}
       </span>
       <button type="button" onClick={onOverride} className="rounded-full border border-navy/70 bg-white px-3 py-1.5 font-display text-sm font-semibold text-navy hover:bg-[#E6DDD2]">

@@ -44,21 +44,22 @@ export function HeroSearch({ locale }: { locale: Locale }) {
   const [budget, setBudget] = useState("");
   const [busy, setBusy] = useState(false);
   const suffix = tab === "LONG_RENT" ? tx(locale, " / mes", " / mo") : tab === "SHORT_RENT" ? tx(locale, " / noche", " / night") : "";
-  const suggest = usePlaceSuggest({ locale, text, setText });
-  const go = async () => {
+  const go = async (typed: string = text) => {
     setBusy(true);
-    let q = heuristicSearchParse(text);
-    if (text.trim()) {
+    let q = heuristicSearchParse(typed);
+    if (typed.trim()) {
       try {
-        const r = await fetch("/api/v1/ai/search-parse", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ q: text, locale }) });
+        const r = await fetch("/api/v1/ai/search-parse", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ q: typed, locale }) });
         if (r.ok) q = (await r.json()).query;
       } catch {}
     }
     if (!q.listingType) q.listingType = tab as never;
     if (kind && !q.propertyKind) q.propertyKind = kind as never;
     if (budget && !q.maxPrice) q.maxPrice = Number(budget);
-    router.push(`/${locale}/search?${queryToParams(q, text).toString()}`);
+    router.push(`/${locale}/search?${queryToParams(q, typed).toString()}`);
   };
+  // Picking a suggested place searches straight away, with the tab, type and budget already chosen.
+  const suggest = usePlaceSuggest({ locale, text, setText, onPick: (next) => void go(next) });
   const label = "np-eyebrow block text-[10.5px] tracking-[0.18em] text-[#6B4F2C]";
   const field = "w-full bg-transparent font-display text-[15px] text-[#1E1A18] placeholder:text-[#1E1A18]/50 focus:outline-none";
   return (
@@ -66,7 +67,7 @@ export function HeroSearch({ locale }: { locale: Locale }) {
       data-hide-fab-mobile
       onSubmit={(e) => {
         e.preventDefault();
-        go();
+        void go();
       }}
       role="search"
       aria-label={tx(locale, "Busca tu casa", "Find your home")}

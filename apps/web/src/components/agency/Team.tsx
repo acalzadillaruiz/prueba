@@ -9,6 +9,7 @@ import type { Locale, User } from "@/types/domain";
 import { AdminShell } from "@/components/layout/AdminShell";
 import { Button } from "@/components/ui";
 import { Chip, Initials, Pill, k } from "./kit";
+import { ScrollRegion } from "./ScrollRegion";
 import { cn } from "@/lib/cn";
 import { useApp } from "@/lib/store";
 import { api } from "@/lib/api";
@@ -47,7 +48,7 @@ export function TeamView({ locale, members, listingsByAgent, invites: initialInv
     <AdminShell locale={locale} area="agency" title={tx(locale, "Equipo", "Team")}>
       {err && <div role="alert" className={cn("mb-4", k.err)}>{err}</div>}
       <div className="grid gap-6 [&>*]:min-w-0 xl:grid-cols-[1fr_360px]">
-        <div className={cn("self-start overflow-x-auto", k.card)}>
+        <ScrollRegion label={tx(locale, "Miembros del equipo", "Team members")} className={cn("self-start", k.card)}>
           <table className="w-full min-w-[720px] text-sm">
             <thead className={cn("border-b text-left", k.line, k.th)}>
               <tr><th className="px-4 py-3">{tx(locale, "Persona", "Member")}</th><th className="px-3 py-3">{tx(locale, "Rol", "Role")}</th><th className="px-3 py-3">{tx(locale, "Verificación", "Verification")}</th><th className="px-3 py-3 text-right">{tx(locale, "Inmuebles", "Listings")}</th><th className="px-3 py-3">{tx(locale, "Última actividad", "Last active")}</th></tr>
@@ -103,7 +104,7 @@ export function TeamView({ locale, members, listingsByAgent, invites: initialInv
               ))}
             </tbody>
           </table>
-        </div>
+        </ScrollRegion>
         <div className="space-y-4">
           {manager && (
             <form

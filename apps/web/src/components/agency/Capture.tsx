@@ -8,6 +8,7 @@ import type { CaptureLead, Locale, Zone } from "@/types/domain";
 import { AdminShell } from "@/components/layout/AdminShell";
 import { Button, Field } from "@/components/ui";
 import { Chip, Pill, k } from "./kit";
+import { ScrollRegion } from "./ScrollRegion";
 import { api, type ApiClientError } from "@/lib/api";
 import { TYPE_LABEL, ago, lbl, money, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
@@ -82,7 +83,7 @@ export function CaptureView({ locale, rows: initialRows, zones, titles, canConve
     <AdminShell locale={locale} area="agency" title={tx(locale, "Cola de captación", "Capture queue")}>
       {rowErr && <div role="alert" className={cn("mb-4", k.err)}>{rowErr}</div>}
       <div className="grid gap-6 [&>*]:min-w-0 xl:grid-cols-[1fr_380px]">
-        <div className={cn("self-start overflow-x-auto", k.card)}>
+        <ScrollRegion fade={false} label={tx(locale, "Cola de captación", "Capture queue")} className={cn("self-start", k.card)}>
           <table className="np-sticky-last w-full min-w-[860px] text-sm">
             <thead className={cn("border-b text-left", k.line, k.th)}>
               <tr><th className="px-4 py-3">{tx(locale, "Dirección", "Address")}</th><th className="px-3 py-3">{tx(locale, "Dueño", "Owner")}</th><th className="px-3 py-3 text-right">m²</th><th className="px-3 py-3 text-right">{tx(locale, "Pide", "Asking")}</th><th className="px-3 py-3">{tx(locale, "Resultado", "Result")}</th><th className="px-3 py-3" /></tr>
@@ -146,7 +147,7 @@ export function CaptureView({ locale, rows: initialRows, zones, titles, canConve
               )}
             </tbody>
           </table>
-        </div>
+        </ScrollRegion>
         <form
           className={cn(k.card, "self-start p-5 md:p-6")}
           onSubmit={async (e) => {

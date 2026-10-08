@@ -82,6 +82,20 @@ test.describe("Cliente · regresiones de la revisión", () => {
     await expect(page.getByText("Escribe un precio en USD mayor que 0, sin decimales.")).toBeVisible();
     await expect(page.getByTestId("wizard-blocked")).toContainText("Tu precio en USD");
     await expect(page.getByText("Paso 5 de 6")).toBeVisible();
+    // No currency conversion for an empty price.
+    await expect(page.getByText(/≈ Bs\./)).toHaveCount(0);
+    // An absurd figure (a missing zero): warned, never called a "quick sale"; the first "Continuar" stops on the
+    // warning, the second (same figure) goes on.
+    await price.fill("9");
+    await expect(page.getByTestId("price-outlier")).toContainText("Muy por debajo del rango estimado — ¿faltan ceros?");
+    await expect(page.getByText("Por debajo: venta rápida")).toHaveCount(0);
+    await page.getByRole("button", { name: "Continuar", exact: true }).click();
+    await expect(page.getByText("Paso 5 de 6")).toBeVisible();
+    await page.getByRole("button", { name: "Continuar igualmente" }).click();
+    await expect(page.getByText("Paso 6 de 6")).toBeVisible();
+    await page.getByRole("button", { name: "Atrás", exact: true }).click();
+    await price.fill("90000000");
+    await expect(page.getByTestId("price-outlier")).toContainText("Muy por encima del rango — revisa la cifra");
     await price.fill("95000");
     await page.getByRole("button", { name: /Redactar con IA/ }).click();
     await expect(page.getByLabel("Título")).toHaveValue(/Terreno/);

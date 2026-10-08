@@ -20,8 +20,9 @@ function complete(text: string, s: PlaceSuggestion): string {
 
 /**
  * Place typeahead for a search text field (ARIA 1.2 combobox with a listbox popup): as people type, the zones and
- * cities that start with the last word(s) appear below the field ("Lech" → Lechería). ↑/↓ move, Enter picks,
- * Escape closes; with nothing highlighted, Enter submits the form as usual. Spread `inputProps` on the <input> and
+ * cities that start with the last word(s) appear below the field ("Lech" → Lechería). ↑/↓ move, Enter or a click
+ * picks AND searches (`onPick` runs the search with the completed text — picking a place is the search), Tab only
+ * completes the text, Escape closes; with nothing highlighted, Enter submits the form as usual. Spread `inputProps` on the <input> and
  * render `listbox` inside a `relative` wrapper around it.
  */
 export function usePlaceSuggest({
@@ -36,7 +37,8 @@ export function usePlaceSuggest({
   text: string;
   setText: (v: string) => void;
   places?: ZoneEntry[];
-  /** Called after a suggestion completes the text (e.g. to run the search straight away). */
+  /** Called when a suggestion is picked with Enter or a click: run the search with `next` straight away (state set
+   * by `setText` isn't readable yet in the same tick, so use `next`, not the field's state). Not called on Tab. */
   onPick?: (next: string, s: PlaceSuggestion) => void;
   className?: string;
 }) {
@@ -48,12 +50,12 @@ export function usePlaceSuggest({
   const shown = open && items.length > 0;
   const optId = (i: number) => `${id}-opt-${i}`;
 
-  const pick = (s: PlaceSuggestion) => {
+  const pick = (s: PlaceSuggestion, search = true) => {
     const next = complete(text, s);
     setText(next);
     setOpen(false);
     setActive(-1);
-    onPick?.(next, s);
+    if (search) onPick?.(next, s);
   };
 
   const onKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -75,8 +77,8 @@ export function usePlaceSuggest({
       setOpen(false);
       setActive(-1);
     } else if (e.key === "Tab" && shown && active >= 0 && items[active]) {
-      // Tab accepts the highlighted place (like most address fields) without trapping focus.
-      pick(items[active]);
+      // Tab accepts the highlighted place (like most address fields) without trapping focus or searching yet.
+      pick(items[active], false);
     }
   };
 

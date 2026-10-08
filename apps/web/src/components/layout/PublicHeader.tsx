@@ -226,9 +226,10 @@ export function PublicHeader({ locale, variant = "light", autoHide = false }: { 
   const vacation = { href: `/${locale}/search?type=SHORT_RENT`, label: t("vacation"), active: onSearch && type === "SHORT_RENT" };
   const luxury = { href: `/${locale}/luxury`, label: t("privateCollection"), active: /\/luxury$/.test(pathname) };
   const remote = { href: `/${locale}#compra-a-distancia`, label: t("remoteBuying"), active: false };
-  // Desktop: "Vacacional" joins from 1400 px (below that the pill has no room for it; it stays in the search filters).
   // Narrow desktops (lg) keep only the essentials; the rest join as room allows (all of them are always in the drawer).
-  const nav = [buy, rent, { ...vacation, wide: true }, { ...luxury, mid: true }, { ...remote, wide: true }];
+  // Measured (es, the longer locale): the bar has ~180 px spare at 1280 → "Vacacional" (95 px) and "Colección
+  // Privada" join from xl; "Compra a distancia" (152 px) only fits from 1400. At 1024 only ~67 px are spare.
+  const nav = [buy, rent, { ...vacation, mid: true }, { ...luxury, mid: true }, { ...remote, wide: true }];
   // Drawer: every way to search (the four search types the search page understands), then the rest.
   const searchTypes: DrawerLink[] = [buy, rent, vacation, { href: `/${locale}/search?type=COMMERCIAL`, label: t("commercial"), active: onSearch && type === "COMMERCIAL" }];
   const home = u ? roleHome(u.role) : "/app";

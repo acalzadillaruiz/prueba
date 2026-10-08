@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
-import { Archive, CalendarPlus, Clock, Loader2, Mail, MessageCircle, MessageSquareText, Phone, RefreshCw, Search, Send, Sparkles, Star, UserRoundCog, X } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Archive, ArrowLeft, CalendarPlus, Clock, Loader2, Mail, MessageCircle, MessageSquareText, Phone, RefreshCw, Search, Send, Sparkles, Star, UserRoundCog, X } from "lucide-react";
 import type { NextAction } from "@newplace/ai";
 import type { Lead, LeadStage, Listing, Locale } from "@/types/domain";
 import { api } from "@/lib/api";
@@ -126,6 +126,19 @@ function TourPicker({ locale, listingId, agentId, busy, onPropose, onClose }: { 
   );
 }
 
+/** Below xl (where the inbox is one column) the open lead is a full-screen sheet. */
+function useNarrow() {
+  const [narrow, setNarrow] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 1279.98px)");
+    const update = () => setNarrow(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+  return narrow;
+}
+
 const BOX = "mt-0.5 h-[18px] w-[18px] shrink-0 cursor-pointer accent-navy dark:accent-[#C9A574]";
 
 function SelectAll({ checked, indeterminate, onChange, label }: { checked: boolean; indeterminate: boolean; onChange: () => void; label: string }) {
@@ -158,7 +171,11 @@ export function LeadsInbox({ locale, initial, listings, agents, assignable = [],
   const byId = useMemo(() => new Map(listings.map((l) => [l.id, l])), [listings]);
   const list = useQuery({ queryKey: ["leads", "all"], queryFn: () => api<{ items: ScoredLead[] }>("leads").then((r) => r.items), initialData: initial, refetchInterval: 15_000 });
   const [stage, setStage] = useState<LeadStage | "ALL">("ALL");
-  const [selId, setSelId] = useState<string | null>(null);
+  // `?lead=<id>` opens that lead (deep link). Below xl the open lead is a full-screen sheet with its own history
+  // entry, so the phone's Back closes it and returns to the list where it was.
+  const searchParams = useSearchParams();
+  const urlLead = searchParams.get("lead");
+  const [selId, setSelId] = useState<string | null>(urlLead);
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
   const [q, setQ] = useState("");
@@ -179,6 +196,69 @@ export function LeadsInbox({ locale, initial, listings, agents, assignable = [],
   const sel = visible.find((l) => l.id === selId) ?? visible[0];
   const detail = useQuery({ queryKey: ["lead", sel?.id], queryFn: () => api<Detail>(`leads/${sel!.id}`), enabled: !!sel, refetchInterval: 15_000 });
   const listing = sel ? byId.get(sel.listingId) : undefined;
+  const narrow = useNarrow();
+  const sheet = narrow && !!urlLead && sel?.id === urlLead;
+  const pushed = useRef(false);
+  const listY = useRef(0);
+  const backRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    // Back/Forward (or a deep link) changes the URL: the selection follows it.
+    if (urlLead) setSelId(urlLead);
+  }, [urlLead]);
+  const leadUrl = (id: string | null) => {
+    const url = new URL(window.location.href);
+    if (id) url.searchParams.set("lead", id);
+    else url.searchParams.delete("lead");
+    return url.pathname + url.search + url.hash;
+  };
+  const openLead = (id: string) => {
+    setSelId(id);
+    if (window.innerWidth >= 1280) {
+      // Desktop keeps the two panes; a deep-linked URL just follows the selection.
+      if (urlLead) window.history.replaceState(null, "", leadUrl(id));
+      return;
+    }
+    listY.current = window.scrollY;
+    if (urlLead) window.history.replaceState(null, "", leadUrl(id));
+    else {
+      window.history.pushState(null, "", leadUrl(id));
+      pushed.current = true;
+    }
+  };
+  const closeLead = () => {
+    if (pushed.current) window.history.back();
+    else window.history.replaceState(null, "", leadUrl(null));
+  };
+  const wasSheet = useRef(false);
+  useEffect(() => {
+    if (sheet) {
+      wasSheet.current = true;
+      const root = document.documentElement;
+      const prev = root.style.overflow;
+      root.style.overflow = "hidden";
+      backRef.current?.focus({ preventScroll: true });
+      const onKey = (e: KeyboardEvent) => {
+        if (e.key === "Escape") closeLead();
+      };
+      window.addEventListener("keydown", onKey);
+      return () => {
+        root.style.overflow = prev;
+        window.removeEventListener("keydown", onKey);
+      };
+    }
+    if (wasSheet.current) {
+      // Closed (Back, the bar or Esc): the list comes back at the same scroll, with focus on the lead's row.
+      wasSheet.current = false;
+      pushed.current = false;
+      const y = listY.current;
+      const id = selId;
+      requestAnimationFrame(() => {
+        window.scrollTo({ top: y, behavior: "instant" as ScrollBehavior });
+        document.querySelector<HTMLElement>(`[data-lead-row="${id}"]`)?.focus({ preventScroll: true });
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sheet]);
   const A = ACTION[(sel?.nextAction as NextAction) ?? "NURSE"] ?? ACTION.NURSE;
   const ActionIcon = A[2];
   const refresh = () => {
@@ -310,11 +390,9 @@ export function LeadsInbox({ locale, initial, listings, agents, assignable = [],
                 <input type="checkbox" className={BOX} checked={picked.has(l.id)} onChange={() => toggle(l.id)} aria-label={tx(locale, `Seleccionar ${l.name}`, `Select ${l.name}`)} />
               </label>
               <button
-                onClick={() => {
-                  setSelId(l.id);
-                  // On phones/tablets the detail sits under the list: bring it into view.
-                  if (window.innerWidth < 1280) requestAnimationFrame(() => document.getElementById("lead-detail")?.scrollIntoView({ behavior: "smooth", block: "start" }));
-                }} className="flex min-w-0 flex-1 items-start gap-3 py-3.5 pl-2 pr-4 text-left transition-colors duration-np">
+                data-lead-row={l.id}
+                onClick={() => openLead(l.id)}
+                className="flex min-w-0 flex-1 items-start gap-3 py-3.5 pl-2 pr-4 text-left transition-colors duration-np">
                 <div className="relative">
                   <Initials name={l.name} size={40} />
                   {l.stage === "NEW" && <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-white bg-navy dark:border-navy-card dark:bg-[#C9A574]" />}
@@ -346,7 +424,27 @@ export function LeadsInbox({ locale, initial, listings, agents, assignable = [],
         </div>
 
         {sel ? (
-          <div className="np-in scroll-mt-28 space-y-4" key={sel.id} id="lead-detail">
+          <div
+            key={sel.id}
+            id="lead-detail"
+            // Below xl the detail only shows as the full-screen sheet (it used to sit ~1,700 px under the list).
+            className={cn(
+              "np-in space-y-4",
+              sheet
+                ? "max-xl:fixed max-xl:inset-0 max-xl:z-[60] max-xl:overflow-y-auto max-xl:overscroll-contain max-xl:bg-ivory max-xl:px-4 max-xl:pb-[calc(1.5rem+env(safe-area-inset-bottom))] max-xl:dark:bg-[#15120F] md:max-xl:px-10"
+                : "max-xl:hidden",
+            )}
+            role={sheet ? "dialog" : undefined}
+            aria-modal={sheet || undefined}
+            aria-label={sheet ? sel.name : undefined}
+          >
+            {sheet && (
+              <div className="sticky top-0 z-10 -mx-4 flex h-14 items-center border-b border-[#ECE6DA] bg-ivory/95 px-2 backdrop-blur md:-mx-10 md:px-8 xl:hidden dark:border-white/10 dark:bg-[#15120F]/95">
+                <button ref={backRef} type="button" onClick={closeLead} className={cn("flex min-h-11 items-center gap-2 rounded-full px-3 font-display text-[15px] font-semibold", k.hover)} aria-label={tx(locale, `Volver a Leads (${visible.length})`, `Back to Leads (${visible.length})`)}>
+                  <ArrowLeft size={18} aria-hidden /> Leads ({visible.length})
+                </button>
+              </div>
+            )}
             <div className={cn(k.card, "p-5 md:p-6")}>
               <div className="flex flex-wrap items-start gap-4">
                 <Initials name={sel.name} size={56} />

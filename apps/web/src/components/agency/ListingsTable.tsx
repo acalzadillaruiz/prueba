@@ -9,6 +9,7 @@ import { listingPhoto } from "@/lib/photos";
 import { PropertyArt } from "@/components/art/PropertyArt";
 import { Button } from "@/components/ui";
 import { Count, Initials, Pill, StatusPill, k, tab } from "./kit";
+import { ScrollRegion } from "./ScrollRegion";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import { useApp } from "@/lib/store";
@@ -280,7 +281,7 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
         })}
         {rows.length === 0 && <li className={cn(k.card, "px-4 py-10 text-center text-sm", k.muted)}>{tx(locale, "No hay inmuebles con este filtro.", "No listings match this filter.")}</li>}
       </ul>
-      <div className={cn("hidden overflow-x-auto md:block", k.card)}>
+      <ScrollRegion fade={false} label={tx(locale, "Tabla de inmuebles", "Listings table")} className={cn("hidden md:block", k.card)}>
         <table className="w-full min-w-[1160px] text-sm">
           <thead className={cn("border-b text-left", k.line, k.th)}>
             <tr>
@@ -344,7 +345,7 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
             )}
           </tbody>
         </table>
-      </div>
+      </ScrollRegion>
       <div className={cn("mt-3 flex items-center gap-2 text-xs", k.muted)}><UserPlus size={13} /> {tx(locale, "Backoffice y dueño pueden reasignar agentes. Los agentes solo editan sus inmuebles.", "Backoffice and owner can reassign agents. Agents only edit their own listings.")}</div>
 
       {bulk && !chosen.length && (

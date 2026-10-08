@@ -40,6 +40,12 @@ const ACTION: Record<NextAction, [string, string, React.ElementType]> = {
 };
 
 const minsAgo = (iso: string) => Math.round((Date.now() - Date.parse(iso)) / 60000);
+/** Time-dependent UI (SLA timer, "Nuevo") renders only after mount, so server and client HTML always match. */
+function useMounted() {
+  const [m, setM] = useState(false);
+  useEffect(() => setM(true), []);
+  return m;
+}
 
 function ScoreRing({ score }: { score: number }) {
   const r = 30;
@@ -54,6 +60,8 @@ function ScoreRing({ score }: { score: number }) {
 }
 
 function Sla({ lead, locale }: { lead: Lead; locale: Locale }) {
+  const mounted = useMounted();
+  if (!mounted) return null;
   const m = minsAgo(lead.createdAt);
   if (lead.stage !== "NEW") return lead.firstResponseMin != null ? <span className={cn("text-[11px]", k.muted)}>{tx(locale, "resp.", "resp.")} {lead.firstResponseMin} min</span> : null;
   const left = 15 - m;
@@ -164,6 +172,7 @@ const SOURCE_LABEL: Record<string, Record<Locale, string>> = {
 };
 
 export function LeadsInbox({ locale, initial, listings, agents, assignable = [], threads, meId }: { locale: Locale; initial: ScoredLead[]; listings: Listing[]; agents: Record<string, string>; /** Agents a manager can hand leads to (empty for agents). */ assignable?: { id: string; name: string }[]; threads?: HubThread[]; meId?: string }) {
+  const mounted = useMounted();
   const { user } = useApp();
   const manager = user?.role === "AGENCY_OWNER" || user?.role === "BACKOFFICE" || user?.role === "SUPERADMIN";
   const stageName = (st: string) => stageLabel(locale, st);
@@ -407,12 +416,12 @@ export function LeadsInbox({ locale, initial, listings, agents, assignable = [],
                   <div className="flex items-center gap-2">
                     <span className="truncate font-semibold">{l.name}</span>
                     {l.priority && <Star size={13} className="shrink-0 fill-gold text-gold" />}
-                    {minsAgo(l.createdAt) < 60 && l.stage === "NEW" && <Pill tone="neutral" className={cn("max-sm:hidden", onTint)}>{tx(locale, "Nuevo", "New")}</Pill>}
+                    {mounted && minsAgo(l.createdAt) < 60 && l.stage === "NEW" && <Pill tone="neutral" className={cn("max-sm:hidden", onTint)}>{tx(locale, "Nuevo", "New")}</Pill>}
                   </div>
                   <div className={cn("truncate text-xs", k.muted)}>{lst ? tx(locale, lst.title_es, lst.title_en) : ""}</div>
                   <div className="mt-1 truncate text-sm text-navy/75 dark:text-ivory/70">{l.message}</div>
                   <div className="mt-2 flex flex-wrap items-center gap-2 sm:hidden">
-                    {minsAgo(l.createdAt) < 60 && l.stage === "NEW" && <Pill tone="neutral" className={onTint}>{tx(locale, "Nuevo", "New")}</Pill>}
+                    {mounted && minsAgo(l.createdAt) < 60 && l.stage === "NEW" && <Pill tone="neutral" className={onTint}>{tx(locale, "Nuevo", "New")}</Pill>}
                     <Chip className={score < 45 ? "bg-transparent text-muted shadow-[inset_0_0_0_1px_#D8CBB7] dark:text-mist" : onTint}>{tx(locale, "Interés", "Interest")} {score}</Chip>
                     <Sla lead={l} locale={locale} />
                   </div>

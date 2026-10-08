@@ -24,3 +24,25 @@ describe("heuristicLeadScore", () => {
     expect(r.score).toBeGreaterThan(80);
   });
 });
+
+describe("searchParse · real phrases (2035 review)", () => {
+  it("reads «million» in English instead of a USD 1 cap", () => {
+    const q = heuristicSearchParse("penthouse with sea view in Lecheria under 1 million");
+    expect(q.maxPrice).toBe(1_000_000);
+    expect(q.zone).toBe("Lechería");
+    expect(q.keywords).toContain("sea");
+  });
+  it("reads 1.2M, 400k and 400 mil", () => {
+    expect(heuristicSearchParse("house up to 1.2m").maxPrice).toBe(1_200_000);
+    expect(heuristicSearchParse("apartment under 400k").maxPrice).toBe(400_000);
+    expect(heuristicSearchParse("ático hasta 400 mil").maxPrice).toBe(400_000);
+  });
+  it("never applies a sale price under USD 1.000", () => {
+    expect(heuristicSearchParse("casa hasta 5").maxPrice).toBeUndefined();
+    expect(heuristicSearchParse("alquiler hasta 800").maxPrice).toBe(800);
+  });
+  it("recognises El Morro and holiday rentals", () => {
+    expect(heuristicSearchParse("casa con piscina en El Morro").zone).toBe("El Morro");
+    expect(heuristicSearchParse("A holiday villa in Margarita")).toMatchObject({ listingType: "SHORT_RENT", zone: "Isla de Margarita" });
+  });
+});

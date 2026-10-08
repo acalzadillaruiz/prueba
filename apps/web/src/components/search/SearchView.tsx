@@ -126,7 +126,8 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
     const p = new URLSearchParams(pending.current ?? sp.toString());
     for (const [k, v] of Object.entries(patch)) { if (v === null) p.delete(k); else p.set(k, v); }
     pending.current = p.toString();
-    router.replace(`/${locale}/search?${p.toString()}`, { scroll: false });
+    // push, not replace: every filter change is a step the Back button can undo (and Back never leaves the site).
+    router.push(`/${locale}/search?${p.toString()}`, { scroll: false });
     setAlertSaved(false);
     setAlertError(null);
   };
@@ -145,6 +146,23 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
     initialData: qs === initialQs ? initial : undefined,
   });
   const results = query.data?.items ?? [];
+  // Coming back from a listing lands where you left the list (per search), like any good shop.
+  const listRef = useRef<HTMLDivElement>(null);
+  const scrollKey = `np-search-scroll:${qs}`;
+  const saveListScroll = () => {
+    try {
+      sessionStorage.setItem(scrollKey, String(listRef.current?.scrollTop ?? 0));
+    } catch {}
+  };
+  const restored = useRef<string | null>(null);
+  useEffect(() => {
+    if (!results.length || restored.current === qs || !listRef.current) return;
+    restored.current = qs;
+    try {
+      const y = Number(sessionStorage.getItem(scrollKey) ?? 0);
+      if (y > 0) listRef.current.scrollTop = y;
+    } catch {}
+  }, [results.length, qs, scrollKey]);
   const createAlert = async () => {
     if (alertSaved || savingAlert) return;
     if (!requireLogin()) return;
@@ -205,6 +223,22 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
   if (verified) activeChips.push(["verified", tx(locale, "Agencia verificada", "Verified agency"), { verified: null }]);
   amen.forEach((a) => activeChips.push([a, lbl(AMENITY_LABEL[a], locale), { am: amen.filter((x) => x !== a).join(",") || null }]));
   activeChips.push(...essentialChips(ess, locale));
+  // Nothing found: for each active filter, how many homes there would be without it (one tap to loosen it).
+  const relaxable = activeChips.slice(0, 6);
+  const relax = useQuery({
+    queryKey: ["relax", qs],
+    enabled: !query.isFetching && results.length === 0 && relaxable.length > 0,
+    queryFn: () =>
+      Promise.all(
+        relaxable.map(async ([key, label, patch]) => {
+          const p = new URLSearchParams(qs);
+          for (const [k, v] of Object.entries(patch)) { if (v === null) p.delete(k); else p.set(k, v); }
+          p.set("take", "1");
+          const r = await api<{ total: number }>(`/api/v1/listings?${p.toString()}`).catch(() => ({ total: 0 }));
+          return { key, label, patch, total: r.total };
+        }),
+      ).then((xs) => xs.filter((x) => x.total > 0).sort((a, b) => b.total - a.total)),
+  });
 
   const pill = "flex h-11 md:h-10 shrink-0 items-center gap-1.5 rounded-full border px-4 font-display text-sm transition-colors duration-np";
   // Selected filter = navy tint + 2 px navy border (brand v4).
@@ -222,7 +256,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
               const p = queryToParams(q, nl);
               if (q.minPrice && (!q.maxPrice || q.minPrice < q.maxPrice)) p.set("min", String(q.minPrice));
               if (!q.listingType) p.set("type", type);
-              router.replace(`/${locale}/search?${p.toString()}`);
+              router.push(`/${locale}/search?${p.toString()}`);
             }}
             className="flex h-11 min-w-[220px] shrink-0 items-center gap-2 rounded-full border border-ink/10 bg-white/75 backdrop-blur px-4 focus-within:border-navy md:h-10 md:flex-1 xl:max-w-[300px]"
           >
@@ -455,7 +489,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
           >
             <span className="h-1.5 w-12 rounded-full bg-ink/25" aria-hidden />
           </button>
-          <div className={cn("min-h-0 flex-1 scrollbar-thin lg:overflow-y-auto", mobileList ? "overflow-y-auto" : "overflow-hidden")}>
+          <div ref={listRef} onScroll={saveListScroll} className={cn("min-h-0 flex-1 scrollbar-thin lg:overflow-y-auto", mobileList ? "overflow-y-auto" : "overflow-hidden")}>
           <div className="sticky top-0 z-10 border-b border-line bg-ivory/95 px-4 py-3 backdrop-blur">
             <div className="flex items-center justify-between gap-2">
               <div>
@@ -491,11 +525,23 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
               </div>
             ))}
           </div>
+          {results.length === 0 && !!relax.data?.length && (
+            <div className="px-4 pt-4" data-testid="relax">
+              <p className="font-display text-[15px] text-ink">{tx(locale, "Si aflojas un filtro, sí hay casas:", "Loosen one filter and there are homes:")}</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {relax.data.map((r) => (
+                  <button key={r.key} onClick={() => set(r.patch)} className="np-glass inline-flex min-h-11 items-center gap-2 rounded-full px-4 font-display text-[14px] text-ink transition-transform hover:-translate-y-0.5">
+                    {tx(locale, "Sin", "Without")} «{r.label}» · <b>{plural(r.total, locale, ["casa", "casas"], ["home", "homes"])}</b>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           {results.length === 0 && (
             <div className="p-4">
               <EmptyState
                 monogram
-                title={tx(locale, "Aún no hay casas aquí", "No homes here yet")}
+                title={tx(locale, "Aún no hay casas con todo eso", "No homes match all of that yet")}
                 body={tx(locale, "Prueba a ampliar la zona o quitar algún filtro. O guarda la búsqueda y te avisamos en cuanto aparezca algo para ti.", "Try widening the area or removing a filter. Or save this search and we’ll let you know the moment something turns up.")}
                 cta={
                   <button onClick={createAlert} disabled={alertSaved || savingAlert} className="np-btn-navy min-h-11 rounded-full bg-navy px-5 font-display font-semibold text-ivory disabled:opacity-60">

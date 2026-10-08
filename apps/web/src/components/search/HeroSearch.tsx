@@ -21,6 +21,7 @@ export function queryToParams(q: ReturnType<typeof heuristicSearchParse>, raw: s
   const am = q.keywords.filter((k) => ["pool", "terrace", "view"].includes(k));
   if (am.length) p.set("am", am.join(","));
   if (q.keywords.includes("pets")) p.set("pets", "1");
+  if (q.keywords.includes("sea")) p.set("sea", "1");
   if (raw) p.set("q", raw);
   return p;
 }

@@ -229,7 +229,8 @@ export function whereFromFilters(f: SearchFilters): Prisma.ListingWhereInput {
   const and: Prisma.ListingWhereInput[] = [publicWhere(), { status: { in: ["COMING_SOON", "ACTIVE", "UNDER_OFFER"] } }];
   if (f.type === "COMMERCIAL") and.push({ listingType: { in: ["COMMERCIAL_SALE", "COMMERCIAL_RENT"] } });
   else if (f.type) and.push({ listingType: f.type as ListingType });
-  if (f.zone) and.push({ OR: [{ zone: f.zone }, { city: f.zone }] });
+  // "El Morro" covers "Cerro El Morro" and "Canales de El Morro"; a city name covers all its zones.
+  if (f.zone) and.push({ OR: [{ zone: { contains: f.zone, mode: "insensitive" } }, { city: { equals: f.zone, mode: "insensitive" } }] });
   if (f.city) and.push({ city: f.city });
   if (f.max) and.push({ priceAmount: { lte: f.max } });
   if (f.min) and.push({ priceAmount: { gte: f.min } });

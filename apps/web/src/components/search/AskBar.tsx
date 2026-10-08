@@ -15,19 +15,20 @@ const MODES = [
   ["SHORT_RENT", "Vacaciones", "Holidays"],
 ] as const;
 
+// Every example returns real homes today (checked against the inventory): the first search is never empty.
 const EXAMPLES: [string, string][] = [
-  ["Un ático con vista al mar en Lechería, hasta 400 mil", "A penthouse with sea views in Lechería, up to 400k"],
-  ["Casa con piscina en El Morro para la familia", "A family house with a pool in El Morro"],
-  ["Apartamento de 2 habitaciones cerca del metro en Chacao", "A 2-bedroom flat near the metro in Chacao"],
-  ["Algo frente a la playa en Margarita para las vacaciones", "Something on the beach in Margarita for the holidays"],
+  ["Un ático con vista al mar en Lechería", "A penthouse with sea views in Lechería"],
+  ["Casa con piscina en El Morro", "A house with a pool in El Morro"],
+  ["Apartamento de 2 habitaciones en Chacao", "A 2-bedroom apartment in Chacao"],
+  ["Una villa en Margarita para las vacaciones", "A holiday villa in Margarita"],
 ];
 
-/** Chips: one tap fills a real request, so the first search is never a blank page. */
-const CHIPS: [string, string, string][] = [
-  ["Frente al mar", "On the sea", "frente al mar en Lechería"],
-  ["Con piscina", "With a pool", "casa con piscina"],
-  ["Ático", "Penthouse", "ático"],
-  ["Hasta 250 mil", "Up to 250k", "hasta 250 mil"],
+/** Chips: one tap runs exactly what the label says, nothing hidden. [label es, label en, query es, query en] */
+const CHIPS: [string, string, string, string][] = [
+  ["Frente al mar", "By the sea", "frente al mar", "by the sea"],
+  ["Con piscina", "With a pool", "con piscina", "with a pool"],
+  ["Áticos", "Penthouses", "ático", "penthouse"],
+  ["Exclusivas", "Exclusive", "exclusivas de lujo", "exclusive luxury"],
 ];
 
 /**
@@ -132,12 +133,12 @@ export function AskBar({ locale, className }: { locale: Locale; className?: stri
         </button>
       </div>
       <div className="no-scrollbar flex gap-2 overflow-x-auto px-1.5 pb-1 pt-2.5">
-        {CHIPS.map(([es, en, q]) => (
+        {CHIPS.map(([es, en, qEs, qEn]) => (
           <button
             key={es}
             type="button"
             onClick={() => {
-              const v = tx(locale, q, en.toLowerCase());
+              const v = tx(locale, qEs, qEn);
               setText(v);
               void go(v);
             }}

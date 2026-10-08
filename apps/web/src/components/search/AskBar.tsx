@@ -96,14 +96,14 @@ export function AskBar({ locale, className }: { locale: Locale; className?: stri
             aria-pressed={mode === k}
             onClick={() => setMode(k)}
             className={cn(
-              "min-h-9 rounded-full px-4 font-display text-[14px] transition-all duration-300",
+              "min-h-11 rounded-full px-4 font-display text-[14px] transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink",
               mode === k ? "bg-ink text-ivory shadow-[0_6px_16px_-6px_rgba(30,26,24,.6)]" : "text-ink/65 hover:bg-white/70 hover:text-ink",
             )}
           >
             {tx(locale, es, en)}
           </button>
         ))}
-        <span className="ml-auto hidden items-center gap-1.5 pr-2 font-display text-[12px] text-ink/55 sm:flex">
+        <span className="ml-auto hidden items-center gap-1.5 pr-2 font-display text-[12px] text-ink/70 sm:flex">
           <Sparkles size={13} aria-hidden /> {tx(locale, "Escríbelo como se lo dirías a un amigo", "Say it like you'd tell a friend")}
         </span>
       </div>
@@ -117,7 +117,7 @@ export function AskBar({ locale, className }: { locale: Locale; className?: stri
           placeholder={tx(locale, "Describe la casa que buscas", "Describe the home you're looking for")}
         />
         {!text && (
-          <span aria-hidden className="pointer-events-none absolute left-5 right-16 truncate font-display text-[16px] text-ink/45 sm:text-[17px]">
+          <span aria-hidden className="pointer-events-none absolute left-5 right-16 truncate font-display text-[16px] text-ink/60 sm:text-[17px]">
             {hint}
             <span className="np-caret" />
           </span>
@@ -126,7 +126,7 @@ export function AskBar({ locale, className }: { locale: Locale; className?: stri
           type="submit"
           aria-busy={busy}
           aria-label={tx(locale, "Buscar", "Search")}
-          className="flex h-12 shrink-0 items-center justify-center gap-2 rounded-[18px] bg-coral-cta px-4 font-display text-[15px] font-semibold text-white transition-[background-color,transform] duration-300 hover:bg-coral-cta-hover active:scale-95 sm:px-6"
+          className="flex h-12 shrink-0 items-center justify-center gap-2 rounded-[18px] bg-coral-cta px-4 font-display text-[15px] font-semibold text-white transition-[background-color,transform] duration-300 hover:bg-coral-cta-hover active:scale-95 sm:px-6 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
         >
           <span className="hidden sm:inline">{tx(locale, "Buscar", "Search")}</span>
           <ArrowUp size={18} aria-hidden className="rotate-45 sm:hidden" />
@@ -142,7 +142,7 @@ export function AskBar({ locale, className }: { locale: Locale; className?: stri
               setText(v);
               void go(v);
             }}
-            className="min-h-9 shrink-0 rounded-full border border-ink/10 bg-white/50 px-3.5 font-display text-[13px] text-ink/75 transition-colors hover:border-ink/30 hover:bg-white hover:text-ink"
+            className="min-h-11 shrink-0 rounded-full border border-ink/10 bg-white/50 px-3.5 font-display text-[13px] text-ink/75 transition-colors hover:border-ink/30 hover:bg-white hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
           >
             {tx(locale, es, en)}
           </button>

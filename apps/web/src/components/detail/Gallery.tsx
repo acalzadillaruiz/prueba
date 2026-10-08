@@ -26,6 +26,8 @@ export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: bo
   const what = (n: number) => (illustrated ? tx(locale, `ilustración ${n} de ${total}`, `illustration ${n} of ${total}`) : tx(locale, `foto ${n} de ${total}`, `photo ${n} of ${total}`));
   const What = (n: number) => what(n).replace(/^./, (c) => c.toUpperCase());
   const view = (n: number) => tx(locale, `Ver ${what(n)}`, `View ${what(n)}`);
+  // Descriptive alt for the photos shown on their own (title + zone); thumbnails inside labelled buttons stay decorative.
+  const alt = `${tx(locale, l.title_es, l.title_en)}, ${l.zone}`;
   const tour = safeTour(l.virtualTourUrl);
   useEffect(() => {
     if (!open) return;
@@ -68,7 +70,7 @@ export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: bo
       <div className={cn("grid h-[320px] gap-3 sm:h-[420px] md:h-[540px] lg:h-[600px]", thumbs.length > 0 && "md:grid-cols-2")}>
         <button onClick={() => show(0)} className="relative block overflow-hidden rounded-[32px] bg-arena">
           <span className="sr-only">{view(1)}</span>
-          <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} sizes="(max-width: 768px) 100vw, 50vw" priority className="h-full w-full transition-transform duration-700 hover:scale-[1.02]" />
+          <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} label={alt} sizes="(max-width: 768px) 100vw, 50vw" priority className="h-full w-full transition-transform duration-700 hover:scale-[1.02]" />
           {tag}
           <span className="absolute right-3 top-3 np-glass rounded-full px-3.5 py-1.5 font-display text-[13px] font-semibold text-ink md:hidden">{allLabel}</span>
         </button>
@@ -127,7 +129,7 @@ export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: bo
             {tab === "photos" && (
               <>
                 <div className="relative max-h-full w-full max-w-5xl">
-                  <PropertyArt scene={shots[i]} seed={i === 0 ? l.id : l.id + (i - 1)} photo={listingPhoto(l, i)} className="max-h-full w-full rounded-np" />
+                  <PropertyArt scene={shots[i]} seed={i === 0 ? l.id : l.id + (i - 1)} photo={listingPhoto(l, i)} label={`${alt} · ${what(i + 1)}`} className="max-h-full w-full rounded-np" />
                   {tag}
                 </div>
                 <button onClick={() => setI((i - 1 + total) % total)} aria-label={tx(locale, "Foto anterior", "Previous photo")} className="absolute left-3 rounded-full bg-white/10 p-3 hover:bg-white/20"><ChevronLeft aria-hidden /></button>

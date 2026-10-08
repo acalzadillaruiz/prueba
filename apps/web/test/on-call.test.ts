@@ -68,7 +68,7 @@ describe("Guardia settings validation (seeded agencies)", () => {
 });
 
 describe("public on-call read", () => {
-  it("lists verified, active agencies only, the listing's agency first, without private fields", async () => {
+  it("lists verified, active agencies only, only the listing's agency on a listing, without private fields", async () => {
     const all = await onCallAdvisors();
     expect(all.map((a) => a.agency.id).sort()).toEqual(["ag-andes", "ag-night"]); // Orinoco is unverified (TRIAL)
     const json = JSON.stringify(all);
@@ -76,7 +76,11 @@ describe("public on-call read", () => {
     expect(json).not.toMatch(/u-agent|u-owner/); // nor internal user ids
     for (const a of all) expect(a.advisor.tel).toMatch(/^tel:\+?\d+$/);
     const night = await prisma.listing.findFirstOrThrow({ where: { agencyId: "ag-night", status: "ACTIVE", review: "APPROVED", privateListing: false }, select: { slug: true } });
-    expect((await onCallAdvisors({ listingSlug: night.slug }))[0].agency.id).toBe("ag-night");
+    // On a listing only that listing's agency is shown (never advisors of other agencies).
+    expect((await onCallAdvisors({ listingSlug: night.slug })).map((a) => a.agency.id)).toEqual(["ag-night"]);
+    expect(await onCallAdvisors({ listingSlug: "no-such-listing" })).toEqual([]);
+    const r = await GET(new NextRequest(`http://localhost/api/v1/on-call?listing=${night.slug}`), undefined as never);
+    expect((await r.json()).advisors.map((a: { agency: { id: string } }) => a.agency.id)).toEqual(["ag-night"]);
   });
   it("follows the Caracas day of the seeded rotation", async () => {
     // Wed 2026-10-07 23:30 Caracas (Thu 03:30 UTC): Andes Prime's Wednesday advisor is Patricia Salas.

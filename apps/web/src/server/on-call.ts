@@ -31,12 +31,19 @@ const initialsOf = (name: string) => name.split(/\s+/).filter(Boolean).map((p) =
 /**
  * Today's on-call advisor per verified, active agency (Caracas weekday). Only fields already public on a listing's
  * contact panel: advisor name/avatar/verified tick, phone and WhatsApp (advisor's, else the agency's). Never emails.
- * `agencyId` restricts to one agency; `listingSlug` (a publicly served listing) puts its agency first.
+ * `agencyId` restricts to one agency; `listingSlug` (a publicly served listing) restricts to that listing's agency
+ * only, so a listing's Guardia never shows advisors of other agencies (unknown listing or owner-listed → []).
  */
 export async function onCallAdvisors(opts: { agencyId?: string; listingSlug?: string; now?: number | Date } = {}): Promise<OnCallAdvisor[]> {
   const now = opts.now ?? Date.now();
+  let agencyId = opts.agencyId;
+  if (opts.listingSlug) {
+    const l = await prisma.listing.findFirst({ where: { AND: [{ slug: opts.listingSlug }, publicWhere({ byLink: true })] }, select: { agencyId: true } });
+    if (!l?.agencyId || (agencyId && agencyId !== l.agencyId)) return [];
+    agencyId = l.agencyId;
+  }
   const agencies = await prisma.agency.findMany({
-    where: { verified: true, status: "ACTIVE", ...(opts.agencyId ? { id: opts.agencyId } : {}) },
+    where: { verified: true, status: "ACTIVE", ...(agencyId ? { id: agencyId } : {}) },
     select: { id: true, name: true, initials: true, color: true, phone: true, whatsapp: true, onCall: true },
     orderBy: { name: "asc" },
   });
@@ -47,11 +54,6 @@ export async function onCallAdvisors(opts: { agencyId?: string; listingSlug?: st
     where: { OR: today.map((t) => ({ agencyId: t.a.id, userId: t.userId })), role: { in: [...ON_CALL_ROLES] }, user: { suspended: false } },
     select: { agencyId: true, userId: true, verified: true, user: { select: { name: true, hue: true, phone: true } } },
   });
-  let first: string | null = null;
-  if (opts.listingSlug) {
-    const l = await prisma.listing.findFirst({ where: { AND: [{ slug: opts.listingSlug }, publicWhere({ byLink: true })] }, select: { agencyId: true } });
-    first = l?.agencyId ?? null;
-  }
   const out: OnCallAdvisor[] = [];
   for (const { a, userId } of today) {
     const m = members.find((x) => x.agencyId === a.id && x.userId === userId);
@@ -71,5 +73,5 @@ export async function onCallAdvisors(opts: { agencyId?: string; listingSlug?: st
       },
     });
   }
-  return first ? [...out.filter((o) => o.agency.id === first), ...out.filter((o) => o.agency.id !== first)] : out;
+  return out;
 }

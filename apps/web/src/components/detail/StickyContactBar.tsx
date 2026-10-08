@@ -6,12 +6,15 @@ import type { Locale } from "@/types/domain";
 import { tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import { WhatsAppIcon } from "@/components/brand/PublicChrome";
+import { useListingWhatsApp } from "./useListingWhatsApp";
 
 /**
  * Mobile-only bottom bar on the listing detail: price + "Request a tour" that jumps to the contact panel.
  * Hidden while the panel itself or the footer is on screen, so it never covers them.
  */
-export function StickyContactBar({ locale, price, suffix, tour, dark, whatsapp, agentFirst }: { locale: Locale; price: string; suffix: string; tour: boolean; dark?: boolean; whatsapp?: string | null; agentFirst?: string }) {
+export function StickyContactBar({ locale, price, suffix, tour, dark, whatsapp: waBase, agentFirst }: { locale: Locale; price: string; suffix: string; tour: boolean; dark?: boolean; whatsapp?: string | null; agentFirst?: string }) {
+  // Prefilled WhatsApp text carries this listing's URL.
+  const whatsapp = useListingWhatsApp(waBase);
   const [shown, setShown] = useState(true);
   useEffect(() => {
     const targets = [document.getElementById("contact"), document.querySelector("footer")].filter((el): el is HTMLElement => !!el);

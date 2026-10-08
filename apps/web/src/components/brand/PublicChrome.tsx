@@ -28,7 +28,7 @@ const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), selec
 
 /**
  * Guardia 24/7 dialog: today's on-call advisor per verified agency (Caracas weekday), with a visible phone number
- * (`tel:`) and WhatsApp. On a listing, that listing's agency comes first. Accessible modal: labelled, focus kept
+ * (`tel:`) and WhatsApp. On a listing (`listingSlug`), only that listing's agency is shown. Accessible modal: labelled, focus kept
  * inside, Esc / backdrop close, focus returns to the trigger. Portalled to <body> so no transformed parent clips it.
  */
 export function OnCallDialog({ locale, listingSlug, onClose }: { locale: Locale; listingSlug?: string; onClose: () => void }) {
@@ -95,7 +95,9 @@ export function OnCallDialog({ locale, listingSlug, onClose }: { locale: Locale;
           </button>
         </div>
         <p id={descId} className="mt-2 text-[15px] text-muted">
-          {tx(locale, "Cada agencia tiene a alguien disponible todos los días, también los fines de semana. Llama o escribe por WhatsApp, sin compromiso.", "Every agency has someone available every day, weekends included. Call or send a WhatsApp, no strings attached.")}
+          {listingSlug
+            ? tx(locale, "La agencia de esta casa tiene a alguien disponible todos los días, también los fines de semana. Llama o escribe por WhatsApp, sin compromiso.", "This home’s agency has someone available every day, weekends included. Call or send a WhatsApp, no strings attached.")
+            : tx(locale, "Cada agencia tiene a alguien disponible todos los días, también los fines de semana. Llama o escribe por WhatsApp, sin compromiso.", "Every agency has someone available every day, weekends included. Call or send a WhatsApp, no strings attached.")}
         </p>
         {q.isLoading && (
           <div className="mt-5 space-y-3" aria-label={tx(locale, "Un momento…", "One moment…")}>
@@ -108,7 +110,13 @@ export function OnCallDialog({ locale, listingSlug, onClose }: { locale: Locale;
             <button type="button" onClick={() => q.refetch()} className={cn("font-semibold underline underline-offset-4", ring)}>{tx(locale, "Intentar de nuevo", "Try again")}</button>
           </div>
         )}
-        {q.isSuccess && list.length === 0 && <p className="mt-5 rounded-2xl bg-white p-4 text-[15px] text-muted ring-1 ring-black/[.04]">{tx(locale, "Hoy no hay nadie de guardia. Escríbenos desde cualquier casa y te respondemos en horario de oficina.", "No one is on call today. Write to us from any home and we’ll reply during office hours.")}</p>}
+        {q.isSuccess && list.length === 0 && (
+          <p className="mt-5 rounded-2xl bg-white p-4 text-[15px] text-muted ring-1 ring-black/[.04]">
+            {listingSlug
+              ? tx(locale, "Hoy no hay nadie de guardia en esta agencia. Escríbele desde esta página y te responde en horario de oficina.", "No one at this agency is on call today. Write from this page and they’ll reply during office hours.")
+              : tx(locale, "Hoy no hay nadie de guardia. Escríbenos desde cualquier casa y te respondemos en horario de oficina.", "No one is on call today. Write to us from any home and we’ll reply during office hours.")}
+          </p>
+        )}
         {list.length > 0 && (
           <ul className="mt-5 space-y-3">
             {list.map((o, i) => (
@@ -193,6 +201,8 @@ export function FloatingContact({ href, label, whatsapp = false, tabbar = false,
     return () => io.disconnect();
   }, []);
   const external = /^https?:/.test(href);
+  // On a listing page the Guardia shows only that listing's agency (same as the contact panel's link).
+  const listingSlug = pathname?.match(/^\/(?:es|en)\/listing\/([^/?#]+)/)?.[1];
   return (
     <div
       aria-hidden={hidden || undefined}
@@ -204,6 +214,7 @@ export function FloatingContact({ href, label, whatsapp = false, tabbar = false,
     >
       <OnCallButton
         locale={locale}
+        listingSlug={listingSlug}
         tabIndex={hidden ? -1 : undefined}
         className="flex min-h-11 items-center gap-2 rounded-full bg-ivory/95 px-4 font-display text-sm font-semibold text-navy shadow-[0_0_0_1.5px_#1E1A18,0_10px_24px_rgba(30,26,24,.18)] backdrop-blur transition-colors duration-np hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy"
       >

@@ -232,11 +232,11 @@ test.describe("Cliente · regresiones de la revisión", () => {
     const send = page.getByRole("button", { name: "Enviar mensaje" });
     await expect(async () => {
       await send.click();
-      await expect(page.getByText("Nombre: Demasiado corto.")).toBeVisible({ timeout: 1000 });
+      await expect(page.getByText("Escribe tu nombre", { exact: true })).toBeVisible({ timeout: 1000 });
     }).toPass();
     await expect(page.getByRole("textbox", { name: "Nombre" })).not.toHaveValue("");
-    await expect(page.getByText("Nombre: Demasiado corto.")).toHaveCount(0);
-    await expect(page.getByText("Escribe un email válido.")).toHaveCount(0);
+    await expect(page.getByText("Escribe tu nombre", { exact: true })).toHaveCount(0);
+    await expect(page.getByText("Escribe un email válido", { exact: true })).toHaveCount(0);
     await page.getByRole("textbox", { name: "Mensaje" }).fill(`Consulta tras autocompletar ${stamp}`);
     await send.click();
     await expect(page.getByTestId("lead-done")).toBeVisible();
@@ -274,14 +274,16 @@ test.describe("Cliente · regresiones de la revisión", () => {
     await page.goto("/es/listing/los-palos-grandes-3h-118m-l5u136");
     const free = page.locator("button:not([disabled])", { hasText: /^\d\d:00$/ });
     await expect(free).toHaveCount(1);
-    // The day shown is the second one (selected style), and "Solicitar visita" is enabled with the free slot pre-chosen.
-    await expect(page.getByRole("button", { name: "Solicitar visita" })).toBeEnabled();
+    // The day shown is the second one (selected style). No time is pre-chosen: "Pedir visita" waits for a pick, then names it.
+    await expect(page.getByRole("button", { name: "Pedir visita", exact: true })).toBeDisabled();
+    await free.click();
+    await expect(page.getByRole("button", { name: /^Pedir visita · / })).toBeEnabled();
     // Going back to the fully booked day explains why nothing can be picked.
     // Visible text is the short day ("lun 6"); the full date follows for screen readers.
     const dayButtons = page.locator("button", { hasText: /^(lun|mar|mié|jue|vie|sáb|dom) \d+/ });
     await dayButtons.first().click();
     await expect(page.getByText("Ese día ya está completo. Prueba con otro.")).toBeVisible();
-    await expect(page.getByRole("button", { name: "Solicitar visita" })).toBeDisabled();
+    await expect(page.getByRole("button", { name: "Pedir visita", exact: true })).toBeDisabled();
   });
   test("sesión aún cargando: pulsar «Guardar búsqueda» no manda al login a un usuario ya autenticado", async ({ page }) => {
     await signIn(page, "seeker@gmail.com");

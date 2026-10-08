@@ -6,11 +6,16 @@ import { AppStateProvider } from "@/lib/store";
 import { isLocale } from "@/lib/i18n";
 import { DemoBar } from "@/components/layout/DemoBar";
 import { SwUpdate } from "@/components/layout/SwUpdate";
-import { SITE_URL } from "@/lib/seo";
+import { OG_IMAGE, SITE_URL, jsonLdHtml } from "@/lib/seo";
 import { fontVars } from "../fonts";
 import "../globals.css";
 
-export const viewport: Viewport = { themeColor: "#1E1A18", width: "device-width", initialScale: 1, viewportFit: "cover" };
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#F1EBE3" },
+    { media: "(prefers-color-scheme: dark)", color: "#15120F" },
+  ],
+  width: "device-width", initialScale: 1, viewportFit: "cover" };
 
 /** Applies the saved theme before first paint (no flash). */
 const THEME_SCRIPT = "try{if(localStorage.getItem('np-theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}";
@@ -36,9 +41,43 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     title: { default: title, template: "%s · New Place" },
     description,
     alternates: { canonical: `/${locale}`, languages: { es: "/es", en: "/en", "x-default": "/es" } },
-    openGraph: { type: "website", siteName: "New Place", locale: es ? "es_VE" : "en_US", title, description, url: `/${locale}`, images: [{ url: "/icons/og.png", width: 1200, height: 630 }] },
-    twitter: { card: "summary_large_image", title, description, images: ["/icons/og.png"] },
+    openGraph: { type: "website", siteName: "New Place", locale: es ? "es_VE" : "en_US", title, description, url: `/${locale}`, images: [OG_IMAGE] },
+    twitter: { card: "summary_large_image", title, description, images: [OG_IMAGE.url] },
   };
+}
+
+/** Site-wide structured data: the brand (a real-estate agent) and the site search box (sitelinks search). */
+function siteJsonLd(locale: string) {
+  const home = `${SITE_URL}/${locale}`;
+  const es = locale !== "en";
+  return [
+    {
+      "@context": "https://schema.org",
+      "@type": "RealEstateAgent",
+      "@id": `${SITE_URL}/#organization`,
+      name: "New Place",
+      url: home,
+      logo: `${SITE_URL}/icons/icon-512.png`,
+      image: `${SITE_URL}${OG_IMAGE.url}`,
+      description: es ? "Inmuebles verificados y de lujo en Venezuela." : "Verified and luxury real estate in Venezuela.",
+      areaServed: { "@type": "Country", name: "Venezuela" },
+      address: { "@type": "PostalAddress", addressCountry: "VE" },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "@id": `${SITE_URL}/#website`,
+      name: "New Place",
+      url: home,
+      inLanguage: es ? "es-VE" : "en",
+      publisher: { "@id": `${SITE_URL}/#organization` },
+      potentialAction: {
+        "@type": "SearchAction",
+        target: { "@type": "EntryPoint", urlTemplate: `${home}/search?q={search_term_string}` },
+        "query-input": "required name=search_term_string",
+      },
+    },
+  ];
 }
 
 export default async function LocaleLayout({ children, params }: { children: React.ReactNode; params: Promise<{ locale: string }> }) {
@@ -51,6 +90,7 @@ export default async function LocaleLayout({ children, params }: { children: Rea
     <html lang={locale} className={fontVars} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdHtml(siteJsonLd(locale)) }} />
       </head>
       <body className="min-h-screen">
         <NextIntlClientProvider>

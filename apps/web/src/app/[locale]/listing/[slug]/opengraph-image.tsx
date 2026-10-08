@@ -15,7 +15,7 @@ export default async function OgImage({ params }: { params: Promise<{ locale: Lo
   const title = l ? tx(locale, l.title_es, l.title_en) : "New Place";
   const price = l ? money(l.priceAmount, locale, l.priceCurrency) : "";
   const where = l ? `${l.zone} · ${l.city}` : "";
-  const facts = l ? [l.beds ? `${l.beds} ${tx(locale, "hab", "bd")}` : "", l.baths ? `${l.baths} ${tx(locale, "baños", "ba")}` : "", `${l.areaM2} m²`].filter(Boolean).join("  ·  ") : "";
+  const facts = l ? [l.beds ? `${l.beds} ${tx(locale, "hab", "bd")}` : "", l.baths ? `${l.baths} ${tx(locale, l.baths === 1 ? "baño" : "baños", "ba")}` : "", `${l.areaM2} m²`].filter(Boolean).join("  ·  ") : "";
   return new ImageResponse(
     (
       <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", background: "#1E1A18", color: "#F1EBE3", padding: 64, fontFamily: "serif" }}>

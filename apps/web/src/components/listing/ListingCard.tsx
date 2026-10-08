@@ -57,7 +57,7 @@ export function ListingCard({ l, locale, compact, className, showCompare }: { l:
       className={cn("group block rounded-[28px] bg-white/75 p-2 ring-1 ring-black/[.04] shadow-[0_1px_2px_rgba(30,26,24,.04),0_14px_34px_-14px_rgba(30,26,24,.18)] transition-[transform,box-shadow] duration-500 hover:-translate-y-1 hover:shadow-[0_2px_4px_rgba(30,26,24,.05),0_28px_50px_-18px_rgba(30,26,24,.28)]", className)}
     >
       <div className="relative aspect-[4/3] overflow-hidden rounded-[22px] bg-arena">
-        <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="h-full w-full transition-transform duration-700 ease-out group-hover:scale-[1.03]" label={tx(locale, l.title_es, l.title_en)} />
+        <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="h-full w-full transition-transform duration-700 ease-out group-hover:scale-[1.03]" label={`${tx(locale, l.title_es, l.title_en)}, ${l.zone}`} />
         <PhotoBadges l={l} locale={locale} />
         <SaveButton id={l.id} locale={locale} className="absolute right-2.5 top-2.5" />
         {/* Honest label for illustration-only listings (never a fake "1/8" photo counter). */}
@@ -95,7 +95,7 @@ export function MapPreviewCard({ l, locale }: { l: Listing; locale: Locale }) {
   return (
     <Link href={`/${locale}/listing/${l.slug}`} className="np-glass block overflow-hidden rounded-[24px] p-1.5">
       <div className="relative aspect-[16/9] overflow-hidden rounded-[18px] bg-arena">
-        <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="h-full w-full" />
+        <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="h-full w-full" label={`${tx(locale, l.title_es, l.title_en)}, ${l.zone}`} />
         <SaveButton id={l.id} locale={locale} className="absolute right-2 top-2" />
       </div>
       <div className="p-3.5">

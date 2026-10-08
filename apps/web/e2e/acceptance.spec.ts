@@ -32,12 +32,13 @@ test.describe.serial("Criterios de aceptación §15", () => {
     await expect(page.getByText("PlaceEstimate").first()).toBeVisible();
     await expect(page.getByText("Comparables usados")).toBeVisible();
     await page.getByRole("button", { name: "EN", exact: true }).first().click();
-    await expect(page.getByRole("heading", { name: /Bright penthouse/ })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 2, name: "Descripción" })).toBeVisible();
+    await expect(page.locator('p[lang="en"]', { hasText: /Bright penthouse/ })).toBeVisible();
     await page.getByLabel("Nombre").fill(`E2E Visitante ${stamp}`);
     await page.getByLabel("Email").fill(`e2e-${stamp}@example.com`);
     const slot = page.locator("button:not([disabled])", { hasText: /^\d\d:00$/ }).first();
     await slot.click();
-    await page.getByRole("button", { name: "Solicitar visita" }).click();
+    await page.getByRole("button", { name: /^Pedir visita · / }).click();
     await expect(page.getByTestId("lead-done")).toBeVisible();
   });
 
@@ -108,7 +109,7 @@ test.describe.serial("Criterios de aceptación §15", () => {
     const m = await r.json();
     expect(m.name).toBe("New Place");
     expect(m.display).toBe("standalone");
-    expect(m.theme_color).toBe("#1E1A18"); // Obsidiana (Palette A)
+    expect(m.theme_color).toBe("#F1EBE3"); // Cal (light-first)
     expect(m.id).toBe("/");
     // start_url lets the middleware pick the visitor's language (/es or /en)
     const start = await request.get(m.start_url);

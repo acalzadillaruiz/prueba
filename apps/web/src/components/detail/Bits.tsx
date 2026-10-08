@@ -20,7 +20,13 @@ export function BilingualBody({ l, locale, dark }: { l: Listing; locale: Locale;
         ))}
         <span className={cn("text-sm", dark ? "text-mist" : "text-muted")}>{tx(locale, "En español e inglés", "In Spanish and English")}</span>
       </div>
-      <h2 lang={lang} className="font-serif text-[26px] leading-tight">{lang === "es" ? l.title_es : l.title_en}</h2>
+      {/* The title is already the page's H1: this section is the description. */}
+      <h2 className="font-serif text-[26px] leading-tight">{tx(locale, "Descripción", "Description")}</h2>
+      {lang !== locale && (
+        <p lang={lang} className="mt-2 text-[17px] font-semibold">
+          {lang === "es" ? l.title_es : l.title_en}
+        </p>
+      )}
       <p lang={lang} className={cn("mt-3 max-w-[680px] text-[16px] leading-[1.75]", dark ? "text-ivory/80" : "text-ink/80")}>{lang === "es" ? l.body_es : l.body_en}</p>
     </div>
   );
@@ -35,7 +41,8 @@ export function PriceHistory({ events, locale, dark }: { events: PriceEvent[]; l
     SOLD: ["Vendido", "Sold"],
   };
   return (
-    <div className={cn("overflow-x-auto rounded-xl border", dark ? "border-navy-line" : "border-line bg-white")}>
+    // The scroller can take keyboard focus (to scroll on narrow screens), so it is a named region, not a bare div.
+    <div role="region" aria-label={tx(locale, "Historial de precio", "Price history")} tabIndex={0} className={cn("overflow-x-auto rounded-xl border focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink", dark ? "border-navy-line" : "border-line bg-white")}>
       <table className="w-full whitespace-nowrap text-sm">
         <tbody>
           {[...events].reverse().map((e, i, arr) => {

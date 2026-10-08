@@ -26,6 +26,17 @@ export function compactMoney(amount: number, _l?: Locale) {
   if (amount >= 1000) return `$${Math.round(amount / 1000)}k`;
   return `$${amount}`;
 }
+/**
+ * Short price in the same style as money() for that locale, for chips, pills and other tight spots:
+ * "USD 150k" / "USD 1,5M" (es, like "USD 150.000"), "$150k" / "$1.5M" (en, like "$150,000"); under 10 000 the
+ * exact amount ("USD 1.800", "$1,800").
+ * compactMoney() stays "$…" in both (map pins).
+ */
+export function shortMoney(amount: number, l: Locale) {
+  if (amount < 10_000) return money(amount, l); // rents: "USD 1.800", not a rounded "USD 2k"
+  const c = compactMoney(amount);
+  return l === "es" ? c.replace("$", "USD ").replace(".", ",") : c;
+}
 export function num(n: number, l: Locale) {
   return clean(new Intl.NumberFormat(l === "es" ? "es-VE" : "en-US").format(n));
 }

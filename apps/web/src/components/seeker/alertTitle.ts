@@ -1,5 +1,5 @@
 import type { Locale } from "@/types/domain";
-import { compactMoney } from "@/lib/i18n";
+import { shortMoney } from "@/lib/i18n";
 
 const t = (l: Locale, es: string, en: string) => (l === "es" ? es : en);
 
@@ -24,7 +24,7 @@ const KIND_TYPE: Record<string, [string, string]> = {
 
 /**
  * A saved search's filters (its URL query) as a sentence a person would say: "Alquiler amoblado en Altamira · 2+ hab ·
- * hasta $250k · últimos 7 días". The stored name is a machine join of chip labels; this is what the alerts list shows.
+ * hasta USD 250k · últimos 7 días". The stored name is a machine join of chip labels; this is what the alerts list shows.
  */
 export function alertTitle(query: string, hasPolygon: boolean, locale: Locale): string {
   const p = new URLSearchParams(query);
@@ -50,9 +50,9 @@ export function alertTitle(query: string, hasPolygon: boolean, locale: Locale): 
   if (beds) extra.push(t(locale, `${beds}+ hab`, `${beds}+ bd`));
   const min = Number(p.get("min"));
   const max = Number(p.get("max"));
-  if (min && max) extra.push(`${compactMoney(min)}–${compactMoney(max)}`);
-  else if (max) extra.push(t(locale, `hasta ${compactMoney(max)}`, `up to ${compactMoney(max)}`));
-  else if (min) extra.push(t(locale, `desde ${compactMoney(min)}`, `from ${compactMoney(min)}`));
+  if (min && max) extra.push(`${shortMoney(min, locale)}–${shortMoney(max, locale).replace("USD ", "")}`);
+  else if (max) extra.push(t(locale, `hasta ${shortMoney(max, locale)}`, `up to ${shortMoney(max, locale)}`));
+  else if (min) extra.push(t(locale, `desde ${shortMoney(min, locale)}`, `from ${shortMoney(min, locale)}`));
   if (p.get("pets")) extra.push(t(locale, "con mascotas", "pets OK"));
   if (p.get("sea")) extra.push(t(locale, "frente al mar", "by the sea"));
   const pub = p.get("pub");

@@ -34,3 +34,28 @@ for (const width of [390, 1024]) {
     }
   });
 }
+
+// Desktop 1280 (sidebar + 936 px of content): the capture queue and the listings table fit without a sideways scroll, so
+// no column hides under the actions column (which only pins while its table really overflows: [data-overflow]).
+test("panel de agencia a 1280px: Captación e Inmuebles sin scroll horizontal en sus tablas", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await demoLogin(page, /Dueño de agencia/);
+  for (const path of ["/es/agency/capture", "/es/agency/listings"]) {
+    await page.goto(path);
+    await page.waitForLoadState("networkidle");
+    await expect(page.locator("main table:visible").first(), `${path}: table`).toBeVisible();
+    const regions = await page.evaluate(() =>
+      [...document.querySelectorAll<HTMLElement>("main [data-scroll-region]")]
+        .filter((r) => r.offsetParent !== null)
+        .map((r) => {
+          const el = r.querySelector<HTMLElement>("[role=region]")!;
+          return { label: el.getAttribute("aria-label"), sw: el.scrollWidth, cw: el.clientWidth, pinned: r.hasAttribute("data-overflow") };
+        }),
+    );
+    expect(regions.length, `${path}: table regions`).toBeGreaterThan(0);
+    for (const r of regions) {
+      expect(r.sw, `${path} · ${r.label}: ${r.sw} > ${r.cw}`).toBeLessThanOrEqual(r.cw + 1);
+      expect(r.pinned, `${path} · ${r.label}: data-overflow`).toBe(false);
+    }
+  }
+});

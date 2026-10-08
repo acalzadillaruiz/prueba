@@ -7,19 +7,21 @@ import { cn } from "@/lib/cn";
  * Horizontally scrolling box for wide tables: a named region that takes keyboard focus while it actually scrolls
  * (axe "scrollable-region-focusable": arrow keys move it), with soft fades on the edge(s) that hide more columns.
  * `className` styles the outer frame (card, `hidden md:block`…); `fade={false}` for tables whose last column is
- * already sticky (np-sticky-last) so the fade never washes over the actions.
+ * sticky (np-sticky-last) so the right fade never washes over the actions (the left fade stays).
+ * While the content is actually wider than the box the root carries `data-overflow`: CSS keys on it, so
+ * `[data-overflow] .np-sticky-last` pins the actions column only when there is something to scroll under it.
  */
 export function ScrollRegion({ label, className, fade = true, children, scrollRef }: { label: string; className?: string; fade?: boolean; children: ReactNode; /** The scrolling element (e.g. to scroll a calendar to "now"). */ scrollRef?: Ref<HTMLDivElement> }) {
   const inner = useRef<HTMLDivElement | null>(null);
-  const [edge, setEdge] = useState({ l: false, r: false });
+  const [edge, setEdge] = useState({ l: false, r: false, o: false });
   useEffect(() => {
     const el = inner.current;
     if (!el) return;
     const update = () => {
       const max = el.scrollWidth - el.clientWidth;
       setEdge((cur) => {
-        const next = { l: el.scrollLeft > 1, r: el.scrollLeft < max - 1 };
-        return cur.l === next.l && cur.r === next.r ? cur : next;
+        const next = { l: el.scrollLeft > 1, r: el.scrollLeft < max - 1, o: max > 1 };
+        return cur.l === next.l && cur.r === next.r && cur.o === next.o ? cur : next;
       });
     };
     update();
@@ -32,14 +34,14 @@ export function ScrollRegion({ label, className, fade = true, children, scrollRe
       ro?.disconnect();
     };
   }, []);
-  const scrollable = edge.l || edge.r;
+  const scrollable = edge.o;
   const setRef = (node: HTMLDivElement | null) => {
     inner.current = node;
     if (typeof scrollRef === "function") scrollRef(node);
     else if (scrollRef) (scrollRef as { current: HTMLDivElement | null }).current = node;
   };
   return (
-    <div className={cn("relative overflow-hidden", className)} data-scroll-region>
+    <div className={cn("relative overflow-hidden", className)} data-scroll-region data-overflow={edge.o ? "" : undefined}>
       <div
         ref={setRef}
         role="region"
@@ -49,12 +51,8 @@ export function ScrollRegion({ label, className, fade = true, children, scrollRe
       >
         {children}
       </div>
-      {fade && (
-        <>
-          <span aria-hidden className={cn("pointer-events-none absolute inset-y-0 left-0 w-6 bg-gradient-to-r from-white to-transparent transition-opacity duration-np dark:from-navy-card", edge.l ? "opacity-100" : "opacity-0")} />
-          <span aria-hidden className={cn("pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-white to-transparent transition-opacity duration-np dark:from-navy-card", edge.r ? "opacity-100" : "opacity-0")} />
-        </>
-      )}
+      <span aria-hidden className={cn("pointer-events-none absolute inset-y-0 left-0 w-6 bg-gradient-to-r from-white to-transparent transition-opacity duration-np dark:from-navy-card", edge.l ? "opacity-100" : "opacity-0")} />
+      {fade && <span aria-hidden className={cn("pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-white to-transparent transition-opacity duration-np dark:from-navy-card", edge.r ? "opacity-100" : "opacity-0")} />}
     </div>
   );
 }

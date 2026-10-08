@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { usePathname } from "next/navigation";
-import { FlaskConical, LogIn } from "lucide-react";
+import { ChevronDown, FlaskConical, LogIn } from "lucide-react";
 import type { Locale } from "@/types/domain";
 import { useApp } from "@/lib/store";
 import { Avatar } from "@/components/ui";
@@ -25,13 +25,13 @@ export function DemoBar({ locale }: { locale: Locale }) {
   // The gate page can't use the demo login (the API needs the preview cookie first), so the pill is pointless there.
   const gate = /^\/(es|en)\/acceso\/?$/.test(path);
   if (!visible || gate) return null;
-  // Back-office below lg: its own bottom bar (Panel · Inmuebles · Leads · Calendario · Más) owns the screen's foot, so
-  // the demo switch is a slim tab on the LEFT edge just above that bar: it covers only the page gutter (the lists'
-  // badges and actions sit on the right, their checkboxes start past the gutter), never the bar. From lg the switch
-  // is docked in the sidebar footer instead (DemoSidebarItem): a floating pill there covered the footer and table rows.
+  // Back-office below lg. Agency pages have their own bottom bar (Panel · Inmuebles · Leads · Calendario · Más): the demo
+  // switch is a row in the "Más" sheet there (DemoSheetItem), so nothing floats over the cards; this tab hides itself
+  // whenever that bar is on the page. Elsewhere (platform console, agency pages without the bar) it is a slim tab on the
+  // LEFT edge, bottom corner, over the page gutter only. From lg it is docked in the sidebar footer (DemoSidebarItem).
   if (admin)
     return (
-      <div className="fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom))] left-0 z-50 print:hidden lg:hidden" data-demobar data-demobar-admin>
+      <div className="fixed bottom-[calc(1rem+env(safe-area-inset-bottom))] left-0 z-50 print:hidden lg:hidden [body:has([data-agency-tabbar])_&]:hidden" data-demobar data-demobar-admin>
         {open && (
           <div className="absolute bottom-full left-2 mb-2">
             <div className="np-in max-h-[70svh] w-64 overflow-y-auto rounded-np border border-navy-line bg-navy py-1 text-ivory shadow-np">
@@ -84,6 +84,30 @@ export function DemoSidebarItem({ locale }: { locale: Locale }) {
       <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label={tx(locale, "Modo demo: entrar como…", "Demo mode: sign in as…")} className="flex w-full items-center gap-3 rounded-lg px-4 py-2 text-[13px] text-ivory/65 hover:bg-white/[.04] hover:text-ivory">
         <FlaskConical size={15} strokeWidth={1.6} className="text-[#C9A574]" aria-hidden /> {tx(locale, "Demo · cambiar de rol", "Demo · switch role")}
       </button>
+    </div>
+  );
+}
+
+/**
+ * Agency "Más" sheet (phones/tablets): the demo switch as one more row, expanding the role list in place on a navy
+ * card. Replaces the floating tab on panel pages, which sat over the cards at the left edge.
+ */
+export function DemoSheetItem({ locale, rowClass, onDone }: { locale: Locale; rowClass: string; onDone?: () => void }) {
+  const [open, setOpen] = useState(false);
+  const visible = useDemoVisible();
+  if (!visible) return null;
+  return (
+    <div className="print:hidden" data-demobar-sheet>
+      <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} className={rowClass}>
+        <FlaskConical size={18} strokeWidth={1.6} className="text-gold-text dark:text-[#C9A574]" aria-hidden />
+        <span className="flex-1">{tx(locale, "Demo · cambiar de rol", "Demo · switch role")}</span>
+        <ChevronDown size={16} aria-hidden className={open ? "rotate-180 transition-transform" : "transition-transform"} />
+      </button>
+      {open && (
+        <div className="np-in mx-1 mb-1 rounded-np border border-navy-line bg-navy py-1 text-ivory">
+          <DemoLoginList locale={locale} onDone={onDone} className="p-1" />
+        </div>
+      )}
     </div>
   );
 }

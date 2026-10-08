@@ -268,6 +268,36 @@ test.describe("Cliente · regresiones de la revisión", () => {
     expect((await term.boundingBox())!.y).toBeLessThan((await value.boundingBox())!.y);
   });
 
+  test("comparador: no es un callejón sin salida («Ver ficha» abre la casa, «Pedir visita» su tarjeta de contacto)", async ({ page }) => {
+    const some = await apiAs(page, "GET", "listings?type=SALE&take=2");
+    const items = some.json.items as { id: string; slug: string; title_es: string }[];
+    expect(items).toHaveLength(2);
+    await page.goto(`/es/compare?ids=${items.map((l) => l.id).join(",")}`);
+    const table = page.getByRole("table");
+    // One distinct "best" mark (a pill), never a second ✓ next to a yes/no value.
+    await expect(table.locator("[data-compare-best]").first()).toHaveText("Mejor");
+    const visit = table.getByRole("link", { name: `Pedir visita: «${items[1].title_es}»` });
+    await expect(visit).toHaveAttribute("href", `/es/listing/${items[1].slug}#contact`);
+    await table.getByRole("link", { name: `Ver ficha: «${items[0].title_es}»` }).click();
+    await expect(page).toHaveURL(new RegExp(`/es/listing/${items[0].slug}$`));
+    await expect(page.getByRole("heading", { level: 1, name: items[0].title_es })).toBeVisible();
+  });
+  test("comparador en móvil: la fila fija trae precio corto y acciones con el nombre de la casa", async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 780 });
+    const some = await apiAs(page, "GET", "listings?type=SALE&take=3");
+    const items = some.json.items as { id: string; slug: string; title_es: string }[];
+    await page.goto(`/es/compare?ids=${items.map((l) => l.id).join(",")}`);
+    const stack = page.locator("[data-compare-stack]");
+    await expect(stack.locator("[data-compare-actions]").getByRole("link", { name: `Ver ficha: «${items[2].title_es}»` })).toBeVisible();
+    await page.mouse.wheel(0, 900);
+    const pinned = page.locator('[data-compare-pinned="on"]');
+    await expect(pinned).toBeVisible();
+    // Compact price ("USD 118k"), never cut ("USD 1…").
+    for (const t of await pinned.locator(".np-num").allTextContents()) expect(t).toMatch(/^USD [\d.,]+[kM]?(\/[nm])?$/);
+    await expect(pinned.getByRole("link", { name: `Ver ficha: «${items[0].title_es}»` })).toHaveAttribute("href", `/es/listing/${items[0].slug}`);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(360);
+  });
+
   test("móvil: la búsqueda abre en lista y la hoja «Filtros» se cierra con «Ver N casas»", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/es/search?type=LONG_RENT");

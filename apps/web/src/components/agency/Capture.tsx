@@ -7,10 +7,11 @@ import { AlertTriangle, Building2, CheckCircle2, ExternalLink, Fingerprint, Load
 import type { CaptureLead, Locale, Zone } from "@/types/domain";
 import { AdminShell } from "@/components/layout/AdminShell";
 import { Button, Field } from "@/components/ui";
+import { PriceInput } from "@/components/ui/PriceInput";
 import { Chip, Pill, k } from "./kit";
 import { ScrollRegion } from "./ScrollRegion";
 import { api, type ApiClientError } from "@/lib/api";
-import { TYPE_LABEL, lbl, money, tx } from "@/lib/i18n";
+import { TYPE_LABEL, lbl, money, num, tx } from "@/lib/i18n";
 import { TimeAgo } from "@/components/owner/TimeAgo";
 import { cn } from "@/lib/cn";
 
@@ -121,7 +122,9 @@ export function CaptureView({ locale, rows: initialRows, zones, titles, canConve
   return (
     <AdminShell locale={locale} area="agency" title={tx(locale, "Cola de captación", "Capture queue")}>
       {rowErr && <div role="alert" className={cn("mb-4", k.err)}>{rowErr}</div>}
-      <div className="grid gap-6 [&>*]:min-w-0 xl:grid-cols-[1fr_380px]">
+      {/* The queue table needs ≈640 px: the form sits beside it only from 1400 px (sidebar + 340 px form leave room);
+          below that it stacks under the table, laid out in two columns. */}
+      <div className="grid gap-6 [&>*]:min-w-0 min-[1400px]:grid-cols-[minmax(0,1fr)_340px]">
         {/* Phones: one card per capture (full address, owner, figures and actions); tablets and up keep the table. */}
         <ul className="space-y-3 self-start md:hidden" aria-label={tx(locale, "Cola de captación", "Capture queue")} data-testid="capture-cards">
           {rows.map((c) => (
@@ -156,28 +159,30 @@ export function CaptureView({ locale, rows: initialRows, zones, titles, canConve
           {rows.length === 0 && <li className={cn(k.card, "px-4 py-10 text-center", k.muted)}>{tx(locale, "La cola está vacía. Registra la primera captación con el formulario.", "The queue is empty. Log the first capture with the form.")}</li>}
         </ul>
         <ScrollRegion fade={false} label={tx(locale, "Cola de captación", "Capture queue")} className={cn("hidden self-start md:block", k.card)}>
-          <table className="np-sticky-last w-full min-w-[860px] text-sm">
+          <table className="np-sticky-last w-full min-w-[640px] text-sm">
             <thead className={cn("border-b text-left", k.line, k.th)}>
-              <tr><th className="px-4 py-3">{tx(locale, "Dirección", "Address")}</th><th className="px-3 py-3">{tx(locale, "Dueño", "Owner")}</th><th className="px-3 py-3 text-right">m²</th><th className="px-3 py-3 text-right">{tx(locale, "Pide", "Asking")}</th><th className="px-3 py-3">{tx(locale, "Resultado", "Result")}</th><th className="px-3 py-3" /></tr>
+              <tr><th className="px-4 py-3">{tx(locale, "Dirección", "Address")}</th><th className="px-3 py-3 text-right">{tx(locale, "Pide", "Asking")}</th><th className="px-3 py-3">{tx(locale, "Resultado", "Result")}</th><th className="px-3 py-3"><span className="sr-only">{tx(locale, "Acciones", "Actions")}</span></th></tr>
             </thead>
             <tbody>
               {rows.map((c) => (
                 <Fragment key={c.id}>
                 <tr className={cn("border-t align-top first:border-t-0", k.line)}>
-                  <td className="px-4 py-3">
-                    <div className="font-semibold">{c.address}</div>
+                  <td className="min-w-[220px] px-4 py-3">
+                    <div className="font-semibold [overflow-wrap:anywhere]">{c.address}</div>
                     <div className={cn("text-xs", k.muted)}>{c.zone} · <TimeAgo iso={c.createdAt} locale={locale} /></div>
-                    {c.duplicateOf && <div className={cn("mt-1 flex items-center gap-1 text-xs font-semibold", k.warnText)}><Fingerprint size={12} /> = {titles[c.duplicateOf] ?? c.duplicateOf}</div>}
+                    <div className="mt-1 text-xs [overflow-wrap:anywhere]"><span className="font-semibold">{c.ownerName}</span> <span className={k.muted}>· {c.phone}</span></div>
+                    {c.duplicateOf && <div className={cn("mt-1 flex items-center gap-1 text-xs font-semibold", k.warnText)}><Fingerprint size={12} className="shrink-0" /> <span className="min-w-0 [overflow-wrap:anywhere]">= {titles[c.duplicateOf] ?? c.duplicateOf}</span></div>}
                   </td>
-                  <td className="px-3 py-3"><div>{c.ownerName}</div><div className={cn("text-xs", k.muted)}>{c.phone}</div></td>
-                  <td className="px-3 py-3 text-right">{c.areaM2}</td>
-                  <td className={cn("whitespace-nowrap px-3 py-3 text-right tracking-normal", k.num)}>{money(c.askingPrice, locale)}</td>
+                  <td className="px-3 py-3 text-right">
+                    <div className={cn("whitespace-nowrap tracking-normal", k.num)}>{money(c.askingPrice, locale)}</div>
+                    <div className={cn("whitespace-nowrap text-xs", k.muted)}>{num(c.areaM2, locale)} m²</div>
+                  </td>
                   <td className="px-3 py-3"><Pill tone={TONE[c.result]}>{label[c.result]}</Pill></td>
                   <td className="px-3 py-3">{actions(c)}</td>
                 </tr>
                 {converting?.id === c.id && (
                   <tr className={k.soft}>
-                    <td colSpan={6} className="px-4 py-3">
+                    <td colSpan={4} className="px-4 py-3">
                       {convertPanel(c)}
                     </td>
                   </tr>
@@ -185,7 +190,7 @@ export function CaptureView({ locale, rows: initialRows, zones, titles, canConve
                 </Fragment>
               ))}
               {rows.length === 0 && (
-                <tr><td colSpan={6} className={cn("px-4 py-10 text-center", k.muted)}>{tx(locale, "La cola está vacía. Registra la primera captación con el formulario.", "The queue is empty. Log the first capture with the form.")}</td></tr>
+                <tr><td colSpan={4} className={cn("px-4 py-10 text-center", k.muted)}>{tx(locale, "La cola está vacía. Registra la primera captación con el formulario.", "The queue is empty. Log the first capture with the form.")}</td></tr>
               )}
             </tbody>
           </table>
@@ -209,8 +214,8 @@ export function CaptureView({ locale, rows: initialRows, zones, titles, canConve
           }}
         >
           <h2 className={k.title}>{tx(locale, "Nueva captación", "New capture")}</h2>
-          <div className="mt-3 space-y-3">
-            <Field label={tx(locale, "Dirección", "Address")}><input required minLength={5} className={k.input} value={f.address} onChange={(e) => setF({ ...f, address: e.target.value })} /></Field>
+          <div className="mt-3 grid gap-3 md:grid-cols-2 min-[1400px]:grid-cols-1">
+            <div className="md:col-span-2 min-[1400px]:col-span-1"><Field label={tx(locale, "Dirección", "Address")}><input required minLength={5} className={k.input} value={f.address} onChange={(e) => setF({ ...f, address: e.target.value })} /></Field></div>
             <Field label={tx(locale, "Zona", "Area")}>
               <select className={k.input} value={f.zone} onChange={(e) => setF({ ...f, zone: e.target.value })}>
                 {zones.map((z) => <option key={z.slug}>{z.name}</option>)}
@@ -223,7 +228,7 @@ export function CaptureView({ locale, rows: initialRows, zones, titles, canConve
             </Field>
             <div className="grid grid-cols-2 gap-2">
               <Field label="m²"><input className={k.input} type="number" min={1} value={f.areaM2} onChange={(e) => setF({ ...f, areaM2: +e.target.value })} /></Field>
-              <Field label={tx(locale, "Precio pedido", "Asking")}><input className={k.input} type="number" min={1} value={f.askingPrice} onChange={(e) => setF({ ...f, askingPrice: +e.target.value })} /></Field>
+              <Field label={tx(locale, "Precio pedido (USD)", "Asking price (USD)")}><PriceInput locale={locale} className={k.input} required value={f.askingPrice} onChange={(askingPrice) => setF({ ...f, askingPrice })} /></Field>
             </div>
             <div className="grid grid-cols-2 gap-2">
               <Field label={tx(locale, "Dueño", "Owner")}><input required minLength={2} className={k.input} value={f.ownerName} onChange={(e) => setF({ ...f, ownerName: e.target.value })} /></Field>
@@ -238,7 +243,7 @@ export function CaptureView({ locale, rows: initialRows, zones, titles, canConve
             </div>
           )}
           {err && <div role="alert" className={cn("mt-3", k.err)}>{err}</div>}
-          <Button className={cn("mt-4 w-full", k.primary)} disabled={busy}>{busy ? <Loader2 size={15} className="animate-spin" /> : <Plus size={15} />} {dup ? tx(locale, "Registrar como duplicado", "Log as duplicate") : tx(locale, "Añadir a la cola", "Add to queue")}</Button>
+          <Button className={cn("mt-4 w-full md:w-auto min-[1400px]:w-full", k.primary)} disabled={busy}>{busy ? <Loader2 size={15} className="animate-spin" /> : <Plus size={15} />} {dup ? tx(locale, "Registrar como duplicado", "Log as duplicate") : tx(locale, "Añadir a la cola", "Add to queue")}</Button>
           <div className="mt-3 flex gap-2"><Chip>{tx(locale, "1 inmueble = 1 unidad física", "1 listing = 1 physical unit")}</Chip></div>
         </form>
       </div>

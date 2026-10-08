@@ -36,3 +36,18 @@ export async function zoneStats(zone: string) {
     live: sale.length >= 2 || rent.length >= 2,
   };
 }
+
+/**
+ * Platform-wide median days on market, same definition as the listing page ("N días en New Place"), the area report
+ * above and the agency reports: days since publication of every public listing still available today. null with
+ * fewer than 2 samples (the caller then shows generic copy instead of a number).
+ */
+export async function platformDaysOnMarket(): Promise<number | null> {
+  const rows = await prisma.listing.findMany({
+    where: { AND: [publicWhere(), { status: { in: ["ACTIVE", "COMING_SOON", "UNDER_OFFER"] } }, { publishedAt: { not: null } }] },
+    select: { publishedAt: true },
+  });
+  const now = Date.now();
+  const dom = rows.map((r) => (now - r.publishedAt!.getTime()) / 864e5);
+  return dom.length >= 2 ? Math.round(median(dom)!) : null;
+}

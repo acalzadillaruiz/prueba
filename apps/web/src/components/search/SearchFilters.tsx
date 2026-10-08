@@ -3,7 +3,7 @@
 import { useEffect, useId, useRef, type ReactNode, type RefObject } from "react";
 import { ChevronDown, Loader2, X } from "lucide-react";
 import type { Amenity, Locale } from "@/types/domain";
-import { AMENITY_LABEL, compactMoney, lbl, money, num, plural, tx } from "@/lib/i18n";
+import { AMENITY_LABEL, lbl, money, shortMoney, num, plural, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import { TANK_STEPS, type EssentialsFilters } from "@/lib/essentials";
 
@@ -79,11 +79,11 @@ export const pill = "flex h-11 md:h-10 shrink-0 items-center gap-1.5 rounded-ful
 export const on = "np-sel border-2 px-[15px]";
 const sectionTitle = "mb-2.5 block text-xs font-semibold uppercase tracking-wide text-muted";
 
-/** "Precio" / "Hasta $400k" / "$150k – $400k" / "Desde $1M": what the price button says. */
+/** "Precio" / "Hasta USD 400k" / "USD 150k – USD 400k" / "Desde USD 1M" (en: "Up to $400k"…): what the price button says. Same currency style as the cards. */
 export function priceLabel(locale: Locale, min?: number, max?: number) {
-  if (min && max) return `${compactMoney(min, locale)} – ${compactMoney(max, locale)}`;
-  if (max) return tx(locale, `Hasta ${compactMoney(max, locale)}`, `Up to ${compactMoney(max, locale)}`);
-  if (min) return tx(locale, `Desde ${compactMoney(min, locale)}`, `From ${compactMoney(min, locale)}`);
+  if (min && max) return `${shortMoney(min, locale)} – ${shortMoney(max, locale).replace("USD ", "")}`; // "USD 150k – 400k"
+  if (max) return tx(locale, `Hasta ${shortMoney(max, locale)}`, `Up to ${shortMoney(max, locale)}`);
+  if (min) return tx(locale, `Desde ${shortMoney(min, locale)}`, `From ${shortMoney(min, locale)}`);
   return tx(locale, "Precio", "Price");
 }
 

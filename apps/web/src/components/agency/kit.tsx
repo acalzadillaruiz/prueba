@@ -9,6 +9,13 @@ import { cn } from "@/lib/cn";
  * Every class carries its dark-mode twin (navy surfaces #2A2420, accent #C9A574) for the theme toggle.
  * Terracotta is reserved for the single main action of a view: never in charts, chips or data.
  */
+/**
+ * Five KPI cards without orphans: phones 2+2+1 with the fifth spanning the row, lg 3+2 on a 6-track grid (top three
+ * span 2, bottom two span 3), xl one row of five.
+ */
+export const kpiGrid5 =
+  "grid grid-cols-2 gap-3 sm:gap-4 [&>*]:min-w-0 [&>:nth-child(5)]:col-span-2 lg:grid-cols-6 lg:[&>*]:col-span-2 lg:[&>:nth-child(n+4)]:col-span-3 xl:grid-cols-5 xl:[&>*]:col-span-1 xl:[&>:nth-child(n+4)]:col-span-1";
+
 export const k = {
   /** White card, radius 18, soft navy shadow. */
   /** Last table column stays in view (actions never hide behind a horizontal scroll). */

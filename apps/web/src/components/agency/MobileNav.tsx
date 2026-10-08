@@ -8,6 +8,7 @@ import type { Locale } from "@/types/domain";
 import { tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import { Count, k } from "./kit";
+import { DemoSheetSlot } from "@/components/layout/DemoBarSlot";
 
 export type MobileNavItem = { href: string; icon: React.ElementType; label: string; active: boolean; badge?: number };
 
@@ -90,6 +91,7 @@ export function AgencyMobileNav({
     <>
       <nav
         aria-label={tx(locale, "Secciones", "Sections")}
+        data-agency-tabbar
         className="fixed inset-x-0 bottom-0 z-30 border-t border-[#ECE6DA] bg-white/95 shadow-[0_-8px_24px_rgba(30,26,24,.08)] backdrop-blur lg:hidden dark:border-white/10 dark:bg-[#1E1A18]/95"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
@@ -192,6 +194,7 @@ export function AgencyMobileNav({
               <div className={cn("mt-4 border-t pt-2", k.line)}>
                 <Link href={`/${locale}`} onClick={() => setOpenAt(null)} className={sheetRow}><ExternalLink size={18} strokeWidth={1.6} aria-hidden /> {tx(locale, "Ver sitio público", "View public site")}</Link>
                 {superadmin && <Link href={`/${locale}/platform`} onClick={() => setOpenAt(null)} className={sheetRow}><ClipboardList size={18} strokeWidth={1.6} aria-hidden /> Platform</Link>}
+                <DemoSheetSlot locale={locale} rowClass={sheetRow} onDone={() => setOpenAt(null)} />
                 <button type="button" onClick={onLogout} className={sheetRow}><LogOut size={18} strokeWidth={1.6} aria-hidden /> {tx(locale, "Cerrar sesión", "Sign out")}</button>
               </div>
             </div>

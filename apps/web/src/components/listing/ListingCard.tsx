@@ -132,7 +132,8 @@ export function ListingCard({ l, locale, compact, className, compareToggle }: { 
           </div>
           {!compact && <span className="shrink-0 text-sm text-muted">{lbl(TYPE_LABEL[l.listingType], locale)}</span>}
         </div>
-        <div className="mt-2.5 line-clamp-1 text-[15px] font-semibold text-ink">
+        {/* Two lines (3 columns at 1280 cut most titles at one); from md the grid reserves both lines so cards in a row stay aligned. */}
+        <div className="mt-2.5 line-clamp-2 text-[15px] font-semibold leading-snug text-ink md:min-h-[2.75em]">
           <Link
             href={href}
             aria-describedby={metaId}

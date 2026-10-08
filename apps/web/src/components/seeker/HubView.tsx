@@ -17,6 +17,7 @@ import { cn } from "@/lib/cn";
 import { HubMessages, type HubThread } from "./HubMessages";
 import { HubOffers, type HubOffer } from "./HubOffers";
 import { HubSectionNav } from "./HubSectionNav";
+import { alertTitle, isMachineName } from "./alertTitle";
 
 type HubTour = Tour & { agentName: string; agentHue: number };
 
@@ -27,7 +28,8 @@ export interface HubData {
   requests: Lead[];
   listings: Listing[];
   savedIds: string[];
-  searches: { id: string; name: string; newCount: number }[];
+  /** `query`/`polygon` let machine-made names be shown as a sentence in the viewer's language (like /alerts). */
+  searches: { id: string; name: string; query: string; polygon?: unknown; newCount: number }[];
   threads: HubThread[];
   offers: HubOffer[];
   /** Listings the buyer can bid on (lead or tour, still available). */
@@ -251,7 +253,7 @@ export function HubView({ locale, data, emailOn = false }: { locale: Locale; dat
             {SAVED_SEARCHES.length === 0 && <p className="mt-3 text-sm text-muted">{tx(locale, "Guarda una búsqueda en el mapa y te avisaremos en cuanto aparezca algo para ti.", "Save a search on the map and we’ll let you know as soon as something fits.")}</p>}
             {SAVED_SEARCHES.map((s) => (
               <div key={s.id} className="mt-3 flex items-center justify-between gap-2 text-sm">
-                <span className="line-clamp-1">{s.name}</span>
+                <span className="line-clamp-1">{isMachineName(s.name) ? alertTitle(s.query, !!s.polygon, locale) : s.name}</span>
                 {s.newCount > 0 && <Badge className="bg-[#E6DDD2] text-navy dark:bg-white/10">+{s.newCount}</Badge>}
               </div>
             ))}

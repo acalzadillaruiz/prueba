@@ -10,7 +10,7 @@ import type { Agency, Listing, Locale, User } from "@/types/domain";
 import { AdminShell } from "@/components/layout/AdminShell";
 import { PropertyArt } from "@/components/art/PropertyArt";
 import { Button, Field } from "@/components/ui";
-import { Chip, Count, Initials, Kpi, Panel, Pill, StatusPill, k } from "./kit";
+import { Chip, Count, Initials, Kpi, Panel, Pill, StatusPill, k, kpiGrid5 } from "./kit";
 import { ScrollRegion } from "./ScrollRegion";
 import { BarChart } from "./charts";
 import { useApp } from "@/lib/store";
@@ -66,7 +66,7 @@ export function PlatformHome({ locale, data }: { locale: Locale; data: PlatformH
   const delta = data.leadsPrev7d ? Math.round(((data.leads7d - data.leadsPrev7d) / data.leadsPrev7d) * 100) : 0;
   return (
     <AdminShell locale={locale} area="platform" title={tx(locale, "Métricas globales", "Global metrics")}>
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-5 [&>*]:min-w-0">
+      <div className={kpiGrid5}>
         <Kpi label={tx(locale, "Agencias", "Agencies")} value={data.agencies.length} hint={`${data.agencies.filter((a) => a.status === "TRIAL").length} ${tx(locale, "en prueba", "on trial")}`} />
         <Kpi label={tx(locale, "Usuarios", "Users")} value={num(data.users, locale)} hint={tx(locale, "registrados", "registered")} />
         <Kpi label={tx(locale, "Inmuebles activos", "Active listings")} value={data.activeListings} hint={tx(locale, "en el buscador", "in search")} />
@@ -93,7 +93,8 @@ export function PlatformHome({ locale, data }: { locale: Locale; data: PlatformH
           </ul>
         </Panel>
       </div>
-      <div className="mt-6 grid gap-6 [&>*]:min-w-0 xl:grid-cols-2">
+      {/* Short agency list beside the long audit feed: narrower track and no stretch, so no empty white block. */}
+      <div className="mt-6 grid gap-6 [&>*]:min-w-0 xl:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] xl:items-start">
         <Panel title={tx(locale, "Agencias", "Agencies")} action={<Link href={`/${locale}/platform/agencies`} className={cn("pt-2 text-[14px]", k.link)}>{tx(locale, "Gestionar", "Manage")}</Link>}>
           <ul className={cn("divide-y", k.divide)}>
             {data.agencies.map((a) => (

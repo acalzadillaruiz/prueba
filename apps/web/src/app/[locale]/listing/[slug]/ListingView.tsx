@@ -206,13 +206,16 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
                 {/* Desktop: aligned to the title's baseline, but never higher than the title's own top margin: with a one-line
                     title the price block is the taller one, and it used to climb into the Compare/Share row. */}
                 <div className="mt-7 shrink-0 lg:mt-5 lg:pt-1 lg:text-right">
-                  <div className="font-serif text-[48px] font-semibold leading-none text-ink md:text-[54px] lg:whitespace-nowrap">
-                    {money(l.priceAmount, locale)}
-                    <span className="font-display text-lg font-normal text-muted">{priceSuffix(l, locale)}</span>
+                  {/* Fluid size + nowrap: "USD 118.000" never breaks after the currency at 360 px. */}
+                  <div className="font-serif text-[clamp(34px,11vw,48px)] font-semibold leading-none text-ink md:text-[54px] lg:whitespace-nowrap" data-testid="listing-price">
+                    <span className="whitespace-nowrap">{money(l.priceAmount, locale)}</span>
+                    <span className="whitespace-nowrap font-display text-lg font-normal text-muted">{priceSuffix(l, locale)}</span>
                   </div>
                   <div className="mt-1.5 text-[15px] text-muted">
                     {stayTerms && <div className="font-semibold text-ink" data-testid="stay-terms">{stayTerms}</div>}
-                    {ppm ? `${money(ppm, locale)} / m² · ` : ""}≈ Bs. {num(Math.round(l.priceAmount * ves), locale)} · € {num(Math.round(l.priceAmount * eur), locale)} <span>({tx(locale, "tasa referencial", "reference rate")})</span>
+                    {ppm ? <><span className="whitespace-nowrap">{money(ppm, locale)} / m²</span> · </> : ""}
+                    <span className="whitespace-nowrap">≈ Bs. {num(Math.round(l.priceAmount * ves), locale)}</span> · <span className="whitespace-nowrap">€ {num(Math.round(l.priceAmount * eur), locale)}</span>{" "}
+                    <span className="whitespace-nowrap">({tx(locale, "tasa referencial", "reference rate")})</span>
                   </div>
                 </div>
               </div>

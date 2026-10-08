@@ -3,7 +3,7 @@ import { alertTitle, isMachineName } from "@/components/seeker/alertTitle";
 
 describe("alertTitle: a saved search in words", () => {
   it("reads the seeded alerts like a person would say them", () => {
-    expect(alertTitle("type=SALE&zone=Chacao&beds=2&max=250000", false, "es")).toBe("Compra en Chacao · 2+ hab · hasta $250k");
+    expect(alertTitle("type=SALE&zone=Chacao&beds=2&max=250000", false, "es")).toBe("Compra en Chacao · 2+ hab · hasta USD 250k");
     expect(alertTitle("type=LONG_RENT&zone=Altamira&furnished=1", false, "es")).toBe("Alquiler amoblado en Altamira");
     expect(alertTitle("type=LONG_RENT&zone=Altamira&furnished=1", false, "en")).toBe("Furnished rental in Altamira");
     expect(alertTitle("poly=1", true, "es")).toBe("Compra en tu zona dibujada");

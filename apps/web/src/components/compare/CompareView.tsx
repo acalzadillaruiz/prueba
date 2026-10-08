@@ -3,14 +3,14 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { AlertTriangle, Check, Minus, Plus, Scale, X } from "lucide-react";
+import { AlertTriangle, CalendarCheck, Check, FileText, Minus, Plus, Scale, X } from "lucide-react";
 import type { Listing, Locale } from "@/types/domain";
 import { PropertyArt } from "@/components/art/PropertyArt";
 import { Button } from "@/components/ui";
 import { Empty, k } from "@/components/agency/kit";
 import { useApp } from "@/lib/store";
 import { listingPhoto } from "@/lib/photos";
-import { AMENITY_LABEL, TYPE_LABEL, lbl, money, num, priceSuffix, tx } from "@/lib/i18n";
+import { AMENITY_LABEL, TYPE_LABEL, lbl, money, num, priceSuffix, shortMoney, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import { useListingsByIds } from "./useListingsByIds";
 
@@ -20,9 +20,21 @@ const OK = "text-ok dark:text-[#8FCBA6]";
 const WARN = "text-warn dark:text-[#E0A84A]";
 /** Remove ("×") on a photo: its own light/dark colours (not the remapped bg-white, which turned it dark-on-dark). */
 const REMOVE_BTN = "absolute flex items-center justify-center rounded-full bg-[#F1EBE3] text-[#1E1A18] shadow ring-1 ring-black/10 after:absolute after:content-[''] dark:bg-[#15120F]/85 dark:text-[#F1EBE3] dark:ring-[#F1EBE3]/45";
+/** Pinned-row icon actions: 28 px (three homes fit in 360 px: price above, thumbnail + 2 actions below), hit area grown by ::after. */
+const MINI_BTN = "relative flex h-7 w-7 shrink-0 items-center justify-center rounded-full after:absolute after:-inset-2 after:content-['']";
+/** Phone actions row: full column width, the label may wrap to 2 lines in a third of 360 px. */
+const STACK_BTN = "flex min-h-11 items-center justify-center rounded-full px-2 py-1.5 text-center font-display text-[13px] font-semibold leading-tight";
 /** Backup power ranked for the "best" mark: full > partial > none; unknown isn't ranked. */
 const POWER_RANK: Record<string, number> = { FULL: 2, PARTIAL: 1, NONE: 0 };
-const yes = (on: boolean, locale: Locale) => (on ? <Check size={16} className={OK} aria-label={tx(locale, "Sí", "Yes")} /> : <Minus size={16} className="text-muted" aria-label={tx(locale, "No", "No")} />);
+/** Yes/no cells: a plain ✓ / — in every boolean row (the winner of a row gets the "Mejor" pill instead, never a second ✓). */
+const yes = (on: boolean, locale: Locale) => (on ? <Check size={16} className="inline text-ink" aria-label={tx(locale, "Sí", "Yes")} /> : <Minus size={16} className="inline text-muted" aria-label={tx(locale, "No", "No")} />);
+/** "USD 118k", "USD 180/n", "$2,500/mo" (as on the map pins): fits the phone's pinned row (a third of 360 px). */
+const shortPrice = (l: Listing, locale: Locale) => shortMoney(l.priceAmount, locale) + (l.pricePeriod === "night" ? tx(locale, "/n", "/nt") : l.pricePeriod === "month" ? tx(locale, "/m", "/mo") : "");
+const listingUrl = (l: Listing, locale: Locale) => `/${locale}/listing/${l.slug}`;
+/** The listing page's contact card (ContactPanel lives in <aside id="contact">). */
+const contactUrl = (l: Listing, locale: Locale) => `${listingUrl(l, locale)}#contact`;
+/** Vacation rentals are booked by dates, not visited (the contact card says "Disponibilidad"). */
+const visitText = (l: Listing, locale: Locale) => (l.listingType === "SHORT_RENT" ? tx(locale, "Consultar fechas", "Check dates") : tx(locale, "Pedir visita", "Request a viewing"));
 
 type Row = {
   label: string;
@@ -32,8 +44,6 @@ type Row = {
   best?: "min" | "max";
   /** Hide the row when no compared home has data for it. */
   show?: (l: Listing) => boolean;
-  /** Yes/no row: the value is already a ✓, so a winning cell is just green (no second ✓). */
-  bool?: true;
 };
 
 /**
@@ -108,7 +118,7 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
     { label: tx(locale, "Operación", "Type"), render: (l) => lbl(TYPE_LABEL[l.listingType], locale) },
     // Venezuelan essentials
     { label: tx(locale, "Planta eléctrica", "Backup generator"), render: (l) => (l.powerBackup === "FULL" ? "100 %" : l.powerBackup === "PARTIAL" ? tx(locale, "Parcial", "Partial") : l.powerBackup === "NONE" ? tx(locale, "No tiene", "None") : "—"), val: (l) => POWER_RANK[l.powerBackup ?? ""] ?? NaN, best: "max" },
-    { label: tx(locale, "Pozo propio", "Own water well"), render: (l) => yes(l.ownWell, locale), val: (l) => (l.ownWell ? 1 : 0), best: "max", bool: true },
+    { label: tx(locale, "Pozo propio", "Own water well"), render: (l) => yes(l.ownWell, locale), val: (l) => (l.ownWell ? 1 : 0), best: "max" },
     { label: tx(locale, "Tanque de agua", "Water tank"), render: (l) => (l.waterTankLiters ? `${num(l.waterTankLiters, locale)} L` : "—"), val: (l) => l.waterTankLiters ?? 0, best: "max" },
     { label: tx(locale, "Muelle", "Private dock"), render: (l) => (l.dockFeet ? tx(locale, `${num(l.dockFeet, locale)} pies`, `${num(l.dockFeet, locale)} ft`) : "—"), show: (l) => !!l.dockFeet },
     { label: tx(locale, "Vista al Ávila", "Ávila view"), render: (l) => yes(l.viewAvila, locale), show: (l) => l.viewAvila },
@@ -126,10 +136,17 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
     const target = known.length ? (best === "min" ? Math.min(...known) : Math.max(...known)) : null;
     return (i: number) => !!val && cmp.length > 1 && known.length > 1 && Number.isFinite(vals[i]) && vals[i] === target && new Set(known).size > 1;
   });
-  const bestMark = (bool: boolean | undefined, cls: string) =>
-    bool ? <span className="sr-only">{tx(locale, " (la mejor)", " (best)")}</span> : <Check size={13} className={cn(cls, "inline", OK)} aria-label={tx(locale, "La mejor", "Best")} />;
+  // The winner of a row: green cell + a small "Mejor" pill (distinct from the ✓ of the yes/no rows).
+  const bestMark = (cls: string) => (
+    <span className={cn("inline-flex items-center whitespace-nowrap rounded-full bg-[#2F6B4F1F] px-1.5 py-px align-[2px] font-display text-[11px] font-semibold leading-4 text-ok dark:bg-[#8FCBA626] dark:text-[#8FCBA6]", cls)} data-compare-best>
+      {tx(locale, "Mejor", "Best")}
+    </span>
+  );
   const cols = { gridTemplateColumns: `repeat(${Math.max(2, cmp.length)}, minmax(0, 1fr))` };
   const removeLabel = (title: string) => tx(locale, `Quitar «${title}» de la comparación`, `Remove “${title}” from the comparison`);
+  const named = (title: string) => <span className="sr-only">{tx(locale, `: «${title}»`, `: “${title}”`)}</span>;
+  const fichaName = (title: string) => tx(locale, `Ver ficha: «${title}»`, `View listing: “${title}”`);
+  const visitName = (l: Listing, title: string) => `${visitText(l, locale)}${tx(locale, `: «${title}»`, `: “${title}”`)}`;
 
   return (
     <div className="mx-auto max-w-[1280px] px-4 pb-32 pt-10 md:px-6">
@@ -137,7 +154,7 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
         <div>
           <div className={k.eyebrow}>{tx(locale, "Comparador", "Compare")}</div>
           <h1 className="mt-1 font-serif text-[40px] font-medium leading-[1.05] md:text-[48px]">{tx(locale, "Lado a lado", "Side by side")}</h1>
-          <p className="mt-1 text-muted">{tx(locale, "Hasta 3 casas, con lo que de verdad importa. Marcamos en verde la mejor de cada fila.", "Up to 3 homes, with what really matters. The best of each row is marked in green.")}</p>
+          <p className="mt-1 text-muted">{tx(locale, "Hasta 3 casas, con lo que de verdad importa. La mejor de cada fila lleva la marca «Mejor».", "Up to 3 homes, with what really matters. The best of each row gets a “Best” tag.")}</p>
         </div>
         {cmp.length > 0 && cmp.length < 3 && (
           <Button href={`/${locale}/search`} variant="outline" className={k.outline}>
@@ -180,23 +197,26 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
                 return (
                   <div key={l.id} className="min-w-0">
                     <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-arena">
-                      <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} sizes="50vw" className="h-full w-full" />
+                      {/* The photo opens the listing too (the title below is the keyboard / screen-reader link). */}
+                      <Link href={listingUrl(l, locale)} tabIndex={-1} aria-hidden className="block h-full w-full">
+                        <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} sizes="50vw" className="h-full w-full" />
+                      </Link>
                       <button type="button" onClick={() => remove(l.id)} aria-label={removeLabel(title)} className={cn(REMOVE_BTN, "right-1 top-1 h-7 w-7 after:-inset-2")}>
                         <X size={13} aria-hidden />
                       </button>
                     </div>
-                    <Link href={`/${locale}/listing/${l.slug}`} className="mt-1.5 line-clamp-2 block break-words font-serif text-[14px] font-medium leading-tight underline-offset-4 hover:underline">
+                    <Link href={listingUrl(l, locale)} className="mt-1.5 line-clamp-2 block break-words font-serif text-[14px] font-medium leading-tight underline-offset-4 hover:underline">
                       {title}
                     </Link>
                   </div>
                 );
               })}
             </div>
-            {/* the slim pinned row (decorative repeat of the header above: hidden from assistive tech) */}
+            {/* The slim pinned row: per home a compact price, a thumbnail and two icon actions (listing, visit). Price and
+                thumbnail repeat the header above (hidden from assistive tech); the actions are real links, only reachable
+                while the row is shown (`invisible` otherwise). */}
             <div ref={pin} className="sticky top-[calc(env(safe-area-inset-top)+var(--np-header-offset,80px)_-_8px)] z-[2] h-0 transition-[top] duration-300 ease-[cubic-bezier(.2,.7,.2,1)]">
               <div
-                aria-hidden
-                inert
                 data-compare-pinned={stuck ? "on" : "off"}
                 className={cn(
                   "absolute inset-x-0 top-0 grid gap-2 border-b border-line bg-white/95 px-3 py-2 shadow-[0_8px_18px_-12px_rgba(30,26,24,.35)] backdrop-blur transition-[opacity,transform] duration-200 dark:bg-navy-card",
@@ -204,33 +224,57 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
                 )}
                 style={cols}
               >
-                {cmp.map((l) => (
-                  <div key={l.id} className="flex min-w-0 items-center gap-2">
-                    <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-md bg-arena">
-                      <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} sizes="40px" className="h-full w-full" />
+                {cmp.map((l) => {
+                  const title = tx(locale, l.title_es, l.title_en);
+                  return (
+                    <div key={l.id} className="min-w-0">
+                      <div aria-hidden className="np-num truncate whitespace-nowrap text-[13px] leading-tight">{shortPrice(l, locale)}</div>
+                      <div className="mt-1 flex items-center gap-1">
+                        <div aria-hidden className="relative h-7 w-7 shrink-0 overflow-hidden rounded-md bg-arena">
+                          <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} sizes="28px" className="h-full w-full" />
+                        </div>
+                        <Link href={listingUrl(l, locale)} aria-label={fichaName(title)} title={tx(locale, "Ver ficha", "View listing")} className={cn(MINI_BTN, "border border-navy/40 text-navy dark:border-ivory/40 dark:text-ivory")}>
+                          <FileText size={14} aria-hidden />
+                        </Link>
+                        <Link href={contactUrl(l, locale)} aria-label={visitName(l, title)} title={visitText(l, locale)} className={cn(MINI_BTN, "np-btn-navy bg-navy text-ivory")}>
+                          <CalendarCheck size={14} aria-hidden />
+                        </Link>
+                      </div>
                     </div>
-                    <span className="np-num min-w-0 truncate text-[14px] leading-tight">
-                      {money(l.priceAmount, locale)}
-                      <span className="block truncate font-display text-[11px] text-muted">{priceSuffix(l, locale) || tx(locale, l.title_es, l.title_en)}</span>
-                    </span>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
             <dl>
-              {rows.map(({ label, render, bool }, r) => (
+              {rows.map(({ label, render }, r) => (
                 <div key={label} className="border-t border-line px-3 py-2.5 first:border-t-0">
                   <dt className="text-[13px] font-semibold text-muted">{label}</dt>
                   <dd className="mt-1 grid gap-2" style={cols}>
                     {cmp.map((l, i) => (
                       <span key={l.id} className={cn("min-w-0 break-words rounded-md px-1.5 py-1 text-[14px] leading-snug", wins[r](i) && "bg-[#2F6B4F14] dark:bg-[#8FCBA61A]")}>
-                        {render(l)} {wins[r](i) && bestMark(bool, "ml-0.5")}
+                        {render(l)} {wins[r](i) && bestMark("ml-0.5")}
                       </span>
                     ))}
                   </dd>
                 </div>
               ))}
             </dl>
+            {/* The way out: each home's listing and its contact card (no dead end after comparing). */}
+            <div className="grid gap-2 border-t border-line px-3 py-3" style={cols} data-compare-actions>
+              {cmp.map((l) => {
+                const title = tx(locale, l.title_es, l.title_en);
+                return (
+                  <div key={l.id} className="flex min-w-0 flex-col gap-2">
+                    <Link href={listingUrl(l, locale)} className={cn(STACK_BTN, "np-btn-outline border-[1.5px] border-navy text-navy", k.outline)}>
+                      {tx(locale, "Ver ficha", "View listing")}{named(title)}
+                    </Link>
+                    <Link href={contactUrl(l, locale)} className={cn(STACK_BTN, "np-btn-navy bg-navy text-ivory")}>
+                      {visitText(l, locale)}{named(title)}
+                    </Link>
+                  </div>
+                );
+              })}
+            </div>
           </div>
           {/* md and up: a table, every home's column the same width. */}
           <div className="hidden overflow-x-auto md:block">
@@ -250,12 +294,14 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
                       <th key={l.id} scope="col" className="p-4 text-left align-top font-normal">
                         {/* 16:10 and capped, so two homes side by side at 1024 don't fill the screen with photo */}
                         <div className="relative aspect-[16/10] max-h-[240px] w-full overflow-hidden rounded-lg bg-arena">
-                          <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} sizes="(max-width: 1280px) 30vw, 380px" className="h-full w-full" />
+                          <Link href={listingUrl(l, locale)} tabIndex={-1} aria-hidden className="block h-full w-full">
+                            <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} sizes="(max-width: 1280px) 30vw, 380px" className="h-full w-full" />
+                          </Link>
                           <button type="button" onClick={() => remove(l.id)} aria-label={removeLabel(title)} className={cn(REMOVE_BTN, "right-2 top-2 h-8 w-8 after:-inset-1.5")}>
                             <X size={14} aria-hidden />
                           </button>
                         </div>
-                        <Link href={`/${locale}/listing/${l.slug}`} className="mt-2 line-clamp-2 block font-serif text-[19px] font-medium leading-tight underline-offset-4 hover:underline">
+                        <Link href={listingUrl(l, locale)} className="mt-2 line-clamp-2 block font-serif text-[19px] font-medium leading-tight underline-offset-4 hover:underline">
                           {title}
                         </Link>
                       </th>
@@ -264,17 +310,37 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
                 </tr>
               </thead>
               <tbody>
-                {rows.map(({ label, render, bool }, r) => (
+                {rows.map(({ label, render }, r) => (
                   <tr key={label} className="border-t border-line">
                     <td className={cn("sticky left-0 z-[1] px-4 py-2.5 font-semibold text-muted", k.stickyCol)}>{label}</td>
                     {cmp.map((l, i) => (
                       <td key={l.id} className={cn("break-words px-4 py-2.5", wins[r](i) && "bg-[#2F6B4F0F] dark:bg-[#8FCBA614]")}>
-                        {render(l)} {wins[r](i) && bestMark(bool, "ml-1")}
+                        {render(l)} {wins[r](i) && bestMark("ml-1")}
                       </td>
                     ))}
                   </tr>
                 ))}
               </tbody>
+              <tfoot>
+                <tr className="border-t border-line" data-compare-actions>
+                  <td className={cn("sticky left-0 z-[1] px-4 py-4 font-semibold text-muted", k.stickyCol)}>{tx(locale, "Siguiente paso", "Next step")}</td>
+                  {cmp.map((l) => {
+                    const title = tx(locale, l.title_es, l.title_en);
+                    return (
+                      <td key={l.id} className="px-4 py-4">
+                        <div className="flex flex-wrap gap-2">
+                          <Button href={listingUrl(l, locale)} variant="outline" size="sm" className={k.outline}>
+                            <FileText size={15} aria-hidden /> {tx(locale, "Ver ficha", "View listing")}{named(title)}
+                          </Button>
+                          <Button href={contactUrl(l, locale)} variant="navy" size="sm">
+                            <CalendarCheck size={15} aria-hidden /> {visitText(l, locale)}{named(title)}
+                          </Button>
+                        </div>
+                      </td>
+                    );
+                  })}
+                </tr>
+              </tfoot>
             </table>
           </div>
         </section>

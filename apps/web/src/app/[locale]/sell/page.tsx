@@ -4,8 +4,9 @@ import { PublicPage } from "@/components/layout/PublicPage";
 import { SellQuickEstimate } from "@/components/owner/SellQuickEstimate";
 import { Button } from "@/components/ui";
 import { getZones } from "@/server/data";
+import { platformDaysOnMarket } from "@/server/zone-stats";
 import { pageMeta } from "@/lib/seo";
-import { tx } from "@/lib/i18n";
+import { plural, tx } from "@/lib/i18n";
 
 // Public, cacheable landing for owners ("Vender con nosotros"); the wizard itself lives at /owner/new.
 export const revalidate = 3600;
@@ -19,10 +20,9 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: L
 
 export default async function SellPage({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params;
-  const zones = await getZones();
-  // Typical time on market, from the areas with homes listed right now (median of the zone medians).
-  const doms = zones.filter((z) => z.activeListings > 0 && z.daysOnMarket > 0).map((z) => z.daysOnMarket).sort((a, b) => a - b);
-  const dom = doms.length ? doms[Math.floor(doms.length / 2)] : null;
+  // Same figure (and definition) as the listing pages and agency reports: median days since publication of the homes
+  // available today. The static zone reference figures (getZones) are not what any other page shows.
+  const [zones, dom] = await Promise.all([getZones(), platformDaysOnMarket()]);
   const start = `/${locale}/owner/new`;
   const values = [
     {
@@ -38,8 +38,8 @@ export default async function SellPage({ params }: { params: Promise<{ locale: L
     {
       Icon: CalendarClock,
       t: tx(locale, "Tiempos", "Timing"),
-      d: dom
-        ? tx(locale, `Publicar te lleva unos minutos. Hoy, una casa en New Place pasa una mediana de ${dom} días en el mercado; un buen precio lo acorta.`, `Listing takes a few minutes. Today a home on New Place spends a median of ${dom} days on the market; a good price shortens it.`)
+      d: dom != null && dom > 0
+        ? tx(locale, `Publicar te lleva unos minutos. Hoy, las casas disponibles en New Place llevan una mediana de ${plural(dom, locale, ["día", "días"], ["day", "days"])} publicadas; un buen precio acorta la espera.`, `Listing takes a few minutes. Today the homes available on New Place have been listed for a median of ${plural(dom, locale, ["día", "días"], ["day", "days"])}; a good price shortens the wait.`)
         : tx(locale, "Publicar te lleva unos minutos, y tú eliges los días y las horas de visita.", "Listing takes a few minutes, and you choose the days and times for visits."),
     },
     {

@@ -62,7 +62,7 @@ export function TeamView({ locale, members, listingsByAgent, invites: initialInv
         u.verified ? (
           <Pill tone="ok"><ShieldCheck size={12} /> {tx(locale, "Verificado", "Verified")}</Pill>
         ) : (
-          <span className="flex items-center gap-2">
+          <span className="flex flex-wrap items-center gap-2">
             <Pill tone="warn"><ShieldQuestion size={12} /> {tx(locale, "Documento en revisión", "Document in review")}</Pill>
             {manager && <Button size="sm" variant="outline" className={k.outline} disabled={busy === u.id} onClick={() => patch(u.id, { verified: true })}>{tx(locale, "Verificar", "Verify")}</Button>}
           </span>
@@ -118,7 +118,7 @@ export function TeamView({ locale, members, listingsByAgent, invites: initialInv
           ))}
         </ul>
         <ScrollRegion label={tx(locale, "Miembros del equipo", "Team members")} className={cn("hidden self-start md:block", k.card)}>
-          <table className="w-full min-w-[720px] text-sm">
+          <table className="w-full min-w-[640px] text-sm">
             <thead className={cn("border-b text-left", k.line, k.th)}>
               <tr><th className="px-4 py-3">{tx(locale, "Persona", "Member")}</th><th className="px-3 py-3">{tx(locale, "Rol", "Role")}</th><th className="px-3 py-3">{tx(locale, "Verificación", "Verification")}</th><th className="px-3 py-3 text-right">{tx(locale, "Inmuebles", "Listings")}</th><th className="px-3 py-3">{tx(locale, "Última actividad", "Last active")}</th></tr>
             </thead>
@@ -126,9 +126,10 @@ export function TeamView({ locale, members, listingsByAgent, invites: initialInv
               {members.map((u) => (
                 <Fragment key={u.id}>
                 <tr className={cn("border-t first:border-t-0", k.line)}>
-                  <td className="px-4 py-3"><div className="flex items-center gap-3"><Initials name={u.name} size={38} /><div><div className="font-semibold">{u.name}</div><div className={cn("text-xs", k.muted)}>{u.email}</div></div></div></td>
+                  <td className="px-4 py-3"><div className="flex items-center gap-3"><Initials name={u.name} size={38} /><div className="min-w-0"><div className="font-semibold">{u.name}</div><div className={cn("text-xs [overflow-wrap:anywhere]", k.muted)}>{u.email}</div></div></div></td>
                   <td className="px-3">{roleSelect(u)}</td>
-                  <td className="px-3">{verification(u)}</td>
+                  {/* Pill and "Verificar" wrap onto two lines when the column is narrow (tablets) instead of running off the edge. */}
+                  <td className="px-3 py-2">{verification(u)}</td>
                   <td className="px-3 text-right">{listingsByAgent[u.id] ?? "—"}</td>
                   <td className={cn("px-3 text-xs", k.muted)}><TimeAgo iso={u.lastSeen} locale={locale} /></td>
                 </tr>

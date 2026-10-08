@@ -121,13 +121,13 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
       if (!canPublishMandate(m)) return null;
       return (
         <Button size="sm" variant="navy" className={cn(k.navy, !compact && "min-h-10")} disabled={busy === m.id} onClick={() => patch(m.id, { status: "ACTIVE" }, `mandates/${m.id}`)} title={tx(locale, "Aprueba la ficha del encargo y la publica en el portal", "Approves the mandate's listing and publishes it")} aria-label={tx(locale, `Revisar y publicar ${title}`, `Review and publish ${title}`)}>
-          <Rocket size={14} /> {tx(locale, "Revisar y publicar", "Review & publish")}
+          <Rocket size={14} /> {compact ? tx(locale, "Publicar", "Publish") : tx(locale, "Revisar y publicar", "Review & publish")}
         </Button>
       );
     }
     if (!inReview(l) || !manager) return null;
     return (
-      <div className="flex flex-wrap gap-1">
+      <div className={cn("flex gap-1", compact ? "flex-nowrap items-center" : "flex-wrap")}>
         <Button size="sm" variant="navy" className={cn(k.navy, !compact && "min-h-10")} disabled={busy === l.id} onClick={() => patch(l.id, { review: "APPROVED" })}><CheckCircle2 size={14} /> {tx(locale, "Aprobar", "Approve")}</Button>
         {compact ? (
           <Button size="sm" variant="ghost" className={k.ghost} disabled={busy === l.id} onClick={() => patch(l.id, { review: "REJECTED" })} aria-label={tx(locale, "Rechazar publicación", "Reject listing")} title={tx(locale, "Rechazar publicación", "Reject listing")}><XCircle size={14} /></Button>
@@ -137,10 +137,12 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
       </div>
     );
   };
-  const statusPills = (l: Listing) => {
+  const statusPills = (l: Listing, stacked = false) => {
     const m = mandateOf.get(l.id);
     if (m) {
       const p = mPhase(m);
+      // Table: "Encargo" as a small kicker over the phase pill, so the Estado column stays as narrow as a single pill.
+      if (stacked) return <span className="flex flex-col items-start gap-0.5"><span className={cn("text-[11px] font-semibold", k.muted)}>{tx(locale, "Encargo", "Mandate")}</span><Pill tone={MANDATE_PHASE[p].tone}><span title={mandateHint(p, locale)}>{mandateLabel(p, locale)}</span></Pill></span>;
       return <Pill tone={MANDATE_PHASE[p].tone}><span title={mandateHint(p, locale)}>{tx(locale, "Encargo", "Mandate")} · {mandateLabel(p, locale)}</span></Pill>;
     }
     return <StatusPill status={l.status} review={l.review} takedownReason={l.takedownReason} locale={locale} />;
@@ -152,6 +154,9 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
     </select>
   );
   const box = "h-[18px] w-[18px] shrink-0 cursor-pointer accent-navy dark:accent-[#C9A574]";
+  const qualityBar = (l: Listing, w: string) => <span className={cn("inline-block h-1.5 rounded-full bg-[#ECE6DA] dark:bg-white/10", w)} aria-hidden><span className={cn("block h-full rounded-full", l.quality >= 85 ? "bg-ok" : l.quality >= 65 ? "bg-warn" : "bg-danger")} style={{ width: `${l.quality}%` }} /></span>;
+  /** Columns that only fit from 2xl (≥ 1536 px); below it they ride on a meta line under the title. */
+  const wide = "hidden 2xl:table-cell";
 
   return (
     <AdminShell locale={locale} area="agency" title={tx(locale, "Inmuebles", "Listings")} actions={user?.role !== "PHOTOGRAPHER" && user?.role !== "CAPTOR" ? <Button className={k.primary} href={`/${locale}/agency/listings/new`}><Plus size={16} /> {tx(locale, "Nuevo inmueble", "New listing")}</Button> : undefined}>
@@ -283,7 +288,9 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
         {rows.length === 0 && <li className={cn(k.card, "px-4 py-10 text-center text-sm", k.muted)}>{tx(locale, "No hay inmuebles con este filtro.", "No listings match this filter.")}</li>}
       </ul>
       <ScrollRegion fade={false} label={tx(locale, "Tabla de inmuebles", "Listings table")} className={cn("hidden md:block", k.card)}>
-        <table className="w-full min-w-[1160px] text-sm">
+        {/* Up to 2xl: checkbox · listing (+ quality, leads, days, updated as a meta line) · status · price · agent · action
+            ≈ 830 px, so it fits the 936 px content at 1280 without a sideways scroll. From 2xl every column has its own. */}
+        <table className="np-sticky-last w-full min-w-[800px] text-sm 2xl:min-w-[1160px]">
           <thead className={cn("border-b text-left", k.line, k.th)}>
             <tr>
               {selectable && (
@@ -295,11 +302,11 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
               <th className="px-3 py-3 font-semibold">{tx(locale, "Estado", "Status")}</th>
               <th className="px-3 py-3 text-right font-semibold">{tx(locale, "Precio", "Price")}</th>
               <th className="px-3 py-3 font-semibold">{tx(locale, "Agente", "Agent")}</th>
-              <th className="px-3 py-3 font-semibold">{tx(locale, "Calidad", "Quality")}</th>
-              <th className="px-3 py-3 text-right font-semibold">Leads</th>
-              <th className="px-3 py-3 text-right font-semibold">{tx(locale, "Días", "Days")}</th>
-              <th className="px-3 py-3 font-semibold">{tx(locale, "Actualizado", "Updated")}</th>
-              <th className={cn("sticky right-0 px-3 py-3", k.stickyCol)} />
+              <th className={cn("px-3 py-3 font-semibold", wide)}>{tx(locale, "Calidad", "Quality")}</th>
+              <th className={cn("px-3 py-3 text-right font-semibold", wide)}>Leads</th>
+              <th className={cn("px-3 py-3 text-right font-semibold", wide)}>{tx(locale, "Días", "Days")}</th>
+              <th className={cn("px-3 py-3 font-semibold", wide)}>{tx(locale, "Actualizado", "Updated")}</th>
+              <th className="px-3 py-3"><span className="sr-only">{tx(locale, "Acciones", "Actions")}</span></th>
             </tr>
           </thead>
           <tbody>
@@ -314,7 +321,7 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
                       <input type="checkbox" className={box} checked={picked.has(l.id)} onChange={() => toggle(l.id)} aria-label={tx(locale, `Seleccionar ${title}`, `Select ${title}`)} />
                     </td>
                   )}
-                  <td className="min-w-[230px] px-4 py-3 md:min-w-[300px]">
+                  <td className="min-w-[230px] px-4 py-3 2xl:min-w-[300px]">
                     <Link href={`/${locale}/agency/listings/${l.id}/edit`} className="flex items-center gap-3">
                       <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="h-12 w-16 shrink-0 rounded-lg" />
                       <div className="min-w-0">
@@ -322,20 +329,27 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
                         <div className={cn("text-xs", k.muted)}>{lbl(TYPE_LABEL[l.listingType], locale)} · {l.zone} · {num(l.areaM2, locale)} m²</div>
                       </div>
                     </Link>
+                    <div className={cn("mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 pl-[76px] text-xs 2xl:hidden", k.muted)} data-testid="listing-meta">
+                      <span className="inline-flex items-center gap-1.5" title={tx(locale, "Calidad de la ficha", "Listing quality")}>{qualityBar(l, "w-8")}<span className="font-semibold text-navy dark:text-ivory">{l.quality}</span></span>
+                      <span>· {l.stats.leads} {l.stats.leads === 1 ? "lead" : "leads"}</span>
+                      <span title={tx(locale, "Días en el mercado", "Days on market")}>· {tx(locale, `${l.daysOnMarket} ${l.daysOnMarket === 1 ? "día" : "días"}`, `${l.daysOnMarket} ${l.daysOnMarket === 1 ? "day" : "days"}`)}</span>
+                      <span title={tx(locale, "Actualizado", "Updated")}>· <TimeAgo iso={l.updatedAt} locale={locale} /></span>
+                    </div>
                   </td>
-                  <td className="whitespace-nowrap px-3"><div className="flex flex-col items-start gap-1">{statusPills(l)}{l.luxury && <Pill tone="exclusive">{tx(locale, "Exclusiva", "Exclusive")}</Pill>}</div></td>
+                  <td className="whitespace-nowrap px-3"><div className="flex flex-col items-start gap-1">{statusPills(l, true)}{l.luxury && <Pill tone="exclusive">{tx(locale, "Exclusiva", "Exclusive")}</Pill>}</div></td>
                   <td className={cn("whitespace-nowrap px-3 text-right", k.num, "tracking-normal")}>{money(l.priceAmount, locale)}<span className={cn("text-xs font-normal", k.muted)}>{priceSuffix(l, locale)}</span></td>
-                  <td className="px-3">{agentSelect(l, title, k.select, tx(locale, "Agente", "Agent"))}</td>
-                  <td className="px-3">
+                  {/* The select sizes to its longest option, so full agent names always show. */}
+                  <td className="px-3">{agentSelect(l, title, cn(k.select, "w-auto max-w-none"), tx(locale, `Agente de ${title}`, `Agent for ${title}`))}</td>
+                  <td className={cn("px-3", wide)}>
                     <div className="flex items-center gap-2">
-                      <div className="h-1.5 w-16 rounded-full bg-[#ECE6DA] dark:bg-white/10"><div className={cn("h-full rounded-full", l.quality >= 85 ? "bg-ok" : l.quality >= 65 ? "bg-warn" : "bg-danger")} style={{ width: `${l.quality}%` }} /></div>
+                      {qualityBar(l, "w-16")}
                       <span className="text-xs font-semibold">{l.quality}</span>
                     </div>
                   </td>
-                  <td className="px-3 text-right font-semibold">{l.stats.leads}</td>
-                  <td className="px-3 text-right">{l.daysOnMarket}</td>
-                  <td className={cn("px-3 text-xs", k.muted)}><TimeAgo iso={l.updatedAt} locale={locale} /></td>
-                  <td className={cn("sticky right-0 px-3", k.stickyCol)}>{action ?? (a && <span title={a.name}><Initials name={a.name} size={28} /></span>)}</td>
+                  <td className={cn("px-3 text-right font-semibold", wide)}>{l.stats.leads}</td>
+                  <td className={cn("px-3 text-right", wide)}>{l.daysOnMarket}</td>
+                  <td className={cn("px-3 text-xs", wide, k.muted)}><TimeAgo iso={l.updatedAt} locale={locale} /></td>
+                  <td className="px-3">{action ?? (a && <span title={a.name}><Initials name={a.name} size={28} /></span>)}</td>
                 </tr>
               );
             })}

@@ -351,9 +351,14 @@ html:not(.np-motion) [data-unveil] { clip-path: none; }
 /* Dark mode: the light 2035 panels (footer, owner band, building) take the warm dark surface. */
 html.dark .np-public :is(footer.np-grain, .bg-\[\#E9E0D3\]) { background-color: #2A2420; }
 html.dark .np-public .bg-ink { background-color: #F1EBE3; color: #1E1A18; }
-/* Panel tables: the last column (actions) stays in view instead of hiding behind a horizontal scroll. */
-.np-sticky-last tr > :last-child { position: sticky; right: 0; z-index: 1; background: #fff; box-shadow: -14px 0 18px -14px rgb(30 26 24 / .22); }
-html.dark .np-sticky-last tr > :last-child { background: #2A2420; }
+/* Panel tables: the last column (actions) stays in view instead of hiding behind a horizontal scroll.
+   Only while the table really overflows its ScrollRegion ([data-overflow], set by a ResizeObserver): when everything fits
+   it is an ordinary column. A soft fade on its left edge says that more columns slide underneath. Full-width rows
+   (colSpan panels, empty states) never pin. */
+[data-overflow] .np-sticky-last tr > :last-child:not([colspan]) { position: sticky; right: 0; z-index: 1; background: #fff; box-shadow: -14px 0 18px -14px rgb(30 26 24 / .22); }
+[data-overflow] .np-sticky-last tr > :last-child:not([colspan])::before { content: ""; position: absolute; inset-block: 0; right: 100%; width: 16px; pointer-events: none; background: linear-gradient(to left, #fff, rgb(255 255 255 / 0)); }
+html.dark [data-overflow] .np-sticky-last tr > :last-child:not([colspan]) { background: #2A2420; }
+html.dark [data-overflow] .np-sticky-last tr > :last-child:not([colspan])::before { background: linear-gradient(to left, #2A2420, rgb(42 36 32 / 0)); }
 /* Dark mode for the 2035 surfaces: translucent whites become warm translucent darks, inputs stay readable. */
 html.dark .np-public :is(.bg-white\/85, .bg-white\/75, .bg-white\/70, .bg-white\/50) { background-color: rgb(255 255 255 / .06); }
 html.dark .np-public :is(input, select, textarea) { color: #F1EBE3; }

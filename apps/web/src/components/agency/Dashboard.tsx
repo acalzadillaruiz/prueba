@@ -8,7 +8,7 @@ import { listingPhoto } from "@/lib/photos";
 import { PropertyArt } from "@/components/art/PropertyArt";
 import { Button } from "@/components/ui";
 import { BarChart, Funnel } from "./charts";
-import { Chip, Empty, Initials, Kpi, Panel, Pill, StatusPill, k } from "./kit";
+import { Chip, Empty, Initials, Kpi, Panel, Pill, StatusPill, k, kpiGrid5 } from "./kit";
 import { useApp } from "@/lib/store";
 import type { Lead, Listing, Tour } from "@/types/domain";
 import type { DashboardStats } from "@/server/agency-stats";
@@ -47,7 +47,7 @@ export function AgencyDashboard({ locale, stats, listings, newLeads, tours, agen
         </>
       }
     >
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-5 [&>*]:min-w-0">
+      <div className={kpiGrid5}>
         <Kpi label={tx(locale, "Inmuebles activos", "Active listings")} value={stats.activeListings} delta={stats.activeDelta ? sign(stats.activeDelta) : undefined} down={stats.activeDelta < 0} hint={tx(locale, "nuevos en 30 días", "new in 30 days")} />
         <Kpi label={tx(locale, "Leads · 7 días", "Leads · 7 days")} value={stats.leads7d} delta={stats.leadsDeltaPct === null ? undefined : `${sign(stats.leadsDeltaPct)} %`} deltaNote={tx(locale, "Aún hay pocos datos para comparar", "Not enough data to compare yet")} down={(stats.leadsDeltaPct ?? 0) < 0} hint={tx(locale, "vs. semana anterior", "vs. previous week")} />
         <Kpi label={tx(locale, "Conversión lead → visita", "Lead → tour")} value={`${stats.convTourPct} %`} hint={tx(locale, "últimos 30 días", "last 30 days")} />
@@ -71,10 +71,9 @@ export function AgencyDashboard({ locale, stats, listings, newLeads, tours, agen
                   <Initials name={ld.name} size={44} />
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-[15px] font-semibold">{ld.name}</div>
-                    <div className={cn("truncate text-[13px]", k.muted)}>
-                      {l?.zone ?? "—"} ·{" "}
-                      {late ? <span className={cn("font-semibold", k.dangerText)} suppressHydrationWarning>{tx(locale, "Sin respuesta a tiempo", "Not answered in time")} · {span(mins)}</span> : <span suppressHydrationWarning>{tx(locale, `quedan ${15 - mins} min`, `${15 - mins} min left`)}</span>}
-                    </div>
+                    {/* The zone truncates; the countdown (what matters) gets its own line and never does. */}
+                    <div className={cn("truncate text-[13px]", k.muted)}>{l?.zone ?? "—"}</div>
+                    {late ? <div className={cn("text-[13px] font-semibold", k.dangerText)} suppressHydrationWarning>{tx(locale, "Sin respuesta a tiempo", "Not answered in time")} · {span(mins)}</div> : <div className={cn("text-[13px] font-semibold", k.warnText)} suppressHydrationWarning>{tx(locale, `Quedan ${15 - mins} min`, `${15 - mins} min left`)}</div>}
                   </div>
                   {ld.score != null && <Chip>{tx(locale, "Interés", "Interest")} {ld.score}</Chip>}
                 </li>

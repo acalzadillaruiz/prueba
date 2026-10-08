@@ -24,6 +24,6 @@ export const POST = handler(async (req: NextRequest, { params }: Ctx) => {
     await audit(u.id, "lead.stage", lead.name, { from: "NEW", to: "CONTACTED", auto: true });
   }
   await prisma.leadEvent.create({ data: { leadId: id, type: "MESSAGE", actorId: u.id } });
-  await queueEmail(lead.email, `Respuesta de ${u.name ?? "tu agente"} en New Place`, "LEAD", text);
+  await queueEmail(lead.email, `${u.name ?? "Tu asesor"} te respondió en New Place`, "LEAD", text);
   return ok({ id: m.id, from: u.name ?? "", body: m.body, at: m.createdAt.toISOString(), mine: true }, 201);
 });

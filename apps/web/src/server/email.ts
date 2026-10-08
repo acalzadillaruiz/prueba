@@ -39,7 +39,7 @@ function html(subject: string, body: string) {
 </td></tr>
 <tr><td style="padding:36px 40px 12px"><h1 style="margin:0;font-family:${serif};font-weight:500;font-size:30px;line-height:1.15;color:#1E1A18">${esc(subject)}</h1></td></tr>
 ${content}
-<tr><td style="padding:28px 40px 32px"><div style="border-top:1px solid #ECE6DA;padding-top:16px;font-family:${sans};font-size:12px;line-height:1.5;color:#5A514B">New Place · Bienes raíces · El Caribe, con alma mediterránea.</div></td></tr>
+<tr><td style="padding:28px 40px 32px"><div style="border-top:1px solid #ECE6DA;padding-top:16px;font-family:${sans};font-size:12px;line-height:1.5;color:#5A514B">New Place · Bienes raíces · El Caribe, con alma mediterránea. Cuando quieras, aquí estamos.</div></td></tr>
 </table>
 </td></tr></table></body></html>`;
 }

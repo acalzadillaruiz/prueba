@@ -14,9 +14,9 @@ export default function GlobalError({ error, reset }: { error: Error & { digest?
       <body className="min-h-screen bg-ivory text-ink">
         <main id="main" className="flex min-h-screen flex-col items-center justify-center gap-4 px-6 text-center">
           <h1 className="font-display text-3xl font-semibold">New Place</h1>
-          <p className="max-w-sm text-ink/70">Algo salió mal. Inténtalo de nuevo en unos segundos. · Something went wrong. Please try again.</p>
+          <p className="max-w-sm text-ink/70">Algo no salió bien de nuestro lado. Inténtalo otra vez en unos segundos. · Something went wrong on our side. Please try again in a moment.</p>
           {error.digest && <code className="text-xs text-muted">{error.digest}</code>}
-          <button onClick={reset} className="min-h-11 rounded-np bg-coral-cta px-5 py-2.5 font-display text-white">Reintentar · Retry</button>
+          <button onClick={reset} className="min-h-11 rounded-np bg-coral-cta px-5 py-2.5 font-display text-white">Intentar de nuevo · Try again</button>
         </main>
       </body>
     </html>

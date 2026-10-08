@@ -65,13 +65,13 @@ export const POST = handler(async (req: NextRequest) => {
   const when = tourStart ? tourWhen(tourStart, seekerLoc) : "";
   await queueEmail(
     b.email,
-    tourStart ? (seekerLoc === "en" ? `Tour requested: ${title("en")} · ${when}` : `Visita solicitada: ${title("es")} · ${when}`) : seekerLoc === "en" ? `Message sent: ${title("en")}` : `Mensaje enviado: ${title("es")}`,
+    tourStart ? (seekerLoc === "en" ? `We got your visit request: ${title("en")} · ${when}` : `Recibimos tu pedido de visita: ${title("es")} · ${when}`) : seekerLoc === "en" ? `We got your message: ${title("en")}` : `Recibimos tu mensaje: ${title("es")}`,
     "TOUR",
   );
   const staff = l.agent?.email ?? l.owner?.email;
   if (staff) {
     const staffLoc = await recipientLocale(staff);
-    await queueEmail(staff, staffLoc === "en" ? `New lead (${score.score}/100): ${b.name} · ${title("en")}` : `Nuevo lead (${score.score}/100): ${b.name} · ${title("es")}`, "LEAD");
+    await queueEmail(staff, staffLoc === "en" ? `New lead (${score.score}/100): ${b.name} · ${title("en")}` : `Nuevo contacto (${score.score}/100): ${b.name} · ${title("es")}`, "LEAD");
   }
   return ok(leadToDomain(lead), 201);
 });

@@ -88,27 +88,27 @@ export function OnCallDialog({ locale, listingSlug, onClose }: { locale: Locale;
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
             <div className="np-eyebrow text-gold-text">{tx(locale, "Guardia 24/7", "24/7 on-call")}</div>
-            <h2 id={titleId} className="mt-1 font-serif text-[28px] font-medium leading-tight text-navy">{tx(locale, "Asesores de guardia hoy", "Advisors on call today")}</h2>
+            <h2 id={titleId} className="mt-1 font-serif text-[28px] font-medium leading-tight text-navy">{tx(locale, "Hoy te atienden", "Here for you today")}</h2>
           </div>
           <button ref={closeBtn} type="button" onClick={onClose} aria-label={tx(locale, "Cerrar", "Close")} className={cn("-mr-2 -mt-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-navy hover:bg-navy/5", ring)}>
             <X size={20} aria-hidden />
           </button>
         </div>
         <p id={descId} className="mt-2 text-[15px] text-muted">
-          {tx(locale, "Cada agencia tiene un asesor de guardia todos los días, también fines de semana. Llámalo o escríbele por WhatsApp.", "Each agency has an advisor on call every day, weekends included. Call or message them on WhatsApp.")}
+          {tx(locale, "Cada agencia tiene a alguien disponible todos los días, también los fines de semana. Llama o escribe por WhatsApp, sin compromiso.", "Every agency has someone available every day, weekends included. Call or send a WhatsApp, no strings attached.")}
         </p>
         {q.isLoading && (
-          <div className="mt-5 space-y-3" aria-label={tx(locale, "Cargando…", "Loading…")}>
+          <div className="mt-5 space-y-3" aria-label={tx(locale, "Un momento…", "One moment…")}>
             {[0, 1].map((i) => <div key={i} className="np-skeleton h-[124px] rounded-2xl" />)}
           </div>
         )}
         {q.isError && (
           <div role="alert" className="mt-5 rounded-xl bg-[#B3261E1A] px-3.5 py-2.5 text-sm text-danger">
-            {tx(locale, "No pudimos cargar la guardia. ", "We couldn’t load the on-call rota. ")}
-            <button type="button" onClick={() => q.refetch()} className={cn("font-semibold underline underline-offset-4", ring)}>{tx(locale, "Reintentar", "Retry")}</button>
+            {tx(locale, "No pudimos ver quién está de guardia. ", "We couldn’t check who’s on call. ")}
+            <button type="button" onClick={() => q.refetch()} className={cn("font-semibold underline underline-offset-4", ring)}>{tx(locale, "Intentar de nuevo", "Try again")}</button>
           </div>
         )}
-        {q.isSuccess && list.length === 0 && <p className="mt-5 rounded-2xl bg-white p-4 text-[15px] text-muted ring-1 ring-black/[.04]">{tx(locale, "Hoy ninguna agencia tiene guardia asignada. Escríbenos desde cualquier ficha y te responderán en horario de oficina.", "No agency has anyone on call today. Write from any listing and they’ll reply during office hours.")}</p>}
+        {q.isSuccess && list.length === 0 && <p className="mt-5 rounded-2xl bg-white p-4 text-[15px] text-muted ring-1 ring-black/[.04]">{tx(locale, "Hoy no hay nadie de guardia. Escríbenos desde cualquier casa y te respondemos en horario de oficina.", "No one is on call today. Write to us from any home and we’ll reply during office hours.")}</p>}
         {list.length > 0 && (
           <ul className="mt-5 space-y-3">
             {list.map((o, i) => (
@@ -122,7 +122,7 @@ export function OnCallDialog({ locale, listingSlug, onClose }: { locale: Locale;
                     </div>
                     <div className="truncate text-sm text-muted">
                       {o.agency.name}
-                      {listingSlug && i === 0 ? tx(locale, " · agencia de este inmueble", " · this listing’s agency") : ""}
+                      {listingSlug && i === 0 ? tx(locale, " · agencia de esta casa", " · this home’s agency") : ""}
                     </div>
                   </div>
                 </div>
@@ -145,7 +145,7 @@ export function OnCallDialog({ locale, listingSlug, onClose }: { locale: Locale;
             ))}
           </ul>
         )}
-        <p className="mt-4 text-center text-sm text-muted">{tx(locale, "Guardia según el día en Caracas (UTC−4).", "Rota follows the day in Caracas (UTC−4).")}</p>
+        <p className="mt-4 text-center text-sm text-muted">{tx(locale, "La guardia sigue el horario de Caracas (UTC−4).", "On-call hours follow Caracas time (UTC−4).")}</p>
       </div>
     </div>,
     document.body,

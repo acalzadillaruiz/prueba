@@ -8,12 +8,12 @@ export type ErrorCode = "UNAUTHORIZED" | "FORBIDDEN" | "NOT_FOUND" | "VALIDATION
 
 const MESSAGES: Record<ErrorCode, { es: string; en: string; status: number }> = {
   UNAUTHORIZED: { es: "Inicia sesión para continuar.", en: "Sign in to continue.", status: 401 },
-  FORBIDDEN: { es: "No tienes permiso para esta acción.", en: "You don’t have permission to do this.", status: 403 },
-  NOT_FOUND: { es: "No encontrado.", en: "Not found.", status: 404 },
-  VALIDATION: { es: "Revisa los datos enviados.", en: "Please check the submitted data.", status: 422 },
-  CONFLICT: { es: "Ya existe un registro igual.", en: "A matching record already exists.", status: 409 },
-  RATE_LIMIT: { es: "Demasiadas solicitudes. Intenta en un momento.", en: "Too many requests. Try again shortly.", status: 429 },
-  INTERNAL: { es: "Algo salió mal. Inténtalo de nuevo.", en: "Something went wrong. Please try again.", status: 500 },
+  FORBIDDEN: { es: "Tu cuenta no tiene acceso a esto.", en: "Your account doesn’t have access to this.", status: 403 },
+  NOT_FOUND: { es: "No encontramos lo que buscas.", en: "We couldn’t find what you’re looking for.", status: 404 },
+  VALIDATION: { es: "Revisa lo que escribiste: hay un dato que no cuadra.", en: "Something needs a second look. Check the details and try again.", status: 422 },
+  CONFLICT: { es: "Esto ya estaba registrado.", en: "This is already on file.", status: 409 },
+  RATE_LIMIT: { es: "Vas muy rápido. Espera un momento y vuelve a intentarlo.", en: "You’re going a little fast. Wait a moment and try again.", status: 429 },
+  INTERNAL: { es: "Algo no salió bien de nuestro lado. Inténtalo otra vez en un momento.", en: "Something went wrong on our side. Please try again in a moment.", status: 500 },
 };
 
 export class ApiError extends Error {

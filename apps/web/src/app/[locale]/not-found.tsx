@@ -17,7 +17,7 @@ export default async function NotFound() {
       <div className="mt-8 flex flex-wrap justify-center gap-3">
         <Link href={`/${locale}`} className="np-btn-navy inline-flex h-12 items-center rounded-full bg-navy px-7 font-display text-[15px] font-semibold text-ivory hover:bg-navy-2">{t("back")}</Link>
         <Link href={`/${locale}/search?type=SALE`} className="np-btn-outline inline-flex h-12 items-center rounded-full border-[1.5px] border-navy px-7 font-display text-[15px] font-semibold text-navy hover:bg-navy/5">
-          {es ? "Ver propiedades" : "See properties"}
+          {es ? "Ver casas" : "Browse homes"}
         </Link>
       </div>
     </main>

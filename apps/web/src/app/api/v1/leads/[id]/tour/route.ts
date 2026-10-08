@@ -37,6 +37,6 @@ export const POST = handler(async (req: NextRequest, { params }: Ctx) => {
   await audit(u.id, "lead.tour", lead.name, { start });
   // The seeker's language (their account's locale when they have one), not the agent's who triggers this.
   const loc = await recipientLocale(lead.email);
-  await queueEmail(lead.email, `${loc === "en" ? "Tour confirmed" : "Visita confirmada"} · ${tourWhen(s, loc)}`, "TOUR");
+  await queueEmail(lead.email, `${loc === "en" ? "Your visit is confirmed" : "Tu visita está confirmada"} · ${tourWhen(s, loc)}`, "TOUR");
   return ok({ id: tour.id, start: tour.start.toISOString(), status: tour.status });
 });

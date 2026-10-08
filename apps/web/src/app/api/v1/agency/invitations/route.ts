@@ -25,7 +25,7 @@ export const POST = handler(async (req: NextRequest) => {
   const token = crypto.randomUUID();
   const inv = await prisma.invitation.create({ data: { agencyId, email, role: b.role, token } });
   const agency = await prisma.agency.findUniqueOrThrow({ where: { id: agencyId } });
-  await queueEmail(email, `${agency.name} te invita a New Place (${b.role})`, "INVITE", `/es/register?invite=${token}`);
+  await queueEmail(email, `${agency.name} te invita a su equipo en New Place (${b.role})`, "INVITE", `/es/register?invite=${token}`);
   await audit(u.id, "team.invite", b.email, { role: b.role });
   return ok({ id: inv.id, email: inv.email, role: inv.role, createdAt: inv.createdAt }, 201);
 });

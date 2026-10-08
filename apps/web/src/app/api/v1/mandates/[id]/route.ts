@@ -36,7 +36,7 @@ export const PATCH = handler(async (req: NextRequest, { params }: Ctx) => {
     if (m.listingId) await prisma.listing.update({ where: { id: m.listingId }, data: { agentId: b.agentId, agencyId: m.agencyId } });
     let thread = await prisma.messageThread.findFirst({ where: { listingId: m.listingId ?? undefined, participants: { some: { userId: m.ownerUserId } } } });
     if (!thread) thread = await prisma.messageThread.create({ data: { listingId: m.listingId, subject: "Encargo", participants: { create: [{ userId: m.ownerUserId }, { userId: b.agentId }] } } });
-    await queueEmail(m.owner.email, "Tu inmueble ya tiene agente asignado", "LEAD");
+    await queueEmail(m.owner.email, "Tu propiedad ya tiene un asesor a cargo", "LEAD");
   }
   if (b.status === "ACTIVE") {
     data.status = "ACTIVE";

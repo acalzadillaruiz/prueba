@@ -31,7 +31,7 @@ export const POST = handler(async (req: NextRequest) => {
     include: { user: { select: { email: true } } },
   });
   for (const s of due) {
-    await queueEmail(s.user.email, `${s.newCount} nuevos en «${s.name}»`, "ALERT", `/es/search?${s.query}`);
+    await queueEmail(s.user.email, `${s.newCount === 1 ? "1 novedad" : `${s.newCount} novedades`} en «${s.name}»`, "ALERT", `/es/search?${s.query}`);
     await prisma.savedSearch.update({ where: { id: s.id }, data: { lastSentAt: new Date(), newCount: 0 } });
   }
   return ok({ sent: due.length });

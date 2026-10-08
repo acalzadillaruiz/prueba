@@ -36,6 +36,6 @@ export const POST = handler(async (req: NextRequest) => {
     await audit(user.id, "agency.create", b.agencyName);
   }
   // Signed 48 h link (HMAC with AUTH_SECRET) → GET /api/v1/auth/verify sets emailVerified.
-  await queueEmail(email, loc === "en" ? "Verify your email on New Place" : "Verifica tu correo en New Place", "VERIFY", verifyPath(user.id, email));
+  await queueEmail(email, loc === "en" ? "Confirm your email to get started" : "Confirma tu correo para empezar", "VERIFY", verifyPath(user.id, email));
   return ok({ id: user.id, email }, 201);
 });

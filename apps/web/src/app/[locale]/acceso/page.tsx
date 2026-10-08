@@ -16,9 +16,9 @@ export default async function Acceso({ params, searchParams }: { params: Promise
   const { error, next } = await searchParams;
   const msg =
     error === "code"
-      ? tx(locale, "El código no es correcto. Inténtalo de nuevo.", "That code is not correct. Please try again.")
+      ? tx(locale, "El código no es correcto. Revísalo y prueba otra vez.", "That code isn’t right. Check it and try again.")
       : error === "limit"
-        ? tx(locale, "Demasiados intentos. Espera unos minutos y vuelve a probar.", "Too many attempts. Wait a few minutes and try again.")
+        ? tx(locale, "Vas muy rápido. Espera unos minutos y vuelve a intentarlo.", "That’s a lot of tries. Wait a few minutes and try again.")
         : null;
   return (
     <main id="main" className="relative isolate grid min-h-[100svh] place-items-center overflow-hidden bg-navy px-4 py-16 text-ivory">
@@ -28,7 +28,7 @@ export default async function Acceso({ params, searchParams }: { params: Promise
         <Logo tone="ivory" size="lg" />
         <div className="grid gap-2">
           <h1 className="text-[34px] leading-tight text-ivory">{tx(locale, "Acceso privado", "Private access")}</h1>
-          <p className="text-[15px] text-ivory/80">{tx(locale, "La web está en vista previa. Introduce el código que te hemos facilitado.", "The site is in private preview. Enter the code you were given.")}</p>
+          <p className="text-[15px] text-ivory/80">{tx(locale, "Estamos en vista previa privada. Escribe el código que te compartimos.", "We’re in private preview. Enter the code we shared with you.")}</p>
         </div>
         <input type="hidden" name="locale" value={locale} />
         <input type="hidden" name="next" value={safeNext(next, `/${locale}`)} />

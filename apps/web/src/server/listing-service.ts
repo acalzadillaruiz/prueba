@@ -110,7 +110,7 @@ export async function notifySavedSearches(listingId: string, reason: "new" | "pr
     n++;
     await prisma.savedSearch.update({ where: { id: s.id }, data: { newCount: { increment: 1 }, ...(s.frequency === "INSTANT" ? { lastSentAt: new Date() } : {}) } });
     if (s.frequency === "INSTANT")
-      await queueEmail(s.user.email, reason === "new" ? `Nuevo en «${s.name}»: ${l.titleEs}` : `Bajó de precio: ${l.titleEs}`, "ALERT", `https://newplace.app/es/listing/${l.slug}`);
+      await queueEmail(s.user.email, reason === "new" ? `Algo nuevo en «${s.name}»: ${l.titleEs}` : `Ahora a mejor precio: ${l.titleEs}`, "ALERT", `https://newplace.app/es/listing/${l.slug}`);
   }
   return n;
 }

@@ -16,9 +16,11 @@ import { useApp } from "@/lib/store";
 import { api, ApiClientError } from "@/lib/api";
 import { tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
+import { isFsbo, takesTours, VISIT_PREF_LABEL, VISIT_PREFS, type VisitPref } from "@/lib/visit-hours";
 import { useListingWhatsApp } from "./useListingWhatsApp";
 
-type Slots = { agentId: string | null; days: { date: string; hours: { hour: number; iso: string; available: boolean }[] }[] };
+/** GET listings/:id/slots — the agent's calendar, or (owner: true) the FSBO owner's visit hours. */
+type Slots = { agentId: string | null; owner?: boolean; hasCalendar?: boolean; days: { date: string; hours: { hour: number; minute?: number; label?: string; iso: string; available: boolean }[] }[] };
 
 /** Optional phone: when given, at least 7 digits; only digits, "+", spaces, dashes, dots and parentheses. */
 const phoneOk = (v: string | undefined) => {
@@ -36,8 +38,10 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
   const uid = useId();
   const agent = l.agent;
   const agency = l.agency;
-  // Tours only while the property is available and has an agent calendar.
-  const bookable = !!l.agentId && ["ACTIVE", "COMING_SOON", "UNDER_OFFER"].includes(l.status);
+  // Tours only while the property is available: on the agent's calendar, or with the owner (FSBO) — their visit hours,
+  // or, when they have none or they're full, a request with preferred times that the owner answers.
+  const bookable = takesTours(l);
+  const fsbo = isFsbo(l);
   const slots = useQuery({ queryKey: ["slots", l.id], queryFn: () => api<Slots>(`listings/${l.id}/slots`), enabled: bookable, refetchInterval: 15_000 });
   const days = slots.data?.days ?? [];
   const [mode, setMode] = useState<"tour" | "msg">(bookable ? "tour" : "msg");
@@ -46,6 +50,12 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
   const [dayPick, setDay] = useState<number | null>(null);
   const firstOpenDay = days.findIndex((d) => d.hours.some((h) => h.available));
   const day = dayPick ?? Math.max(0, firstOpenDay);
+  // FSBO with no free slot (no calendar yet, or fully booked): "Pide una visita" with preferred times instead of a dead end.
+  const askMode = fsbo && !slots.isLoading && firstOpenDay === -1;
+  const [prefs, setPrefs] = useState<VisitPref[]>([]);
+  const [visitNote, setVisitNote] = useState("");
+  const [asked, setAsked] = useState(false);
+  const askReady = prefs.length > 0 || visitNote.trim().length > 0;
   // No time is pre-selected: the visitor picks one, and the main button then names it.
   const [iso, setIso] = useState<string | null>(null);
   const [virtual, setVirtual] = useState(false);
@@ -106,11 +116,17 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
   const submit = async ({ name, email, phone, message: msg }: F) => {
     setErr(null);
     setBusy(true);
+    const ask = mode === "tour" && askMode && !chosen;
     try {
       await api("leads", {
         method: "POST",
-        json: { listingId: l.id, name, email, phone, message: msg, budget: undefined, ...(mode === "tour" && chosen ? { tourStart: chosen, virtual } : {}) },
+        json: {
+          listingId: l.id, name, email, phone, message: msg, budget: undefined,
+          ...(mode === "tour" && chosen ? { tourStart: chosen, virtual } : {}),
+          ...(ask ? { visitPrefs: prefs, visitNote: visitNote.trim() || undefined, virtual } : {}),
+        },
       });
+      setAsked(ask);
       setDone(mode === "tour" && chosen ? fmt(chosen, { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }) : "");
       qc.invalidateQueries({ queryKey: ["slots", l.id] });
     } catch (e) {
@@ -127,7 +143,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
   const field = cn(inputCls, "h-12 rounded-xl border-[#D8CBB7]", dark && "border-navy-line bg-navy-2 text-ivory");
   const wa = useListingWhatsApp(whatsappHref(l, locale));
   const first = agent?.name.split(" ")[0] ?? agency?.name ?? "";
-  const confirmer = first || tx(locale, "el anunciante", "the lister");
+  const confirmer = first || (fsbo ? tx(locale, "su dueño", "the owner") : tx(locale, "el anunciante", "the lister"));
   const initials = (agent?.name ?? agency?.name ?? "NP").split(" ").map((p) => p[0]).slice(0, 2).join("");
   const box = dark ? "bg-navy-card text-ivory ring-navy-line" : "np-glass ring-0";
   const seg = (active: boolean) => cn("flex min-h-11 items-center justify-center gap-1.5 rounded-full border-2 font-display text-sm transition-colors duration-np focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2", dark ? "focus-visible:outline-ivory" : "focus-visible:outline-ink", active ? "np-sel font-semibold" : "border-transparent text-muted hover:text-ink");
@@ -144,11 +160,12 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
 
   if (done !== null) {
     const tour = mode === "tour" && !!done;
+    const replier = agent ? agent.name.split(" ")[0] : fsbo ? tx(locale, "Su dueño", "The owner") : tx(locale, "Tu asesor", "Your advisor");
     return (
       <div id="contact-panel" tabIndex={-1} className={cn("np-in rounded-[28px] p-6 ring-1", box)} data-testid="lead-done" role="status">
         <CheckCircle2 className="text-ok" size={30} aria-hidden />
         <div className="mt-3 font-serif text-[28px] leading-tight">
-          {tour ? tx(locale, "Visita pedida", "Viewing requested") : tx(locale, "Tu mensaje ya llegó", "Your message is on its way")}
+          {tour ? tx(locale, "Visita pedida", "Viewing requested") : asked ? tx(locale, "Tu pedido de visita ya llegó", "Your visit request is in") : tx(locale, "Tu mensaje ya llegó", "Your message is on its way")}
         </div>
         {tour && (
           <>
@@ -159,7 +176,11 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
           </>
         )}
         <p className={cn("mt-2 text-[15px]", muted)}>
-          {tx(locale, `${agent?.name.split(" ")[0] ?? "Tu asesor"} suele contestar en menos de 15 minutos. Te escribirá a ${email}.`, `${agent?.name.split(" ")[0] ?? "Your advisor"} usually replies within 15 minutes and will write to you at ${email}.`)}
+          {asked
+            ? tx(locale, `Su dueño ya sabe cuándo te viene bien. Te escribirá a ${email} para cuadrar el día.`, `The owner now knows when suits you and will write to you at ${email} to set the day.`)
+            : fsbo
+              ? tx(locale, `${replier} te escribirá a ${email}. Lo publica sin intermediarios, así que le hablas directo.`, `${replier} will write to you at ${email}. It’s listed without middlemen, so you talk to them directly.`)
+              : tx(locale, `${replier} suele contestar en menos de 15 minutos. Te escribirá a ${email}.`, `${replier} usually replies within 15 minutes and will write to you at ${email}.`)}
         </p>
         <div className="mt-5 flex flex-wrap gap-2">
           {tour ? (
@@ -167,7 +188,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
           ) : (
             user && <Button href={`/${locale}/app`} size="sm" variant="navy">{tx(locale, "Ver en mi Hub", "Open my Hub")}</Button>
           )}
-          <Button size="sm" variant={dark ? "dark-outline" : "outline"} onClick={() => { setDone(null); setIso(null); setDay(null); }}>{tx(locale, "Enviar otra", "Send another")}</Button>
+          <Button size="sm" variant={dark ? "dark-outline" : "outline"} onClick={() => { setDone(null); setIso(null); setDay(null); setAsked(false); setPrefs([]); setVisitNote(""); }}>{tx(locale, "Enviar otra", "Send another")}</Button>
         </div>
       </div>
     );
@@ -175,7 +196,9 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
 
   const primaryLabel =
     mode === "tour"
-      ? chosen
+      ? askMode
+        ? tx(locale, "Pedir una visita", "Request a visit")
+        : chosen
         ? `${tx(locale, "Pedir visita", "Request a viewing")} · ${slotLabel(chosen)}`
         : tx(locale, "Pedir visita", "Request a viewing")
       : tx(locale, "Enviar mensaje", "Send message");
@@ -220,7 +243,45 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
         ))}
       </div>
       <div role="tabpanel" id={`${uid}-panel`} aria-labelledby={`${uid}-tab-${mode}`}>
-        {mode === "tour" && (
+        {mode === "tour" && askMode && (
+          <div className="mt-5" data-testid="visit-ask">
+            <div className="np-eyebrow mb-2 text-gold-text">{tx(locale, "Pide una visita", "Ask for a visit")}</div>
+            <p className={cn("text-[15px]", muted)}>
+              {slots.data?.hasCalendar
+                ? tx(locale, "Esta semana ya no quedan horas libres. Cuéntale a su dueño cuándo te viene bien y te propone un momento.", "No free times left this week. Tell the owner when suits you and they’ll suggest a time.")
+                : tx(locale, "Su dueño todavía no ha puesto horarios de visita. Dinos cuándo te viene bien y se lo hacemos llegar.", "The owner hasn’t set visit hours yet. Tell us when suits you and we’ll pass it on.")}
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label={tx(locale, "Cuándo te viene bien", "When suits you")}>
+              {VISIT_PREFS.map((p) => {
+                const on = prefs.includes(p);
+                return (
+                  <button
+                    key={p}
+                    type="button"
+                    aria-pressed={on}
+                    onClick={() => setPrefs(on ? prefs.filter((x) => x !== p) : [...prefs, p])}
+                    className={cn("inline-flex min-h-11 items-center gap-1.5 rounded-full border px-3.5 font-display text-sm font-semibold", on ? "np-sel border-2" : dark ? "border-navy-line" : "border-[#D8CBB7] hover:border-navy/50")}
+                  >
+                    {on && <CheckCircle2 size={14} aria-hidden />} {tx(locale, ...VISIT_PREF_LABEL[p])}
+                  </button>
+                );
+              })}
+            </div>
+            <input
+              className={cn(field, "mt-2")}
+              maxLength={200}
+              value={visitNote}
+              onChange={(e) => setVisitNote(e.target.value)}
+              placeholder={tx(locale, "¿Algún día u hora en concreto? (opcional)", "Any particular day or time? (optional)")}
+              aria-label={tx(locale, "Día u hora que prefieres", "Preferred day or time")}
+            />
+            <label className={cn("mt-2 flex min-h-11 cursor-pointer items-center gap-2 text-sm", muted)}>
+              <input type="checkbox" checked={virtual} onChange={(e) => setVirtual(e.target.checked)} className="h-5 w-5 accent-[#1E1A18]" />
+              <Video size={14} aria-hidden /> {tx(locale, "Prefiero verla por videollamada", "I’d rather see it on a video call")}
+            </label>
+          </div>
+        )}
+        {mode === "tour" && !askMode && (
           <div className="mt-5">
             <div className="np-eyebrow mb-3 text-gold-text">{tx(locale, "Elige cuándo quieres verla", "Choose when to see it")}</div>
             {slots.isLoading && (
@@ -275,7 +336,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
                     chosen === h.iso ? "np-sel border-2" : dark ? "border-navy-line" : "border-[#D8CBB7] hover:border-navy/50",
                   )}
                 >
-                  {String(h.hour).padStart(2, "0")}:00
+                  {h.label ?? `${String(h.hour).padStart(2, "0")}:00`}
                 </button>
               ))}
             </div>
@@ -311,10 +372,13 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
           </div>
           {err && <div role="alert" className="rounded-xl bg-[#B3261E1A] px-3 py-2 text-sm text-danger">{err}</div>}
           {/* The one terracotta action of each tab: confirm the visit (naming the chosen time) or send the message. */}
-          <Button type="submit" className="!mt-3 h-[52px] w-full md:h-[52px]" size="lg" disabled={busy || (mode === "tour" && !chosen)} variant="primary">
+          <Button type="submit" className="!mt-3 h-[52px] w-full md:h-[52px]" size="lg" disabled={busy || (mode === "tour" && !chosen && !(askMode && askReady))} variant="primary">
             {busy && <Loader2 size={16} className="animate-spin" aria-hidden />}
             {primaryLabel}
           </Button>
+          {mode === "tour" && askMode && !askReady && (
+            <p className={cn("text-center text-sm", muted)}>{tx(locale, "Elige cuándo te viene bien para pedir la visita", "Pick when suits you to request the visit")}</p>
+          )}
           {mode === "tour" && !chosen && days.some((d) => d.hours.some((h) => h.available)) && (
             <p className={cn("text-center text-sm", muted)}>{tx(locale, "Elige un día y una hora para pedir la visita", "Pick a day and a time to request the viewing")}</p>
           )}
@@ -344,7 +408,15 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
         </div>
       )}
       <p className={cn("mt-3 text-center text-sm", muted)}>
-        {bookable && mode === "tour" ? tx(locale, "Horarios reales de tu asesor · Sin costo", "Your advisor’s real availability · Free") : tx(locale, "Suele contestar en menos de 15 minutos", "Usually replies within 15 minutes")}
+        {bookable && mode === "tour"
+          ? fsbo
+            ? askMode
+              ? tx(locale, "Le llega directo a su dueño · Sin costo", "Goes straight to the owner · Free")
+              : tx(locale, "Horarios que puso su dueño · Sin costo", "Times set by the owner · Free")
+            : tx(locale, "Horarios reales de tu asesor · Sin costo", "Your advisor’s real availability · Free")
+          : fsbo
+            ? tx(locale, "Le escribes directo a su dueño", "You write straight to the owner")
+            : tx(locale, "Suele contestar en menos de 15 minutos", "Usually replies within 15 minutes")}
       </p>
     </div>
   );

@@ -348,6 +348,9 @@ model Listing {
   privateListing Boolean       @default(false)
   shortRent      Json?
   commercial     Json?
+  /// FSBO weekly visit hours set by the owner: { slotMin: 30|45|60|90, ranges: [{ day: 0 (Mon)…6, from: "HH:MM", to: "HH:MM" }] }
+  /// (America/Caracas wall time). Null = no calendar → the listing page offers "request a visit" instead.
+  visitHours     Json?
   fingerprint    String
   quality        Int           @default(0)
   impressions    Int           @default(0)

@@ -19,6 +19,7 @@ import { AMENITY_LABEL, TYPE_LABEL, lbl, money, num, priceSuffix, tx, plural } f
 import { cn } from "@/lib/cn";
 import { ViewBeacon } from "@/components/detail/ViewBeacon";
 import { StickyContactBar } from "@/components/detail/StickyContactBar";
+import { takesTours } from "@/lib/visit-hours";
 import { zoneStats } from "@/server/zone-stats";
 import { essentialLabels } from "@/lib/essentials";
 
@@ -240,7 +241,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
             locale={locale}
             price={money(l.priceAmount, locale)}
             suffix={priceSuffix(l, locale)}
-            tour={!!l.agentId && ["ACTIVE", "COMING_SOON", "UNDER_OFFER"].includes(l.status)}
+            tour={takesTours(l)}
             whatsapp={whatsappHref(l, locale)}
             agentFirst={l.agent?.name.split(" ")[0]}
           />

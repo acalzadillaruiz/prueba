@@ -142,6 +142,11 @@ async function main() {
     const quality = listingQuality({ photos, titleEn: row.titleEn, bodyEn: row.bodyEn, located: !!row.lat, hasFloorplan: row.hasFloorplan, hasVirtualTour: row.hasVirtualTour });
     await prisma.$executeRaw`UPDATE "Listing" SET "quality" = ${quality} WHERE "id" = ${l.id}`;
   }
+  // FSBO visit hours: Isabel's Sabana Grande apartment takes bookings (weekday evenings + Saturday morning, 45-min visits);
+  // her El Hatillo house has none, so its page offers "Pide una visita" (request with preferred times).
+  const fsboWithHours = LISTINGS.find((l) => l.ownerUserId === "u-priv" && l.zone === "Sabana Grande")!;
+  const visitHours = { slotMin: 45, ranges: [0, 1, 2, 3, 4].map((day) => ({ day, from: "17:00", to: "19:15" })).concat([{ day: 5, from: "09:00", to: "12:00" }]) };
+  await prisma.$executeRaw`UPDATE "Listing" SET "visitHours" = ${JSON.stringify(visitHours)}::jsonb WHERE "id" = ${fsboWithHours.id}`;
   // two listings pending review so backoffice has something to approve
   await prisma.listing.updateMany({ where: { id: { in: [LISTINGS[12].id, LISTINGS[20].id] } }, data: { review: "PENDING" } });
 

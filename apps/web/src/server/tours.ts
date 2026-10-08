@@ -1,6 +1,7 @@
 import "server-only";
 import { prisma, type Prisma } from "@newplace/db";
 import { ApiError } from "./api";
+import { HORIZON_MS, isVisitSlot, MIN_LEAD_MS, type VisitHours } from "@/lib/visit-hours";
 
 const TZ_OFFSET_H = -4; // America/Caracas (no DST)
 const HOUR = 3600e3;
@@ -16,6 +17,13 @@ export async function assertBookableSlot(agentId: string, start: Date) {
   if (!slot) throw new ApiError("VALIDATION", { tourStart: "not a slot" });
 }
 
+/** FSBO: the owner's weekly visit hours (Listing.visitHours), same 2 h – 8 days window as agent calendars. */
+export function assertOwnerVisitSlot(hours: VisitHours, start: Date) {
+  const now = Date.now();
+  if (Number.isNaN(start.getTime()) || start.getTime() < now + MIN_LEAD_MS - 60e3 || start.getTime() > now + HORIZON_MS) throw new ApiError("VALIDATION", { tourStart: "out of range" });
+  if (!isVisitSlot(hours, start)) throw new ApiError("VALIDATION", { tourStart: "not a slot" });
+}
+
 /** Staff-proposed tours: any future time within 60 days. */
 export function assertFutureTour(start: Date) {
   const now = Date.now();
@@ -24,12 +32,13 @@ export function assertFutureTour(start: Date) {
 
 /**
  * Serialises bookings per agent (Postgres advisory lock held until the transaction ends), then checks for a
- * clash within ±59 min. Two buyers racing for the same slot: one wins, the other gets 409.
+ * clash within ±59 min (±`windowMin`: an FSBO owner's slots may be 30/45/90 min long). Two buyers racing for the same
+ * slot: one wins, the other gets 409. For FSBO listings the "agent" is the owner, who attends the visits.
  */
-export async function lockAgentAndCheck(tx: Prisma.TransactionClient, agentId: string, start: Date, exceptLeadId?: string) {
+export async function lockAgentAndCheck(tx: Prisma.TransactionClient, agentId: string, start: Date, exceptLeadId?: string, windowMin = 59) {
   await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${agentId}))`;
   const clash = await tx.tour.findFirst({
-    where: { agentId, ...(exceptLeadId ? { leadId: { not: exceptLeadId } } : {}), status: { in: ["REQUESTED", "CONFIRMED"] }, start: { gte: new Date(start.getTime() - 59 * 60e3), lte: new Date(start.getTime() + 59 * 60e3) } },
+    where: { agentId, ...(exceptLeadId ? { leadId: { not: exceptLeadId } } : {}), status: { in: ["REQUESTED", "CONFIRMED"] }, start: { gte: new Date(start.getTime() - windowMin * 60e3), lte: new Date(start.getTime() + windowMin * 60e3) } },
   });
   if (clash) throw new ApiError("CONFLICT", { tourStart: "slot taken" });
 }

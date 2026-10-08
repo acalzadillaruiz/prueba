@@ -25,6 +25,9 @@ export const leadSchema = z.object({
   budget: z.number().int().positive().optional(),
   tourStart: z.string().datetime().optional(),
   virtual: z.boolean().optional(),
+  /** FSBO without a free slot: when the visitor would like to come (the owner then proposes a time). */
+  visitPrefs: z.array(z.enum(["WEEKDAY_AM", "WEEKDAY_PM", "WEEKEND"])).max(3).optional(),
+  visitNote: z.string().trim().max(200).optional(),
 });
 
 export const captureSchema = z.object({

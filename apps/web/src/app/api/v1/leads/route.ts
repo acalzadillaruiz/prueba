@@ -8,13 +8,18 @@ import { leadToDomain, queueEmail } from "@/server/data";
 import { isManager } from "@/server/access";
 import { limit } from "@/server/rate-limit";
 import { publicWhere } from "@/server/listings";
-import { assertBookableSlot, lockAgentAndCheck } from "@/server/tours";
+import { assertBookableSlot, assertOwnerVisitSlot, lockAgentAndCheck } from "@/server/tours";
+import { isFsbo, OPEN_FOR_TOURS, parseVisitHours, VISIT_PREF_LABEL } from "@/lib/visit-hours";
 import { bump } from "@/server/counters";
 import { recipientLocale, requestLocale, tourWhen, type Loc } from "@/server/email-locale";
 
 const Create = leadSchema;
 
-/** Public: contact form / tour request from a listing. Creates Lead (+ Tour, thread, emails). */
+/**
+ * Public: contact form / tour request from a listing. Creates Lead (+ Tour, thread, emails).
+ * Tours are booked on the agent's calendar, or — FSBO listings — on the owner's visit hours (the owner is the Tour's host).
+ * FSBO without a free slot: `visitPrefs`/`visitNote` say when the visitor would like to come; the owner proposes a time.
+ */
 export const POST = handler(async (req: NextRequest) => {
   await limit(req, "lead", 10, 10 * 60);
   const u = await currentUser();
@@ -23,16 +28,31 @@ export const POST = handler(async (req: NextRequest) => {
   const l = await prisma.listing.findFirst({ where: { AND: [{ id: b.listingId }, publicWhere({ byLink: true })] }, include: { agent: true, owner: true } });
   if (!l) throw new ApiError("NOT_FOUND");
   const tourStart = b.tourStart ? new Date(b.tourStart) : null;
+  const fsbo = isFsbo(l);
+  const ownerHours = fsbo ? parseVisitHours(l.visitHours) : null;
+  // Who attends the visit: the listing's agent, or the FSBO owner when they published visit hours.
+  const host = l.agentId ?? (ownerHours ? l.ownerUserId : null);
   if (tourStart) {
-    if (!l.agentId) throw new ApiError("VALIDATION", { tourStart: "listing has no agent calendar" });
-    if (!["ACTIVE", "COMING_SOON", "UNDER_OFFER"].includes(l.status)) throw new ApiError("VALIDATION", { tourStart: "listing not available" });
-    await assertBookableSlot(l.agentId, tourStart);
+    if (!host) throw new ApiError("VALIDATION", { tourStart: "listing has no visit calendar" });
+    if (!OPEN_FOR_TOURS.includes(l.status)) throw new ApiError("VALIDATION", { tourStart: "listing not available" });
+    if (l.agentId) await assertBookableSlot(l.agentId, tourStart);
+    else assertOwnerVisitSlot(ownerHours!, tourStart);
   }
-  const source = b.tourStart ? "TOUR_REQUEST" : "LISTING_FORM";
+  const prefs = !tourStart ? [...new Set(b.visitPrefs ?? [])] : [];
+  const visitNote = !tourStart ? b.visitNote?.trim() || "" : "";
+  const visitRequest = prefs.length > 0 || !!visitNote;
+  if (visitRequest && !OPEN_FOR_TOURS.includes(l.status)) throw new ApiError("VALIDATION", { visitPrefs: "listing not available" });
+  // The request reaches whoever answers the lead, in their language, at the top of the message.
+  const staffEmail = l.agent?.email ?? l.owner?.email ?? null;
+  const staffLoc = staffEmail ? await recipientLocale(staffEmail) : "es";
+  const message = visitRequest
+    ? `${staffLoc === "en" ? "Would like to visit" : "Quiere visitarla"}: ${[...prefs.map((p) => VISIT_PREF_LABEL[p][staffLoc === "en" ? 1 : 0]), b.virtual ? (staffLoc === "en" ? "by video call" : "por videollamada") : "", visitNote].filter(Boolean).join(" · ")}\n\n${b.message}`
+    : b.message;
+  const source = b.tourStart || visitRequest ? "TOUR_REQUEST" : "LISTING_FORM";
   const provider = await aiProvider();
   const score = await provider.leadScore({ createdMinutesAgo: 0, budget: b.budget, listingPrice: l.priceAmount, source, messages: 1, hasPhone: !!b.phone, toursRequested: b.tourStart ? 1 : 0 });
   const lead = await prisma.$transaction(async (tx) => {
-    if (tourStart && l.agentId) await lockAgentAndCheck(tx, l.agentId, tourStart);
+    if (tourStart && host) await lockAgentAndCheck(tx, host, tourStart, undefined, l.agentId ? 59 : ownerHours!.slotMin - 1);
     const created = await tx.lead.create({
     data: {
       listingId: l.id,
@@ -42,22 +62,22 @@ export const POST = handler(async (req: NextRequest) => {
       name: b.name,
       email: b.email.toLowerCase(),
       phone: b.phone || null,
-      message: b.message,
+      message,
       budget: b.budget,
       source,
       toursRequested: b.tourStart ? 1 : 0,
       score: score.score,
       nextAction: score.nextAction,
       reason: score.reason,
-      events: { create: { type: "CREATED", data: { source, provider: provider.id }, actorId: u?.id } },
+      events: { create: { type: "CREATED", data: { source, provider: provider.id, ...(visitRequest ? { visitPrefs: prefs, visitNote } : {}) }, actorId: u?.id } },
     },
     });
-    if (tourStart && l.agentId) await tx.tour.create({ data: { listingId: l.id, leadId: created.id, agentId: l.agentId, seekerUserId: u?.id, seekerName: b.name, start: tourStart, virtual: !!b.virtual } });
+    if (tourStart && host) await tx.tour.create({ data: { listingId: l.id, leadId: created.id, agentId: host, seekerUserId: u?.id, seekerName: b.name, start: tourStart, virtual: !!b.virtual } });
     return created;
   });
   const participants = [l.agentId ?? l.ownerUserId, u?.id].filter((x): x is string => !!x);
   const thread = await prisma.messageThread.create({ data: { leadId: lead.id, listingId: l.id, subject: l.titleEs, participants: { create: [...new Set(participants)].map((userId) => ({ userId })) } } });
-  if (u) await prisma.message.create({ data: { threadId: thread.id, senderId: u.id, body: b.message } });
+  if (u) await prisma.message.create({ data: { threadId: thread.id, senderId: u.id, body: message } });
   await bump([l.id], ["leadsCount", "interactions"]);
   // Subjects in each recipient's language: the seeker's saved locale (or the language they're browsing in), the staff's.
   const seekerLoc = await recipientLocale(b.email, requestLocale(req));
@@ -68,10 +88,14 @@ export const POST = handler(async (req: NextRequest) => {
     tourStart ? (seekerLoc === "en" ? `We got your visit request: ${title("en")} · ${when}` : `Recibimos tu pedido de visita: ${title("es")} · ${when}`) : seekerLoc === "en" ? `We got your message: ${title("en")}` : `Recibimos tu mensaje: ${title("es")}`,
     "TOUR",
   );
-  const staff = l.agent?.email ?? l.owner?.email;
-  if (staff) {
-    const staffLoc = await recipientLocale(staff);
-    await queueEmail(staff, staffLoc === "en" ? `New lead (${score.score}/100): ${b.name} · ${title("en")}` : `Nuevo contacto (${score.score}/100): ${b.name} · ${title("es")}`, "LEAD");
+  if (staffEmail && fsbo && (tourStart || visitRequest)) {
+    // FSBO owner: plain words, no lead score — a visit to confirm or a visit to schedule.
+    const subject = tourStart
+      ? staffLoc === "en" ? `New viewing to confirm: ${b.name} · ${tourWhen(tourStart, "en")} · ${title("en")}` : `Visita por confirmar: ${b.name} · ${tourWhen(tourStart, "es")} · ${title("es")}`
+      : staffLoc === "en" ? `${b.name} would like to visit ${title("en")}` : `${b.name} quiere visitar ${title("es")}`;
+    await queueEmail(staffEmail, subject, "TOUR");
+  } else if (staffEmail) {
+    await queueEmail(staffEmail, staffLoc === "en" ? `New lead (${score.score}/100): ${b.name} · ${title("en")}` : `Nuevo contacto (${score.score}/100): ${b.name} · ${title("es")}`, "LEAD");
   }
   return ok(leadToDomain(lead), 201);
 });

@@ -56,7 +56,7 @@ export function validateExtras(locale: Locale, listingType: string, luxury: bool
     if (commercialSchema.safeParse(com).success) payload.commercial = com;
   }
   if (luxury && x.brochurePdf.trim()) {
-    if (bad(brochurePdfSchema, x.brochurePdf)) errors.brochurePdf = tx(locale, "Enlace no válido: usa una URL https://… del PDF.", "Invalid link: use an https://… URL to the PDF.");
+    if (bad(brochurePdfSchema, x.brochurePdf)) errors.brochurePdf = tx(locale, "Ese enlace no funciona. Usa la dirección https://… del PDF.", "That link doesn’t work. Use the PDF’s https://… address.");
     else payload.brochurePdf = x.brochurePdf.trim();
   }
   return { payload, errors, ok: Object.keys(errors).length === 0 };
@@ -114,7 +114,7 @@ export function ListingTypeFields({
           <div className="grid gap-3 sm:grid-cols-3">
             {input("minNights", tx(locale, "Noches mínimas", "Minimum nights"), { min: 1, max: 365 })}
             {input("maxGuests", tx(locale, "Huéspedes máximos", "Maximum guests"), { min: 1, max: 50 })}
-            {input("cleaningFee", tx(locale, "Tarifa de limpieza (USD)", "Cleaning fee (USD)"), { min: 0, max: 10_000, hint: tx(locale, "Informativa, no se cobra en New Place.", "For information; not charged on New Place.") })}
+            {input("cleaningFee", tx(locale, "Tarifa de limpieza (USD)", "Cleaning fee (USD)"), { min: 0, max: 10_000, hint: tx(locale, "Solo informativa: no se cobra a través de New Place.", "Just for reference; it isn’t charged through New Place.") })}
           </div>
         </div>
       )}

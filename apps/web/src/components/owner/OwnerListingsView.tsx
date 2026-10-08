@@ -109,7 +109,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
           files.forEach((f) => fd.append("files", f));
           await act(async () => {
             const r = await fetch(`/api/v1/listings/${uploadFor}/photos`, { method: "POST", body: fd });
-            if (!r.ok) throw new Error(((await r.json().catch(() => null)) as { error?: { message?: string } } | null)?.error?.message ?? tx(locale, "No se pudieron subir las fotos.", "Photos could not be uploaded."));
+            if (!r.ok) throw new Error(((await r.json().catch(() => null)) as { error?: { message?: string } } | null)?.error?.message ?? tx(locale, "No pudimos subir las fotos. Inténtalo otra vez en un momento.", "We couldn’t upload the photos. Please try again in a moment."));
           }, `photos-${uploadFor}`);
           e.target.value = "";
         }}
@@ -128,7 +128,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
                 {[
                   [tx(locale, "Solicitado", "Requested"), <TimeAgo key="t" iso={m.createdAt} locale={locale} />],
                   [tx(locale, "Agente asignado", "Agent assigned"), m.agentName ?? "—"],
-                  [tx(locale, "Publicado", "Live"), tx(locale, "Tras sesión de fotos", "After photo shoot")],
+                  [tx(locale, "Publicado", "Live"), tx(locale, "Después de la sesión de fotos", "After the photo shoot")],
                 ].map(([t, d], i) => (
                   <li key={i}>
                     <div className={cn("h-1.5 rounded-full", i <= stageIdx[m.status] ? "bg-navy dark:bg-ivory" : "bg-black/10")} />
@@ -140,7 +140,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
             </Card>
           ))}
 
-          {listings.length === 0 && <Empty title={tx(locale, "Aún no publicas nada", "Nothing listed yet")} body={tx(locale, "Publica gratis o encárgalo a una agencia verificada.", "List for free or hire a verified agency.")} cta={<Button href={`/${locale}/owner/new`} variant="outline" className={k.outline}>{tx(locale, "Publicar", "List a property")}</Button>} />}
+          {listings.length === 0 && <Empty title={tx(locale, "Todavía no has publicado nada", "Nothing listed yet")} body={tx(locale, "Publica tu casa gratis o deja que una agencia verificada se encargue.", "List your home for free, or let a verified agency take care of it.")} cta={<Button href={`/${locale}/owner/new`} variant="outline" className={k.outline}>{tx(locale, "Publicar mi casa", "List my home")}</Button>} />}
 
           {listings.map((l) => {
             const lo = offers.filter((o) => o.listingId === l.id);
@@ -227,7 +227,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
                           (confirmSold === l.id ? (
                             // Taking a listing off the market is not undoable from here: ask first.
                             <span className="flex flex-wrap items-center gap-2" role="group" aria-label={tx(locale, "Confirmar", "Confirm")}>
-                              <span className="text-sm font-semibold">{l.listingType.includes("RENT") ? tx(locale, "¿Marcar como alquilado? Saldrá del buscador.", "Mark as rented? It leaves search.") : tx(locale, "¿Marcar como vendido? Saldrá del buscador.", "Mark as sold? It leaves search.")}</span>
+                              <span className="text-sm font-semibold">{l.listingType.includes("RENT") ? tx(locale, "¿Marcar como alquilado? Dejará de aparecer en el buscador.", "Mark as rented? It will no longer appear in search.") : tx(locale, "¿Marcar como vendido? Dejará de aparecer en el buscador.", "Mark as sold? It will no longer appear in search.")}</span>
                               <Button size="sm" variant="navy" disabled={busy === `sold-${l.id}`} onClick={() => act(() => api(`listings/${l.id}`, { method: "PATCH", json: { status: l.listingType.includes("RENT") ? "RENTED" : "SOLD" } }), `sold-${l.id}`).then(() => setConfirmSold(null))}>
                                 {busy === `sold-${l.id}` && <Loader2 size={13} className="animate-spin" />} {tx(locale, "Sí, confirmar", "Yes, confirm")}
                               </Button>
@@ -242,7 +242,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
                     )}
                     {ll.length > 0 && (
                       <div className="mt-4 rounded-lg border border-line" data-testid="owner-leads">
-                        <div className="border-b border-line px-3 py-2 text-xs font-bold uppercase tracking-wide text-muted">{tx(locale, "Contactos recibidos", "Enquiries received")} · {ll.length}</div>
+                        <div className="border-b border-line px-3 py-2 text-xs font-bold uppercase tracking-wide text-muted">{tx(locale, "Personas interesadas", "Interested people")} · {ll.length}</div>
                         <ul className="divide-y divide-line">
                           {ll.slice(0, 5).map((ld) => (
                             <li key={ld.id} className="px-3 py-2.5 text-sm">
@@ -277,7 +277,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
                             {o.note && <div className="w-full text-xs text-muted">{o.note}</div>}
                           </div>
                         ))}
-                        <div className="border-t border-line px-3 py-2 text-[11px] text-muted">{tx(locale, "Registro de ofertas. La firma se hace fuera de New Place en v1.", "Offer log. Signing happens outside New Place in v1.")}</div>
+                        <div className="border-t border-line px-3 py-2 text-[11px] text-muted">{tx(locale, "Aquí ves cada oferta. Por ahora, la firma se hace fuera de New Place.", "Every offer, in one place. For now, signing happens outside New Place.")}</div>
                       </div>
                     )}
                   </div>
@@ -323,7 +323,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
               </div>
               {threadLead && !other ? (
                 <div className="border-t border-line p-3 text-center text-sm text-muted">
-                  {tx(locale, "Escribió sin cuenta: responde por email o teléfono.", "Sent without an account: reply by email or phone.")}{" "}
+                  {tx(locale, "Te escribió sin crear una cuenta. Respóndele por email o teléfono.", "They wrote without an account. Reply by email or phone.")}{" "}
                   <a href={`mailto:${threadLead.email}`} className="font-semibold font-semibold text-navy underline decoration-navy/30 underline-offset-4">{tx(locale, "Responder por email", "Reply by email")}</a>
                 </div>
               ) : (
@@ -352,7 +352,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
               </form>
               )}
               {chatErr && <div role="alert" className="mx-3 mb-2 rounded-lg bg-[#B3261E1A] px-3 py-2 text-xs text-danger">{chatErr}</div>}
-              <div className="pb-2 text-center text-[10px] text-muted">{tx(locale, "Inbox interno · se actualiza cada 15 s", "Internal inbox · refreshes every 15 s")}</div>
+              <div className="pb-2 text-center text-[10px] text-muted">{tx(locale, "Tus mensajes · se actualizan cada 15 s", "Your messages · refresh every 15 s")}</div>
             </>
           ) : (
             <div className="m-auto p-6 text-center text-sm text-muted">{tx(locale, "Cuando un comprador o tu agente te escriba, verás la conversación aquí.", "When a buyer or your agent writes, the conversation shows up here.")}</div>

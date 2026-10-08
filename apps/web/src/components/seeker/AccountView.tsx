@@ -41,7 +41,7 @@ export function AccountView({ locale, data }: { locale: Locale; data: AccountDat
   const errs = {
     name: f.name.trim().length < 2 || f.name.trim().length > 80 ? tx(locale, "Entre 2 y 80 caracteres.", "Between 2 and 80 characters.") : null,
     phone: f.phone.length > 30 ? tx(locale, "Hasta 30 caracteres.", "Up to 30 characters.") : null,
-    budget: f.budget !== null && (!Number.isInteger(f.budget) || f.budget <= 0) ? tx(locale, "Un monto en USD mayor que 0, sin decimales.", "A USD amount above 0, no decimals.") : null,
+    budget: f.budget !== null && (!Number.isInteger(f.budget) || f.budget <= 0) ? tx(locale, "Escribe un monto en USD mayor que 0, sin decimales.", "Enter a USD amount above 0, no decimals.") : null,
     interests: f.interests.length > 200 ? tx(locale, "Hasta 200 caracteres.", "Up to 200 characters.") : null,
   };
   const invalid = Object.values(errs).some(Boolean);
@@ -63,7 +63,7 @@ export function AccountView({ locale, data }: { locale: Locale; data: AccountDat
   };
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 md:px-6">
-      <div className={k.eyebrow}>{tx(locale, "Área privada", "Private area")}</div>
+      <div className={k.eyebrow}>{tx(locale, "Tu espacio", "Your space")}</div>
       <h1 className="mt-1 font-serif text-[40px] font-medium leading-[1.05] md:text-[48px]">{tx(locale, "Mi cuenta", "My account")}</h1>
       <Card className={cn(k.card, "border-0 mt-6 p-6")}>
         <div className="flex flex-wrap items-center gap-4">
@@ -80,7 +80,7 @@ export function AccountView({ locale, data }: { locale: Locale; data: AccountDat
           <Field label={tx(locale, "Nombre", "Name")} error={showErrs ? errs.name ?? undefined : undefined}><input className={inputCls} value={f.name} maxLength={80} autoComplete="name" aria-invalid={showErrs && !!errs.name} onChange={(e) => setF({ ...f, name: e.target.value })} /></Field>
           <Field label={tx(locale, "Teléfono", "Phone")} error={showErrs ? errs.phone ?? undefined : undefined}><input className={inputCls} type="tel" value={f.phone} maxLength={30} autoComplete="tel" aria-invalid={showErrs && !!errs.phone} onChange={(e) => setF({ ...f, phone: e.target.value })} /></Field>
           <Field label={tx(locale, "Presupuesto (USD)", "Budget (USD)")} error={showErrs ? errs.budget ?? undefined : undefined}><input className={inputCls} type="number" inputMode="numeric" min={1} step={1} value={f.budget ?? ""} aria-invalid={showErrs && !!errs.budget} onChange={(e) => setF({ ...f, budget: e.target.value ? Number(e.target.value) : null })} /></Field>
-          <Field label={tx(locale, "Zonas de interés", "Areas of interest")} error={showErrs ? errs.interests ?? undefined : undefined}><input className={inputCls} value={f.interests} maxLength={200} aria-invalid={showErrs && !!errs.interests} onChange={(e) => setF({ ...f, interests: e.target.value })} /></Field>
+          <Field label={tx(locale, "Zonas que te interesan", "Areas you like")} error={showErrs ? errs.interests ?? undefined : undefined}><input className={inputCls} value={f.interests} maxLength={200} aria-invalid={showErrs && !!errs.interests} onChange={(e) => setF({ ...f, interests: e.target.value })} /></Field>
         </div>
       </Card>
       <Card className={cn(k.card, "border-0 mt-6 divide-y divide-line")}>
@@ -88,7 +88,7 @@ export function AccountView({ locale, data }: { locale: Locale; data: AccountDat
           <Globe size={20} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" />
           <div className="flex-1">
             <div className="font-semibold">{tx(locale, "Idioma", "Language")}</div>
-            <div className="text-sm text-muted">{tx(locale, "Precios en USD con referencia en VES y EUR.", "Prices in USD with VES and EUR reference.")}</div>
+            <div className="text-sm text-muted">{tx(locale, "Te mostramos los precios en USD, con su referencia en VES y EUR.", "We show prices in USD, with VES and EUR for reference.")}</div>
           </div>
           <select className="h-10 rounded-lg border border-line bg-white px-3" value={f.locale} onChange={(e) => setF({ ...f, locale: e.target.value as "es" | "en" })} aria-label={tx(locale, "Idioma", "Language")}>
             <option value="es">Español</option>
@@ -98,7 +98,7 @@ export function AccountView({ locale, data }: { locale: Locale; data: AccountDat
         <div className="flex items-center gap-4 p-5">
           <Lock size={20} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" />
           <div className="flex-1">
-            <div className="font-semibold">{tx(locale, "Inicio de sesión", "Sign-in")}</div>
+            <div className="font-semibold">{tx(locale, "Cómo entras", "How you sign in")}</div>
             <div className="text-sm text-muted">
               {[data.providers.includes("google") && "Google", data.hasPassword && tx(locale, "email y contraseña", "email & password")].filter(Boolean).join(" · ") || "—"}
             </div>

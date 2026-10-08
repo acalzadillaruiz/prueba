@@ -150,7 +150,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
   const parking = d.kind === "land" ? 0 : d.parking;
   // Step 2 checks, with the same bounds the API enforces (a bad year used to fail only at publish with a generic error).
   const detailsErr = {
-    m2: !Number.isInteger(d.m2) || d.m2 < 1 || d.m2 > 1_000_000 ? tx(locale, "Indica la superficie en m² (número entero mayor que 0).", "Enter the area in m² (whole number above 0).") : null,
+    m2: !Number.isInteger(d.m2) || d.m2 < 1 || d.m2 > 1_000_000 ? tx(locale, "Escribe la superficie en m², un número entero mayor que 0.", "Enter the area in m², a whole number above 0.") : null,
     year: !Number.isInteger(d.year) || d.year < 1800 || d.year > THIS_YEAR + 5 ? tx(locale, `Año entre 1800 y ${THIS_YEAR + 5}.`, `Year between 1800 and ${THIS_YEAR + 5}.`) : null,
   };
   const detailsOk = !detailsErr.m2 && !detailsErr.year;
@@ -200,7 +200,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
       });
       set({ copy: r.copy });
     } catch (e) {
-      setAiErr(`${tx(locale, "No se pudo redactar el texto", "Couldn’t write the text")}: ${(e as Error).message}`);
+      setAiErr(`${tx(locale, "No pudimos escribir el texto", "We couldn’t write the text")}: ${(e as Error).message}`);
     } finally {
       setWriting(false);
     }
@@ -260,7 +260,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
         const r = await fetch(`/api/v1/listings/${created.id}/photos`, { method: "POST", body: fd }).catch(() => null);
         if (!r?.ok) {
           const msg = ((await r?.json().catch(() => null)) as { error?: { message?: string } } | null)?.error?.message;
-          setPhotoWarn(tx(locale, `El inmueble se creó, pero las fotos no se subieron${msg ? ` (${msg})` : ""}. Súbelas desde «Mis inmuebles».`, `The listing was created but the photos didn’t upload${msg ? ` (${msg})` : ""}. Add them from “My properties”.`));
+          setPhotoWarn(tx(locale, `Tu anuncio ya está creado, pero las fotos no se subieron${msg ? ` (${msg})` : ""}. Puedes subirlas desde «Mis inmuebles».`, `Your listing is created, but the photos didn’t upload${msg ? ` (${msg})` : ""}. You can add them from “My properties”.`));
         }
       }
       sessionStorage.removeItem(DRAFT_KEY);
@@ -270,7 +270,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
       if (e instanceof ApiClientError && e.code === "CONFLICT") {
         const dd = (e.details as { duplicateOf?: { title: string; slug: string } })?.duplicateOf;
         if (dd) setDup(dd);
-        setErr(tx(locale, "Este inmueble ya está publicado en New Place (anti-duplicados).", "This property is already on New Place (duplicate check)."));
+        setErr(tx(locale, "Este inmueble ya está publicado en New Place, así que no podemos publicarlo dos veces.", "This property is already on New Place, so we can’t list it twice."));
       } else setErr((e as Error).message);
     } finally {
       setBusy(null);
@@ -293,17 +293,17 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
     return (
       <div className="mx-auto max-w-xl px-4 py-20 text-center" data-testid="owner-published">
         <CheckCircle2 size={56} className="mx-auto text-ok" />
-        <h1 className="mt-4 font-serif text-[36px] font-medium leading-[1.05] md:text-[44px]">{done.mode === "AGENCY" ? tx(locale, "Inmueble creado", "Listing created") : done.mode === "FSBO" ? (done.pending ? tx(locale, "Enviado a revisión", "Sent for review") : tx(locale, `¡Publicado en ${d.addr?.zone}!`, `Live in ${d.addr?.zone}!`)) : tx(locale, "Encargo enviado", "Request sent")}</h1>
+        <h1 className="mt-4 font-serif text-[36px] font-medium leading-[1.05] md:text-[44px]">{done.mode === "AGENCY" ? tx(locale, "Anuncio creado", "Listing created") : done.mode === "FSBO" ? (done.pending ? tx(locale, "Lo estamos revisando", "We’re reviewing it") : tx(locale, `Ya está publicado en ${d.addr?.zone}`, `Now live in ${d.addr?.zone}`)) : tx(locale, "Tu encargo va en camino", "Your request is on its way")}</h1>
         <p className="mt-2 text-muted">
           {done.mode === "AGENCY"
             ? user?.role === "AGENT"
-              ? tx(locale, "Quedó pendiente de aprobación del backoffice.", "It’s pending backoffice approval.")
-              : tx(locale, "Publicado y visible en el mapa.", "Published and visible on the map.")
+              ? tx(locale, "Queda a la espera de que el backoffice lo apruebe.", "It’s waiting for backoffice approval.")
+              : tx(locale, "Ya está publicado y visible en el mapa.", "It’s live and on the map.")
             : done.mode === "FSBO" && done.pending
-            ? tx(locale, "Como tu cuenta es nueva, el equipo de New Place revisará el anuncio antes de publicarlo. Te avisaremos por email.", "As your account is new, the New Place team will review the listing before it goes live. We’ll email you.")
+            ? tx(locale, "Como tu cuenta es nueva, alguien de nuestro equipo revisará el anuncio antes de publicarlo. Te escribimos por email en cuanto esté listo.", "Since your account is new, someone from our team will look over the listing before it goes live. We’ll email you as soon as it’s ready.")
             : done.mode === "FSBO"
-            ? tx(locale, "Pasó la revisión automática (sin duplicados) y ya aparece en el mapa.", "It passed automated checks (no duplicates) and is live on the map.")
-            : tx(locale, `${agencies.find((a) => a.id === d.agency)?.name} asignará un agente. Estado: SOLICITADO.`, `${agencies.find((a) => a.id === d.agency)?.name} will assign an agent. Status: REQUESTED.`)}
+            ? tx(locale, "Pasó nuestra revisión y ya aparece en el mapa, listo para que lo descubran.", "It passed our checks and is on the map, ready to be discovered.")
+            : tx(locale, `${agencies.find((a) => a.id === d.agency)?.name} te asignará un agente y se pondrá en contacto contigo pronto.`, `${agencies.find((a) => a.id === d.agency)?.name} will assign you an agent and be in touch soon.`)}
         </p>
         {photoWarn && <p role="alert" className="mt-4 rounded-lg bg-[#8A5A0014] px-3 py-2 text-sm text-warn">{photoWarn}</p>}
         <div className="mt-6 flex flex-wrap justify-center gap-3">
@@ -312,7 +312,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
           ) : (
             <Button href={`/${locale}/owner/listings`}>{tx(locale, "Ver mis inmuebles", "My properties")}</Button>
           )}
-          {done.mode === "FSBO" && !done.pending && <Button href={`/${locale}/listing/${done.slug}`} variant="outline" className="border-navy/70 bg-transparent text-navy hover:bg-[#E6DDD2]">{tx(locale, "Ver la ficha", "View listing")}</Button>}
+          {done.mode === "FSBO" && !done.pending && <Button href={`/${locale}/listing/${done.slug}`} variant="outline" className="border-navy/70 bg-transparent text-navy hover:bg-[#E6DDD2]">{tx(locale, "Ver el anuncio", "View listing")}</Button>}
         </div>
       </div>
     );
@@ -338,7 +338,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
         <div className="mb-6">
           <div className="mb-3 flex items-center justify-between text-sm">
             <span className="font-display font-semibold">{tx(locale, `Paso ${step + 1} de 6`, `Step ${step + 1} of 6`)} · {tx(locale, STEPS[step][0], STEPS[step][1])}</span>
-            <span className="text-muted">{tx(locale, "Borrador guardado en este dispositivo", "Draft saved on this device")}</span>
+            <span className="text-muted">{tx(locale, "Tu borrador se guarda en este dispositivo", "Your draft is saved on this device")}</span>
           </div>
           <div className="grid grid-cols-6 gap-1.5">
             {STEPS.map((s, i) => (
@@ -357,7 +357,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               <button className={opt(d.mode === "FSBO")} onClick={() => set({ mode: "FSBO" })}>
                 <User strokeWidth={1.6} className="text-navy dark:text-ivory" />
                 <div className="mt-2 font-display text-lg font-semibold">{tx(locale, "Publicar yo mismo", "List it myself")}</div>
-                <div className="text-sm text-muted">{tx(locale, "Gratis. Tú gestionas visitas y ofertas.", "Free. You handle tours and offers.")}</div>
+                <div className="text-sm text-muted">{tx(locale, "Gratis. Tú atiendes las visitas y las ofertas.", "Free. You handle tours and offers yourself.")}</div>
               </button>
               <button className={opt(d.mode === "MANDATE")} onClick={() => set({ mode: "MANDATE" })}>
                 <Building2 strokeWidth={1.6} className="text-navy dark:text-ivory" />
@@ -425,13 +425,13 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                 <span className="font-semibold">{tx(locale, "Ubicación", "Location")}: {d.addr.lat.toFixed(5)}, {d.addr.lng.toFixed(5)}</span>
                 {dup ? (
                   <span>
-                    · {tx(locale, "Ya existe:", "Already listed:")}{" "}
-                    {dup.slug ? <Link className="font-semibold text-navy underline underline-offset-4" href={`/${locale}/listing/${dup.slug}`}>{dup.title}</Link> : tx(locale, "un inmueble en revisión o no público.", "a listing under review or not public.")}
+                    · {tx(locale, "Ya está publicado:", "Already listed:")}{" "}
+                    {dup.slug ? <Link className="font-semibold text-navy underline underline-offset-4" href={`/${locale}/listing/${dup.slug}`}>{dup.title}</Link> : tx(locale, "un anuncio que está en revisión o no es público.", "a listing that’s under review or not public.")}
                   </span>
                 ) : dupError ? (
-                  <span className="text-muted">· {tx(locale, "No pudimos verificar duplicados ahora; lo revisaremos al publicar.", "Couldn’t check for duplicates now; we’ll check again when you publish.")}</span>
+                  <span className="text-muted">· {tx(locale, "Ahora no pudimos comprobar si ya está publicado; lo revisaremos cuando publiques.", "We couldn’t check for duplicates right now; we’ll check again when you publish.")}</span>
                 ) : (
-                  <span className="text-muted">· {tx(locale, "Sin duplicados (fingerprint lat/lng + m² + dirección)", "No duplicates (fingerprint lat/lng + m² + address)")}</span>
+                  <span className="text-muted">· {tx(locale, "Sin duplicados: no encontramos otro anuncio igual", "No duplicates: we found no matching listing")}</span>
                 )}
               </div>
             )}
@@ -501,7 +501,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               onChange={(e) => {
                 const all = Array.from(e.target.files ?? []);
                 const list = all.filter((f) => f.size <= 12 * 1024 * 1024);
-                setFileNote(all.length > list.length ? tx(locale, `${all.length - list.length} foto(s) superan 12 MB y no se añadieron.`, `${all.length - list.length} photo(s) exceed 12 MB and were skipped.`) : null);
+                setFileNote(all.length > list.length ? tx(locale, `${all.length - list.length} foto(s) pesan más de 12 MB y no pudimos añadirlas.`, `${all.length - list.length} photo(s) are over 12 MB, so we left them out.`) : null);
                 setFiles((prev) => [...prev, ...list].slice(0, 30));
                 e.target.value = "";
               }}
@@ -513,14 +513,14 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                 e.preventDefault();
                 const all = Array.from(e.dataTransfer.files).filter((f) => ["image/jpeg", "image/png", "image/webp"].includes(f.type));
                 const list = all.filter((f) => f.size <= 12 * 1024 * 1024);
-                setFileNote(all.length > list.length ? tx(locale, `${all.length - list.length} foto(s) superan 12 MB y no se añadieron.`, `${all.length - list.length} photo(s) exceed 12 MB and were skipped.`) : null);
+                setFileNote(all.length > list.length ? tx(locale, `${all.length - list.length} foto(s) pesan más de 12 MB y no pudimos añadirlas.`, `${all.length - list.length} photo(s) are over 12 MB, so we left them out.`) : null);
                 setFiles((prev) => [...prev, ...list].slice(0, 30));
               }}
               className="flex w-full flex-col items-center rounded-np border-2 border-dashed border-line bg-white py-10 hover:border-navy"
             >
               <ImagePlus size={30} strokeWidth={1.5} className="text-navy dark:text-ivory" />
-              <span className="mt-2 font-display font-semibold">{tx(locale, "Arrastra tus fotos o haz clic", "Drag your photos or click")}</span>
-              <span className="text-sm text-muted">JPG / PNG / WebP · {tx(locale, "máx. 12 MB c/u · ideal 8 a 20", "max 12 MB each · ideally 8 to 20")}</span>
+              <span className="mt-2 font-display font-semibold">{tx(locale, "Arrastra tus fotos o elígelas", "Drop your photos or browse")}</span>
+              <span className="text-sm text-muted">JPG / PNG / WebP · {tx(locale, "hasta 12 MB cada una · lo ideal, entre 8 y 20", "up to 12 MB each · 8 to 20 is ideal")}</span>
             </button>
             {fileNote && <p role="alert" className="text-sm font-semibold text-warn">{fileNote}</p>}
             {files.length > 0 && (
@@ -595,13 +595,13 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               />
               <textarea
                 className={cn(inputCls, "mt-2 h-32 py-2")}
-                placeholder={tx(locale, "Describe tu inmueble… o deja que la IA lo haga.", "Describe your place… or let AI do it.")}
+                placeholder={tx(locale, "Cuenta qué lo hace especial… o deja que la IA te ayude.", "Tell people what makes it special… or let AI help.")}
                 aria-label={tx(locale, "Descripción", "Description")}
                 value={lang === "es" ? d.copy.body_es : d.copy.body_en}
                 onChange={(e) => set({ copy: { ...d.copy, [lang === "es" ? "body_es" : "body_en"]: e.target.value } })}
               />
               {aiErr && <div role="alert" className="mt-2 rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-sm text-danger">{aiErr}</div>}
-              <div className="mt-2 text-xs text-muted">{tx(locale, "Si lo dejas vacío, generamos un texto base al publicar.", "Leave empty and we’ll generate a base text on publish.")}</div>
+              <div className="mt-2 text-xs text-muted">{tx(locale, "Si lo dejas en blanco, escribimos un primer texto por ti al publicar.", "Leave it blank and we’ll write a first draft for you when you publish.")}</div>
             </div>
           </div>
         )}
@@ -613,8 +613,8 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               <div className="flex items-center gap-2 rounded-np border border-warn/60 bg-[#8A5A0014] p-3 text-sm" role="alert">
                 <AlertTriangle size={18} className="text-warn" />
                 <span>
-                  {tx(locale, "Con estos datos ya existe un anuncio:", "A listing with these details already exists:")}{" "}
-                  {dup.slug ? <Link className="font-semibold text-navy underline underline-offset-4" href={`/${locale}/listing/${dup.slug}`}>{dup.title}</Link> : tx(locale, "un inmueble en revisión o no público.", "a listing under review or not public.")}
+                  {tx(locale, "Ya hay un anuncio con estos datos:", "There’s already a listing with these details:")}{" "}
+                  {dup.slug ? <Link className="font-semibold text-navy underline underline-offset-4" href={`/${locale}/listing/${dup.slug}`}>{dup.title}</Link> : tx(locale, "un anuncio que está en revisión o no es público.", "a listing that’s under review or not public.")}
                 </span>
               </div>
             )}
@@ -637,7 +637,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               </div>
             </div>
             <div className="rounded-[18px] bg-white shadow-[0_8px_24px_rgba(30,26,24,.06)] p-5">
-              <div className="flex items-center justify-between"><span className="font-display font-semibold">{tx(locale, "Calidad de la ficha", "Listing quality")}</span><span className="font-display text-2xl font-semibold text-ok">{quality}/100</span></div>
+              <div className="flex items-center justify-between"><span className="font-display font-semibold">{tx(locale, "Calidad del anuncio", "Listing quality")}</span><span className="font-display text-2xl font-semibold text-ok">{quality}/100</span></div>
               <Progress value={quality} tone="ok" className="mt-2" />
               <ul className="mt-3 grid gap-1.5 text-sm sm:grid-cols-2">
                 {[[files.length >= 8, tx(locale, "8+ fotos (+35)", "8+ photos (+35)")], [!!(d.copy.title_en && d.copy.body_en), tx(locale, "Bilingüe ES/EN (+20)", "Bilingual ES/EN (+20)")], [!!d.addr, tx(locale, "Geolocalizado (+20)", "Geolocated (+20)")], [false, tx(locale, "Plano (+15, después)", "Floor plan (+15, later)")]].map(([ok, t]) => (
@@ -646,8 +646,8 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               </ul>
             </div>
             <label className="flex items-start gap-2 text-sm text-muted"><input type="checkbox" checked={confirm} onChange={(e) => setConfirm(e.target.checked)} className="mt-1 h-4 w-4 shrink-0 accent-navy dark:accent-[#C9A574]" /> {tx(locale, "Confirmo que soy el propietario o tengo autorización para publicar.", "I confirm I’m the owner or authorised to list.")}</label>
-            {!confirm && <p className="text-xs text-muted">{tx(locale, "Marca la confirmación para poder publicar.", "Tick the confirmation to publish.")}</p>}
-            {!user && <p className="rounded-lg bg-[#8E3B220D] px-3 py-2 text-sm">{tx(locale, "Te pediremos iniciar sesión para publicar. Tu borrador se conserva.", "We’ll ask you to sign in to publish. Your draft is kept.")}</p>}
+            {!confirm && <p className="text-xs text-muted">{tx(locale, "Marca la casilla para poder publicar.", "Tick the box to publish.")}</p>}
+            {!user && <p className="rounded-lg bg-[#8E3B220D] px-3 py-2 text-sm">{tx(locale, "Para publicar te pediremos que entres a tu cuenta. Tu borrador no se pierde.", "We’ll ask you to sign in before publishing. Your draft stays safe.")}</p>}
             {err && <div className="rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-sm text-danger" role="alert">{err}</div>}
           </div>
         )}
@@ -694,7 +694,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
           <div className="rounded-np bg-navy p-4 text-ivory">
             <div className="flex items-center gap-2 font-display font-semibold"><Sparkles size={16} className="text-[#C9A574]" /> PlaceEstimate</div>
             <div className="mt-1 font-display text-2xl">{estimate ? money(estimate.mid, locale) : "—"}</div>
-            <div className="text-xs text-mist">{tx(locale, "Se actualiza mientras completas", "Updates as you go")}</div>
+            <div className="text-xs text-mist">{tx(locale, "Cambia a medida que avanzas", "Updates as you go")}</div>
           </div>
           <Link href={`/${locale}/owner/listings`} className="block text-center text-sm text-muted underline-offset-4 hover:text-navy hover:underline"><MapPin size={13} className="inline" /> {tx(locale, "Guardar y salir", "Save & exit")}</Link>
         </div>

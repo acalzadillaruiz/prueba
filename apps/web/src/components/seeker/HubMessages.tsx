@@ -107,7 +107,7 @@ export function HubMessages({
     if (!open) return;
     const text = draft.trim();
     if (!text) {
-      setErr(tx(locale, "Escribe un mensaje.", "Write a message."));
+      setErr(tx(locale, "Escribe algo antes de enviar.", "Write something before sending."));
       return;
     }
     setSending(true);
@@ -142,7 +142,7 @@ export function HubMessages({
 
       {!open && list.length === 0 && (
         <div className="mt-4">
-          <Empty className="py-6" title={tx(locale, "Aún no tienes mensajes", "No messages yet")} body={direct ? tx(locale, "Cuando un cliente pulse «Contactar» en una de tus fichas, la conversación aparecerá aquí.", "When a client taps “Contact” on one of your listings, the conversation shows up here.") : tx(locale, "Escribe al agente desde cualquier ficha y la conversación aparecerá aquí.", "Write to the agent from any listing and the conversation will show up here.")} />
+          <Empty className="py-6" title={tx(locale, "Aún no tienes mensajes", "No messages yet")} body={direct ? tx(locale, "Cuando alguien te escriba desde uno de tus anuncios, la conversación aparecerá aquí.", "When someone writes to you from one of your listings, the conversation will show up here.") : tx(locale, "Escríbele al agente desde cualquier casa que te guste y aquí podrás seguir la conversación.", "Message the agent from any home you like and you can carry on the conversation here.")} />
         </div>
       )}
 
@@ -179,7 +179,7 @@ export function HubMessages({
           <div className="font-semibold">{title(open)}</div>
           <div className="text-xs text-muted">{open.participants.filter((p) => p.id !== meId).map((p) => p.name).join(", ")}</div>
           <div ref={logRef} role="log" aria-live="polite" aria-label={tx(locale, "Conversación", "Conversation")} className="mt-3 max-h-80 space-y-2 overflow-y-auto rounded-np bg-ivory p-3 scrollbar-thin">
-            {open.messages.length === 0 && <p className="text-sm text-muted">{tx(locale, "Aún no hay mensajes en esta conversación.", "No messages in this conversation yet.")}</p>}
+            {open.messages.length === 0 && <p className="text-sm text-muted">{tx(locale, "Todavía no hay mensajes. Escribe el primero.", "No messages yet. Say hello.")}</p>}
             {open.messages.map((m) => (
               <div key={m.id} className={cn("flex", m.mine ? "justify-end" : "justify-start")}>
                 <div className={cn("max-w-[85%] break-words rounded-2xl px-3 py-2 text-sm", m.mine ? "bg-navy text-ivory" : "border border-line bg-white")}>

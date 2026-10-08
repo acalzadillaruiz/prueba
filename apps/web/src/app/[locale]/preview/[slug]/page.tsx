@@ -21,7 +21,7 @@ export default async function PreviewPage({ params }: { params: Promise<{ locale
   return (
     <>
       <div className="sticky top-0 z-50 bg-navy px-4 py-2 text-center text-sm font-semibold text-ivory" role="status">
-        {tx(locale, "Vista previa privada · así se verá la ficha", "Private preview · this is how the listing will look")}
+        {tx(locale, "Vista previa privada · así se verá el anuncio publicado", "Private preview · this is how the listing will look once it’s live")}
       </div>
       <ListingView locale={locale} l={l} />
     </>

@@ -52,9 +52,9 @@ export function SavedView({ locale, all }: { locale: Locale; all: Listing[] }) {
     <div className="mx-auto max-w-[1280px] px-4 py-10 md:px-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <div className={k.eyebrow}>{tx(locale, "Su colección privada", "Your private collection")}</div>
+          <div className={k.eyebrow}>{tx(locale, "Tu colección privada", "Your private collection")}</div>
           <h1 className="mt-1 font-serif text-[40px] font-medium leading-[1.05] md:text-[48px]">{tx(locale, "Guardados", "Saved homes")}</h1>
-          <p className="mt-1 text-muted">{tx(locale, `${items.length} inmuebles · selecciona hasta 3 para comparar`, `${items.length} homes · pick up to 3 to compare`)}</p>
+          <p className="mt-1 text-muted">{tx(locale, `${items.length} ${items.length === 1 ? "casa" : "casas"} · elige hasta 3 para compararlas`, `${items.length} ${items.length === 1 ? "home" : "homes"} · pick up to 3 to compare`)}</p>
         </div>
         <Button href={`/${locale}/alerts`} variant="outline" className={k.outline}>{tx(locale, "Mis alertas", "My alerts")}</Button>
       </div>
@@ -63,7 +63,7 @@ export function SavedView({ locale, all }: { locale: Locale; all: Listing[] }) {
         <section className={cn("np-in mt-8 overflow-hidden", k.card)}>
           <div className="flex items-center gap-2 border-b border-line bg-navy px-5 py-3 text-ivory">
             <Scale size={18} strokeWidth={1.6} className="text-[#C9A574]" />
-            <span className="font-serif text-[22px] font-medium">{tx(locale, "Comparador", "Compare")}</span>
+            <span className="font-serif text-[22px] font-medium">{tx(locale, "Lado a lado", "Side by side")}</span>
             <span className="text-sm text-mist">{cmp.length}/3</span>
           </div>
           <div className="overflow-x-auto">
@@ -117,7 +117,7 @@ export function SavedView({ locale, all }: { locale: Locale; all: Listing[] }) {
         ))}
       </div>
       {items.length === 0 && (
-        <Empty title={tx(locale, "Aún no guardas nada", "Nothing saved yet")} body={tx(locale, "Toca el corazón en cualquier inmueble para tenerlo aquí, incluso sin conexión.", "Tap the heart on any listing to keep it here — even offline.")} cta={<Button href={`/${locale}/search`} variant="outline" className={k.outline}>{tx(locale, "Explorar el mapa", "Explore the map")}</Button>} />
+        <Empty title={tx(locale, "Todavía no guardas ninguna casa", "No saved homes yet")} body={tx(locale, "Toca el corazón en las que te gusten y aparecerán aquí, incluso sin conexión.", "Tap the heart on the ones you love and they’ll wait for you here, even offline.")} cta={<Button href={`/${locale}/search`} variant="outline" className={k.outline}>{tx(locale, "Explorar casas", "Explore homes")}</Button>} />
       )}
     </div>
   );

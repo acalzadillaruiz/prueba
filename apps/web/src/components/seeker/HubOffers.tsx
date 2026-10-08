@@ -33,12 +33,12 @@ export function HubOffers({ locale, offers: initial, offerable, listingById, onC
   const submit = async () => {
     setSent(false);
     const e: typeof errors = {};
-    if (!listingId) e.listing = tx(locale, "Elige un inmueble.", "Pick a property.");
+    if (!listingId) e.listing = tx(locale, "Elige la casa sobre la que quieres ofertar.", "Choose the home you’d like to make an offer on.");
     const parsed = offerSchema.safeParse({ amount: Number(amount), note: note.trim() || undefined });
     if (!parsed.success) {
       const f = parsed.error.flatten().fieldErrors;
       if (f.amount || !amount) e.amount = tx(locale, "Escribe un monto en USD mayor que 0 (sin decimales).", "Enter a USD amount above 0 (no decimals).");
-      if (f.note) e.note = tx(locale, "La nota admite hasta 500 caracteres.", "The note allows up to 500 characters.");
+      if (f.note) e.note = tx(locale, "La nota puede tener hasta 500 caracteres.", "The note can be up to 500 characters.");
     }
     setErrors(e);
     if (Object.keys(e).length || !parsed.success) return;
@@ -104,17 +104,17 @@ export function HubOffers({ locale, offers: initial, offerable, listingById, onC
             <Button type="submit" disabled={busy} className="w-full sm:w-auto">
               {busy && <Loader2 size={16} className="animate-spin" />} {tx(locale, "Enviar oferta", "Send offer")}
             </Button>
-            {sent && <span role="status" className="ml-0 mt-2 block text-sm font-semibold text-ok sm:ml-3 sm:mt-0 sm:inline">{tx(locale, "Oferta enviada al agente.", "Offer sent to the agent.")}</span>}
+            {sent && <span role="status" className="ml-0 mt-2 block text-sm font-semibold text-ok sm:ml-3 sm:mt-0 sm:inline">{tx(locale, "Listo. Tu oferta ya está con el agente.", "Done. Your offer is with the agent now.")}</span>}
           </div>
           {errors.form && <div role="alert" className="rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-sm text-danger sm:col-span-2">{errors.form}</div>}
         </form>
       ) : (
-        <p className="mt-3 text-sm text-muted">{tx(locale, "Para ofertar, primero escribe al agente o pide una visita desde la ficha del inmueble.", "To make an offer, first message the agent or book a tour from the listing.")}</p>
+        <p className="mt-3 text-sm text-muted">{tx(locale, "Para hacer una oferta, primero escríbele al agente o pide una visita desde la casa que te interesa.", "To make an offer, first message the agent or book a tour from the home you like.")}</p>
       )}
 
       <div className="mt-5">
         {offers.length === 0 ? (
-          <Empty className="py-6" title={tx(locale, "Sin ofertas todavía", "No offers yet")} body={tx(locale, "Cuando hagas una oferta verás aquí su estado.", "Once you make an offer you’ll see its status here.")} />
+          <Empty className="py-6" title={tx(locale, "Aún no has hecho ofertas", "No offers yet")} body={tx(locale, "Cuando hagas una, podrás seguir aquí cómo avanza.", "When you make one, you can follow how it’s going right here.")} />
         ) : (
           <ul className="divide-y divide-line" aria-label={tx(locale, "Ofertas enviadas", "Offers sent")}>
             {offers.map((o) => {

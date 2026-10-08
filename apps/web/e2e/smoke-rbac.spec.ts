@@ -17,7 +17,7 @@ test.describe("Smoke: login, mapa, crear inmueble · RBAC duro", () => {
     await page.getByLabel("Email").fill("seeker@gmail.com");
     await page.getByLabel("Contraseña", { exact: true }).fill("incorrecta123");
     await page.getByRole("button", { name: "Entrar", exact: true }).click();
-    await expect(page.getByText(/Email o contraseña incorrectos/)).toBeVisible();
+    await expect(page.getByText(/El email o la contraseña no coinciden/)).toBeVisible();
   });
 
   test("mapa: dibujar polígono filtra resultados", async ({ page }) => {
@@ -26,7 +26,7 @@ test.describe("Smoke: login, mapa, crear inmueble · RBAC duro", () => {
     const box = (await page.locator('[role="application"]').boundingBox())!;
     for (const [x, y] of [[0.5, 0.25], [0.82, 0.27], [0.84, 0.56], [0.55, 0.62]]) await page.mouse.click(box.x + box.width * x, box.y + box.height * y);
     await page.getByRole("button", { name: /Cerrar zona/ }).click();
-    await expect(page.getByText("en tu zona dibujada")).toBeVisible();
+    await expect(page.getByText("en la zona que dibujaste")).toBeVisible();
   });
 
   test("RBAC: rutas protegidas y API", async ({ page }) => {

@@ -34,7 +34,7 @@ test.describe.serial("Cliente: búsqueda, Hub y precalificación", () => {
     const sort = page.getByRole("combobox", { name: "Ordenar por" });
     await expect(sort).toHaveValue("price-desc");
     await expect(page.getByRole("button", { name: /Quitar filtro: Zona dibujada/ })).toBeVisible();
-    await expect(page.getByText("en tu zona dibujada")).toBeVisible();
+    await expect(page.getByText("en la zona que dibujaste")).toBeVisible();
     // The map draws the shape again (NightMap: dashed terracotta path; Google: polygon overlay).
     await expect(page.locator('[role="application"] path[data-shape="poly"]').first()).toBeAttached();
     expect(await resultsCount(page)).toBe(inPoly.json.total);
@@ -83,7 +83,7 @@ test.describe.serial("Cliente: búsqueda, Hub y precalificación", () => {
     for (const [x, y] of [[0.5, 0.25], [0.82, 0.27], [0.84, 0.56], [0.55, 0.62]]) await page.mouse.click(box.x + box.width * x, box.y + box.height * y);
     await page.getByRole("button", { name: /Cerrar zona/ }).click();
     await expect(page).toHaveURL(/poly=[-\d.,%3B;]+/);
-    await expect(page.getByText("en tu zona dibujada")).toBeVisible();
+    await expect(page.getByText("en la zona que dibujaste")).toBeVisible();
     await page.getByRole("button", { name: "Guardar búsqueda" }).click();
     await page.waitForURL(/\/es\/login/);
     const next = new URL(page.url()).searchParams.get("next")!;
@@ -174,7 +174,7 @@ test.describe.serial("Cliente: búsqueda, Hub y precalificación", () => {
     }).toPass();
     await page.getByLabel("Nota para el agente (opcional)").fill(`Oferta E2E ${stamp}`);
     await page.getByRole("button", { name: "Enviar oferta" }).click();
-    await expect(page.getByText("Oferta enviada al agente.")).toBeVisible();
+    await expect(page.getByText("Listo. Tu oferta ya está con el agente.")).toBeVisible();
     const offers = page.getByRole("list", { name: "Ofertas enviadas" });
     await expect(offers.getByText(new RegExp(`Oferta E2E ${stamp}`))).toBeVisible();
     await page.reload();
@@ -195,7 +195,7 @@ test.describe.serial("Cliente: búsqueda, Hub y precalificación", () => {
       await expect(page.locator("label", { has: slider }).getByText(shown)).toBeVisible({ timeout: 1000 });
     }).toPass();
     await page.getByRole("slider", { name: "Plazo (años)" }).fill("20");
-    await page.getByRole("button", { name: "Guardar y generar carta" }).click();
+    await page.getByRole("button", { name: "Guardar y crear carta" }).click();
     await expect(page.getByRole("button", { name: "Precalificación guardada" })).toBeVisible();
     await expect(page.getByTestId("prequal-letter")).toBeVisible();
 

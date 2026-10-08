@@ -20,7 +20,7 @@ import { cn } from "@/lib/cn";
 import { k } from "@/components/agency/kit";
 
 const GOOGLE = process.env.NEXT_PUBLIC_GOOGLE_AUTH === "true";
-const ROLE_LABEL: Record<string, [string, string]> = { AGENT: ["agente", "an agent"], CAPTOR: ["captador", "a captor"], PHOTOGRAPHER: ["fotógrafo", "a photographer"], BACKOFFICE: ["backoffice", "backoffice"] };
+const ROLE_LABEL: Record<string, [string, string]> = { AGENT: ["agente", "an agent"], CAPTOR: ["captador", "a listings scout"], PHOTOGRAPHER: ["fotógrafo", "a photographer"], BACKOFFICE: ["backoffice", "backoffice"] };
 
 /** Landing page after sign-in, by role. */
 function homeFor(role: string) {
@@ -62,7 +62,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
         setInv(d);
         setValue("email", d.email);
       })
-      .catch(() => setErr(tx(locale, "La invitación no es válida o ya se usó.", "This invitation is invalid or was already used.")));
+      .catch(() => setErr(tx(locale, "Esta invitación ya no es válida o ya se usó. Pídele una nueva a tu agencia.", "This invitation is no longer valid or was already used. Ask your agency for a new one.")));
   }, [invite, locale, setValue]);
   const rawNext = sp.get("next");
   // Same-origin paths only: "/x" is fine, "//evil.com" and "/\\evil.com" and "/\tevil.com" are not.
@@ -89,16 +89,16 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
     try {
       if (mode === "register") await api("auth/register", { method: "POST", json: { name, email, password, ...(agency && !inv ? { agencyName } : {}), ...(inv && invite ? { invite } : {}) } });
       const r = await signIn("credentials", { email, password, redirect: false });
-      if (r?.error) throw new Error(tx(locale, "Email o contraseña incorrectos.", "Wrong email or password."));
+      if (r?.error) throw new Error(tx(locale, "El email o la contraseña no coinciden. Revísalos e inténtalo otra vez.", "That email and password don’t match. Check them and try again."));
       // Existing account opening an invite link from the login screen: join the agency now.
       if (mode === "login" && inv && invite)
         await api(`invitations/${encodeURIComponent(invite)}`, { method: "POST" }).catch((e3: unknown) => {
           const code = e3 instanceof ApiClientError ? e3.code : "";
           throw new Error(
             code === "CONFLICT"
-              ? tx(locale, "Entraste, pero tu cuenta ya pertenece a una agencia: no se pudo aceptar la invitación.", "You’re signed in, but your account already belongs to an agency, so the invitation couldn’t be accepted.")
+              ? tx(locale, "Ya entraste, pero tu cuenta ya forma parte de una agencia, así que no pudimos aceptar la invitación.", "You’re in, but your account already belongs to an agency, so we couldn’t accept the invitation.")
               : code === "FORBIDDEN"
-                ? tx(locale, "Entraste, pero la invitación es para otro email.", "You’re signed in, but the invitation is for another email.")
+                ? tx(locale, "Ya entraste, pero esta invitación es para otro email. Entra con ese correo para aceptarla.", "You’re in, but this invitation is for a different email. Sign in with that one to accept it.")
                 : (e3 as Error).message,
           );
         });
@@ -107,29 +107,29 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
     } catch (e2) {
       // "Ya existe un registro igual" says nothing to someone signing up: name the email and point to sign-in.
       const taken = mode === "register" && e2 instanceof ApiClientError && e2.code === "CONFLICT";
-      setErr(taken ? tx(locale, "Ya existe una cuenta con este email. Entra con tu contraseña.", "An account with this email already exists. Sign in with your password.") : (e2 as Error).message);
+      setErr(taken ? tx(locale, "Ya tienes una cuenta con este email. Entra con tu contraseña.", "You already have an account with this email. Sign in with your password.") : (e2 as Error).message);
     } finally {
       setBusy(null);
     }
   };
 
-  const title = mode === "login" ? tx(locale, "Bienvenido de nuevo", "Welcome back") : tx(locale, "Cree su cuenta", "Create your account");
+  const title = mode === "login" ? tx(locale, "Qué bueno verte de nuevo", "Good to see you again") : tx(locale, "Crea tu cuenta", "Create your account");
   return (
     <div className="np-public grid min-h-screen bg-ivory lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
       <main id="main" className="flex flex-col px-5 pb-10 pt-8 sm:px-10 lg:px-16">
         <Link href={`/${locale}`} className="self-center rounded-md lg:self-start" aria-label="New Place"><Logo className="lg:hidden" size="lg" /><Logo className="hidden lg:inline-flex" /></Link>
         <div className="mx-auto my-auto w-full max-w-[440px] pt-10 lg:pt-14">
-          <div className={k.eyebrow}>{mode === "login" ? tx(locale, "Área privada", "Private area") : tx(locale, "Únase a New Place", "Join New Place")}</div>
+          <div className={k.eyebrow}>{mode === "login" ? tx(locale, "Tu espacio", "Your space") : tx(locale, "Te damos la bienvenida", "Welcome to New Place")}</div>
           <h1 className="mt-2 font-serif text-[44px] font-medium leading-[1.02] text-navy md:text-[52px]">{title}</h1>
           {inv && (
             <div className="mt-5 rounded-[18px] bg-rosa/60 p-4 text-sm text-navy" role="status">
               {tx(locale, `${inv.agencyName} te invita a su equipo como ${ROLE_LABEL[inv.role]?.[0] ?? inv.role}.`, `${inv.agencyName} invited you to their team as ${ROLE_LABEL[inv.role]?.[1] ?? inv.role}.`)}{" "}
               {mode === "register" ? (
-                <Link className={k.link} href={`/${locale}/login${carry}`}>{tx(locale, "¿Ya tienes cuenta? Entra", "Have an account? Sign in")}</Link>
+                <Link className={k.link} href={`/${locale}/login${carry}`}>{tx(locale, "¿Ya tienes cuenta? Entra", "Already have an account? Sign in")}</Link>
               ) : null}
             </div>
           )}
-          <p className={cn("mt-3 text-[16px]", k.muted)}>{mode === "login" ? tx(locale, "Guarde, compare y agende visitas privadas.", "Save, compare and book private tours.") : tx(locale, "Gratis. Sin tarjeta.", "Free. No card needed.")}</p>
+          <p className={cn("mt-3 text-[16px]", k.muted)}>{mode === "login" ? tx(locale, "Retoma tus casas guardadas, compáralas con calma y agenda tus visitas.", "Pick up where you left off: your saved homes, side by side, and your tours.") : tx(locale, "Es gratis y no te pedimos tarjeta.", "It’s free, and no card is needed.")}</p>
           <button
             type="button"
             disabled={!GOOGLE}
@@ -139,13 +139,13 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
           >
             <GoogleG /> {tx(locale, "Continuar con Google", "Continue with Google")}
           </button>
-          <div className={cn("my-6 flex items-center gap-3 text-[12px] uppercase tracking-[.14em]", k.muted)}><span className="h-px flex-1 bg-[#D8CBB7]" />{tx(locale, "o con su correo", "or with email")}<span className="h-px flex-1 bg-[#D8CBB7]" /></div>
+          <div className={cn("my-6 flex items-center gap-3 text-[12px] uppercase tracking-[.14em]", k.muted)}><span className="h-px flex-1 bg-[#D8CBB7]" />{tx(locale, "o con tu correo", "or with your email")}<span className="h-px flex-1 bg-[#D8CBB7]" /></div>
           <form className="space-y-4" onSubmit={handleSubmit(submit)} noValidate>
             {mode === "register" && (
               <Field label={tx(locale, "Nombre completo", "Full name")} error={fieldError(errs.name, locale, "name")}><input className={inputCls} {...register("name")} aria-invalid={!!errs.name} autoComplete="name" /></Field>
             )}
             <Field label="Email" error={fieldError(errs.email, locale, "email")}><input className={inputCls} type="email" readOnly={!!inv} {...register("email")} aria-invalid={!!errs.email} autoComplete="email" placeholder="tu@gmail.com" /></Field>
-            <Field label={tx(locale, "Contraseña", "Password")} error={fieldError(errs.password, locale, "password")} hint={(mode === "register" ? tx(locale, "Mínimo 8 caracteres.", "At least 8 characters.") : undefined)}>
+            <Field label={tx(locale, "Contraseña", "Password")} error={fieldError(errs.password, locale, "password")} hint={(mode === "register" ? tx(locale, "Usa al menos 8 caracteres.", "Use at least 8 characters.") : undefined)}>
               <div className="relative">
                 <input className={inputCls} type={show ? "text" : "password"} {...register("password")} aria-invalid={!!errs.password} autoComplete={mode === "login" ? "current-password" : "new-password"} />
                 <button type="button" onClick={() => setShow(!show)} className="absolute right-1 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center text-muted" aria-label={tx(locale, "Mostrar contraseña", "Show password")}>{show ? <EyeOff size={18} /> : <Eye size={18} />}</button>
@@ -156,7 +156,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
                 <input type="checkbox" checked={agency} onChange={(e) => setAgency(e.target.checked)} className="mt-1 h-4 w-4 accent-navy" />
                 <span>
                   <span className="flex items-center gap-1.5 font-display font-semibold"><Building2 size={16} strokeWidth={1.7} /> {tx(locale, "¿Eres agencia?", "Are you an agency?")}</span>
-                  <span className="text-sm text-muted">{tx(locale, "Crea tu inmobiliaria y empieza con el plan Free.", "Set up your agency on the Free plan.")}</span>
+                  <span className="text-sm text-muted">{tx(locale, "Crea el espacio de tu inmobiliaria y empieza con el plan Free.", "Set up your agency and start on the Free plan.")}</span>
                 </span>
               </label>
             )}
@@ -169,9 +169,9 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
           </form>
           <p className={cn("mt-6 text-center text-[15px]", k.muted)}>
             {mode === "login" ? (
-              <>{tx(locale, "¿No tienes cuenta?", "No account?")} <Link className={k.link} href={`/${locale}/register${carry}`}>{tx(locale, "Regístrate", "Sign up")}</Link></>
+              <>{tx(locale, "¿Aún no tienes cuenta?", "New here?")} <Link className={k.link} href={`/${locale}/register${carry}`}>{tx(locale, "Regístrate", "Create an account")}</Link></>
             ) : (
-              <>{tx(locale, "¿Ya tienes cuenta?", "Have an account?")} <Link className={k.link} href={`/${locale}/login${carry}`}>{tx(locale, "Entra", "Sign in")}</Link></>
+              <>{tx(locale, "¿Ya tienes cuenta?", "Already have an account?")} <Link className={k.link} href={`/${locale}/login${carry}`}>{tx(locale, "Entra", "Sign in")}</Link></>
             )}
           </p>
           {mode === "login" && DEMO_ENABLED && (
@@ -209,7 +209,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
             <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-navy/80 to-transparent" />
             <div className="absolute inset-x-0 bottom-8 px-8 text-center text-ivory">
               <div className="text-[11px] font-semibold uppercase tracking-[.22em] text-[#EBD5C8]">{tx(locale, "El Caribe, con alma mediterránea", "The Caribbean, with a Mediterranean soul")}</div>
-              <div className="mt-2 font-serif text-[34px] leading-[1.05]">{tx(locale, "Pocas propiedades.", "Few properties.")}<br /><em>{tx(locale, "Todas extraordinarias.", "All extraordinary.")}</em></div>
+              <div className="mt-2 font-serif text-[34px] leading-[1.05]">{tx(locale, "Tu próximo hogar", "Your next home")}<br /><em>{tx(locale, "ya te está esperando.", "is already waiting.")}</em></div>
             </div>
           </div>
         </div>

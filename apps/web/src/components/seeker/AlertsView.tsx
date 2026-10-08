@@ -29,7 +29,7 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
       await api(`me/searches/${s.id}`, { method: "PATCH", json: { frequency } });
     } catch (e) {
       setItems(prev);
-      setError(`${tx(locale, "No se pudo cambiar la frecuencia", "Couldn’t change the frequency")}: ${(e as Error).message}`);
+      setError(`${tx(locale, "No pudimos cambiar la frecuencia. Inténtalo otra vez en un momento", "We couldn’t change the frequency. Please try again in a moment")}: ${(e as Error).message}`);
     }
   };
   const remove = async (s: Search) => {
@@ -43,7 +43,7 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
       router.refresh();
     } catch (e) {
       setItems(prev);
-      setError(`${tx(locale, "No se pudo eliminar la alerta", "Couldn’t delete the alert")}: ${(e as Error).message}`);
+      setError(`${tx(locale, "No pudimos eliminar la alerta. Inténtalo otra vez en un momento", "We couldn’t delete the alert. Please try again in a moment")}: ${(e as Error).message}`);
     } finally {
       setBusyId(null);
     }
@@ -52,9 +52,9 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
   return (
     <div className="mx-auto grid max-w-[1180px] gap-8 px-4 py-10 md:px-6 lg:grid-cols-[1fr_380px]">
       <div>
-        <div className={k.eyebrow}>{tx(locale, "Avisos a su medida", "Tailored notices")}</div>
+        <div className={k.eyebrow}>{tx(locale, "Avisos a tu medida", "Made for you")}</div>
         <h1 className="mt-1 font-serif text-[40px] font-medium leading-[1.05] md:text-[48px]">{tx(locale, "Alertas de búsqueda", "Search alerts")}</h1>
-        <p className="mt-1 text-muted">{tx(locale, "Te avisamos cuando entra algo nuevo o baja de precio.", "We’ll tell you when something new lands or drops in price.")}</p>
+        <p className="mt-1 text-muted">{tx(locale, "Te escribimos cuando llega una casa que encaja contigo o cuando alguna baja de precio.", "We’ll write when a home that fits you comes along, or when one drops in price.")}</p>
         {error && <div role="alert" className="mt-4 rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-sm text-danger">{error}</div>}
         <div className="mt-6 space-y-3">
           {items.map((s) => (
@@ -63,7 +63,7 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
               <div className="min-w-0 flex-1 basis-[calc(100%-4rem)] sm:basis-auto">
                 <div className="font-serif text-[22px] font-medium leading-tight">{s.name}</div>
                 <div className="text-sm text-muted">
-                  {freq[s.frequency]} · {s.lastSentAt ? `${tx(locale, "último envío", "last sent")} ${ago(s.lastSentAt, locale)}` : tx(locale, "sin envíos aún", "nothing sent yet")}
+                  {freq[s.frequency]} · {s.lastSentAt ? `${tx(locale, "último aviso", "last sent")} ${ago(s.lastSentAt, locale)}` : tx(locale, "aún sin avisos", "nothing sent yet")}
                 </div>
               </div>
               {s.newCount > 0 && <Badge className="bg-[#E6DDD2] text-navy dark:bg-white/10">{s.newCount} {tx(locale, "nuevos", "new")}</Badge>}
@@ -91,14 +91,14 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
               )}
             </Card>
           ))}
-          {items.length === 0 && <Empty title={tx(locale, "Sin alertas", "No alerts")} body={tx(locale, "Guarda una búsqueda desde el mapa y te avisamos.", "Save a search from the map and we’ll let you know.")} />}
+          {items.length === 0 && <Empty title={tx(locale, "Aún no tienes alertas", "No alerts yet")} body={tx(locale, "Guarda una búsqueda en el mapa y te avisaremos en cuanto aparezca algo para ti.", "Save a search on the map and we’ll let you know as soon as something fits.")} />}
         </div>
-        <Button href={`/${locale}/search`} className="mt-5">{tx(locale, "Crear alerta desde el mapa", "Create alert from the map")}</Button>
+        <Button href={`/${locale}/search`} className="mt-5">{tx(locale, "Crear una alerta", "Create an alert")}</Button>
       </div>
       <aside>
         <Card className={cn(k.card, "border-0 p-5")}>
-          <div className="flex items-center gap-2 font-serif text-[24px] font-medium leading-tight"><Mail size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Enviados", "Sent")}</div>
-          <p className="mt-1 text-xs text-muted">{tx(locale, "Correos de tu cuenta («Simulado» = sin proveedor de email configurado)", "Your account’s emails (“Simulated” = no email provider configured)")}</p>
+          <div className="flex items-center gap-2 font-serif text-[24px] font-medium leading-tight"><Mail size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Avisos enviados", "Sent to you")}</div>
+          <p className="mt-1 text-xs text-muted">{tx(locale, "Los correos que te enviamos. «Simulado» significa que aún no hay un servicio de correo conectado.", "The emails we’ve sent you. “Simulated” means no email service is connected yet.")}</p>
           <ul className="mt-4 divide-y divide-line">
             {emails.map((e) => (
               <li key={e.id} className="py-3">

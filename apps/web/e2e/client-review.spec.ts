@@ -26,7 +26,7 @@ async function nlSearch(page: Page, label: string, text: string, until: RegExp) 
 test.describe("Cliente · regresiones de la revisión", () => {
   test("búsqueda NL: «2+ hab», rango «entre … y … mil», ciudad y sin falso «mascotas» por Petare", async ({ page }) => {
     await page.goto("/es/search");
-    await nlSearch(page, "Búsqueda en lenguaje natural", "casa 2+ hab en Caracas entre 100 y 400 mil cerca de Petare", /beds=2/);
+    await nlSearch(page, "Cuéntanos con tus palabras qué buscas", "casa 2+ hab en Caracas entre 100 y 400 mil cerca de Petare", /beds=2/);
     const url = new URL(page.url());
     expect(url.searchParams.get("beds")).toBe("2");
     expect(url.searchParams.get("min")).toBe("100000");
@@ -132,7 +132,7 @@ test.describe("Cliente · regresiones de la revisión", () => {
     // "Marcar vendido" asks for confirmation first, and cancelling keeps it on sale.
     const card = page.locator("div.overflow-hidden", { has: page.getByTestId("owner-leads").filter({ hasText: `Anónimo ${stamp}` }) }).first();
     await card.getByRole("button", { name: "Marcar vendido" }).click();
-    await expect(card.getByText("¿Marcar como vendido? Saldrá del buscador.")).toBeVisible();
+    await expect(card.getByText("¿Marcar como vendido? Dejará de aparecer en el buscador.")).toBeVisible();
     await card.getByRole("button", { name: "Cancelar" }).click();
     await expect(card.getByRole("button", { name: "Marcar vendido" })).toBeVisible();
     // Clean up: take the test listing off the market.
@@ -154,7 +154,7 @@ test.describe("Cliente · regresiones de la revisión", () => {
       await expect(page.getByText("Entre 2 y 80 caracteres.")).toBeVisible({ timeout: 1000 });
     }).toPass();
     await page.getByLabel("Presupuesto (USD)").fill("1500.5");
-    await expect(page.getByText("Un monto en USD mayor que 0, sin decimales.")).toBeVisible();
+    await expect(page.getByText("Escribe un monto en USD mayor que 0, sin decimales.")).toBeVisible();
     expect(patched).toBe(false);
     // Fixing the fields saves; editing again brings back "Guardar cambios".
     await name.fill(original);
@@ -181,7 +181,7 @@ test.describe("Cliente · regresiones de la revisión", () => {
       await page.locator('input[name="email"]').fill("seeker@gmail.com");
       await page.locator('input[name="password"]').fill("NewPlace!2026x");
       await page.getByRole("button", { name: "Crear cuenta" }).click();
-      await expect(page.getByText("Ya existe una cuenta con este email. Entra con tu contraseña.")).toBeVisible({ timeout: 5000 });
+      await expect(page.getByText("Ya tienes una cuenta con este email. Entra con tu contraseña.")).toBeVisible({ timeout: 5000 });
     }).toPass({ timeout: 60_000 });
   });
   test("comparador en inglés: filas «Area» y «Location» distintas (sin claves duplicadas)", async ({ page }) => {
@@ -246,10 +246,10 @@ test.describe("Cliente · regresiones de la revisión", () => {
     await page.goto(`/es/search?type=LONG_RENT&pub=7d&furnished=1&radius=10.49000,-66.85000,${km}`);
     await session;
     await expect(async () => {
-      // Click only while it still offers to save (a slow response turns it into "Alerta creada").
+      // Click only while it still offers to save (a slow response turns it into "Búsqueda guardada").
       const save = page.getByRole("button", { name: "Guardar búsqueda" });
       if (await save.count()) await save.click({ timeout: 2000 });
-      await expect(page.getByRole("button", { name: "Alerta creada" }).first()).toBeVisible({ timeout: 5000 });
+      await expect(page.getByRole("button", { name: "Búsqueda guardada" }).first()).toBeVisible({ timeout: 5000 });
     }).toPass();
     const list = await apiAs(page, "GET", "me/searches");
     const s = (list.json.items as { name: string; query: string }[]).find((x) => x.query.includes(km))!;
@@ -278,7 +278,7 @@ test.describe("Cliente · regresiones de la revisión", () => {
     // Visible text is the short day ("lun 6"); the full date follows for screen readers.
     const dayButtons = page.locator("button", { hasText: /^(lun|mar|mié|jue|vie|sáb|dom) \d+/ });
     await dayButtons.first().click();
-    await expect(page.getByText("Este día ya no tiene horarios libres. Elige otro día.")).toBeVisible();
+    await expect(page.getByText("Ese día ya está completo. Prueba con otro.")).toBeVisible();
     await expect(page.getByRole("button", { name: "Solicitar visita" })).toBeDisabled();
   });
   test("sesión aún cargando: pulsar «Guardar búsqueda» no manda al login a un usuario ya autenticado", async ({ page }) => {
@@ -293,8 +293,8 @@ test.describe("Cliente · regresiones de la revisión", () => {
     const save = page.getByRole("button", { name: "Guardar búsqueda" });
     // Hydrated (the NL box reacts) but the session is still pending.
     await expect(async () => {
-      await page.getByRole("textbox", { name: "Búsqueda en lenguaje natural" }).fill("x");
-      await expect(page.getByRole("textbox", { name: "Búsqueda en lenguaje natural" })).toHaveValue("x", { timeout: 1000 });
+      await page.getByRole("textbox", { name: "Cuéntanos con tus palabras qué buscas" }).fill("x");
+      await expect(page.getByRole("textbox", { name: "Cuéntanos con tus palabras qué buscas" })).toHaveValue("x", { timeout: 1000 });
     }).toPass();
     await save.click();
     await page.waitForTimeout(1500);
@@ -302,6 +302,6 @@ test.describe("Cliente · regresiones de la revisión", () => {
     release();
     await expect(page.getByRole("link", { name: /Daniel/ })).toBeVisible();
     await save.click();
-    await expect(page.getByRole("button", { name: "Alerta creada" }).first()).toBeVisible();
+    await expect(page.getByRole("button", { name: "Búsqueda guardada" }).first()).toBeVisible();
   });
 });

@@ -35,7 +35,7 @@ export interface HubData {
 
 const PREQUAL_DEFAULT: PrequalInput = { price: 180000, downPct: 30, years: 15, ratePct: 10.5 };
 
-export function HubView({ locale, data }: { locale: Locale; data: HubData }) {
+export function HubView({ locale, data, emailOn = false }: { locale: Locale; data: HubData; emailOn?: boolean }) {
   const { user } = useApp();
   const me = user ?? { name: "—", initials: "?", hue: 200 };
   const byId = new Map(data.listings.map((l) => [l.id, l]));
@@ -116,7 +116,8 @@ export function HubView({ locale, data }: { locale: Locale; data: HubData }) {
         <Card className={cn(k.card, "border-0 p-5 lg:col-span-2")}>
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 className="flex items-center gap-2 font-serif text-[24px] font-medium leading-tight"><CalendarCheck size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Tus visitas y solicitudes", "Your tours & requests")}</h2>
-            <Badge tone="ok">{tx(locale, "Te lo recordamos por email", "We’ll remind you by email")}</Badge>
+            {/* Only while an email provider is configured: otherwise reminders are never delivered. */}
+            {emailOn && <Badge tone="ok">{tx(locale, "Te lo recordamos por email", "We’ll remind you by email")}</Badge>}
           </div>
           <div className="mt-4 space-y-3">
             {extraLeads.map((ld) => {
@@ -125,11 +126,12 @@ export function HubView({ locale, data }: { locale: Locale; data: HubData }) {
               return (
                 <div key={ld.id} className="np-in flex flex-wrap items-center gap-4 rounded-2xl bg-[#F6F2EA] p-3 sm:flex-nowrap dark:bg-white/[.05]">
                   <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="h-16 w-24 shrink-0 rounded-lg" />
-                  <div className="min-w-0 flex-1">
+                  {/* Mobile: the text keeps the rest of the first row; the status badge wraps below it instead of squeezing the title to "A…". */}
+                  <div className="min-w-0 flex-1 basis-[calc(100%-7rem)] sm:basis-auto">
                     <div className="line-clamp-1 font-semibold">{tx(locale, l.title_es, l.title_en)}</div>
                     <div className="line-clamp-1 text-sm text-muted">{ld.message}</div>
                   </div>
-                  <Badge tone={ld.stage === "NEW" ? "warn" : "ok"}>{ld.stage === "NEW" ? tx(locale, "Esperando respuesta", "Awaiting reply") : tx(locale, "En contacto", "In contact")}</Badge>
+                  <Badge className="ml-28 sm:ml-0" tone={ld.stage === "NEW" ? "warn" : "ok"}>{ld.stage === "NEW" ? tx(locale, "Esperando respuesta", "Awaiting reply") : tx(locale, "En contacto", "In contact")}</Badge>
                 </div>
               );
             })}

@@ -18,3 +18,17 @@ export async function gateToken(): Promise<string> {
 export function safeNext(next: string | null | undefined, fallback: string): string {
   return next && next.startsWith("/") && !next.startsWith("//") && !next.startsWith("/\\") ? next : fallback;
 }
+
+function readCookie(header: string | null, name: string): string | undefined {
+  for (const part of (header ?? "").split(";")) {
+    const i = part.indexOf("=");
+    if (i > 0 && part.slice(0, i).trim() === name) return part.slice(i + 1).trim();
+  }
+  return undefined;
+}
+
+/** True when the gate is off or the request carries a valid gate cookie (the middleware's check, for route code). */
+export async function gatePassed(req: { headers: Headers }): Promise<boolean> {
+  if (!gateCode()) return true;
+  return readCookie(req.headers.get("cookie"), GATE_COOKIE) === (await gateToken());
+}

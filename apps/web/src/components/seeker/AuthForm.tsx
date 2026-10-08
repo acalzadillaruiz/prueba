@@ -154,16 +154,21 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
             </div>
           )}
           <p className={cn("mt-3 text-[16px]", k.muted)}>{lead}</p>
-          <button
-            type="button"
-            disabled={!GOOGLE}
-            title={GOOGLE ? undefined : tx(locale, "Configura AUTH_GOOGLE_ID para activar Google", "Set AUTH_GOOGLE_ID to enable Google")}
-            onClick={() => signIn("google", { callbackUrl: next ?? `/${locale}/app` })}
-            className="mt-8 flex h-12 w-full items-center justify-center gap-3 rounded-full bg-white font-display font-medium text-navy shadow-[inset_0_0_0_1px_#D8CBB7] transition-shadow hover:shadow-[inset_0_0_0_1px_#1E1A18] disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <GoogleG /> {tx(locale, "Continuar con Google", "Continue with Google")}
-          </button>
-          <div className={cn("my-6 flex items-center gap-3 text-[12px] uppercase tracking-[.14em]", k.muted)}><span className="h-px flex-1 bg-[#D8CBB7]" />{tx(locale, "o con tu correo", "or with your email")}<span className="h-px flex-1 bg-[#D8CBB7]" /></div>
+          {/* Google sign-in only when it is configured: no disabled button with a developer tooltip for visitors. */}
+          {GOOGLE ? (
+            <>
+              <button
+                type="button"
+                onClick={() => signIn("google", { callbackUrl: next ?? `/${locale}/app` })}
+                className="mt-8 flex h-12 w-full items-center justify-center gap-3 rounded-full bg-white font-display font-medium text-navy shadow-[inset_0_0_0_1px_#D8CBB7] transition-shadow hover:shadow-[inset_0_0_0_1px_#1E1A18]"
+              >
+                <GoogleG /> {tx(locale, "Continuar con Google", "Continue with Google")}
+              </button>
+              <div className={cn("my-6 flex items-center gap-3 text-[12px] uppercase tracking-[.14em]", k.muted)}><span className="h-px flex-1 bg-[#D8CBB7]" />{tx(locale, "o con tu correo", "or with your email")}<span className="h-px flex-1 bg-[#D8CBB7]" /></div>
+            </>
+          ) : (
+            <div className="mt-8" />
+          )}
           <form className="space-y-4" onSubmit={handleSubmit(submit)} noValidate>
             {mode === "register" && (
               <Field label={tx(locale, "Nombre completo", "Full name")} error={fieldError(errs.name, locale, "name")}><input className={inputCls} {...register("name")} aria-invalid={!!errs.name} autoComplete="name" /></Field>

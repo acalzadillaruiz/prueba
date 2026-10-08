@@ -6,8 +6,8 @@ import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { prisma } from "@newplace/db";
 import type { Role } from "@newplace/config";
-import { authConfig } from "./auth.config";
-import { isDemoEmail } from "./lib/demo";
+import { authConfig, staleDemo } from "./auth.config";
+import { demoUserId } from "./server/demo-auth";
 import { allowed, loginAttempt, reset } from "./server/rate-limit";
 
 const DEMO = process.env.DEMO_AUTH === "true";
@@ -59,12 +59,10 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
             id: "demo",
             name: "Demo",
             credentials: { email: {} },
-            async authorize(raw) {
-              const email = String((raw as { email?: string })?.email ?? "").trim().toLowerCase();
-              // Password-less login only for the fixed seeded demo accounts, never for arbitrary/registered users.
-              if (!isDemoEmail(email)) return null;
-              const u = await prisma.user.findUnique({ where: { email } });
-              return u ? profile(u.id) : null;
+            async authorize(raw, request) {
+              // Seeded demo accounts only, and only with the preview gate cookie while the gate is on (server/demo-auth.ts).
+              const id = await demoUserId(raw, request);
+              return id ? profile(id) : null;
             },
           }),
         ]
@@ -73,6 +71,8 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
   callbacks: {
     ...authConfig.callbacks,
     async jwt(params) {
+      // A session opened with the password-less demo login dies once DEMO_AUTH is switched off (see authConfig).
+      if (staleDemo(params.token)) return null;
       // Google sign-in: enrich with role/agency from DB (new users default to SEEKER via schema).
       if (params.user && params.account?.provider === "google") {
         const p = await profile(params.user.id as string);

@@ -44,6 +44,9 @@ ${content}
 </td></tr></table></body></html>`;
 }
 
+/** True when real delivery is configured (Resend key + sender). Without it mails are only recorded (SIMULATED). */
+export const emailConfigured = () => !!(process.env.RESEND_API_KEY && process.env.EMAIL_FROM);
+
 export async function deliver(to: string, subject: string, body: string): Promise<Delivery> {
   const key = process.env.RESEND_API_KEY;
   const from = process.env.EMAIL_FROM;

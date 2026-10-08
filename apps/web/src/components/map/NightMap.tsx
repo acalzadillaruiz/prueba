@@ -206,30 +206,50 @@ export function NightMap({
     setMode("pan");
   };
 
-  // screen-space pins with clustering
+  // Screen-space pins with clustering. Distance-based (not grid cells): two markers whose footprints would overlap —
+  // a price label is ~70 px wide and ~40 px tall above its point — always merge, so a label is never half-hidden
+  // behind a neighbouring one just because the two fell into adjacent cells.
   const pins = useMemo(() => {
     const pts = listings.map((l) => {
       const p = P(l.lat, l.lng);
       return { l, x: p.x * view.s + view.x, y: p.y * view.s + view.y };
     });
-    const cell = view.s > 5 ? 0 : (region === "venezuela" ? 44 : 50) * k;
-    if (!cell) return pts.map((p) => ({ ...p, items: [p.l] }));
-    const groups = new Map<string, { x: number; y: number; items: Listing[]; l: Listing }>();
+    if (view.s > 5) return pts.map((p) => ({ ...p, items: [p.l] }));
+    const f = region === "venezuela" ? 0.88 : 1;
+    const near = (a: { x: number; y: number }, b: { x: number; y: number }) => Math.abs(a.x - b.x) < 70 * f * k && Math.abs(a.y - b.y) < 40 * f * k;
+    type G = { x: number; y: number; items: Listing[]; l: Listing };
+    let groups: G[] = [];
     const solo: typeof pts = [];
     for (const p of pts) {
       if (p.l.id === selectedId) {
         solo.push(p);
         continue;
       }
-      const key = `${Math.round(p.x / cell)}:${Math.round(p.y / cell)}`;
-      const g = groups.get(key);
+      const g = groups.find((g) => near(g, p));
       if (g) {
         g.items.push(p.l);
         g.x = (g.x * (g.items.length - 1) + p.x) / g.items.length;
         g.y = (g.y * (g.items.length - 1) + p.y) / g.items.length;
-      } else groups.set(key, { x: p.x, y: p.y, items: [p.l], l: p.l });
+      } else groups.push({ x: p.x, y: p.y, items: [p.l], l: p.l });
     }
-    return [...groups.values(), ...solo.map((p) => ({ ...p, items: [p.l] }))];
+    // Moving centroids can bring two groups together: merge until no pair overlaps (a handful of passes at most).
+    for (let merged = true; merged; ) {
+      merged = false;
+      const next: G[] = [];
+      for (const g of groups) {
+        const h = next.find((h) => near(h, g));
+        if (!h) next.push(g);
+        else {
+          const n = h.items.length + g.items.length;
+          h.x = (h.x * h.items.length + g.x * g.items.length) / n;
+          h.y = (h.y * h.items.length + g.y * g.items.length) / n;
+          h.items.push(...g.items);
+          merged = true;
+        }
+      }
+      groups = next;
+    }
+    return [...groups, ...solo.map((p) => ({ ...p, items: [p.l] }))];
   }, [listings, view, P, region, k, selectedId]);
 
   // Screen-space boxes of pins and clusters: zone labels that collide with one are faded so "CH[3]AO" never happens.

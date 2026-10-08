@@ -8,6 +8,7 @@ import { listingsByIds } from "@/server/listings";
 import { getAppUser } from "@/server/session";
 import { unreadByThread } from "@/server/thread-unread";
 import { pageMeta } from "@/lib/seo";
+import { emailConfigured } from "@/server/email";
 import { tx } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
@@ -54,6 +55,7 @@ export default async function Hub({ params }: { params: Promise<{ locale: Locale
     <PublicPage locale={locale}>
       <HubView
         locale={locale}
+        emailOn={emailConfigured()}
         data={{
           tours: tours.map(tourDto),
           pastTours: pastTours.map(tourDto),

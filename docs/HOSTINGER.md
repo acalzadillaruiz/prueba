@@ -35,6 +35,7 @@ Volver a publicar **no borra datos** (la siembra solo ocurre si la base está va
 | `AUTH_SECRET` | firma de las sesiones (cadena aleatoria; no la compartas) |
 | `AUTH_TRUST_HOST` | `true` |
 | `APP_URL`, `NEXT_PUBLIC_APP_URL` | `https://newplace.site` |
+| `AUTH_URL` | opcional: la URL pública de Auth.js (inicio de sesión). Si falta, se toma de `APP_URL`; nunca la dirección interna del servidor. |
 | `SITE_ACCESS_CODE` | código de la vista previa. **Bórrala y vuelve a publicar el día del lanzamiento.** |
 | `DEMO_AUTH`, `NEXT_PUBLIC_DEMO_AUTH` | `true` durante la vista previa («Entrar como…» con las cuentas de ejemplo). **Bórralas antes de abrir al público.** |
 

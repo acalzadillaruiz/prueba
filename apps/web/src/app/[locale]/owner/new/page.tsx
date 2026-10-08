@@ -2,8 +2,16 @@ import type { Locale } from "@/types/domain";
 import { PublicHeader } from "@/components/layout/PublicHeader";
 import { OwnerWizard } from "@/components/owner/OwnerWizard";
 import { getAgencies, getFx, getZones } from "@/server/data";
+import { pageMeta } from "@/lib/seo";
+import { tx } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
+
+/** Own title and canonical (the owner layout's "Mis inmuebles" doesn't describe this page). */
+export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }) {
+  const { locale } = await params;
+  return pageMeta(locale, tx(locale, "Publicar inmueble", "List a property"), "/owner/new", { index: false });
+}
 
 export default async function OwnerNew({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params;

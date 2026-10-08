@@ -114,14 +114,15 @@ html:not(.dark) .np-public .text-coral { color: rgb(var(--np-coral-cta-rgb)); }
 html:not(.dark) .np-public :is(.bg-navy, .bg-navy-2, .bg-navy-card) .text-coral { color: var(--np-coral-light); }
 html.dark .np-public .text-coral { color: var(--np-coral-light); }
 
-/* Listing detail on phones: keep the demo pill above the sticky "Request a tour" bar. */
-@media (max-width: 767px) {
+/* Listing detail on large phones / small tablets: keep the demo pill above the sticky "Request a tour" bar.
+   Below 640px the pill is an edge tab at mid-height (DemoBar.tsx), so no `bottom` there (it would stretch the box). */
+@media (min-width: 640px) and (max-width: 767px) {
   body:has([data-sticky-cta="shown"]) [data-demobar] { bottom: calc(5rem + env(safe-area-inset-bottom)); }
   /* Public mobile tab bar: the demo pill and the floating contact button sit above it. */
   body:has([data-tabbar]) [data-demobar] { bottom: calc(4.75rem + env(safe-area-inset-bottom)); }
 }
 /* Search on phones/tablets: keep it above the peeking results sheet. */
-@media (max-width: 1023px) {
+@media (min-width: 640px) and (max-width: 1023px) {
   body:has([data-search-sheet="peek"]) [data-demobar] { bottom: 150px; }
 }
 

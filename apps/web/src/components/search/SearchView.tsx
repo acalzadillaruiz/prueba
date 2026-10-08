@@ -511,14 +511,14 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
           >
             {/* one row: count · sort · filters */}
             <div className="sticky top-0 z-10 flex min-h-[52px] items-center gap-2 border-b border-line bg-ivory/95 px-4 py-1 backdrop-blur lg:px-5">
-              <div className="flex min-w-0 flex-1 items-center gap-2">
-                <p className="truncate font-serif text-[20px] leading-tight lg:text-[22px]" aria-live="polite">
+              <div className="flex shrink-0 items-center gap-2 lg:min-w-0 lg:flex-1">
+                <p className="whitespace-nowrap font-serif text-[18px] leading-tight sm:text-[20px] lg:text-[22px]" aria-live="polite">
                   {notUnderstood ? tx(locale, `${total} casas en total`, `${total} homes in all`) : plural(total, locale, ["resultado", "resultados"], ["result", "results"])}
                 </p>
                 {query.isFetching && <Loader2 size={15} aria-hidden className="shrink-0 animate-spin text-muted" />}
                 {shape && <span className="hidden shrink-0 rounded-full bg-[#C2A988] px-2.5 py-0.5 font-display text-xs font-semibold text-[#433B35] sm:inline-block">{tx(locale, "en la zona que dibujaste", "in the area you drew")}</span>}
               </div>
-              <select value={sort} onChange={(e) => set({ sort: e.target.value === "new" ? null : e.target.value })} aria-label={tx(locale, "Ordenar por", "Sort by")} className="h-11 max-w-[42vw] shrink-0 rounded-full border border-ink/10 bg-white/75 px-3 text-[13px] backdrop-blur lg:h-9 lg:max-w-none lg:text-sm">
+              <select value={sort} onChange={(e) => set({ sort: e.target.value === "new" ? null : e.target.value })} aria-label={tx(locale, "Ordenar por", "Sort by")} className="h-11 min-w-0 flex-1 rounded-full border border-ink/10 bg-white/75 px-3 text-[13px] backdrop-blur lg:h-9 lg:flex-none lg:text-sm">
                 <option value="new">{tx(locale, "Lo más reciente", "Newest first")}</option>
                 <option value="price-asc">{tx(locale, "Menor precio", "Lowest price")}</option>
                 <option value="price-desc">{tx(locale, "Mayor precio", "Highest price")}</option>

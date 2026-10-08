@@ -277,9 +277,11 @@ test.describe("Cliente · regresiones de la revisión", () => {
     await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(600);
     const y = await page.evaluate(() => window.scrollY);
     await expect(page.locator("html")).toHaveAttribute("data-np-header", "hidden");
-    // Open a card that is already on screen with a real tap point (a locator click would scroll the page first).
+    // Open a card that is already on screen with a real tap point (a locator click would scroll the page first). The
+    // card's only link is its title, stretched over the whole card: a tap on the photo opens it.
+    expect(await page.locator("#search-results [data-listing-card]").first().locator("a[href*='/listing/']").count()).toBe(1);
     const pt = await page.evaluate(() => {
-      for (const a of Array.from(document.querySelectorAll("#search-results a[href*='/listing/']"))) {
+      for (const a of Array.from(document.querySelectorAll("#search-results [data-listing-card]"))) {
         const r = a.getBoundingClientRect();
         const y = Math.max(r.top + 40, 160);
         if (y < r.bottom - 10 && y < window.innerHeight - 200) return { x: r.left + r.width / 2, y };
@@ -301,6 +303,71 @@ test.describe("Cliente · regresiones de la revisión", () => {
       sessionStorage.removeItem("np-search-view");
     });
   });
+  test("búsqueda a 360/390/768: nada más ancho que la pantalla y «Buscar en esta zona» centrado, sin pisar el zoom", async ({ page }) => {
+    await page.addInitScript(() => sessionStorage.removeItem("np-search-view"));
+    const overlaps = (a: { x: number; y: number; width: number; height: number }, b: { x: number; y: number; width: number; height: number }) =>
+      a.x < b.x + b.width && b.x < a.x + a.width && a.y < b.y + b.height && b.y < a.y + a.height;
+    for (const width of [360, 390, 768]) {
+      await page.setViewportSize({ width, height: 800 });
+      await page.goto("/es/search?type=SALE");
+      await expect(page.locator("#search-results [data-listing-card]").first()).toBeVisible();
+      // Nothing sticks out sideways (carousels and chip rows scroll inside their own clipped box).
+      const wide = await page.evaluate((w) => {
+        const out: string[] = [];
+        if (document.documentElement.scrollWidth > w) out.push(`page ${document.documentElement.scrollWidth}`);
+        for (const el of Array.from(document.querySelectorAll<HTMLElement>("body *"))) {
+          const r = el.getBoundingClientRect();
+          if (!r.width || (r.right <= w + 1 && r.left >= -1)) continue;
+          const cs = getComputedStyle(el);
+          if (cs.visibility === "hidden") continue;
+          let clipped = false;
+          for (let p = el.parentElement; p && !clipped; p = p.parentElement) clipped = getComputedStyle(p).overflowX !== "visible" || getComputedStyle(p).visibility === "hidden";
+          if (!clipped) out.push(`${el.tagName}.${String(el.className).slice(0, 60)} ${Math.round(r.left)}–${Math.round(r.right)}`);
+        }
+        return out;
+      }, width);
+      expect(wide, `${width}px`).toEqual([]);
+      // The sort select fits and is not stretched.
+      const sort = await page.getByRole("combobox", { name: "Ordenar por" }).boundingBox();
+      expect(sort!.x + sort!.width).toBeLessThanOrEqual(width);
+      expect(sort!.width).toBeLessThanOrEqual(180);
+      await expect(page.getByRole("combobox", { name: "Ordenar por" })).toHaveValue("rec");
+      // Map: after a zoom the button shows up under the tool row, centred, clear of the zoom buttons.
+      await page.locator("[data-search-toggle]").getByRole("button", { name: "Mapa", exact: true }).click();
+      await page.getByRole("button", { name: "Acercar" }).click();
+      const area = page.locator("[data-search-area]");
+      await expect(area).toBeVisible();
+      const a = (await area.boundingBox())!;
+      expect(a.x, `${width}px`).toBeGreaterThanOrEqual(0);
+      expect(a.x + a.width, `${width}px`).toBeLessThanOrEqual(width);
+      expect(Math.abs(a.x + a.width / 2 - width / 2), `${width}px centred`).toBeLessThanOrEqual(2);
+      for (const name of ["Acercar", "Alejar"]) expect(overlaps(a, (await page.getByRole("button", { name }).boundingBox())!), `${width}px vs ${name}`).toBe(false);
+      expect(overlaps(a, (await page.locator("[data-map-tools]").boundingBox())!), `${width}px vs tools`).toBe(false);
+    }
+    await page.evaluate(() => sessionStorage.removeItem("np-search-view"));
+  });
+
+  test("tarjetas: el único enlace es el título (botones fuera del enlace) y un atajo lleva del filtro a los resultados", async ({ page }) => {
+    await page.goto("/es/search?type=SALE");
+    const card = page.locator("#search-results [data-listing-card]").first();
+    await expect(card).toBeVisible();
+    // One link per card, named by the title; no button inside a link anywhere in the results.
+    await expect(card.getByRole("link")).toHaveCount(1);
+    const title = (await card.getByRole("link").innerText()).trim();
+    await expect(card.getByRole("link")).toHaveAccessibleName(title);
+    expect(await page.locator("#search-results a button, #search-results a a").count()).toBe(0);
+    // Owner listings say so in the agreed wording.
+    for (const t of await page.locator('[data-testid="card-advisor"][data-owner]').allInnerTexts()) expect(t).toBe("Dueño/a · sin intermediarios");
+    // Skip link: after the filter bar, visible on focus, lands on the results.
+    const skip = page.getByRole("link", { name: "Saltar a los resultados" });
+    await skip.focus();
+    await expect(skip).toBeVisible();
+    await skip.press("Enter");
+    await expect(page.locator("#search-results-grid")).toBeFocused();
+    await page.keyboard.press("Tab");
+    expect(await page.evaluate(() => !!document.activeElement?.closest("[data-listing-card]"))).toBe(true);
+  });
+
   test("búsqueda: una frase entendida a medias dice qué palabras no entendimos", async ({ page }) => {
     await page.goto("/es/search?type=SALE&kind=house&q=zzqx+casa+rara");
     await expect(page.locator('[data-testid="partly-understood"]:visible')).toHaveText("Buscamos «casa»; no entendimos «zzqx rara».");

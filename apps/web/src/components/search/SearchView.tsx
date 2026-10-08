@@ -42,8 +42,17 @@ import {
 
 export type { ZoneGroup } from "./SearchFilters";
 
-const SORTS = ["new", "price-asc", "price-desc", "ppm"] as const;
+/** "rec" (Recomendados: photos, completeness, then recency) is the default and stays out of the URL. */
+const SORTS = ["rec", "new", "price-asc", "price-desc", "ppm"] as const;
 type Sort = (typeof SORTS)[number];
+/** Sort labels: [es short, en short, es full, en full]. Phones and tablets show the short one (the select stays narrow). */
+const SORT_LABEL: Record<Sort, [string, string, string, string]> = {
+  rec: ["Recomendados", "Recommended", "Recomendados", "Recommended"],
+  new: ["Recientes", "Newest", "Lo más reciente", "Newest first"],
+  "price-asc": ["Precio ↑", "Price ↑", "Menor precio", "Lowest price"],
+  "price-desc": ["Precio ↓", "Price ↓", "Mayor precio", "Highest price"],
+  ppm: ["Precio/m²", "Price/m²", "Mejor precio por m²", "Best value per m²"],
+};
 
 /** sessionStorage: the phone view (list / map) the visitor last chose, kept across listing → Back. */
 const VIEW_KEY = "np-search-view";
@@ -164,7 +173,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
   const baths = numParam("baths");
   const minM2 = numParam("m2");
   const sortParam = sp.get("sort");
-  const sort: Sort = SORTS.includes(sortParam as Sort) ? (sortParam as Sort) : "new";
+  const sort: Sort = SORTS.includes(sortParam as Sort) ? (sortParam as Sort) : "rec";
   const polyParam = sp.get("poly");
   const radiusParam = sp.get("radius");
   // Sort and the drawn area live in the URL, so reload / share restores them (and the map redraws the shape).
@@ -208,7 +217,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
     const q = heuristicSearchParse(raw);
     const p = queryToParams(q, raw);
     if (!q.listingType) p.set("type", type);
-    if (sort !== "new") p.set("sort", sort);
+    if (sort !== "rec") p.set("sort", sort);
     if (view === "map") p.set("view", "map");
     router.push(`/${locale}/search?${p.toString()}`);
   };
@@ -539,54 +548,33 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
           </div>
         )}
       </div>
+      {/* Keyboard: straight from the filters to the first result (hidden until focused). */}
+      {hasResults && !listHidden && (
+        <a
+          href="#search-results-grid"
+          onClick={(e) => {
+            e.preventDefault();
+            const grid = document.getElementById("search-results-grid");
+            grid?.focus({ preventScroll: true });
+            grid?.scrollIntoView({ block: "start" });
+          }}
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-[calc(var(--np-header-offset,80px)+64px)] focus:z-[60] focus:rounded-full focus:bg-[#1E1A18] focus:px-5 focus:py-3 focus:font-display focus:text-sm focus:font-semibold focus:text-[#F1EBE3] focus:shadow-np lg:focus:top-[136px]"
+        >
+          {tx(locale, "Saltar a los resultados", "Skip to results")}
+        </a>
+      )}
       {/* "Más filtros" backdrop: dims the page; a click on it closes the panel (useDismiss). */}
       {moreOpen && desktop && <div aria-hidden className="np-in fixed inset-0 z-20 bg-[#1E1A18]/35" />}
 
       {/* Phones: room for the bottom tab bar. */}
       <div className={cn("relative mb-[calc(4rem+env(safe-area-inset-bottom))] md:mb-0 lg:flex lg:min-h-0 lg:flex-1", phoneMap && "flex min-h-0 flex-1")}>
-        {/* map 40% (phones: full screen, shown with the "Mapa" toggle; in list view it stays mounted, sized and invisible) */}
-        <div
-          className={cn("lg:relative lg:min-h-0 lg:min-w-0 lg:flex-1 lg:basis-[40%]", phoneMap ? "relative min-h-0 flex-1" : "max-lg:pointer-events-none max-lg:invisible max-lg:fixed max-lg:inset-0")}
-          inert={mapHidden || undefined}
-          aria-hidden={mapHidden || undefined}
-        >
-          <NightMap
-            key={region + mapFilters}
-            region={region}
-            listings={mapListings}
-            focus={fit.focus}
-            locale={locale}
-            selectedId={sel}
-            hoverId={hover}
-            onSelect={setSel}
-            shape={shape}
-            onShape={setShape}
-            className="h-full w-full"
-            renderPreview={(l, variant) => <MapPreviewCard l={l} locale={locale} variant={variant} />}
-            previewInset={desktop ? 12 : 80}
-            onArea={searchArea}
-            initialScale={fit.scale}
-            fitPoints={fitPoints}
-            fitPadding={fitPadding}
-            fitMaxScale={MAP_FIT[region].max}
-            toolbar={
-              // Which map: in the tool row (top-left), out of the way of the pins and the docked bar.
-              <div role="group" aria-label={tx(locale, "Mapa de", "Map of")} className="flex gap-0.5 rounded-full border border-[#E3D7C2] bg-[#ffffff] p-1 font-display text-[13px] text-[#1E1A18] shadow-np sm:text-sm">
-                {(["caracas", "venezuela"] as const).map((r) => (
-                  <button key={r} type="button" onClick={() => setRegionPick(r)} aria-pressed={region === r} className={cn("min-h-9 rounded-full border-2 px-3 sm:px-3.5", region === r ? "np-sel font-semibold" : "border-transparent text-[#1E1A18]/70")}>
-                    {r === "caracas" ? "Caracas" : "Venezuela"}
-                  </button>
-                ))}
-              </div>
-            }
-          />
-        </div>
-        {/* list 60% (phones: covers the map) */}
+        {/* list 60% (phones: covers the map). First in the DOM, so the keyboard reaches the results before the map's
+            controls; on desktop it still sits on the right (order). */}
         {/* Phones: in the page flow (the document scrolls, the header steps away). Desktop: its own scrolling panel. */}
         <div
           data-search-sheet={view}
           inert={listHidden || undefined}
-          className={cn("bg-ivory lg:flex lg:min-w-0 lg:flex-1 lg:basis-[60%] lg:flex-col lg:border-l lg:border-line", listHidden && "hidden")}
+          className={cn("bg-ivory lg:order-2 lg:flex lg:min-w-0 lg:flex-1 lg:basis-[60%] lg:flex-col lg:border-l lg:border-line", listHidden && "hidden")}
         >
           <div
             ref={listRef}
@@ -597,21 +585,35 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
           >
             {/* one row: count · sort · filters — phones: pinned under the header (follows it as it hides) */}
             <div className="sticky top-[calc(env(safe-area-inset-top)+var(--np-header-offset,80px)_-_8px)] z-20 flex min-h-[52px] items-center gap-2 border-b border-line bg-ivory/95 px-4 py-1 backdrop-blur transition-[top] duration-300 ease-[cubic-bezier(.2,.7,.2,1)] lg:top-0 lg:z-10 lg:px-5">
-              <div className="flex shrink-0 items-center gap-2 lg:min-w-0 lg:flex-1">
-                <p className="whitespace-nowrap font-serif text-[18px] leading-tight sm:text-[20px] lg:text-[22px]" aria-live="polite">
+              <div className="flex min-w-0 flex-1 items-center gap-2">
+                <p className="shrink-0 whitespace-nowrap font-serif text-[16px] leading-tight min-[390px]:text-[18px] sm:text-[20px] lg:text-[22px]" aria-live="polite">
                   {notUnderstood ? tx(locale, `${total} casas en total`, `${total} homes in all`) : plural(total, locale, ["resultado", "resultados"], ["result", "results"])}
                 </p>
                 {query.isFetching && <Loader2 size={15} aria-hidden className="shrink-0 animate-spin text-muted" />}
                 {shape && <span className="hidden shrink-0 rounded-full bg-[#C2A988] px-2.5 py-0.5 font-display text-xs font-semibold text-[#433B35] sm:inline-block">{tx(locale, "en la zona que dibujaste", "in the area you drew")}</span>}
               </div>
-              <select value={sort} onChange={(e) => set({ sort: e.target.value === "new" ? null : e.target.value })} aria-label={tx(locale, "Ordenar por", "Sort by")} className="h-11 min-w-0 flex-1 rounded-full border border-ink/10 bg-white/75 px-3 text-[13px] backdrop-blur lg:h-9 lg:flex-none lg:text-sm">
-                <option value="new">{tx(locale, "Lo más reciente", "Newest first")}</option>
-                <option value="price-asc">{tx(locale, "Menor precio", "Lowest price")}</option>
-                <option value="price-desc">{tx(locale, "Mayor precio", "Highest price")}</option>
-                <option value="ppm">{tx(locale, "Mejor precio por m²", "Best value per m²")}</option>
-              </select>
-              <button type="button" onClick={openSheet} aria-haspopup="dialog" aria-label={filtersAria} className={cn("flex h-11 shrink-0 items-center gap-1.5 rounded-full border px-3.5 font-display text-sm lg:hidden", filterCount ? on : "border-ink/10 bg-white/75")}>
-                <SlidersHorizontal size={15} aria-hidden /> {filtersLabel} {countBadge}
+              {/* As wide as its longest label (short ones below lg: "Precio ↑"); the full wording on desktop. */}
+              <span className="relative flex-none">
+                <select
+                  value={sort}
+                  onChange={(e) => set({ sort: e.target.value === "rec" ? null : e.target.value })}
+                  aria-label={tx(locale, "Ordenar por", "Sort by")}
+                  className="h-11 max-w-[11rem] appearance-none rounded-full border border-ink/10 bg-white/75 pl-3 pr-7 text-[13px] backdrop-blur lg:h-9 lg:max-w-[14rem] lg:pl-3.5 lg:pr-8 lg:text-sm"
+                >
+                  {SORTS.map((k) => {
+                    const [es, en, esFull, enFull] = SORT_LABEL[k];
+                    return (
+                      <option key={k} value={k} aria-label={tx(locale, esFull, enFull)} title={tx(locale, esFull, enFull)}>
+                        {desktop ? tx(locale, esFull, enFull) : tx(locale, es, en)}
+                      </option>
+                    );
+                  })}
+                </select>
+                <ChevronDown size={14} aria-hidden className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-muted lg:right-3" />
+              </span>
+              {/* Phones with filters on: icon + count (the chips below name them), so the sort keeps its room. */}
+              <button type="button" onClick={openSheet} aria-haspopup="dialog" aria-label={filtersAria} className={cn("flex h-11 shrink-0 items-center gap-1.5 rounded-full border px-3 font-display text-sm lg:hidden", filterCount ? on : "border-ink/10 bg-white/75")}>
+                <SlidersHorizontal size={15} aria-hidden /> <span className={cn(filterCount > 0 && "max-[389px]:hidden")}>{filtersLabel}</span> {countBadge}
               </button>
             </div>
             {activeChips.length > 0 && (
@@ -652,9 +654,9 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
               </div>
             )}
             {/* Phones in map view: the cards are hidden, keep them out of the tab order (the wrapper is inert). */}
-            <div className="grid gap-5 p-4 sm:grid-cols-2 lg:px-5 xl:grid-cols-3">
+            <div id="search-results-grid" tabIndex={-1} aria-label={tx(locale, "Resultados", "Results")} role="region" className="grid scroll-mt-[calc(var(--np-header-offset,80px)+60px)] gap-5 p-4 focus:outline-none sm:grid-cols-2 lg:scroll-mt-14 lg:px-5 xl:grid-cols-3">
               {results.map((l) => (
-                <div key={l.id} onMouseEnter={() => setHover(l.id)} onMouseLeave={() => setHover(null)}>
+                <div key={l.id} onMouseEnter={() => setHover(l.id)} onMouseLeave={() => setHover(null)} onFocus={() => setHover(l.id)} onBlur={() => setHover(null)}>
                   <ListingCard l={l} locale={locale} compact compareToggle />
                 </div>
               ))}
@@ -688,6 +690,44 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
             {/* Phones: room so the last card clears the docked Mapa / Comparar bar. */}
             <div aria-hidden className="h-[5.5rem] lg:hidden" />
           </div>
+        </div>
+
+        {/* map 40% (phones: full screen, shown with the "Mapa" toggle; in list view it stays mounted, sized and invisible) */}
+        <div
+          className={cn("lg:relative lg:order-1 lg:min-h-0 lg:min-w-0 lg:flex-1 lg:basis-[40%]", phoneMap ? "relative min-h-0 flex-1" : "max-lg:pointer-events-none max-lg:invisible max-lg:fixed max-lg:inset-0")}
+          inert={mapHidden || undefined}
+          aria-hidden={mapHidden || undefined}
+        >
+          <NightMap
+            key={region + mapFilters}
+            region={region}
+            listings={mapListings}
+            focus={fit.focus}
+            locale={locale}
+            selectedId={sel}
+            hoverId={hover}
+            onSelect={setSel}
+            shape={shape}
+            onShape={setShape}
+            className="h-full w-full"
+            renderPreview={(l, variant) => <MapPreviewCard l={l} locale={locale} variant={variant} />}
+            previewInset={desktop ? 12 : 80}
+            onArea={searchArea}
+            initialScale={fit.scale}
+            fitPoints={fitPoints}
+            fitPadding={fitPadding}
+            fitMaxScale={MAP_FIT[region].max}
+            toolbar={
+              // Which map: in the tool row (top-left), out of the way of the pins and the docked bar.
+              <div role="group" aria-label={tx(locale, "Mapa de", "Map of")} className="flex gap-0.5 rounded-full border border-[#E3D7C2] bg-[#ffffff] p-1 font-display text-[13px] text-[#1E1A18] shadow-np sm:text-sm">
+                {(["caracas", "venezuela"] as const).map((r) => (
+                  <button key={r} type="button" onClick={() => setRegionPick(r)} aria-pressed={region === r} className={cn("min-h-9 rounded-full border-2 px-3 sm:px-3.5", region === r ? "np-sel font-semibold" : "border-transparent text-[#1E1A18]/70")}>
+                    {r === "caracas" ? "Caracas" : "Venezuela"}
+                  </button>
+                ))}
+              </div>
+            }
+          />
         </div>
 
       </div>

@@ -4,7 +4,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { AppStateProvider } from "@/lib/store";
 import { isLocale } from "@/lib/i18n";
-import { DemoBar } from "@/components/layout/DemoBar";
+import { DemoBarSlot } from "@/components/layout/DemoBarSlot";
 import { SwUpdate } from "@/components/layout/SwUpdate";
 import { OG_IMAGE, SITE_URL, jsonLdHtml } from "@/lib/seo";
 import { fontVars } from "../fonts";
@@ -100,7 +100,7 @@ export default async function LocaleLayout({ children, params }: { children: Rea
         <NextIntlClientProvider>
           <AppStateProvider>
             {children}
-            <DemoBar locale={locale} />
+            <DemoBarSlot locale={locale} />
             <SwUpdate locale={locale} />
           </AppStateProvider>
         </NextIntlClientProvider>

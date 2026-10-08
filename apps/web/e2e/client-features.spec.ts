@@ -128,6 +128,10 @@ test.describe.serial("Cliente: búsqueda, Hub y precalificación", () => {
     await expect(footer.getByRole("link", { name: "English" })).toHaveAttribute("href", "/en/sell");
     await expect(footer.getByRole("button", { name: "Modo oscuro" })).toBeVisible();
     await expect(footer.getByText("Publicado en New Place")).toHaveCount(0);
+    // Phones: the footer's link lists are closed accordions (they repeat the tab bar and the menu); one tap opens one.
+    await expect(footer.getByRole("link", { name: "Vender con nosotros" })).toBeHidden();
+    await footer.locator("summary", { hasText: "Propietarios" }).click();
+    await expect(footer.getByRole("link", { name: "Vender con nosotros" })).toBeVisible();
     // "Buscar" (not a second "Mapa"): opens the search, list first.
     await expect(tabbar.getByRole("link", { name: "Buscar" })).toHaveAttribute("href", "/es/search?type=SALE");
     await expect(tabbar.getByRole("link", { name: "Mapa" })).toHaveCount(0);
@@ -160,6 +164,17 @@ test.describe.serial("Cliente: búsqueda, Hub y precalificación", () => {
     expect(b.json.query).toContain("radius=");
     const mine = await apiAs(page, "GET", "me/searches");
     expect((mine.json.items as { name: string }[]).filter((s) => s.name === `E2E radio ${stamp}`)).toHaveLength(1);
+    // Alerts page: the card says what it watches in words, the whole card opens the results ("Ver casas"), and
+    // "Editar" renames it in place (the name the person types becomes the title).
+    await page.goto("/es/alerts");
+    const card = page.locator("[data-alert]").filter({ hasText: `E2E-${stamp}` });
+    await expect(card.getByRole("heading", { level: 2 })).toHaveText(`E2E radio ${stamp}`);
+    await expect(card.getByRole("link", { name: /^Ver casas/ })).toHaveAttribute("href", new RegExp(`^/es/search\\?.*zone=E2E-${stamp}`));
+    await card.getByRole("button", { name: /^Editar/ }).click();
+    await card.getByLabel("Nombre (opcional)").fill(`Casa E2E ${stamp}`);
+    await card.getByRole("button", { name: "Guardar" }).click();
+    await expect(card.getByRole("heading", { level: 2 })).toHaveText(`Casa E2E ${stamp}`);
+    await expect(card.getByText(`Compra en E2E-${stamp} · 2+ hab`)).toBeVisible();
     await apiAs(page, "DELETE", `me/searches/${a.json.id}`);
   });
 

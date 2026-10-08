@@ -2,17 +2,25 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Bell, CalendarCheck, ChevronDown, ChevronLeft, FlaskConical, Heart, LogIn, Menu, MessageCircle, Moon, Settings, Sun, User, X } from "lucide-react";
+import { ChevronLeft, FlaskConical, Heart, Menu, Moon, Sun, User } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import type { Locale } from "@/types/domain";
-import { Logo, RoofGlyph } from "@/components/brand/Logo";
+import { Logo } from "@/components/brand/Logo";
 import { Avatar, Button } from "@/components/ui";
 import { useHideOnScroll } from "@/components/brand/useScrollChrome";
-import { roleHome, useUnreadMessages } from "@/components/brand/PublicChrome";
-import { DemoLoginList, useDemoVisible } from "./DemoBar";
+import { roleHome } from "@/components/brand/PublicChrome";
+import { useDemoVisible } from "./useDemoVisible";
+import type { DrawerLink } from "./MenuDrawer";
 import { useApp } from "@/lib/store";
 import { cn } from "@/lib/cn";
 import { msg, tx } from "@/lib/i18n";
+
+/** The menu drawer and the demo list are never on screen at first paint: their code arrives on demand (and the
+ *  drawer's is warmed in an idle slot after load, so the first tap still opens it at once). */
+const loadDrawer = () => import("./MenuDrawer");
+const MenuDrawer = dynamic(() => loadDrawer().then((m) => m.MenuDrawer), { ssr: false });
+const DemoLoginList = dynamic(() => import("./DemoLoginList").then((m) => m.DemoLoginList), { ssr: false });
 
 /** The logo's roof draws itself once per visit (first load), not on every client navigation. */
 let roofPlayed = false;
@@ -97,9 +105,8 @@ export function PublicHeader({ locale, variant = "light", autoHide = false }: { 
     return () => window.removeEventListener("scroll", on);
   }, [onListing, back]);
   const showBack = onListing && !!back && deep;
-  // Demo mode (DEMO_AUTH): desktop popover and the drawer's section keep separate states.
+  // Demo mode (DEMO_AUTH): the desktop popover (the drawer keeps its own state).
   const [deskDemo, setDeskDemo] = useState(false);
-  const [drawerDemo, setDrawerDemo] = useState(false);
   const demo = useDemoVisible();
   // Query string read in the browser (keeps the header static-renderable): used to keep filters on EN/ES switch
   // and to mark the active section on /search.
@@ -109,6 +116,14 @@ export function PublicHeader({ locale, variant = "light", autoHide = false }: { 
   const opener = useRef<HTMLElement | null>(null);
   useEffect(() => {
     roofPlayed = true;
+    const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number; cancelIdleCallback?: (id: number) => void };
+    const warm = () => void loadDrawer().catch(() => {});
+    if (w.requestIdleCallback) {
+      const id = w.requestIdleCallback(warm, { timeout: 4000 });
+      return () => w.cancelIdleCallback?.(id);
+    }
+    const t = window.setTimeout(warm, 2500);
+    return () => window.clearTimeout(t);
   }, []);
   useEffect(() => {
     // A navigation closes the drawer without pulling focus back to its opener.
@@ -135,7 +150,6 @@ export function PublicHeader({ locale, variant = "light", autoHide = false }: { 
   }, []);
   useEffect(() => {
     if (!menuOpen) {
-      setDrawerDemo(false);
       // Back to whatever opened it (the compact search's menu button), when it is still there.
       const el = opener.current;
       opener.current = null;
@@ -215,17 +229,9 @@ export function PublicHeader({ locale, variant = "light", autoHide = false }: { 
   // Desktop: "Vacacional" joins from 1400 px (below that the pill has no room for it; it stays in the search filters).
   const nav = [buy, rent, { ...vacation, wide: true }, luxury, remote];
   // Drawer: every way to search (the four search types the search page understands), then the rest.
-  const searchTypes = [buy, rent, vacation, { href: `/${locale}/search?type=COMMERCIAL`, label: t("commercial"), active: onSearch && type === "COMMERCIAL" }];
+  const searchTypes: DrawerLink[] = [buy, rent, vacation, { href: `/${locale}/search?type=COMMERCIAL`, label: t("commercial"), active: onSearch && type === "COMMERCIAL" }];
   const home = u ? roleHome(u.role) : "/app";
   const seeker = !!u && home === "/app";
-  // Unread messages for the drawer's "Tu espacio" block: fetched only while the drawer is open.
-  const unread = useUnreadMessages(menuOpen && seeker);
-  const space = [
-    { href: `/${locale}/app#visitas`, label: tx(locale, "Visitas", "Tours"), Icon: CalendarCheck },
-    { href: `/${locale}/app#mensajes`, label: tx(locale, "Mensajes", "Messages"), Icon: MessageCircle, badge: unread },
-    { href: `/${locale}/alerts`, label: tx(locale, "Alertas", "Alerts"), Icon: Bell },
-    { href: `/${locale}/account`, label: tx(locale, "Ajustes", "Settings"), Icon: Settings },
-  ];
   // Hide on scroll-down (never while the drawer is open or focus is inside the header).
   const [focusIn, setFocusIn] = useState(false);
   const scrolledAway = useHideOnScroll({ enabled: autoHide && variant !== "dark" });
@@ -250,7 +256,6 @@ export function PublicHeader({ locale, variant = "light", autoHide = false }: { 
       document.removeEventListener("keydown", onKey);
     };
   }, [deskDemo]);
-  const drawerItem = "flex min-h-12 items-center gap-3 rounded-lg px-3 font-display text-[16px] hover:bg-white/5";
   const iconBtn = cn("flex h-11 w-11 items-center justify-center rounded-full transition-colors duration-np", dark ? "hover:bg-white/10" : "hover:bg-black/5");
   const switchLang = (e: React.MouseEvent) => {
     // use the live query (filters may have changed since render)
@@ -407,85 +412,20 @@ export function PublicHeader({ locale, variant = "light", autoHide = false }: { 
       </div>
     </header>
     {menuOpen && (
-      // Not lg:hidden: on desktop it only opens from the compact search's menu button (np:open-menu).
-      <div className="fixed inset-0 z-[65]" role="dialog" aria-modal="true" aria-label={t("menu")} id="np-mobile-menu">
-        <button className="absolute inset-0 bg-navy/60" aria-label={locale === "es" ? "Cerrar menú" : "Close menu"} onClick={() => setMenuOpen(false)} />
-        <div className="np-in absolute inset-y-0 right-0 flex w-[min(340px,88vw)] flex-col bg-navy text-ivory shadow-np" style={{ paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}>
-          <div className="flex h-[72px] items-center justify-between px-5">
-            <Logo tone="ivory" />
-            <button autoFocus onClick={() => setMenuOpen(false)} className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-white/10" aria-label={locale === "es" ? "Cerrar menú" : "Close menu"}>
-              <X size={20} />
-            </button>
-          </div>
-          <nav className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 pb-4 pt-1" aria-label={locale === "es" ? "Principal" : "Main"}>
-            {searchTypes.map((n) => (
-              <Link key={n.href} href={n.href} onClick={() => setMenuOpen(false)} aria-current={n.active ? "page" : undefined} className="flex min-h-[50px] items-center gap-3 rounded-lg px-3 font-serif text-[23px] hover:bg-white/5">
-                {n.label}
-                {n.active && <RoofGlyph className="text-[#C9A574]" />}
-              </Link>
-            ))}
-            <div className="mx-3 my-3 h-px bg-[#B08A55]/40" aria-hidden />
-            <Link href={luxury.href} onClick={() => setMenuOpen(false)} aria-current={luxury.active ? "page" : undefined} className={drawerItem}>
-              <RoofGlyph className="w-[18px] text-[#C9A574]" /> {luxury.label}
-            </Link>
-            <Link href={remote.href} onClick={() => setMenuOpen(false)} className={drawerItem}>
-              <span aria-hidden className="w-[18px] text-center text-[#C9A574]">↗</span> {remote.label}
-            </Link>
-            <Link href={`/${locale}/saved`} onClick={() => setMenuOpen(false)} className={drawerItem}>
-              <Heart size={18} aria-hidden /> {t("saved")} {saved.length > 0 && <span className="text-sm text-mist">({saved.length})</span>}
-            </Link>
-            {seeker && (
-              <>
-                <div className="mx-3 mb-1 mt-4 font-display text-[12px] font-semibold uppercase tracking-[.18em] text-[#C9A574]">{tx(locale, "Tu espacio", "Your space")}</div>
-                {space.map(({ href, label, Icon, badge }) => (
-                  <Link key={href} href={href} onClick={() => setMenuOpen(false)} className={drawerItem}>
-                    <Icon size={18} aria-hidden /> {label}
-                    {!!badge && (
-                      <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-[#C9A574] px-1.5 text-[11px] font-bold text-navy">
-                        {badge}
-                        <span className="sr-only">{tx(locale, " sin leer", " unread")}</span>
-                      </span>
-                    )}
-                  </Link>
-                ))}
-              </>
-            )}
-            <div className="mx-3 my-3 h-px bg-[#B08A55]/40" aria-hidden />
-            <div className="flex items-center gap-2 px-1">
-              <Link href={switchHref} prefetch={false} onClick={switchLang} hrefLang={other} lang={other} className="flex min-h-12 items-center rounded-lg px-2 font-display text-[16px] hover:bg-white/5">
-                {other === "en" ? "English" : "Español"}
-              </Link>
-              <button onClick={toggleTheme} aria-pressed={isDark} className="ml-auto flex min-h-12 items-center gap-2 rounded-lg px-3 font-display text-[16px] hover:bg-white/5">
-                {isDark ? <Sun size={18} aria-hidden /> : <Moon size={18} aria-hidden />} {isDark ? (locale === "es" ? "Modo claro" : "Light mode") : locale === "es" ? "Modo oscuro" : "Dark mode"}
-              </button>
-            </div>
-            {demo && (
-              <div className="mt-2 rounded-xl border border-navy-line">
-                <button type="button" onClick={() => setDrawerDemo((o) => !o)} aria-expanded={drawerDemo} className="flex min-h-12 w-full items-center gap-2.5 rounded-xl px-3 font-display text-[15px] text-mist hover:bg-white/5">
-                  <FlaskConical size={16} className="text-[#C9A574]" aria-hidden /> {tx(locale, "Modo demo · entrar como…", "Demo mode · sign in as…")}
-                  <ChevronDown size={16} aria-hidden className={cn("ml-auto transition-transform", drawerDemo && "rotate-180")} />
-                </button>
-                {drawerDemo && <DemoLoginList locale={locale} onDone={() => setMenuOpen(false)} className="px-1 pb-1" />}
-              </div>
-            )}
-          </nav>
-          <div className="shrink-0 space-y-3 border-t border-navy-line p-5">
-            <Link href={`/${locale}/sell`} className="flex min-h-12 items-center justify-center rounded-full border-[1.5px] border-ivory/60 font-display font-semibold text-ivory hover:bg-white/5">
-              {t("sell")}
-            </Link>
-            {u ? (
-              <Link href={`/${locale}${home}`} className="flex min-h-12 items-center gap-3 rounded-lg px-2 hover:bg-white/5">
-                <Avatar initials={u.initials} hue={u.hue} size={32} />
-                <span className="font-display">{u.name}</span>
-              </Link>
-            ) : (
-              <Link href={`/${locale}/login`} className="flex min-h-12 items-center justify-center gap-2 rounded-full bg-ivory font-display font-semibold text-navy">
-                <LogIn size={18} aria-hidden /> {t("signIn")}
-              </Link>
-            )}
-          </div>
-        </div>
-      </div>
+      <MenuDrawer
+        locale={locale}
+        onClose={() => setMenuOpen(false)}
+        searchTypes={searchTypes}
+        luxury={luxury}
+        remote={remote}
+        seeker={seeker}
+        home={home}
+        switchHref={switchHref}
+        onSwitchLang={switchLang}
+        isDark={isDark}
+        onToggleTheme={toggleTheme}
+        demo={demo}
+      />
     )}
     </>
   );

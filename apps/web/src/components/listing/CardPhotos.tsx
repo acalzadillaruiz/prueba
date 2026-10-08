@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { Listing, Locale } from "@/types/domain";
 import { listingPhoto } from "@/lib/photos";
@@ -15,10 +16,13 @@ const SIZES = "(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw";
 /**
  * Card photos: a scroll-snap mini carousel when the listing has several photos (swipe on touch, arrows on desktop
  * hover, dots). Only the cover loads up front; the next photo loads as soon as the visitor shows interest (hover,
- * touch, a swipe), the rest one step ahead. A tap still opens the listing (the card link); a swipe scrolls and never
- * navigates (no click after a scroll gesture). One photo or none: a plain image, no "1/1" counter.
+ * touch, a swipe), the rest one step ahead. The card's title link stretches over the photo: with a mouse a click
+ * on the photo is a click on that link. On touch screens the strip sits above it (so it can be swiped) and a tap
+ * opens `href`; a swipe scrolls and never navigates (no click after a scroll gesture). One photo or none: a plain
+ * image under the link, no "1/1" counter. Unloaded slides show the arena placeholder (dark brown in dark mode).
  */
-export function CardPhotos({ l, locale, label }: { l: Listing; locale: Locale; label: string }) {
+export function CardPhotos({ l, locale, label, href }: { l: Listing; locale: Locale; label: string; href?: string }) {
+  const router = useRouter();
   const n = Math.min(5, l.photos?.length ?? 0);
   const [idx, setIdx] = useState(0);
   const [loaded, setLoaded] = useState(1);
@@ -27,7 +31,7 @@ export function CardPhotos({ l, locale, label }: { l: Listing; locale: Locale; l
 
   const ahead = (i: number) => setLoaded((v) => Math.max(v, Math.min(n, i + 2)));
   const go = (e: React.MouseEvent, d: number) => {
-    // Inside the card link: the arrows page the photos, they never open the listing.
+    // The arrows page the photos, they never open the listing.
     e.preventDefault();
     e.stopPropagation();
     const el = track.current;
@@ -36,7 +40,7 @@ export function CardPhotos({ l, locale, label }: { l: Listing; locale: Locale; l
     ahead(i);
     el.scrollTo({ left: i * el.clientWidth, behavior: "smooth" });
   };
-  const arrow = "absolute top-1/2 z-[1] flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-[#ffffffe6] text-[#1E1A18] opacity-0 shadow-sm transition-opacity duration-np group-hover:opacity-100 disabled:!opacity-0 [@media(hover:none)]:hidden";
+  const arrow = "absolute top-1/2 z-[2] flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-[#ffffffe6] text-[#1E1A18] opacity-0 shadow-sm transition-opacity duration-np group-hover:opacity-100 disabled:!opacity-0 [@media(hover:none)]:hidden";
   return (
     <>
       <div
@@ -49,10 +53,12 @@ export function CardPhotos({ l, locale, label }: { l: Listing; locale: Locale; l
           if (i !== idx) setIdx(i);
           ahead(i);
         }}
-        className="no-scrollbar flex h-full w-full snap-x snap-mandatory overflow-x-auto overscroll-x-contain"
+        // Touch only (with a mouse the stretched link is on top and gets the click).
+        onClick={href ? () => router.push(href) : undefined}
+        className="no-scrollbar flex h-full w-full snap-x snap-mandatory overflow-x-auto overscroll-x-contain [@media(hover:none)]:relative [@media(hover:none)]:z-[2]"
       >
         {Array.from({ length: n }, (_, i) => (
-          <div key={i} className="relative h-full w-full shrink-0 snap-start snap-always overflow-hidden">
+          <div key={i} className="relative h-full w-full shrink-0 snap-start snap-always overflow-hidden bg-arena">
             {i < loaded && (
               <PropertyArt
                 scene={l.scenes[i % l.scenes.length] ?? l.scenes[0]}
@@ -72,7 +78,7 @@ export function CardPhotos({ l, locale, label }: { l: Listing; locale: Locale; l
       <button type="button" tabIndex={-1} disabled={idx === n - 1} onClick={(e) => go(e, 1)} aria-label={tx(locale, "Foto siguiente", "Next photo")} className={cn(arrow, "right-2.5")}>
         <ChevronRight size={18} aria-hidden />
       </button>
-      <div aria-hidden data-photo-dots className="pointer-events-none absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-1.5">
+      <div aria-hidden data-photo-dots className="pointer-events-none absolute bottom-3 left-1/2 z-[2] flex -translate-x-1/2 items-center gap-1.5">
         {Array.from({ length: n }, (_, i) => (
           <span key={i} className={cn("h-1.5 rounded-full shadow-[0_0_2px_rgba(30,26,24,.5)] transition-all duration-np", i === idx ? "w-3 bg-white" : "w-1.5 bg-white/60")} />
         ))}

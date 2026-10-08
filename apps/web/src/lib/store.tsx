@@ -6,8 +6,11 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { Role } from "@newplace/config";
 import type { Agency } from "@/types/domain";
 import { api, ApiClientError } from "./api";
-import { SignupPrompt } from "@/components/seeker/SignupPrompt";
-import { SavedToast } from "@/components/brand/SavedToast";
+import dynamic from "next/dynamic";
+
+// Shown only after an action (a heart, a gated tap): their code loads then, not with every page.
+const SignupPrompt = dynamic(() => import("@/components/seeker/SignupPrompt").then((m) => m.SignupPrompt), { ssr: false });
+const SavedToast = dynamic(() => import("@/components/brand/SavedToast").then((m) => m.SavedToast), { ssr: false });
 
 export interface AppUser {
   id: string;

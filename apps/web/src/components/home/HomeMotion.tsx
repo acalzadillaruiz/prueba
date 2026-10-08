@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import Lenis from "lenis";
 import { gsap, ScrollTrigger } from "./motion";
 
 /**
@@ -42,8 +41,11 @@ export function HomeMotion() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     let stop: (() => void) | undefined;
     let cancelled = false;
+    // Lenis (smooth scroll) is fetched in that idle slot too: it is not part of the home's first-load JS.
     const start = () => {
-      if (!cancelled) stop = initMotion();
+      void import("lenis").then(({ default: Lenis }) => {
+        if (!cancelled) stop = initMotion(Lenis);
+      });
     };
     const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number; cancelIdleCallback?: (id: number) => void };
     let idle = 0;
@@ -66,7 +68,7 @@ export function HomeMotion() {
   return null;
 }
 
-function initMotion(): () => void {
+function initMotion(Lenis: typeof import("lenis").default): () => void {
   document.documentElement.classList.add("np-motion");
 
   const lenis = new Lenis({ duration: 1.15, easing: (t) => 1 - Math.pow(1 - t, 4), smoothWheel: true });

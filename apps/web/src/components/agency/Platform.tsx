@@ -131,9 +131,9 @@ export function PlatformAgencies({ locale, agencies }: { locale: Locale; agencie
         </form>
       )}
       <div className={cn("overflow-x-auto", k.card)}>
-        <table className="w-full min-w-[980px] text-sm">
+        <table className="np-sticky-last w-full min-w-[980px] text-sm">
           <thead className={cn("border-b text-left", k.line, k.th)}>
-            <tr><th className="px-4 py-3">{tx(locale, "Agencia", "Agency")}</th><th className="px-3 py-3">{tx(locale, "Estado", "Status")}</th><th className="px-3 py-3">{tx(locale, "Verificación", "Verification")}</th><th className="px-3 py-3">{tx(locale, "Plan (flag, sin cobro)", "Plan (flag, no billing)")}</th><th className="px-3 py-3 text-right">Listings</th><th className="px-3 py-3 text-right">{tx(locale, "Miembros", "Members")}</th><th className="px-3 py-3 text-right">Leads 30 d</th><th className="px-3 py-3" /></tr>
+            <tr><th className="px-4 py-3">{tx(locale, "Agencia", "Agency")}</th><th className="px-3 py-3">{tx(locale, "Estado", "Status")}</th><th className="px-3 py-3">{tx(locale, "Verificación", "Verification")}</th><th className="px-3 py-3">{tx(locale, "Plan", "Plan")}</th><th className="px-3 py-3 text-right">{tx(locale, "Anuncios", "Listings")}</th><th className="px-3 py-3 text-right">{tx(locale, "Miembros", "Members")}</th><th className="px-3 py-3 text-right">Leads 30 d</th><th className="px-3 py-3" /></tr>
           </thead>
           <tbody>
             {agencies.map((a) => (
@@ -208,7 +208,7 @@ export function PlatformUsers({ locale, users, providers }: { locale: Locale; us
         <span className={cn("text-sm", k.muted)}>{rows.length} / {users.length}</span>
       </div>
       <div className={cn("overflow-x-auto", k.card)}>
-        <table className="w-full min-w-[860px] text-sm">
+        <table className="np-sticky-last w-full min-w-[860px] text-sm">
           <thead className={cn("border-b text-left", k.line, k.th)}><tr><th className="px-4 py-3">{tx(locale, "Usuario", "User")}</th><th className="px-3 py-3">{tx(locale, "Rol", "Role")}</th><th className="px-3 py-3">{tx(locale, "Agencia", "Agency")}</th><th className="px-3 py-3">{tx(locale, "Acceso", "Sign-in")}</th><th className="px-3 py-3">{tx(locale, "Actividad", "Activity")}</th><th className="px-3 py-3" /></tr></thead>
           <tbody>
             {rows.map((u) => (
@@ -503,7 +503,7 @@ export function PlatformAudit({
         {(filters.action || filters.actor) && <Link href={base} className={cn("pb-2.5 text-sm", k.link)}>{tx(locale, "Quitar filtros", "Clear filters")}</Link>}
       </div>
       <div className={cn("overflow-x-auto", k.card)}>
-        <table className="w-full min-w-[860px] text-sm">
+        <table className="np-sticky-last w-full min-w-[860px] text-sm">
           <thead className={cn("border-b text-left", k.line, k.th)}>
             <tr><th className="px-4 py-3">{tx(locale, "Fecha", "Date")}</th><th className="px-3 py-3">{tx(locale, "Autor", "Actor")}</th><th className="px-3 py-3">{tx(locale, "Acción", "Action")}</th><th className="px-3 py-3">{tx(locale, "Sobre", "Target")}</th><th className="px-3 py-3">{tx(locale, "Detalle", "Details")}</th></tr>
           </thead>

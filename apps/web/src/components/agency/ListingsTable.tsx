@@ -101,7 +101,7 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
               <th className="px-3 py-3 text-right font-semibold">Leads</th>
               <th className="px-3 py-3 text-right font-semibold">{tx(locale, "Días", "Days")}</th>
               <th className="px-3 py-3 font-semibold">{tx(locale, "Actualizado", "Updated")}</th>
-              <th className="px-3 py-3" />
+              <th className={cn("sticky right-0 px-3 py-3", k.stickyCol)} />
             </tr>
           </thead>
           <tbody>
@@ -136,7 +136,7 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
                   <td className="px-3 text-right font-semibold">{l.stats.leads}</td>
                   <td className="px-3 text-right">{l.daysOnMarket}</td>
                   <td className={cn("px-3 text-xs", k.muted)} suppressHydrationWarning>{ago(l.updatedAt, locale)}</td>
-                  <td className="px-3">
+                  <td className={cn("sticky right-0 px-3", k.stickyCol)}>
                     {inReview && manager ? (
                       <div className="flex gap-1">
                         <Button size="sm" variant="navy" className={k.navy} disabled={busy === l.id} onClick={() => patch(l.id, { review: "APPROVED" })}><CheckCircle2 size={14} /> {tx(locale, "Aprobar", "Approve")}</Button>

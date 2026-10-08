@@ -100,7 +100,7 @@ test.describe.serial("Cliente: búsqueda, Hub y precalificación", () => {
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
     await demoLogin(page, /Buscador/);
     await page.goto("/es/app");
-    await expect(page.getByText("Homebuyer Hub")).toBeVisible();
+    await expect(page.getByText("Tu espacio", { exact: true })).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
   });
 

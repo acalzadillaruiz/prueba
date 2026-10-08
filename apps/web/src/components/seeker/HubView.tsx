@@ -77,7 +77,7 @@ export function HubView({ locale, data }: { locale: Locale; data: HubData }) {
     { done: SAVED_SEARCHES.length > 0, t: tx(locale, "Define tu búsqueda", "Define your search"), d: tx(locale, `${SAVED_SEARCHES.length} alertas activas`, `${SAVED_SEARCHES.length} active alerts`) },
     { done: saved.length > 0, t: tx(locale, "Guarda y compara", "Save and compare"), d: `${saved.length} ${tx(locale, "guardados", "saved")}` },
     { done: tourCount > 0, t: tx(locale, "Visita tus favoritos", "Tour your favorites"), d: `${tourCount} ${tx(locale, "visitas", "tours")}` },
-    { done: !!savedPrequal, t: tx(locale, "Precalificación (simulada)", "Pre-qualification (mock)"), d: savedPrequal ? tx(locale, `Hasta ${money(savedPrequal.price, locale)}`, `Up to ${money(savedPrequal.price, locale)}`) : tx(locale, "Sin compromiso", "No commitment") },
+    { done: !!savedPrequal, t: tx(locale, "Precalificación orientativa", "Indicative pre-qualification"), d: savedPrequal ? tx(locale, `Hasta ${money(savedPrequal.price, locale)}`, `Up to ${money(savedPrequal.price, locale)}`) : tx(locale, "Sin compromiso", "No commitment") },
     { done: offerCount > 0, t: tx(locale, "Haz una oferta", "Make an offer"), d: offerCount > 0 ? tx(locale, `${offerCount} ${offerCount === 1 ? "oferta" : "ofertas"}`, `${offerCount} ${offerCount === 1 ? "offer" : "offers"}`) : tx(locale, "Con tu agente", "With your agent") },
   ];
   const doneCount = steps.filter((s) => s.done).length;
@@ -86,7 +86,7 @@ export function HubView({ locale, data }: { locale: Locale; data: HubData }) {
       <div className="flex flex-wrap items-center gap-4">
         <Avatar initials={me.initials} hue={me.hue} size={56} />
         <div>
-          <div className={k.eyebrow}>Homebuyer Hub</div>
+          <div className={k.eyebrow}>{tx(locale, "Tu espacio", "Your space")}</div>
           <h1 className="mt-1 font-serif text-[40px] font-medium leading-[1.05] md:text-[48px]">{tx(locale, `Hola, ${me.name.split(" ")[0]}`, `Hi, ${me.name.split(" ")[0]}`)}</h1>
         </div>
         <div className="ml-auto w-full max-w-xs">
@@ -157,7 +157,7 @@ export function HubView({ locale, data }: { locale: Locale; data: HubData }) {
 
         {/* preapproval mock */}
         <Card className={cn(k.card, "border-0 p-5")}>
-          <h2 className="flex items-center gap-2 font-serif text-[24px] font-medium leading-tight"><CircleDollarSign size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Precalificación (simulada)", "Pre-qualification (mock)")}</h2>
+          <h2 className="flex items-center gap-2 font-serif text-[24px] font-medium leading-tight"><CircleDollarSign size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Precalificación orientativa", "Indicative pre-qualification")}</h2>
           <p className="mt-1 text-xs text-muted">{tx(locale, "Es solo una referencia: New Place no otorga créditos.", "Just a reference: New Place doesn’t provide loans.")}</p>
           <div className="mt-4 space-y-4 text-sm">
             <label className="block"><div className="flex justify-between"><span>{tx(locale, "Precio", "Price")}</span><b>{money(price, locale)}</b></div><input type="range" min={50000} max={500000} step={5000} value={price} onChange={(e) => setPrice(+e.target.value)} className="w-full accent-navy dark:accent-[#C9A574]" aria-label={tx(locale, "Precio", "Price")} /></label>
@@ -176,7 +176,7 @@ export function HubView({ locale, data }: { locale: Locale; data: HubData }) {
           {prequalErr && <div role="alert" className="mt-2 rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-sm text-danger">{prequalErr}</div>}
           {savedPrequal && (
             <div className="np-in mt-3 rounded-np border border-dashed border-line p-3 text-xs leading-relaxed text-ink/70" data-testid="prequal-letter">
-              <b>{tx(locale, "Carta de precalificación (simulada)", "Pre-qualification letter (mock)")}</b>
+              <b>{tx(locale, "Carta de precalificación orientativa", "Indicative pre-qualification letter")}</b>
               <br />
               {tx(
                 locale,

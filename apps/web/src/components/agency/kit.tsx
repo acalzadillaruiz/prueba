@@ -11,6 +11,8 @@ import { cn } from "@/lib/cn";
  */
 export const k = {
   /** White card, radius 18, soft navy shadow. */
+  /** Last table column stays in view (actions never hide behind a horizontal scroll). */
+  stickyCol: "bg-white shadow-[-14px_0_18px_-14px_rgba(30,26,24,.22)] dark:bg-navy-card",
   card: "rounded-[18px] bg-white shadow-[0_8px_24px_rgba(30,26,24,.06)] dark:bg-navy-card dark:shadow-none dark:ring-1 dark:ring-white/[.07]",
   line: "border-[#ECE6DA] dark:border-white/10",
   divide: "divide-[#ECE6DA] dark:divide-white/10",

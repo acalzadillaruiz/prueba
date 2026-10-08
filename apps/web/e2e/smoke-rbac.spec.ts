@@ -9,7 +9,7 @@ test.describe("Smoke: login, mapa, crear inmueble · RBAC duro", () => {
     await page.getByLabel("Contraseña", { exact: true }).fill("NewPlace!2026");
     await page.getByRole("button", { name: "Entrar", exact: true }).click();
     await page.waitForURL(/\/es\/app/);
-    await expect(page.getByText("Homebuyer Hub")).toBeVisible();
+    await expect(page.getByText("Tu espacio", { exact: true })).toBeVisible();
   });
 
   test("contraseña incorrecta muestra error", async ({ page }) => {

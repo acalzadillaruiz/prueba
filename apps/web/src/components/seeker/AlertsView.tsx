@@ -13,6 +13,16 @@ import { cn } from "@/lib/cn";
 
 type Search = { id: string; name: string; query: string; polygon: unknown; frequency: "INSTANT" | "DAILY" | "WEEKLY"; newCount: number; lastSentAt: string | null };
 
+/** What each email was about, in words (never the internal code). */
+const EMAIL_KIND_LABEL: Record<string, [string, string]> = {
+  ALERT: ["Alerta", "Alert"],
+  TOUR: ["Visita", "Viewing"],
+  VERIFY: ["Tu cuenta", "Your account"],
+  LEAD: ["Mensaje", "Message"],
+  OFFER: ["Oferta", "Offer"],
+  PRICE_DROP: ["Bajó de precio", "Price drop"],
+};
+
 export function AlertsView({ locale, searches, emails }: { locale: Locale; searches: Search[]; emails: EmailOutbox[] }) {
   const [items, setItems] = useState(searches);
   const [confirmId, setConfirmId] = useState<string | null>(null);
@@ -98,16 +108,16 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
       <aside>
         <Card className={cn(k.card, "border-0 p-5")}>
           <div className="flex items-center gap-2 font-serif text-[24px] font-medium leading-tight"><Mail size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Avisos enviados", "Sent to you")}</div>
-          <p className="mt-1 text-xs text-muted">{tx(locale, "Los correos que te enviamos. «Simulado» significa que aún no hay un servicio de correo conectado.", "The emails we’ve sent you. “Simulated” means no email service is connected yet.")}</p>
+          <p className="mt-1 text-xs text-muted">{tx(locale, "Lo último que te hemos escrito.", "The latest we’ve written to you.")}</p>
           <ul className="mt-4 divide-y divide-line">
             {emails.map((e) => (
               <li key={e.id} className="py-3">
                 <div className="flex items-center justify-between gap-2">
-                  <Badge tone={e.kind === "TOUR" ? "ok" : "mist"} className={e.kind === "ALERT" ? "bg-[#E6DDD2] text-navy dark:bg-white/10" : undefined}>{e.kind}</Badge>
+                  <Badge tone={e.kind === "TOUR" ? "ok" : "mist"} className={e.kind === "ALERT" ? "bg-[#E6DDD2] text-navy dark:bg-white/10" : undefined}>{lbl(EMAIL_KIND_LABEL[e.kind] ?? [e.kind, e.kind], locale)}</Badge>
                   <span className="text-xs text-muted">{ago(e.at, locale)}</span>
                 </div>
                 <div className="mt-1.5 text-sm font-semibold">{e.subject}</div>
-                <div className="text-xs text-muted">{e.to} · {EMAIL_STATUS_LABEL[e.status as keyof typeof EMAIL_STATUS_LABEL] ? lbl(EMAIL_STATUS_LABEL[e.status as keyof typeof EMAIL_STATUS_LABEL], locale) : e.status}</div>
+                <div className="text-xs text-muted">{e.to}{e.status !== "SIMULATED" && EMAIL_STATUS_LABEL[e.status as keyof typeof EMAIL_STATUS_LABEL] ? ` · ${lbl(EMAIL_STATUS_LABEL[e.status as keyof typeof EMAIL_STATUS_LABEL], locale)}` : ""}</div>
               </li>
             ))}
           </ul>

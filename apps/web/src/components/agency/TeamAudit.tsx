@@ -97,7 +97,7 @@ function Performance({ locale, days, rows }: { locale: Locale; days: AuditPeriod
       ) : (
         <>
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[1180px] text-sm">
+            <table className="np-sticky-last w-full min-w-[1180px] text-sm">
               <caption className="sr-only">{tx(locale, `Desempeño por asesor, últimos ${days} días. Pulse un encabezado para ordenar.`, `Performance by advisor, last ${days} days. Press a header to sort.`)}</caption>
               <thead className={cn("border-b text-left", k.line, k.th)}>
                 <tr>

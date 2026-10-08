@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { Check, Eye, Heart, ImagePlus, Inbox, Loader2, Pause, Pencil, Play, Plus, Send, Trash2, TrendingDown } from "lucide-react";
+import { CalendarClock, Check, Eye, Heart, ImagePlus, Inbox, Loader2, Pause, Pencil, Play, Plus, Send, Trash2, TrendingDown } from "lucide-react";
 import type { Listing, Locale, Message, Offer } from "@/types/domain";
 import { listingPhoto } from "@/lib/photos";
 import { PropertyArt } from "@/components/art/PropertyArt";
@@ -19,6 +19,8 @@ import { listingHref } from "@/lib/listing-href";
 import { OwnerInbox, type OwnerLead, type OwnerTour } from "./OwnerInbox";
 import { OwnerEditForm } from "./OwnerEditForm";
 import { OwnerTakedown } from "./OwnerTakedown";
+import { OwnerVisitHours } from "./OwnerVisitHours";
+import { isFsbo, summarizeVisitHours, type VisitHours } from "@/lib/visit-hours";
 import { mandateLabel, mandatePhase } from "@/lib/lifecycle";
 
 type Thread = { id: string; subject: string | null; listingId: string | null; leadId?: string | null; participants: { id: string; name: string; hue: number }[]; messages: Message[] };
@@ -32,7 +34,7 @@ const OFFER_LABEL: Record<Offer["status"], [string, string]> = {
 };
 const MAX_PRICE = 1_000_000_000;
 
-export function OwnerListingsView({ locale, listings, offers, threads, mandates, leads = [], tours = [], appeals = {} }: { locale: Locale; listings: Listing[]; offers: Offer[]; threads: Thread[]; mandates: Mandate[]; leads?: OwnerLead[]; tours?: OwnerTour[]; /** listing id → open appeal date */ appeals?: Record<string, string> }) {
+export function OwnerListingsView({ locale, listings, offers, threads, mandates, leads = [], tours = [], appeals = {}, visitHours = {} }: { locale: Locale; listings: Listing[]; offers: Offer[]; threads: Thread[]; mandates: Mandate[]; leads?: OwnerLead[]; tours?: OwnerTour[]; /** listing id → open appeal date */ appeals?: Record<string, string>; /** FSBO listing id → its weekly visit hours (null: none yet) */ visitHours?: Record<string, VisitHours | null> }) {
   const { user } = useApp();
   const router = useRouter();
   const [active, setActive] = useState(threads[0]?.id ?? null);
@@ -42,6 +44,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
   const [confirmSold, setConfirmSold] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [editingListing, setEditingListing] = useState<string | null>(null);
+  const [editingHours, setEditingHours] = useState<string | null>(null);
   const [editing, setEditing] = useState<string | null>(null);
   const [price, setPrice] = useState("");
   const [priceErr, setPriceErr] = useState<string | null>(null);
@@ -148,6 +151,9 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
             const isMandate = mandates.some((m) => m.listingId === l.id);
             const takenDown = !!l.takedownReason;
             const paused = l.status === "WITHDRAWN" && !takenDown;
+            // The owner attends the visits of their own FSBO listings: they set when (an agency's mandate uses its agent's calendar).
+            const ownVisits = !isMandate && isFsbo(l);
+            const hours = visitHours[l.id] ?? null;
             return (
               <Card key={l.id} className={cn(k.card, "border-0 overflow-hidden")}>
                 <div className="grid sm:grid-cols-[220px_1fr]">
@@ -225,6 +231,11 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
                     {!isMandate && (
                       <div className="mt-3 flex flex-wrap gap-2">
                         <Button size="sm" variant="outline" className={k.outline} aria-expanded={editingListing === l.id} onClick={() => setEditingListing(editingListing === l.id ? null : l.id)}><Pencil size={13} /> {tx(locale, "Editar", "Edit")}</Button>
+                        {ownVisits && !takenDown && (
+                          <Button size="sm" variant="outline" className={k.outline} aria-expanded={editingHours === l.id} onClick={() => setEditingHours(editingHours === l.id ? null : l.id)}>
+                            <CalendarClock size={13} /> {tx(locale, "Horario de visitas", "Visit hours")}
+                          </Button>
+                        )}
                         {/* A taken-down listing is fixed and appealed first: no price changes or new photos meanwhile. */}
                         {!takenDown && (
                           <>
@@ -273,6 +284,15 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
                           ))}
                       </div>
                     )}
+                    {ownVisits && !takenDown && editingHours !== l.id && (
+                      <p className="mt-2 flex items-start gap-1.5 text-xs text-muted" data-testid="visit-hours-summary">
+                        <CalendarClock size={13} className="mt-px shrink-0" aria-hidden />
+                        {hours
+                          ? `${tx(locale, "Visitas", "Visits")}: ${summarizeVisitHours(hours, locale)} · ${hours.slotMin} min`
+                          : tx(locale, "Aún sin horario de visitas: quien se interese te dirá cuándo le viene bien. Pon tu horario y podrán reservar directamente.", "No visit hours yet: interested people will tell you when suits them. Set your hours and they can book directly.")}
+                      </p>
+                    )}
+                    {ownVisits && editingHours === l.id && <OwnerVisitHours listingId={l.id} locale={locale} initial={hours} onDone={(saved) => { setEditingHours(null); if (saved) router.refresh(); }} />}
                     {!isMandate && editingListing === l.id && <OwnerEditForm l={l} locale={locale} onDone={(saved) => { setEditingListing(null); if (saved) router.refresh(); }} />}
                     {paused && !isMandate && <p className="mt-2 text-xs text-muted">{tx(locale, "En pausa: no aparece en el buscador. Reactívala cuando quieras.", "Paused: it doesn’t show in search. Resume it whenever you like.")}</p>}
                     <OwnerInbox locale={locale} leads={ll} tours={lt} manage={!isMandate} onChanged={() => router.refresh()} />

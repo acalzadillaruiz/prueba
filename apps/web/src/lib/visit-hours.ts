@@ -127,3 +127,27 @@ export const VISIT_PREF_LABEL: Record<VisitPref, [string, string]> = {
 export const OPEN_FOR_TOURS = ["ACTIVE", "COMING_SOON", "UNDER_OFFER"];
 export const isFsbo = (l: { agentId?: string | null; agencyId?: string | null; ownerUserId?: string | null }) => !l.agentId && !l.agencyId && !!l.ownerUserId;
 export const takesTours = (l: { status: string; agentId?: string | null; agencyId?: string | null; ownerUserId?: string | null }) => OPEN_FOR_TOURS.includes(l.status) && (!!l.agentId || isFsbo(l));
+
+const DAY_SHORT: Record<"es" | "en", string[]> = { es: ["lun", "mar", "mié", "jue", "vie", "sáb", "dom"], en: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] };
+export const weekdayShort = (day: number, locale: "es" | "en") => DAY_SHORT[locale][day];
+
+/** "lun–vie 17:00–19:15 · sáb 09:00–12:00": consecutive days with the same ranges are merged. */
+export function summarizeVisitHours(h: VisitHours, locale: "es" | "en"): string {
+  const perDay = Array.from({ length: 7 }, (_, d) =>
+    h.ranges
+      .filter((r) => r.day === d)
+      .sort((a, b) => toMinutes(a.from) - toMinutes(b.from))
+      .map((r) => `${r.from}–${r.to}`)
+      .join(", "),
+  );
+  const parts: string[] = [];
+  for (let d = 0; d < 7; d++) {
+    if (!perDay[d]) continue;
+    let e = d;
+    while (e + 1 < 7 && perDay[e + 1] === perDay[d]) e++;
+    const days = e === d ? weekdayShort(d, locale) : e === d + 1 ? `${weekdayShort(d, locale)}, ${weekdayShort(e, locale)}` : `${weekdayShort(d, locale)}–${weekdayShort(e, locale)}`;
+    parts.push(`${days} ${perDay[d]}`);
+    d = e;
+  }
+  return parts.join(" · ");
+}

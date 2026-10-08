@@ -6,6 +6,7 @@ import { getOffers, getThreadsFor, leadToDomain } from "@/server/data";
 import { listingInclude, toDomain } from "@/server/listings";
 import { getAppUser } from "@/server/session";
 import { openAppeals } from "@/server/listing-service";
+import { isFsbo, parseVisitHours } from "@/lib/visit-hours";
 
 export const dynamic = "force-dynamic";
 
@@ -38,6 +39,7 @@ export default async function OwnerListings({ params }: { params: Promise<{ loca
         threads={threads}
         leads={leads.map(leadToDomain).map((l) => ({ id: l.id, listingId: l.listingId, name: l.name, email: l.email, phone: l.phone ?? null, message: l.message, createdAt: l.createdAt }))}
         tours={tours.map((t) => ({ id: t.id, listingId: t.listingId, leadId: t.leadId, seekerName: t.seekerName, email: t.lead?.email ?? null, phone: t.lead?.phone ?? null, start: t.start.toISOString(), status: t.status, virtual: t.virtual }))}
+        visitHours={Object.fromEntries(rows.filter((r) => isFsbo(r)).map((r) => [r.id, parseVisitHours(r.visitHours)]))}
         appeals={Object.fromEntries([...appeals].map(([id, at]) => [id, at.toISOString()]))}
         mandates={mandates.map((m) => ({ id: m.id, status: m.status, listingId: m.listingId, agencyName: m.agency.name, agentName: m.agent?.name ?? null, createdAt: m.createdAt.toISOString() }))}
       />

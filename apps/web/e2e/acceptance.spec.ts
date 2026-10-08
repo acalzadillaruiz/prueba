@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { apiAs, demoLogin, logout } from "./helpers";
+import { apiAs, demoLogin, logout, fillWizardBasics, fillWizardPrice } from "./helpers";
 
 const LPG = "/es/listing/los-palos-grandes-3h-118m-l5u136";
 const stamp = Date.now().toString(36);
@@ -62,9 +62,11 @@ test.describe.serial("Criterios de aceptación §15", () => {
     await page.getByRole("option").filter({ hasText: "Altamira" }).first().click();
     await expect(page.getByText(/Sin duplicados/)).toBeVisible();
     await page.getByRole("button", { name: "Continuar" }).click();
+    await fillWizardBasics(page);
     await page.getByRole("button", { name: "Continuar" }).click();
     await page.getByTestId("photo-input").setInputFiles("e2e/fixtures/photo.jpg");
     await page.getByRole("button", { name: "Continuar" }).click();
+    await fillWizardPrice(page);
     await page.getByRole("button", { name: /Redactar con IA/ }).click();
     await expect(page.getByLabel("Título")).not.toHaveValue("");
     await page.getByRole("button", { name: "Continuar" }).click();

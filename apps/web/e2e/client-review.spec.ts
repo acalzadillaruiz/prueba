@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { apiAs, expectOk, logout } from "./helpers";
+import { apiAs, expectOk, logout, fillWizardBasics } from "./helpers";
 
 // Regression tests for the client-flow review (search NL, owner wizard, owner inbox, account, auth).
 const stamp = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`;
@@ -62,6 +62,7 @@ test.describe("Cliente · regresiones de la revisión", () => {
     // Land: no bedrooms/bathrooms/parking steppers.
     await expect(page.getByRole("button", { name: "Habitaciones +" })).toHaveCount(0);
     await expect(page.getByRole("button", { name: "Baños +" })).toHaveCount(0);
+    await page.getByLabel("Superficie del terreno (m²)").fill("800");
     await page.getByLabel("Año de construcción").fill("20");
     await page.getByRole("button", { name: "Continuar" }).click();
     await expect(page.getByText(/Año entre 1800 y/)).toBeVisible();
@@ -94,6 +95,7 @@ test.describe("Cliente · regresiones de la revisión", () => {
     await page.getByRole("button", { name: "Continuar" }).click();
     await page.getByRole("checkbox", { name: "Inmueble de lujo" }).check();
     await expect(page.getByRole("checkbox", { name: /Anuncio privado/ })).toBeVisible();
+    await fillWizardBasics(page);
     await page.getByRole("button", { name: "Continuar" }).click();
     await page.getByRole("button", { name: "Continuar" }).click();
     await expect(page.getByLabel("Tu precio (USD / mes)")).toBeVisible();

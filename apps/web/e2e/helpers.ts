@@ -17,3 +17,14 @@ export async function apiAs(page: Page, method: string, path: string, data?: unk
 }
 
 export const expectOk = (status: number) => expect(status, `HTTP ${status}`).toBeLessThan(300);
+
+/** Publish wizard, details step: nothing is pre-filled any more, so the owner writes the basics. */
+export async function fillWizardBasics(page: Page, o: { m2?: string; year?: string } = {}) {
+  await page.getByLabel(/Superficie (construida|del terreno)/).fill(o.m2 ?? "110");
+  await page.getByLabel("Año de construcción").fill(o.year ?? "2005");
+}
+
+/** Publish wizard, price step. */
+export async function fillWizardPrice(page: Page, price = "150000") {
+  await page.getByLabel(/^Tu precio/).fill(price);
+}

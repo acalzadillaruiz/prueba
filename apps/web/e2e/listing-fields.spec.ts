@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { expect, test, type Page } from "@playwright/test";
-import { apiAs, demoLogin, logout } from "./helpers";
+import { apiAs, demoLogin, logout, fillWizardBasics, fillWizardPrice } from "./helpers";
 
 /**
  * 1 · Mandates can't be used to publish under an agency's name (owner-created MANDATE listings stay private
@@ -158,6 +158,8 @@ test.describe("2 · Campos por tipo de inmueble", () => {
     // step 3: vacation fields only for SHORT_RENT; commercial fields hidden
     await expect(page.getByLabel("Noches mínimas")).toBeVisible();
     await expect(page.getByLabel("Zonificación")).toHaveCount(0);
+    await fillWizardBasics(page, { m2: "85" });
+    await page.getByRole("button", { name: "Puestos +" }).click();
     await page.getByLabel("Noches mínimas").fill("0");
     await page.getByRole("button", { name: "Continuar" }).click();
     await expect(page.getByRole("alert").filter({ hasText: /Entre 1 y 365 noches/ })).toBeVisible();
@@ -167,6 +169,7 @@ test.describe("2 · Campos por tipo de inmueble", () => {
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
     await page.getByRole("button", { name: "Continuar" }).click();
     await page.getByRole("button", { name: "Continuar" }).click(); // photos (none)
+    await fillWizardPrice(page, "120");
     await page.getByRole("button", { name: "Continuar" }).click(); // price
 
     // review: deduped address with unit, plural labels, confirmation not pre-checked

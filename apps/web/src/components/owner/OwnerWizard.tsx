@@ -52,7 +52,6 @@ type Draft = {
   ess: EssentialsDraft;
 };
 const DRAFT_KEY_BASE = "np-owner-draft-v1";
-const DEFAULT_PRICE: Record<string, number> = { SALE: 150000, LONG_RENT: 900, SHORT_RENT: 80, COMMERCIAL_SALE: 250000, COMMERCIAL_RENT: 1500 };
 const RESIDENTIAL_KINDS: Kind[] = ["apartment", "house", "penthouse", "townhouse", "studio", "villa", "chalet"];
 /** Bedrooms don't apply to these kinds; land has no bathrooms or parking either. */
 const NO_BEDS: Kind[] = ["land", "office", "retail", "warehouse"];
@@ -78,13 +77,14 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
     kind: "apartment",
     addr: null,
     unit: "",
-    m2: 110,
-    beds: 3,
-    baths: 2,
-    parking: 1,
-    year: 2005,
-    amen: ["generator", "waterTank", "security"],
-    price: 150000,
+    // Nothing is pre-filled: a listing only ever shows what its owner actually wrote.
+    m2: 0,
+    beds: 0,
+    baths: 0,
+    parking: 0,
+    year: 0,
+    amen: [],
+    price: 0,
     copy: { title_es: "", title_en: "", body_es: "", body_en: "" },
     agency: agencies.find((a) => a.verified)?.id ?? agencies[0]?.id ?? "",
     luxury: false,
@@ -93,9 +93,8 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
     ess: EMPTY_ESSENTIALS,
   });
   const set = (p: Partial<Draft>) => setD((x) => ({ ...x, ...p }));
-  /** Switching operation swaps an untouched default price (a sale's 150.000 must not become 150.000/month). */
-  const setOp = (op: string) =>
-    setD((x) => ({ ...x, op, price: x.price === DEFAULT_PRICE[x.op] || !x.price ? (DEFAULT_PRICE[op] ?? x.price) : x.price }));
+  /** Switching operation clears the price: a sale's 150.000 must never become 150.000/month. */
+  const setOp = (op: string) => setD((x) => ({ ...x, op, price: x.op === op ? x.price : 0 }));
   const [dupError, setDupError] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const [cover, setCover] = useState(0);
@@ -178,7 +177,8 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
 
   // live PlaceEstimate (debounced)
   useEffect(() => {
-    if (!zone) return;
+    // No valuation from made-up numbers: wait until the owner has written the area.
+    if (!zone || !d.m2) return setEstimate(null);
     const t = setTimeout(() => {
       api<{ estimate: EstimateResult }>("ai/estimate", {
         method: "POST",
@@ -686,8 +686,8 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
             )}
             <div className="p-4">
               <div className="text-xs font-semibold uppercase tracking-wide text-muted">{tx(locale, "Vista previa", "Preview")}</div>
-              <div className="font-display text-xl font-semibold">{money(d.price, locale)}<span className="text-sm font-normal text-muted">{priceUnit}</span></div>
-              <div className="text-sm">{facts}</div>
+              <div className="font-display text-xl font-semibold">{d.price ? <>{money(d.price, locale)}<span className="text-sm font-normal text-muted">{priceUnit}</span></> : <span className="text-muted">{tx(locale, "Precio pendiente", "Price to come")}</span>}</div>
+              <div className="text-sm">{d.m2 ? facts : <span className="text-muted">{tx(locale, "Aquí verás los datos de tu casa", "Your home's details will show here")}</span>}</div>
               <div className="text-sm text-muted">{d.addr ? fullAddress([d.addr.zone, d.addr.city]) : tx(locale, "Dirección pendiente", "Address pending")}</div>
             </div>
           </div>

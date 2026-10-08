@@ -79,7 +79,7 @@ test.describe.serial("Criterios de aceptación §15", () => {
     await demoLogin(page, /Dueño de agencia/);
     await page.goto("/es/agency");
     await expect(page.locator("main").getByText("Inmuebles activos").first()).toBeVisible();
-    await expect(page.getByText("Ranking de agentes")).toBeVisible();
+    await expect(page.getByText("Ranking de agentes").first()).toBeVisible();
     await expect(page.getByText("Valentina Rojas").first()).toBeVisible();
   });
 
@@ -125,7 +125,7 @@ test.describe.serial("Criterios de aceptación §15", () => {
 
   test("10 · sin Maps key ni AI key: sin crash (mapa ilustrado + IA local)", async ({ page }) => {
     await page.goto("/es/search?type=SALE");
-    await expect(page.getByText(/Mapa ilustrativo/)).toBeVisible();
+    await expect(page.getByText(/Mapa ilustrativo/).first()).toBeVisible();
     const r = await apiAs(page, "POST", "ai/search-parse", { q: "ático con luz en Los Palos Grandes por menos de 180 mil" });
     expect(r.json.provider).toBe("heuristic");
     expect(r.json.query.maxPrice).toBe(180000);

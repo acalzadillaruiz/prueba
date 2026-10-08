@@ -25,12 +25,26 @@ const TYPES = [
   ["COMMERCIAL", "Comercial", "Commercial"],
 ] as const;
 
+// Tiers per operation, up to the top of the luxury market: sale (total), long rent (per month), vacation (per night), commercial (rent or sale).
 const PRICE_STEPS: Record<string, number[]> = {
-  SALE: [80000, 120000, 150000, 200000, 250000, 400000, 1000000],
-  LONG_RENT: [500, 800, 1200, 1800, 2500],
-  SHORT_RENT: [60, 90, 150, 250],
-  COMMERCIAL: [2000, 5000, 200000, 500000, 1000000],
+  SALE: [100000, 150000, 250000, 400000, 600000, 1000000, 1500000, 2000000, 3000000, 5000000],
+  LONG_RENT: [500, 800, 1200, 1800, 2500, 4000, 6000, 10000],
+  SHORT_RENT: [60, 100, 150, 250, 400, 600, 1000],
+  COMMERCIAL: [1000, 2500, 5000, 10000, 150000, 300000, 600000, 1000000, 2000000, 5000000],
 };
+
+/** The tiers, plus a value from the URL or the NL parser that isn't one of them (so the select still shows it). */
+const withValue = (steps: number[], v?: number) => (v && !steps.includes(v) ? [...steps, v].sort((a, b) => a - b) : steps);
+
+const KIND_OPTIONS = [
+  ["house", "Casa o villa", "House or villa"],
+  ["apartment", "Apartamento", "Apartment"],
+  ["penthouse", "Ático", "Penthouse"],
+  ["land", "Terreno", "Land"],
+] as const;
+
+/** Zones grouped by city (the city itself is a valid `zone` value: the API matches it on listing.city). */
+export type ZoneGroup = { city: string; zones: string[] };
 
 const MIN_M2_STEPS = [50, 80, 100, 150, 200, 300];
 const SORTS = ["new", "price-asc", "price-desc", "ppm"] as const;
@@ -62,9 +76,10 @@ const KIND_CHIP: Record<string, [string, string]> = {
   land: ["Terreno", "Land"],
 };
 
-const FILTER_AMENITIES: Amenity[] = ["pool", "generator", "waterTank", "security", "gym", "terrace", "view", "garden", "elevator", "ac"];
+// Power, water tank and views live in "Servicios esenciales" (with finer options), so they aren't repeated here.
+const FILTER_AMENITIES: Amenity[] = ["pool", "security", "gym", "terrace", "garden", "elevator", "ac"];
 
-export function SearchView({ locale, initial, zones }: { locale: Locale; initial: { items: Listing[]; total: number }; zones: string[] }) {
+export function SearchView({ locale, initial, zones }: { locale: Locale; initial: { items: Listing[]; total: number }; zones: ZoneGroup[] }) {
   const sp = useSearchParams();
   const router = useRouter();
   const { requireLogin } = useApp();
@@ -107,6 +122,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
   const pub = sp.get("pub");
   const lux = sp.get("lux") === "1";
   const kind = sp.get("kind");
+  const knownZone = !zone || zones.some((g) => g.city === zone || g.zones.includes(zone));
   const furnished = sp.get("furnished") === "1";
   const pets = sp.get("pets") === "1";
   const verified = sp.get("verified") === "1";
@@ -288,7 +304,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
             aria-label={tx(locale, "Precio mínimo", "Min price")}
           >
             <option value="">{tx(locale, "Precio mín.", "Min price")}</option>
-            {[...(PRICE_STEPS[type] ?? [])].slice(0, -1).map((v) => (
+            {withValue((PRICE_STEPS[type] ?? []).slice(0, -1), min).map((v) => (
               <option key={v} value={v} disabled={!!max && v >= max}>≥ {money(v, locale)}</option>
             ))}
           </select>
@@ -299,8 +315,15 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
             aria-label={tx(locale, "Precio máximo", "Max price")}
           >
             <option value="">{tx(locale, "Precio máx.", "Max price")}</option>
-            {PRICE_STEPS[type]?.map((v) => (
+            {withValue(PRICE_STEPS[type] ?? [], max).map((v) => (
               <option key={v} value={v} disabled={!!min && v <= min}>≤ {money(v, locale)}</option>
+            ))}
+          </select>
+          <select value={kind ?? ""} onChange={(e) => set({ kind: e.target.value || null })} className={cn(pill, "appearance-none border-line bg-white", kind && on)} aria-label={tx(locale, "Tipo de inmueble", "Property type")}>
+            <option value="">{tx(locale, "Cualquier tipo", "Any type")}</option>
+            {kind && !KIND_OPTIONS.some(([k]) => k === kind) && <option value={kind}>{KIND_CHIP[kind] ? tx(locale, ...KIND_CHIP[kind]) : kind}</option>}
+            {KIND_OPTIONS.map(([k, es, en]) => (
+              <option key={k} value={k}>{tx(locale, es, en)}</option>
             ))}
           </select>
           <select value={beds ?? ""} onChange={(e) => set({ beds: e.target.value || null })} className={cn(pill, "appearance-none border-line bg-white", beds && on)} aria-label={tx(locale, "Habitaciones", "Bedrooms")}>
@@ -312,8 +335,14 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
           <select value={zone ?? ""} onChange={(e) => set({ zone: e.target.value || null })} className={cn(pill, "appearance-none border-line bg-white", zone && on)} aria-label={tx(locale, "Zona", "Area")}>
             <option value="">{tx(locale, "Todas las zonas", "All areas")}</option>
             {/* A zone that came from the URL or the NL parser (e.g. a city) stays selectable and visible. */}
-            {(zone && !zones.includes(zone) ? [zone, ...zones] : zones).map((z) => (
-              <option key={z} value={z}>{z}</option>
+            {!knownZone && zone && <option value={zone}>{zone}</option>}
+            {zones.map((g) => (
+              <optgroup key={g.city} label={g.city}>
+                <option value={g.city}>{tx(locale, `${/^(El|Los|Puerto)\s/.test(g.city) ? "Todo" : "Toda"} ${g.city}`, `All of ${g.city}`)}</option>
+                {g.zones.map((z) => (
+                  <option key={z} value={z}>{z}</option>
+                ))}
+              </optgroup>
             ))}
           </select>
           <button onClick={() => setMoreOpen((o) => !o)} aria-expanded={moreOpen} aria-controls="search-more-filters" className={cn(pill, "border-line bg-white", (moreOpen || baths || minM2 || essCount) && on)}>

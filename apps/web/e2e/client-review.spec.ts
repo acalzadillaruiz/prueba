@@ -384,7 +384,7 @@ test.describe("Cliente · regresiones de la revisión", () => {
     // Owner listings say so in the agreed wording.
     for (const t of await page.locator('[data-testid="card-advisor"][data-owner]').allInnerTexts()) expect(t).toMatch(/Dueño\/a · sin intermediarios$/);
     // Skip link: the very first Tab stop on /search (the header's), visible on focus, lands on the results.
-    await page.locator("body").focus();
+    await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
     await page.keyboard.press("Tab");
     const skip = page.getByRole("link", { name: "Saltar a los resultados" });
     await expect(skip).toBeFocused();

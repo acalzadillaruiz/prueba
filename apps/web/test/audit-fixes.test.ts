@@ -189,7 +189,7 @@ describe("19 · email verification tokens", () => {
       expect((await prisma.user.findUniqueOrThrow({ where: { id: u.id } })).emailVerified).toBeNull();
       const res = await call(signVerifyToken(u.id, u.email));
       expect(res.status).toBeGreaterThanOrEqual(300);
-      expect(res.headers.get("location")).toBe("http://localhost/en/account?verified=1");
+      expect(res.headers.get("location")).toBe("/en/account?verified=1");
       expect((await prisma.user.findUniqueOrThrow({ where: { id: u.id } })).emailVerified).not.toBeNull();
     } finally {
       vi.unstubAllEnvs();

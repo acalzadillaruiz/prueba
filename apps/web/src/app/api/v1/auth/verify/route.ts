@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
 import { prisma } from "@newplace/db";
 import { handler } from "@/server/api";
+import { redirectTo } from "@/server/redirect";
 import { readVerifyToken } from "@/server/email-verify";
 import { requestLocale } from "@/server/email-locale";
 
@@ -13,5 +13,5 @@ export const GET = handler(async (req: NextRequest) => {
   const ok = !!user && user.email === t!.email;
   if (ok && !user.emailVerified) await prisma.user.update({ where: { id: user.id }, data: { emailVerified: new Date() } });
   const loc = user?.locale === "en" || user?.locale === "es" ? user.locale : requestLocale(req);
-  return NextResponse.redirect(new URL(`/${loc}/account?verified=${ok ? 1 : 0}`, req.nextUrl.origin));
+  return redirectTo(`/${loc}/account?verified=${ok ? 1 : 0}`, 307);
 });

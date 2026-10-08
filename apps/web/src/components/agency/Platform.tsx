@@ -115,7 +115,7 @@ export function PlatformAgencies({ locale, agencies }: { locale: Locale; agencie
   const [f, setF] = useState({ name: "", city: "Caracas" });
   return (
     <AdminShell locale={locale} area="platform" title={tx(locale, "Agencias", "Agencies")} actions={<Button className={k.primary} onClick={() => setCreating(!creating)} aria-expanded={creating}><Plus size={16} /> {tx(locale, "Nueva agencia", "New agency")}</Button>}>
-      {err && <div role="alert" className="mb-4 rounded-lg bg-[#B3261E33] px-3 py-2 text-sm text-[#E79A7F]">{err}</div>}
+      {err && <div role="alert" className="mb-4 rounded-lg bg-[#B3261E33] px-3 py-2 text-sm text-[#C9A574]">{err}</div>}
       {current && (
         <div className="np-in mb-4 flex flex-wrap items-center gap-3 rounded-[18px] bg-rosa/70 px-4 py-3 text-sm text-navy dark:bg-white/[.08] dark:text-ivory">
           <LogIn size={16} strokeWidth={1.7} /> {tx(locale, `Impersonando a ${current.name}. Todo queda en el registro de auditoría.`, `Impersonating ${current.name}. Everything is audit-logged.`)}
@@ -238,7 +238,7 @@ export function PlatformUsers({ locale, users, providers }: { locale: Locale; us
                     <button disabled={busy === u.id} onClick={() => {
                       if (!u.suspended && !window.confirm(tx(locale, `¿Suspender a ${u.name}? No podrá iniciar sesión.`, `Suspend ${u.name}? They won’t be able to sign in.`))) return;
                       run(u.id, () => api(`platform/users/${u.id}`, { method: "PATCH", json: { suspended: !u.suspended } }));
-                    }} className={cn("rounded-full p-2 hover:bg-[#E6EBF1] dark:hover:bg-white/5", u.suspended ? k.okText : k.dangerText)} aria-label={u.suspended ? tx(locale, "Reactivar", "Restore") : tx(locale, "Suspender", "Suspend")} title={u.suspended ? tx(locale, "Reactivar", "Restore") : tx(locale, "Suspender", "Suspend")}>
+                    }} className={cn("rounded-full p-2 hover:bg-[#E6DDD2] dark:hover:bg-white/5", u.suspended ? k.okText : k.dangerText)} aria-label={u.suspended ? tx(locale, "Reactivar", "Restore") : tx(locale, "Suspender", "Suspend")} title={u.suspended ? tx(locale, "Reactivar", "Restore") : tx(locale, "Suspender", "Suspend")}>
                       {u.suspended ? <RotateCcw size={14} /> : <Ban size={14} />}
                     </button>
                   )}
@@ -387,7 +387,7 @@ export function PlatformAI({ locale, settings, fx, counts }: { locale: Locale; s
           <p className={cn("mt-1 text-sm", k.muted)}>{tx(locale, "Una sola interfaz AIProvider para las 4 funciones. Cambia en caliente.", "One AIProvider interface for all 4 features. Hot-swappable.")}</p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             {([["heuristic", "HeuristicProvider", tx(locale, "Local · sin API key · por defecto", "Local · no API key · default")], ["openai-compatible", "OpenAICompatibleProvider", "OpenAI · Groq · xAI · OpenRouter…"]] as const).map(([key, n, d]) => (
-              <button key={key} disabled={busy === "ai"} onClick={() => run("ai", () => api("platform/settings", { method: "PUT", json: { aiProvider: key } }))} aria-pressed={settings.aiProvider === key} className={cn("rounded-[18px] p-4 text-left transition-shadow duration-np", settings.aiProvider === key ? "bg-[#E6EBF1] shadow-[inset_0_0_0_2px_#162638] dark:bg-white/10 dark:shadow-[inset_0_0_0_2px_#E79A7F]" : cn("shadow-[inset_0_0_0_1px_#D9D2C4] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,.15)]", k.hover))}>
+              <button key={key} disabled={busy === "ai"} onClick={() => run("ai", () => api("platform/settings", { method: "PUT", json: { aiProvider: key } }))} aria-pressed={settings.aiProvider === key} className={cn("rounded-[18px] p-4 text-left transition-shadow duration-np", settings.aiProvider === key ? "bg-[#E6DDD2] shadow-[inset_0_0_0_2px_#1E1A18] dark:bg-white/10 dark:shadow-[inset_0_0_0_2px_#C9A574]" : cn("shadow-[inset_0_0_0_1px_#D8CBB7] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,.15)]", k.hover))}>
                 <div className="flex items-center justify-between"><span className="font-mono text-sm font-semibold">{n}</span>{settings.aiProvider === key && <CheckCircle2 size={16} />}</div>
                 <div className={cn("mt-1 text-xs", k.muted)}>{d}</div>
               </button>

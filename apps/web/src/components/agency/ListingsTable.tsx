@@ -59,7 +59,7 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
       {error && <div className={cn("mb-3", k.err)} role="alert">{error}</div>}
       {mandates.length > 0 && (
         <section className={cn(k.card, "mb-6 p-5 md:p-6")} aria-labelledby="mandates-title" data-testid="mandates">
-          <h2 id="mandates-title" className={cn(k.title, "mb-1 flex items-center gap-2.5")}><FileSignature size={18} strokeWidth={1.6} className="text-gold-text dark:text-[#D9C59C]" /> {tx(locale, "Encargos de propietarios", "Owner mandates")} <Count>{mandates.length}</Count></h2>
+          <h2 id="mandates-title" className={cn(k.title, "mb-1 flex items-center gap-2.5")}><FileSignature size={18} strokeWidth={1.6} className="text-gold-text dark:text-[#D4B98C]" /> {tx(locale, "Encargos de propietarios", "Owner mandates")} <Count>{mandates.length}</Count></h2>
           <p className={cn("mb-3 text-[13px]", k.muted)}>{tx(locale, "Solicitado → asigna un agente → publícalo cuando la ficha esté lista.", "Requested → assign an agent → publish when the listing is ready.")}</p>
           <div className={cn("divide-y", k.divide)}>
             {mandates.map((m) => {

@@ -80,13 +80,13 @@ export function CollectionRail({ eyebrow, title, items, more }: { eyebrow: strin
                     <Image src={it.photo} alt="" fill sizes="(max-width: 768px) 78vw, 400px" className="object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.06]" />
                   </span>
                 )}
-                <span className="absolute inset-0 bg-[linear-gradient(180deg,rgba(22,38,56,0)_55%,rgba(22,38,56,.55)_100%)]" aria-hidden />
-                {it.badge && <span className="absolute left-1/2 top-[18%] -translate-x-1/2 rounded-full bg-[#F8F5EFEE] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#162638]">{it.badge}</span>}
+                <span className="absolute inset-0 bg-[linear-gradient(180deg,rgba(30,26,24,0)_55%,rgba(30,26,24,.55)_100%)]" aria-hidden />
+                {it.badge && <span className="absolute left-1/2 top-[18%] -translate-x-1/2 rounded-full bg-[#F1EBE3EE] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#1E1A18]">{it.badge}</span>}
                 <span className="absolute bottom-4 left-5 font-serif text-[64px] leading-none text-ivory/90" aria-hidden>
                   {String(i + 1).padStart(2, "0")}
                 </span>
               </span>
-              <span className="mt-5 block font-serif text-[24px] leading-tight text-ink transition-colors group-hover:text-[#A8452A] md:text-[27px]">{it.title}</span>
+              <span className="mt-5 block font-serif text-[24px] leading-tight text-ink transition-colors group-hover:text-[#8E3B22] md:text-[27px]">{it.title}</span>
               <span className="mt-1 block text-sm text-muted">
                 {it.zone} · {it.facts}
               </span>

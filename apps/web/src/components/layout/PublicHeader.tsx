@@ -197,10 +197,10 @@ export function PublicHeader({ locale, variant = "light" }: { locale: Locale; va
             {nav.map((n) => (
               <Link key={n.label} href={n.href} onClick={() => setMenuOpen(false)} aria-current={n.active ? "page" : undefined} className="flex min-h-[52px] items-center gap-3 rounded-lg px-3 font-serif text-[24px] hover:bg-white/5">
                 {n.label}
-                {n.active && <RoofGlyph className="text-[#E79A7F]" />}
+                {n.active && <RoofGlyph className="text-[#C9A574]" />}
               </Link>
             ))}
-            <div className="mx-3 my-3 h-px bg-[#B4935A]/40" aria-hidden />
+            <div className="mx-3 my-3 h-px bg-[#B08A55]/40" aria-hidden />
             <Link href={`/${locale}/saved`} className="flex min-h-12 items-center gap-2.5 rounded-lg px-3 font-display text-[16px] hover:bg-white/5">
               <Heart size={18} aria-hidden /> {t("saved")} {saved.length > 0 && <span className="text-sm text-mist">({saved.length})</span>}
             </Link>

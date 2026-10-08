@@ -33,7 +33,7 @@ export default async function LuxuryPage({ params }: { params: Promise<{ locale:
     <PublicPage locale={locale} header="transparent" tabbar contact={{ href: "#acceso", label: tx(locale, "Hablar con un asesor", "Talk to an advisor") }}>
       <section className="relative isolate overflow-hidden bg-navy text-ivory">
         <Image src="/brand/villa-arcos.jpg" alt="" fill priority sizes="100vw" quality={80} className="-z-10 object-cover object-center" />
-        <div className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(22,38,56,.7)_0%,rgba(22,38,56,.25)_40%,rgba(22,38,56,.9)_100%)]" aria-hidden />
+        <div className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(30,26,24,.7)_0%,rgba(30,26,24,.25)_40%,rgba(30,26,24,.9)_100%)]" aria-hidden />
         <div className="mx-auto flex min-h-[560px] max-w-[1320px] flex-col justify-end px-4 pb-14 pt-[132px] md:px-8 lg:min-h-[680px] lg:pb-20">
           <p className="np-eyebrow text-ivory/90">{tx(locale, "New Place · Colección Privada", "New Place · Private Collection")}</p>
           <h1 className="np-hero-title mt-4 max-w-[860px] text-[44px] leading-[1.04] sm:text-[58px] lg:text-[76px]">
@@ -85,7 +85,7 @@ export default async function LuxuryPage({ params }: { params: Promise<{ locale:
       <section id="acceso" data-hide-fab className="np-navy-panel scroll-mt-24 bg-navy text-ivory">
         <div className="mx-auto grid max-w-[1320px] items-center gap-10 px-4 py-20 md:px-8 lg:grid-cols-[1.2fr_1fr] lg:py-24">
           <div>
-            <p className="np-eyebrow text-[#D9C59C]">{tx(locale, "Acceso privado", "Private access")}</p>
+            <p className="np-eyebrow text-[#D4B98C]">{tx(locale, "Acceso privado", "Private access")}</p>
             <h2 className="mt-3 text-[36px] leading-tight md:text-[48px]">
               {tx(locale, `${privateCount} ${privateCount === 1 ? "residencia privada disponible" : "residencias privadas disponibles"}`, `${privateCount} private residence${privateCount === 1 ? "" : "s"} available`)}
             </h2>
@@ -95,11 +95,11 @@ export default async function LuxuryPage({ params }: { params: Promise<{ locale:
                 tx(locale, "Visitas privadas en la agenda real del asesor", "Private viewings on the advisor’s real calendar"),
                 tx(locale, "Videovisita si compra desde el exterior", "Video tour if you buy from abroad"),
               ].map((x) => (
-                <li key={x} className="flex items-center gap-3"><RoofGlyph className="text-[#E79A7F]" /> {x}</li>
+                <li key={x} className="flex items-center gap-3"><RoofGlyph className="text-[#C9A574]" /> {x}</li>
               ))}
             </ul>
           </div>
-          <div className="rounded-[24px] border border-[#B4935A]/40 p-8 text-center">
+          <div className="rounded-[24px] border border-[#B08A55]/40 p-8 text-center">
             <p className="mx-auto max-w-sm text-[15px] text-ivory/80">{tx(locale, "Escriba a un asesor de la colección: le enviamos el enlace tras una precalificación breve.", "Write to a collection advisor: we’ll send the link after a short pre-qualification.")}</p>
             {hero && (
               <Button href={`/${locale}/listing/${hero.slug}#contact`} variant="primary" size="lg" className="mt-6">

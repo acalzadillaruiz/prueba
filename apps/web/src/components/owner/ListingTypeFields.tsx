@@ -129,7 +129,7 @@ export function ListingTypeFields({
             {input("capRate", tx(locale, "Cap rate (%) · opcional", "Cap rate (%) · optional"), { min: 0, max: 30, step: 0.1 })}
           </div>
           <label className="mt-3 flex items-center gap-2 text-sm">
-            <input type="checkbox" disabled={disabled} checked={value.loadingDock} onChange={(e) => set({ loadingDock: e.target.checked })} className="h-4 w-4 accent-navy dark:accent-[#E79A7F]" />
+            <input type="checkbox" disabled={disabled} checked={value.loadingDock} onChange={(e) => set({ loadingDock: e.target.checked })} className="h-4 w-4 accent-navy dark:accent-[#C9A574]" />
             {tx(locale, "Tiene andén de carga", "Has a loading dock")}
           </label>
         </div>

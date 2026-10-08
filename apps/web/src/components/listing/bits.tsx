@@ -19,9 +19,9 @@ export function SaveButton({ id, className, locale }: { id: string; className?: 
         e.stopPropagation();
         toggleSaved(id);
       }}
-      className={cn("flex h-11 w-11 items-center justify-center rounded-full bg-[#ffffffe6] text-[#162638] shadow-sm backdrop-blur transition-transform duration-np hover:scale-105", className)}
+      className={cn("flex h-11 w-11 items-center justify-center rounded-full bg-[#ffffffe6] text-[#1E1A18] shadow-sm backdrop-blur transition-transform duration-np hover:scale-105", className)}
     >
-      <Heart size={18} strokeWidth={1.7} aria-hidden className={on ? "fill-[#A8452A] text-[#A8452A]" : "text-[#162638]"} />
+      <Heart size={18} strokeWidth={1.7} aria-hidden className={on ? "fill-[#8E3B22] text-[#8E3B22]" : "text-[#1E1A18]"} />
     </button>
   );
 }
@@ -55,14 +55,14 @@ export function CompareButton({ id, locale, dark, className }: { id: string; loc
 
 // Brand pills: egeo / arena for market states, navy for closed deals; status colours only where they warn.
 const STATUS_TONE: Record<ListingStatus, string> = {
-  DRAFT: "bg-[#5E6673] text-white",
-  COMING_SOON: "bg-[#A9C6D8] text-[#1F4A63]",
+  DRAFT: "bg-[#5A514B] text-white",
+  COMING_SOON: "bg-[#C2A988] text-[#433B35]",
   ACTIVE: "bg-[#2F6B4F] text-white",
-  UNDER_OFFER: "bg-[#E8DCC8] text-[#162638]",
-  SOLD: "bg-[#162638] text-[#F8F5EF]",
-  RENTED: "bg-[#162638] text-[#F8F5EF]",
+  UNDER_OFFER: "bg-[#D9C6AB] text-[#1E1A18]",
+  SOLD: "bg-[#1E1A18] text-[#F1EBE3]",
+  RENTED: "bg-[#1E1A18] text-[#F1EBE3]",
   WITHDRAWN: "bg-danger text-white",
-  EXPIRED: "bg-[#5E6673] text-white",
+  EXPIRED: "bg-[#5A514B] text-white",
 };
 
 /**

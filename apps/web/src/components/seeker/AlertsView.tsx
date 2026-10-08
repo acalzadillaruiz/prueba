@@ -66,12 +66,12 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
                   {freq[s.frequency]} · {s.lastSentAt ? `${tx(locale, "último envío", "last sent")} ${ago(s.lastSentAt, locale)}` : tx(locale, "sin envíos aún", "nothing sent yet")}
                 </div>
               </div>
-              {s.newCount > 0 && <Badge className="bg-[#E6EBF1] text-navy dark:bg-white/10">{s.newCount} {tx(locale, "nuevos", "new")}</Badge>}
+              {s.newCount > 0 && <Badge className="bg-[#E6DDD2] text-navy dark:bg-white/10">{s.newCount} {tx(locale, "nuevos", "new")}</Badge>}
               <select
                 value={s.frequency}
                 aria-label={`${tx(locale, "Frecuencia", "Frequency")} · ${s.name}`}
                 onChange={(e) => void changeFrequency(s, e.target.value as Search["frequency"])}
-                className="h-10 rounded-full border border-[#D9D2C4] bg-white px-3 text-sm text-navy focus:border-navy focus:outline-none"
+                className="h-10 rounded-full border border-[#D8CBB7] bg-white px-3 text-sm text-navy focus:border-navy focus:outline-none"
               >
                 <option value="INSTANT">{freq.INSTANT}</option>
                 <option value="DAILY">{freq.DAILY}</option>
@@ -103,7 +103,7 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
             {emails.map((e) => (
               <li key={e.id} className="py-3">
                 <div className="flex items-center justify-between gap-2">
-                  <Badge tone={e.kind === "TOUR" ? "ok" : "mist"} className={e.kind === "ALERT" ? "bg-[#E6EBF1] text-navy dark:bg-white/10" : undefined}>{e.kind}</Badge>
+                  <Badge tone={e.kind === "TOUR" ? "ok" : "mist"} className={e.kind === "ALERT" ? "bg-[#E6DDD2] text-navy dark:bg-white/10" : undefined}>{e.kind}</Badge>
                   <span className="text-xs text-muted">{ago(e.at, locale)}</span>
                 </div>
                 <div className="mt-1.5 text-sm font-semibold">{e.subject}</div>

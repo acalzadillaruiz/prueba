@@ -6,61 +6,61 @@
 :root {
   /* New Place brand (v4, approved by the committee):
      Cal 60 % · Azul noche 25 % · Arena/Egeo 10 % · Terracota "Teja" 4 % (one action per screen) · Oro 1 % (fillets). */
-  --np-navy: #162638;
-  --np-navy-2: #1E3048;
-  --np-coral: #A8452A;          /* Terracota "Teja": the single main action per screen */
-  --np-coral-hover: #8E3A23;
-  --np-coral-light: #E79A7F;    /* terracota on navy surfaces */
-  --np-ivory: #F8F5EF;          /* Cal */
-  --np-arena: #E8DCC8;
-  --np-egeo: #A9C6D8;
-  --np-rosa: #F2DDD3;
-  --np-mist: #A9B4C2;           /* muted text on navy */
-  --np-gold: #B4935A;           /* fillets only; text uses --np-gold-text */
-  --np-gold-text: #735829;
-  --np-ink: #162638;
-  --np-muted: #535B66;
-  --np-line: #DDD3C2;
+  --np-navy: #1E1A18;
+  --np-navy-2: #2A2420;
+  --np-coral: #8E3B22;          /* Terracota "Teja": the single main action per screen */
+  --np-coral-hover: #74301C;
+  --np-coral-light: #C9A574;    /* terracota on navy surfaces */
+  --np-ivory: #F1EBE3;          /* Cal */
+  --np-arena: #D9C6AB;
+  --np-egeo: #C2A988;
+  --np-rosa: #EBD5C8;
+  --np-mist: #B5AAA0;           /* muted text on navy */
+  --np-gold: #B08A55;           /* fillets only; text uses --np-gold-text */
+  --np-gold-text: #6B4F2C;
+  --np-ink: #1E1A18;
+  --np-muted: #5E5248;
+  --np-line: #D8CBB7;
   --np-ok: #2F6B4F;
   --np-warn: #8A5A00;
   --np-danger: #B3261E;
-  --np-map-dark: #162638;
-  --font-display: var(--font-manrope), ui-sans-serif, system-ui;   /* interface (buttons, labels) */
-  --font-body: var(--font-manrope), ui-sans-serif, system-ui;
-  --font-serif: var(--font-cormorant), Georgia, "Times New Roman", serif;  /* titles and prices */
+  --np-map-dark: #1E1A18;
+  --font-display: var(--font-jost), ui-sans-serif, system-ui;   /* interface (buttons, labels) */
+  --font-body: var(--font-jost), ui-sans-serif, system-ui;
+  --font-serif: var(--font-prata), Georgia, "Times New Roman", serif;  /* titles and prices */
   --font-logo: var(--font-cinzel), Georgia, serif;
   /* rgb channels for Tailwind opacity modifiers (text-ink/60, bg-ivory/90…) */
-  --np-navy-rgb: 22 38 56;
-  --np-navy-2-rgb: 30 48 72;
-  --np-coral-rgb: 168 69 42;
-  --np-coral-hover-rgb: 142 58 35;
+  --np-navy-rgb: 30 26 24;
+  --np-navy-2-rgb: 42 36 32;
+  --np-coral-rgb: 142 59 34;
+  --np-coral-hover-rgb: 116 48 28;
   /* Terracota already meets WCAG AA with white text (5.9:1) and as text on Cal (5.4:1). */
-  --np-coral-cta-rgb: 168 69 42;
-  --np-coral-cta-hover-rgb: 142 58 35;
-  --np-ivory-rgb: 248 245 239;
-  --np-arena-rgb: 232 220 200;
-  --np-egeo-rgb: 169 198 216;
-  --np-rosa-rgb: 242 221 211;
-  --np-mist-rgb: 169 180 194;
-  --np-gold-rgb: 180 147 90;
-  --np-gold-text-rgb: 115 88 41;
-  --np-ink-rgb: 22 38 56;
-  --np-muted-rgb: 83 91 102;
-  --np-line-rgb: 221 211 194;
+  --np-coral-cta-rgb: 142 59 34;
+  --np-coral-cta-hover-rgb: 116 48 28;
+  --np-ivory-rgb: 241 235 227;
+  --np-arena-rgb: 217 198 171;
+  --np-egeo-rgb: 194 169 136;
+  --np-rosa-rgb: 235 213 200;
+  --np-mist-rgb: 181 170 160;
+  --np-gold-rgb: 176 138 85;
+  --np-gold-text-rgb: 107 79 44;
+  --np-ink-rgb: 30 26 24;
+  --np-muted-rgb: 94 82 72;
+  --np-line-rgb: 216 203 183;
   --np-ok-rgb: 47 107 79;
   --np-warn-rgb: 138 90 0;
   --np-danger-rgb: 179 38 30;
   --np-surface-rgb: 255 255 255;
   --radius: 16px;
-  --shadow: 0 8px 24px rgba(22,38,56,.07);
+  --shadow: 0 8px 24px rgba(30,26,24,.07);
 }
 
 html { -webkit-font-smoothing: antialiased; }
 body { font-family: var(--font-body); background: var(--np-ivory); color: var(--np-ink); }
-/* Lining figures everywhere: prices and data align (Cormorant defaults to old-style figures). */
+/* Lining figures everywhere: prices and data align (keeps prices and data aligned). */
 * { font-feature-settings: "lnum", "tnum"; }
 .font-display { font-family: var(--font-display); letter-spacing: 0; }
-/* Titles in Cormorant Garamond, even when they carry the UI font class. */
+/* Titles in Prata, even when they carry the UI font class. */
 h1, h2, h3, h1.font-display, h2.font-display, h3.font-display, .font-serif { font-family: var(--font-serif); font-weight: 500; letter-spacing: -0.005em; font-feature-settings: "lnum", "pnum"; }
 h1, h2, h3 { text-wrap: balance; }
 .font-logo { font-family: var(--font-logo); }
@@ -68,46 +68,46 @@ h1, h2, h3 { text-wrap: balance; }
 
 /* Public dark mode (toggle). Admin is always dark; only light surfaces of the public scope are remapped,
    so navy sections (hero, footer, trust strip) keep their Cal text. Committee dark panel:
-   background #101C2B, surfaces #1E3048, text Cal, accent terracotta-light #E79A7F (6.8:1 on navy). */
-html.dark body { background: #101C2B; }
+   background #15120F, surfaces #2A2420, text Cal, accent terracotta-light #C9A574 (6.8:1 on navy). */
+html.dark body { background: #15120F; }
 html.dark { --np-muted-rgb: 169 180 194; }
 html.dark .np-public {
-  --np-ink: #F8F5EF;
+  --np-ink: #F1EBE3;
   --np-ink-rgb: 248 245 239;
   --np-muted-rgb: 169 180 194;
-  --np-line: #2A3E55;
+  --np-line: #3A322D;
   --np-line-rgb: 42 62 85;
   --np-arena-rgb: 30 48 72;
   --np-rosa-rgb: 58 44 48;
   --np-gold-text-rgb: 217 197 156;
   --np-coral-cta-rgb: 168 69 42;
-  --np-sel: #243852;
-  --np-logo-ink: #F8F5EF;
-  --np-logo-teja: #E79A7F;
+  --np-sel: #3A322D;
+  --np-logo-ink: #F1EBE3;
+  --np-logo-teja: #C9A574;
   --shadow: 0 12px 40px rgba(0,0,0,.35);
   color-scheme: dark;
-  background: #101C2B;
+  background: #15120F;
   color: var(--np-ink);
 }
-html.dark .np-public .bg-white { background-color: #1E3048; }
+html.dark .np-public .bg-white { background-color: #2A2420; }
 html.dark .np-public .bg-white\/90 { background-color: rgb(30 48 72 / .9); }
 html.dark .np-public .bg-white\/60 { background-color: rgb(30 48 72 / .6); }
-html.dark .np-public .bg-ivory { background-color: #101C2B; }
+html.dark .np-public .bg-ivory { background-color: #15120F; }
 html.dark .np-public .bg-ivory\/90, html.dark .np-public .bg-ivory\/95 { background-color: rgb(16 28 43 / .92); }
-html.dark .np-public .hover\:bg-ivory:hover { background-color: #243852; }
-html.dark .np-public .text-navy { color: #F8F5EF; }
-html.dark .np-public .border-navy { border-color: #E79A7F; }
+html.dark .np-public .hover\:bg-ivory:hover { background-color: #3A322D; }
+html.dark .np-public .text-navy { color: #F1EBE3; }
+html.dark .np-public .border-navy { border-color: #C9A574; }
 html.dark .np-public .bg-black\/5, html.dark .np-public .hover\:bg-black\/5:hover { background-color: rgb(255 255 255 / .06); }
 html.dark .np-public .bg-black\/10 { background-color: rgb(255 255 255 / .12); }
 html.dark .np-public :is(input, select, textarea) { color-scheme: dark; }
-/* Navy solid surfaces stay navy in dark mode but lift slightly so they read as panels on #101C2B. */
-html.dark .np-public .np-navy-panel { background-color: #1E3048; }
-html.dark .np-public .np-sel { background-color: #243852; border-color: #E79A7F; color: #F8F5EF; }
-html.dark .np-public .np-btn-navy { background-color: #F8F5EF; color: #162638; }
+/* Navy solid surfaces stay navy in dark mode but lift slightly so they read as panels on #15120F. */
+html.dark .np-public .np-navy-panel { background-color: #2A2420; }
+html.dark .np-public .np-sel { background-color: #3A322D; border-color: #C9A574; color: #F1EBE3; }
+html.dark .np-public .np-btn-navy { background-color: #F1EBE3; color: #1E1A18; }
 html.dark .np-public .np-btn-navy:hover { background-color: #fff; }
-html.dark .np-public .np-btn-outline { border-color: rgb(248 245 239 / .7); color: #F8F5EF; }
+html.dark .np-public .np-btn-outline { border-color: rgb(248 245 239 / .7); color: #F1EBE3; }
 html.dark .np-public .np-btn-outline:hover { background-color: rgb(255 255 255 / .06); }
-html.dark .np-public .text-coral-cta { color: #E79A7F; }
+html.dark .np-public .text-coral-cta { color: #C9A574; }
 
 /* Coral text on light public surfaces uses the AA-contrast shade; navy sections and dark mode keep brand coral. */
 html:not(.dark) .np-public .text-coral { color: rgb(var(--np-coral-cta-rgb)); }
@@ -138,7 +138,7 @@ html.dark .np-public .text-coral { color: var(--np-coral-light); }
 .np-in { animation: np-in 180ms ease-out both; }
 
 /* ——— Brand v4 devices ——— */
-:root { --np-sel: #E6EBF1; }  /* selected state: navy tint + 2px navy border */
+:root { --np-sel: #E6DDD2; }  /* selected state: navy tint + 2px navy border */
 .np-sel { background-color: var(--np-sel); border: 2px solid var(--np-navy); color: var(--np-navy); }
 .np-eyebrow { font-family: var(--font-display); font-size: 12px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; }
 /* Arch mask (Mediterranean arch): hero and feature photos. */
@@ -174,15 +174,18 @@ html.dark .np-public .text-coral { color: var(--np-coral-light); }
 :is(.bg-navy, .np-navy-panel, .text-ivory) *:focus-visible, html.dark .np-public *:focus-visible { outline-color: var(--np-coral-light); }
 
 /* ── Immersive home (components/home) ───────────────────────────────────────── */
-.np-chapter-dot.is-on { background: var(--np-coral-light, #E79A7F); }
-.np-scroll-line::after { content: ""; position: absolute; inset: 0; background: #F8F5EF; transform: translateY(-100%); animation: np-scroll-line 2.2s cubic-bezier(.65,0,.35,1) infinite; }
+.np-chapter-dot.is-on { background: var(--np-coral-light, #C9A574); }
+.np-scroll-line::after { content: ""; position: absolute; inset: 0; background: #F1EBE3; transform: translateY(-100%); animation: np-scroll-line 2.2s cubic-bezier(.65,0,.35,1) infinite; }
 @keyframes np-scroll-line { 0% { transform: translateY(-100%) } 55% { transform: translateY(0) } 100% { transform: translateY(100%) } }
 /* Steps light up as the route draws; text stays full-contrast, only the numeral and a rule change. */
 .np-steps li { position: relative; transition: transform .6s ease; }
-.np-steps li::before { content: ""; position: absolute; left: -16px; top: 18px; bottom: 18px; width: 2px; background: var(--np-coral, #A8452A); transform: scaleY(0); transition: transform .6s ease; }
+.np-steps li::before { content: ""; position: absolute; left: -16px; top: 18px; bottom: 18px; width: 2px; background: var(--np-coral, #8E3B22); transform: scaleY(0); transition: transform .6s ease; }
 .np-steps li[data-on="1"]::before { transform: scaleY(1); }
 .np-steps li[data-on="0"] { transform: translateX(-4px); }
-.np-steps li .np-step-n { color: var(--np-gold-text, #735829); transition: color .6s ease; }
-.np-steps li[data-on="1"] .np-step-n { color: var(--np-coral, #A8452A); }
+.np-steps li .np-step-n { color: var(--np-gold-text, #6B4F2C); transition: color .6s ease; }
+.np-steps li[data-on="1"] .np-step-n { color: var(--np-coral, #8E3B22); }
 html.np-motion { scroll-behavior: auto; }
 @media (prefers-reduced-motion: reduce) { .np-scroll-line::after { animation: none; } }
+
+/* Prata has no italic: emphasis in titles stays upright */
+h1 em, h2 em, h3 em, .np-hero-title em { font-style: normal; }

@@ -217,7 +217,7 @@ function Chats({ locale, advisors, threads, agentId, onAgent, pending }: { local
               const active = open?.id === t.id;
               return (
                 <li key={t.id}>
-                  <button type="button" onClick={() => show(t.id)} aria-current={active ? "true" : undefined} className={cn("block w-full px-4 py-3 text-left transition-colors", active ? "bg-[#E6EBF1] dark:bg-white/10" : k.hover)}>
+                  <button type="button" onClick={() => show(t.id)} aria-current={active ? "true" : undefined} className={cn("block w-full px-4 py-3 text-left transition-colors", active ? "bg-[#E6DDD2] dark:bg-white/10" : k.hover)}>
                     <div className="flex items-baseline justify-between gap-2">
                       <span className="truncate font-semibold">{names(t.participants)}</span>
                       <span className={cn("shrink-0 text-xs", k.muted)}>{t.last ? ago(t.last.at, locale) : ago(t.updatedAt, locale)}</span>
@@ -259,7 +259,7 @@ function Chats({ locale, advisors, threads, agentId, onAgent, pending }: { local
                     const staff = open.participants.find((p) => p.id === m.senderId)?.member ?? false;
                     return (
                       <li key={m.id} className={cn("flex", staff ? "justify-end" : "justify-start")}>
-                        <div className={cn("max-w-[80%] rounded-2xl px-3.5 py-2.5 text-[14px]", staff ? "bg-navy text-ivory dark:bg-[#2A3E55]" : "bg-[#F6F2EA] text-navy dark:bg-white/[.06] dark:text-ivory")}>
+                        <div className={cn("max-w-[80%] rounded-2xl px-3.5 py-2.5 text-[14px]", staff ? "bg-navy text-ivory dark:bg-[#3A322D]" : "bg-[#F6F2EA] text-navy dark:bg-white/[.06] dark:text-ivory")}>
                           <div className={cn("mb-0.5 text-[12px] font-semibold", staff ? "text-ivory/85" : "text-muted dark:text-mist")}>
                             {m.senderName} · <time dateTime={m.at}>{dateTime(m.at, locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</time>
                           </div>

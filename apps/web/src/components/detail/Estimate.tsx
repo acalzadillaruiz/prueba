@@ -21,7 +21,7 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
       {/* Navy valuation panel (brand): range in Cormorant, gold fillet scale, the asking price as a dot. */}
       <div className="np-navy-panel bg-navy px-6 py-7 text-ivory md:px-8">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="np-eyebrow text-[#D9C59C]">PlaceEstimate · {tx(locale, "Valor estimado", "Estimated value")}</div>
+          <div className="np-eyebrow text-[#D4B98C]">PlaceEstimate · {tx(locale, "Valor estimado", "Estimated value")}</div>
           <div className="text-sm text-ivory/70">
             {conf} · {e.comparables.length > 0 ? `${e.comparables.length} ${tx(locale, "comparables", "comparables")}` : aiProvider === "heuristic" ? tx(locale, "modelo local", "local model") : tx(locale, "IA externa", "external AI")}
           </div>
@@ -34,11 +34,11 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
           {tx(locale, "Valor central", "Mid value")} {money(e.mid, locale)} · {tx(locale, "confianza", "confidence")} {Math.round(e.confidence * 100)} %
         </div>
         <div className="relative mt-9 h-[3px] rounded-full bg-white/15">
-          <div className="absolute inset-y-0 rounded-full bg-gradient-to-r from-[#B4935A]/60 via-[#D9C59C] to-[#B4935A]/60" style={{ left: `${at(e.low)}%`, right: `${100 - at(e.high)}%` }} />
+          <div className="absolute inset-y-0 rounded-full bg-gradient-to-r from-[#B08A55]/60 via-[#D4B98C] to-[#B08A55]/60" style={{ left: `${at(e.low)}%`, right: `${100 - at(e.high)}%` }} />
           <div className="absolute -top-8 whitespace-nowrap text-[13px] font-semibold text-ivory/85" style={{ left: `${pos}%`, transform: `translateX(-${Math.min(100, Math.max(0, pos))}%)` }}>
             {tx(locale, "Precio pedido", "Asking")} · {compactMoney(l.priceAmount, locale)}
           </div>
-          <div className="absolute top-1/2 h-[18px] w-[18px] -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] border-[#D9C59C] bg-ivory" style={{ left: `${pos}%` }} />
+          <div className="absolute top-1/2 h-[18px] w-[18px] -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] border-[#D4B98C] bg-ivory" style={{ left: `${pos}%` }} />
         </div>
         <div className="mt-4 flex items-center justify-between gap-2 text-sm text-ivory/70">
           <span>{compactMoney(e.low, locale).replace("$", "USD ")}</span>

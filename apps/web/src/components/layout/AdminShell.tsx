@@ -116,19 +116,19 @@ export function AdminShell({ locale, area, children, title, actions, eyebrow }: 
     // Bell = new leads waiting (real count, polled); opens the inbox.
     <Link
       href={`${base}/leads`}
-      className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-navy shadow-[inset_0_0_0_1px_#D9D2C4] hover:bg-white dark:text-ivory dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,.18)] dark:hover:bg-white/5"
+      className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-navy shadow-[inset_0_0_0_1px_#D8CBB7] hover:bg-white dark:text-ivory dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,.18)] dark:hover:bg-white/5"
       aria-label={`${t("notifications")}: ${nNew}`}
     >
       <Bell size={17} strokeWidth={1.7} />
-      {nNew > 0 && <Count className="absolute -right-1 -top-1 bg-navy text-ivory dark:bg-[#E79A7F] dark:text-navy">{nNew}</Count>}
+      {nNew > 0 && <Count className="absolute -right-1 -top-1 bg-navy text-ivory dark:bg-[#C9A574] dark:text-navy">{nNew}</Count>}
     </Link>
   );
   return (
-    <div className={cn("min-h-screen bg-ivory text-navy dark:bg-[#101C2B] dark:text-ivory", k.darkVars)}>
+    <div className={cn("min-h-screen bg-ivory text-navy dark:bg-[#15120F] dark:text-ivory", k.darkVars)}>
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-[264px] flex-col bg-navy text-ivory lg:flex">
         <div className="px-7 pb-7 pt-8">
           <Link href={`/${locale}`} aria-label="New Place" className="inline-block rounded-md"><Logo tone="ivory" /></Link>
-          <div className="mt-2 pl-[62px] text-[10px] font-semibold uppercase tracking-[.22em] text-[#D9C59C]/80">{area === "agency" ? tx(locale, "Agencia", "Agency") : tx(locale, "Plataforma", "Platform")}</div>
+          <div className="mt-2 pl-[62px] text-[10px] font-semibold uppercase tracking-[.22em] text-[#D4B98C]/80">{area === "agency" ? tx(locale, "Agencia", "Agency") : tx(locale, "Plataforma", "Platform")}</div>
         </div>
         <nav className="flex-1 space-y-1 overflow-y-auto px-4" aria-label={area === "agency" ? tx(locale, "Panel de agencia", "Agency dashboard") : tx(locale, "Consola de plataforma", "Platform console")}>
           {items.map((i) => {
@@ -140,7 +140,7 @@ export function AdminShell({ locale, area, children, title, actions, eyebrow }: 
                 aria-current={active ? "page" : undefined}
                 className={cn(
                   "flex items-center gap-3.5 rounded-xl px-4 py-2.5 text-[15px] transition-colors duration-np",
-                  active ? "bg-[#1E3048] text-ivory shadow-[inset_3px_0_0_#D9C59C]" : "text-ivory/75 hover:bg-white/[.04] hover:text-ivory",
+                  active ? "bg-[#2A2420] text-ivory shadow-[inset_3px_0_0_#D4B98C]" : "text-ivory/75 hover:bg-white/[.04] hover:text-ivory",
                 )}
               >
                 <i.icon size={18} strokeWidth={1.6} className={active ? "text-ivory" : "text-ivory/70"} />
@@ -192,7 +192,7 @@ export function AdminShell({ locale, area, children, title, actions, eyebrow }: 
                   key={i.href}
                   href={base + i.href}
                   aria-current={active ? "page" : undefined}
-                  className={cn("flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-2 text-[14px]", active ? "bg-[#1E3048] text-ivory shadow-[inset_0_-2px_0_#D9C59C]" : "text-ivory/70")}
+                  className={cn("flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-2 text-[14px]", active ? "bg-[#2A2420] text-ivory shadow-[inset_0_-2px_0_#D4B98C]" : "text-ivory/70")}
                 >
                   <i.icon size={15} strokeWidth={1.6} /> {t(i.label)}
                   {(badges[i.href] ?? 0) > 0 && <Count>{badges[i.href]}</Count>}
@@ -205,7 +205,7 @@ export function AdminShell({ locale, area, children, title, actions, eyebrow }: 
         </div>
 
         {area === "agency" && u.role === "SUPERADMIN" && (
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-[#E9D2C6] bg-rosa/60 px-4 py-2.5 text-sm text-navy md:px-10 dark:border-white/10 dark:bg-[#1E3048] dark:text-ivory">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-[#E9D2C6] bg-rosa/60 px-4 py-2.5 text-sm text-navy md:px-10 dark:border-white/10 dark:bg-[#2A2420] dark:text-ivory">
             {agency ? tx(locale, `Viendo como superadmin: ${agency.name}`, `Viewing as superadmin: ${agency.name}`) : tx(locale, "Elige una agencia en Platform → Agencias para impersonarla.", "Pick an agency in Platform → Agencies to impersonate it.")}
             <Link href={`/${locale}/platform/agencies`} className={cn("ml-auto", k.link)}>Platform →</Link>
           </div>

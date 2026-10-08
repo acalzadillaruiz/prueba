@@ -160,10 +160,10 @@ export function HubView({ locale, data }: { locale: Locale; data: HubData }) {
           <h2 className="flex items-center gap-2 font-serif text-[24px] font-medium leading-tight"><CircleDollarSign size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Precalificación (simulada)", "Pre-qualification (mock)")}</h2>
           <p className="mt-1 text-xs text-muted">{tx(locale, "Referencial. New Place no origina créditos.", "For reference. New Place does not originate loans.")}</p>
           <div className="mt-4 space-y-4 text-sm">
-            <label className="block"><div className="flex justify-between"><span>{tx(locale, "Precio", "Price")}</span><b>{money(price, locale)}</b></div><input type="range" min={50000} max={500000} step={5000} value={price} onChange={(e) => setPrice(+e.target.value)} className="w-full accent-navy dark:accent-[#E79A7F]" aria-label={tx(locale, "Precio", "Price")} /></label>
-            <label className="block"><div className="flex justify-between"><span>{tx(locale, "Inicial", "Down payment")}</span><b>{down} %</b></div><input type="range" min={10} max={70} value={down} onChange={(e) => setDown(+e.target.value)} className="w-full accent-navy dark:accent-[#E79A7F]" aria-label={tx(locale, "Inicial (%)", "Down payment (%)")} /></label>
-            <label className="block"><div className="flex justify-between"><span>{tx(locale, "Plazo", "Term")}</span><b>{years} {tx(locale, "años", "yrs")}</b></div><input type="range" min={5} max={25} value={years} onChange={(e) => setYears(+e.target.value)} className="w-full accent-navy dark:accent-[#E79A7F]" aria-label={tx(locale, "Plazo (años)", "Term (years)")} /></label>
-            <label className="block"><div className="flex justify-between"><span>{tx(locale, "Tasa anual", "Annual rate")}</span><b>{ratePct.toLocaleString(locale === "es" ? "es-VE" : "en-US")} %</b></div><input type="range" min={0} max={30} step={0.5} value={ratePct} onChange={(e) => setRatePct(+e.target.value)} className="w-full accent-navy dark:accent-[#E79A7F]" aria-label={tx(locale, "Tasa anual (%)", "Annual rate (%)")} /></label>
+            <label className="block"><div className="flex justify-between"><span>{tx(locale, "Precio", "Price")}</span><b>{money(price, locale)}</b></div><input type="range" min={50000} max={500000} step={5000} value={price} onChange={(e) => setPrice(+e.target.value)} className="w-full accent-navy dark:accent-[#C9A574]" aria-label={tx(locale, "Precio", "Price")} /></label>
+            <label className="block"><div className="flex justify-between"><span>{tx(locale, "Inicial", "Down payment")}</span><b>{down} %</b></div><input type="range" min={10} max={70} value={down} onChange={(e) => setDown(+e.target.value)} className="w-full accent-navy dark:accent-[#C9A574]" aria-label={tx(locale, "Inicial (%)", "Down payment (%)")} /></label>
+            <label className="block"><div className="flex justify-between"><span>{tx(locale, "Plazo", "Term")}</span><b>{years} {tx(locale, "años", "yrs")}</b></div><input type="range" min={5} max={25} value={years} onChange={(e) => setYears(+e.target.value)} className="w-full accent-navy dark:accent-[#C9A574]" aria-label={tx(locale, "Plazo (años)", "Term (years)")} /></label>
+            <label className="block"><div className="flex justify-between"><span>{tx(locale, "Tasa anual", "Annual rate")}</span><b>{ratePct.toLocaleString(locale === "es" ? "es-VE" : "en-US")} %</b></div><input type="range" min={0} max={30} step={0.5} value={ratePct} onChange={(e) => setRatePct(+e.target.value)} className="w-full accent-navy dark:accent-[#C9A574]" aria-label={tx(locale, "Tasa anual (%)", "Annual rate (%)")} /></label>
           </div>
           <div className="mt-4 rounded-np bg-navy p-4 text-ivory">
             <div className="text-xs text-mist">{tx(locale, `Cuota estimada (${ratePct.toLocaleString("es-VE")} % anual)`, `Est. payment (${ratePct}% APR)`)}</div>
@@ -223,7 +223,7 @@ export function HubView({ locale, data }: { locale: Locale; data: HubData }) {
             {SAVED_SEARCHES.map((s) => (
               <div key={s.id} className="mt-3 flex items-center justify-between gap-2 text-sm">
                 <span className="line-clamp-1">{s.name}</span>
-                {s.newCount > 0 && <Badge className="bg-[#E6EBF1] text-navy dark:bg-white/10">+{s.newCount}</Badge>}
+                {s.newCount > 0 && <Badge className="bg-[#E6DDD2] text-navy dark:bg-white/10">+{s.newCount}</Badge>}
               </div>
             ))}
           </Card>

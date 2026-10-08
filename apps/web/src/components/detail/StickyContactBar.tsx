@@ -41,7 +41,7 @@ export function StickyContactBar({ locale, price, suffix, tour, dark, whatsapp, 
       data-sticky-cta={shown ? "shown" : "hidden"}
       aria-hidden={!shown}
       className={cn(
-        "fixed inset-x-0 bottom-0 z-40 border-t px-4 pt-3 shadow-[0_-10px_30px_rgba(22,38,56,.12)] transition-transform duration-np ease-out md:hidden print:hidden",
+        "fixed inset-x-0 bottom-0 z-40 border-t px-4 pt-3 shadow-[0_-10px_30px_rgba(30,26,24,.12)] transition-transform duration-np ease-out md:hidden print:hidden",
         dark ? "border-navy-line bg-navy text-ivory" : "border-line bg-white text-ink",
         !shown && "pointer-events-none translate-y-full",
       )}

@@ -103,7 +103,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
   };
 
   const muted = dark ? "text-mist" : "text-muted";
-  const field = cn(inputCls, "h-12 rounded-xl border-[#DDD3C2]", dark && "border-navy-line bg-navy-2 text-ivory");
+  const field = cn(inputCls, "h-12 rounded-xl border-[#D8CBB7]", dark && "border-navy-line bg-navy-2 text-ivory");
   const wa = whatsappHref(l, locale);
   const first = agent?.name.split(" ")[0] ?? agency?.name ?? "";
   const initials = (agent?.name ?? agency?.name ?? "NP").split(" ").map((p) => p[0]).slice(0, 2).join("");
@@ -112,7 +112,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
 
   if (done !== null)
     return (
-      <div id="contact-panel" tabIndex={-1} className={cn("np-in rounded-[24px] p-6 shadow-[0_24px_60px_rgba(22,38,56,.12)] ring-1", box)} data-testid="lead-done">
+      <div id="contact-panel" tabIndex={-1} className={cn("np-in rounded-[24px] p-6 shadow-[0_24px_60px_rgba(30,26,24,.12)] ring-1", box)} data-testid="lead-done">
         <CheckCircle2 className="text-ok" size={30} />
         <div className="mt-3 font-serif text-[28px] leading-tight">{mode === "tour" && done ? tx(locale, "Visita solicitada", "Tour requested") : tx(locale, "Mensaje enviado", "Message sent")}</div>
         {done && <div className="mt-1 font-display text-[17px] font-semibold first-letter:uppercase text-ink">{done}</div>}
@@ -127,10 +127,10 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
     );
 
   return (
-    <div id="contact-panel" tabIndex={-1} data-hide-fab className={cn("rounded-[24px] p-6 shadow-[0_24px_60px_rgba(22,38,56,.12)] ring-1", box)}>
+    <div id="contact-panel" tabIndex={-1} data-hide-fab className={cn("rounded-[24px] p-6 shadow-[0_24px_60px_rgba(30,26,24,.12)] ring-1", box)}>
       {(agent || agency) && (
         <div className="flex items-center gap-4">
-          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#E8DCC8] font-serif text-[22px] font-semibold text-[#162638]" aria-hidden>{initials}</span>
+          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#D9C6AB] font-serif text-[22px] font-semibold text-[#1E1A18]" aria-hidden>{initials}</span>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-1.5 text-[17px] font-semibold">
               {agent?.name ?? agency?.name}
@@ -196,7 +196,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
                   data-month={fmt(d.date, { month: "short" }).replace(".", "")}
                   className={cn(
                     "min-w-[62px] flex-1 rounded-xl border px-2 py-2.5 text-center font-display text-sm first-letter:uppercase after:mt-0.5 after:block after:text-[13px] after:text-muted after:content-[attr(data-month)]",
-                    day === i ? "np-sel border-2" : dark ? "border-navy-line" : "border-[#DDD3C2] hover:border-navy/50",
+                    day === i ? "np-sel border-2" : dark ? "border-navy-line" : "border-[#D8CBB7] hover:border-navy/50",
                   )}
                 >
                   <span className="block">{label.slice(0, cut)}</span> <span className="mt-0.5 block font-serif text-[24px] font-semibold leading-none">{label.slice(cut + 1)}</span>
@@ -222,7 +222,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
                 }}
                 className={cn(
                   "min-h-11 rounded-xl border font-display text-[15px] font-semibold tracking-[0.04em] disabled:cursor-not-allowed disabled:line-through disabled:opacity-40",
-                  chosen === h.iso ? "np-sel border-2" : dark ? "border-navy-line" : "border-[#DDD3C2] hover:border-navy/50",
+                  chosen === h.iso ? "np-sel border-2" : dark ? "border-navy-line" : "border-[#D8CBB7] hover:border-navy/50",
                 )}
               >
                 {String(h.hour).padStart(2, "0")}:00
@@ -230,7 +230,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
             ))}
           </div>
           <label className={cn("mt-3 flex min-h-11 cursor-pointer items-center gap-2 text-sm", muted)}>
-            <input type="checkbox" checked={virtual} onChange={(e) => setVirtual(e.target.checked)} className="h-5 w-5 accent-[#162638]" />
+            <input type="checkbox" checked={virtual} onChange={(e) => setVirtual(e.target.checked)} className="h-5 w-5 accent-[#1E1A18]" />
             <Video size={14} aria-hidden /> {tx(locale, "Prefiero visita por videollamada", "I prefer a video tour")}
           </label>
         </div>

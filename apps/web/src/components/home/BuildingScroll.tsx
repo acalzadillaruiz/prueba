@@ -14,7 +14,7 @@ const W = 6;
 const D = 4.2;
 const H = 1;
 const BASE = 0.5;
-const C = { cal: 0xf8f5ef, arena: 0xe8dcc8, navy: 0x162638, card: 0x1e3048, glass: 0x35516d, teja: 0xa8452a, tejaLight: 0xe79a7f, warm: 0xf3c48d };
+const C = { cal: 0xf1ebe3, arena: 0xd9c6ab, navy: 0x1e1a18, card: 0x2a2420, glass: 0x48403a, teja: 0x8e3b22, tejaLight: 0xc9a574, warm: 0xf3c48d };
 
 /**
  * "El edificio que se construye": a real-time 3D building (Three.js, loaded only when the section nears the
@@ -95,11 +95,11 @@ export function BuildingScroll({ chapters, picks, heading, cta }: { chapters: Ch
       scene.fog = fog;
       const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 200);
 
-      scene.add(new THREE.HemisphereLight(0xcfe0ee, 0x2a3e55, 1.6));
+      scene.add(new THREE.HemisphereLight(0xe6dcd1, 0x3a322d, 1.6));
       const sun = new THREE.DirectionalLight(0xfff1e2, 2.2);
       sun.position.set(-8, 14, 10);
       scene.add(sun);
-      const rim = new THREE.DirectionalLight(0xa9c6d8, 1.2);
+      const rim = new THREE.DirectionalLight(0xc2a988, 1.2);
       rim.position.set(10, 6, -8);
       scene.add(rim);
 
@@ -306,7 +306,7 @@ export function BuildingScroll({ chapters, picks, heading, cta }: { chapters: Ch
           <ol className="mt-10 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
             {chapters.map((c) => (
               <li key={c.title}>
-                <p className="np-eyebrow text-[#D9C59C]">{c.eyebrow}</p>
+                <p className="np-eyebrow text-[#D4B98C]">{c.eyebrow}</p>
                 <h3 className="mt-2 text-[26px] leading-tight text-ivory">{c.title}</h3>
                 <p className="mt-2 text-[15px] text-ivory/75">{c.body}</p>
               </li>
@@ -315,10 +315,10 @@ export function BuildingScroll({ chapters, picks, heading, cta }: { chapters: Ch
           <ul className="mt-12 grid gap-3 md:grid-cols-3">
             {picks.map((k) => (
               <li key={k.href}>
-                <Link href={k.href} className="block rounded-2xl border border-ivory/15 p-5 hover:border-[#E79A7F]">
+                <Link href={k.href} className="block rounded-2xl border border-ivory/15 p-5 hover:border-[#C9A574]">
                   <span className="block font-serif text-[22px] text-ivory">{k.title}</span>
                   <span className="block text-sm text-ivory/70">{k.meta}</span>
-                  <span className="mt-2 block font-display font-semibold text-[#E79A7F]">{k.price}</span>
+                  <span className="mt-2 block font-display font-semibold text-[#C9A574]">{k.price}</span>
                 </Link>
               </li>
             ))}
@@ -330,7 +330,7 @@ export function BuildingScroll({ chapters, picks, heading, cta }: { chapters: Ch
   return (
     <section ref={root} className="relative h-[420vh] bg-navy text-ivory" aria-label={heading}>
       <div className="sticky top-0 h-[100svh] overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_65%_40%,rgba(169,198,216,.16),transparent_60%)]" aria-hidden />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_65%_40%,rgba(194,169,136,.16),transparent_60%)]" aria-hidden />
         <canvas ref={canvas} className="absolute inset-0 h-full w-full" aria-hidden />
 
         {/* Copy column */}
@@ -339,7 +339,7 @@ export function BuildingScroll({ chapters, picks, heading, cta }: { chapters: Ch
           <div className="relative h-[220px] max-w-[440px] lg:h-[300px]">
             {chapters.map((c, i) => (
               <div key={c.title} ref={(el) => void (chapterEls.current[i] = el)} className="absolute inset-x-0 bottom-0 lg:top-0" style={{ opacity: i === 0 ? 1 : 0 }}>
-                <p className="np-eyebrow text-[12px] tracking-[0.2em] text-[#D9C59C]">{c.eyebrow}</p>
+                <p className="np-eyebrow text-[12px] tracking-[0.2em] text-[#D4B98C]">{c.eyebrow}</p>
                 <h3 className="mt-3 text-[34px] leading-[1.05] text-ivory sm:text-[44px] lg:text-[56px]">{c.title}</h3>
                 <p className="mt-4 max-w-[400px] text-[16px] leading-relaxed text-ivory/80">{c.body}</p>
               </div>
@@ -364,11 +364,11 @@ export function BuildingScroll({ chapters, picks, heading, cta }: { chapters: Ch
             tabIndex={-1}
             className="group absolute left-0 top-0 flex items-center gap-3 opacity-0 will-change-transform"
           >
-            <span className="h-px w-4 bg-[#E79A7F] sm:w-14" aria-hidden />
-            <span className="rounded-xl border border-ivory/15 bg-[#162638]/85 px-3 py-2 sm:px-4 sm:py-3 shadow-[0_18px_40px_rgba(0,0,0,.35)] backdrop-blur-md transition-colors group-hover:border-[#E79A7F]">
+            <span className="h-px w-4 bg-[#C9A574] sm:w-14" aria-hidden />
+            <span className="rounded-xl border border-ivory/15 bg-[#1E1A18]/85 px-3 py-2 sm:px-4 sm:py-3 shadow-[0_18px_40px_rgba(0,0,0,.35)] backdrop-blur-md transition-colors group-hover:border-[#C9A574]">
               <span className="block max-w-[150px] truncate font-serif text-[16px] leading-tight text-ivory sm:max-w-[240px] sm:text-[20px]">{k.title}</span>
               <span className="hidden text-[12px] text-ivory/70 sm:block">{k.meta}</span>
-              <span className="mt-1 block font-display text-[14px] font-semibold text-[#E79A7F]">
+              <span className="mt-1 block font-display text-[14px] font-semibold text-[#C9A574]">
                 {k.price} <span className="font-normal text-ivory/70">· {cta} →</span>
               </span>
             </span>

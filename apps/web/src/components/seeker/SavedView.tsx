@@ -62,7 +62,7 @@ export function SavedView({ locale, all }: { locale: Locale; all: Listing[] }) {
       {cmp.length > 0 && (
         <section className={cn("np-in mt-8 overflow-hidden", k.card)}>
           <div className="flex items-center gap-2 border-b border-line bg-navy px-5 py-3 text-ivory">
-            <Scale size={18} strokeWidth={1.6} className="text-[#E79A7F]" />
+            <Scale size={18} strokeWidth={1.6} className="text-[#C9A574]" />
             <span className="font-serif text-[22px] font-medium">{tx(locale, "Comparador", "Compare")}</span>
             <span className="text-sm text-mist">{cmp.length}/3</span>
           </div>

@@ -419,9 +419,9 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
             renderPreview={(l) => <MapPreviewCard l={l} locale={locale} />}
             initialScale={fit.scale}
           />
-          <div className="absolute bottom-8 right-3 z-10 flex gap-0.5 overflow-hidden rounded-full border border-[#E3D7C2] bg-[#ffffff] p-1 font-display text-sm text-[#162638] shadow-np">
+          <div className="absolute bottom-8 right-3 z-10 flex gap-0.5 overflow-hidden rounded-full border border-[#E3D7C2] bg-[#ffffff] p-1 font-display text-sm text-[#1E1A18] shadow-np">
             {(["caracas", "venezuela"] as const).map((r) => (
-              <button key={r} onClick={() => setRegionPick(r)} aria-pressed={region === r} className={cn("min-h-11 rounded-full border-2 px-3.5 md:min-h-8", region === r ? "np-sel font-semibold" : "border-transparent text-[#162638]/70")}>
+              <button key={r} onClick={() => setRegionPick(r)} aria-pressed={region === r} className={cn("min-h-11 rounded-full border-2 px-3.5 md:min-h-8", region === r ? "np-sel font-semibold" : "border-transparent text-[#1E1A18]/70")}>
                 {r === "caracas" ? "Caracas" : "Venezuela"}
               </button>
             ))}
@@ -431,7 +431,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
         <div
           data-search-sheet={mobileList ? "open" : "peek"}
           className={cn(
-            "absolute inset-x-0 bottom-0 z-20 flex flex-col overflow-hidden rounded-t-2xl bg-ivory shadow-[0_-10px_30px_rgba(22,38,56,.28)] transition-[height] duration-300 ease-np",
+            "absolute inset-x-0 bottom-0 z-20 flex flex-col overflow-hidden rounded-t-2xl bg-ivory shadow-[0_-10px_30px_rgba(30,26,24,.28)] transition-[height] duration-300 ease-np",
             mobileList ? "h-[88%]" : "h-[132px]",
             "lg:static lg:z-auto lg:h-auto lg:basis-[40%] lg:rounded-none lg:border-l lg:border-line lg:shadow-none lg:transition-none",
           )}
@@ -461,7 +461,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
               <div>
                 <div className="font-serif text-[26px] leading-tight">
                   {plural(query.data?.total ?? results.length, locale, ["resultado", "resultados"], ["result", "results"])}{query.isFetching && <Loader2 size={15} className="ml-2 inline animate-spin text-muted" />}
-                  {shape && <span className="ml-2 inline-block rounded-full bg-[#A9C6D8] px-2.5 py-0.5 align-middle font-display text-xs font-semibold text-[#1F4A63]">{tx(locale, "en tu zona dibujada", "in your drawn area")}</span>}
+                  {shape && <span className="ml-2 inline-block rounded-full bg-[#C2A988] px-2.5 py-0.5 align-middle font-display text-xs font-semibold text-[#433B35]">{tx(locale, "en tu zona dibujada", "in your drawn area")}</span>}
                 </div>
                 <div className="text-sm text-muted">{tx(locale, "Precios en USD · actualizados en tiempo real", "Prices in USD · updated in real time")}</div>
               </div>

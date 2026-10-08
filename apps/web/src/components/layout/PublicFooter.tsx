@@ -10,7 +10,7 @@ export async function PublicFooter({ locale }: { locale: Locale }) {
   const linkCls = "inline-flex min-h-11 items-center text-[15px] text-ivory/80 transition-colors hover:text-ivory md:min-h-0 md:py-1";
   const col = (title: string, links: [string, string][], extra?: React.ReactNode) => (
     <div>
-      <div className="np-eyebrow mb-4 text-[#D9C59C]">{title}</div>
+      <div className="np-eyebrow mb-4 text-[#D4B98C]">{title}</div>
       <ul className="space-y-1.5 md:space-y-2">
         {links.map(([label, h]) => (
           <li key={label}><Link href={h} className={linkCls}>{label}</Link></li>
@@ -37,7 +37,7 @@ export async function PublicFooter({ locale }: { locale: Locale }) {
         {col(t("owners"), [[t("sellWithUs"), `/${locale}/owner/new`], [t("valuation"), `/${locale}/owner/new`], [t("myProperties"), `/${locale}/owner/listings`]])}
         {col(t("agencies"), [[t("forAgencies"), `/${locale}/register`]], <FooterAccountLink locale={locale} signIn={nav("signIn")} className={linkCls} />)}
       </div>
-      <div className="border-t border-[#B4935A]/30">
+      <div className="border-t border-[#B08A55]/30">
         <div className="mx-auto flex max-w-[1320px] flex-wrap items-center justify-between gap-2 px-4 py-5 text-sm text-ivory/60 md:px-8">
           <span>© {new Date().getFullYear()} New Place · {t("legal")}</span>
           <span>{t("listedOn")}</span>

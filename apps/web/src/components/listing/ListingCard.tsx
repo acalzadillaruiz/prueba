@@ -53,7 +53,7 @@ export function ListingCard({ l, locale, compact, className, showCompare }: { l:
   return (
     <Link
       href={`/${locale}/listing/${l.slug}`}
-      className={cn("group block overflow-hidden rounded-np bg-white shadow-[0_1px_2px_rgba(22,38,56,.05),0_8px_24px_rgba(22,38,56,.06)] transition-shadow duration-np hover:shadow-[0_2px_4px_rgba(22,38,56,.06),0_16px_36px_rgba(22,38,56,.12)]", className)}
+      className={cn("group block overflow-hidden rounded-np bg-white shadow-[0_1px_2px_rgba(30,26,24,.05),0_8px_24px_rgba(30,26,24,.06)] transition-shadow duration-np hover:shadow-[0_2px_4px_rgba(30,26,24,.06),0_16px_36px_rgba(30,26,24,.12)]", className)}
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-arena">
         <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="h-full w-full transition-transform duration-700 ease-out group-hover:scale-[1.03]" label={tx(locale, l.title_es, l.title_en)} />
@@ -63,7 +63,7 @@ export function ListingCard({ l, locale, compact, className, showCompare }: { l:
         {l.photos?.length ? (
           <span className="absolute bottom-2.5 right-2.5 rounded-full bg-navy/70 px-2 py-0.5 text-xs font-semibold text-ivory">1/{l.photos.length}</span>
         ) : (
-          <span className="absolute bottom-2.5 right-2.5 rounded-full bg-white/85 px-2 py-0.5 text-xs font-medium text-[#162638]">{tx(locale, "Ilustración", "Illustration")}</span>
+          <span className="absolute bottom-2.5 right-2.5 rounded-full bg-white/85 px-2 py-0.5 text-xs font-medium text-[#1E1A18]">{tx(locale, "Ilustración", "Illustration")}</span>
         )}
       </div>
       <div className={cn("px-5 pb-4 pt-4", compact && "px-4 pb-3.5 pt-3.5")}>
@@ -92,7 +92,7 @@ export function ListingCard({ l, locale, compact, className, showCompare }: { l:
 
 export function MapPreviewCard({ l, locale }: { l: Listing; locale: Locale }) {
   return (
-    <Link href={`/${locale}/listing/${l.slug}`} className="block overflow-hidden rounded-np bg-white shadow-[0_16px_40px_rgba(22,38,56,.22)] ring-1 ring-black/5">
+    <Link href={`/${locale}/listing/${l.slug}`} className="block overflow-hidden rounded-np bg-white shadow-[0_16px_40px_rgba(30,26,24,.22)] ring-1 ring-black/5">
       <div className="relative aspect-[16/9] bg-arena">
         <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="h-full w-full" />
         <SaveButton id={l.id} locale={locale} className="absolute right-2 top-2" />

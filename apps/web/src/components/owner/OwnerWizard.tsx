@@ -277,9 +277,9 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
     }
   };
 
-  const opt = (active: boolean) => cn("rounded-[18px] p-4 text-left transition-shadow duration-np", active ? "bg-[#E6EBF1] shadow-[inset_0_0_0_2px_#162638] dark:bg-white/10 dark:shadow-[inset_0_0_0_2px_#E79A7F]" : "bg-white shadow-[inset_0_0_0_1px_#D9D2C4] hover:shadow-[inset_0_0_0_1px_#162638]");
+  const opt = (active: boolean) => cn("rounded-[18px] p-4 text-left transition-shadow duration-np", active ? "bg-[#E6DDD2] shadow-[inset_0_0_0_2px_#1E1A18] dark:bg-white/10 dark:shadow-[inset_0_0_0_2px_#C9A574]" : "bg-white shadow-[inset_0_0_0_1px_#D8CBB7] hover:shadow-[inset_0_0_0_1px_#1E1A18]");
   const stepper = (label: string, v: number, onChange: (n: number) => void) => (
-    <div className="flex items-center justify-between rounded-[18px] bg-white shadow-[0_8px_24px_rgba(22,38,56,.06)] px-4 py-3">
+    <div className="flex items-center justify-between rounded-[18px] bg-white shadow-[0_8px_24px_rgba(30,26,24,.06)] px-4 py-3">
       <span className="font-semibold">{label}</span>
       <div className="flex items-center gap-3">
         <button type="button" aria-label={`${label} −`} onClick={() => onChange(Math.max(0, v - 1))} className="h-8 w-8 rounded-full border border-line text-lg">−</button>
@@ -312,7 +312,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
           ) : (
             <Button href={`/${locale}/owner/listings`}>{tx(locale, "Ver mis inmuebles", "My properties")}</Button>
           )}
-          {done.mode === "FSBO" && !done.pending && <Button href={`/${locale}/listing/${done.slug}`} variant="outline" className="border-navy/70 bg-transparent text-navy hover:bg-[#E6EBF1]">{tx(locale, "Ver la ficha", "View listing")}</Button>}
+          {done.mode === "FSBO" && !done.pending && <Button href={`/${locale}/listing/${done.slug}`} variant="outline" className="border-navy/70 bg-transparent text-navy hover:bg-[#E6DDD2]">{tx(locale, "Ver la ficha", "View listing")}</Button>}
         </div>
       </div>
     );
@@ -382,7 +382,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               <div className="mb-2 font-semibold">{tx(locale, "Operación", "Operation")}</div>
               <div className="flex flex-wrap gap-2">
                 {[["SALE", "Venta", "Sale"], ["LONG_RENT", "Alquiler", "Rent"], ["SHORT_RENT", "Vacacional", "Vacation"], ["COMMERCIAL_SALE", "Comercial · venta", "Commercial · sale"], ["COMMERCIAL_RENT", "Comercial · alquiler", "Commercial · rent"]].map(([k, es, en]) => (
-                  <button key={k} onClick={() => setOp(k)} aria-pressed={d.op === k} className={cn("rounded-full border px-4 py-2 font-display text-sm", d.op === k ? "border-navy bg-[#E6EBF1] text-navy ring-1 ring-navy dark:bg-white/10 dark:ring-[#E79A7F]" : "border-line bg-white")}>{tx(locale, es, en)}</button>
+                  <button key={k} onClick={() => setOp(k)} aria-pressed={d.op === k} className={cn("rounded-full border px-4 py-2 font-display text-sm", d.op === k ? "border-navy bg-[#E6DDD2] text-navy ring-1 ring-navy dark:bg-white/10 dark:ring-[#C9A574]" : "border-line bg-white")}>{tx(locale, es, en)}</button>
                 ))}
               </div>
             </div>
@@ -390,7 +390,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               <div className="mb-2 font-semibold">{tx(locale, "Tipo de inmueble", "Property type")}</div>
               <div className="flex flex-wrap gap-2">
                 {([["apartment", "Apartamento", "Apartment"], ["house", "Casa", "House"], ["penthouse", "Penthouse", "Penthouse"], ["townhouse", "Townhouse", "Townhouse"], ["studio", "Estudio", "Studio"], ["office", "Oficina", "Office"], ["retail", "Local", "Retail"], ["warehouse", "Galpón", "Warehouse"], ["land", "Terreno", "Land"]] as [Kind, string, string][]).map(([k, es, en]) => (
-                  <button key={k} onClick={() => set({ kind: k })} className={cn("rounded-full border px-4 py-2 font-display text-sm", d.kind === k ? "border-navy bg-[#E6EBF1] text-navy ring-1 ring-navy dark:bg-white/10 dark:ring-[#E79A7F]" : "border-line bg-white")}>{tx(locale, es, en)}</button>
+                  <button key={k} onClick={() => set({ kind: k })} className={cn("rounded-full border px-4 py-2 font-display text-sm", d.kind === k ? "border-navy bg-[#E6DDD2] text-navy ring-1 ring-navy dark:bg-white/10 dark:ring-[#C9A574]" : "border-line bg-white")}>{tx(locale, es, en)}</button>
                 ))}
               </div>
             </div>
@@ -466,19 +466,19 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                 })}
               </div>
             </div>
-            <div className="rounded-[18px] bg-white p-5 shadow-[0_8px_24px_rgba(22,38,56,.06)]">
+            <div className="rounded-[18px] bg-white p-5 shadow-[0_8px_24px_rgba(30,26,24,.06)]">
               <EssentialsFields locale={locale} value={d.ess} onChange={(x) => set({ ess: x })} showErrors={showExtrasErr} />
             </div>
             {!listingType.startsWith("COMMERCIAL") && RESIDENTIAL_KINDS.includes(d.kind) && (
               <label className="flex items-center gap-2 text-sm font-semibold">
-                <input type="checkbox" checked={d.luxury} onChange={(e) => set({ luxury: e.target.checked })} className="h-4 w-4 accent-navy dark:accent-[#E79A7F]" />
+                <input type="checkbox" checked={d.luxury} onChange={(e) => set({ luxury: e.target.checked })} className="h-4 w-4 accent-navy dark:accent-[#C9A574]" />
                 {tx(locale, "Inmueble de lujo", "Luxury property")}
               </label>
             )}
             <ListingTypeFields locale={locale} listingType={listingType} luxury={luxury} value={d.extras} onChange={(x) => set({ extras: x })} showErrors={showExtrasErr} />
             {luxury && (
               <label className="flex items-start gap-2 text-sm">
-                <input type="checkbox" checked={d.privateListing} onChange={(e) => set({ privateListing: e.target.checked })} className="mt-0.5 h-4 w-4 shrink-0 accent-navy dark:accent-[#E79A7F]" />
+                <input type="checkbox" checked={d.privateListing} onChange={(e) => set({ privateListing: e.target.checked })} className="mt-0.5 h-4 w-4 shrink-0 accent-navy dark:accent-[#C9A574]" />
                 <span>
                   <span className="font-semibold">{tx(locale, "Anuncio privado", "Private listing")}</span>
                   <span className="block text-muted">{tx(locale, "No aparece en el buscador ni en el mapa; solo quien tenga el enlace puede verlo.", "Hidden from search and the map; only people with the link can see it.")}</span>
@@ -552,7 +552,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
         {step === 4 && (
           <div className="np-in space-y-5">
             <h1 className="font-serif text-[36px] font-medium leading-[1.05] md:text-[44px]">{tx(locale, "Precio y descripción", "Price & description")}</h1>
-            <div className="rounded-[18px] bg-white shadow-[0_8px_24px_rgba(22,38,56,.06)] p-5">
+            <div className="rounded-[18px] bg-white shadow-[0_8px_24px_rgba(30,26,24,.06)] p-5">
               <div className="flex items-center gap-2 font-display font-semibold"><Sparkles size={17} strokeWidth={1.6} /> PlaceEstimate · {zone?.name}</div>
               {estimate ? (
                 <>
@@ -574,16 +574,16 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               </div>
               {fxVes > 0 && <div className="mt-2 text-xs text-muted">≈ Bs. {num(Math.round(d.price * fxVes), locale)} ({tx(locale, "tasa referencial", "reference rate")})</div>}
             </div>
-            <div className="rounded-[18px] bg-white shadow-[0_8px_24px_rgba(22,38,56,.06)] p-5">
+            <div className="rounded-[18px] bg-white shadow-[0_8px_24px_rgba(30,26,24,.06)] p-5">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="font-display font-semibold">{tx(locale, "Título y descripción (ES / EN)", "Title & description (ES / EN)")}</div>
                 <Button size="sm" variant="navy" onClick={writeAI} disabled={writing}>
-                  {writing ? <Loader2 size={15} className="animate-spin" /> : <Sparkles size={15} className="text-[#E79A7F]" />} {tx(locale, "Redactar con IA", "Write with AI")}
+                  {writing ? <Loader2 size={15} className="animate-spin" /> : <Sparkles size={15} className="text-[#C9A574]" />} {tx(locale, "Redactar con IA", "Write with AI")}
                 </Button>
               </div>
               <div className="mt-3 flex gap-2">
                 {(["es", "en"] as Locale[]).map((x) => (
-                  <button key={x} onClick={() => setLang(x)} className={cn("rounded-full px-3 py-0.5 text-xs font-bold", lang === x ? "bg-[#E6EBF1] text-navy shadow-[inset_0_0_0_2px_#162638]" : "bg-black/5")}>{x.toUpperCase()}</button>
+                  <button key={x} onClick={() => setLang(x)} className={cn("rounded-full px-3 py-0.5 text-xs font-bold", lang === x ? "bg-[#E6DDD2] text-navy shadow-[inset_0_0_0_2px_#1E1A18]" : "bg-black/5")}>{x.toUpperCase()}</button>
                 ))}
               </div>
               <input
@@ -618,7 +618,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                 </span>
               </div>
             )}
-            <div className="overflow-hidden rounded-[18px] bg-white shadow-[0_8px_24px_rgba(22,38,56,.06)]">
+            <div className="overflow-hidden rounded-[18px] bg-white shadow-[0_8px_24px_rgba(30,26,24,.06)]">
               <div className="grid sm:grid-cols-[260px_1fr]">
                 {files.length ? (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -632,11 +632,11 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                   <div className="text-sm text-muted" data-testid="review-address">{address}</div>
                   <div className="mt-2 text-sm" data-testid="review-facts">{facts}</div>
                   {extrasSummary && <div className="mt-1 text-sm text-muted">{extrasSummary}</div>}
-                  <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#E6EBF1] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[.12em] text-navy">{d.mode === "AGENCY" ? tx(locale, "Inventario de la agencia", "Agency inventory") : d.mode === "FSBO" ? tx(locale, "Publicación directa (FSBO)", "For sale by owner") : tx(locale, "Encargo a agencia", "Agency mandate")}</div>
+                  <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#E6DDD2] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[.12em] text-navy">{d.mode === "AGENCY" ? tx(locale, "Inventario de la agencia", "Agency inventory") : d.mode === "FSBO" ? tx(locale, "Publicación directa (FSBO)", "For sale by owner") : tx(locale, "Encargo a agencia", "Agency mandate")}</div>
                 </div>
               </div>
             </div>
-            <div className="rounded-[18px] bg-white shadow-[0_8px_24px_rgba(22,38,56,.06)] p-5">
+            <div className="rounded-[18px] bg-white shadow-[0_8px_24px_rgba(30,26,24,.06)] p-5">
               <div className="flex items-center justify-between"><span className="font-display font-semibold">{tx(locale, "Calidad de la ficha", "Listing quality")}</span><span className="font-display text-2xl font-semibold text-ok">{quality}/100</span></div>
               <Progress value={quality} tone="ok" className="mt-2" />
               <ul className="mt-3 grid gap-1.5 text-sm sm:grid-cols-2">
@@ -645,9 +645,9 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                 ))}
               </ul>
             </div>
-            <label className="flex items-start gap-2 text-sm text-muted"><input type="checkbox" checked={confirm} onChange={(e) => setConfirm(e.target.checked)} className="mt-1 h-4 w-4 shrink-0 accent-navy dark:accent-[#E79A7F]" /> {tx(locale, "Confirmo que soy el propietario o tengo autorización para publicar.", "I confirm I’m the owner or authorised to list.")}</label>
+            <label className="flex items-start gap-2 text-sm text-muted"><input type="checkbox" checked={confirm} onChange={(e) => setConfirm(e.target.checked)} className="mt-1 h-4 w-4 shrink-0 accent-navy dark:accent-[#C9A574]" /> {tx(locale, "Confirmo que soy el propietario o tengo autorización para publicar.", "I confirm I’m the owner or authorised to list.")}</label>
             {!confirm && <p className="text-xs text-muted">{tx(locale, "Marca la confirmación para poder publicar.", "Tick the confirmation to publish.")}</p>}
-            {!user && <p className="rounded-lg bg-[#A8452A0D] px-3 py-2 text-sm">{tx(locale, "Te pediremos iniciar sesión para publicar. Tu borrador se conserva.", "We’ll ask you to sign in to publish. Your draft is kept.")}</p>}
+            {!user && <p className="rounded-lg bg-[#8E3B220D] px-3 py-2 text-sm">{tx(locale, "Te pediremos iniciar sesión para publicar. Tu borrador se conserva.", "We’ll ask you to sign in to publish. Your draft is kept.")}</p>}
             {err && <div className="rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-sm text-danger" role="alert">{err}</div>}
           </div>
         )}
@@ -677,7 +677,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
 
       <aside className="hidden lg:block">
         <div className="sticky top-24 space-y-4">
-          <div className="overflow-hidden rounded-[18px] bg-white shadow-[0_8px_24px_rgba(22,38,56,.06)]">
+          <div className="overflow-hidden rounded-[18px] bg-white shadow-[0_8px_24px_rgba(30,26,24,.06)]">
             {files.length ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={previews[cover]} alt="" className="aspect-[4/3] w-full object-cover" />
@@ -692,7 +692,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
             </div>
           </div>
           <div className="rounded-np bg-navy p-4 text-ivory">
-            <div className="flex items-center gap-2 font-display font-semibold"><Sparkles size={16} className="text-[#E79A7F]" /> PlaceEstimate</div>
+            <div className="flex items-center gap-2 font-display font-semibold"><Sparkles size={16} className="text-[#C9A574]" /> PlaceEstimate</div>
             <div className="mt-1 font-display text-2xl">{estimate ? money(estimate.mid, locale) : "—"}</div>
             <div className="text-xs text-mist">{tx(locale, "Se actualiza mientras completas", "Updates as you go")}</div>
           </div>

@@ -99,7 +99,7 @@ export function SettingsView({
               <div className="flex-1"><div className="font-display font-semibold">{b.name}</div><div className="text-sm text-muted">{b.whatsapp}</div></div>
               <span className="rounded-np px-3 py-2 font-display text-sm text-white" style={{ background: b.color }}>{tx(locale, "Contactar", "Contact")}</span>
             </div>
-            <div className="mt-3 flex items-center justify-between border-t border-[#DDD3C2] pt-2 text-xs text-muted"><span>Listed on New Place</span><Logo size="sm" /></div>
+            <div className="mt-3 flex items-center justify-between border-t border-[#D8CBB7] pt-2 text-xs text-muted"><span>Listed on New Place</span><Logo size="sm" /></div>
           </div>
         </div>
         <div className="space-y-6">
@@ -117,7 +117,7 @@ export function SettingsView({
             <h2 className={cn(k.title, "flex items-center gap-2")}><Lock size={16} strokeWidth={1.6} className={k.muted} /> {tx(locale, "Plan (solo lectura)", "Plan (read-only)")}</h2>
             <div className="mt-3 grid grid-cols-3 gap-2 text-center text-sm">
               {["FREE", "PRO", "ENTERPRISE"].map((p) => (
-                <div key={p} aria-current={p === agency.plan ? "true" : undefined} className={p === agency.plan ? "rounded-xl bg-[#E6EBF1] p-3 text-navy shadow-[inset_0_0_0_2px_#162638] dark:bg-white/10 dark:text-ivory dark:shadow-[inset_0_0_0_2px_#E79A7F]" : cn("rounded-xl border p-3", k.line, k.muted)}><div className="font-display font-semibold">{p}</div><div className="text-xs">{p === "FREE" ? "10 listings" : p === "PRO" ? "100 listings · IA" : tx(locale, "Ilimitado", "Unlimited")}</div></div>
+                <div key={p} aria-current={p === agency.plan ? "true" : undefined} className={p === agency.plan ? "rounded-xl bg-[#E6DDD2] p-3 text-navy shadow-[inset_0_0_0_2px_#1E1A18] dark:bg-white/10 dark:text-ivory dark:shadow-[inset_0_0_0_2px_#C9A574]" : cn("rounded-xl border p-3", k.line, k.muted)}><div className="font-display font-semibold">{p}</div><div className="text-xs">{p === "FREE" ? "10 listings" : p === "PRO" ? "100 listings · IA" : tx(locale, "Ilimitado", "Unlimited")}</div></div>
               ))}
             </div>
             <p className={cn("mt-3 text-xs", k.muted)}>{tx(locale, "Sin cobros en v1. El plan lo gestiona el superadmin.", "No billing in v1. Plans are managed by the superadmin.")}</p>
@@ -146,7 +146,7 @@ export function SettingsView({
                 const isToday = today === Number(d);
                 const label = tx(locale, ...WEEKDAY_LABEL[d]);
                 return (
-                  <label key={d} className={cn("block rounded-xl border p-3", k.line, isToday && "border-navy/40 dark:border-[#E79A7F]/50")}>
+                  <label key={d} className={cn("block rounded-xl border p-3", k.line, isToday && "border-navy/40 dark:border-[#C9A574]/50")}>
                     <span className="mb-1.5 flex items-center justify-between gap-2 text-sm font-semibold text-navy dark:text-ivory">
                       {label}
                       {isToday && <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[.12em]", k.soft)}>{tx(locale, "Hoy", "Today")}</span>}

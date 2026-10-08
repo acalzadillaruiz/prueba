@@ -62,7 +62,7 @@ export function Logo({ tone = "navy", className, size = "md", animate = false }:
         <span className={cn("font-logo text-[30px] leading-none tracking-[0.22em]", animate && "np-roof-fade")} style={{ color: ink, paddingLeft: "0.22em" }}>
           NEW PLACE
         </span>
-        <span className={cn("text-[11px] font-medium uppercase tracking-[0.34em]", animate && "np-roof-fade")} style={{ color: dark ? "#D9C59C" : "var(--np-muted)", paddingLeft: "0.34em" }}>
+        <span className={cn("text-[11px] font-medium uppercase tracking-[0.34em]", animate && "np-roof-fade")} style={{ color: dark ? "#D4B98C" : "var(--np-muted)", paddingLeft: "0.34em" }}>
           Bienes raíces
         </span>
       </span>

@@ -3,7 +3,7 @@ const bone = "rounded-[18px] bg-gradient-to-r from-[#EFE7DA] via-[#F7F2EA] to-[#
 
 export default function Loading() {
   return (
-    <div className="min-h-screen bg-ivory lg:pl-[264px] dark:bg-[#101C2B]" aria-busy="true" aria-live="polite">
+    <div className="min-h-screen bg-ivory lg:pl-[264px] dark:bg-[#15120F]" aria-busy="true" aria-live="polite">
       <div className="fixed inset-y-0 left-0 hidden w-[264px] bg-navy lg:block" />
       <div className="h-[104px] bg-navy lg:hidden" />
       <div className="mx-auto max-w-[1360px] animate-pulse space-y-6 px-4 pb-16 pt-6 md:px-10 md:pt-10">

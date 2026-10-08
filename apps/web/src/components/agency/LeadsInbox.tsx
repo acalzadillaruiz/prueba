@@ -42,8 +42,8 @@ function ScoreRing({ score }: { score: number }) {
   const c = 2 * Math.PI * r;
   return (
     <svg viewBox="0 0 80 80" className="h-20 w-20">
-      <circle cx={40} cy={40} r={r} fill="none" strokeWidth={6} className="stroke-[#E6EBF1] dark:stroke-white/10" />
-      <circle cx={40} cy={40} r={r} fill="none" strokeWidth={6} strokeDasharray={`${(score / 100) * c} ${c}`} strokeLinecap="round" transform="rotate(-90 40 40)" className={score >= 45 ? "stroke-navy dark:stroke-ivory" : "stroke-[#7D8B9B]"} />
+      <circle cx={40} cy={40} r={r} fill="none" strokeWidth={6} className="stroke-[#E6DDD2] dark:stroke-white/10" />
+      <circle cx={40} cy={40} r={r} fill="none" strokeWidth={6} strokeDasharray={`${(score / 100) * c} ${c}`} strokeLinecap="round" transform="rotate(-90 40 40)" className={score >= 45 ? "stroke-navy dark:stroke-ivory" : "stroke-[#81776F]"} />
       <text x={40} y={47} textAnchor="middle" fontSize={22} fontWeight={600} letterSpacing="-1" fontFamily="var(--font-display)" className="fill-navy dark:fill-ivory">{score}</text>
     </svg>
   );
@@ -244,10 +244,10 @@ export function LeadsInbox({ locale, initial, listings, agents, threads, meId }:
                   setSelId(l.id);
                   // On phones/tablets the detail sits under the list: bring it into view.
                   if (window.innerWidth < 1280) requestAnimationFrame(() => document.getElementById("lead-detail")?.scrollIntoView({ behavior: "smooth", block: "start" }));
-                }} className={cn("flex w-full items-start gap-3 border-b px-4 py-3.5 text-left transition-colors duration-np last:border-b-0", k.line, sel?.id === l.id ? "bg-[#E6EBF1] shadow-[inset_3px_0_0_#162638] dark:bg-white/[.07] dark:shadow-[inset_3px_0_0_#E79A7F]" : k.hover)}>
+                }} className={cn("flex w-full items-start gap-3 border-b px-4 py-3.5 text-left transition-colors duration-np last:border-b-0", k.line, sel?.id === l.id ? "bg-[#E6DDD2] shadow-[inset_3px_0_0_#1E1A18] dark:bg-white/[.07] dark:shadow-[inset_3px_0_0_#C9A574]" : k.hover)}>
                 <div className="relative">
                   <Initials name={l.name} size={40} />
-                  {l.stage === "NEW" && <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-white bg-navy dark:border-navy-card dark:bg-[#E79A7F]" />}
+                  {l.stage === "NEW" && <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-white bg-navy dark:border-navy-card dark:bg-[#C9A574]" />}
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
@@ -259,7 +259,7 @@ export function LeadsInbox({ locale, initial, listings, agents, threads, meId }:
                   <div className="mt-1 truncate text-sm text-navy/75 dark:text-ivory/70">{l.message}</div>
                 </div>
                 <div className="flex flex-col items-end gap-1.5">
-                  <Chip className={score < 45 ? "bg-transparent text-muted shadow-[inset_0_0_0_1px_#D9D2C4] dark:text-mist" : ""}>{tx(locale, "Interés", "Interest")} {score}</Chip>
+                  <Chip className={score < 45 ? "bg-transparent text-muted shadow-[inset_0_0_0_1px_#D8CBB7] dark:text-mist" : ""}>{tx(locale, "Interés", "Interest")} {score}</Chip>
                   <Sla lead={l} locale={locale} />
                 </div>
               </button>

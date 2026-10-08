@@ -106,7 +106,7 @@ test.describe.serial("Criterios de aceptación §15", () => {
     const m = await r.json();
     expect(m.name).toBe("New Place");
     expect(m.display).toBe("standalone");
-    expect(m.theme_color).toBe("#162638"); // brand navy (Rebrand foundation)
+    expect(m.theme_color).toBe("#1E1A18"); // Obsidiana (Palette A)
     expect(m.id).toBe("/");
     // start_url lets the middleware pick the visitor's language (/es or /en)
     const start = await request.get(m.start_url);

@@ -24,22 +24,22 @@ function html(subject: string, body: string) {
   const sans = "Manrope,'Helvetica Neue',Arial,sans-serif";
   const serif = "'Cormorant Garamond',Georgia,'Times New Roman',serif";
   const content = link
-    ? `<tr><td style="padding:8px 40px 8px"><a href="${esc(link)}" style="display:inline-block;background:#A8452A;color:#ffffff;padding:14px 28px;border-radius:999px;text-decoration:none;font-family:${sans};font-size:15px;font-weight:600;letter-spacing:.01em">Abrir en New Place</a></td></tr>`
+    ? `<tr><td style="padding:8px 40px 8px"><a href="${esc(link)}" style="display:inline-block;background:#8E3B22;color:#ffffff;padding:14px 28px;border-radius:999px;text-decoration:none;font-family:${sans};font-size:15px;font-weight:600;letter-spacing:.01em">Abrir en New Place</a></td></tr>`
     : body
-      ? `<tr><td style="padding:0 40px 8px;font-family:${sans};font-size:15px;line-height:1.6;color:#162638">${esc(body)}</td></tr>`
+      ? `<tr><td style="padding:0 40px 8px;font-family:${sans};font-size:15px;line-height:1.6;color:#1E1A18">${esc(body)}</td></tr>`
       : "";
   return `<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>${esc(subject)}</title></head>
-<body style="margin:0;padding:0;background:#F8F5EF;color:#162638;-webkit-font-smoothing:antialiased">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F8F5EF"><tr><td align="center" style="padding:32px 16px">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;background:#ffffff;border-radius:18px;overflow:hidden;box-shadow:0 8px 24px rgba(22,38,56,.06)">
-<tr><td align="center" style="background:#162638;padding:28px 24px 24px">
-<div style="font-family:${serif};font-size:22px;letter-spacing:.32em;color:#F8F5EF;padding-left:.32em">NEW PLACE</div>
-<div style="margin:8px auto 0;width:44px;height:2px;background:#E79A7F;line-height:2px;font-size:0">&nbsp;</div>
-<div style="margin-top:8px;font-family:${sans};font-size:10px;letter-spacing:.34em;text-transform:uppercase;color:#D9C59C;padding-left:.34em">Bienes raíces</div>
+<body style="margin:0;padding:0;background:#F1EBE3;color:#1E1A18;-webkit-font-smoothing:antialiased">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F1EBE3"><tr><td align="center" style="padding:32px 16px">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;background:#ffffff;border-radius:18px;overflow:hidden;box-shadow:0 8px 24px rgba(30,26,24,.06)">
+<tr><td align="center" style="background:#1E1A18;padding:28px 24px 24px">
+<div style="font-family:${serif};font-size:22px;letter-spacing:.32em;color:#F1EBE3;padding-left:.32em">NEW PLACE</div>
+<div style="margin:8px auto 0;width:44px;height:2px;background:#C9A574;line-height:2px;font-size:0">&nbsp;</div>
+<div style="margin-top:8px;font-family:${sans};font-size:10px;letter-spacing:.34em;text-transform:uppercase;color:#D4B98C;padding-left:.34em">Bienes raíces</div>
 </td></tr>
-<tr><td style="padding:36px 40px 12px"><h1 style="margin:0;font-family:${serif};font-weight:500;font-size:30px;line-height:1.15;color:#162638">${esc(subject)}</h1></td></tr>
+<tr><td style="padding:36px 40px 12px"><h1 style="margin:0;font-family:${serif};font-weight:500;font-size:30px;line-height:1.15;color:#1E1A18">${esc(subject)}</h1></td></tr>
 ${content}
-<tr><td style="padding:28px 40px 32px"><div style="border-top:1px solid #ECE6DA;padding-top:16px;font-family:${sans};font-size:12px;line-height:1.5;color:#5E6673">New Place · Bienes raíces · El Caribe, con alma mediterránea.</div></td></tr>
+<tr><td style="padding:28px 40px 32px"><div style="border-top:1px solid #ECE6DA;padding-top:16px;font-family:${sans};font-size:12px;line-height:1.5;color:#5A514B">New Place · Bienes raíces · El Caribe, con alma mediterránea.</div></td></tr>
 </table>
 </td></tr></table></body></html>`;
 }

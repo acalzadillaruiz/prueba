@@ -127,7 +127,7 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
           <ul data-reveal="stagger" className="flex flex-col gap-3">
             {zones.map((z) => (
               <li key={z.zone}>
-                <Link href={z.href} className="group flex h-full min-h-[104px] items-stretch overflow-hidden rounded-2xl bg-white shadow-[0_1px_2px_rgba(22,38,56,.05),0_8px_24px_rgba(22,38,56,.06)] transition-shadow duration-np hover:shadow-[0_16px_36px_rgba(22,38,56,.12)]">
+                <Link href={z.href} className="group flex h-full min-h-[104px] items-stretch overflow-hidden rounded-2xl bg-white shadow-[0_1px_2px_rgba(30,26,24,.05),0_8px_24px_rgba(30,26,24,.06)] transition-shadow duration-np hover:shadow-[0_16px_36px_rgba(30,26,24,.12)]">
                   <span className="relative w-[84px] shrink-0 overflow-hidden sm:w-[112px]">
                     <Image src={z.photo} alt="" fill sizes="112px" className="object-cover transition-transform duration-700 group-hover:scale-105" />
                   </span>

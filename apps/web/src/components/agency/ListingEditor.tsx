@@ -235,8 +235,8 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
               })}
             </div>
             <div className="mt-4 flex flex-wrap gap-4 text-sm">
-              <label className="flex items-center gap-2"><input type="checkbox" disabled={!canEdit} checked={f.hasFloorplan} onChange={(e) => { setF({ ...f, hasFloorplan: e.target.checked }); dirty(); }} className="h-4 w-4 accent-navy dark:accent-[#E79A7F]" /> {tx(locale, "Tiene plano", "Has floor plan")}</label>
-              <label className="flex items-center gap-2"><input type="checkbox" disabled={!canEdit} checked={f.hasVirtualTour} onChange={(e) => { setF({ ...f, hasVirtualTour: e.target.checked }); dirty(); }} className="h-4 w-4 accent-navy dark:accent-[#E79A7F]" /> {tx(locale, "Tour virtual", "Virtual tour")}</label>
+              <label className="flex items-center gap-2"><input type="checkbox" disabled={!canEdit} checked={f.hasFloorplan} onChange={(e) => { setF({ ...f, hasFloorplan: e.target.checked }); dirty(); }} className="h-4 w-4 accent-navy dark:accent-[#C9A574]" /> {tx(locale, "Tiene plano", "Has floor plan")}</label>
+              <label className="flex items-center gap-2"><input type="checkbox" disabled={!canEdit} checked={f.hasVirtualTour} onChange={(e) => { setF({ ...f, hasVirtualTour: e.target.checked }); dirty(); }} className="h-4 w-4 accent-navy dark:accent-[#C9A574]" /> {tx(locale, "Tour virtual", "Virtual tour")}</label>
             </div>
             {f.hasVirtualTour && (
               <div className="mt-3 max-w-md">

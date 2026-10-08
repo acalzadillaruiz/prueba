@@ -95,6 +95,8 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
   };
   /** Set when the owner taps "Continuar" on an incomplete step: the missing items show (never a silent disabled button). */
   const [tried, setTried] = useState(false);
+  /** The price field was left (blurred) once: only then (or after "Continuar") does its error show, never on arrival. */
+  const [priceTouched, setPriceTouched] = useState(false);
   const [d, setD] = useState<Draft>({
     mode: staff ? "AGENCY" : "FSBO",
     op: "SALE",
@@ -421,6 +423,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
     ).filter((x): x is Issue => !!x);
   // Live list: items disappear as the owner fixes them.
   const blocked = tried ? issues(step) : [];
+  const showPriceErr = !!priceErr && (tried || priceTouched);
   /** Scroll to a field zone and focus its first invalid control (or its first control). */
   const focusZone = (zone: string) => {
     const box = formRef.current?.querySelector<HTMLElement>(`[data-wiz="${zone}"]`);
@@ -467,9 +470,9 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
     <div className="mx-auto grid max-w-[1200px] gap-8 px-4 py-8 md:px-6 lg:grid-cols-[1fr_340px]">
       <div ref={formRef}>
         <div className="mb-6">
-          <div className="mb-3 flex items-center justify-between text-sm">
-            <span className="font-display font-semibold">{tx(locale, `Paso ${step + 1} de 6`, `Step ${step + 1} of 6`)} · {tx(locale, STEPS[step][0], STEPS[step][1])}</span>
-            <span className="text-muted">{tx(locale, "Tu borrador se guarda en este dispositivo", "Your draft is saved on this device")}</span>
+          <div className="mb-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5 text-sm">
+            <span className="whitespace-nowrap font-display font-semibold">{tx(locale, `Paso ${step + 1} de 6`, `Step ${step + 1} of 6`)} · {tx(locale, STEPS[step][0], STEPS[step][1])}</span>
+            <span className="w-full text-xs text-muted sm:w-auto sm:text-sm">{tx(locale, "Tu borrador se guarda en este dispositivo", "Your draft is saved on this device")}</span>
           </div>
           <div className="grid grid-cols-6 gap-1.5">
             {STEPS.map((s, i) => (
@@ -702,10 +705,10 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                 <div className="mt-2 flex items-center gap-2 text-muted"><Loader2 size={16} className="animate-spin" /> {tx(locale, "Calculando…", "Calculating…")}</div>
               )}
               <div data-wiz="price" className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto]">
-                <Field label={tx(locale, `Tu precio (USD${priceUnit})`, `Your price (USD${priceUnit})`)} error={priceErr ?? undefined}>
-                  <input className={inputCls} type="number" inputMode="numeric" min={1} step={1} value={d.price || ""} aria-invalid={!!priceErr} onChange={(e) => set({ price: Math.max(0, Math.round(+e.target.value || 0)) })} />
+                <Field label={tx(locale, `Tu precio (USD${priceUnit})`, `Your price (USD${priceUnit})`)} error={(showPriceErr && priceErr) || undefined}>
+                  <input className={inputCls} type="number" inputMode="numeric" min={1} step={1} value={d.price || ""} aria-invalid={showPriceErr} onBlur={() => setPriceTouched(true)} onChange={(e) => set({ price: Math.max(0, Math.round(+e.target.value || 0)) })} />
                 </Field>
-                {estimate && (
+                {estimate && d.price > 0 && (
                   <div className="self-end pb-2.5 text-sm">
                     {d.price > estimate.high ? <span className="font-semibold text-warn">{tx(locale, "Por encima del rango", "Above range")}</span> : d.price < estimate.low ? <span className="font-semibold text-ok">{tx(locale, "Por debajo: venta rápida", "Below: quick sale")}</span> : <span className="font-semibold text-ok">{tx(locale, "Dentro del rango ✓", "Within range ✓")}</span>}
                   </div>

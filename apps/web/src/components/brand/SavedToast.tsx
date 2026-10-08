@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Heart } from "lucide-react";
 import type { Locale } from "@/types/domain";
@@ -33,11 +34,18 @@ function bottomInset(toast: HTMLElement | null) {
 /**
  * Quiet confirmation after a heart: "Guardada · Ver guardadas". Bottom centre, above whatever floats there (see
  * `bottomInset`; globals.css `[data-np-toast]` is the first-paint fallback), announced politely, gone after a few
- * seconds. `nonce` changes on every save so a second heart restarts the timer.
+ * seconds or as soon as the route changes. `nonce` changes on every save so a second heart restarts the timer.
  */
 export function SavedToast({ locale, nonce, onClose }: { locale: Locale; nonce: number; onClose: () => void }) {
   const [bottom, setBottom] = useState<number | null>(null);
   const box = useRef<HTMLDivElement>(null);
+  // It belongs to the page where the heart was tapped: a navigation (listing → Back to the results) dismisses it,
+  // so it never lands on top of the next page's cards.
+  const pathname = usePathname();
+  const shownOn = useRef(pathname);
+  useEffect(() => {
+    if (pathname !== shownOn.current) onClose();
+  }, [pathname, onClose]);
   useEffect(() => {
     const t = window.setTimeout(onClose, 4200);
     return () => window.clearTimeout(t);

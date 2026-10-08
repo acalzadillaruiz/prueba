@@ -252,6 +252,6 @@ export interface EmailOutbox {
   to: string;
   subject: string;
   at: string;
-  kind: "ALERT" | "TOUR" | "INVITE" | "VERIFY";
+  kind: "ALERT" | "TOUR" | "INVITE" | "VERIFY" | "LEAD" | "RESET";
   status: "QUEUED" | "SENT" | "SIMULATED" | "FAILED";
 }

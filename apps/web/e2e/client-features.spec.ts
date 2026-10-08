@@ -122,6 +122,12 @@ test.describe.serial("Cliente: búsqueda, Hub y precalificación", () => {
       await page.goto(path);
       await expect(tabbar, path).toBeVisible();
     }
+    // Footer: language and theme switches, no odd "Publicado en New Place" line.
+    await page.goto("/es/sell");
+    const footer = page.getByRole("contentinfo");
+    await expect(footer.getByRole("link", { name: "English" })).toHaveAttribute("href", "/en/sell");
+    await expect(footer.getByRole("button", { name: "Modo oscuro" })).toBeVisible();
+    await expect(footer.getByText("Publicado en New Place")).toHaveCount(0);
     // "Buscar" (not a second "Mapa"): opens the search, list first.
     await expect(tabbar.getByRole("link", { name: "Buscar" })).toHaveAttribute("href", "/es/search?type=SALE");
     await expect(tabbar.getByRole("link", { name: "Mapa" })).toHaveCount(0);
@@ -132,6 +138,12 @@ test.describe.serial("Cliente: búsqueda, Hub y precalificación", () => {
     await expect(tabbar.getByRole("link", { name: "Cuenta" })).toHaveAttribute("href", "/es/app");
     await page.goto("/es/app");
     await expect(tabbar).toBeVisible();
+    // "Tu espacio": section chips with anchors (scroll-spy marks the one being read).
+    const chips = page.getByRole("navigation", { name: "Secciones de tu espacio" });
+    await expect(chips.getByRole("link", { name: /^Mensajes/ })).toHaveAttribute("href", "#mensajes");
+    await expect(chips.getByRole("link", { name: "Visitas" })).toHaveAttribute("aria-current", "location");
+    await chips.getByRole("link", { name: "Ofertas" }).click();
+    await expect(chips.getByRole("link", { name: "Ofertas" })).toHaveAttribute("aria-current", "location");
     await page.goto("/es/account");
     await expect(page.getByRole("heading", { level: 1, name: "Ajustes" })).toBeVisible();
   });

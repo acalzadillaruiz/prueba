@@ -181,7 +181,7 @@ export async function audit(actorId: string | null, action: string, target: stri
   await prisma.auditLog.create({ data: { actorId, action, target, data: data ?? undefined } });
 }
 
-export async function queueEmail(to: string, subject: string, kind: "ALERT" | "TOUR" | "INVITE" | "VERIFY" | "LEAD", body = "") {
+export async function queueEmail(to: string, subject: string, kind: "ALERT" | "TOUR" | "INVITE" | "VERIFY" | "LEAD" | "RESET", body = "") {
   // Every email is recorded in email_outbox (visible in /alerts → "Enviados" and the platform console);
   // real delivery happens through Resend when configured (src/server/email.ts).
   const row = await prisma.emailOutbox.create({ data: { to, subject, kind, body, status: "QUEUED" } });

@@ -23,7 +23,7 @@ const GOOGLE = process.env.NEXT_PUBLIC_GOOGLE_AUTH === "true";
 const ROLE_LABEL: Record<string, [string, string]> = { AGENT: ["agente", "an agent"], CAPTOR: ["captador", "a listings scout"], PHOTOGRAPHER: ["fotógrafo", "a photographer"], BACKOFFICE: ["backoffice", "backoffice"] };
 
 /** Landing page after sign-in, by role. */
-function homeFor(role: string) {
+export function homeFor(role: string) {
   if (role === "SUPERADMIN") return "/platform";
   if (["AGENCY_OWNER", "AGENT", "BACKOFFICE", "CAPTOR", "PHOTOGRAPHER"].includes(role)) return "/agency";
   if (role === "OWNER_PRIVATE") return "/owner/listings";
@@ -154,6 +154,9 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
             </div>
           )}
           <p className={cn("mt-3 text-[16px]", k.muted)}>{lead}</p>
+          {mode === "login" && sp.get("reset") === "1" && (
+            <div className={cn(k.okBox, "mt-5")} role="status">{tx(locale, "Listo, tu contraseña cambió. Entra con la nueva.", "Done, your password changed. Sign in with the new one.")}</div>
+          )}
           {/* Google sign-in only when it is configured: no disabled button with a developer tooltip for visitors. */}
           {GOOGLE ? (
             <>
@@ -180,6 +183,11 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
                 <button type="button" onClick={() => setShow(!show)} className="absolute right-1 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center text-muted" aria-label={tx(locale, "Mostrar contraseña", "Show password")}>{show ? <EyeOff size={18} /> : <Eye size={18} />}</button>
               </div>
             </Field>
+            {mode === "login" && (
+              <div className="-mt-1 text-right">
+                <Link className={cn(k.link, "text-[14px]")} href={`/${locale}/forgot-password`}>{tx(locale, "¿Olvidaste tu contraseña?", "Forgot your password?")}</Link>
+              </div>
+            )}
             {mode === "register" && !inv && (
               <label className={cn("flex cursor-pointer items-start gap-3 rounded-[18px] p-4", agency ? "bg-[#E6DDD2] shadow-[inset_0_0_0_2px_#1E1A18]" : "bg-white shadow-[inset_0_0_0_1px_#D8CBB7]")}>
                 <input type="checkbox" checked={agency} onChange={(e) => setAgency(e.target.checked)} className="mt-1 h-4 w-4 accent-navy" />

@@ -130,6 +130,8 @@ enum EmailKind {
   INVITE
   VERIFY
   LEAD
+  /// "¿Olvidaste tu contraseña?" link (single-use, 30 min)
+  RESET
 }
 
 enum EmailStatus {
@@ -180,6 +182,7 @@ model User {
   mandatesAgent Mandate[]       @relation("MandateAgent")
   audit         AuditLog[]
   commissions   CommissionEntry[]
+  passwordResets PasswordResetToken[]
 }
 
 model Account {
@@ -208,6 +211,20 @@ model Session {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+}
+
+/// Password recovery: only the SHA-256 of the emailed token is stored; single use (usedAt), 30-minute expiry.
+/// A new request deletes the user's earlier tokens, so only the latest link works.
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model VerificationToken {

@@ -592,11 +592,12 @@ function LiteTower({ step, picks, cta }: { step: number; picks: FloorPick[]; cta
   const roof = step >= 2;
   const lit = step >= 3;
   return (
-    <div className={cn("np-tower", styles.tower, "relative mx-auto h-[220px] w-full max-w-[520px] md:h-[500px]")} data-step={step}>
+    <div className={cn("np-tower", styles.tower, "relative mx-auto h-[290px] w-full max-w-[520px] md:h-[540px]")} data-step={step}>
       <div className={styles.sky} aria-hidden />
       <div className="np-tower-grid" aria-hidden />
       <div className="np-tower-halo" data-on={lit ? "1" : "0"} aria-hidden />
-      <div className="absolute inset-y-0 left-[9%] w-[var(--fw)] md:left-[12%]">
+      {/* Centred in its column while it rises; in the last chapter it glides left to make room for the lit floors' labels. */}
+      <div className={cn("np-tower-body absolute inset-y-0 w-[var(--fw)]", styles.body)}>
         <span className="np-tower-podium" aria-hidden />
         {Array.from({ length: FLOORS }, (_, i) => (
           <span

@@ -532,7 +532,8 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
           <div className="np-in space-y-5">
             <h1 className="font-serif text-[36px] font-medium leading-[1.05] md:text-[44px]">{tx(locale, "¿Dónde está?", "Where is it?")}</h1>
             <div data-wiz="addr" className="space-y-3">
-              <PlacesSearch locale={locale} zones={zones} value={d.addr} onPick={(p) => set({ addr: p })} />
+              <PlacesSearch locale={locale} zones={zones} value={d.addr} onPick={(p) => set({ addr: p })} describedBy="wizard-addr-help" />
+              <p id="wizard-addr-help" className="-mt-1 text-sm text-muted dark:text-mist">{tx(locale, "Escribe la calle y el edificio (o el nombre de la casa) y elige la urbanización en la lista.", "Type the street and building (or the house name), then pick the neighborhood from the list.")}</p>
               {streetErr && <p role="alert" id="wizard-street-error" className="-mt-1 text-sm text-danger" data-testid="street-error">{streetErr}</p>}
               {tried && !d.addr && <p role="alert" id="wizard-street-error" className="-mt-1 text-sm font-semibold text-danger">{tx(locale, "Falta la dirección: escríbela y elige una opción.", "Address missing: type it and pick an option.")}</p>}
             </div>
@@ -801,12 +802,22 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
             </ul>
           </div>
         )}
-        <div className="mt-8 flex items-center justify-between border-t border-line pt-5">
-          <Button variant="ghost" onClick={() => setStep(Math.max(0, step - 1))} disabled={step === 0}><ArrowLeft size={16} /> {tx(locale, "Atrás", "Back")}</Button>
+        {/* Phones: Atrás / Continuar stay pinned to the bottom (safe-area aware) so the next step is always one tap away.
+            In the agency panel it sits above the section bar (57 px + safe area) below lg. */}
+        <div
+          data-wizard-nav
+          data-hide-fab-mobile
+          className={cn(
+            "mt-8 flex items-center justify-between gap-3 border-t border-line pt-5",
+            "max-md:sticky max-md:z-30 max-md:-mx-4 max-md:mt-6 max-md:bg-ivory/95 max-md:px-4 max-md:pb-[calc(12px+env(safe-area-inset-bottom))] max-md:pt-3 max-md:shadow-[0_-10px_24px_rgba(30,26,24,.08)] max-md:backdrop-blur dark:max-md:bg-[#15120F]/95",
+            staff ? "max-lg:sticky max-lg:bottom-[calc(57px+env(safe-area-inset-bottom))] max-md:pb-3" : "max-md:bottom-0",
+          )}
+        >
+          <Button variant="ghost" onClick={() => setStep(Math.max(0, step - 1))} disabled={step === 0} aria-hidden={step === 0 || undefined} tabIndex={step === 0 ? -1 : undefined} className={cn(step === 0 && "invisible")}><ArrowLeft size={16} /> {tx(locale, "Atrás", "Back")}</Button>
           {step < 5 ? (
             <Button onClick={next} aria-describedby={blocked.length ? "wizard-blocked" : undefined}>{tx(locale, "Continuar", "Continue")} <ArrowRight size={16} /></Button>
           ) : (
-            <Button size="lg" onClick={publish} disabled={!!busy || !confirm || !d.addr}>
+            <Button size="lg" onClick={publish} disabled={!!busy || !confirm || !d.addr} className="disabled:text-[#5E5650] dark:disabled:bg-white/10 dark:disabled:text-[#CFC4B8]">
               {busy && <Loader2 size={16} className="animate-spin" />}
               {busy === "photos" ? tx(locale, "Subiendo fotos…", "Uploading photos…") : d.mode === "MANDATE" ? tx(locale, "Enviar encargo", "Send request") : tx(locale, "Publicar ahora", "Publish now")}
             </Button>

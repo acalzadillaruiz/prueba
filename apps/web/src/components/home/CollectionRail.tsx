@@ -36,7 +36,8 @@ export function CollectionRail({ eyebrow, title, items, more }: { eyebrow: strin
       const photos = Array.from(tr.querySelectorAll<HTMLElement>("[data-drift]"));
       off = scrubSection(el, (p) => {
         tr.style.transform = `translate3d(${-travel() * p}px,0,0)`;
-        photos.forEach((ph, i) => (ph.style.transform = `translate3d(${(p * items.length - i) * -6}%,0,0) scale(1.18)`));
+        // Drift clamped to ±8 % inside a 1.25× photo (12.5 % spare per side): the arch never shows its beige backing.
+        photos.forEach((ph, i) => (ph.style.transform = `translate3d(${Math.max(-8, Math.min(8, (p * items.length - i) * -6))}%,0,0) scale(1.25)`));
         if (counter.current) counter.current.textContent = String(Math.min(items.length, 1 + Math.floor(p * items.length * 0.999))).padStart(2, "0");
         if (bar.current) bar.current.style.transform = `scaleX(${Math.max(0.04, p)})`;
       });
@@ -77,7 +78,7 @@ export function CollectionRail({ eyebrow, title, items, more }: { eyebrow: strin
             <Link key={it.href} href={it.href} data-spotlight className="group relative w-[78vw] shrink-0 snap-start overflow-hidden rounded-[32px] bg-arena sm:w-[46vw] md:w-[34vw] lg:w-[28vw] xl:w-[420px]">
               <span className="relative block aspect-[4/5] overflow-hidden">
                 {it.photo && (
-                  <span data-drift className="absolute inset-0 block scale-[1.18] will-change-transform">
+                  <span data-drift className="absolute inset-0 block scale-[1.25] will-change-transform">
                     <Image src={it.photo} alt="" fill sizes="(max-width: 768px) 78vw, 420px" className="object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.06]" />
                   </span>
                 )}

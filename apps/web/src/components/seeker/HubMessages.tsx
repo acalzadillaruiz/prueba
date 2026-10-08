@@ -96,7 +96,10 @@ export function HubMessages({
   useEffect(() => {
     if (!openId || openUnread === 0) return;
     qc.setQueryData<{ threads: HubThread[] }>(["hub-threads"], (d) => (d ? { threads: d.threads.map((x) => (x.id === openId ? { ...x, unread: 0 } : x)) } : d));
-    api(`threads/${openId}/read`, { method: "POST" }).catch(() => undefined);
+    // The tab bar's / drawer's unread badge (shared "threads/drawer" cache) follows once the server has it.
+    api(`threads/${openId}/read`, { method: "POST" })
+      .then(() => qc.invalidateQueries({ queryKey: ["threads", "drawer"] }))
+      .catch(() => undefined);
   }, [openId, openUnread, qc]);
 
   useEffect(() => {

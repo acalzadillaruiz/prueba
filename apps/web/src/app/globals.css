@@ -274,10 +274,10 @@ h1 em, h2 em, h3 em, .np-hero-title em { font-style: normal; }
 }
 html.dark .np-public .np-glass { background: rgb(42 36 32 / .62); border-color: rgb(255 255 255 / .08); box-shadow: 0 20px 50px -18px rgb(0 0 0 / .6); }
 /* Navigation glass: chrome that floats over moving content (header pill, compact search, menus, toasts, trays) must
-   stay readable, so it is near-opaque Lino with the same blur. The lighter `.np-glass` above is for decorative chips
+   stay readable, so it is opaque Lino (.98: no ghost text behind the logo) with the same blur. The lighter `.np-glass` above is for decorative chips
    and cards sitting on photos. The compact search sets `--np-glass` inline, so it is pinned here too. */
-:root { --np-glass-nav: rgb(251 248 244 / .93); }
-html.dark { --np-glass-nav: rgb(36 31 27 / .94); }
+:root { --np-glass-nav: rgb(251 248 244 / .98); }
+html.dark { --np-glass-nav: rgb(36 31 27 / .98); }
 .np-glass-nav, [data-public-header] .np-glass, [data-sticky-search] .np-glass, [data-compare-tray] .np-glass {
   background: var(--np-glass-nav);
   -webkit-backdrop-filter: blur(22px) saturate(1.4);

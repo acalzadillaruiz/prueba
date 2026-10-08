@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { ArrowRight, Bell, CalendarCheck, Check, CircleDollarSign, FileCheck2, Heart, Loader2 } from "lucide-react";
 import type { PrequalInput } from "@newplace/config";
@@ -15,6 +16,7 @@ import { dateTime, money, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import { HubMessages, type HubThread } from "./HubMessages";
 import { HubOffers, type HubOffer } from "./HubOffers";
+import { HubSectionNav } from "./HubSectionNav";
 
 type HubTour = Tour & { agentName: string; agentHue: number };
 
@@ -83,6 +85,21 @@ export function HubView({ locale, data, emailOn = false }: { locale: Locale; dat
   const doneCount = steps.filter((s) => s.done).length;
   // Once every step is done the checklist has nothing left to say: visits and messages lead the page instead.
   const allDone = doneCount === steps.length;
+  // Unread count for the "Mensajes" chip: the same cache HubMessages polls (no extra requests from here).
+  const threadsQ = useQuery({ queryKey: ["hub-threads"], queryFn: () => api<{ threads: HubThread[] }>("threads"), initialData: { threads: data.threads }, staleTime: Infinity });
+  const unread = threadsQ.data.threads.reduce((n, t) => n + (t.unread ?? 0), 0);
+  // Section chips, in page order (every section below always renders on this page).
+  const sections = useMemo(
+    () => [
+      { id: "visitas", label: tx(locale, "Visitas", "Tours") },
+      { id: "mensajes", label: tx(locale, "Mensajes", "Messages"), badge: unread },
+      { id: "precalificacion", label: tx(locale, "Precalificación", "Pre-qualification") },
+      { id: "ofertas", label: tx(locale, "Ofertas", "Offers") },
+    ],
+    [locale, unread],
+  );
+  // Room for the header (when it is back) and the pinned chips above an anchored section.
+  const anchor = "scroll-mt-[150px]";
   return (
     <div className="mx-auto max-w-[1280px] px-4 py-10 md:px-6">
       <div className="flex flex-wrap items-center gap-4">
@@ -99,9 +116,11 @@ export function HubView({ locale, data, emailOn = false }: { locale: Locale; dat
         )}
       </div>
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-3">
+      <HubSectionNav locale={locale} sections={sections} />
+
+      <div className="mt-6 grid gap-6 lg:grid-cols-3">
         {/* tours: first thing on the page */}
-        <section id="visitas" className={cn("rounded-np border border-line bg-white", k.card, "scroll-mt-24 border-0 p-5", allDone ? "lg:col-span-3" : "lg:col-span-2")}>
+        <section id="visitas" className={cn("rounded-np border border-line bg-white", k.card, anchor, "border-0 p-5", allDone ? "lg:col-span-3" : "lg:col-span-2")}>
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 className="flex items-center gap-2 font-serif text-[24px] font-medium leading-tight"><CalendarCheck size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Tus visitas y solicitudes", "Your tours & requests")}</h2>
             {/* Only while an email provider is configured: otherwise reminders are never delivered. */}
@@ -143,7 +162,7 @@ export function HubView({ locale, data, emailOn = false }: { locale: Locale; dat
         </section>
 
         {/* messages */}
-        <HubMessages locale={locale} threads={data.threads} meId={user?.id ?? ""} listingById={listingById} />
+        <HubMessages locale={locale} threads={data.threads} meId={user?.id ?? ""} listingById={listingById} className={anchor} />
 
         {/* next steps: beside the visits on desktop, after visits and messages on phones; gone once all done */}
         {!allDone && (
@@ -164,7 +183,8 @@ export function HubView({ locale, data, emailOn = false }: { locale: Locale; dat
         )}
 
         {/* preapproval mock */}
-        <Card className={cn(k.card, "border-0 p-5")}>
+        <div id="precalificacion" className={anchor}>
+        <Card className={cn(k.card, "h-full border-0 p-5")}>
           <h2 className="flex items-center gap-2 font-serif text-[24px] font-medium leading-tight"><CircleDollarSign size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Precalificación orientativa", "Indicative pre-qualification")}</h2>
           <p className="mt-1 text-xs text-muted">{tx(locale, "Es solo una referencia: New Place no otorga créditos.", "Just a reference: New Place doesn’t provide loans.")}</p>
           <div className="mt-4 space-y-4 text-sm">
@@ -194,9 +214,10 @@ export function HubView({ locale, data, emailOn = false }: { locale: Locale; dat
             </div>
           )}
         </Card>
+        </div>
 
         {/* offers */}
-        <HubOffers locale={locale} offers={data.offers} offerable={data.offerable} listingById={listingById} onChange={setOfferCount} />
+        <HubOffers id="ofertas" className={anchor} locale={locale} offers={data.offers} offerable={data.offerable} listingById={listingById} onChange={setOfferCount} />
 
         {/* saved + alerts */}
         <div className="space-y-6">

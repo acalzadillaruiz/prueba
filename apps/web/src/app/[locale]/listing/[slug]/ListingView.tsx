@@ -42,9 +42,14 @@ export function amenitiesBeyondEssentials(l: Pick<Listing, "amenities" | "powerB
   return l.amenities.filter((a) => !shown.has(a));
 }
 
-/** "Servicios esenciales": backup power, water and dock/views — only values the listing actually declares. */
+/** Views are a feature of the home, not a utility: they go with the amenities, never under "Servicios esenciales". */
+const VIEW_KEYS = new Set(["avila", "sea"]);
+const essentialServices = (l: Listing, locale: Locale) => essentialLabels(l, locale).filter((x) => !VIEW_KEYS.has(x.key));
+const viewFeatures = (l: Listing, locale: Locale) => essentialLabels(l, locale).filter((x) => VIEW_KEYS.has(x.key));
+
+/** "Servicios esenciales": backup power, water and dock — only values the listing actually declares. */
 function Essentials({ l, locale, title }: { l: Listing; locale: Locale; title: React.ReactNode }) {
-  const items = essentialLabels(l, locale);
+  const items = essentialServices(l, locale);
   if (!items.length) return null;
   return (
     <div className="border-t border-line py-10" data-testid="essentials">
@@ -117,6 +122,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
   const H = ({ children }: { children: React.ReactNode }) => <h3 className="mb-5 font-serif text-[28px] leading-tight">{children}</h3>;
   const sec = "border-t border-line py-10";
   const amenities = amenitiesBeyondEssentials(l);
+  const views = viewFeatures(l, locale);
   const tile = "rounded-[20px] bg-white/70 ring-1 ring-black/[.04] px-4 py-3 text-[15px]";
   const searchType = l.listingType.startsWith("COMMERCIAL") ? "COMMERCIAL" : l.listingType;
 
@@ -201,10 +207,19 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
 
             <Essentials l={l} locale={locale} title={<H>{tx(locale, "Servicios esenciales", "Essential services")}</H>} />
 
-            {(amenities.length > 0 || l.commercial || l.shortRent) && (
+            {(amenities.length > 0 || views.length > 0 || l.commercial || l.shortRent) && (
             <div className={sec} data-testid="amenities">
-              <H>{tx(locale, "Amenidades", "Amenities")}</H>
+              <H>{views.length ? tx(locale, "Vistas y amenidades", "Views and amenities") : tx(locale, "Amenidades", "Amenities")}</H>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                {views.map(({ key, label }) => {
+                  const Icon = ESSENTIAL_ICON[key];
+                  return (
+                    <div key={key} className={cn(tile, "flex items-center gap-2 font-semibold")} data-testid={`view-${key}`}>
+                      <Icon size={17} strokeWidth={1.7} className="shrink-0 text-navy" aria-hidden />
+                      {label}
+                    </div>
+                  );
+                })}
                 {amenities.map((a) => (
                   <div key={a} className={cn(tile, "font-semibold")}>{lbl(AMENITY_LABEL[a], locale)}</div>
                 ))}

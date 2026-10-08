@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import type { Locale } from "@/types/domain";
 import { Logo } from "@/components/brand/Logo";
 import { FooterAccountLink } from "./FooterAccountLink";
+import { FooterPrefs } from "./FooterPrefs";
 
 export async function PublicFooter({ locale }: { locale: Locale }) {
   const t = await getTranslations({ locale, namespace: "footer" });
@@ -20,7 +21,7 @@ export async function PublicFooter({ locale }: { locale: Locale }) {
     </div>
   );
   return (
-    <footer className="np-grain relative mt-24 overflow-hidden rounded-t-[40px] bg-[#E9E0D3] text-ink">
+    <footer className="np-grain relative mt-16 overflow-hidden md:mt-24 rounded-t-[40px] bg-[#E9E0D3] text-ink">
       <div className="relative mx-auto flex max-w-[1320px] flex-wrap items-end justify-between gap-6 border-b border-ink/10 px-4 pb-12 pt-16 md:px-8 md:pt-20">
         <p className="max-w-[720px] font-serif text-[40px] leading-[1.04] tracking-[-0.02em] md:text-[64px]">
           {locale === "es" ? "Cuando quieras," : "Whenever you're ready,"} <span className="text-ink/45">{locale === "es" ? "aquí estamos." : "we're here."}</span>
@@ -46,9 +47,10 @@ export async function PublicFooter({ locale }: { locale: Locale }) {
         {col(t("agencies"), [[t("forAgencies"), `/${locale}/register`]], <FooterAccountLink locale={locale} signIn={nav("signIn")} className={linkCls} />)}
       </div>
       <div className="relative border-t border-ink/10">
-        <div className="mx-auto flex max-w-[1320px] flex-wrap items-center justify-between gap-2 px-4 py-5 text-sm text-ink/55 md:px-8">
+        {/* TODO(legal): Privacidad · Términos · Cookies links go here once the client provides and approves the texts. */}
+        <div className="mx-auto flex max-w-[1320px] flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 py-5 text-sm text-ink/55 md:px-8">
           <span>© {new Date().getFullYear()} New Place · {t("legal")}</span>
-          <span>{t("listedOn")}</span>
+          <FooterPrefs locale={locale} />
         </div>
       </div>
     </footer>

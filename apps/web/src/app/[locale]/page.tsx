@@ -128,7 +128,7 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
       />
 
       {/* EXPLORE EN EL MAPA */}
-      <section id="explorar" className="mx-auto max-w-[1320px] px-4 pt-24 md:px-8 lg:pt-32">
+      <section id="explorar" className="mx-auto max-w-[1320px] px-4 pt-6 md:px-8 md:pt-20 lg:pt-24">
         <div data-reveal className="mb-8 grid items-end gap-4 md:grid-cols-[1fr_auto] lg:mb-10">
           <div><p className="np-kicker text-gold-text">{tx(locale, "El mapa", "The map")}</p><h2 className="mt-3 text-[36px] leading-[1.05] tracking-[-0.02em] md:text-[52px]">{tx(locale, "Elige primero el lugar.", "Choose the place first.")}</h2></div>
           <p className="max-w-[380px] text-[15px] leading-relaxed text-muted md:text-right">
@@ -136,7 +136,8 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
           </p>
         </div>
         <div className="grid gap-6 lg:grid-cols-[1.55fr_1fr]">
-          <HomeMap listings={pins} locale={locale} focus={{ lat: 10.62, lng: -65.45 }} initialScale={2.9} />
+          {/* Framed on the coast from Los Roques / Caracas to Margarita, with room for the edge clusters and price pills. */}
+          <HomeMap listings={pins} locale={locale} focus={{ lat: 10.95, lng: -65.45 }} initialScale={2.9} phoneScale={2.15} />
           <div className="flex flex-col gap-3">
             {/* One metric per list: the sale zones show the price per m²; zones that today only have rentals (Lechería:
                 vacation homes) go in their own small group, with their "from" price per night / month. */}
@@ -204,12 +205,12 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
 
       {/* THE BUILDING — how we work. Plays by itself when it comes into view (pause / step bars, no scroll pinning):
           3D on capable desktops, a light CSS tower on phones and modest devices, a plain list under reduced motion. */}
-      <div className="mt-24 lg:mt-32">
+      <div className="mt-14 lg:mt-24">
         <BuildingScroll locale={locale} chapters={chapters} picks={floors} heading={tx(locale, "Así trabajamos", "How we work")} cta={tx(locale, "Ver casa", "See home")} />
       </div>
 
       {/* COMPRA A DISTANCIA — the diaspora's routes draw in to Lechería as the steps light up. */}
-      <div className="pt-20 lg:pt-28">
+      <div className="lg:pt-8">
         <RemoteRoute
           eyebrow={tx(locale, "Si vives fuera", "If you live abroad")}
           title={tx(locale, "Tu casa en Venezuela, sin subirte a un avión.", "Your home in Venezuela, without boarding a plane.")}
@@ -222,7 +223,7 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
       </div>
 
       {/* VENDA EN PRIVADO */}
-      <section className="np-grain relative mx-3 mt-24 overflow-hidden rounded-[40px] bg-[#E9E0D3] md:mx-6 lg:mt-32">
+      <section className="np-grain relative mx-3 mt-2 overflow-hidden rounded-[40px] bg-[#E9E0D3] md:mx-6 lg:mt-16">
         <div className="relative mx-auto grid max-w-[1320px] items-center gap-10 px-5 pt-16 md:px-10 lg:grid-cols-2 lg:gap-16 lg:pt-12">
           <div data-reveal className="pb-4 lg:pb-12">
             <p className="np-kicker text-gold-text">{tx(locale, "Si vas a vender", "If you\u2019re selling")}</p>

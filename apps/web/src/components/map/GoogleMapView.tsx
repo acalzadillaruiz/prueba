@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { APIProvider, InfoWindow, Map, useMap } from "@vis.gl/react-google-maps";
 import { MarkerClusterer } from "@googlemaps/markerclusterer";
-import { Minus, Moon, Plus, Sun } from "lucide-react";
+import { Minus, Moon, Plus, Search, Sun } from "lucide-react";
 import type { Listing } from "@/types/domain";
 import type { LatLng } from "@/lib/geo";
 import { compactMoney, tx } from "@/lib/i18n";
@@ -113,7 +113,7 @@ function Layers({ props, theme, mode, setMode, draft, setDraft }: { props: MapVi
   const sel = listings.find((l) => l.id === selectedId);
   return sel && props.renderPreview ? (
     <InfoWindow position={{ lat: sel.lat, lng: sel.lng }} pixelOffset={[0, -36]} onCloseClick={() => onSelect?.(null)} headerDisabled>
-      <div className="w-60">{props.renderPreview(sel)}</div>
+      <div className="w-60">{props.renderPreview(sel, "card")}</div>
     </InfoWindow>
   ) : null;
 }
@@ -140,6 +140,7 @@ export function GoogleMapView(props: MapViewProps) {
         >
           <Layers props={props} theme={theme} mode={mode} setMode={setMode} draft={draft} setDraft={setDraft} />
           <ZoomButtons className={ctl} />
+          {props.onArea && controls && <SearchArea locale={locale} onArea={props.onArea} />}
         </Map>
       </APIProvider>
       {controls && (
@@ -171,6 +172,38 @@ export function GoogleMapView(props: MapViewProps) {
         </>
       )}
     </div>
+  );
+}
+
+/** "Buscar en esta zona" after the visitor drags or zooms: the visible bounds as [south, west, north, east]. */
+function SearchArea({ locale, onArea }: { locale: MapViewProps["locale"]; onArea: NonNullable<MapViewProps["onArea"]> }) {
+  const map = useMap();
+  const [moved, setMoved] = useState(false);
+  useEffect(() => {
+    if (!map) return;
+    const on = () => setMoved(true);
+    const drag = map.addListener("dragend", on);
+    const div = map.getDiv();
+    div.addEventListener("wheel", on, { passive: true });
+    return () => {
+      drag.remove();
+      div.removeEventListener("wheel", on);
+    };
+  }, [map]);
+  if (!moved) return null;
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        const b = map?.getBounds();
+        if (!b) return;
+        setMoved(false);
+        onArea([b.getSouthWest().lat(), b.getSouthWest().lng(), b.getNorthEast().lat(), b.getNorthEast().lng()]);
+      }}
+      className="absolute left-1/2 top-[66px] z-10 flex min-h-11 -translate-x-1/2 items-center gap-2 whitespace-nowrap rounded-full bg-[#1E1A18] px-4 font-display text-sm font-semibold text-[#F1EBE3] shadow-np"
+    >
+      <Search size={15} aria-hidden /> {tx(locale, "Buscar en esta zona", "Search this area")}
+    </button>
   );
 }
 

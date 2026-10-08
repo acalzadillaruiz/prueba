@@ -153,13 +153,29 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
 
   return (
     <AdminShell locale={locale} area="agency" title={tx(locale, "Inmuebles", "Listings")} actions={user?.role !== "PHOTOGRAPHER" && user?.role !== "CAPTOR" ? <Button className={k.primary} href={`/${locale}/agency/listings/new`}><Plus size={16} /> {tx(locale, "Nuevo inmueble", "New listing")}</Button> : undefined}>
-      <div className="mb-5 flex flex-wrap items-center gap-2">
-        {tabs.map(([key, t]) => (
-          <button key={key} onClick={() => setStatus(key)} aria-pressed={status === key} className={tab(status === key)}>
-            {t} {key === "REVIEW" && <Count>{reviewCount}</Count>}
-          </button>
-        ))}
-        <label className="relative ml-auto w-full sm:w-72">
+      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2">
+        {/* Phones: one horizontally scrolling row (snap + faded edges) instead of 10 chips wrapping onto 4 rows. */}
+        <div
+          role="group"
+          aria-label={tx(locale, "Filtrar por estado", "Filter by status")}
+          data-testid="status-chips"
+          className="-mx-4 flex snap-x snap-mandatory scroll-px-4 gap-2 overflow-x-auto px-4 py-0.5 [mask-image:linear-gradient(to_right,transparent,#000_14px,#000_calc(100%-28px),transparent)] [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:[mask-image:none] [&::-webkit-scrollbar]:hidden"
+        >
+          {tabs.map(([key, t]) => (
+            <button
+              key={key}
+              onClick={(e) => {
+                setStatus(key);
+                e.currentTarget.scrollIntoView({ block: "nearest", inline: "nearest" });
+              }}
+              aria-pressed={status === key}
+              className={cn(tab(status === key), "shrink-0 snap-start whitespace-nowrap max-sm:min-h-10")}
+            >
+              {t} {key === "REVIEW" && <Count>{reviewCount}</Count>}
+            </button>
+          ))}
+        </div>
+        <label className="relative w-full sm:ml-auto sm:w-72">
           <Filter size={14} className={cn("absolute left-3.5 top-1/2 -translate-y-1/2", k.muted)} aria-hidden />
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={tx(locale, "Buscar título, zona, agente…", "Search title, area, agent…")} aria-label={tx(locale, "Buscar inmuebles", "Search listings")} className={cn(k.input, "rounded-full pl-10")} />
         </label>
@@ -347,14 +363,14 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
               </select>
             )}
             {manager && (
-              <Button size="sm" variant="navy" className={cn(k.navy, "min-h-10")} disabled={bulk?.running || !approvable.length} onClick={() => runBulk(tx(locale, "Aprobar", "Approve"), approvable, (l) => api(`listings/${l.id}`, { method: "PATCH", json: { review: "APPROVED" } }))} title={tx(locale, "Solo las que están en revisión", "Only those in review")}>
+              <Button size="sm" variant="navy" className={cn(k.navy, "min-h-10", DISABLED)} disabled={bulk?.running || !approvable.length} onClick={() => runBulk(tx(locale, "Aprobar", "Approve"), approvable, (l) => api(`listings/${l.id}`, { method: "PATCH", json: { review: "APPROVED" } }))} title={tx(locale, "Solo las que están en revisión", "Only those in review")}>
                 <CheckCircle2 size={14} /> {tx(locale, `Aprobar (${approvable.length})`, `Approve (${approvable.length})`)}
               </Button>
             )}
-            <Button size="sm" variant="outline" className={cn(k.outline, "min-h-10")} disabled={bulk?.running || !pausable.length} onClick={() => runBulk(tx(locale, "Pausar", "Pause"), pausable, (l) => api(`listings/${l.id}`, { method: "PATCH", json: { status: "WITHDRAWN" } }))} title={tx(locale, "Oculta del portal las publicadas; puedes reactivarlas", "Hides published listings; you can reactivate them")}>
+            <Button size="sm" variant="outline" className={cn(k.outline, "min-h-10", DISABLED)} disabled={bulk?.running || !pausable.length} onClick={() => runBulk(tx(locale, "Pausar", "Pause"), pausable, (l) => api(`listings/${l.id}`, { method: "PATCH", json: { status: "WITHDRAWN" } }))} title={tx(locale, "Oculta del portal las publicadas; puedes reactivarlas", "Hides published listings; you can reactivate them")}>
               <Pause size={14} /> {tx(locale, `Pausar (${pausable.length})`, `Pause (${pausable.length})`)}
             </Button>
-            <Button size="sm" variant="outline" className={cn(k.outline, "min-h-10")} disabled={bulk?.running || !activable.length} onClick={() => runBulk(tx(locale, "Activar", "Activate"), activable, (l) => api(`listings/${l.id}`, { method: "PATCH", json: { status: "ACTIVE" } }))} title={tx(locale, "Vuelve a publicar las pausadas", "Publishes paused listings again")}>
+            <Button size="sm" variant="outline" className={cn(k.outline, "min-h-10", DISABLED)} disabled={bulk?.running || !activable.length} onClick={() => runBulk(tx(locale, "Activar", "Activate"), activable, (l) => api(`listings/${l.id}`, { method: "PATCH", json: { status: "ACTIVE" } }))} title={tx(locale, "Vuelve a publicar las pausadas", "Publishes paused listings again")}>
               <Play size={14} /> {tx(locale, `Activar (${activable.length})`, `Activate (${activable.length})`)}
             </Button>
             <Button size="sm" variant="ghost" className={cn(k.ghost, "ml-auto min-h-10")} disabled={bulk?.running} onClick={() => setPicked(new Set())}><X size={14} /> {tx(locale, "Quitar selección", "Clear selection")}</Button>
@@ -371,6 +387,9 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
 }
 
 /** Header / phone "select all visible" checkbox with the indeterminate state when only some rows are picked. */
+/** Disabled bulk actions still say what they are: legible text on the disabled fill (≥ 4.5:1, ≥ 3:1 in dark). */
+const DISABLED = "disabled:border-transparent disabled:bg-[#E3DDD3] disabled:text-[#5E5650] dark:disabled:bg-white/10 dark:disabled:text-[#CFC4B8]";
+
 function SelectAll({ checked, indeterminate, onChange, label, className, disabled }: { checked: boolean; indeterminate: boolean; onChange: () => void; label: string; className?: string; disabled?: boolean }) {
   const ref = useRef<HTMLInputElement>(null);
   useEffect(() => {

@@ -9,23 +9,8 @@ import { money, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import { usePlaceSuggest } from "./PlaceSuggest";
 
-export function queryToParams(q: ReturnType<typeof heuristicSearchParse>, raw: string) {
-  const p = new URLSearchParams();
-  if (q.listingType) p.set("type", q.listingType);
-  if (q.zone) p.set("zone", q.zone);
-  if (q.minPrice) p.set("min", String(q.minPrice));
-  if (q.maxPrice) p.set("max", String(q.maxPrice));
-  if (q.minBeds) p.set("beds", String(q.minBeds));
-  if (q.luxury) p.set("lux", "1");
-  if (q.propertyKind) p.set("kind", q.propertyKind);
-  // "con piscina / terraza / vista" → amenity filters; "acepta mascotas" → pets
-  const am = q.keywords.filter((k) => ["pool", "terrace", "view"].includes(k));
-  if (am.length) p.set("am", am.join(","));
-  if (q.keywords.includes("pets")) p.set("pets", "1");
-  if (q.keywords.includes("sea")) p.set("sea", "1");
-  if (raw.trim()) p.set("q", raw.trim());
-  return p;
-}
+export { queryToParams } from "./queryParams";
+import { queryToParams } from "./queryParams";
 
 const TABS = [
   ["SALE", "Comprar", "Buy"],

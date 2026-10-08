@@ -104,9 +104,9 @@ export function HeroAura({
                   <ShieldCheck size={13} aria-hidden /> {tx(locale, "Precio verificado", "Verified price")}
                 </span>
                 <span className="mt-0.5 block truncate font-display text-[14px] font-semibold text-ink">{featured.title}</span>
-                <span className="block truncate font-display text-[13px] text-ink/60">
-                  {featured.zone} · {featured.price}
-                </span>
+                <span className="block truncate font-display text-[12.5px] text-ink/60">{featured.zone}</span>
+                {/* The price gets its own line and is never cut ("USD 890.…" read as a different number). */}
+                <span className="mt-0.5 block whitespace-nowrap font-display text-[15px] font-semibold text-ink [font-feature-settings:'lnum']">{featured.price}</span>
               </span>
               <ArrowUpRight size={18} aria-hidden className="shrink-0 text-ink/50 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-ink" />
             </Link>

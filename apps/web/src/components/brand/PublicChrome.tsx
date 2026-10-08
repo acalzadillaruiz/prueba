@@ -294,6 +294,22 @@ export function roleHome(role: string | undefined) {
 }
 
 /**
+ * Unread messages of a signed-in seeker (sum over their threads). Shared cache with the header drawer's "Tu espacio"
+ * block. Light on purpose: no polling, it refreshes on mount (when older than 30 s) and when the tab becomes visible
+ * again (React Query's focus/visibility refetch).
+ */
+export function useUnreadMessages(enabled: boolean, opts: { refetchOnWindowFocus?: boolean } = {}) {
+  const q = useQuery({
+    queryKey: ["threads", "drawer"],
+    queryFn: () => api<{ threads: { unread?: number }[] }>("threads"),
+    enabled,
+    staleTime: 30_000,
+    refetchOnWindowFocus: opts.refetchOnWindowFocus ?? false,
+  });
+  return enabled ? (q.data?.threads ?? []).reduce((n, th) => n + (th.unread ?? 0), 0) : 0;
+}
+
+/**
  * Phones: bottom tab bar (Inicio · Buscar · Guardados · Cuenta). The active item carries the roof glyph. "Buscar" opens
  * the search (list first; its own floating toggle switches to the map). "Cuenta" opens the user's own space when signed
  * in (seekers: /app "Tu espacio"), the sign-in page otherwise.
@@ -302,7 +318,9 @@ export function MobileTabBar({ locale }: { locale: Locale }) {
   const pathname = usePathname();
   const { saved, user } = useApp();
   const t = msg(locale, "nav");
-  const items = [
+  const seeker = !!user && roleHome(user.role) === "/app";
+  const unread = useUnreadMessages(seeker, { refetchOnWindowFocus: true });
+  const items: { href: string; label: string; Icon: typeof Home; active: boolean; badge?: number; badgeLabel?: string }[] = [
     { href: `/${locale}`, label: t("home"), Icon: Home, active: pathname === `/${locale}` },
     { href: `/${locale}/search?type=SALE`, label: tx(locale, "Buscar", "Search"), Icon: Search, active: pathname.endsWith("/search") },
     { href: `/${locale}/saved`, label: t("saved"), Icon: Heart, active: pathname.endsWith("/saved"), badge: saved.length },
@@ -311,6 +329,8 @@ export function MobileTabBar({ locale }: { locale: Locale }) {
       label: t("account"),
       Icon: User,
       active: /^\/(es|en)\/(app|account|alerts|login|register|owner\/listings)(\/|$)/.test(pathname),
+      badge: unread,
+      badgeLabel: tx(locale, unread === 1 ? "mensaje sin leer" : "mensajes sin leer", unread === 1 ? "unread message" : "unread messages"),
     },
   ];
   return (
@@ -321,13 +341,18 @@ export function MobileTabBar({ locale }: { locale: Locale }) {
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <ul className="grid grid-cols-4">
-        {items.map(({ href, label, Icon, active, badge }) => (
+        {items.map(({ href, label, Icon, active, badge, badgeLabel }) => (
           <li key={label}>
             <Link href={href} aria-current={active ? "page" : undefined} className={cn("relative flex h-16 flex-col items-center justify-center gap-1 font-display text-[13px]", active ? "text-ink" : "text-muted")}>
               {active && <RoofGlyph className="absolute top-1.5 h-[6px] w-[18px]" />}
               <span className="relative">
                 <Icon size={21} strokeWidth={1.6} aria-hidden />
-                {!!badge && <span className="absolute -right-2.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-navy px-1 text-[10px] font-bold text-ivory">{badge}</span>}
+                {!!badge && (
+                  <span className={cn("absolute -right-2.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-bold", badgeLabel ? "bg-coral-cta text-white" : "bg-navy text-ivory")}>
+                    {badge}
+                    {badgeLabel && <span className="sr-only"> {badgeLabel}</span>}
+                  </span>
+                )}
               </span>
               {label}
             </Link>

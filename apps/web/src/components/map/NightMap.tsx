@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
-import { Minus, Moon, Plus, Sun } from "lucide-react";
+import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { Minus, Moon, Plus, Search, Sun, X } from "lucide-react";
 import type { Listing, Locale } from "@/types/domain";
 import type { LatLng, Shape } from "@/lib/geo";
 import { compactMoney, plural, tx } from "@/lib/i18n";
@@ -81,7 +81,12 @@ export interface NightMapProps {
   onShape?: (s: Shape) => void;
   controls?: boolean;
   className?: string;
-  renderPreview?: (l: Listing) => ReactNode;
+  /** Preview of the selected pin: a floating "card" (md and up) or a compact "sheet" row (phones, swipeable). */
+  renderPreview?: (l: Listing, variant: "card" | "sheet") => ReactNode;
+  /** px kept clear at the bottom of the map (a docked bar over it): the phone sheet sits above it. */
+  previewInset?: number;
+  /** "Buscar en esta zona": shown once the visitor pans or zooms; gets the visible bounds [south, west, north, east]. */
+  onArea?: (bbox: [number, number, number, number]) => void;
   initialTheme?: Theme;
   initialScale?: number;
   focus?: LatLng;
@@ -126,6 +131,8 @@ export function NightMap({
   fitPadding = FIT_PADDING,
   fitMaxScale = 8,
   toolbar,
+  previewInset = 12,
+  onArea,
 }: NightMapProps) {
   const B = BOUNDS[region];
   const uid = useId().replace(/:/g, "");
@@ -157,6 +164,17 @@ export function NightMap({
   const [box, setBox] = useState({ w: 0, h: 0 });
   // Once the visitor pans or zooms, the map stops fitting itself to the results.
   const touched = useRef(false);
+  // Panned / zoomed since the last "Buscar en esta zona" (shows that button).
+  const [moved, setMoved] = useState(false);
+  // md and up: the preview floats next to the pin; phones: a bottom sheet.
+  const [wide, setWide] = useState(true);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)");
+    const on = () => setWide(mq.matches);
+    on();
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, []);
   const fitRef = useRef({ fitPoints, fitPadding, fitMaxScale });
   fitRef.current = { fitPoints, fitPadding, fitMaxScale };
   useEffect(() => {
@@ -199,7 +217,8 @@ export function NightMap({
 
   const toSvg = (e: React.PointerEvent | React.WheelEvent | React.MouseEvent) => {
     const r = svgRef.current!.getBoundingClientRect();
-    const scale = Math.max(B.W / r.width, B.H / r.height);
+    // "slice": svg units per CSS px is the smaller ratio (same k as the ResizeObserver above).
+    const scale = Math.min(B.W / r.width, B.H / r.height);
     const offX = (r.width * scale - B.W) / 2;
     const offY = (r.height * scale - B.H) / 2;
     return { x: (e.clientX - r.left) * scale - offX, y: (e.clientY - r.top) * scale - offY, k: scale };
@@ -207,6 +226,7 @@ export function NightMap({
 
   const zoom = (factor: number, cx = B.W / 2, cy = B.H / 2) => {
     touched.current = true;
+    setMoved(true);
     setView((v) => {
       const s = Math.max(0.9, Math.min(8, v.s * factor));
       const k = s / v.s;
@@ -227,6 +247,7 @@ export function NightMap({
     if (Math.abs(dx) + Math.abs(dy) > 4) {
       drag.current.moved = true;
       touched.current = true;
+      setMoved(true);
     }
     setView((v) => ({ ...v, x: drag.current!.vx + dx, y: drag.current!.vy + dy }));
   };
@@ -325,7 +346,73 @@ export function NightMap({
   const ctl = theme === "light" ? "border-[#E3D7C2] bg-[#ffffff] text-[#1E1A18]" : "border-white/10 bg-navy/90 text-ivory backdrop-blur";
   const ctlHover = theme === "light" ? "hover:bg-[#F3EEE5]" : "hover:bg-white/10";
   const ctlLine = theme === "light" ? "border-[#E3D7C2]" : "border-white/10";
-  const selPt = selected ? { x: P(selected.lat, selected.lng).x * view.s + view.x, y: P(selected.lat, selected.lng).y * view.s + view.y } : null;
+
+  // CSS px inside the map box ⇄ map coordinates (same "slice" geometry as the pins).
+  const toPx = useCallback(
+    (lat: number, lng: number) => {
+      const p = P(lat, lng);
+      return { x: (p.x * view.s + view.x) / k - (B.W / k - box.w) / 2, y: (p.y * view.s + view.y) / k - (B.H / k - box.h) / 2 };
+    },
+    [P, view, k, B, box],
+  );
+  const fromPx = (px: number, py: number) => unP((px * k + (B.W - box.w * k) / 2 - view.x) / view.s, (py * k + (B.H - box.h * k) / 2 - view.y) / view.s);
+  const searchHere = () => {
+    const nw = fromPx(0, 0);
+    const se = fromPx(box.w, box.h);
+    setMoved(false);
+    onSelect?.(null);
+    onArea?.([se.lat, nw.lng, nw.lat, se.lng]);
+  };
+
+  // md and up: the preview card floats by its pin, clamped to the visible map (never half off-screen). Above the pin
+  // when it fits, else below it.
+  const previewRef = useRef<HTMLDivElement>(null);
+  const [previewH, setPreviewH] = useState(290);
+  useLayoutEffect(() => {
+    const h = previewRef.current?.offsetHeight;
+    if (h && Math.abs(h - previewH) > 1) setPreviewH(h);
+  });
+  const CARD_W = 256;
+  const EDGE = 8;
+  const cardPos = (() => {
+    if (!selected || !wide || !box.w) return null;
+    const pt = toPx(selected.lat, selected.lng);
+    const left = Math.max(EDGE, Math.min(box.w - CARD_W - EDGE, pt.x - CARD_W / 2));
+    let top = pt.y - 46 - previewH - 6;
+    if (top < EDGE) top = pt.y + 10;
+    top = Math.max(EDGE, Math.min(box.h - previewInset - previewH, top));
+    return { left, top };
+  })();
+
+  // Phones: a bottom sheet over the docked bar, swipeable between the homes on screen (left → right, as on the map).
+  const sheetItems = useMemo(() => {
+    if (!selected || wide || !box.w) return [];
+    return listings
+      .map((l) => ({ l, ...toPx(l.lat, l.lng) }))
+      .filter((p) => p.l.id === selected.id || (p.x >= 0 && p.x <= box.w && p.y >= 0 && p.y <= box.h))
+      .sort((a, b) => a.x - b.x || a.l.id.localeCompare(b.l.id))
+      .slice(0, 40)
+      .map((p) => p.l);
+  }, [selected, wide, box, listings, toPx]);
+  const selIdx = sheetItems.findIndex((l) => l.id === selectedId);
+  const strip = useRef<HTMLDivElement>(null);
+  const SHEET_GAP = 12;
+  useLayoutEffect(() => {
+    const el = strip.current;
+    if (!el || selIdx < 0) return;
+    const w = el.clientWidth + SHEET_GAP;
+    if (Math.round(el.scrollLeft / w) !== selIdx) el.scrollTo({ left: selIdx * w, behavior: "instant" });
+  }, [selIdx, sheetItems.length]);
+  const swipeTimer = useRef<number | undefined>(undefined);
+  const onStripScroll = () => {
+    window.clearTimeout(swipeTimer.current);
+    swipeTimer.current = window.setTimeout(() => {
+      const el = strip.current;
+      if (!el) return;
+      const l = sheetItems[Math.round(el.scrollLeft / (el.clientWidth + SHEET_GAP))];
+      if (l && l.id !== selectedId) onSelect?.(l.id);
+    }, 90);
+  };
 
   const shapeEl =
     shape?.type === "poly" ? (
@@ -549,16 +636,52 @@ export function NightMap({
           </div>
         );
       })()}
-      {selected && selPt && renderPreview && (
-        <div
-          className="np-in pointer-events-auto absolute z-20 w-64 -translate-x-1/2"
-          style={{
-            left: `clamp(140px, ${(selPt.x / B.W) * 100}%, calc(100% - 140px))`,
-            top: `clamp(10px, calc(${(selPt.y / B.H) * 100}% - 300px), calc(100% - 300px))`,
-          }}
-        >
-          {renderPreview(selected)}
+      {selected && renderPreview && cardPos && (
+        <div ref={previewRef} data-map-preview className="np-in pointer-events-auto absolute z-20 w-64" style={{ left: cardPos.left, top: cardPos.top }}>
+          {renderPreview(selected, "card")}
+          <button
+            type="button"
+            onClick={() => onSelect?.(null)}
+            aria-label={tx(locale, "Cerrar vista previa", "Close preview")}
+            className="absolute left-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-[#ffffffe6] text-[#1E1A18] shadow-sm backdrop-blur"
+          >
+            <X size={16} aria-hidden />
+          </button>
         </div>
+      )}
+      {selected && renderPreview && sheetItems.length > 0 && (
+        <div data-map-sheet role="region" aria-label={tx(locale, "Casa seleccionada", "Selected home")} className="np-in pointer-events-auto absolute inset-x-0 z-20 px-3" style={{ bottom: previewInset }}>
+          <div className="np-glass rounded-[26px] p-1.5 shadow-np">
+            <div className="flex min-h-11 items-center justify-between gap-2 pl-3">
+              <p className="text-[13px] text-muted [font-feature-settings:'lnum']" aria-live="polite">
+                {sheetItems.length > 1 && selIdx >= 0 ? tx(locale, `${selIdx + 1} de ${sheetItems.length} en el mapa · desliza para ver más`, `${selIdx + 1} of ${sheetItems.length} on the map · swipe for more`) : ""}
+              </p>
+              <button type="button" onClick={() => onSelect?.(null)} aria-label={tx(locale, "Cerrar vista previa", "Close preview")} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-ink hover:bg-ink/5">
+                <X size={18} aria-hidden />
+              </button>
+            </div>
+            <div ref={strip} onScroll={onStripScroll} className="no-scrollbar flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain" style={{ gap: SHEET_GAP }}>
+              {sheetItems.map((l, i) => (
+                <div key={l.id} className="w-full shrink-0 snap-center snap-always" aria-hidden={i !== selIdx || undefined} inert={i !== selIdx || undefined}>
+                  {/* Only the shown card and its neighbours render (photos load as you swipe). */}
+                  {Math.abs(i - selIdx) <= 1 ? renderPreview(l, "sheet") : <div className="h-[120px] rounded-[20px] bg-white/60" />}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+      {onArea && moved && controls && (
+        <button
+          type="button"
+          onClick={searchHere}
+          // Phones: under the tool row (the bottom belongs to the sheet and the docked bar). Wider: bottom centre,
+          // clear of the tool row that wraps on a narrow desktop map.
+          style={wide ? { bottom: previewInset + 24 } : { top: 66 }}
+          className="np-in absolute left-1/2 z-10 flex min-h-11 -translate-x-1/2 items-center gap-2 whitespace-nowrap rounded-full bg-[#1E1A18] px-4 font-display text-sm font-semibold text-[#F1EBE3] shadow-[0_12px_30px_-8px_rgba(30,26,24,.55)] [html.dark_&]:bg-[#F1EBE3] [html.dark_&]:text-[#1E1A18]"
+        >
+          <Search size={15} aria-hidden /> {tx(locale, "Buscar en esta zona", "Search this area")}
+        </button>
       )}
 
       {controls && (

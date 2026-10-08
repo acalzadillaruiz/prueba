@@ -21,7 +21,7 @@ const STATUS: Record<HubOffer["status"], { es: string; en: string; tone: "warn" 
 };
 
 /** Make an offer on a listing the buyer already contacted (lead or tour) and follow its status. */
-export function HubOffers({ locale, offers: initial, offerable, listingById, onChange }: { locale: Locale; offers: HubOffer[]; offerable: string[]; listingById: (id: string) => Listing | undefined; onChange?: (n: number) => void }) {
+export function HubOffers({ id, className, locale, offers: initial, offerable, listingById, onChange }: { id?: string; className?: string; locale: Locale; offers: HubOffer[]; offerable: string[]; listingById: (id: string) => Listing | undefined; onChange?: (n: number) => void }) {
   const [offers, setOffers] = useState(initial);
   const [listingId, setListingId] = useState(offerable[0] ?? "");
   const [amount, setAmount] = useState("");
@@ -64,7 +64,8 @@ export function HubOffers({ locale, offers: initial, offerable, listingById, onC
   };
 
   return (
-    <Card className={cn(k.card, "border-0 p-5 lg:col-span-2")}>
+    <div id={id} className={cn("lg:col-span-2", className)}>
+    <Card className={cn(k.card, "h-full border-0 p-5")}>
       <h2 className="flex items-center gap-2 font-serif text-[24px] font-medium leading-tight"><HandCoins size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Mis ofertas", "My offers")}</h2>
 
       {offerable.length > 0 ? (
@@ -139,5 +140,6 @@ export function HubOffers({ locale, offers: initial, offerable, listingById, onC
         )}
       </div>
     </Card>
+    </div>
   );
 }

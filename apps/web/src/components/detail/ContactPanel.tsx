@@ -214,8 +214,13 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
               {agent?.verified && <ShieldCheck size={15} className="text-ok" aria-label={tx(locale, "Verificado", "Verified")} />}
             </div>
             <div className={cn("text-sm", muted)}>
-              {agent?.verified ? tx(locale, "Asesor verificado", "Verified advisor") : tx(locale, "Asesor", "Advisor")}
-              {agency ? ` · ${agency.name}` : ""}
+              {/* FSBO: the person shown is the owner (no agent), never "Asesor". Gender-neutral wording. */}
+              {fsbo
+                ? tx(locale, "Dueño/a · publica sin intermediarios", "Owner · no middlemen")
+                : agent?.verified
+                  ? tx(locale, "Asesor/a verificado/a", "Verified advisor")
+                  : tx(locale, "Asesor/a", "Advisor")}
+              {agency && !fsbo ? ` · ${agency.name}` : ""}
             </div>
           </div>
         </div>
@@ -332,11 +337,14 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
                     setIso(h.iso);
                   }}
                   className={cn(
-                    "min-h-11 rounded-xl border font-display text-[15px] font-semibold tracking-[0.04em] disabled:cursor-not-allowed disabled:line-through disabled:opacity-40",
+                    "min-h-11 rounded-xl border font-display text-[15px] font-semibold tracking-[0.04em] disabled:cursor-not-allowed disabled:border-dashed disabled:font-normal disabled:line-through",
+                    // Taken slots stay legible (≥ 4.5:1): dashed border + strike-through, not a 40 % fade.
+                    dark ? "disabled:text-mist" : "disabled:text-[#6E655E]",
                     chosen === h.iso ? "np-sel border-2" : dark ? "border-navy-line" : "border-[#D8CBB7] hover:border-navy/50",
                   )}
                 >
                   {h.label ?? `${String(h.hour).padStart(2, "0")}:00`}
+                  {!h.available && <span className="sr-only">{tx(locale, " · ocupada", " · taken")}</span>}
                 </button>
               ))}
             </div>
@@ -372,7 +380,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
           </div>
           {err && <div role="alert" className="rounded-xl bg-[#B3261E1A] px-3 py-2 text-sm text-danger">{err}</div>}
           {/* The one terracotta action of each tab: confirm the visit (naming the chosen time) or send the message. */}
-          <Button type="submit" className="!mt-3 h-[52px] w-full md:h-[52px]" size="lg" disabled={busy || (mode === "tour" && !chosen && !(askMode && askReady))} variant="primary">
+          <Button type="submit" className="!mt-3 h-[52px] w-full disabled:text-[#5E5650] md:h-[52px] dark:disabled:bg-white/10 dark:disabled:text-[#CFC4B8]" size="lg" disabled={busy || (mode === "tour" && !chosen && !(askMode && askReady))} variant="primary">
             {busy && <Loader2 size={16} className="animate-spin" aria-hidden />}
             {primaryLabel}
           </Button>

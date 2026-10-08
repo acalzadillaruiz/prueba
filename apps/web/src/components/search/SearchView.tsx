@@ -17,7 +17,7 @@ import { cn } from "@/lib/cn";
 import { useApp } from "@/lib/store";
 import { api } from "@/lib/api";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { queryToParams } from "./HeroSearch";
+import { FILTER_KEYS, queryToParams } from "./queryParams";
 import { URL_CHANGE_EVENT } from "@/components/layout/PublicHeader";
 import { essentialChips, essentialsFromParams } from "@/lib/essentials";
 import { placesFromGroups, usePlaceSuggest } from "./PlaceSuggest";
@@ -51,8 +51,8 @@ const VIEW_KEY = "np-search-view";
 export const LAST_SEARCH_KEY = "np-last-search";
 export const LAST_SEARCH_COUNT_KEY = "np-last-search-count";
 
-/** Every URL key that narrows the results (type, q and sort don't). */
-const FILTER_KEYS = ["zone", "city", "min", "max", "beds", "baths", "m2", "kind", "lux", "pub", "furnished", "pets", "verified", "am", "power", "well", "tank", "dock", "avila", "sea", "poly", "radius"];
+/** Keys that change neither the results nor the map's fit: what the list fetch and the map remount ignore. */
+const VIEW_ONLY_KEYS = ["view"];
 
 /** Ideas offered when the typed text meant nothing to the parser: each one runs as a search. */
 const TRY_INSTEAD: [string, string][] = [
@@ -103,25 +103,49 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
   const sheetOpener = useRef<HTMLElement | null>(null);
   const moreBtn = useRef<HTMLButtonElement>(null);
   const morePanel = useRef<HTMLDivElement>(null);
-  // Phones: the list first (with a floating "Mapa" toggle); the choice survives a visit to a listing and Back.
-  const [view, setView] = useState<"list" | "map">("list");
+  // Phones: the list first (with a docked "Mapa" toggle). The map is a history entry (`view=map`): the phone's Back
+  // gesture closes it instead of leaving the search, and reload / share / listing → Back keep it. sessionStorage
+  // still remembers the last choice for a fresh visit to /search (the Buscar tab).
+  const view: "list" | "map" = sp.get("view") === "map" ? "map" : "list";
   const [desktop, setDesktop] = useState(false);
-  useIsoLayoutEffect(() => {
+  /** The `?…` of the map entry this page pushed: closing the map from it goes Back (no stale entry left behind). */
+  const mapEntry = useRef<string | null>(null);
+  const changeView = (v: "list" | "map") => {
     try {
-      if (sessionStorage.getItem(VIEW_KEY) === "map") setView("map");
+      sessionStorage.setItem(VIEW_KEY, v);
     } catch {}
+    const p = new URLSearchParams(window.location.search);
+    if ((p.get("view") === "map") === (v === "map")) return;
+    if (v === "map") {
+      p.set("view", "map");
+      window.history.pushState(null, "", `?${p.toString()}`);
+      mapEntry.current = `?${p.toString()}`;
+    } else if (mapEntry.current === window.location.search) {
+      mapEntry.current = null;
+      window.history.back();
+    } else {
+      // Landed on the map (reload, shared link) or filtered since: swap the entry for the list.
+      p.delete("view");
+      window.history.replaceState(null, "", `?${p.toString()}`);
+    }
+  };
+  useIsoLayoutEffect(() => {
     const mq = window.matchMedia("(min-width: 1024px)");
+    try {
+      if (!mq.matches && sessionStorage.getItem(VIEW_KEY) === "map" && new URLSearchParams(window.location.search).get("view") !== "map") changeView("map");
+    } catch {}
     const onMq = () => setDesktop(mq.matches);
     onMq();
     mq.addEventListener("change", onMq);
     return () => mq.removeEventListener("change", onMq);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  const changeView = (v: "list" | "map") => {
-    setView(v);
+  // Back / forward between list and map keeps the remembered choice in step.
+  useEffect(() => {
     try {
-      sessionStorage.setItem(VIEW_KEY, v);
+      sessionStorage.setItem(VIEW_KEY, view);
     } catch {}
-  };
+  }, [view]);
   const [alertSaved, setAlertSaved] = useState(false);
   const qText = sp.get("q") ?? "";
   const [nl, setNl] = useState(qText);
@@ -173,7 +197,9 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
     setAlertSaved(false);
     setAlertError(null);
   };
-  const setShape = (s: Shape) => set(shapeToParams(s));
+  // A drawn shape and "Buscar en esta zona" replace each other (one area at a time).
+  const setShape = (s: Shape) => set({ ...shapeToParams(s), bbox: null });
+  const searchArea = (b: [number, number, number, number]) => set({ bbox: b.map((v) => v.toFixed(5)).join(","), poly: null, radius: null });
   const clearAll = () => set(Object.fromEntries([...FILTER_KEYS, "q"].map((k) => [k, null])));
 
   /** Natural-language search (filter bar, "try instead" ideas): the parser turns the words into filters. */
@@ -183,6 +209,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
     const p = queryToParams(q, raw);
     if (!q.listingType) p.set("type", type);
     if (sort !== "new") p.set("sort", sort);
+    if (view === "map") p.set("view", "map");
     router.push(`/${locale}/search?${p.toString()}`);
   };
 
@@ -191,6 +218,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
 
   // The page defaults to "Comprar"; the API must get the same default or other types leak into the results.
   const base = new URLSearchParams(sp.toString());
+  VIEW_ONLY_KEYS.forEach((k) => base.delete(k));
   if (!base.get("type")) base.set("type", "SALE");
   const qs = base.toString();
   // The server rendered `initial` for the URL we landed on (sort and shape included).
@@ -210,12 +238,16 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
   const notUnderstood = !!qText.trim() && !FILTER_KEYS.some((k) => sp.get(k)) && !queryUnderstood(heuristicSearchParse(qText));
   const didYouMean = useMemo(() => (notUnderstood ? closestPlaces(qText, places, 3) : []), [notUnderstood, qText, places]);
   const placeIdeas = didYouMean.length ? didYouMean : zones.slice(0, 3).map((g) => ({ name: g.city }));
-  // Partly understood ("zzqx casa rara"): the understood words became filters; say which words were left out.
+  // Partly understood ("zzqx casa rara"): the understood words became filters; say which words were left out. Only
+  // while those filters are really applied (a removed chip makes "we searched for…" untrue, so the note goes).
   const partly = useMemo(() => {
     if (!qText.trim() || notUnderstood) return null;
+    const parsed = queryToParams(heuristicSearchParse(qText), qText);
+    const p = new URLSearchParams(qs);
+    if (![...parsed.entries()].every(([k, v]) => k === "q" || p.get(k) === v)) return null;
     const r = splitUnderstood(qText);
     return r.understood.length && r.unknown.length ? r : null;
-  }, [qText, notUnderstood]);
+  }, [qText, notUnderstood, qs]);
 
   // The listing page offers "← Resultados" back to this exact search.
   useEffect(() => {
@@ -321,7 +353,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
   // Map remounts when filters change, but not when only the drawn shape or the sort change (keeps zoom/pan).
   const filtersKey = (() => {
     const p = new URLSearchParams(sp.toString());
-    ["poly", "radius", "sort"].forEach((k) => p.delete(k));
+    ["poly", "radius", "bbox", "sort", ...VIEW_ONLY_KEYS].forEach((k) => p.delete(k));
     return p.toString();
   })();
   // While new results load, the previous ones stay on screen: the map remounts (and fits) only once the fresh set for
@@ -352,6 +384,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
   if (baths) activeChips.push(["baths", `${baths}+ ${tx(locale, "baños", "ba")}`, { baths: null }]);
   if (minM2) activeChips.push(["m2", `≥ ${num(minM2, locale)} m²`, { m2: null }]);
   const kmLabel = shape?.type === "radius" ? shape.km.toLocaleString(locale === "es" ? "es-VE" : "en-US", { maximumFractionDigits: 1 }) : "";
+  if (sp.get("bbox")) activeChips.push(["bbox", tx(locale, "Zona del mapa", "Map area"), { bbox: null }]);
   if (shape) activeChips.push(["shape", shape.type === "radius" ? tx(locale, `Radio ${kmLabel} km`, `${kmLabel} km radius`) : tx(locale, "Zona dibujada", "Drawn area"), { poly: null, radius: null }]);
   if (kind) activeChips.push(["kind", KIND_CHIP[kind] ? tx(locale, ...KIND_CHIP[kind]) : kind, { kind: null }]);
   if (lux) activeChips.push(["lux", tx(locale, "Colección Privada", "Private Collection"), { lux: null }]);
@@ -397,8 +430,8 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
   const compareLabel = tx(locale, `Comparar (${compare.length})`, `Compare (${compare.length})`);
   const compareSeg = compare.length > 0 && (
     <>
-      <span aria-hidden className="my-3 w-px bg-current opacity-30" />
-      <Link href={compareHref(locale, compare)} aria-label={phoneMap ? compareLabel : undefined} className="flex h-12 items-center gap-1.5 pl-4 pr-5">
+      {(hasResults || phoneMap) && <span aria-hidden className="my-3 w-px bg-current opacity-30" />}
+      <Link href={compareHref(locale, compare)} aria-label={phoneMap ? compareLabel : undefined} className={cn("flex h-12 items-center gap-1.5 pr-5", hasResults || phoneMap ? "pl-4" : "pl-5")}>
         <Scale size={16} aria-hidden className="shrink-0 text-[#C9A574] [html.dark_&]:text-[#8E3B22]" />
         {phoneMap ? <span className="[font-feature-settings:'lnum']">{compare.length}</span> : <>{compareLabel} <ArrowRight size={15} aria-hidden /></>}
       </Link>
@@ -529,7 +562,9 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
             shape={shape}
             onShape={setShape}
             className="h-full w-full"
-            renderPreview={(l) => <MapPreviewCard l={l} locale={locale} />}
+            renderPreview={(l, variant) => <MapPreviewCard l={l} locale={locale} variant={variant} />}
+            previewInset={desktop ? 12 : 80}
+            onArea={searchArea}
             initialScale={fit.scale}
             fitPoints={fitPoints}
             fitPadding={fitPadding}
@@ -620,7 +655,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
             <div className="grid gap-5 p-4 sm:grid-cols-2 lg:px-5 xl:grid-cols-3">
               {results.map((l) => (
                 <div key={l.id} onMouseEnter={() => setHover(l.id)} onMouseLeave={() => setHover(null)}>
-                  <ListingCard l={l} locale={locale} compact />
+                  <ListingCard l={l} locale={locale} compact compareToggle />
                 </div>
               ))}
             </div>
@@ -660,15 +695,19 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
       {/* Phones and tablets: ONE docked bar — list/map toggle (+ filters on the map) and the comparator, which does
           not float a second layer here (CompareTray stays out below lg on /search). `data-search-toggle` lets other
           floating pieces (the save toast) sit above it. */}
+      {(hasResults || view === "map" || compare.length > 0) && (
       <div
         className="pointer-events-none fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom)+12px)] z-[35] flex justify-center px-4 md:bottom-[calc(env(safe-area-inset-bottom)+16px)] lg:hidden print:hidden"
         data-search-toggle
       >
         <div className="pointer-events-auto flex max-w-full overflow-hidden whitespace-nowrap rounded-full bg-[#1E1A18] font-display text-[15px] font-semibold text-[#F1EBE3] shadow-[0_12px_30px_-8px_rgba(30,26,24,.55)] [html.dark_&]:bg-[#F1EBE3] [html.dark_&]:text-[#1E1A18]">
           {view === "list" ? (
-            <button type="button" onClick={() => changeView("map")} className={cn("flex h-12 items-center gap-2", compare.length ? "pl-5 pr-4" : "px-5")}>
-              <MapIcon size={17} aria-hidden /> {tx(locale, "Mapa", "Map")}
-            </button>
+            // Nothing found: no map to open (the empty state keeps the whole screen; the comparator stays).
+            hasResults && (
+              <button type="button" onClick={() => changeView("map")} className={cn("flex h-12 items-center gap-2", compare.length ? "pl-5 pr-4" : "px-5")}>
+                <MapIcon size={17} aria-hidden /> {tx(locale, "Mapa", "Map")}
+              </button>
+            )
           ) : (
             <>
               <button type="button" onClick={() => changeView("list")} className="flex h-12 items-center gap-2 pl-5 pr-4">
@@ -684,6 +723,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
           {compareSeg}
         </div>
       </div>
+      )}
 
       {sheetOpen && !desktop && (
         <FilterSheet

@@ -23,7 +23,7 @@ const norm = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCa
 
 /** Address search. With NEXT_PUBLIC_GOOGLE_MAPS_KEY → Google Places Autocomplete (country VE by default).
  *  Without a key → local geocoder over the zone catalogue (point refined by tapping the map). */
-export function PlacesSearch({ locale, zones, value, onPick }: { locale: Locale; zones: Zone[]; value: PlacePick | null; onPick: (p: PlacePick) => void }) {
+export function PlacesSearch({ locale, zones, value, onPick, describedBy }: { locale: Locale; zones: Zone[]; value: PlacePick | null; onPick: (p: PlacePick) => void; /** id of helper text under the field */ describedBy?: string }) {
   const [q, setQ] = useState(value?.main ?? "");
   const [country, setCountry] = useState("VE");
   const [open, setOpen] = useState(false);
@@ -37,7 +37,7 @@ export function PlacesSearch({ locale, zones, value, onPick }: { locale: Locale;
     return (top.length ? top : scored.slice(0, 4)).map(({ z }) => z);
   }, [q, zones]);
 
-  if (GOOGLE_MAPS_KEY) return <GooglePlacesInput locale={locale} zones={zones} value={value} onPick={onPick} country={country} setCountry={setCountry} />;
+  if (GOOGLE_MAPS_KEY) return <GooglePlacesInput locale={locale} zones={zones} value={value} onPick={onPick} country={country} setCountry={setCountry} describedBy={describedBy} />;
 
   const pick = (z: Zone) => {
     let h = 0;
@@ -51,7 +51,8 @@ export function PlacesSearch({ locale, zones, value, onPick }: { locale: Locale;
 
   return (
     <div className="flex gap-2">
-      <select className={cn(inputCls, "w-40")} value={country} onChange={(e) => setCountry(e.target.value)} aria-label={tx(locale, "País", "Country")}>
+      {/* Stacked on phones so the address field gets the full width (its placeholder used to be cut). */}
+      <select className={cn(inputCls, "w-full sm:w-40 sm:shrink-0")} value={country} onChange={(e) => setCountry(e.target.value)} aria-label={tx(locale, "País", "Country")}>
         <option value="VE">🇻🇪 Venezuela</option>
       </select>
       <div className="relative flex-1">
@@ -64,8 +65,10 @@ export function PlacesSearch({ locale, zones, value, onPick }: { locale: Locale;
             setOpen(true);
           }}
           onFocus={() => setOpen(true)}
-          placeholder={tx(locale, "Calle, edificio y urbanización…", "Street, building and neighborhood…")}
+          // Short enough not to be cut on a 360 px phone; the wizard explains the rest in helper text (describedBy).
+          placeholder={tx(locale, "Calle y edificio", "Street and building")}
           aria-label={tx(locale, "Dirección", "Address")}
+          aria-describedby={describedBy}
         />
         {open && suggestions.length > 0 && (
           <div className="np-in absolute inset-x-0 top-full z-20 mt-1 overflow-hidden rounded-np border border-line bg-white shadow-np" role="listbox">

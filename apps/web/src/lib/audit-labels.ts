@@ -3,6 +3,7 @@ import type { Locale } from "@/types/domain";
 /** Human labels for audit actions (AuditLog.action). Unknown actions fall back to their prefix, then to the raw code. */
 const ACTIONS: Record<string, [string, string]> = {
   "agency.branding": ["Marca de agencia actualizada", "Agency branding updated"],
+  "auth.password.reset": ["Contraseña restablecida por email", "Password reset by email"],
   "agency.create": ["Agencia creada", "Agency created"],
   "agency.oncall": ["Guardia 24/7 actualizada", "On-call rota updated"],
   "agency.flags": ["Agencia: estado o plan cambiado", "Agency: status or plan changed"],

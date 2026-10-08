@@ -1,18 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Bell, CalendarCheck, ChevronDown, FlaskConical, Heart, LogIn, Menu, MessageCircle, Moon, Settings, Sun, User, X } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { Bell, CalendarCheck, ChevronDown, ChevronLeft, FlaskConical, Heart, LogIn, Menu, MessageCircle, Moon, Settings, Sun, User, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import type { Locale } from "@/types/domain";
 import { Logo, RoofGlyph } from "@/components/brand/Logo";
 import { Avatar, Button } from "@/components/ui";
 import { useHideOnScroll } from "@/components/brand/useScrollChrome";
-import { roleHome } from "@/components/brand/PublicChrome";
+import { roleHome, useUnreadMessages } from "@/components/brand/PublicChrome";
 import { DemoLoginList, useDemoVisible } from "./DemoBar";
 import { useApp } from "@/lib/store";
-import { api } from "@/lib/api";
 import { cn } from "@/lib/cn";
 import { msg, tx } from "@/lib/i18n";
 
@@ -27,6 +25,45 @@ export const URL_CHANGE_EVENT = "np:urlchange";
  * hides the header, see globals.css): it dispatches this event and the header's drawer opens.
  */
 export const OPEN_MENU_EVENT = "np:open-menu";
+
+/** Header mounts in this document: only the first page loaded can trust `document.referrer` as "the page before". */
+let headerMounts = 0;
+
+/** Same-origin search path only (never an open redirect): "/es/search?…" or "/en/search…" (same rule as BackToResults). */
+const searchPath = (v: string | null) => (v && /^\/(?:es|en)\/search(?:[?#]|$)/.test(v) ? v : null);
+
+type BackTarget = { kind: "back" | "push"; href: string };
+
+/**
+ * Where the header's back chevron leads on a listing: the last search of this tab (sessionStorage `np-last-search`,
+ * written by the search page), by history when that search is really the previous entry (full load from it), or
+ * history.back() when the visitor came from another page of this site. Arriving from outside: no chevron.
+ */
+function useListingBack(enabled: boolean) {
+  const [target, setTarget] = useState<BackTarget | null>(null);
+  useEffect(() => {
+    const first = headerMounts++ === 0;
+    if (!enabled) return;
+    let stored: string | null = null;
+    try {
+      stored = searchPath(sessionStorage.getItem("np-last-search"));
+    } catch {
+      /* storage blocked */
+    }
+    let sameOrigin = false;
+    let fromSearch = false;
+    try {
+      const ref = document.referrer ? new URL(document.referrer) : null;
+      sameOrigin = !!ref && ref.origin === location.origin;
+      fromSearch = sameOrigin && !!searchPath(ref!.pathname + ref!.search);
+    } catch {
+      /* bad referrer */
+    }
+    if (stored) setTarget({ kind: first && fromSearch && window.history.length > 1 ? "back" : "push", href: stored });
+    else if ((sameOrigin || !first) && window.history.length > 1) setTarget({ kind: "back", href: `/${location.pathname.split("/")[1]}` });
+  }, [enabled]);
+  return target;
+}
 
 /** Theme: the visitor's explicit choice (np-theme) wins; without one, the device setting (applied before paint in layout.tsx). */
 function storedTheme() {
@@ -46,7 +83,20 @@ function storedTheme() {
  */
 export function PublicHeader({ locale, variant = "light", autoHide = false }: { locale: Locale; variant?: "light" | "dark" | "transparent"; autoHide?: boolean }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
+  // Listing detail: once the page's own "← Resultados" has scrolled away, the returning header carries a back chevron.
+  const onListing = /^\/(?:es|en)\/listing\//.test(pathname);
+  const back = useListingBack(onListing);
+  const [deep, setDeep] = useState(false);
+  useEffect(() => {
+    if (!onListing || !back) return;
+    const on = () => setDeep(window.scrollY > 280);
+    on();
+    window.addEventListener("scroll", on, { passive: true });
+    return () => window.removeEventListener("scroll", on);
+  }, [onListing, back]);
+  const showBack = onListing && !!back && deep;
   // Demo mode (DEMO_AUTH): desktop popover and the drawer's section keep separate states.
   const [deskDemo, setDeskDemo] = useState(false);
   const [drawerDemo, setDrawerDemo] = useState(false);
@@ -125,17 +175,23 @@ export function PublicHeader({ locale, variant = "light", autoHide = false }: { 
   const t = msg(locale, "nav");
   const [isDark, setDarkState] = useState(false);
   useEffect(() => {
-    setDarkState(document.documentElement.classList.contains("dark"));
+    const root = document.documentElement;
+    setDarkState(root.classList.contains("dark"));
+    // Other switches (the footer's) flip html.dark too: follow the class so the icon stays right.
+    const mo = new MutationObserver(() => setDarkState(root.classList.contains("dark")));
+    mo.observe(root, { attributes: true, attributeFilter: ["class"] });
     // No explicit choice yet: follow the device when it switches (e.g. at sunset).
     const mq = window.matchMedia?.("(prefers-color-scheme: dark)");
-    if (!mq) return;
     const onChange = (e: MediaQueryListEvent) => {
       if (storedTheme()) return;
-      document.documentElement.classList.toggle("dark", e.matches);
+      root.classList.toggle("dark", e.matches);
       setDarkState(e.matches);
     };
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
+    mq?.addEventListener("change", onChange);
+    return () => {
+      mo.disconnect();
+      mq?.removeEventListener("change", onChange);
+    };
   }, []);
   const toggleTheme = () => {
     const next = !document.documentElement.classList.contains("dark");
@@ -163,13 +219,7 @@ export function PublicHeader({ locale, variant = "light", autoHide = false }: { 
   const home = u ? roleHome(u.role) : "/app";
   const seeker = !!u && home === "/app";
   // Unread messages for the drawer's "Tu espacio" block: fetched only while the drawer is open.
-  const inbox = useQuery({
-    queryKey: ["threads", "drawer"],
-    queryFn: () => api<{ threads: { unread?: number }[] }>("threads"),
-    enabled: menuOpen && seeker,
-    staleTime: 30_000,
-  });
-  const unread = (inbox.data?.threads ?? []).reduce((n, th) => n + (th.unread ?? 0), 0);
+  const unread = useUnreadMessages(menuOpen && seeker);
   const space = [
     { href: `/${locale}/app#visitas`, label: tx(locale, "Visitas", "Tours"), Icon: CalendarCheck },
     { href: `/${locale}/app#mensajes`, label: tx(locale, "Mensajes", "Messages"), Icon: MessageCircle, badge: unread },
@@ -231,9 +281,27 @@ export function PublicHeader({ locale, variant = "light", autoHide = false }: { 
           float && (variant === "light" || scrolled || menuOpen ? "np-glass" : "border-transparent bg-transparent"),
         )}
       >
-        <Link href={`/${locale}`} aria-label="New Place" className="flex min-h-11 shrink-0 items-center whitespace-nowrap">
-          <Logo tone={dark ? "ivory" : "navy"} animate={animate} />
-        </Link>
+        <div className={cn("flex shrink-0 items-center", showBack && "-ml-3 gap-0.5 md:-ml-3.5")}>
+          {showBack && back && (
+            <a
+              href={back.href}
+              onClick={(e) => {
+                if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+                e.preventDefault();
+                if (back.kind === "back") router.back();
+                else router.push(back.href);
+              }}
+              aria-label={searchPath(back.href) ? tx(locale, "Volver a los resultados", "Back to results") : tx(locale, "Volver", "Back")}
+              data-header-back
+              className={cn("np-in flex h-11 w-11 shrink-0 items-center justify-center rounded-full", dark ? "hover:bg-white/10" : "hover:bg-black/5")}
+            >
+              <ChevronLeft size={22} aria-hidden />
+            </a>
+          )}
+          <Link href={`/${locale}`} aria-label="New Place" className="flex min-h-11 shrink-0 items-center whitespace-nowrap">
+            <Logo tone={dark ? "ivory" : "navy"} size={showBack ? "sm" : "md"} animate={animate} />
+          </Link>
+        </div>
         <nav aria-label={locale === "es" ? "Principal" : "Main"} className="hidden items-center gap-1 lg:flex">
           {nav.map((n) => (
             <Link

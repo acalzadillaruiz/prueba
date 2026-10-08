@@ -18,6 +18,7 @@ const EMAIL_KIND_LABEL: Record<string, [string, string]> = {
   ALERT: ["Alerta", "Alert"],
   TOUR: ["Visita", "Viewing"],
   VERIFY: ["Tu cuenta", "Your account"],
+  RESET: ["Tu contraseña", "Your password"],
   LEAD: ["Mensaje", "Message"],
   OFFER: ["Oferta", "Offer"],
   PRICE_DROP: ["Bajó de precio", "Price drop"],

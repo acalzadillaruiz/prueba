@@ -3,22 +3,32 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
-import { ArrowUp, ChevronDown, Menu, Search, Sparkles } from "lucide-react";
+import { ArrowUp, ChevronDown, Heart, House, KeyRound, Menu, Palmtree, Search, Sparkles, User } from "lucide-react";
 import Link from "next/link";
 import { heuristicSearchParse } from "@newplace/ai";
 import type { Locale } from "@/types/domain";
 import { tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
-import { queryToParams } from "./HeroSearch";
+import { queryToParams } from "./queryParams";
 import { usePlaceSuggest } from "./PlaceSuggest";
 import { RoofMark } from "@/components/brand/Logo";
 import { OPEN_MENU_EVENT } from "@/components/layout/PublicHeader";
+import { roleHome } from "@/components/brand/PublicChrome";
+import { Avatar } from "@/components/ui";
+import { useApp } from "@/lib/store";
 
 const MODES = [
   ["SALE", "Comprar", "Buy"],
   ["LONG_RENT", "Alquilar", "Rent"],
   ["SHORT_RENT", "Vacacional", "Holiday rentals"],
 ] as const;
+
+/** Compact bar's mode chip: an icon and a short word (the full name stays in the native select's options). */
+const MODE_CHIP = {
+  SALE: { Icon: House, es: "Compra", en: "Buy" },
+  LONG_RENT: { Icon: KeyRound, es: "Alquila", en: "Rent" },
+  SHORT_RENT: { Icon: Palmtree, es: "Vaca.", en: "Holiday" },
+} as const;
 
 /** Chips: one tap runs exactly what the label says, nothing hidden. [label es, label en, query es, query en] */
 const CHIPS: [string, string, string, string][] = [
@@ -182,6 +192,8 @@ function CompactAsk({
 }) {
   const id = useId();
   const suggest = usePlaceSuggest({ locale, text, setText });
+  const { saved, user, ready } = useApp();
+  const chip = MODE_CHIP[mode];
   // Contract with the header: while this bar is shown the header steps away (one bar at the top, not two).
   useEffect(() => {
     const el = document.documentElement;
@@ -208,7 +220,7 @@ function CompactAsk({
           e.preventDefault();
           onSubmit();
         }}
-        className={cn("np-glass relative mx-auto flex h-14 max-w-[720px] items-center gap-1 rounded-full p-1.5 text-ink", shown && "pointer-events-auto")}
+        className={cn("np-glass relative mx-auto flex h-14 max-w-[720px] items-center gap-1 rounded-full p-1.5 text-ink lg:max-w-[940px]", shown && "pointer-events-auto")}
       >
         <Link href={`/${locale}`} aria-label={tx(locale, "New Place, inicio", "New Place, home")} className={cn("flex h-11 w-11 shrink-0 items-center justify-center rounded-full hover:bg-black/5", ring)}>
           <RoofMark small className="h-[13px] w-[36px]" ink="var(--np-logo-ink, var(--np-navy))" teja="var(--np-logo-teja, var(--np-coral))" />
@@ -216,12 +228,17 @@ function CompactAsk({
         <label htmlFor={`${id}-mode`} className="sr-only">
           {tx(locale, "Qué buscas", "What you're after")}
         </label>
-        <span className="relative shrink-0">
+        {/* Narrow chip (icon only on phones, icon + short word from sm) so the text field keeps its room at 360 px.
+            The native select sits invisibly on top: one tap opens the system picker with the full names. */}
+        <span className="relative flex h-11 shrink-0 items-center gap-1.5 rounded-full bg-ink pl-3 pr-2 font-display text-[14px] font-medium text-ivory has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ink sm:pl-3.5 sm:pr-2.5 [html.dark_&]:text-[#1E1A18]">
+          <chip.Icon size={16} strokeWidth={1.8} aria-hidden />
+          <span aria-hidden className="hidden sm:inline">{tx(locale, chip.es, chip.en)}</span>
+          <ChevronDown size={14} aria-hidden className="opacity-80" />
           <select
             id={`${id}-mode`}
             value={mode}
             onChange={(e) => setMode(e.target.value as (typeof MODES)[number][0])}
-            className={cn("h-11 cursor-pointer appearance-none rounded-full bg-ink pl-3.5 pr-7 font-display text-[14px] font-medium text-ivory sm:pl-4 sm:pr-8", ring)}
+            className="absolute inset-0 h-full w-full cursor-pointer appearance-none rounded-full opacity-0"
           >
             {MODES.map(([k, es, en]) => (
               <option key={k} value={k}>
@@ -229,7 +246,6 @@ function CompactAsk({
               </option>
             ))}
           </select>
-          <ChevronDown size={15} aria-hidden className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-ivory opacity-80 [html.dark_&]:text-[#1E1A18]" />
         </span>
         <Search size={17} aria-hidden className="ml-2 hidden shrink-0 text-ink/55 sm:block" />
         <span className="flex min-w-0 flex-1">
@@ -239,7 +255,7 @@ function CompactAsk({
             value={text}
             enterKeyHint="search"
             aria-label={tx(locale, "Describe la casa que buscas", "Describe the home you're looking for")}
-            placeholder={tx(locale, "Zona, tipo de casa o presupuesto", "Area, type of home or budget")}
+            placeholder={tx(locale, "Buscar zona…", "Search area…")}
             className="h-11 min-w-0 flex-1 bg-transparent px-1.5 font-display text-[16px] text-ink placeholder:text-ink/60 focus:outline-none"
           />
         </span>
@@ -254,6 +270,23 @@ function CompactAsk({
           <ArrowUp size={18} aria-hidden className="rotate-45 md:hidden" />
           <span className="hidden font-display text-[15px] font-semibold md:inline">{tx(locale, "Buscar", "Search")}</span>
         </button>
+        {/* Desktop: the compact bar replaces the header, so it keeps the header's everyday shortcuts. */}
+        <Link href={`/${locale}/saved`} aria-label={tx(locale, "Guardados", "Saved")} className={cn("relative ml-1 hidden h-11 w-11 shrink-0 items-center justify-center rounded-full hover:bg-black/5 lg:flex", ring)}>
+          <Heart size={19} aria-hidden />
+          {saved.length > 0 && <span className="absolute right-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-navy px-1 text-[11px] font-bold leading-none text-ivory ring-2 ring-ivory">{saved.length}</span>}
+        </Link>
+        {ready && (
+          <Link
+            href={user ? `/${locale}${roleHome(user.role)}` : `/${locale}/login`}
+            aria-label={user ? tx(locale, "Tu espacio", "Your space") : tx(locale, "Entrar", "Sign in")}
+            className={cn("hidden h-11 w-11 shrink-0 items-center justify-center rounded-full hover:bg-black/5 lg:flex", ring)}
+          >
+            {user ? <Avatar initials={user.initials} hue={user.hue} size={32} /> : <User size={19} aria-hidden />}
+          </Link>
+        )}
+        <Link href={`/${locale}/sell`} className={cn("hidden h-11 shrink-0 items-center rounded-full border-[1.5px] border-ink/70 px-4 font-display text-[14px] font-semibold text-ink hover:bg-black/5 xl:flex", ring)}>
+          {tx(locale, "Vender", "Sell")}
+        </Link>
         <button
           type="button"
           onClick={() => window.dispatchEvent(new CustomEvent(OPEN_MENU_EVENT))}

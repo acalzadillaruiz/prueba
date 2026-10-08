@@ -53,6 +53,60 @@ export function CompareButton({ id, locale, dark, className }: { id: string; loc
   );
 }
 
+/**
+ * Compare toggle on a listing card's photo (search results). Touch screens: a round icon button next to the heart.
+ * Mouse: a "Comparar" pill that shows on hover (always while picked). Same store as CompareTray (3 at most): a 4th
+ * says so kindly instead of failing silently.
+ */
+export function CardCompareToggle({ id, locale }: { id: string; locale: Locale }) {
+  const { compare, toggleCompare } = useApp();
+  const on = compare.includes(id);
+  const [full, setFull] = useState(false);
+  const click = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!toggleCompare(id)) {
+      setFull(true);
+      window.setTimeout(() => setFull(false), 3000);
+    }
+  };
+  const label = tx(locale, "Comparar", "Compare");
+  return (
+    <>
+      <button
+        type="button"
+        aria-pressed={on}
+        aria-label={label}
+        onClick={click}
+        data-card-compare
+        className={cn(
+          "absolute right-[3.75rem] top-2.5 flex h-11 w-11 items-center justify-center rounded-full shadow-sm backdrop-blur transition-transform duration-np hover:scale-105 [@media(hover:hover)]:hidden",
+          on ? "bg-[#1E1A18] text-[#F1EBE3]" : "bg-[#ffffffe6] text-[#1E1A18]",
+        )}
+      >
+        <Scale size={17} strokeWidth={1.8} aria-hidden />
+      </button>
+      <button
+        type="button"
+        aria-pressed={on}
+        onClick={click}
+        data-card-compare
+        className={cn(
+          "absolute bottom-2.5 left-2.5 z-[1] hidden min-h-9 items-center gap-1.5 rounded-full px-3 font-display text-[13px] font-semibold shadow-sm backdrop-blur transition-opacity duration-np focus-visible:opacity-100 [@media(hover:hover)]:inline-flex",
+          on ? "bg-[#1E1A18] text-[#F1EBE3] opacity-100" : "bg-[#ffffffe6] text-[#1E1A18] opacity-0 group-hover:opacity-100",
+        )}
+      >
+        <Scale size={14} aria-hidden /> {on ? tx(locale, "Comparando", "Comparing") : label}
+      </button>
+      {full && (
+        <span role="status" className="np-in absolute inset-x-2.5 bottom-14 z-[2] rounded-2xl bg-[#1E1A18] px-3.5 py-2.5 text-[13px] leading-snug text-[#F1EBE3] shadow-np">
+          {tx(locale, "Ya tienes 3 casas para comparar. Quita una del comparador y añade esta.", "You already have 3 homes to compare. Remove one and add this one.")}
+        </span>
+      )}
+    </>
+  );
+}
+
 // Brand pills: egeo / arena for market states, navy for closed deals; status colours only where they warn.
 const STATUS_TONE: Record<ListingStatus, string> = {
   DRAFT: "bg-[#5A514B] text-white",

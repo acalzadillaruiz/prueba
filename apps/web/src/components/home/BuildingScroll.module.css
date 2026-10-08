@@ -47,6 +47,18 @@
   --t-sweep: rgb(255 240 210 / 0.55);
 }
 
+/* Composition: the tower (front face + 26 % side face ≈ 1.26 × --fw) sits centred in its column, then glides left
+   in the last chapter so the labels of the lit floors fit beside it. Bigger floors on phones too: it fills the column. */
+:global(.np-tower).tower { --fh: 21px; --fw: 120px; --base: 34px; }
+@media (min-width: 768px) { :global(.np-tower).tower { --fh: 38px; --fw: 220px; --base: 64px; } }
+.body {
+  left: calc(50% - var(--fw) * 0.63);
+  transition: left 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.tower[data-step="3"] .body { left: 4%; }
+.tower :global(.np-tower-halo) { left: calc(50% - var(--fw) * 0.9); width: calc(var(--fw) * 1.8); }
+.tower[data-step="3"] :global(.np-tower-halo) { left: 0; }
+
 /* Sky: warm daylight gradient with a low sun behind the tower; fades out at the edges so it melts into the page.
    A gentle parallax: it drifts a few pixels as the chapters advance. */
 .sky {
@@ -149,6 +161,7 @@
   filter: drop-shadow(0 8px 14px rgb(30 26 24 / 0.16));
 }
 @media (prefers-reduced-motion: reduce) {
+  .body { transition: none; }
   .sky { transition: none; transform: none !important; }
   .tower :global(.np-floor[data-lit="1"])::before { animation: none; display: none; }
 }

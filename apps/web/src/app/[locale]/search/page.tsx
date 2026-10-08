@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { redirect } from "next/navigation";
 import type { Locale } from "@/types/domain";
 import { PublicHeader } from "@/components/layout/PublicHeader";
 import { CompareTray } from "@/components/compare/CompareTray";
@@ -7,6 +8,7 @@ import { SearchView, type ZoneGroup } from "@/components/search/SearchView";
 import { filtersFromParams, searchListings } from "@/server/listings";
 import { prisma } from "@newplace/db";
 import { pageMeta } from "@/lib/seo";
+import { canonicalQueryUrl } from "@/components/search/queryParams";
 
 export const dynamic = "force-dynamic";
 
@@ -54,6 +56,11 @@ function groupZones(rows: { zone: string; city: string }[]): ZoneGroup[] {
 export default async function SearchPage({ params, searchParams }: { params: Promise<{ locale: Locale }>; searchParams: Promise<Record<string, string>> }) {
   const { locale } = await params;
   const sp = new URLSearchParams(await searchParams);
+  // `?q=` links (shared, bookmarked, the JSON-LD SearchAction) must search what the words say: same parser as the
+  // search boxes, then a temporary redirect to the canonical URL with structured filters (the words stay in q, so the
+  // page can say which ones it used). Temporary: the parser improves, and the same words may map differently later.
+  const canonical = canonicalQueryUrl(sp);
+  if (canonical) redirect(`/${locale}/search?${canonical.toString()}`);
   if (!sp.get("type")) sp.set("type", "SALE");
   const [initial, zones] = await Promise.all([searchListings(filtersFromParams(sp)), prisma.listing.findMany({ where: { status: { in: ["ACTIVE", "COMING_SOON", "UNDER_OFFER"] } }, distinct: ["zone", "city"], select: { zone: true, city: true } })]);
   return (

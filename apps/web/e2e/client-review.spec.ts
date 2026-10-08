@@ -218,7 +218,7 @@ test.describe("Cliente · regresiones de la revisión", () => {
     await page.evaluate(() => sessionStorage.removeItem("np-search-view"));
     await page.reload();
     // List first, with the floating "Mapa" toggle and the bottom tab bar.
-    await expect(page.locator('[data-search-sheet="list"]')).toBeVisible({ timeout: 15_000 });
+    await expect(page.locator('[data-search-sheet="list"]:visible')).toBeVisible({ timeout: 15_000 });
     await expect(page.getByRole("button", { name: "Mapa", exact: true })).toBeVisible();
     await expect(page.locator("[data-tabbar]")).toBeVisible();
     await expect(async () => {
@@ -232,11 +232,12 @@ test.describe("Cliente · regresiones de la revisión", () => {
     await expect(page.getByRole("button", { name: "Quitar filtro: 3+ hab" })).toBeVisible();
     // Map toggle and back; the choice survives a reload (and a listing → Back).
     await page.getByRole("button", { name: "Mapa", exact: true }).click();
-    await expect(page.locator('[data-search-sheet="map"]')).toBeAttached();
+    await expect(page.locator('[data-search-sheet="map"]')).not.toHaveCount(0);
+    await expect(page).toHaveURL(/view=map/);
     await page.reload();
     await expect(page.getByRole("button", { name: /^Lista · \d+/ })).toBeVisible();
     await page.getByRole("button", { name: /^Lista · \d+/ }).click();
-    await expect(page.locator('[data-search-sheet="list"]')).toBeVisible();
+    await expect(page.locator('[data-search-sheet="list"]:visible')).toBeVisible();
   });
   test("móvil: comparador y «Mapa» en una sola barra; la página (no un panel) hace scroll y lo recuerda", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
@@ -285,8 +286,48 @@ test.describe("Cliente · regresiones de la revisión", () => {
   });
   test("búsqueda: una frase entendida a medias dice qué palabras no entendimos", async ({ page }) => {
     await page.goto("/es/search?type=SALE&kind=house&q=zzqx+casa+rara");
-    await expect(page.getByTestId("partly-understood")).toHaveText("Buscamos «casa»; no entendimos «zzqx rara».");
+    await expect(page.locator('[data-testid="partly-understood"]:visible')).toHaveText("Buscamos «casa»; no entendimos «zzqx rara».");
     await expect(page.getByTestId("not-understood")).toHaveCount(0);
+  });
+  test("búsqueda: un enlace ?q= aplica lo que entendimos (redirige a filtros) y la nota es verdad", async ({ page }) => {
+    await page.goto("/es/search?q=" + encodeURIComponent("casa en lechería con helipuerto"));
+    await page.waitForURL(/zone=Lecher/);
+    const url = new URL(page.url());
+    expect(url.searchParams.get("kind")).toBe("house");
+    expect(url.searchParams.get("type")).toBe("SALE");
+    expect(url.searchParams.get("q")).toBe("casa en lechería con helipuerto");
+    await expect(page.locator('[data-testid="partly-understood"]:visible')).toHaveText("Buscamos «casa lechería»; no entendimos «helipuerto».");
+    await expect(page.getByRole("button", { name: "Quitar filtro: Lechería" })).toBeVisible();
+    const api = await apiAs(page, "GET", "listings?type=SALE&zone=Lecher%C3%ADa&kind=house");
+    await expect(page.getByText(/^\d+ resultados?$/).first()).toHaveText(new RegExp(`^${api.json.total} resultados?$`));
+    // Removing what we understood makes the note untrue: it goes.
+    await page.getByRole("button", { name: "Quitar filtro: Lechería" }).click();
+    await expect(page.locator('[data-testid="partly-understood"]:visible')).toHaveCount(0);
+  });
+  test("móvil: el mapa es un paso del historial; «Atrás» lo cierra sin salir de la búsqueda", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/es/search?type=SALE");
+    await page.evaluate(() => sessionStorage.removeItem("np-search-view"));
+    await page.reload();
+    await expect(page.locator('[data-search-sheet="list"]:visible')).toBeVisible({ timeout: 15_000 });
+    await page.locator("[data-search-toggle]").getByRole("button", { name: "Mapa", exact: true }).click();
+    await expect(page).toHaveURL(/view=map/);
+    await expect(page.locator('[data-search-sheet="map"]')).not.toHaveCount(0);
+    await page.goBack();
+    await expect(page).toHaveURL(/\/es\/search\?type=SALE$/);
+    await expect(page.locator('[data-search-sheet="list"]:visible')).toBeVisible();
+    // Forward re-opens it; "Lista" closes it the same way (no stale map entry left behind).
+    await page.goForward();
+    await expect(page).toHaveURL(/view=map/);
+    await page.getByRole("button", { name: /^Lista · \d+/ }).click();
+    await expect(page).not.toHaveURL(/view=map/);
+    await expect(page.locator('[data-search-sheet="list"]:visible')).toBeVisible();
+  });
+  test("móvil: sin resultados no hay «Mapa» en la barra y el aviso queda a la vista", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/es/search?type=SALE&zone=zzqx-nada&min=99000000");
+    await expect(page.getByText("Aún no hay casas con todo eso")).toBeVisible();
+    await expect(page.locator("[data-search-toggle]")).toHaveCount(0);
   });
   test("búsqueda: un texto que no entendemos lo dice y sugiere zonas; «Lech» sugiere Lechería", async ({ page }) => {
     await page.goto("/es/search?type=SALE&q=xyzzy+castillo");

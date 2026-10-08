@@ -18,7 +18,7 @@ const COUNTRIES = [
   ["MX", "🇲🇽 México"],
 ] as const;
 
-function Inner({ locale, zones, value, onPick, country }: { locale: Locale; zones: Zone[]; value: PlacePick | null; onPick: (p: PlacePick) => void; country: string }) {
+function Inner({ locale, zones, value, onPick, country, describedBy }: { locale: Locale; zones: Zone[]; value: PlacePick | null; onPick: (p: PlacePick) => void; country: string; describedBy?: string }) {
   const places = useMapsLibrary("places");
   const ref = useRef<HTMLInputElement>(null);
   useEffect(() => {
@@ -43,15 +43,15 @@ function Inner({ locale, zones, value, onPick, country }: { locale: Locale; zone
     });
     return () => l.remove();
   }, [places, country, zones, onPick]);
-  return <input ref={ref} defaultValue={value?.main} className={inputCls} placeholder={tx(locale, "Escribe la dirección…", "Type the address…")} aria-label={tx(locale, "Dirección", "Address")} />;
+  return <input ref={ref} defaultValue={value?.main} className={inputCls} placeholder={tx(locale, "Calle y edificio", "Street and building")} aria-label={tx(locale, "Dirección", "Address")} aria-describedby={describedBy} />;
 }
 
 /** Google Places Autocomplete (componentRestrictions country, VE by default) + country selector. */
-export function GooglePlacesInput(props: { locale: Locale; zones: Zone[]; value: PlacePick | null; onPick: (p: PlacePick) => void; country: string; setCountry: (c: string) => void }) {
+export function GooglePlacesInput(props: { locale: Locale; zones: Zone[]; value: PlacePick | null; onPick: (p: PlacePick) => void; country: string; setCountry: (c: string) => void; describedBy?: string }) {
   return (
     <APIProvider apiKey={GOOGLE_MAPS_KEY} language={props.locale}>
-      <div className="flex gap-2">
-        <select className={cn(inputCls, "w-40")} value={props.country} onChange={(e) => props.setCountry(e.target.value)} aria-label={tx(props.locale, "País", "Country")}>
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <select className={cn(inputCls, "w-full sm:w-40 sm:shrink-0")} value={props.country} onChange={(e) => props.setCountry(e.target.value)} aria-label={tx(props.locale, "País", "Country")}>
           {COUNTRIES.map(([c, n]) => (
             <option key={c} value={c}>{n}</option>
           ))}

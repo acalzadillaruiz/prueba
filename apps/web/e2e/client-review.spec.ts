@@ -265,6 +265,8 @@ test.describe("Cliente · regresiones de la revisión", () => {
       await route.continue();
     });
     await page.goto(`/es/listing/${fsbo.slug}`);
+    // Owner listings now open on "Pedir visita" (they take bookings too): switch to the message tab.
+    await page.getByRole("tab", { name: "Mensaje" }).click();
     const send = page.getByRole("button", { name: "Enviar mensaje" });
     await expect(async () => {
       await send.click();

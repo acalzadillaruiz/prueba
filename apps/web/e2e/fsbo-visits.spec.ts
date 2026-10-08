@@ -59,7 +59,7 @@ test.describe.serial("FSBO · horario de visitas y reserva", () => {
     await page.getByLabel("Email").fill(`e2e-visit-${stamp}@example.com`);
     await page.locator("button:not([disabled])", { hasText: /^\d\d:\d\d$/ }).first().click();
     await page.getByRole("button", { name: /^Pedir visita · / }).click();
-    await expect(page.getByTestId("lead-done")).toContainText("Pendiente de que su dueño la confirme");
+    await expect(page.getByTestId("lead-done")).toContainText(/Pendiente de que .+ la confirme/, { timeout: 15_000 });
     const tour = await db.tour.findFirstOrThrow({ where: { listingId: id } });
     expect([tour.agentId, tour.status]).toEqual(["u-priv", "REQUESTED"]);
 

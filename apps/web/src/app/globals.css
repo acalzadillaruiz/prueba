@@ -143,7 +143,6 @@ body:has([data-public-header]) [data-demobar] { display: none; }
 }
 /* Search on phones/tablets: keep it above the peeking results sheet. */
 @media (min-width: 640px) and (max-width: 1023px) {
-  body:has([data-search-sheet="peek"]) [data-demobar] { bottom: 150px; }
 }
 
 .sr-only-focusable:not(:focus) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }

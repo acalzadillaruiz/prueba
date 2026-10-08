@@ -28,9 +28,9 @@ function useBottomInset() {
         if (getComputedStyle(el).display === "none") return;
         h = Math.max(h, el.getBoundingClientRect().height);
       });
-      // Search on phones: sit above the results sheet while it peeks (over the map), not over the list.
-      const sheet = document.querySelector<HTMLElement>('[data-search-sheet="peek"]');
-      if (sheet && window.innerWidth < 1024) h = Math.max(h, window.innerHeight - sheet.getBoundingClientRect().top);
+      // Search on phones: sit above the floating list/map toggle.
+      const toggle = document.querySelector<HTMLElement>("[data-search-toggle]");
+      if (toggle && window.innerWidth < 1024 && getComputedStyle(toggle).display !== "none") h = Math.max(h, window.innerHeight - toggle.getBoundingClientRect().top + 8);
       setInset(h);
     };
     measure();
@@ -41,7 +41,7 @@ function useBottomInset() {
       window.clearTimeout(t);
       t = window.setTimeout(measure, 350);
     });
-    mo.observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ["data-sticky-cta", "data-search-sheet"] });
+    mo.observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ["data-sticky-cta", "data-search-sheet", "data-search-toggle"] });
     window.addEventListener("resize", measure);
     return () => {
       mo.disconnect();

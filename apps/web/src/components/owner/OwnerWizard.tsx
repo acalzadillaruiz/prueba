@@ -18,6 +18,7 @@ import { EMPTY_EXTRAS, ListingTypeFields, validateExtras, type ExtrasDraft } fro
 import { listingQuality } from "@newplace/config";
 import { EMPTY_ESSENTIALS, EssentialsFields, validateEssentials, type EssentialsDraft } from "./EssentialsFields";
 import { essentialLabels } from "@/lib/essentials";
+import { OwnerNextSteps } from "./OwnerNextSteps";
 
 const STEPS: [string, string][] = [
   ["Tipo", "Type"],
@@ -343,6 +344,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
           )}
           {done.mode === "FSBO" && !done.pending && <Button href={`/${locale}/listing/${done.slug}`} variant="outline" className="border-navy/70 bg-transparent text-navy hover:bg-[#E6DDD2]">{tx(locale, "Ver el anuncio", "View listing")}</Button>}
         </div>
+        {done.mode === "FSBO" && <OwnerNextSteps locale={locale} slug={done.slug} title={(locale === "es" ? d.copy.title_es : d.copy.title_en || d.copy.title_es) || tx(locale, "mi casa", "my home")} live={!done.pending} />}
       </div>
     );
 

@@ -133,3 +133,13 @@ export async function uniqueSlug(base: string) {
 export function draftCopy(input: { kind: string; zone: string; city: string; areaM2: number; beds: number; baths: number; parking: number; amenities: string[] }) {
   return heuristicWriteListing({ ...input, highlights: undefined });
 }
+
+/** Title prefix that marks a moderation report as a lister's appeal against a takedown. */
+export const APPEAL_PREFIX = "Apelación · ";
+
+/** Open (unresolved) takedown appeals for these listings, by listing id. */
+export async function openAppeals(listingIds: string[]) {
+  if (!listingIds.length) return new Map<string, Date>();
+  const rows = await prisma.moderationReport.findMany({ where: { listingId: { in: listingIds }, resolved: false, title: { startsWith: APPEAL_PREFIX } }, select: { listingId: true, createdAt: true } });
+  return new Map(rows.map((r) => [r.listingId!, r.createdAt]));
+}

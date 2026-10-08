@@ -83,9 +83,9 @@ describe("public on-call read", () => {
     expect((await r.json()).advisors.map((a: { agency: { id: string } }) => a.agency.id)).toEqual(["ag-night"]);
   });
   it("follows the Caracas day of the seeded rotation", async () => {
-    // Wed 2026-10-07 23:30 Caracas (Thu 03:30 UTC): Andes Prime's Wednesday advisor is Patricia Salas.
+    // Wed 2026-10-07 23:30 Caracas (Thu 03:30 UTC): Andes Prime's Wednesday advisor is Andrés Mejías (only verified agents are on call).
     const wed = await onCallAdvisors({ agencyId: "ag-andes", now: Date.parse("2026-10-08T03:30:00Z") });
-    expect(wed[0].advisor.name).toBe("Patricia Salas");
+    expect(wed[0].advisor.name).toBe("Andrés Mejías");
     const thu = await onCallAdvisors({ agencyId: "ag-andes", now: Date.parse("2026-10-08T04:30:00Z") });
     expect(thu[0].advisor.name).toBe("Valentina Rojas");
   });

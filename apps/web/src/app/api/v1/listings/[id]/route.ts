@@ -34,6 +34,8 @@ async function brochureOf(id: string) {
   return (await prisma.listing.findUnique({ where: { id }, select: { brochurePdf: true } }))?.brochurePdf ?? null;
 }
 
+const OWNER_STATUSES: string[] = ["DRAFT", "ACTIVE", "UNDER_OFFER", "SOLD", "RENTED", "WITHDRAWN"];
+
 const Patch = z.object({
   title_es: z.string().min(3).max(120).optional(),
   title_en: z.string().max(120).optional(),
@@ -47,6 +49,7 @@ const Patch = z.object({
   baths: z.number().int().min(0).max(30).optional(),
   parking: z.number().int().min(0).max(50).optional(),
   areaM2: z.number().int().positive().max(1_000_000).optional(),
+  yearBuilt: z.number().int().min(1800).max(2100).optional(),
   amenities: z.array(z.string().max(60)).max(50).optional(),
   /** Venezuelan essentials; null clears powerBackup / waterTankLiters / dockFeet */
   ...essentialsSchema.shape,
@@ -75,6 +78,8 @@ export const PATCH = handler(async (req: NextRequest, { params }: Ctx) => {
     const pending = await prisma.mandate.count({ where: { listingId: id, ownerUserId: u.id, status: { in: ["REQUESTED", "ASSIGNED"] } } });
     if (pending) throw new ApiError("FORBIDDEN", { status: "mandate pending" });
   }
+  // A private owner pauses (WITHDRAWN), resumes (ACTIVE) or closes (SOLD/RENTED) their own listing; EXPIRED and COMING_SOON stay with the platform/agencies.
+  if (u.role === "OWNER_PRIVATE" && b.status && !OWNER_STATUSES.includes(b.status)) throw new ApiError("FORBIDDEN", { status: "not for owners" });
   if (b.shortRent && cur.listingType !== "SHORT_RENT") throw new ApiError("VALIDATION", { shortRent: "only for SHORT_RENT" });
   if (b.commercial && !cur.listingType.startsWith("COMMERCIAL")) throw new ApiError("VALIDATION", { commercial: "only for commercial listings" });
   if (b.brochurePdf && !cur.luxury) throw new ApiError("VALIDATION", { brochurePdf: "only for luxury listings" });
@@ -85,7 +90,7 @@ export const PATCH = handler(async (req: NextRequest, { params }: Ctx) => {
   if (b.title_en !== undefined) data.titleEn = b.title_en;
   if (b.body_es) data.bodyEs = b.body_es;
   if (b.body_en !== undefined) data.bodyEn = b.body_en;
-  for (const k of ["beds", "baths", "parking", "areaM2", "amenities", "powerBackup", "ownWell", "waterTankLiters", "dockFeet", "viewAvila", "viewSea", "privateListing", "hasFloorplan", "hasVirtualTour", "virtualTourUrl", "brochurePdf"] as const) if (b[k] !== undefined) data[k] = b[k];
+  for (const k of ["beds", "baths", "parking", "areaM2", "yearBuilt", "amenities", "powerBackup", "ownWell", "waterTankLiters", "dockFeet", "viewAvila", "viewSea", "privateListing", "hasFloorplan", "hasVirtualTour", "virtualTourUrl", "brochurePdf"] as const) if (b[k] !== undefined) data[k] = b[k];
   // Json columns: null clears (Prisma.DbNull), an object replaces.
   for (const k of ["shortRent", "commercial"] as const) if (b[k] !== undefined) data[k] = b[k] === null ? Prisma.DbNull : b[k];
   if (b.agentId !== undefined) {
@@ -121,6 +126,19 @@ export const DELETE = handler(async (_req: NextRequest, { params }: Ctx) => {
   const { id } = await params;
   const u = requireUser(await currentUser());
   const l = await listingForUser(id, u, "edit");
+  // A private owner deleting their own FSBO listing (never handed to an agency) really deletes it: it leaves their list
+  // for good. A taken-down listing stays (the moderation record must survive; the owner can appeal instead).
+  const fsbo = u.role === "OWNER_PRIVATE" && l.ownerUserId === u.id && !l.agencyId && !l.agentId;
+  if (fsbo) {
+    if (l.takedownReason) throw new ApiError("FORBIDDEN", { status: "takedown" });
+    const mandates = await prisma.mandate.count({ where: { listingId: id, status: { not: "CANCELLED" } } });
+    if (!mandates) {
+      await prisma.listing.delete({ where: { id } });
+      await audit(u.id, "listing.delete", l.titleEs);
+      revalidateListing(l.slug);
+      return ok({ ok: true, deleted: true });
+    }
+  }
   await prisma.listing.update({ where: { id }, data: { status: "WITHDRAWN" } });
   await audit(u.id, "listing.withdraw", l.titleEs);
   revalidateListing(l.slug);

@@ -55,7 +55,22 @@ export async function leadForUser(id: string, u: SessionUser) {
     u.role === "SUPERADMIN" ||
     (isManager(u) && !!lead.agencyId && lead.agencyId === u.agencyId) ||
     (lead.agentId === u.id && !!lead.agencyId && lead.agencyId === u.agencyId);
-  if (!ok) throw new ApiError("FORBIDDEN");
+  if (!ok && !(await ownsFsboLead(lead, u))) throw new ApiError("FORBIDDEN");
   return lead;
+}
+
+/**
+ * A private owner answers the enquiries of their own FSBO listing (no agency, no agent on the lead nor on the listing).
+ * Once an agency takes the listing over (mandate linked), its leads belong to the agency.
+ */
+async function ownsFsboLead(lead: { listingId: string; agencyId: string | null; agentId: string | null }, u: SessionUser) {
+  if (u.role !== "OWNER_PRIVATE" || lead.agencyId || lead.agentId) return false;
+  const l = await prisma.listing.findUnique({ where: { id: lead.listingId }, select: { ownerUserId: true, agencyId: true, agentId: true } });
+  return !!l && l.ownerUserId === u.id && !l.agencyId && !l.agentId;
+}
+
+/** Tours of a private owner's FSBO listing: the owner confirms or cancels them (they attend the visits themselves). */
+export function ownsFsboTour(listing: { ownerUserId: string | null; agencyId: string | null; agentId: string | null }, u: SessionUser) {
+  return u.role === "OWNER_PRIVATE" && listing.ownerUserId === u.id && !listing.agencyId && !listing.agentId;
 }
 

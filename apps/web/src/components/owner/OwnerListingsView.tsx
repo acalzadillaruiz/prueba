@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { Check, Eye, Heart, ImagePlus, Inbox, Loader2, Pencil, Plus, Send, TrendingDown } from "lucide-react";
+import { Check, Eye, Heart, ImagePlus, Inbox, Loader2, Pause, Pencil, Play, Plus, Send, Trash2, TrendingDown } from "lucide-react";
 import type { Listing, Locale, Message, Offer } from "@/types/domain";
 import { listingPhoto } from "@/lib/photos";
 import { PropertyArt } from "@/components/art/PropertyArt";
@@ -16,9 +16,11 @@ import { money, num, priceSuffix, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import { TimeAgo } from "./TimeAgo";
 import { listingHref } from "@/lib/listing-href";
+import { OwnerInbox, type OwnerLead, type OwnerTour } from "./OwnerInbox";
+import { OwnerEditForm } from "./OwnerEditForm";
+import { OwnerTakedown } from "./OwnerTakedown";
 
 type Thread = { id: string; subject: string | null; listingId: string | null; leadId?: string | null; participants: { id: string; name: string; hue: number }[]; messages: Message[] };
-type OwnerLead = { id: string; listingId: string; name: string; email: string; phone: string | null; message: string; createdAt: string };
 type Mandate = { id: string; status: "REQUESTED" | "ASSIGNED" | "ACTIVE" | "CANCELLED"; listingId: string | null; agencyName: string; agentName: string | null; createdAt: string };
 
 const MANDATE_LABEL: Record<Mandate["status"], [string, string]> = {
@@ -35,7 +37,7 @@ const OFFER_LABEL: Record<Offer["status"], [string, string]> = {
 };
 const MAX_PRICE = 1_000_000_000;
 
-export function OwnerListingsView({ locale, listings, offers, threads, mandates, leads = [] }: { locale: Locale; listings: Listing[]; offers: Offer[]; threads: Thread[]; mandates: Mandate[]; leads?: OwnerLead[] }) {
+export function OwnerListingsView({ locale, listings, offers, threads, mandates, leads = [], tours = [], appeals = {} }: { locale: Locale; listings: Listing[]; offers: Offer[]; threads: Thread[]; mandates: Mandate[]; leads?: OwnerLead[]; tours?: OwnerTour[]; /** listing id → open appeal date */ appeals?: Record<string, string> }) {
   const { user } = useApp();
   const router = useRouter();
   const [active, setActive] = useState(threads[0]?.id ?? null);
@@ -43,6 +45,8 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
   const [sending, setSending] = useState(false);
   const [chatErr, setChatErr] = useState<string | null>(null);
   const [confirmSold, setConfirmSold] = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [editingListing, setEditingListing] = useState<string | null>(null);
   const [editing, setEditing] = useState<string | null>(null);
   const [price, setPrice] = useState("");
   const [priceErr, setPriceErr] = useState<string | null>(null);
@@ -145,14 +149,17 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
           {listings.map((l) => {
             const lo = offers.filter((o) => o.listingId === l.id);
             const ll = leads.filter((ld) => ld.listingId === l.id);
+            const lt = tours.filter((t) => t.listingId === l.id);
             const isMandate = mandates.some((m) => m.listingId === l.id);
+            const takenDown = !!l.takedownReason;
+            const paused = l.status === "WITHDRAWN" && !takenDown;
             return (
               <Card key={l.id} className={cn(k.card, "border-0 overflow-hidden")}>
                 <div className="grid sm:grid-cols-[220px_1fr]">
                   <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="aspect-[4/3] h-full w-full" />
                   <div className="p-5">
                     <div className="flex flex-wrap items-center gap-2">
-                      <StatusPill status={l.status} review={l.review} locale={locale} />
+                      <StatusPill status={l.status} review={l.review} takedownReason={l.takedownReason} locale={locale} />
                       <span className="text-xs font-semibold text-muted">{isMandate ? tx(locale, "Encargo", "Mandate") : tx(locale, "Publicado por ti", "Listed by you")}</span>
                       <span className="text-xs text-muted">· {l.photos?.length ?? 0} {tx(locale, "fotos", "photos")} · {tx(locale, "calidad", "quality")} {l.quality}</span>
                     </div>
@@ -217,13 +224,32 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
                         );
                       })}
                     </div>
+                    {!isMandate && takenDown && (
+                      <OwnerTakedown locale={locale} listingId={l.id} reason={l.takedownReason!} appealedAt={appeals[l.id] ?? null} onAppealed={() => router.refresh()} />
+                    )}
                     {!isMandate && (
                       <div className="mt-3 flex flex-wrap gap-2">
-                        <Button size="sm" variant="outline" className={k.outline} onClick={() => { setEditing(l.id); setPrice(String(l.priceAmount)); setPriceErr(null); }}><Pencil size={13} /> {tx(locale, "Cambiar precio", "Change price")}</Button>
-                        <Button size="sm" variant="outline" className={k.outline} disabled={busy === `photos-${l.id}`} onClick={() => { setUploadFor(l.id); fileRef.current?.click(); }}>
-                          {busy === `photos-${l.id}` ? <Loader2 size={13} className="animate-spin" /> : <ImagePlus size={13} />} {tx(locale, "Subir fotos", "Upload photos")}
-                        </Button>
-                        {(l.status === "ACTIVE" || l.status === "UNDER_OFFER") &&
+                        <Button size="sm" variant="outline" className={k.outline} aria-expanded={editingListing === l.id} onClick={() => setEditingListing(editingListing === l.id ? null : l.id)}><Pencil size={13} /> {tx(locale, "Editar", "Edit")}</Button>
+                        {/* A taken-down listing is fixed and appealed first: no price changes or new photos meanwhile. */}
+                        {!takenDown && (
+                          <>
+                            <Button size="sm" variant="outline" className={k.outline} onClick={() => { setEditing(l.id); setPrice(String(l.priceAmount)); setPriceErr(null); }}>{tx(locale, "Cambiar precio", "Change price")}</Button>
+                            <Button size="sm" variant="outline" className={k.outline} disabled={busy === `photos-${l.id}`} onClick={() => { setUploadFor(l.id); fileRef.current?.click(); }}>
+                              {busy === `photos-${l.id}` ? <Loader2 size={13} className="animate-spin" /> : <ImagePlus size={13} />} {tx(locale, "Subir fotos", "Upload photos")}
+                            </Button>
+                          </>
+                        )}
+                        {!takenDown && (l.status === "ACTIVE" || l.status === "UNDER_OFFER") && (
+                          <Button size="sm" variant="outline" className={k.outline} disabled={busy === `pause-${l.id}`} onClick={() => act(() => api(`listings/${l.id}`, { method: "PATCH", json: { status: "WITHDRAWN" } }), `pause-${l.id}`)}>
+                            {busy === `pause-${l.id}` ? <Loader2 size={13} className="animate-spin" /> : <Pause size={13} />} {tx(locale, "Pausar", "Pause")}
+                          </Button>
+                        )}
+                        {paused && (
+                          <Button size="sm" variant="navy" disabled={busy === `pause-${l.id}`} onClick={() => act(() => api(`listings/${l.id}`, { method: "PATCH", json: { status: "ACTIVE" } }), `pause-${l.id}`)}>
+                            {busy === `pause-${l.id}` ? <Loader2 size={13} className="animate-spin" /> : <Play size={13} />} {tx(locale, "Reactivar", "Resume")}
+                          </Button>
+                        )}
+                        {!takenDown && (l.status === "ACTIVE" || l.status === "UNDER_OFFER") &&
                           (confirmSold === l.id ? (
                             // Taking a listing off the market is not undoable from here: ask first.
                             <span className="flex flex-wrap items-center gap-2" role="group" aria-label={tx(locale, "Confirmar", "Confirm")}>
@@ -238,27 +264,23 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
                               {l.listingType.includes("RENT") ? tx(locale, "Marcar alquilado", "Mark rented") : tx(locale, "Marcar vendido", "Mark sold")}
                             </Button>
                           ))}
-                      </div>
-                    )}
-                    {ll.length > 0 && (
-                      <div className="mt-4 rounded-lg border border-line" data-testid="owner-leads">
-                        <div className="border-b border-line px-3 py-2 text-xs font-bold uppercase tracking-wide text-muted">{tx(locale, "Personas interesadas", "Interested people")} · {ll.length}</div>
-                        <ul className="divide-y divide-line">
-                          {ll.slice(0, 5).map((ld) => (
-                            <li key={ld.id} className="px-3 py-2.5 text-sm">
-                              <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5">
-                                <span className="font-semibold">{ld.name}</span>
-                                <a href={`mailto:${ld.email}`} className="font-semibold text-navy underline decoration-navy/30 underline-offset-4">{ld.email}</a>
-                                {ld.phone && <a href={`tel:${ld.phone}`} className="font-semibold text-navy underline decoration-navy/30 underline-offset-4">{ld.phone}</a>}
-                                <TimeAgo iso={ld.createdAt} locale={locale} className="ml-auto text-xs text-muted" />
-                              </div>
-                              <p className="mt-0.5 line-clamp-2 text-ink/70">{ld.message}</p>
-                            </li>
+                        {!takenDown &&
+                          (confirmDelete === l.id ? (
+                            <span className="flex flex-wrap items-center gap-2" role="group" aria-label={tx(locale, "Confirmar borrado", "Confirm deletion")}>
+                              <span className="text-sm font-semibold">{tx(locale, "¿Borrar esta casa? No se puede deshacer.", "Delete this home? This can’t be undone.")}</span>
+                              <Button size="sm" variant="ghost" className="bg-danger text-white hover:bg-danger/90" disabled={busy === `del-${l.id}`} onClick={() => act(() => api(`listings/${l.id}`, { method: "DELETE" }), `del-${l.id}`).then(() => setConfirmDelete(null))}>
+                                {busy === `del-${l.id}` ? <Loader2 size={13} className="animate-spin" /> : <Trash2 size={13} />} {tx(locale, "Sí, borrar", "Yes, delete")}
+                              </Button>
+                              <Button size="sm" variant="ghost" onClick={() => setConfirmDelete(null)}>{tx(locale, "No, mantener", "No, keep it")}</Button>
+                            </span>
+                          ) : (
+                            <Button size="sm" variant="ghost" className="text-danger" onClick={() => setConfirmDelete(l.id)}><Trash2 size={13} /> {tx(locale, "Borrar", "Delete")}</Button>
                           ))}
-                        </ul>
-                        {ll.length > 5 && <div className="border-t border-line px-3 py-2 text-[11px] text-muted">{tx(locale, `y ${ll.length - 5} más`, `and ${ll.length - 5} more`)}</div>}
                       </div>
                     )}
+                    {!isMandate && editingListing === l.id && <OwnerEditForm l={l} locale={locale} onDone={(saved) => { setEditingListing(null); if (saved) router.refresh(); }} />}
+                    {paused && !isMandate && <p className="mt-2 text-xs text-muted">{tx(locale, "En pausa: no aparece en el buscador. Reactívala cuando quieras.", "Paused: it doesn’t show in search. Resume it whenever you like.")}</p>}
+                    <OwnerInbox locale={locale} leads={ll} tours={lt} manage={!isMandate} onChanged={() => router.refresh()} />
                     {lo.length > 0 && (
                       <div className="mt-4 rounded-lg border border-line">
                         <div className="border-b border-line px-3 py-2 text-xs font-bold uppercase tracking-wide text-muted">{tx(locale, "Ofertas recibidas", "Offers received")} · {lo.length}</div>
@@ -287,7 +309,8 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
           })}
         </div>
 
-        <Card className={cn(k.card, "border-0 flex h-[620px] flex-col lg:sticky lg:top-24")}>
+        <div id="mensajes" className="scroll-mt-24 lg:sticky lg:top-24 lg:self-start">
+        <Card className={cn(k.card, "border-0 flex h-[620px] flex-col")}>
           {thread ? (
             <>
               <div className="flex items-center gap-3 border-b border-line p-4">
@@ -358,6 +381,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
             <div className="m-auto p-6 text-center text-sm text-muted">{tx(locale, "Cuando un comprador o tu agente te escriba, verás la conversación aquí.", "When a buyer or your agent writes, the conversation shows up here.")}</div>
           )}
         </Card>
+        </div>
       </div>
     </div>
   );

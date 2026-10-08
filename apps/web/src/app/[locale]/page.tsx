@@ -136,10 +136,10 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
             <span className="hidden md:inline">{tx(locale, " Dibuja la tuya y te avisamos cuando aparezca algo.", " Draw yours and we\u2019ll tell you when something turns up.")}</span>
           </p>
         </div>
-        <div className="grid gap-4 md:gap-6 lg:grid-cols-[1.55fr_1fr]">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-4 md:gap-6 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
           {/* Framed on the coast from Los Roques / Caracas to Margarita, with room for the edge clusters and price pills. */}
           <HomeMap listings={pins} locale={locale} focus={{ lat: 10.95, lng: -65.45 }} initialScale={2.9} phoneScale={2.15} className="h-[340px] sm:h-[420px]" />
-          <div className="flex flex-col gap-3">
+          <div className="flex min-w-0 flex-col gap-3">
             {/* One metric per list: the sale zones show the price per m²; zones that today only have rentals (Lechería:
                 vacation homes) go in their own small group, with their "from" price per night / month. */}
             {saleZones.length > 0 && <p className="font-display text-[13px] font-semibold uppercase tracking-[.16em] text-muted">{tx(locale, "En venta · precio por m²", "For sale · price per m²")}</p>}

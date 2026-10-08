@@ -227,7 +227,8 @@ export function PublicHeader({ locale, variant = "light", autoHide = false }: { 
   const luxury = { href: `/${locale}/luxury`, label: t("privateCollection"), active: /\/luxury$/.test(pathname) };
   const remote = { href: `/${locale}#compra-a-distancia`, label: t("remoteBuying"), active: false };
   // Desktop: "Vacacional" joins from 1400 px (below that the pill has no room for it; it stays in the search filters).
-  const nav = [buy, rent, { ...vacation, wide: true }, luxury, remote];
+  // Narrow desktops (lg) keep only the essentials; the rest join as room allows (all of them are always in the drawer).
+  const nav = [buy, rent, { ...vacation, wide: true }, { ...luxury, mid: true }, { ...remote, wide: true }];
   // Drawer: every way to search (the four search types the search page understands), then the rest.
   const searchTypes: DrawerLink[] = [buy, rent, vacation, { href: `/${locale}/search?type=COMMERCIAL`, label: t("commercial"), active: onSearch && type === "COMMERCIAL" }];
   const home = u ? roleHome(u.role) : "/app";
@@ -314,8 +315,9 @@ export function PublicHeader({ locale, variant = "light", autoHide = false }: { 
               href={n.href}
               aria-current={n.active ? "page" : undefined}
               className={cn(
-                "flex min-h-11 items-center px-3 font-display text-[15px] transition-colors duration-np",
+                "flex min-h-11 items-center whitespace-nowrap px-3 font-display text-[15px] transition-colors duration-np",
                 "wide" in n && "hidden min-[1400px]:flex",
+                "mid" in n && "hidden xl:flex",
                 n.active ? (dark ? "text-ivory" : "text-ink") : dark ? "text-ivory/85 hover:text-ivory" : "text-ink/80 hover:text-ink",
               )}
             >

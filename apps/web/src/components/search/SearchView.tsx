@@ -451,13 +451,13 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
     <div className={cn("lg:flex lg:h-[calc(100dvh-72px)] lg:flex-col", phoneMap && "flex h-[calc(100dvh-72px)] flex-col")}>
       {/* search + filter bar */}
       <div className="relative z-30 border-b border-ink/[.06] bg-ivory/80 backdrop-blur-xl">
-        <div className="flex items-center gap-2 px-4 py-2.5 lg:flex-wrap lg:px-5 xl:flex-nowrap">
+        <div className="flex items-center gap-2 px-4 py-2.5 lg:flex-wrap lg:px-5 min-[1440px]:flex-nowrap">
           <form
             onSubmit={(e) => {
               e.preventDefault();
               runNl(nl);
             }}
-            className="relative flex h-11 min-w-0 flex-1 items-center gap-2 rounded-full border border-ink/10 bg-white/75 px-4 backdrop-blur focus-within:border-navy lg:h-10 lg:min-w-[180px] lg:max-w-[320px]"
+            className="relative flex h-11 min-w-0 flex-1 items-center gap-2 rounded-full border border-ink/10 bg-white/75 px-4 backdrop-blur focus-within:border-navy lg:h-10 lg:min-w-[140px] lg:max-w-[320px]"
           >
             <Sparkles size={15} className="shrink-0 text-gold-text" aria-hidden />
             <input
@@ -529,7 +529,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
               className={cn(pill, "ml-auto px-3 disabled:cursor-default xl:px-4", alertSaved ? "border-ok text-ok" : "np-btn-outline border-navy bg-transparent font-semibold text-navy hover:bg-navy/5")}
             >
               {alertSaved ? <Check size={15} aria-hidden /> : savingAlert ? <Loader2 size={15} aria-hidden className="animate-spin" /> : <Bell size={15} aria-hidden />}
-              <span aria-hidden className="hidden xl:inline">{alertSaved ? tx(locale, "Búsqueda guardada", "Search saved") : tx(locale, "Guardar búsqueda", "Save search")}</span>
+              <span aria-hidden className="hidden min-[1440px]:inline">{alertSaved ? tx(locale, "Búsqueda guardada", "Search saved") : tx(locale, "Guardar búsqueda", "Save search")}</span>
             </button>
           </div>
         </div>

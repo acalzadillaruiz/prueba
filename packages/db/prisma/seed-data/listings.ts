@@ -183,18 +183,18 @@ function bodies(s: Seed) {
     en.push(`${s.m2} m² ${KIND_EN[s.k].toLowerCase()} in ${s.z}, ${zone.city}.`, s.hn, `${s.p} parking spaces. Zoning ${s.com?.zoning}.`);
   } else {
     es.push(
-      `${KIND_ES[s.k]} de ${s.m2} m² en ${s.z}, ${zone.city}: ${s.b} habitaciones, ${s.ba} baños y ${s.p} puesto${s.p === 1 ? "" : "s"}.`,
+      `${KIND_ES[s.k]} de ${s.m2} m² en ${s.z}, ${zone.city}: ${s.b} habitaci${s.b === 1 ? "ón" : "ones"}, ${s.ba} baño${s.ba === 1 ? "" : "s"} y ${s.p} puesto${s.p === 1 ? "" : "s"}.`,
       s.he,
       s.t === "SHORT_RENT"
-        ? `Estancia mínima de ${s.sr?.minNights} noches, hasta ${s.sr?.maxGuests} huéspedes.`
+        ? `Estancia mínima de ${s.sr?.minNights} noche${s.sr?.minNights === 1 ? "" : "s"}, hasta ${s.sr?.maxGuests} huésped${s.sr?.maxGuests === 1 ? "" : "es"}.`
         : s.y < 2026
           ? `Construido en ${s.y}. Documentos al día y listo para visitar.`
           : "",
     );
     en.push(
-      `${s.m2} m² ${KIND_EN[s.k].toLowerCase()} in ${s.z}, ${zone.city}: ${s.b} bedrooms, ${s.ba} bathrooms and ${s.p} parking space${s.p === 1 ? "" : "s"}.`,
+      `${s.m2} m² ${KIND_EN[s.k].toLowerCase()} in ${s.z}, ${zone.city}: ${s.b} bedroom${s.b === 1 ? "" : "s"}, ${s.ba} bathroom${s.ba === 1 ? "" : "s"} and ${s.p} parking space${s.p === 1 ? "" : "s"}.`,
       s.hn,
-      s.t === "SHORT_RENT" ? `Minimum stay ${s.sr?.minNights} nights, up to ${s.sr?.maxGuests} guests.` : `Built in ${s.y}. Paperwork in order, ready to view.`,
+      s.t === "SHORT_RENT" ? `Minimum stay ${s.sr?.minNights} night${s.sr?.minNights === 1 ? "" : "s"}, up to ${s.sr?.maxGuests} guest${s.sr?.maxGuests === 1 ? "" : "s"}.` : `Built in ${s.y}. Paperwork in order, ready to view.`,
     );
   }
   return { body_es: es.filter(Boolean).join(" "), body_en: en.filter(Boolean).join(" ") };

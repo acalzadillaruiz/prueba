@@ -152,10 +152,10 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
         </div>
       </section>
 
-      {/* THE BUILDING — how we work. 3D on capable desktops (rises floor by floor, the lit floors are the featured
-          residences); a static, readable layout on phones, Save-Data, modest CPUs and reduced motion. */}
+      {/* THE BUILDING — how we work. Plays by itself when it comes into view (pause / step bars, no scroll pinning):
+          3D on capable desktops, a light CSS tower on phones and modest devices, a plain list under reduced motion. */}
       <div className="mt-24 lg:mt-32">
-        <BuildingScroll chapters={chapters} picks={floors} heading={tx(locale, "Así trabajamos", "How we work")} cta={tx(locale, "Entrar", "Step inside")} />
+        <BuildingScroll locale={locale} chapters={chapters} picks={floors} heading={tx(locale, "Así trabajamos", "How we work")} cta={tx(locale, "Entrar", "Step inside")} />
       </div>
 
       {/* COMPRA A DISTANCIA — the diaspora's routes draw in to Lechería as the steps light up. */}

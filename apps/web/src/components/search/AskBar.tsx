@@ -218,12 +218,12 @@ function CompactAsk({
     >
       <form
         role="search"
-        aria-label={tx(locale, "Buscar propiedades", "Search properties")}
+        aria-label={tx(locale, "Búsqueda rápida", "Quick search")}
         onSubmit={(e) => {
           e.preventDefault();
           onSubmit();
         }}
-        className={cn("np-glass mx-auto flex h-14 max-w-[640px] items-center gap-1 rounded-full p-1.5 pl-1.5 text-ink", shown && "pointer-events-auto")}
+        className={cn("np-glass mx-auto flex h-14 max-w-[640px] [--np-glass:rgb(255_255_255/.8)] items-center gap-1 rounded-full p-1.5 pl-1.5 text-ink", shown && "pointer-events-auto")}
       >
         <label htmlFor={`${id}-mode`} className="sr-only">
           {tx(locale, "Qué buscas", "What you're after")}

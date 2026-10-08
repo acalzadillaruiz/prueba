@@ -121,6 +121,11 @@ html.dark .np-public .text-coral { color: var(--np-coral-light); }
   /* Public mobile tab bar: the demo pill and the floating contact button sit above it. */
   body:has([data-tabbar]) [data-demobar] { bottom: calc(4.75rem + env(safe-area-inset-bottom)); }
 }
+/* Home on phones: the demo edge tab sits high on the right (beside the headline, under the pinned compact search),
+   never over the hero search or the floating contact buttons. */
+@media (max-width: 639px) {
+  body:has([data-sticky-search]) [data-demobar] { top: calc(env(safe-area-inset-top) + 148px); }
+}
 /* Search on phones/tablets: keep it above the peeking results sheet. */
 @media (min-width: 640px) and (max-width: 1023px) {
   body:has([data-search-sheet="peek"]) [data-demobar] { bottom: 150px; }
@@ -176,6 +181,51 @@ html.dark .np-public .text-coral { color: var(--np-coral-light); }
 
 /* ── Immersive home (components/home) ───────────────────────────────────────── */
 .np-chapter-dot.is-on { background: var(--np-coral, #8E3B22); }
+/* Building (autoplay): step bars. Done = full, current = fills over the chapter's duration (paused with playback). */
+.np-step-fill { background: var(--np-coral, #8E3B22); transform: scaleX(0); }
+.np-step-fill.is-done { transform: scaleX(1); }
+.np-step-fill.is-now { animation: np-step-fill linear forwards; }
+html.dark .np-public .np-step-fill { background: #C9A574; }
+@keyframes np-step-fill { from { transform: scaleX(0) } to { transform: scaleX(1) } }
+/* Building (lite): a CSS tower for phones and modest devices. Floors are absolutely stacked (--i), rise out of a
+   blueprint grid with a small blur-to-sharp, and carry an isometric side face; only transform/opacity/filter move. */
+.np-tower { --fh: 16px; --fw: 104px; --base: 26px; --cal: #FBF8F3; --side: #E2D5C3; --glass: #CDC2B3; --mull: rgb(30 26 24 / .16); --lit: #D9A866; --grid: rgb(176 138 85 / .32); }
+@media (min-width: 768px) { .np-tower { --fh: 34px; --fw: 210px; --base: 64px; } }
+html.dark .np-public .np-tower { --cal: #6E6157; --side: #40372F; --glass: #3A322D; --mull: rgb(255 255 255 / .09); --grid: rgb(201 165 116 / .22); }
+.np-tower-grid { position: absolute; left: -30%; right: -30%; bottom: 0; height: 62%; pointer-events: none;
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: 26px 26px;
+  transform: perspective(360px) rotateX(66deg); transform-origin: 50% 100%;
+  -webkit-mask-image: radial-gradient(ellipse 60% 70% at 40% 100%, #000 25%, transparent 72%); mask-image: radial-gradient(ellipse 60% 70% at 40% 100%, #000 25%, transparent 72%); }
+.np-tower-halo { position: absolute; left: 4%; bottom: 6%; width: 60%; height: 70%; border-radius: 50%; pointer-events: none; background: radial-gradient(closest-side, rgb(217 168 102 / .45), transparent); opacity: 0; transition: opacity 1.4s ease; filter: blur(8px); }
+.np-tower-halo[data-on="1"] { opacity: 1; }
+.np-tower-podium { position: absolute; left: -8%; width: 136%; height: 8px; bottom: calc(var(--base) - 8px); border-radius: 3px; background: var(--side); box-shadow: 0 10px 24px -10px rgb(30 26 24 / .35); }
+.np-floor { position: absolute; left: 0; width: 100%; height: calc(var(--fh) - 3px); bottom: calc(var(--base) + var(--i) * var(--fh)); border-radius: 2px;
+  background-color: var(--glass);
+  background-image: linear-gradient(var(--cal) 0 3px, transparent 3px), repeating-linear-gradient(90deg, var(--mull) 0 1px, transparent 1px calc(var(--fw) / 6));
+  box-shadow: 0 1px 0 var(--cal) inset;
+  opacity: 0; transform: translate3d(0, -56px, 0) scale(.96); filter: blur(5px);
+  transition: opacity .8s cubic-bezier(.16,1,.3,1), transform 1.1s cubic-bezier(.16,1,.3,1), filter .8s ease, background-color .9s ease, box-shadow .9s ease;
+  transition-delay: var(--d, 0ms); }
+.np-floor::after { content: ""; position: absolute; top: 0; bottom: 0; left: 100%; width: 26%; background: linear-gradient(var(--cal) 0 3px, var(--side) 3px); transform: skewY(-34deg); transform-origin: 0 0; }
+.np-floor[data-on="1"] { opacity: 1; transform: none; filter: none; }
+.np-floor[data-lit="1"] { background-color: var(--lit); box-shadow: 0 1px 0 var(--cal) inset, 0 0 22px 1px rgb(217 168 102 / .6); }
+.np-tower-roof { position: absolute; left: -6%; width: 138%; height: auto; bottom: calc(var(--base) + 9 * var(--fh) - 1px); overflow: visible;
+  opacity: 0; transform: translate3d(0, -40px, 0); transition: opacity .9s ease, transform 1.2s cubic-bezier(.16,1,.3,1); }
+.np-tower-roof[data-on="1"] { opacity: 1; transform: none; }
+.np-roof-cal { fill: var(--cal); filter: drop-shadow(0 6px 10px rgb(30 26 24 / .18)); }
+.np-roof-teja { fill: #8E3B22; }
+html.dark .np-public .np-roof-teja { fill: #C9A574; }
+.np-tower-scan { position: absolute; left: -12%; width: 150%; height: 2px; bottom: var(--base); pointer-events: none; opacity: 0;
+  background: linear-gradient(90deg, transparent, rgb(201 165 116 / .95), transparent); box-shadow: 0 0 14px 2px rgb(201 165 116 / .5);
+  animation: np-tower-scan 1.8s cubic-bezier(.65,0,.35,1) .2s both; }
+@keyframes np-tower-scan { 0% { opacity: 0; transform: translateY(0) } 15% { opacity: 1 } 85% { opacity: 1 } 100% { opacity: 0; transform: translateY(calc(-9 * var(--fh) - 40px)) } }
+.np-tower-label { position: absolute; left: calc(126% + 6px); bottom: calc(var(--base) + var(--i) * var(--fh) + var(--fh) / 2); display: flex; align-items: center; gap: 6px; transform: translate3d(-8px, 50%, 0); opacity: 0; pointer-events: none;
+  transition: opacity .7s ease, transform .9s cubic-bezier(.16,1,.3,1); transition-delay: 0ms; }
+.np-tower-label[data-on="1"] { opacity: 1; transform: translate3d(0, 50%, 0); pointer-events: auto; transition-delay: var(--d, 0ms); }
+@media (prefers-reduced-motion: reduce) {
+  .np-floor, .np-tower-roof, .np-tower-label, .np-tower-halo { transition: none; filter: none; }
+  .np-tower-scan, .np-step-fill.is-now { animation: none; }
+}
 .np-scroll-line::after { content: ""; position: absolute; inset: 0; background: #F1EBE3; transform: translateY(-100%); animation: np-scroll-line 2.2s cubic-bezier(.65,0,.35,1) infinite; }
 @keyframes np-scroll-line { 0% { transform: translateY(-100%) } 55% { transform: translateY(0) } 100% { transform: translateY(100%) } }
 /* Steps light up as the route draws; text stays full-contrast, only the numeral and a rule change. */

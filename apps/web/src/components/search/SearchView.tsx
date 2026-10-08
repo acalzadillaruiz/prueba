@@ -733,11 +733,18 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
       </div>
 
       {/* Phones and tablets: ONE docked bar — list/map toggle (+ filters on the map) and the comparator, which does
-          not float a second layer here (CompareTray stays out below lg on /search). `data-search-toggle` lets other
-          floating pieces (the save toast) sit above it. */}
+          not float a second layer here (CompareTray stays out below lg on /search). Tablets (md, two card columns) in
+          list view: the pill sits in a solid bottom bar, so it never covers a card's title in the middle of the grid
+          (the list's bottom spacer clears the bar). `data-search-toggle` lets other floating pieces (the save toast)
+          sit above it. */}
       {(hasResults || view === "map" || compare.length > 0) && (
       <div
-        className="pointer-events-none fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom)+12px)] z-[35] flex justify-center px-4 md:bottom-[calc(env(safe-area-inset-bottom)+16px)] lg:hidden print:hidden"
+        className={cn(
+          "pointer-events-none fixed inset-x-0 z-[35] flex justify-center px-4 lg:hidden print:hidden",
+          view === "list"
+            ? "bottom-[calc(4rem+env(safe-area-inset-bottom)+12px)] md:pointer-events-auto md:bottom-0 md:border-t md:border-line md:bg-[#F1EBE3]/90 md:pb-[calc(env(safe-area-inset-bottom)+10px)] md:pt-2.5 md:backdrop-blur-md md:dark:bg-[#15120F]/90"
+            : "bottom-[calc(4rem+env(safe-area-inset-bottom)+12px)] md:bottom-[calc(env(safe-area-inset-bottom)+16px)]",
+        )}
         data-search-toggle
       >
         <div className="pointer-events-auto flex max-w-full overflow-hidden whitespace-nowrap rounded-full bg-[#1E1A18] font-display text-[15px] font-semibold text-[#F1EBE3] shadow-[0_12px_30px_-8px_rgba(30,26,24,.55)] [html.dark_&]:bg-[#F1EBE3] [html.dark_&]:text-[#1E1A18]">

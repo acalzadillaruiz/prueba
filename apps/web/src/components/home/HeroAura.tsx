@@ -65,9 +65,10 @@ export function HeroAura({
         </div>
 
         {/* Phones: the search comes first (whole bar visible on first paint, clear of the tab bar); the arch follows
-            as a calmer band right below it. */}
-        <div className="relative mx-auto w-full max-w-[360px] sm:max-w-[520px] lg:mr-0" data-tilt="5" style={{ transformStyle: "preserve-3d" }}>
-          <div className="np-arch relative aspect-[6/5] w-full bg-arena shadow-[0_40px_90px_-30px_rgba(30,26,24,.45)] sm:aspect-[4/5]">
+            as a calmer band right below it. Tablets (md, one column): a wider, shorter arch (≤ ~420 px), not a 650 px
+            portrait one. */}
+        <div className="relative mx-auto w-full max-w-[360px] sm:max-w-[520px] md:max-w-[620px] lg:mr-0 lg:max-w-[520px]" data-tilt="5" style={{ transformStyle: "preserve-3d" }}>
+          <div className="np-arch relative aspect-[6/5] w-full bg-arena shadow-[0_40px_90px_-30px_rgba(30,26,24,.45)] sm:aspect-[4/5] md:aspect-[3/2] lg:aspect-[4/5]">
             <Image
               src="/brand/hero-arco.jpg"
               alt={tx(locale, "Arco abierto a una terraza frente al mar", "An arch opening onto a terrace by the sea")}

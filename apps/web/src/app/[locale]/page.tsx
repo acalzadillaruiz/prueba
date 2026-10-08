@@ -144,7 +144,8 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
                 vacation homes) go in their own small group, with their "from" price per night / month. */}
             {saleZones.length > 0 && <p className="font-display text-[13px] font-semibold uppercase tracking-[.16em] text-muted">{tx(locale, "En venta · precio por m²", "For sale · price per m²")}</p>}
             {/* Phones: a sideways rail (one row, swipe) instead of a tall stack; md+: the stacked list. */}
-            <ul data-reveal="stagger" data-zone-rail className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 md:mx-0 md:snap-none md:flex-col md:overflow-visible md:px-0">
+            {/* Tablets (md, map above): two columns, so the list isn't four tall rows; lg: the stack beside the map. */}
+            <ul data-reveal="stagger" data-zone-rail className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 md:mx-0 md:grid md:snap-none md:grid-cols-2 md:overflow-visible md:px-0 lg:flex lg:flex-col">
               {saleZones.map((z) => (
                 <li key={z.zone} className="w-[78%] shrink-0 snap-start sm:w-[46%] md:w-auto">
                   <Link href={z.href} data-spotlight className="np-glass group flex h-full min-h-[88px] items-stretch overflow-hidden rounded-[24px] transition-transform duration-500 hover:-translate-y-0.5 md:min-h-[104px]">
@@ -247,7 +248,8 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
               </Button>
             </span>
           </div>
-          <div data-unveil className="relative mx-auto mb-5 aspect-[16/10] w-full max-w-[520px] overflow-hidden rounded-[24px] bg-[#D9CDB8] sm:aspect-[5/6] sm:rounded-[32px] md:mb-6 lg:mb-12 lg:mr-0">
+          {/* Portrait only beside the copy (lg); stacked below it (phones, tablets) a landscape band. */}
+          <div data-unveil className="relative mx-auto mb-5 aspect-[16/10] w-full max-w-[520px] overflow-hidden rounded-[24px] bg-[#D9CDB8] sm:rounded-[32px] md:mb-6 lg:mb-12 lg:mr-0 lg:aspect-[5/6]">
             <div data-parallax="40" className="absolute -inset-y-[8%] inset-x-0">
               <Image src="/brand/oficina.jpg" alt={tx(locale, "Despacho con ventanal en arco", "Study with an arched window")} fill sizes="(max-width: 1024px) 90vw, 520px" className="object-cover" />
             </div>

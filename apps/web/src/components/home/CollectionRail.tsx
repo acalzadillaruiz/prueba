@@ -7,9 +7,15 @@ import { scrubSection, useReducedMotion } from "./motion";
 
 export type RailItem = { href: string; title: string; zone: string; price: string; facts: string; photo?: string; badge?: string };
 
+/** Pinning (scroll-driven sideways glide) only on desktops with a mouse/trackpad: on touch (tablets, phones) a pinned
+ * section is ~2,400 px of scrolling that goes sideways, so they get a native swipe row instead. Same query as the
+ * `[@media(min-width:1024px)_and_(pointer:fine)]:` classes below. */
+const PIN_QUERY = "(min-width: 1024px) and (pointer: fine)";
+
 /**
- * Colección Privada as a horizontal gallery: the section pins and the residences glide sideways with the
- * scroll, each photo drifting inside its arch (parallax). Phones and reduced motion get a native swipe row.
+ * Colección Privada as a horizontal gallery: on desktops with a fine pointer the section pins and the residences
+ * glide sideways with the scroll, each photo drifting inside its arch (parallax). Touch screens (phones, tablets,
+ * touch laptops) and reduced motion get a native swipe row.
  */
 export function CollectionRail({ eyebrow, title, items, more }: { eyebrow: string; title: string; items: RailItem[]; more: { href: string; label: string } }) {
   const reduced = useReducedMotion();
@@ -22,7 +28,7 @@ export function CollectionRail({ eyebrow, title, items, more }: { eyebrow: strin
     const el = root.current;
     const tr = track.current;
     if (reduced || !el || !tr) return;
-    const mq = window.matchMedia("(min-width: 768px)");
+    const mq = window.matchMedia(PIN_QUERY);
     let off: (() => void) | undefined;
     const setup = () => {
       off?.();
@@ -55,13 +61,13 @@ export function CollectionRail({ eyebrow, title, items, more }: { eyebrow: strin
   return (
     // data-hide-fab: the floating contact button steps away while the cards glide under its corner.
     <section ref={root} data-hide-fab className="relative bg-ivory" aria-label={title}>
-      <div className="flex flex-col justify-center overflow-hidden py-10 md:sticky md:top-0 md:h-[100svh] md:py-0">
+      <div className="flex flex-col justify-center overflow-hidden py-10 md:py-14 [@media(min-width:1024px)_and_(pointer:fine)]:sticky [@media(min-width:1024px)_and_(pointer:fine)]:top-0 [@media(min-width:1024px)_and_(pointer:fine)]:h-[100svh] [@media(min-width:1024px)_and_(pointer:fine)]:py-0">
         <div className="mx-auto mb-5 flex w-full max-w-[1320px] items-end justify-between gap-6 px-4 md:mb-12 md:px-8">
           <div>
             <p className="np-kicker text-gold-text">{eyebrow}</p>
             <h2 className="mt-2 text-[32px] leading-[1.02] tracking-[-0.02em] md:mt-3 md:text-[60px]">{title}</h2>
           </div>
-          <div className="hidden items-center gap-4 md:flex" aria-hidden>
+          <div className="hidden items-center gap-4 [@media(min-width:1024px)_and_(pointer:fine)]:flex" aria-hidden>
             <span className="font-display text-[13px] font-semibold tracking-[0.2em] text-muted">
               <span ref={counter} className="text-ink">01</span> / {String(items.length).padStart(2, "0")}
             </span>
@@ -72,7 +78,7 @@ export function CollectionRail({ eyebrow, title, items, more }: { eyebrow: strin
         </div>
         <div
           ref={track}
-          className="no-scrollbar flex snap-x snap-mandatory gap-5 overflow-x-auto px-4 will-change-transform md:snap-none md:gap-8 md:overflow-visible md:px-8 md:pl-[max(2rem,calc((100vw-1320px)/2+2rem))]"
+          className="no-scrollbar flex snap-x snap-mandatory gap-5 overflow-x-auto px-4 md:gap-8 md:px-8 md:pl-[max(2rem,calc((100vw-1320px)/2+2rem))] [@media(min-width:1024px)_and_(pointer:fine)]:snap-none [@media(min-width:1024px)_and_(pointer:fine)]:overflow-visible [@media(min-width:1024px)_and_(pointer:fine)]:will-change-transform"
         >
           {items.map((it, i) => (
             <Link key={it.href} href={it.href} data-spotlight className="group relative w-[72vw] shrink-0 snap-start overflow-hidden rounded-[32px] bg-arena sm:w-[46vw] md:w-[34vw] lg:w-[28vw] xl:w-[420px]">

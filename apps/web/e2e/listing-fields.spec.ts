@@ -198,10 +198,10 @@ test.describe("2 · Campos por tipo de inmueble", () => {
     await page.goto(`/es/agency/listings/${r.json.id}/edit`);
     await expect(page.getByLabel("Zonificación").first()).toHaveValue("C-3 Comercial");
     await expect(page.getByLabel("Noches mínimas")).toHaveCount(0);
-    await page.getByLabel("Altura libre (m)").fill("1");
+    await page.getByLabel("Altura libre (m)").filter({ visible: true }).fill("1");
     await page.getByRole("button", { name: "Guardar" }).click();
     await expect(page.getByRole("alert").filter({ hasText: /Altura libre entre 2 y 40 m/ })).toBeVisible();
-    await page.getByLabel("Altura libre (m)").fill("4.5");
+    await page.getByLabel("Altura libre (m)").filter({ visible: true }).fill("4.5");
     await page.getByLabel("Zonificación").fill(`C-2 E2E ${stamp}`);
     await page.getByLabel("Tiene andén de carga").check();
     await page.getByRole("button", { name: "Guardar" }).click();

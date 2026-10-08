@@ -486,11 +486,42 @@ test.describe("Cliente · regresiones de la revisión", () => {
     }).toPass();
     await box.press("ArrowDown");
     await expect(box).toHaveAttribute("aria-activedescendant", /.+/);
-    await box.press("Enter");
-    await expect(box).toHaveValue(/^casa en Lechería/);
+    // Picking a place IS the search: one Enter completes the text and applies the zone at once (no second Enter).
     await box.press("Enter");
     await page.waitForURL(/zone=Lecher/);
     await expect(page.getByTestId("not-understood")).toHaveCount(0);
+    // The understood words became filters, so the box doesn't keep them (box, chips and results agree)…
+    await expect(box).not.toHaveValue(/Lechería/);
+    // …and the map view shows the same search.
+    if (await page.getByRole("button", { name: "Mapa", exact: true }).isVisible()) {
+      await page.getByRole("button", { name: "Mapa", exact: true }).click();
+      await expect(page).toHaveURL(/zone=Lecher/);
+    }
+  });
+  test("buscador de la portada: un clic en una zona sugerida busca al instante", async ({ page }) => {
+    await page.goto("/es");
+    const box = page.getByRole("combobox", { name: "Describe la casa que buscas" }).first();
+    await expect(async () => {
+      await box.fill("Lech");
+      await expect(page.getByRole("option", { name: /Lechería/ }).first()).toBeVisible({ timeout: 1000 });
+    }).toPass();
+    await page.getByRole("option", { name: /Lechería/ }).first().click();
+    await page.waitForURL(/\/es\/search\?.*zone=Lecher/);
+  });
+  test("cabecera a 1280: «Vacacional» se ve y nada salta de línea", async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto("/es/search");
+    const nav = page.getByRole("navigation", { name: "Principal" });
+    await expect(nav.getByRole("link", { name: "Vacacional" })).toBeVisible();
+    await expect(nav.getByRole("link", { name: "Colección Privada" })).toBeVisible();
+    // One line: every nav link on the same row, and the bar no wider than the screen.
+    const tops = await nav.getByRole("link").evaluateAll((els) => els.filter((e) => e.getBoundingClientRect().width > 0).map((e) => Math.round(e.getBoundingClientRect().top)));
+    expect(new Set(tops).size).toBe(1);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(1280);
+    // 1024 keeps only the essentials (and still fits).
+    await page.setViewportSize({ width: 1024, height: 800 });
+    await expect(nav.getByRole("link", { name: "Vacacional" })).toBeHidden();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(1024);
   });
   test("ficha: si se envía antes de que llegue la sesión, los errores se limpian al autocompletar y luego se envía", async ({ page }) => {
     await signIn(page, "seeker@gmail.com");

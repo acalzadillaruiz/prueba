@@ -70,14 +70,14 @@ h1, h2, h3 { text-wrap: balance; }
    so navy sections (hero, footer, trust strip) keep their Cal text. Committee dark panel:
    background #15120F, surfaces #2A2420, text Cal, accent terracotta-light #C9A574 (6.8:1 on navy). */
 html.dark body { background: #15120F; }
-html.dark { --np-muted-rgb: 169 180 194; }
+html.dark { --np-muted-rgb: 181 170 160; }
 html.dark .np-public {
   --np-ink: #F1EBE3;
   --np-ink-rgb: 248 245 239;
-  --np-muted-rgb: 169 180 194;
+  --np-muted-rgb: 181 170 160;
   --np-line: #3A322D;
-  --np-line-rgb: 42 62 85;
-  --np-arena-rgb: 30 48 72;
+  --np-line-rgb: 58 50 45;
+  --np-arena-rgb: 42 36 32;
   --np-rosa-rgb: 58 44 48;
   --np-gold-text-rgb: 217 197 156;
   --np-coral-cta-rgb: 168 69 42;
@@ -90,10 +90,10 @@ html.dark .np-public {
   color: var(--np-ink);
 }
 html.dark .np-public .bg-white { background-color: #2A2420; }
-html.dark .np-public .bg-white\/90 { background-color: rgb(30 48 72 / .9); }
-html.dark .np-public .bg-white\/60 { background-color: rgb(30 48 72 / .6); }
+html.dark .np-public .bg-white\/90 { background-color: rgb(42 36 32 / .9); }
+html.dark .np-public .bg-white\/60 { background-color: rgb(42 36 32 / .6); }
 html.dark .np-public .bg-ivory { background-color: #15120F; }
-html.dark .np-public .bg-ivory\/90, html.dark .np-public .bg-ivory\/95 { background-color: rgb(16 28 43 / .92); }
+html.dark .np-public .bg-ivory\/90, html.dark .np-public .bg-ivory\/95, html.dark .np-public .bg-ivory\/80 { background-color: rgb(21 18 15 / .9); }
 html.dark .np-public .hover\:bg-ivory:hover { background-color: #3A322D; }
 html.dark .np-public .text-navy { color: #F1EBE3; }
 html.dark .np-public .border-navy { border-color: #C9A574; }
@@ -245,3 +245,14 @@ html:not(.np-motion) [data-unveil] { clip-path: none; }
 /* Dark mode: the light 2035 panels (footer, owner band, building) take the warm dark surface. */
 html.dark .np-public :is(footer.np-grain, .bg-\[\#E9E0D3\]) { background-color: #2A2420; }
 html.dark .np-public .bg-ink { background-color: #F1EBE3; color: #1E1A18; }
+/* Panel tables: the last column (actions) stays in view instead of hiding behind a horizontal scroll. */
+.np-sticky-last tr > :last-child { position: sticky; right: 0; z-index: 1; background: #fff; box-shadow: -14px 0 18px -14px rgb(30 26 24 / .22); }
+html.dark .np-sticky-last tr > :last-child { background: #2A2420; }
+/* Dark mode for the 2035 surfaces: translucent whites become warm translucent darks, inputs stay readable. */
+html.dark .np-public :is(.bg-white\/85, .bg-white\/75, .bg-white\/70, .bg-white\/50) { background-color: rgb(255 255 255 / .06); }
+html.dark .np-public :is(input, select, textarea) { color: #F1EBE3; }
+html.dark .np-public :is(input, textarea):not(.placeholder\:text-transparent)::placeholder { color: #B5AAA0; }
+html.dark .np-public .text-ink\/45 { color: rgb(241 235 227 / .55); }
+html.dark .np-public :is(.border-ink\/10, .border-ink\/\[\.07\], .border-ink\/\[\.06\]) { border-color: rgb(255 255 255 / .1); }
+html.dark .np-public .bg-ivory { background-color: #15120F; }
+html.dark .np-public .np-aura i { opacity: .12; }

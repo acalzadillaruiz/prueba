@@ -36,7 +36,7 @@ function Essentials({ l, locale, title }: { l: Listing; locale: Locale; title: R
         {items.map(({ key, label }) => {
           const Icon = ESSENTIAL_ICON[key];
           return (
-            <li key={key} className="flex items-center gap-3 rounded-xl border border-line bg-white px-4 py-3 text-[15px] font-semibold text-ink [font-feature-settings:'lnum']">
+            <li key={key} className="flex items-center gap-3 rounded-[20px] bg-white/70 ring-1 ring-black/[.04] px-4 py-3 text-[15px] font-semibold text-ink [font-feature-settings:'lnum']">
               <Icon size={18} strokeWidth={1.7} className="shrink-0 text-navy" aria-hidden />
               <span>{label}</span>
             </li>
@@ -118,7 +118,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
   const soldNearby = soldRows.map((r) => toCard(toDomain(r))).map((o) => ({ t: `${tx(locale, o.title_es, o.title_en)} · ${o.areaM2} m²`, p: o.priceAmount, d: tx(locale, o.status === "SOLD" ? "Vendido" : "Alquilado", o.status === "SOLD" ? "Sold" : "Rented") }));
   const H = ({ children }: { children: React.ReactNode }) => <h3 className="mb-5 font-serif text-[28px] leading-tight">{children}</h3>;
   const sec = "border-t border-line py-10";
-  const tile = "rounded-xl border border-line bg-white px-4 py-3 text-[15px]";
+  const tile = "rounded-[20px] bg-white/70 ring-1 ring-black/[.04] px-4 py-3 text-[15px]";
   const searchType = l.listingType.startsWith("COMMERCIAL") ? "COMMERCIAL" : l.listingType;
 
   return (
@@ -167,7 +167,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
                 <SaveButton id={l.id} locale={locale} className="border border-line" />
               </div>
             </div>
-            <h1 className="mt-5 max-w-[760px] text-[38px] leading-[1.08] md:text-[52px]">{tx(locale, l.title_es, l.title_en)}</h1>
+            <h1 className="mt-5 max-w-[760px] text-[38px] leading-[1.06] tracking-[-0.02em] md:text-[56px]">{tx(locale, l.title_es, l.title_en)}</h1>
             <p className="mt-2 text-[15px] text-muted">{l.address} · {l.zone}, {l.city}{l.state && l.state !== l.city ? `, ${l.state}` : ""}</p>
             <div className="mt-7 flex flex-wrap items-baseline gap-x-5 gap-y-1">
               <div className="font-serif text-[48px] font-semibold leading-none text-ink md:text-[58px]">
@@ -220,7 +220,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
               </p>
             </div>
 
-            <div className={cn(sec, "grid gap-10 md:grid-cols-2")}>
+            <div className={cn(sec, "grid grid-cols-1 gap-10 md:grid-cols-2")}>
               <div>
                 <H>{tx(locale, "Historial de precio", "Price history")}</H>
                 <PriceHistory events={l.priceHistory} locale={locale} />
@@ -235,7 +235,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
                     [num(zone.activeListings, locale), tx(locale, "en oferta en New Place", "available on New Place")],
                     [zone.daysOnMarket, tx(locale, "días en mercado (mediana)", "median days on market")],
                   ].map(([v, t]) => (
-                    <div key={String(t)} className="rounded-xl border border-line bg-white p-4">
+                    <div key={String(t)} className="rounded-[20px] bg-white/70 ring-1 ring-black/[.04] p-4">
                       <div className="font-serif text-[26px] font-semibold leading-none">{v}</div>
                       <div className="mt-1.5 text-sm text-muted">{t}</div>
                     </div>
@@ -247,7 +247,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
             {soldNearby.length > 0 && (
               <div className={sec}>
                 <H>{tx(locale, "Vendidos cerca", "Sold nearby")}</H>
-                <div className="divide-y divide-line rounded-xl border border-line bg-white">
+                <div className="divide-y divide-line rounded-[20px] bg-white/70 ring-1 ring-black/[.04]">
                   {soldNearby.map((s) => (
                     <div key={s.t} className="flex items-center justify-between gap-3 px-4 py-3 text-[15px]">
                       <span className="font-semibold">{s.t}</span>
@@ -275,7 +275,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
 
         {similar.length > 0 && (
           <div className="mx-auto max-w-[1320px] px-4 pb-20 pt-10 md:px-8">
-            <h2 className="mb-8 text-[34px] leading-tight md:text-[42px]">{tx(locale, "Propiedades similares", "Similar properties")}</h2>
+            <h2 className="mb-8 text-[34px] leading-tight tracking-[-0.02em] md:text-[46px]">{tx(locale, "También te pueden gustar", "You might also like")}</h2>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {similar.map((s) => (
                 <ListingCard key={s.id} l={s} locale={locale} compact />

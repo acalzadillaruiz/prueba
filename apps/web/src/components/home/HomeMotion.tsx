@@ -67,15 +67,6 @@ export function HomeMotion() {
       };
     });
 
-    // [data-spotlight]: a soft light follows the pointer (CSS reads --mx/--my).
-    const onSpot = (e: PointerEvent) => {
-      const el = (e.target as HTMLElement).closest?.("[data-spotlight]") as HTMLElement | null;
-      if (!el) return;
-      const r = el.getBoundingClientRect();
-      el.style.setProperty("--mx", `${e.clientX - r.left}px`);
-      el.style.setProperty("--my", `${e.clientY - r.top}px`);
-    };
-    document.addEventListener("pointermove", onSpot, { passive: true });
     // [data-tilt]: cards lean a few degrees toward the pointer (fine pointers only).
     const fine = window.matchMedia("(pointer: fine)").matches;
     const tilts = fine ? Array.from(document.querySelectorAll<HTMLElement>("[data-tilt]")) : [];
@@ -127,7 +118,6 @@ export function HomeMotion() {
       window.clearTimeout(t);
       cleanups.forEach((c) => c());
       tiltOff.forEach((c) => c());
-      document.removeEventListener("pointermove", onSpot);
       io.disconnect();
       ctx.revert();
       gsap.ticker.remove(tick);

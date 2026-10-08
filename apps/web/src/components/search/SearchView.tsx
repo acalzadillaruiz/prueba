@@ -213,7 +213,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
   return (
     <div className="flex h-[calc(100dvh-72px)] flex-col">
       {/* filter bar */}
-      <div className="relative z-30 border-b border-line bg-ivory">
+      <div className="relative z-30 border-b border-ink/[.06] bg-ivory/80 backdrop-blur-xl">
         <div className="no-scrollbar flex items-center gap-2 overflow-x-auto px-4 py-2.5 md:flex-wrap md:overflow-visible md:px-5">
           <form
             onSubmit={(e) => {
@@ -224,7 +224,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
               if (!q.listingType) p.set("type", type);
               router.replace(`/${locale}/search?${p.toString()}`);
             }}
-            className="flex h-11 min-w-[220px] shrink-0 items-center gap-2 rounded-full border border-line bg-white px-4 focus-within:border-navy md:h-10 md:flex-1 xl:max-w-[300px]"
+            className="flex h-11 min-w-[220px] shrink-0 items-center gap-2 rounded-full border border-ink/10 bg-white/75 backdrop-blur px-4 focus-within:border-navy md:h-10 md:flex-1 xl:max-w-[300px]"
           >
             <Sparkles size={15} className="shrink-0 text-gold-text" aria-hidden />
             <input
@@ -235,7 +235,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
               className="min-w-0 flex-1 bg-transparent text-sm focus:outline-none"
             />
           </form>
-          <div className="flex shrink-0 gap-0.5 rounded-full border border-line bg-white p-1">
+          <div className="flex shrink-0 gap-0.5 rounded-full border border-ink/10 bg-white/75 backdrop-blur p-1">
             {TYPES.map(([k, es, en]) => (
               <button
                 key={k}
@@ -463,9 +463,9 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
                   {plural(query.data?.total ?? results.length, locale, ["resultado", "resultados"], ["result", "results"])}{query.isFetching && <Loader2 size={15} className="ml-2 inline animate-spin text-muted" />}
                   {shape && <span className="ml-2 inline-block rounded-full bg-[#C2A988] px-2.5 py-0.5 align-middle font-display text-xs font-semibold text-[#433B35]">{tx(locale, "en tu zona dibujada", "in your drawn area")}</span>}
                 </div>
-                <div className="text-sm text-muted">{tx(locale, "Precios en USD · actualizados en tiempo real", "Prices in USD · updated in real time")}</div>
+                <div className="text-sm text-muted">{tx(locale, "Precios en dólares, siempre al día", "Prices in US dollars, always up to date")}</div>
               </div>
-              <select value={sort} onChange={(e) => set({ sort: e.target.value === "new" ? null : e.target.value })} aria-label={tx(locale, "Ordenar por", "Sort by")} className="h-11 rounded-full border border-line bg-white px-3 text-sm md:h-9">
+              <select value={sort} onChange={(e) => set({ sort: e.target.value === "new" ? null : e.target.value })} aria-label={tx(locale, "Ordenar por", "Sort by")} className="h-11 rounded-full border border-ink/10 bg-white/75 backdrop-blur px-3 text-sm md:h-9">
                 <option value="new">{tx(locale, "Más nuevos", "Newest")}</option>
                 <option value="price-asc">{tx(locale, "Precio ↑", "Price ↑")}</option>
                 <option value="price-desc">{tx(locale, "Precio ↓", "Price ↓")}</option>
@@ -484,7 +484,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
           </div>
           {/* Collapsed sheet on phones: the cards are off-screen, keep them out of the tab order. */}
           <div id="search-results" inert={!desktop && !mobileList ? true : undefined}>
-          <div className="grid gap-4 p-4 sm:grid-cols-2">
+          <div className="grid gap-5 p-4 sm:grid-cols-2">
             {results.map((l) => (
               <div key={l.id} onMouseEnter={() => setHover(l.id)} onMouseLeave={() => setHover(null)}>
                 <ListingCard l={l} locale={locale} compact />

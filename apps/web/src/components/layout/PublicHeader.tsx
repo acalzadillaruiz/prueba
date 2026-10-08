@@ -48,7 +48,19 @@ export function PublicHeader({ locale, variant = "light" }: { locale: Locale; va
       document.body.style.overflow = "";
     };
   }, [menuOpen]);
-  // Transparent header (over the hero photo) turns solid navy once the page scrolls.
+  // Pointer light for [data-spotlight] surfaces (cards, glass panels) on every public page.
+  useEffect(() => {
+    const onSpot = (e: PointerEvent) => {
+      const el = (e.target as HTMLElement).closest?.("[data-spotlight]") as HTMLElement | null;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      el.style.setProperty("--mx", `${e.clientX - r.left}px`);
+      el.style.setProperty("--my", `${e.clientY - r.top}px`);
+    };
+    document.addEventListener("pointermove", onSpot, { passive: true });
+    return () => document.removeEventListener("pointermove", onSpot);
+  }, []);
+  // Transparent header (over the hero) turns into frosted glass once the page scrolls.
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
     if (variant !== "transparent") return;

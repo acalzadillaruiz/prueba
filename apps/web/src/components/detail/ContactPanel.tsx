@@ -107,12 +107,12 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
   const wa = whatsappHref(l, locale);
   const first = agent?.name.split(" ")[0] ?? agency?.name ?? "";
   const initials = (agent?.name ?? agency?.name ?? "NP").split(" ").map((p) => p[0]).slice(0, 2).join("");
-  const box = dark ? "bg-navy-card text-ivory ring-navy-line" : "bg-white ring-black/[.04]";
+  const box = dark ? "bg-navy-card text-ivory ring-navy-line" : "np-glass ring-0";
   const seg = (active: boolean) => cn("flex min-h-11 items-center justify-center gap-1.5 rounded-full border-2 font-display text-sm transition-colors duration-np", active ? "np-sel font-semibold" : "border-transparent text-muted hover:text-ink");
 
   if (done !== null)
     return (
-      <div id="contact-panel" tabIndex={-1} className={cn("np-in rounded-[24px] p-6 shadow-[0_24px_60px_rgba(30,26,24,.12)] ring-1", box)} data-testid="lead-done">
+      <div id="contact-panel" tabIndex={-1} className={cn("np-in rounded-[28px] p-6 ring-1", box)} data-testid="lead-done">
         <CheckCircle2 className="text-ok" size={30} />
         <div className="mt-3 font-serif text-[28px] leading-tight">{mode === "tour" && done ? tx(locale, "Visita solicitada", "Tour requested") : tx(locale, "Mensaje enviado", "Message sent")}</div>
         {done && <div className="mt-1 font-display text-[17px] font-semibold first-letter:uppercase text-ink">{done}</div>}
@@ -127,7 +127,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
     );
 
   return (
-    <div id="contact-panel" tabIndex={-1} data-hide-fab className={cn("rounded-[24px] p-6 shadow-[0_24px_60px_rgba(30,26,24,.12)] ring-1", box)}>
+    <div id="contact-panel" tabIndex={-1} data-hide-fab className={cn("rounded-[28px] p-6 ring-1", box)}>
       {(agent || agency) && (
         <div className="flex items-center gap-4">
           <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#D9C6AB] font-serif text-[22px] font-semibold text-[#1E1A18]" aria-hidden>{initials}</span>

@@ -93,7 +93,7 @@ test.describe("Revisión admin: regresiones", () => {
     expect(r.json.photos[0]).toMatchObject({ id: photos[1].id, isCover: true });
 
     await page.goto(`/es/agency/listings/${id}/edit`);
-    await expect(page.getByText("Comisión estimada")).toBeVisible();
+    await expect(page.getByText("Comisión estimada").first()).toBeVisible();
     await expect(page.getByRole("button", { name: "Subir" })).toBeVisible();
 
     await logout(page);

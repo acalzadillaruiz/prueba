@@ -193,7 +193,7 @@ test.describe("2 · Campos por tipo de inmueble", () => {
     const r = await create(page, base({ mode: "AGENCY", listingType: "COMMERCIAL_SALE", kind: "office", beds: 0, priceAmount: 250_000, commercial: { ceilingHeight: 3, loadingDock: false, zoning: "C-3 Comercial" } }));
     expect(r.status).toBe(201);
     await page.goto(`/es/agency/listings/${r.json.id}/edit`);
-    await expect(page.getByLabel("Zonificación")).toHaveValue("C-3 Comercial");
+    await expect(page.getByLabel("Zonificación").first()).toHaveValue("C-3 Comercial");
     await expect(page.getByLabel("Noches mínimas")).toHaveCount(0);
     await page.getByLabel("Altura libre (m)").fill("1");
     await page.getByRole("button", { name: "Guardar" }).click();

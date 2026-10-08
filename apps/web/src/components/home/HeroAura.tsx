@@ -21,30 +21,31 @@ export function HeroAura({
   featured?: { href: string; title: string; zone: string; price: string; photo?: string };
 }) {
   return (
-    <section data-hide-fab className="np-grain relative overflow-hidden bg-ivory pt-[84px] sm:pt-[104px] lg:pt-[120px]" aria-labelledby="hero-title">
+    <section data-hide-fab className="np-grain relative overflow-hidden bg-ivory pt-[calc(env(safe-area-inset-top)+80px)] sm:pt-[104px] lg:pt-[120px]" aria-labelledby="hero-title">
       <div className="np-aura" aria-hidden>
         <i />
         <i />
         <i />
       </div>
-      <div className="relative mx-auto grid max-w-[1320px] grid-cols-1 items-center gap-7 px-4 pb-14 sm:gap-12 sm:pb-16 md:px-8 lg:grid-cols-[1.08fr_.92fr] lg:gap-10 lg:pb-24">
+      <div className="relative mx-auto grid max-w-[1320px] grid-cols-1 items-center gap-9 px-4 pb-14 sm:gap-12 sm:pb-16 md:px-8 lg:grid-cols-[1.08fr_.92fr] lg:gap-10 lg:pb-24">
         <div data-reveal="stagger" className="relative z-10 min-w-0">
-          <p className="np-glass inline-flex items-center gap-2.5 rounded-full px-3.5 py-1.5 font-display text-[13px] text-ink/80">
+          <p className="np-glass inline-flex items-center gap-2.5 rounded-full px-3.5 py-1 font-display text-[13px] text-ink/80 sm:py-1.5">
             <span className="np-live" aria-hidden />
             <span>
               <span data-count={available}>{available}</span> {tx(locale, "casas disponibles hoy", "homes available today")}
             </span>
           </p>
-          <h1 id="hero-title" className="mt-5 max-w-[680px] text-[36px] leading-[1.04] tracking-[-0.02em] text-ink sm:mt-7 sm:text-[60px] lg:text-[76px]">
+          <h1 id="hero-title" className="mt-4 max-w-[680px] text-[31px] leading-[1.06] tracking-[-0.02em] text-ink sm:mt-7 sm:text-[60px] sm:leading-[1.04] lg:text-[76px]">
             {tx(locale, "Hay casas que se visitan.", "Some homes you visit.")}{" "}
-            <span className="text-ink/45">{tx(locale, "Y otras que se quedan contigo.", "Others stay with you.")}</span>
+            {/* Second line in Bronce text (6.6:1 on Lino, AA in dark too): quieter than the first, never faint. */}
+            <span className="text-gold-text">{tx(locale, "Y otras que se quedan contigo.", "Others stay with you.")}</span>
           </h1>
-          <p className="mt-4 max-w-[540px] text-[16px] leading-relaxed text-ink/70 sm:mt-6 sm:text-[17px]">
+          <p className="mt-3 max-w-[540px] text-[15px] leading-normal text-ink/75 sm:mt-6 sm:text-[17px] sm:leading-relaxed">
             <span className="sm:hidden">
               {tx(
                 locale,
-                "Pocas casas, bien elegidas. Te acompañamos hasta que tengas las llaves en la mano, estés donde estés.",
-                "A few homes, well chosen. We stay with you until the keys are in your hand, wherever you are.",
+                "Pocas casas, bien elegidas. Te acompañamos hasta las llaves.",
+                "A few homes, well chosen. With you until the keys.",
               )}
             </span>
             <span className="hidden sm:inline">
@@ -55,14 +56,15 @@ export function HeroAura({
               )}
             </span>
           </p>
-          <div className="mt-7 sm:mt-9">
-            <AskBar locale={locale} />
+          <div className="mt-5 sm:mt-9">
+            <AskBar locale={locale} sticky />
           </div>
         </div>
 
-        {/* Phones: the arch comes first (≈40% of the screen) so the first impression is the photo, not beige on beige. */}
-        <div className="relative order-first mx-auto w-full max-w-[360px] sm:order-none sm:max-w-[520px] lg:mr-0" data-tilt="5" style={{ transformStyle: "preserve-3d" }}>
-          <div className="np-arch relative h-[40svh] min-h-[260px] w-full sm:h-auto sm:min-h-0 bg-arena sm:aspect-[4/5] shadow-[0_40px_90px_-30px_rgba(30,26,24,.45)]">
+        {/* Phones: the search comes first (whole bar visible on first paint, clear of the tab bar); the arch follows
+            as a calmer band right below it. */}
+        <div className="relative mx-auto w-full max-w-[360px] sm:max-w-[520px] lg:mr-0" data-tilt="5" style={{ transformStyle: "preserve-3d" }}>
+          <div className="np-arch relative aspect-[5/6] w-full bg-arena shadow-[0_40px_90px_-30px_rgba(30,26,24,.45)] sm:aspect-[4/5]">
             <Image
               src="/brand/hero-arco.jpg"
               alt={tx(locale, "Arco abierto a una terraza frente al mar", "An arch opening onto a terrace by the sea")}

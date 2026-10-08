@@ -179,7 +179,7 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
             <h2 className="mt-3 text-[38px] leading-[1.05] md:text-[52px]">
               {tx(locale, "Tu casa merece", "Your home deserves")}
               <br />
-              <span className="text-ink/45">{tx(locale, "que la cuenten bien.", "to be told well.")}</span>
+              <span className="text-gold-text">{tx(locale, "que la cuenten bien.", "to be told well.")}</span>
             </h2>
             <ul className="mt-7 space-y-3">
               {owner.map((o) => (

@@ -40,7 +40,7 @@ export function Button({
   href?: string;
 } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
   const cls = cn(
-    "inline-flex items-center justify-center gap-2 rounded-full font-display font-semibold tracking-[0.01em] transition-colors duration-np ease-np disabled:cursor-not-allowed disabled:bg-[#D7DBDF] disabled:text-[#8A8F96] disabled:border-transparent whitespace-nowrap",
+    "inline-flex items-center justify-center gap-2 rounded-full font-display font-semibold tracking-[0.01em] transition-colors duration-np ease-np disabled:cursor-not-allowed disabled:bg-[#E3DDD3] disabled:text-[#8A8F96] disabled:border-transparent whitespace-nowrap",
     BTN[variant],
     SIZE[size],
     className,
@@ -56,18 +56,18 @@ type BadgeTone = "neutral" | "coral" | "gold" | "ok" | "warn" | "danger" | "navy
  */
 export function Badge({ children, tone = "neutral", className }: { children: ReactNode; tone?: BadgeTone; className?: string }) {
   const t = {
-    neutral: "bg-black/5 text-ink dark:bg-white/10 dark:text-[#EEF0F2]",
-    coral: "bg-[#8E3B221F] text-coral-hover dark:bg-[#C9A57426] dark:text-[#C3C8CD]",
-    gold: "bg-[#B08A5529] text-gold-text dark:text-[#A8B0B8]",
+    neutral: "bg-black/5 text-ink dark:bg-white/10 dark:text-[#F1EBE3]",
+    coral: "bg-[#8E3B221F] text-coral-hover dark:bg-[#C9A57426] dark:text-[#C9A574]",
+    gold: "bg-[#B08A5529] text-gold-text dark:text-[#D4B98C]",
     ok: "bg-[#2F6B4F1F] text-ok dark:bg-[#7FC8A426] dark:text-[#7FC8A4]",
     warn: "bg-[#8A5A0024] text-[#7A4F00] dark:bg-[#F2B86626] dark:text-[#F2B866]",
     danger: "bg-[#B3261E1A] text-danger dark:bg-[#F2A09A26] dark:text-[#F2A09A]",
     navy: "bg-navy text-ivory",
-    mist: "bg-[#B5AAA02E] text-[#3F464E] dark:text-[#C6CCD1]",
+    mist: "bg-[#B5AAA02E] text-[#4E453F] dark:text-[#DECEB9]",
     dark: "bg-white/10 text-ivory",
     exclusive: "bg-[#ffffff] text-[#8E3B22] shadow-[inset_0_0_0_1px_rgba(142,59,34,.3)]",
-    egeo: "bg-[#B8BDC2] text-[#363C42]",
-    arena: "bg-[#D5D9DD] text-[#1F2328]",
+    egeo: "bg-[#C2A988] text-[#433B35]",
+    arena: "bg-[#D9C6AB] text-[#1E1A18]",
   }[tone];
   const caps = tone === "exclusive" || tone === "egeo" || tone === "arena";
   return (
@@ -103,7 +103,7 @@ export function Field({ label, children, hint, dark, error }: { label: string; c
       <span className={cn("mb-1.5 block text-sm font-semibold", dark ? "text-ivory/80" : "text-ink/80")}>{label}</span>
       {children}
       {error ? (
-        <span role="alert" className={cn("mt-1 block text-xs font-semibold", dark ? "text-[#C3C8CD]" : "text-danger")}>{error}</span>
+        <span role="alert" className={cn("mt-1 block text-xs font-semibold", dark ? "text-[#C9A574]" : "text-danger")}>{error}</span>
       ) : (
         hint && <span className={cn("mt-1 block text-xs", dark ? "text-mist" : "text-muted")}>{hint}</span>
       )}
@@ -153,9 +153,9 @@ export function EmptyState({ icon, title, body, cta, dark, monogram }: { icon?: 
   return (
     <div className={cn("flex flex-col items-center rounded-np border px-6 py-12 text-center", dark ? "border-navy-line" : "border-line bg-white")}>
       {monogram || !icon ? (
-        <Monogram className="mb-4 h-16 w-16" bg={dark ? "#2C3137" : "#E6E9EC"} ink={dark ? "#EEF0F2" : "#1F2328"} teja={dark ? "#C3C8CD" : "#8E3B22"} animate />
+        <Monogram className="mb-4 h-16 w-16" bg={dark ? "#3A322D" : "#EBD5C8"} ink={dark ? "#F1EBE3" : "#1E1A18"} teja={dark ? "#C9A574" : "#8E3B22"} animate />
       ) : (
-        <div className={cn("mb-4 flex h-14 w-14 items-center justify-center rounded-full", dark ? "bg-white/5 text-[#C3C8CD]" : "bg-rosa text-coral")}>{icon}</div>
+        <div className={cn("mb-4 flex h-14 w-14 items-center justify-center rounded-full", dark ? "bg-white/5 text-[#C9A574]" : "bg-rosa text-coral")}>{icon}</div>
       )}
       <div className="font-serif text-2xl">{title}</div>
       <p className={cn("mt-1.5 max-w-sm text-[15px]", dark ? "text-mist" : "text-muted")}>{body}</p>

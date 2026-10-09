@@ -56,14 +56,14 @@ export function SignupPrompt({ locale, reason, onClose }: { locale: Locale; reas
   const Icon = alert ? Bell : Heart;
   const ring = "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy";
   return createPortal(
-    <div className="fixed inset-0 z-[70] flex items-end justify-center bg-[#1F2328]/45 sm:items-center sm:p-6 print:hidden" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+    <div className="fixed inset-0 z-[70] flex items-end justify-center bg-[#1E1A18]/45 sm:items-center sm:p-6 print:hidden" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
       <div
         ref={panel}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descId}
-        className="np-in w-full rounded-t-[24px] bg-ivory p-6 text-ink shadow-[0_24px_60px_rgba(31,35,40,.25)] sm:max-w-[420px] sm:rounded-[24px]"
+        className="np-in w-full rounded-t-[24px] bg-ivory p-6 text-ink shadow-[0_24px_60px_rgba(30,26,24,.25)] sm:max-w-[420px] sm:rounded-[24px]"
         style={{ paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))" }}
       >
         <div className="flex items-start justify-between gap-4">

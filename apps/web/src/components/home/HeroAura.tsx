@@ -1,97 +1,125 @@
-import { ArrowRight } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { ArrowUpRight, PhoneCall, ShieldCheck } from "lucide-react";
 import type { Locale } from "@/types/domain";
-import { num, tx } from "@/lib/i18n";
+import { tx } from "@/lib/i18n";
 import { AskBar } from "@/components/search/AskBar";
 import { OnCallButton } from "@/components/brand/PublicChrome";
-import { Building4D, type Hotspot } from "./Building4D";
 
 /**
- * Hero "Titanio 2035" (entries 018 §c, 021, 022): cool fog, graphite Geist Light headline with the word "verificado."
- * in terracotta, the full search (mode tabs, field, "Buscar casas", essentials chips) on the first screen, a link to
- * the on-call advisor and a trust row with real figures. The living model (Building4D) sits on the right on desktop
- * and peeks below the search on phones.
+ * 2035 hero: light Lino with a slow aurora, a quiet editorial headline, the conversational search, and an arched
+ * photograph that leans toward the pointer with two frosted cards floating over it (a real residence and the
+ * advisors on call). No dark overlay: the photo is framed, not darkened.
  */
 export function HeroAura({
   locale,
-  verified,
-  advisorShare,
-  model,
+  available,
+  featured,
 }: {
   locale: Locale;
-  /** Homes on show today whose agency or advisor is verified (computed when the page renders). */
-  verified: number;
-  /** Share (0–100) of those homes that show their advisor. Only printed as a claim when it is really 100. */
-  advisorShare: number;
-  model: { caption?: { label: string; href: string }; hotspots: Hotspot[] };
+  available: number;
+  featured?: { href: string; title: string; zone: string; price: string; photo?: string; verified?: boolean };
 }) {
-  const trust = [
-    verified > 0 && { n: num(verified, locale), label: tx(locale, "casas verificadas", "verified homes") },
-    { n: "24/7", label: tx(locale, "guardia de cada agencia", "on call at every agency") },
-    advisorShare > 0 && { n: `${advisorShare} %`, label: tx(locale, "asesor visible en cada ficha", "advisor shown on every listing") },
-  ].filter(Boolean) as { n: string; label: string }[];
-
   return (
-    <section data-hide-fab className="relative overflow-hidden bg-ivory pt-[calc(env(safe-area-inset-top)+76px)] sm:pt-[100px] lg:pt-[112px]" aria-labelledby="hero-title">
-      {/* Studio light: one cool radial highlight behind the model, a barely visible cool noise over everything. */}
-      <div aria-hidden className="pointer-events-none absolute -right-[10%] top-[8%] h-[80%] w-[70%] rounded-full bg-[radial-gradient(closest-side,#F9FAFB,transparent)] [html.dark_&]:bg-[radial-gradient(closest-side,#16191D,transparent)]" />
-      <div className="relative mx-auto grid max-w-[1440px] grid-cols-1 items-center gap-6 px-5 pb-10 md:px-10 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,1fr)] lg:gap-6 lg:px-12 lg:pb-16 min-[1440px]:px-24">
-        <div className="relative z-10 min-w-0">
-          {verified > 0 && (
-            <p className="np-label flex items-center gap-2 text-gold-text">
-              <span className="np-live" aria-hidden />
-              {tx(locale, `${num(verified, locale)} casas verificadas · guardia activa`, `${num(verified, locale)} verified homes · on call now`)}
-            </p>
-          )}
-          <h1 id="hero-title" className="np-hero-title mt-4 text-[44px] text-ink sm:text-[64px] lg:mt-6 lg:text-[58px] xl:text-[68px] min-[1440px]:text-[80px]">
-            {tx(locale, "Tu próximo lugar,", "Your next place,")}
-            <br />
-            <em>{tx(locale, "verificado.", "verified.")}</em>
+    <section data-hide-fab className="np-grain relative overflow-hidden bg-ivory pt-[calc(env(safe-area-inset-top)+80px)] sm:pt-[104px] lg:pt-[100px] min-[1440px]:pt-[120px]" aria-labelledby="hero-title">
+      <div className="np-aura" aria-hidden>
+        <i />
+        <i />
+        <i />
+      </div>
+      <div className="relative mx-auto grid max-w-[1320px] grid-cols-1 items-center gap-7 px-4 pb-10 sm:gap-12 sm:pb-16 md:px-8 lg:grid-cols-[1.08fr_.92fr] lg:gap-10 lg:pb-24">
+        <div data-reveal="stagger" className="relative z-10 min-w-0">
+          <p className="np-glass inline-flex items-center gap-2.5 rounded-full px-3.5 py-1 font-display text-[13px] text-ink/80 sm:py-1.5">
+            <span className="np-live" aria-hidden />
+            <span>
+              {/* The real figure from the first frame (no count-up here: a climbing number reads as "still loading"). */}
+              {available} {tx(locale, "casas disponibles hoy", "homes available today")}
+            </span>
+          </p>
+          {/* Short laptops (1024×768, 1280×800, 1366×768): a smaller headline and tighter spacing, so the search is on
+              the first screen; the full 76 px from 1440. */}
+          <h1 id="hero-title" className="mt-4 max-w-[680px] text-[31px] leading-[1.06] tracking-[-0.02em] text-ink sm:mt-7 sm:text-[60px] sm:leading-[1.04] lg:mt-5 lg:text-[54px] xl:text-[64px] min-[1440px]:mt-7 min-[1440px]:text-[76px]">
+            {tx(locale, "Hay casas que se visitan.", "Some homes you visit.")}{" "}
+            {/* Second line in Bronce text (6.6:1 on Lino, AA in dark too): quieter than the first, never faint. */}
+            <span className="text-gold-text">{tx(locale, "Y otras que se quedan contigo.", "Others stay with you.")}</span>
           </h1>
-          <p className="mt-4 max-w-[540px] text-[16px] leading-[1.55] text-muted sm:text-[17px] lg:mt-6">
-            <span className="sm:hidden">{tx(locale, "Precio en USD, papeles revisados y un asesor de guardia 24/7.", "Prices in USD, paperwork checked and an advisor on call 24/7.")}</span>
+          <p className="mt-3 max-w-[540px] text-[15px] leading-normal text-ink/75 sm:mt-6 sm:text-[17px] sm:leading-relaxed lg:mt-4 lg:text-[16px] min-[1440px]:mt-6 min-[1440px]:text-[17px]">
+            <span className="sm:hidden">
+              {tx(
+                locale,
+                "Pocas casas, bien elegidas. Te acompañamos hasta las llaves.",
+                "A few homes, well chosen. With you until the keys.",
+              )}
+            </span>
             <span className="hidden sm:inline">
               {tx(
                 locale,
-                "Casas y apartamentos verificados en Caracas, Lechería, El Morro y Puerto La Cruz. Precio en USD, papeles revisados y un asesor de guardia 24/7.",
-                "Verified houses and flats in Caracas, Lechería, El Morro and Puerto La Cruz. Prices in USD, paperwork checked and an advisor on call 24/7.",
+                "Elegimos pocas casas en Lechería, El Morro, Margarita y Caracas. Las conocemos por dentro, sabemos lo que valen y te acompañamos hasta que tengas las llaves en la mano, estés donde estés.",
+                "We choose a few homes in Lechería, El Morro, Margarita and Caracas. We know them inside out, we know what they're worth, and we stay with you until the keys are in your hand, wherever you are.",
               )}
             </span>
           </p>
-          <div className="mt-5 lg:mt-8">
+          <div className="mt-5 sm:mt-9 lg:mt-6 min-[1440px]:mt-9">
             <AskBar locale={locale} sticky />
           </div>
+        </div>
+
+        {/* Phones: the search comes first (whole bar visible on first paint, clear of the tab bar); the arch follows
+            as a calmer band right below it. Tablets (md, one column): a wider, shorter arch (≤ ~420 px), not a 650 px
+            portrait one. */}
+        <div className="relative mx-auto w-full max-w-[360px] sm:max-w-[520px] md:max-w-[620px] lg:mr-0 lg:max-w-[520px]" data-tilt="5" style={{ transformStyle: "preserve-3d" }}>
+          <div className="np-arch relative aspect-[6/5] w-full bg-arena shadow-[0_40px_90px_-30px_rgba(30,26,24,.45)] sm:aspect-[4/5] md:aspect-[3/2] lg:aspect-[4/5]">
+            <Image
+              src="/brand/hero-arco.jpg"
+              alt={tx(locale, "Arco abierto a una terraza frente al mar", "An arch opening onto a terrace by the sea")}
+              fill
+              priority
+              fetchPriority="high"
+              sizes="(max-width: 640px) 360px, (max-width: 1024px) 90vw, 520px"
+              className="object-cover"
+            />
+          </div>
+          {/* Advisors on call: opens today's rota. */}
           <OnCallButton
             locale={locale}
-            className="group mt-4 inline-flex min-h-11 items-center gap-2 font-display text-[15px] font-medium text-ink underline decoration-[#9A9DA1] decoration-1 underline-offset-[6px] transition-colors hover:decoration-ink"
+            // Hangs over the arch's edge only where the page has a margin to spare (tablets, wide screens); on laptops
+            // (the arch runs to the page edge) it sits inside the arch, never clipped.
+            className="np-glass absolute -right-2 top-[14%] hidden items-center sm:flex gap-3 rounded-2xl px-4 py-3 text-left transition-transform duration-300 hover:-translate-y-0.5 sm:-right-8 lg:right-4 min-[1400px]:-right-8"
           >
-            {tx(locale, "Hablar con el asesor de guardia", "Talk to the on-call advisor")}
-            <ArrowRight size={16} aria-hidden className="transition-transform duration-200 group-hover:translate-x-0.5" />
+            <span className="relative flex h-10 w-10 items-center justify-center rounded-full bg-ink text-ivory">
+              <PhoneCall size={17} aria-hidden />
+              <span className="np-live absolute -right-0.5 -top-0.5 ring-2 ring-white" aria-hidden />
+            </span>
+            <span>
+              <span className="block font-display text-[14px] font-semibold text-ink">{tx(locale, "Un asesor te atiende ya", "An advisor is here now")}</span>
+              <span className="block font-display text-[12.5px] text-ink/60">{tx(locale, "De guardia los 7 días", "On call 7 days a week")}</span>
+            </span>
           </OnCallButton>
-          {/* Trust row (desktop here; on phones it follows the model). */}
-          <dl className="mt-8 hidden max-w-[620px] grid-cols-3 gap-6 border-t border-line pt-6 lg:grid">
-            {trust.map((t) => (
-              <div key={t.label}>
-                <dt className="sr-only">{t.label}</dt>
-                <dd className="np-num text-[34px] leading-none text-ink">{t.n}</dd>
-                <dd className="np-label mt-2 text-muted">{t.label}</dd>
-              </div>
-            ))}
-          </dl>
+          {featured && (
+            <Link
+              href={featured.href}
+              data-spotlight
+              className="np-glass group absolute -left-2 bottom-[8%] flex w-[min(320px,92%)] items-center gap-3 rounded-2xl p-2 pr-3 sm:p-2.5 sm:pr-4 transition-transform duration-300 hover:-translate-y-0.5 sm:-left-10"
+            >
+              <span className="relative h-12 w-12 shrink-0 sm:h-16 sm:w-16 overflow-hidden rounded-xl bg-arena">
+                {featured.photo && <Image src={featured.photo} alt="" fill sizes="64px" className="object-cover transition-transform duration-700 group-hover:scale-110" />}
+              </span>
+              <span className="min-w-0 flex-1">
+                {/* Only when it is true (lib/price-badge: within ±10 % of an estimate with ≥ 3 comparables). */}
+                {featured.verified && (
+                  <span className="flex items-center gap-1 font-display text-[11.5px] font-medium uppercase tracking-[.14em] text-gold-text">
+                    <ShieldCheck size={13} aria-hidden /> {tx(locale, "Precio verificado", "Verified price")}
+                  </span>
+                )}
+                <span className="mt-0.5 block truncate font-display text-[14px] font-semibold text-ink">{featured.title}</span>
+                <span className="block truncate font-display text-[12.5px] text-ink/60">{featured.zone}</span>
+                {/* The price gets its own line and is never cut ("USD 890.…" read as a different number). */}
+                <span className="mt-0.5 block whitespace-nowrap font-display text-[15px] font-semibold text-ink [font-feature-settings:'lnum']">{featured.price}</span>
+              </span>
+              <ArrowUpRight size={18} aria-hidden className="shrink-0 text-ink/50 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-ink" />
+            </Link>
+          )}
         </div>
-
-        <div className="relative -mx-5 min-w-0 md:mx-0">
-          <Building4D locale={locale} caption={model.caption} hotspots={model.hotspots} className="px-3 md:px-0" />
-        </div>
-
-        <dl className="grid grid-cols-3 gap-3 border-t border-line pt-5 lg:hidden">
-          {trust.map((t) => (
-            <div key={t.label}>
-              <dt className="sr-only">{t.label}</dt>
-              <dd className="np-num text-[26px] leading-none text-ink">{t.n}</dd>
-              <dd className="np-label mt-1.5 text-[10px] text-muted">{t.label}</dd>
-            </div>
-          ))}
-        </dl>
       </div>
     </section>
   );

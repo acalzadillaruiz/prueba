@@ -1,0 +1,167 @@
+/* Lite tower as a refined architectural render (CSS only, paint + transform/opacity): a warm daylight sky with a
+   low sun, glass floors framed by thin bronze mullions and pale stone slabs, a diagonal sky reflection on the glass,
+   ambient occlusion under every slab, a shaded side face, and a slow light sweep across the lit residences.
+   Layered over the base .np-tower rules (globals.css). */
+.tower {
+  --t-sky-top: #efd9bd;
+  --t-sky-mid: #f4e6d4;
+  --t-sky-low: #f1ebe3;
+  --t-sun: rgb(255 226 178 / 0.7);
+  --t-glass-hi: #dcd8d0;
+  --t-glass-lo: #b2a89b;
+  --t-reflect: rgb(255 255 255 / 0.5);
+  --t-slab: #f7f2ea;
+  --t-slab-edge: rgb(30 26 24 / 0.16);
+  --t-mull: rgb(176 138 85 / 0.7);
+  --t-side-hi: #c9b9a2;
+  --t-side-lo: #9c8b77;
+  --t-side-mull: rgb(120 92 58 / 0.45);
+  --t-ao: rgb(30 26 24 / 0.28);
+  --t-edge: rgb(30 26 24 / 0.14);
+  --t-shadow: rgb(30 26 24 / 0.22);
+  --t-grid: rgb(176 138 85 / 0.13);
+  --t-lit-hi: #f8dfb4;
+  --t-lit-lo: #d9a866;
+  --t-sweep: rgb(255 250 240 / 0.75);
+}
+:global(html.dark) .tower {
+  --t-sky-top: #3a2c22;
+  --t-sky-mid: #2a221d;
+  --t-sky-low: #1e1a18;
+  --t-sun: rgb(201 120 70 / 0.24);
+  --t-glass-hi: #4a4440;
+  --t-glass-lo: #2c2724;
+  --t-reflect: rgb(255 236 210 / 0.14);
+  --t-slab: rgb(217 198 171 / 0.55);
+  --t-slab-edge: rgb(0 0 0 / 0.4);
+  --t-mull: rgb(201 165 116 / 0.55);
+  --t-side-hi: #3a322c;
+  --t-side-lo: #241f1b;
+  --t-side-mull: rgb(201 165 116 / 0.25);
+  --t-ao: rgb(0 0 0 / 0.45);
+  --t-edge: rgb(255 255 255 / 0.08);
+  --t-shadow: rgb(0 0 0 / 0.55);
+  --t-grid: rgb(201 165 116 / 0.12);
+  --t-lit-hi: #f0cf94;
+  --t-lit-lo: #b98a4e;
+  --t-sweep: rgb(255 240 210 / 0.55);
+}
+
+/* Composition: the tower (front face + 26 % side face ≈ 1.26 × --fw) sits centred in its column, then glides left
+   in the last chapter so the labels of the lit floors fit beside it. Bigger floors on phones too: it fills the column. */
+:global(.np-tower).tower { --fh: 21px; --fw: 120px; --base: 34px; }
+@media (min-width: 768px) { :global(.np-tower).tower { --fh: 38px; --fw: 220px; --base: 64px; } }
+.body {
+  left: calc(50% - var(--fw) * 0.63);
+  transition: left 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.tower[data-step="3"] .body { left: 4%; }
+.tower :global(.np-tower-halo) { left: calc(50% - var(--fw) * 0.9); width: calc(var(--fw) * 1.8); }
+.tower[data-step="3"] :global(.np-tower-halo) { left: 0; }
+
+/* Sky: warm daylight gradient with a low sun behind the tower; fades out at the edges so it melts into the page.
+   A gentle parallax: it drifts a few pixels as the chapters advance. */
+.sky {
+  position: absolute;
+  inset: -6% -12% 0;
+  pointer-events: none;
+  border-radius: 28px;
+  background:
+    radial-gradient(38% 34% at 72% 30%, var(--t-sun), transparent 70%),
+    linear-gradient(180deg, var(--t-sky-top) 0%, var(--t-sky-mid) 48%, var(--t-sky-low) 82%);
+  -webkit-mask-image: radial-gradient(closest-side at 50% 48%, #000 52%, transparent 100%);
+  mask-image: radial-gradient(closest-side at 50% 48%, #000 52%, transparent 100%);
+  transform: translate3d(0, 0, 0);
+  transition: transform 2.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.tower[data-step="1"] .sky { transform: translate3d(0, -4px, 0); }
+.tower[data-step="2"] .sky { transform: translate3d(0, -8px, 0); }
+.tower[data-step="3"] .sky { transform: translate3d(0, -12px, 0); }
+
+.tower :global(.np-tower-grid) {
+  background-image: linear-gradient(var(--t-grid) 1px, transparent 1px), linear-gradient(90deg, var(--t-grid) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+/* Podium: a pale stone plinth with a wide, soft contact shadow. */
+.tower :global(.np-tower-podium) {
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--t-slab), var(--t-side-hi));
+  box-shadow: 0 0 0 1px var(--t-edge) inset;
+}
+.tower :global(.np-tower-podium)::after {
+  content: "";
+  position: absolute;
+  left: 4%;
+  right: 4%;
+  top: 4px;
+  height: 24px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--t-shadow), transparent);
+  filter: blur(5px);
+}
+/* Floors: glass between stone slabs, thin bronze mullions, a diagonal sky reflection, and ambient occlusion
+   (a soft dark band) right under each slab. */
+.tower :global(.np-floor) {
+  height: calc(var(--fh) - 2px);
+  border-radius: 1px;
+  background-color: transparent;
+  background-image:
+    linear-gradient(var(--t-slab) 0 2px, var(--t-slab-edge) 2px 3px, var(--t-ao) 3px, transparent 7px),
+    repeating-linear-gradient(90deg, var(--t-mull) 0 1px, transparent 1px calc(var(--fw) / 6)),
+    linear-gradient(112deg, transparent 18%, var(--t-reflect) 30%, transparent 44%, transparent 62%, var(--t-reflect) 70%, transparent 78%),
+    linear-gradient(180deg, var(--t-glass-hi), var(--t-glass-lo));
+  background-size: 100% 100%, 100% 100%, calc(var(--fw) * 1.6) 100%, 100% 100%;
+  background-position: 0 0, 0 0, calc(var(--i) * -6px) 0, 0 0;
+  box-shadow:
+    0 0 0 1px var(--t-edge) inset,
+    0 6px 12px -10px var(--t-shadow);
+}
+/* Side face: in shade, with fainter mullions. */
+.tower :global(.np-floor)::after {
+  width: 22%;
+  background:
+    linear-gradient(var(--t-slab) 0 2px, var(--t-slab-edge) 2px 3px, transparent 3px),
+    repeating-linear-gradient(90deg, var(--t-side-mull) 0 1px, transparent 1px calc(var(--fw) / 14)),
+    linear-gradient(180deg, var(--t-side-hi), var(--t-side-lo));
+  box-shadow: 0 0 0 1px var(--t-edge) inset;
+}
+/* Lit residences: warm interior light behind the glass, and a slow sweep of light along the facade. */
+.tower :global(.np-floor[data-lit="1"]) {
+  background-color: transparent;
+  background-image:
+    linear-gradient(var(--t-slab) 0 2px, var(--t-slab-edge) 2px 3px, transparent 3px),
+    repeating-linear-gradient(90deg, rgb(142 59 34 / 0.28) 0 1px, transparent 1px calc(var(--fw) / 6)),
+    linear-gradient(180deg, var(--t-lit-hi), var(--t-lit-lo));
+  background-size: 100% 100%;
+  background-position: 0 0;
+  box-shadow:
+    0 0 0 1px rgb(176 138 85 / 0.4) inset,
+    0 0 26px 2px rgb(217 168 102 / 0.42);
+}
+.tower :global(.np-floor[data-lit="1"])::before {
+  content: "";
+  position: absolute;
+  inset: 3px 0 0;
+  pointer-events: none;
+  background: linear-gradient(100deg, transparent 38%, var(--t-sweep) 50%, transparent 62%) no-repeat;
+  background-size: 260% 100%;
+  background-position: 160% 0;
+  animation: np-floor-sweep 5.2s cubic-bezier(0.45, 0, 0.25, 1) 1s infinite;
+}
+@keyframes np-floor-sweep {
+  0% { background-position: 160% 0; }
+  55%, 100% { background-position: -60% 0; }
+}
+.tower :global(.np-tower-halo) {
+  background: radial-gradient(closest-side, rgb(217 168 102 / 0.3), transparent);
+  filter: blur(14px);
+}
+.tower :global(.np-roof-cal) {
+  filter: drop-shadow(0 8px 14px rgb(30 26 24 / 0.16));
+}
+@media (prefers-reduced-motion: reduce) {
+  .body { transition: none; }
+  .sky { transition: none; transform: none !important; }
+  .tower :global(.np-floor[data-lit="1"])::before { animation: none; display: none; }
+}

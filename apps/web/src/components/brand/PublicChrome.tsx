@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { useQuery } from "@tanstack/react-query";
-import { Heart, Home, MessageCircle, PhoneCall, Search, ShieldCheck, User, X } from "lucide-react";
+import { Heart, Home, MessageCircle, PhoneCall, Search, User, X } from "lucide-react";
 import { WhatsAppIcon } from "./WhatsAppIcon";
 import { useHideOnScroll } from "./useScrollChrome";
 import type { Locale } from "@/types/domain";
@@ -101,7 +101,7 @@ export function FloatingContact({ href, label, whatsapp = false, tabbar = false,
       )}
     >
       {open && (
-        <div id={menuId} role="group" aria-label={tx(locale, "Hablar con una persona", "Talk to a person")} className="np-glass-nav np-in w-[min(300px,calc(100vw-2rem))] rounded-[24px] p-2 shadow-[0_18px_40px_rgba(31,35,40,.22)]">
+        <div id={menuId} role="group" aria-label={tx(locale, "Hablar con una persona", "Talk to a person")} className="np-glass-nav np-in w-[min(300px,calc(100vw-2rem))] rounded-[24px] p-2 shadow-[0_18px_40px_rgba(30,26,24,.22)]">
           <button
             type="button"
             aria-haspopup="dialog"
@@ -135,7 +135,7 @@ export function FloatingContact({ href, label, whatsapp = false, tabbar = false,
         aria-controls={open ? menuId : undefined}
         tabIndex={hidden ? -1 : undefined}
         onClick={() => setOpen((o) => !o)}
-        className="flex h-14 w-14 items-center justify-center rounded-full bg-navy text-ivory shadow-[0_0_0_2px_#C3C8CD,0_14px_30px_rgba(31,35,40,.35)] transition-colors hover:bg-navy-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-navy"
+        className="flex h-14 w-14 items-center justify-center rounded-full bg-navy text-ivory shadow-[0_0_0_2px_#C9A574,0_14px_30px_rgba(30,26,24,.35)] transition-colors hover:bg-navy-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-navy"
       >
         {open ? <X size={22} aria-hidden /> : <MessageCircle size={23} aria-hidden />}
       </button>
@@ -179,17 +179,6 @@ export function MobileTabBar({ locale }: { locale: Locale }) {
   const t = msg(locale, "nav");
   const seeker = !!user && roleHome(user.role) === "/app";
   const unread = useUnreadMessages(seeker, { refetchOnWindowFocus: true });
-  // While the on-screen keyboard is open (visible viewport < 75 % of the window) the bar steps away, so nothing
-  // fixed sits over the field, its suggestions or the "Buscar" button.
-  const [keyboard, setKeyboard] = useState(false);
-  useEffect(() => {
-    const vv = window.visualViewport;
-    if (!vv) return;
-    const check = () => setKeyboard(vv.height < window.innerHeight * 0.75);
-    check();
-    vv.addEventListener("resize", check);
-    return () => vv.removeEventListener("resize", check);
-  }, []);
   const items: { href: string; label: string; Icon: typeof Home; active: boolean; badge?: number; badgeLabel?: string }[] = [
     { href: `/${locale}`, label: t("home"), Icon: Home, active: pathname === `/${locale}` },
     { href: `/${locale}/search?type=SALE`, label: tx(locale, "Buscar", "Search"), Icon: Search, active: pathname.endsWith("/search") },
@@ -203,42 +192,31 @@ export function MobileTabBar({ locale }: { locale: Locale }) {
       badgeLabel: tx(locale, unread === 1 ? "mensaje sin leer" : "mensajes sin leer", unread === 1 ? "unread message" : "unread messages"),
     },
   ];
-  const cell = (active: boolean) => cn("relative flex h-[60px] w-full flex-col items-center justify-center gap-1 rounded-[22px] font-display text-[11.5px] transition-colors", active ? "bg-black/[.05] font-medium text-ink [html.dark_&]:bg-white/[.08]" : "text-muted");
-  const link = (it: (typeof items)[number]) => (
-    <li key={it.label}>
-      <Link href={it.href} aria-current={it.active ? "page" : undefined} className={cell(it.active)}>
-        <span className="relative">
-          <it.Icon size={21} strokeWidth={1.5} aria-hidden />
-          {!!it.badge && (
-            <span className={cn("absolute -right-2.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-bold", it.badgeLabel ? "bg-coral-cta text-white" : "bg-navy text-ivory")}>
-              {it.badge}
-              {it.badgeLabel && <span className="sr-only"> {it.badgeLabel}</span>}
-            </span>
-          )}
-        </span>
-        {it.label}
-      </Link>
-    </li>
-  );
   return (
     <nav
       data-tabbar
-      data-keyboard={keyboard ? "open" : undefined}
       aria-label={locale === "es" ? "Navegación inferior" : "Bottom navigation"}
-      className={cn("fixed inset-x-3 z-40 transition-[transform,opacity] duration-300 md:hidden print:hidden", keyboard && "pointer-events-none translate-y-[calc(100%+24px)] opacity-0")}
-      style={{ bottom: "calc(env(safe-area-inset-bottom) + 10px)" }}
-      inert={keyboard || undefined}
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-ivory/95 backdrop-blur md:hidden print:hidden"
+      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
-      {/* Floating frosted-glass bar (022): Inicio · Buscar · Guardia · Guardados · Cuenta. */}
-      <ul className="np-glass-nav grid grid-cols-5 gap-0.5 rounded-[28px] p-1">
-        {items.slice(0, 2).map(link)}
-        <li>
-          <OnCallButton locale={locale} className={cell(false)}>
-            <ShieldCheck size={21} strokeWidth={1.5} aria-hidden />
-            {tx(locale, "Guardia", "On call")}
-          </OnCallButton>
-        </li>
-        {items.slice(2).map(link)}
+      <ul className="grid grid-cols-4">
+        {items.map(({ href, label, Icon, active, badge, badgeLabel }) => (
+          <li key={label}>
+            <Link href={href} aria-current={active ? "page" : undefined} className={cn("relative flex h-16 flex-col items-center justify-center gap-1 font-display text-[13px]", active ? "text-ink" : "text-muted")}>
+              {active && <RoofGlyph className="absolute top-1.5 h-[6px] w-[18px]" />}
+              <span className="relative">
+                <Icon size={21} strokeWidth={1.6} aria-hidden />
+                {!!badge && (
+                  <span className={cn("absolute -right-2.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-bold", badgeLabel ? "bg-coral-cta text-white" : "bg-navy text-ivory")}>
+                    {badge}
+                    {badgeLabel && <span className="sr-only"> {badgeLabel}</span>}
+                  </span>
+                )}
+              </span>
+              {label}
+            </Link>
+          </li>
+        ))}
       </ul>
     </nav>
   );

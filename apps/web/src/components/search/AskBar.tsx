@@ -30,12 +30,12 @@ const MODE_CHIP = {
   SHORT_RENT: { Icon: Palmtree, es: "Vaca.", en: "Holiday" },
 } as const;
 
-/** Venezuelan essentials (022): one tap opens the search already filtered by that service. [es, en, URL params] */
-const CHIPS: [string, string, string][] = [
-  ["Planta eléctrica", "Backup generator", "power=full"],
-  ["Pozo propio", "Own well", "well=1"],
-  ["Vista al mar", "Sea view", "sea=1"],
-  ["Vista al Ávila", "Ávila view", "avila=1"],
+/** Chips: one tap runs exactly what the label says, nothing hidden. [label es, label en, query es, query en] */
+const CHIPS: [string, string, string, string][] = [
+  ["Frente al mar", "By the sea", "frente al mar", "by the sea"],
+  ["Con piscina", "With a pool", "con piscina", "with a pool"],
+  ["Áticos", "Penthouses", "ático", "penthouse"],
+  ["Exclusivas", "Exclusive", "exclusivas de lujo", "exclusive luxury"],
 ];
 
 /**
@@ -113,7 +113,7 @@ export function AskBar({ locale, className, sticky = false }: { locale: Locale; 
             onClick={() => setMode(k)}
             className={cn(
               "min-h-11 rounded-full px-4 font-display text-[14px] transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink",
-              mode === k ? "bg-ink text-ivory shadow-[0_6px_16px_-6px_rgba(31,35,40,.6)]" : "text-ink/65 hover:bg-white/70 hover:text-ink",
+              mode === k ? "bg-ink text-ivory shadow-[0_6px_16px_-6px_rgba(30,26,24,.6)]" : "text-ink/65 hover:bg-white/70 hover:text-ink",
             )}
           >
             {tx(locale, es, en)}
@@ -131,7 +131,7 @@ export function AskBar({ locale, className, sticky = false }: { locale: Locale; 
           enterKeyHint="search"
           aria-label={tx(locale, "Describe la casa que buscas", "Describe the home you're looking for")}
           className="min-h-12 w-full bg-transparent font-display text-[16px] text-ink placeholder:text-ink/60 focus:outline-none sm:text-[17px]"
-          placeholder={tx(locale, "Zona, tipo o lo que quieras…", "Area, type or anything…")}
+          placeholder={tx(locale, "Zona, tipo de casa o presupuesto", "Area, type of home or budget")}
         />
         {suggest.listbox}
         <button
@@ -140,19 +140,24 @@ export function AskBar({ locale, className, sticky = false }: { locale: Locale; 
           aria-label={tx(locale, "Buscar", "Search")}
           className="flex h-12 shrink-0 items-center justify-center gap-2 rounded-[18px] bg-coral-cta px-4 font-display text-[15px] font-semibold text-white transition-[background-color,transform] duration-300 hover:bg-coral-cta-hover active:scale-95 sm:px-6 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
         >
-          <span className="sm:hidden">{tx(locale, "Buscar", "Search")}</span>
-          <span className="hidden sm:inline">{tx(locale, "Buscar casas", "Search homes")}</span>
+          <span className="hidden sm:inline">{tx(locale, "Buscar", "Search")}</span>
+          <ArrowUp size={18} aria-hidden className="rotate-45 sm:hidden" />
         </button>
       </div>
       <div className="no-scrollbar flex gap-2 overflow-x-auto px-1.5 pb-1 pt-2.5">
-        {CHIPS.map(([es, en, q]) => (
-          <Link
+        {CHIPS.map(([es, en, qEs, qEn]) => (
+          <button
             key={es}
-            href={`/${locale}/search?type=${mode}&${q}`}
-            className="flex min-h-11 shrink-0 items-center rounded-full border border-ink/10 bg-white/60 px-3.5 font-display text-[13px] text-ink/80 transition-[border-color,background-color,color,transform] duration-200 hover:-translate-y-px hover:border-[#9A9DA1] hover:bg-white hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+            type="button"
+            onClick={() => {
+              const v = tx(locale, qEs, qEn);
+              setText(v);
+              void go(v);
+            }}
+            className="min-h-11 shrink-0 rounded-full border border-ink/10 bg-white/50 px-3.5 font-display text-[13px] text-ink/75 transition-colors hover:border-ink/30 hover:bg-white hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
           >
             {tx(locale, es, en)}
-          </Link>
+          </button>
         ))}
       </div>
     </form>
@@ -229,14 +234,14 @@ function CompactAsk({
         className={cn("np-glass relative mx-auto flex h-14 max-w-[720px] items-center gap-1 rounded-full p-1.5 text-ink lg:max-w-[940px]", shown && "pointer-events-auto")}
       >
         <Link href={`/${locale}`} aria-label={tx(locale, "New Place, inicio", "New Place, home")} className={cn("flex h-11 w-11 shrink-0 items-center justify-center rounded-full hover:bg-black/5", ring)}>
-          <RoofMark small className="h-[13px] w-[36px]" ink="var(--np-logo-ink, var(--np-navy))" teja="var(--np-logo-teja, #8C9298)" />
+          <RoofMark small className="h-[13px] w-[36px]" ink="var(--np-logo-ink, var(--np-navy))" teja="var(--np-logo-teja, var(--np-coral))" />
         </Link>
         <label htmlFor={`${id}-mode`} className="sr-only">
           {tx(locale, "Qué buscas", "What you're after")}
         </label>
         {/* Mode chip: always the short word ("Compra", "Alquila", "Vaca.") so it never reads as a "home" button; the icon
             joins it from sm. The native select sits invisibly on top: one tap opens the system picker with the full names. */}
-        <span data-mode-chip className="relative flex h-11 shrink-0 items-center gap-1 rounded-full bg-ink pl-3 pr-2 font-display text-[14px] font-medium text-ivory has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ink sm:gap-1.5 sm:pl-3.5 sm:pr-2.5 [html.dark_&]:text-[#1F2328]">
+        <span data-mode-chip className="relative flex h-11 shrink-0 items-center gap-1 rounded-full bg-ink pl-3 pr-2 font-display text-[14px] font-medium text-ivory has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ink sm:gap-1.5 sm:pl-3.5 sm:pr-2.5 [html.dark_&]:text-[#1E1A18]">
           <chip.Icon size={16} strokeWidth={1.8} aria-hidden className="hidden sm:block" />
           <span aria-hidden>{tx(locale, chip.es, chip.en)}</span>
           <ChevronDown size={14} aria-hidden className="opacity-80" />

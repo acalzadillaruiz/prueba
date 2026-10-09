@@ -41,7 +41,7 @@ export function DemoBar({ locale }: { locale: Locale }) {
           </div>
         )}
         <button onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label={tx(locale, "Modo demo: entrar como…", "Demo mode: sign in as…")} className="relative flex h-10 w-6 items-center justify-center rounded-r-full border border-l-0 border-navy-line bg-navy/90 text-sm text-ivory opacity-75 shadow-np backdrop-blur transition-opacity after:absolute after:-inset-y-1 after:-right-2 after:left-0 after:content-[''] hover:opacity-100">
-          <FlaskConical size={13} className="text-[#C3C8CD]" aria-hidden />
+          <FlaskConical size={13} className="text-[#C9A574]" aria-hidden />
         </button>
       </div>
     );
@@ -58,7 +58,7 @@ export function DemoBar({ locale }: { locale: Locale }) {
       )}
       <button onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label={tx(locale, "Modo demo: entrar como…", "Demo mode: sign in as…")} className="flex h-11 w-7 items-center justify-center rounded-l-full border border-r-0 border-navy-line bg-navy/90 text-sm text-ivory opacity-75 shadow-np backdrop-blur transition-opacity hover:opacity-100 sm:h-auto sm:min-h-11 sm:w-auto sm:min-w-11 sm:gap-2 sm:rounded-full sm:border-r sm:p-1.5 sm:pr-3.5 sm:opacity-100">
         <span className="hidden sm:contents">{user ? <Avatar initials={user.initials} hue={user.hue} size={26} /> : <span className="flex h-[26px] w-[26px] items-center justify-center rounded-full bg-white/10"><LogIn size={14} /></span>}</span>
-        <FlaskConical size={14} className="text-[#C3C8CD]" />
+        <FlaskConical size={14} className="text-[#C9A574]" />
         <span className="hidden font-display sm:inline">Demo</span>
       </button>
     </div>
@@ -82,7 +82,7 @@ export function DemoSidebarItem({ locale }: { locale: Locale }) {
         </div>
       )}
       <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label={tx(locale, "Modo demo: entrar como…", "Demo mode: sign in as…")} className="flex w-full items-center gap-3 rounded-lg px-4 py-2 text-[13px] text-ivory/65 hover:bg-white/[.04] hover:text-ivory">
-        <FlaskConical size={15} strokeWidth={1.6} className="text-[#C3C8CD]" aria-hidden /> {tx(locale, "Demo · cambiar de rol", "Demo · switch role")}
+        <FlaskConical size={15} strokeWidth={1.6} className="text-[#C9A574]" aria-hidden /> {tx(locale, "Demo · cambiar de rol", "Demo · switch role")}
       </button>
     </div>
   );
@@ -99,7 +99,7 @@ export function DemoSheetItem({ locale, rowClass, onDone }: { locale: Locale; ro
   return (
     <div className="print:hidden" data-demobar-sheet>
       <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} className={rowClass}>
-        <FlaskConical size={18} strokeWidth={1.6} className="text-gold-text dark:text-[#C3C8CD]" aria-hidden />
+        <FlaskConical size={18} strokeWidth={1.6} className="text-gold-text dark:text-[#C9A574]" aria-hidden />
         <span className="flex-1">{tx(locale, "Demo · cambiar de rol", "Demo · switch role")}</span>
         <ChevronDown size={16} aria-hidden className={open ? "rotate-180 transition-transform" : "transition-transform"} />
       </button>

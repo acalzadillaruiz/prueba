@@ -301,7 +301,7 @@ test.describe("Cliente · regresiones de la revisión", () => {
     const pill = pinned.getByRole("link", { name: `Pedir visita: «${items[0].title_es}»` });
     await expect(pill).toHaveText("Visita");
     await expect(pill).toHaveAttribute("href", `/es/listing/${items[0].slug}#contact`);
-    expect(Math.round((await pill.boundingBox())!.height)).toBeGreaterThanOrEqual(36);
+    expect((await pill.boundingBox())!.height).toBeGreaterThanOrEqual(36);
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(360);
   });
 
@@ -550,8 +550,7 @@ test.describe("Cliente · regresiones de la revisión", () => {
     await page.goto("/es/search");
     const nav = page.getByRole("navigation", { name: "Principal" });
     await expect(nav.getByRole("link", { name: "Vacacional" })).toBeVisible();
-    // 022 navigation: Comprar · Alquilar · Vacacional · Vender · Agencias.
-    await expect(nav.getByRole("link", { name: "Agencias" })).toBeVisible();
+    await expect(nav.getByRole("link", { name: "Colección Privada" })).toBeVisible();
     // One line: every nav link on the same row, and the bar no wider than the screen.
     const tops = await nav.getByRole("link").evaluateAll((els) => els.filter((e) => e.getBoundingClientRect().width > 0).map((e) => Math.round(e.getBoundingClientRect().top)));
     expect(new Set(tops).size).toBe(1);

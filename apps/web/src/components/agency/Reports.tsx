@@ -48,8 +48,8 @@ function SourceBars({ locale, rows }: { locale: Locale; rows: ReportData["bySour
         return (
           <li key={r.source} className="grid grid-cols-[minmax(0,9.5rem)_1fr_auto] items-center gap-3 text-[14px]">
             <span className="truncate">{label}</span>
-            <span className="h-2.5 rounded-full bg-[#E8EAEC] dark:bg-white/[.06]" aria-hidden>
-              <span className="block h-full rounded-full bg-[#6F7881] dark:bg-[#7A838C]" style={{ width: `${(r.count / max) * 100}%` }} />
+            <span className="h-2.5 rounded-full bg-[#F1ECE3] dark:bg-white/[.06]" aria-hidden>
+              <span className="block h-full rounded-full bg-[#81776F] dark:bg-[#8C817A]" style={{ width: `${(r.count / max) * 100}%` }} />
             </span>
             <span className="min-w-[4.5rem] text-right font-display font-semibold [font-feature-settings:'lnum','tnum']">
               {num(r.count, locale)} <span className={cn("text-[13px] font-normal", k.muted)}>· {share} %</span>

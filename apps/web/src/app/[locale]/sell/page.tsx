@@ -101,7 +101,7 @@ export default async function SellPage({ params }: { params: Promise<{ locale: L
           <ol className="mt-10 grid gap-8 md:grid-cols-3">
             {steps.map(([t, d], i) => (
               <li key={t} className="border-t border-ink/15 pt-5">
-                <span className="font-serif text-[44px] leading-none text-[#9A9DA1] [font-feature-settings:'lnum']">{i + 1}</span>
+                <span className="font-serif text-[44px] leading-none text-[#B08A55] [font-feature-settings:'lnum']">{i + 1}</span>
                 <h3 className="mt-3 font-display text-[18px] font-semibold text-ink">{t}</h3>
                 <p className="mt-1.5 text-[15px] leading-relaxed text-muted">{d}</p>
               </li>

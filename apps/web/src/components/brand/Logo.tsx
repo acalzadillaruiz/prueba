@@ -1,10 +1,10 @@
 import { cn } from "@/lib/cn";
 
 /**
- * New Place mark: the agency's double roof. Outer roof in graphite, inner roof in titanium (022).
+ * New Place mark: the agency's double roof. Outer roof in ink, inner roof (the "teja") in terracotta.
  * Below ~70 px wide the strokes thicken so the teja stays legible (header, sidebar, favicon).
  */
-export function RoofMark({ className, ink = "currentColor", teja = "var(--np-logo-teja, #8C9298)", small = false, animate = false }: { className?: string; ink?: string; teja?: string; small?: boolean; animate?: boolean }) {
+export function RoofMark({ className, ink = "currentColor", teja = "var(--np-coral)", small = false, animate = false }: { className?: string; ink?: string; teja?: string; small?: boolean; animate?: boolean }) {
   // pathLength=1 lets the brand animation draw each stroke with stroke-dasharray (globals.css .np-roof-draw).
   return small ? (
     <svg viewBox="0 0 120 42" className={cn(className, animate && "np-roof-draw")} aria-hidden>
@@ -34,7 +34,7 @@ export function Pin({ className, color = "var(--np-coral)", dot = "currentColor"
 }
 
 /** NP monogram under the roof: avatar, app icon, empty states. */
-export function Monogram({ className, bg = "var(--np-navy)", ink = "var(--np-ivory)", teja = "#A9AEB4", animate = false }: { className?: string; bg?: string; ink?: string; teja?: string; animate?: boolean }) {
+export function Monogram({ className, bg = "var(--np-navy)", ink = "var(--np-ivory)", teja = "var(--np-coral-light)", animate = false }: { className?: string; bg?: string; ink?: string; teja?: string; animate?: boolean }) {
   return (
     <svg viewBox="0 0 120 120" className={cn(className, animate && "np-roof-draw")} aria-hidden>
       <circle cx="60" cy="60" r="60" fill={bg} />
@@ -47,14 +47,14 @@ export function Monogram({ className, bg = "var(--np-navy)", ink = "var(--np-ivo
 }
 
 /**
- * Horizontal lockup used in headers: roof + NEW PLACE (Geist Medium, wide tracking). `lg` is the stacked lockup with "Bienes raíces".
+ * Horizontal lockup used in headers: roof + NEW PLACE (Cinzel). `lg` is the stacked lockup with "Bienes raíces".
  * tone="ivory" for navy/photo backgrounds (teja switches to the light terracotta for contrast).
  */
 export function Logo({ tone = "navy", className, size = "md", animate = false }: { tone?: "navy" | "ivory"; className?: string; size?: "sm" | "md" | "lg"; animate?: boolean }) {
   const dark = tone === "ivory";
   // --np-logo-ink / --np-logo-teja let the public dark mode turn the navy lockup into Cal + light terracotta.
   const ink = dark ? "var(--np-ivory)" : "var(--np-logo-ink, var(--np-navy))";
-  const teja = dark ? "#A9AEB4" : "var(--np-logo-teja, #8C9298)";
+  const teja = dark ? "var(--np-coral-light)" : "var(--np-logo-teja, var(--np-coral))";
   if (size === "lg")
     return (
       <span className={cn("inline-grid justify-items-center gap-2", className)} aria-label="New Place Bienes raíces">
@@ -62,7 +62,7 @@ export function Logo({ tone = "navy", className, size = "md", animate = false }:
         <span className={cn("font-logo text-[30px] leading-none tracking-[0.22em]", animate && "np-roof-fade")} style={{ color: ink, paddingLeft: "0.22em" }}>
           NEW PLACE
         </span>
-        <span className={cn("text-[11px] font-medium uppercase tracking-[0.34em]", animate && "np-roof-fade")} style={{ color: dark ? "#A8B0B8" : "var(--np-muted)", paddingLeft: "0.34em" }}>
+        <span className={cn("text-[11px] font-medium uppercase tracking-[0.34em]", animate && "np-roof-fade")} style={{ color: dark ? "#D4B98C" : "var(--np-muted)", paddingLeft: "0.34em" }}>
           Bienes raíces
         </span>
       </span>
@@ -71,7 +71,7 @@ export function Logo({ tone = "navy", className, size = "md", animate = false }:
   return (
     <span className={cn("inline-flex items-center gap-2.5 whitespace-nowrap", className)}>
       <RoofMark className={m} ink={ink} teja={teja} small animate={animate} />
-      <span className={cn("font-logo leading-none tracking-[0.32em]", size === "sm" ? "text-[13px]" : "text-[13px] sm:text-[15px]")} style={{ color: ink }}>
+      <span className={cn("font-logo leading-none tracking-[0.22em]", size === "sm" ? "text-[15px]" : "text-[17px]")} style={{ color: ink }}>
         NEW PLACE
       </span>
     </span>

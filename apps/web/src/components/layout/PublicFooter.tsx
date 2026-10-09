@@ -38,7 +38,7 @@ export async function PublicFooter({ locale }: { locale: Locale }) {
     </div>
   );
   return (
-    <footer className="np-grain relative mt-12 overflow-hidden rounded-t-[32px] md:mt-24 md:rounded-t-[40px] bg-[#E3E6E9] text-ink">
+    <footer className="np-grain relative mt-12 overflow-hidden rounded-t-[32px] md:mt-24 md:rounded-t-[40px] bg-[#E9E0D3] text-ink">
       <div className="relative mx-auto flex max-w-[1320px] flex-wrap items-end justify-between gap-6 border-b border-ink/10 px-4 pb-10 pt-12 md:px-8 md:pb-12 md:pt-20">
         <p className="max-w-[720px] font-serif text-[34px] leading-[1.04] tracking-[-0.02em] md:text-[64px]">
           {locale === "es" ? "Cuando quieras," : "Whenever you're ready,"} <span className="text-ink/45">{locale === "es" ? "aquí estamos." : "we're here."}</span>

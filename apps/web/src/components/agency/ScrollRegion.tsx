@@ -47,7 +47,7 @@ export function ScrollRegion({ label, className, fade = true, children, scrollRe
         role="region"
         aria-label={label}
         tabIndex={scrollable ? 0 : undefined}
-        className="overflow-x-auto overscroll-x-contain rounded-[inherit] scrollbar-thin focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-navy dark:focus-visible:outline-[#C3C8CD]"
+        className="overflow-x-auto overscroll-x-contain rounded-[inherit] scrollbar-thin focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-navy dark:focus-visible:outline-[#C9A574]"
       >
         {children}
       </div>

@@ -40,9 +40,9 @@ export function SellQuickEstimate({ locale, zones }: { locale: Locale; zones: { 
   };
   const suffix = op === "LONG_RENT" ? tx(locale, " / mes", " / month") : "";
   return (
-    <form onSubmit={run} className="np-glass rounded-[28px] p-5 shadow-[0_24px_60px_-30px_rgba(31,35,40,.35)] md:p-7" aria-labelledby="quick-estimate-title" noValidate>
+    <form onSubmit={run} className="np-glass rounded-[28px] p-5 shadow-[0_24px_60px_-30px_rgba(30,26,24,.35)] md:p-7" aria-labelledby="quick-estimate-title" noValidate>
       <div className="flex items-center gap-2 font-display text-[15px] font-semibold text-ink">
-        <Sparkles size={16} strokeWidth={1.7} className="text-[#9A9DA1]" aria-hidden />
+        <Sparkles size={16} strokeWidth={1.7} className="text-[#B08A55]" aria-hidden />
         <h2 id="quick-estimate-title">{tx(locale, "¿Cuánto vale tu casa?", "What’s your home worth?")}</h2>
       </div>
       <p className="mt-1 text-sm text-muted">{tx(locale, "Gratis y sin registrarte. Una primera cifra en segundos.", "Free, no sign-up. A first figure in seconds.")}</p>
@@ -62,7 +62,7 @@ export function SellQuickEstimate({ locale, zones }: { locale: Locale; zones: { 
               setOp(k);
               setRes(null);
             }}
-            className={cn("min-h-10 rounded-full px-4 font-display text-sm font-semibold transition-colors duration-np", op === k ? "bg-white text-ink shadow-[0_2px_8px_rgba(31,35,40,.1)]" : "text-muted hover:text-ink")}
+            className={cn("min-h-10 rounded-full px-4 font-display text-sm font-semibold transition-colors duration-np", op === k ? "bg-white text-ink shadow-[0_2px_8px_rgba(30,26,24,.1)]" : "text-muted hover:text-ink")}
           >
             {label}
           </button>

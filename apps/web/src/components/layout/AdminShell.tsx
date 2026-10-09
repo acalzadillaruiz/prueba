@@ -145,21 +145,21 @@ export function AdminShell({
     // Bell = new leads waiting (real count, polled); opens the inbox.
     <Link
       href={`${base}/leads`}
-      className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-navy shadow-[inset_0_0_0_1px_#D3D7DB] hover:bg-white dark:text-ivory dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,.18)] dark:hover:bg-white/5"
+      className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-navy shadow-[inset_0_0_0_1px_#D8CBB7] hover:bg-white dark:text-ivory dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,.18)] dark:hover:bg-white/5"
       aria-label={`${t("notifications")}: ${nNew}`}
     >
       <Bell size={17} strokeWidth={1.7} />
-      {nNew > 0 && <Count className="absolute -right-1 -top-1 bg-navy text-ivory dark:bg-[#C3C8CD] dark:text-navy">{nNew}</Count>}
+      {nNew > 0 && <Count className="absolute -right-1 -top-1 bg-navy text-ivory dark:bg-[#C9A574] dark:text-navy">{nNew}</Count>}
     </Link>
   );
   return (
-    <div className={cn("min-h-screen bg-ivory text-navy dark:bg-[#0E1013] dark:text-ivory", k.darkVars)}>
+    <div className={cn("min-h-screen bg-ivory text-navy dark:bg-[#15120F] dark:text-ivory", k.darkVars)}>
       {/* Laptop heights (1024×768, 1280×720): compact logo block, 38 px rows and a one-row footer, so every section shows
           without the nav scrolling; secondary actions live in the account menu at the bottom. */}
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-[264px] flex-col bg-navy text-ivory lg:flex">
         <div className="px-7 pb-6 pt-8 [@media(max-height:820px)]:pb-3 [@media(max-height:820px)]:pt-5">
           <Link href={`/${locale}`} aria-label="New Place" className="inline-block rounded-md"><Logo tone="ivory" /></Link>
-          <div className="mt-2 pl-[62px] text-[10px] font-semibold uppercase tracking-[.22em] text-[#A8B0B8]/80 [@media(max-height:820px)]:mt-1">{area === "agency" ? tx(locale, "Agencia", "Agency") : tx(locale, "Plataforma", "Platform")}</div>
+          <div className="mt-2 pl-[62px] text-[10px] font-semibold uppercase tracking-[.22em] text-[#D4B98C]/80 [@media(max-height:820px)]:mt-1">{area === "agency" ? tx(locale, "Agencia", "Agency") : tx(locale, "Plataforma", "Platform")}</div>
         </div>
         <nav className="min-h-0 flex-1 space-y-0.5 overflow-y-auto px-4 scrollbar-thin" aria-label={area === "agency" ? tx(locale, "Panel de agencia", "Agency dashboard") : tx(locale, "Consola de plataforma", "Platform console")}>
           {items.map((i) => {
@@ -171,7 +171,7 @@ export function AdminShell({
                 aria-current={active ? "page" : undefined}
                 className={cn(
                   "flex min-h-[38px] items-center gap-3.5 rounded-xl px-4 py-2 text-[14.5px] leading-[22px] transition-colors duration-np",
-                  active ? "bg-[#1C2025] text-ivory shadow-[inset_3px_0_0_#A8B0B8]" : "text-ivory/75 hover:bg-white/[.04] hover:text-ivory",
+                  active ? "bg-[#2A2420] text-ivory shadow-[inset_3px_0_0_#D4B98C]" : "text-ivory/75 hover:bg-white/[.04] hover:text-ivory",
                 )}
               >
                 <i.icon size={18} strokeWidth={1.6} className={active ? "text-ivory" : "text-ivory/70"} />
@@ -242,7 +242,7 @@ export function AdminShell({
                   key={i.href}
                   href={base + i.href}
                   aria-current={active ? "page" : undefined}
-                  className={cn("flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-2 text-[14px]", active ? "bg-[#1C2025] text-ivory shadow-[inset_0_-2px_0_#A8B0B8]" : "text-ivory/70")}
+                  className={cn("flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-2 text-[14px]", active ? "bg-[#2A2420] text-ivory shadow-[inset_0_-2px_0_#D4B98C]" : "text-ivory/70")}
                 >
                   <i.icon size={15} strokeWidth={1.6} /> {t(i.label)}
                   {(badges[i.href] ?? 0) > 0 && <Count>{badges[i.href]}</Count>}
@@ -265,7 +265,7 @@ export function AdminShell({
         )}
 
         {area === "agency" && u.role === "SUPERADMIN" && (
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-[#D4D8DB] bg-rosa/60 px-4 py-2.5 text-sm text-navy md:px-10 dark:border-white/10 dark:bg-[#1C2025] dark:text-ivory">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-[#E9D2C6] bg-rosa/60 px-4 py-2.5 text-sm text-navy md:px-10 dark:border-white/10 dark:bg-[#2A2420] dark:text-ivory">
             {agency ? tx(locale, `Viendo como superadmin: ${agency.name}`, `Viewing as superadmin: ${agency.name}`) : tx(locale, "Elige una agencia en Platform → Agencias para impersonarla.", "Pick an agency in Platform → Agencies to impersonate it.")}
             <Link href={`/${locale}/platform/agencies`} className={cn("ml-auto", k.link)}>Platform →</Link>
           </div>
@@ -331,7 +331,7 @@ function SidebarAccount({ locale, card, children }: { locale: Locale; card: Reac
       }}
     >
       {open && (
-        <div id="np-account-menu" className="np-in absolute inset-x-0 bottom-full z-20 mb-2 space-y-0.5 rounded-np border border-navy-line bg-[#1C2025] p-1 shadow-np">
+        <div id="np-account-menu" className="np-in absolute inset-x-0 bottom-full z-20 mb-2 space-y-0.5 rounded-np border border-navy-line bg-[#2A2420] p-1 shadow-np">
           {children(close)}
         </div>
       )}

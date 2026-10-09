@@ -429,7 +429,7 @@ export function PublicHeader({ locale, variant = "light", autoHide = false }: { 
               opener.current = e.currentTarget;
               setMenuOpen(true);
             }}
-            className={cn("flex h-11 w-11 items-center justify-center rounded-full lg:hidden", dark ? "bg-white/15 backdrop-blur hover:bg-white/25" : "hover:bg-black/5")}
+            className={cn("flex h-11 w-11 items-center justify-center rounded-full min-[1400px]:hidden", dark ? "bg-white/15 backdrop-blur hover:bg-white/25" : "hover:bg-black/5")}
             aria-label={t("menu")}
             aria-expanded={menuOpen}
             aria-controls="np-mobile-menu"

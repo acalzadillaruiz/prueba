@@ -98,7 +98,7 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
   const unit = (l: Listing) => <span className="text-xs font-normal text-muted">{priceSuffix(l, locale)}</span>;
   const ppm = (l: Listing) => (l.areaM2 > 0 ? l.priceAmount / l.areaM2 : NaN);
   const allRows: Row[] = [
-    { label: tx(locale, "Precio", "Price"), render: (l) => <span className="font-serif text-[17px] font-medium leading-tight md:text-[22px]">{money(l.priceAmount, locale)}{unit(l)}</span>, val: sameUnit ? (l) => l.priceAmount : undefined, best: "min" },
+    { label: tx(locale, "Precio", "Price"), render: (l) => <span className="font-serif text-[17px] font-medium leading-tight md:text-[22px]"><span className="whitespace-nowrap md:hidden">{shortMoney(l.priceAmount, locale)}</span><span className="hidden md:inline">{money(l.priceAmount, locale)}</span><span className="whitespace-nowrap">{unit(l)}</span></span>, val: sameUnit ? (l) => l.priceAmount : undefined, best: "min" },
     // A rent per m² next to a sale per m² (or a nightly next to a monthly one) isn't comparable: "—" for the rents.
     { label: tx(locale, "Precio por m²", "Price per m²"), render: (l) => (Number.isFinite(ppm(l)) && (sameUnit || !l.pricePeriod) ? <>{num(Math.round(ppm(l) * (l.pricePeriod ? 10 : 1)) / (l.pricePeriod ? 10 : 1), locale)} USD/m²{unit(l)}</> : <span aria-label={tx(locale, "No comparable", "Not comparable")}>—</span>), val: sameUnit ? ppm : undefined, best: "min" },
     { label: "PlaceEstimate", render: (l) => <>{money(l.estimate.mid, locale)}{unit(l)}</> },

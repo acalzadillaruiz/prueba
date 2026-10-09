@@ -486,7 +486,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
           </form>
           {/* Phones: the operation as one compact select (the rest lives in "Filtros"). */}
           <span className="relative shrink-0 lg:hidden">
-            <select value={type} onChange={(e) => set({ type: e.target.value, max: null, min: null })} aria-label={tx(locale, "Qué buscas", "What you're after")} className={cn(pill, "appearance-none pr-8 font-semibold", on)}>
+            <select value={type} onChange={(e) => set({ type: e.target.value, max: null, min: null })} aria-label={tx(locale, "Qué buscas", "What you're after")} className={cn(pill, "min-w-[8.5rem] appearance-none pr-9 font-semibold", on)}>
               {TYPES.map(([k, es, en]) => (
                 <option key={k} value={k}>{tx(locale, es, en)}</option>
               ))}

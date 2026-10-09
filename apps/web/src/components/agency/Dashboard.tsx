@@ -59,7 +59,7 @@ export function AgencyDashboard({ locale, stats, listings, newLeads, tours, agen
       <div className={kpiGrid5}>
         <Kpi label={tx(locale, "Inmuebles activos", "Active listings")} value={stats.activeListings} delta={stats.activeDelta ? sign(stats.activeDelta) : undefined} down={stats.activeDelta < 0} hint={tx(locale, "nuevos en 30 días", "new in 30 days")} />
         <Kpi label={tx(locale, "Leads · 7 días", "Leads · 7 days")} value={stats.leads7d} delta={stats.leadsDeltaPct === null ? undefined : `${sign(stats.leadsDeltaPct)} %`} deltaNote={tx(locale, "Aún hay pocos datos para comparar", "Not enough data to compare yet")} down={(stats.leadsDeltaPct ?? 0) < 0} hint={tx(locale, "vs. semana anterior", "vs. previous week")} />
-        <Kpi label={tx(locale, "Conversión lead → visita", "Lead → tour")} value={`${stats.convTourPct} %`} hint={tx(locale, "últimos 30 días", "last 30 days")} />
+        <Kpi label={tx(locale, "Conversión lead → visita", "Lead → tour")} value={stats.convTourPct === null ? "—" : `${stats.convTourPct} %`} hint={tx(locale, "últimos 30 días", "last 30 days")} />
         <Kpi label={tx(locale, "Tiempo medio a visita", "Avg. time to tour")} value={stats.avgDaysToTour === null ? "—" : `${String(stats.avgDaysToTour).replace(".", locale === "es" ? "," : ".")} d`} hint={tx(locale, "desde el lead", "from lead")} />
         <Kpi label={tx(locale, "Respondidos en 15\u00a0min", "Answered within 15\u00a0min")} value={stats.slaPct === null ? "—" : `${stats.slaPct} %`} hint={tx(locale, "primera respuesta", "first response")} />
       </div>

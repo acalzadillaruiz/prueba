@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Anchor, Clock, Droplet, Droplets, Eye, Heart, Mountain, Waves, X, Zap, type LucideIcon } from "lucide-react";
+import { Anchor, Clock, Droplet, Droplets, Heart, Mountain, Waves, X, Zap, type LucideIcon } from "lucide-react";
 import type { Listing, Locale } from "@/types/domain";
 import { PublicPage } from "@/components/layout/PublicPage";
 import { Gallery } from "@/components/detail/Gallery";
@@ -25,6 +25,8 @@ import { CompareLink } from "@/components/compare/CompareTray";
 import { OPEN_FOR_TOURS, takesTours } from "@/lib/visit-hours";
 import { zoneStats } from "@/server/zone-stats";
 import { essentialLabels } from "@/lib/essentials";
+import { WEEK_MS, weeklySavesLabel } from "@/lib/public-metrics";
+import { isPriceVerified, priceBadgeLabel } from "@/lib/price-badge";
 
 const ESSENTIAL_ICON: Record<string, LucideIcon> = { power: Zap, well: Droplet, tank: Droplets, dock: Anchor, avila: Mountain, sea: Waves };
 
@@ -126,13 +128,16 @@ function Facts({ l, locale }: { l: Listing; locale: Locale }) {
  */
 export async function ListingView({ locale, l }: { locale: Locale; l: Listing }) {
   const isPublic = isPublicListing(l);
-  const [zoneRow, fx, similarRows, nearbyRows, soldRows] = await Promise.all([
+  const [zoneRow, fx, similarRows, nearbyRows, soldRows, weeklySaves] = await Promise.all([
     zoneStats(l.zone),
     getFx(),
     prisma.listing.findMany({ where: { AND: [publicWhere(), { id: { not: l.id }, listingType: l.listingType }, { OR: [{ city: l.city }, { luxury: l.luxury }] }] }, include: listingInclude, take: 24 }),
     prisma.listing.findMany({ where: { AND: [publicWhere(), { id: { not: l.id }, city: l.city }] }, include: listingInclude, take: 12 }),
     prisma.listing.findMany({ where: { AND: [publicWhere(), { id: { not: l.id }, zone: l.zone, status: { in: ["SOLD", "RENTED"] } }] }, include: listingInclude, take: 3, orderBy: { updatedAt: "desc" } }),
+    // Real, recorded saves of the last 7 days only (the listing's lifetime counters are not shown publicly).
+    prisma.savedListing.count({ where: { listingId: l.id, createdAt: { gte: new Date(Date.now() - WEEK_MS) } } }),
   ]);
+  const savesLabel = weeklySavesLabel(weeklySaves, locale);
   const zone = zoneRow;
   const usd1 = (n: number) => new Intl.NumberFormat(locale === "es" ? "es-VE" : "en-US", { style: "currency", currency: "USD", maximumFractionDigits: 1 }).format(n).replace(/[\u00a0\u202f]/g, " ");
   const similar = similarRows.map((r) => toCard(toDomain(r))).sort((a, b) => Math.abs(a.priceAmount - l.priceAmount) - Math.abs(b.priceAmount - l.priceAmount)).slice(0, 4);
@@ -217,6 +222,8 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
                     <span className="whitespace-nowrap">≈ Bs. {num(Math.round(l.priceAmount * ves), locale)}</span> · <span className="whitespace-nowrap">€ {num(Math.round(l.priceAmount * eur), locale)}</span>{" "}
                     <span className="whitespace-nowrap">({tx(locale, "tasa referencial", "reference rate")})</span>
                   </div>
+                  {/* "Precio verificado" only within ±10 % of an estimate from ≥ 3 comparables (lib/price-badge). */}
+                  <div className="mt-2"><Badge tone={isPriceVerified(l) ? "ok" : "mist"}>{priceBadgeLabel(l, locale)}</Badge></div>
                 </div>
               </div>
             </header>
@@ -238,8 +245,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
             <Facts l={l} locale={locale} />
             <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted">
               <Freshness iso={l.updatedAt} locale={locale} />
-              <span className="inline-flex items-center gap-1.5"><Eye size={15} aria-hidden /> {num(l.stats.impressions, locale)} {tx(locale, "vistas", "views")}</span>
-              <span className="inline-flex items-center gap-1.5"><Heart size={15} aria-hidden /> {l.stats.saves} {tx(locale, "lo guardaron", "saves")}</span>
+              {savesLabel && <span className="inline-flex items-center gap-1.5"><Heart size={15} aria-hidden /> {savesLabel}</span>}
               <span className="inline-flex items-center gap-1.5"><Clock size={15} aria-hidden /> {l.daysOnMarket === 0 ? tx(locale, "Publicado hoy", "Listed today") : plural(l.daysOnMarket, locale, ["día en New Place", "días en New Place"], ["day on New Place", "days on New Place"])}</span>
             </div>
 
@@ -249,7 +255,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
 
             {(amenities.length > 0 || views.length > 0 || l.commercial) && (
             <div className={sec} data-testid="amenities">
-              <H>{views.length ? tx(locale, "Vistas y amenidades", "Views and amenities") : tx(locale, "Amenidades", "Amenities")}</H>
+              <H>{views.length ? tx(locale, "Vistas y servicios", "Views and amenities") : tx(locale, "Servicios", "Amenities")}</H>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                 {views.map(({ key, label }) => {
                   const Icon = ESSENTIAL_ICON[key];

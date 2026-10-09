@@ -12,7 +12,7 @@ import { Building2, Eye, EyeOff, FlaskConical, Loader2 } from "lucide-react";
 import type { Locale } from "@/types/domain";
 import { Logo } from "@/components/brand/Logo";
 import { Avatar, Button, Field, inputCls } from "@/components/ui";
-import { DEMO_ENABLED, DEMO_LOGINS } from "@/lib/demo";
+import { DEMO_ENABLED, DEMO_LOGINS, PREVIEW_PARAM } from "@/lib/demo";
 import { api, ApiClientError } from "@/lib/api";
 import { useApp } from "@/lib/store";
 import { tx } from "@/lib/i18n";
@@ -38,7 +38,7 @@ function GoogleG() {
       <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.6 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z" />
       <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z" />
       <path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z" />
-      <path fill="#696059" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z" />
+      <path fill="#596169" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z" />
     </svg>
   );
 }
@@ -55,6 +55,8 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
   const [err, setErr] = useState<string | null>(null);
   const router = useRouter();
   const sp = useSearchParams();
+  // Demo "sign in as…" chooser: private preview flow only (footer link → /login?preview=1), never on the public login.
+  const preview = DEMO_ENABLED && sp.get(PREVIEW_PARAM) === "1";
   const invite = sp.get("invite");
   // "¿Olvidaste tu contraseña?" carries the email already typed (only when it looks like one), so it isn't typed twice.
   // It travels in sessionStorage, never in the URL (URLs end up in history, logs and referrers).
@@ -175,11 +177,11 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
               <button
                 type="button"
                 onClick={() => signIn("google", { callbackUrl: next ?? `/${locale}/app` })}
-                className="mt-8 flex h-12 w-full items-center justify-center gap-3 rounded-full bg-white font-display font-medium text-navy shadow-[inset_0_0_0_1px_#D8CBB7] transition-shadow hover:shadow-[inset_0_0_0_1px_#1E1A18]"
+                className="mt-8 flex h-12 w-full items-center justify-center gap-3 rounded-full bg-white font-display font-medium text-navy shadow-[inset_0_0_0_1px_#D3D7DB] transition-shadow hover:shadow-[inset_0_0_0_1px_#1F2328]"
               >
                 <GoogleG /> {tx(locale, "Continuar con Google", "Continue with Google")}
               </button>
-              <div className={cn("my-6 flex items-center gap-3 text-[12px] uppercase tracking-[.14em]", k.muted)}><span className="h-px flex-1 bg-[#D8CBB7]" />{tx(locale, "o con tu correo", "or with your email")}<span className="h-px flex-1 bg-[#D8CBB7]" /></div>
+              <div className={cn("my-6 flex items-center gap-3 text-[12px] uppercase tracking-[.14em]", k.muted)}><span className="h-px flex-1 bg-[#D3D7DB]" />{tx(locale, "o con tu correo", "or with your email")}<span className="h-px flex-1 bg-[#D3D7DB]" /></div>
             </>
           ) : (
             <div className="mt-8" />
@@ -201,7 +203,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
               </div>
             )}
             {mode === "register" && !inv && (
-              <label className={cn("flex cursor-pointer items-start gap-3 rounded-[18px] p-4", agency ? "bg-[#E6DDD2] shadow-[inset_0_0_0_2px_#1E1A18]" : "bg-white shadow-[inset_0_0_0_1px_#D8CBB7]")}>
+              <label className={cn("flex cursor-pointer items-start gap-3 rounded-[18px] p-4", agency ? "bg-[#E1E4E8] shadow-[inset_0_0_0_2px_#1F2328]" : "bg-white shadow-[inset_0_0_0_1px_#D3D7DB]")}>
                 <input type="checkbox" checked={agency} onChange={(e) => setAgency(e.target.checked)} className="mt-1 h-4 w-4 accent-navy" />
                 <span>
                   <span className="flex items-center gap-1.5 font-display font-semibold"><Building2 size={16} strokeWidth={1.7} /> {tx(locale, "¿Eres agencia?", "Are you an agency?")}</span>
@@ -223,9 +225,9 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
               <>{tx(locale, "¿Ya tienes cuenta?", "Already have an account?")} <Link className={k.link} href={`/${locale}/login${carry}`}>{tx(locale, "Entra", "Sign in")}</Link></>
             )}
           </p>
-          {mode === "login" && DEMO_ENABLED && (
-            <div className="mt-10 rounded-[18px] border border-dashed border-[#D8CBB7] bg-white/60 p-4">
-              <div className={cn("flex items-center gap-2", k.label)}><FlaskConical size={14} /> DEMO_AUTH · {tx(locale, "Entrar como…", "Sign in as…")}</div>
+          {mode === "login" && preview && (
+            <div className="mt-10 rounded-[18px] border border-dashed border-[#D3D7DB] bg-white/60 p-4" data-private-preview>
+              <div className={cn("flex items-center gap-2", k.label)}><FlaskConical size={14} /> {tx(locale, "Vista previa privada · Entrar como…", "Private preview · Sign in as…")}</div>
               <div className="mt-3 grid grid-cols-2 gap-2">
                 {DEMO_LOGINS.map((d) => (
                   <button
@@ -236,7 +238,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
                       await signIn("demo", { email: d.email, redirect: false });
                       finish(d.home);
                     }}
-                    className="flex items-center gap-2 rounded-xl bg-white p-2 text-left text-sm shadow-[inset_0_0_0_1px_#E4DCCD] transition-shadow hover:shadow-[inset_0_0_0_1px_#1E1A18]"
+                    className="flex items-center gap-2 rounded-xl bg-white p-2 text-left text-sm shadow-[inset_0_0_0_1px_#D5D9DC] transition-shadow hover:shadow-[inset_0_0_0_1px_#1F2328]"
                   >
                     {busy === d.email ? <Loader2 size={18} className="animate-spin" /> : <Avatar initials={d.initials} hue={d.hue} size={26} />}
                     <span className="font-semibold leading-tight">{tx(locale, d.label.es, d.label.en)}</span>
@@ -252,12 +254,12 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
         <div className="relative flex h-full flex-col items-center justify-center px-12 py-16">
           <Logo size="lg" className="mb-10" />
           {/* Arch-framed brand photo (the arch is the signature of the brand imagery). */}
-          <div className="relative aspect-[3/4] w-full max-w-[400px] overflow-hidden rounded-t-full shadow-[0_30px_60px_-20px_rgba(30,26,24,.35)] ring-[10px] ring-ivory">
+          <div className="relative aspect-[3/4] w-full max-w-[400px] overflow-hidden rounded-t-full shadow-[0_30px_60px_-20px_rgba(31,35,40,.35)] ring-[10px] ring-ivory">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/brand/arco.jpg" alt="" className="h-full w-full object-cover" />
             <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-navy/80 to-transparent" />
             <div className="absolute inset-x-0 bottom-8 px-8 text-center text-ivory">
-              <div className="text-[11px] font-semibold uppercase tracking-[.22em] text-[#EBD5C8]">{tx(locale, "El Caribe, con alma mediterránea", "The Caribbean, with a Mediterranean soul")}</div>
+              <div className="text-[11px] font-semibold uppercase tracking-[.22em] text-[#E6E9EC]">{tx(locale, "El Caribe, con alma mediterránea", "The Caribbean, with a Mediterranean soul")}</div>
               <div className="mt-2 font-serif text-[34px] leading-[1.05]">{tx(locale, "Tu próximo hogar", "Your next home")}<br /><em>{tx(locale, "ya te está esperando.", "is already waiting.")}</em></div>
             </div>
           </div>

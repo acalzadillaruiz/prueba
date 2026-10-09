@@ -145,7 +145,7 @@ export function MediaView({ locale, jobs, listings, names = {}, manage = null }:
             const jl = byId.get(j.listingId);
             if (!jl) return null;
             return (
-              <button key={j.id} onClick={() => setSel(j.id)} aria-pressed={sel === j.id} className={cn("flex w-full gap-3 rounded-[18px] p-3 text-left transition-shadow duration-np", sel === j.id ? "bg-[#E6DDD2] shadow-[inset_0_0_0_2px_#1E1A18] dark:bg-white/[.08] dark:shadow-[inset_0_0_0_2px_#C9A574]" : cn(k.card, "hover:shadow-[0_8px_24px_rgba(30,26,24,.1)]"))}>
+              <button key={j.id} onClick={() => setSel(j.id)} aria-pressed={sel === j.id} className={cn("flex w-full gap-3 rounded-[18px] p-3 text-left transition-shadow duration-np", sel === j.id ? "bg-[#E1E4E8] shadow-[inset_0_0_0_2px_#1F2328] dark:bg-white/[.08] dark:shadow-[inset_0_0_0_2px_#C3C8CD]" : cn(k.card, "hover:shadow-[0_8px_24px_rgba(31,35,40,.1)]"))}>
                 <PropertyArt scene={jl.scenes[0]} seed={jl.id} photo={listingPhoto(jl, 0)} className="h-16 w-20 shrink-0 rounded-xl" />
                 <div className="min-w-0 flex-1">
                   <div className="line-clamp-1 font-semibold">{tx(locale, jl.title_es, jl.title_en)}</div>
@@ -217,7 +217,7 @@ export function MediaView({ locale, jobs, listings, names = {}, manage = null }:
                 </button>
               ))}
             </div>
-            <div className="mt-3 h-1.5 rounded-full bg-[#ECE6DA] dark:bg-white/10"><div className="h-full rounded-full bg-navy transition-all duration-500 dark:bg-ivory" style={{ width: `${Math.min(100, (photos.length / 20) * 100)}%` }} /></div>
+            <div className="mt-3 h-1.5 rounded-full bg-[#E0E3E6] dark:bg-white/10"><div className="h-full rounded-full bg-navy transition-all duration-500 dark:bg-ivory" style={{ width: `${Math.min(100, (photos.length / 20) * 100)}%` }} /></div>
             {photos.length ? (
               <div className="mt-5 grid grid-cols-3 gap-2 sm:grid-cols-5 lg:grid-cols-6">
                 {photos.map((src, i) => (

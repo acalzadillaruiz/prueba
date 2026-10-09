@@ -136,7 +136,7 @@ function Performance({ locale, days, rows }: { locale: Locale; days: AuditPeriod
               <button
                 type="button"
                 onClick={() => setSort((s) => ({ ...s, dir: s.dir === 1 ? -1 : 1 }))}
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-navy shadow-[inset_0_0_0_1px_#D8CBB7] dark:text-ivory dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,.18)]"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-navy shadow-[inset_0_0_0_1px_#D3D7DB] dark:text-ivory dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,.18)]"
                 aria-label={sort.dir === 1 ? tx(locale, "Orden ascendente (cambiar a descendente)", "Ascending order (switch to descending)") : tx(locale, "Orden descendente (cambiar a ascendente)", "Descending order (switch to ascending)")}
               >
                 {sort.dir === 1 ? <ArrowUp size={16} aria-hidden /> : <ArrowDown size={16} aria-hidden />}
@@ -301,7 +301,7 @@ function Chats({ locale, advisors, threads, agentId, onAgent, pending }: { local
               const active = open?.id === t.id;
               return (
                 <li key={t.id}>
-                  <button type="button" onClick={() => show(t.id)} aria-current={active ? "true" : undefined} className={cn("block w-full px-4 py-3 text-left transition-colors", active ? "bg-[#E6DDD2] dark:bg-white/10" : k.hover)}>
+                  <button type="button" onClick={() => show(t.id)} aria-current={active ? "true" : undefined} className={cn("block w-full px-4 py-3 text-left transition-colors", active ? "bg-[#E1E4E8] dark:bg-white/10" : k.hover)}>
                     <div className="flex items-baseline justify-between gap-2">
                       <span className="min-w-0 font-semibold leading-snug">{names(t.participants)}</span>
                       <span className={cn("shrink-0 text-xs", k.muted)}><TimeAgo iso={t.last ? t.last.at : t.updatedAt} locale={locale} /></span>
@@ -343,7 +343,7 @@ function Chats({ locale, advisors, threads, agentId, onAgent, pending }: { local
                     const staff = open.participants.find((p) => p.id === m.senderId)?.member ?? false;
                     return (
                       <li key={m.id} className={cn("flex", staff ? "justify-end" : "justify-start")}>
-                        <div className={cn("max-w-[80%] rounded-2xl px-3.5 py-2.5 text-[14px]", staff ? "bg-navy text-ivory dark:bg-[#3A322D]" : "bg-[#F6F2EA] text-navy dark:bg-white/[.06] dark:text-ivory")}>
+                        <div className={cn("max-w-[80%] rounded-2xl px-3.5 py-2.5 text-[14px]", staff ? "bg-navy text-ivory dark:bg-[#2C3137]" : "bg-[#EEF0F2] text-navy dark:bg-white/[.06] dark:text-ivory")}>
                           <div className={cn("mb-0.5 text-[12px] font-semibold", staff ? "text-ivory/85" : "text-muted dark:text-mist")}>
                             {m.senderName} · <time dateTime={m.at}>{dateTime(m.at, locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</time>
                           </div>

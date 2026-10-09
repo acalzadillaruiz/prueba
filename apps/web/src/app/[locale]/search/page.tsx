@@ -26,7 +26,7 @@ export async function generateMetadata({ params, searchParams }: { params: Promi
   const [es, en] = SEARCH_TITLE[type];
   const where = sp.zone ? ` · ${sp.zone}` : "";
   return pageMeta(locale, (locale === "es" ? es : en) + where, `/search?type=${type}${sp.zone ? `&zone=${encodeURIComponent(sp.zone)}` : ""}`, {
-    description: locale === "es" ? `${es} en Venezuela, sobre el mapa, con precios verificados y lo que vale cada una según PlaceEstimate.` : `${en} in Venezuela, on the map, with verified prices and what each one is really worth, by PlaceEstimate.`,
+    description: locale === "es" ? `${es} en Venezuela, sobre el mapa, con el valor estimado New Place de cada una.` : `${en} in Venezuela, on the map, with what each one is really worth, by PlaceEstimate.`,
   });
 }
 

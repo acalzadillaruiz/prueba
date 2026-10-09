@@ -201,7 +201,7 @@ export function TeamView({ locale, members, listingsByAgent, invites: initialInv
                 <Chip>{tr(i.role)}</Chip>
                 {manager && (
                   <button
-                    className={cn("flex h-9 w-9 items-center justify-center rounded-full", k.muted, "hover:bg-[#E6DDD2] hover:text-navy dark:hover:bg-white/10 dark:hover:text-ivory")}
+                    className={cn("flex h-9 w-9 items-center justify-center rounded-full", k.muted, "hover:bg-[#E1E4E8] hover:text-navy dark:hover:bg-white/10 dark:hover:text-ivory")}
                     aria-label={tx(locale, `Revocar invitación a ${i.email}`, `Revoke invite to ${i.email}`)}
                     onClick={async () => {
                       try {

@@ -17,7 +17,7 @@ export function OwnerNextSteps({ locale, slug, title, live }: { locale: Locale; 
   const path = `/${locale}/listing/${slug}`;
   const url = () => (typeof window !== "undefined" ? `${window.location.origin}${path}` : path);
   const shareText = (u: string) => tx(locale, `Estoy vendiendo «${title}». Mírala en New Place: ${u}`, `I’m selling “${title}”. Take a look on New Place: ${u}`);
-  const card = "rounded-[18px] bg-white p-4 text-left shadow-[0_8px_24px_rgba(30,26,24,.06)] dark:bg-navy-card";
+  const card = "rounded-[18px] bg-white p-4 text-left shadow-[0_8px_24px_rgba(31,35,40,.06)] dark:bg-navy-card";
   const link = "inline-flex min-h-11 items-center gap-1.5 rounded-full border-[1.5px] border-navy px-4 text-sm font-semibold text-navy hover:bg-navy/5 dark:border-ivory dark:text-ivory";
 
   return (

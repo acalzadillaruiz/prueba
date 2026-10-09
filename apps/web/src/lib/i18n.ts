@@ -115,6 +115,6 @@ export function dwell(sec: number | null | undefined): string {
 export const EMAIL_STATUS_LABEL: Record<EmailOutbox["status"], [string, string]> = {
   QUEUED: ["En cola", "Queued"],
   SENT: ["Enviado", "Sent"],
-  SIMULATED: ["Simulado (sin proveedor)", "Simulated (no provider)"],
+  SIMULATED: ["Registrado", "Recorded"],
   FAILED: ["Fallido", "Failed"],
 };

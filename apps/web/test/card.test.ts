@@ -21,7 +21,9 @@ describe("toCard", () => {
   it("drops heavy fields but keeps what cards render", () => {
     const c = toCard(base);
     expect(c.body_es).toBe("");
-    expect(c.estimate.comparables).toEqual([]);
+    // At most 3 comparables survive: enough for the "Precio verificado" rule (lib/price-badge).
+    expect(c.estimate.comparables).toEqual([{ id: "c1" }, { id: "c2" }]);
+    expect(toCard({ ...base, estimate: { ...base.estimate, comparables: Array.from({ length: 5 }, (_, i) => ({ id: `c${i}` })) } } as unknown as Listing).estimate.comparables).toHaveLength(3);
     expect(c.estimate.mid).toBe(185000);
     expect(c.priceHistory).toEqual([{ date: "2026-03-01", amount: 180000, kind: "DROP" }]);
     expect(c.photos).toHaveLength(5);

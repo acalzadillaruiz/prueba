@@ -5,7 +5,7 @@
     "about": "We help you find home in Lechería, El Morro, Margarita and Caracas.",
     "search": "Search", "owners": "Owners", "agencies": "Agencies",
     "listFree": "List for free", "hireAgency": "Hire an agency", "myProperties": "My properties",
-    "forAgencies": "New Place for agencies", "legal": "Prices in USD. VES/EUR conversions are for reference only.", "listedOn": "Listed on New Place", "sellWithUs": "Sell with us", "valuation": "Value my property"
+    "forAgencies": "New Place for agencies", "legal": "Prices in USD. VES/EUR conversions are for reference only.", "sellWithUs": "Sell with us", "valuation": "Value my property"
   },
   "admin": {
     "dashboard": "Dashboard", "leads": "Leads", "listings": "Listings", "calendar": "Calendar", "capture": "Capture", "media": "Media", "team": "Team", "reports": "Reports", "teamAudit": "Team audit", "settings": "Settings",

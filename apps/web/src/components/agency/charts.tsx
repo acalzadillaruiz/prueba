@@ -47,7 +47,7 @@ export function BarChart({ data, height = 180, format = (v: number) => String(v)
             const y = H - pad.b - (t / max) * (H - pad.t - pad.b);
             return (
               <g key={t}>
-                <line x1={pad.l} x2={W - pad.r} y1={y} y2={y} className={t === 0 ? "stroke-[#D8CBB7] dark:stroke-white/20" : "stroke-[#EFEAE0] dark:stroke-white/[.07]"} strokeWidth={1} />
+                <line x1={pad.l} x2={W - pad.r} y1={y} y2={y} className={t === 0 ? "stroke-[#D3D7DB] dark:stroke-white/20" : "stroke-[#E5E8EA] dark:stroke-white/[.07]"} strokeWidth={1} />
                 <text x={pad.l - 6} y={y + 4} textAnchor="end" fontSize={FONT} className="fill-muted dark:fill-mist">{t}</text>
               </g>
             );
@@ -64,7 +64,7 @@ export function BarChart({ data, height = 180, format = (v: number) => String(v)
                 {d.value > 0 && (
                   <path
                     d={`M${x} ${H - pad.b} V${Math.min(y + r, H - pad.b)} q0 -${r} ${r} -${r} h${w - 2 * r} q${r} 0 ${r} ${r} V${H - pad.b} Z`}
-                    className={cn(i === current ? "fill-navy dark:fill-ivory" : "fill-[#81776F] dark:fill-[#605751]", "transition-opacity duration-np")}
+                    className={cn(i === current ? "fill-navy dark:fill-ivory" : "fill-[#6F7881] dark:fill-[#515860]", "transition-opacity duration-np")}
                     opacity={hover === null || hover === i ? 1 : 0.55}
                   />
                 )}
@@ -93,12 +93,13 @@ export function Funnel({ steps }: { steps: { label: string; value: number }[] })
       {steps.map((s, i) => (
         <div key={s.label} className="grid grid-cols-[96px_1fr_64px] items-center gap-3 text-sm">
           <span className="text-muted dark:text-mist">{s.label}</span>
-          <div className="h-6 rounded-md bg-[#F1ECE3] dark:bg-white/[.06]">
-            <div className={cn("h-full rounded-md", i === steps.length - 1 ? "bg-navy dark:bg-ivory" : "bg-[#81776F] dark:bg-[#605751]")} style={{ width: `${max > 0 ? (s.value / max) * 100 : 0}%` }} />
+          <div className="h-6 rounded-md bg-[#E8EAEC] dark:bg-white/[.06]">
+            <div className={cn("h-full rounded-md", i === steps.length - 1 ? "bg-navy dark:bg-ivory" : "bg-[#6F7881] dark:bg-[#515860]")} style={{ width: `${max > 0 ? (s.value / max) * 100 : 0}%` }} />
           </div>
           <span className="text-right font-display font-semibold [font-feature-settings:'lnum','pnum']">
             {s.value}
-            {i > 0 && steps[i - 1].value > 0 && <span className="ml-1 text-xs font-normal text-muted dark:text-mist">{Math.round((s.value / steps[i - 1].value) * 100)}%</span>}
+            {/* No step % from a base under 5: "100 %" of 1 lead is noise. */}
+            {i > 0 && steps[i - 1].value >= 5 && <span className="ml-1 text-xs font-normal text-muted dark:text-mist">{Math.round((s.value / steps[i - 1].value) * 100)}%</span>}
           </span>
         </div>
       ))}

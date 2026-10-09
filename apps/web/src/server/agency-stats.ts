@@ -47,7 +47,8 @@ export interface DashboardStats {
   leads7d: number;
   /** null = previous week had fewer than MIN_DELTA_BASE leads: too little data to compare. */
   leadsDeltaPct: number | null;
-  convTourPct: number;
+  /** null = fewer than MIN_DELTA_BASE leads in 30 days: a % of so few leads is noise (shown as "—"). */
+  convTourPct: number | null;
   avgDaysToTour: number | null;
   slaPct: number | null;
   perDay: { date: string; value: number }[];
@@ -108,7 +109,7 @@ export async function dashboardStats(agencyId: string, agentId?: string): Promis
     activeDelta: active - activeOld,
     leads7d,
     leadsDeltaPct: deltaPct(leads7d, leadsPrev),
-    convTourPct: leads30.length ? Math.round((funnel.TOUR / leads30.length) * 100) : 0,
+    convTourPct: leads30.length >= MIN_DELTA_BASE ? Math.round((funnel.TOUR / leads30.length) * 100) : null,
     avgDaysToTour: gaps.length ? Math.round((gaps.reduce((a, b) => a + b, 0) / gaps.length) * 10) / 10 : null,
     slaPct: sla,
     perDay,

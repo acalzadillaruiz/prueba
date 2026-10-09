@@ -32,7 +32,7 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
       {/* Navy valuation panel (brand): range in Cormorant, gold fillet scale, the asking price as a dot. */}
       <div className="np-navy-panel bg-navy px-6 py-7 text-ivory md:px-8">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="np-eyebrow text-[#D4B98C]">PlaceEstimate · {tx(locale, "Valor estimado", "Estimated value")}</div>
+          <div className="np-eyebrow text-[#A8B0B8]">{tx(locale, "Valor estimado New Place", "PlaceEstimate · Estimated value")}</div>
           <div className="text-sm text-ivory/70">
             {rough ? tx(locale, "Estimación orientativa", "Indicative estimate") : conf} · {source}
           </div>
@@ -62,11 +62,11 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
           {tx(locale, "Valor central", "Mid value")} {money(e.mid, locale)}
         </div>
         <div className="relative mt-9 h-[3px] rounded-full bg-white/15">
-          <div className="absolute inset-y-0 rounded-full bg-gradient-to-r from-[#B08A55]/60 via-[#D4B98C] to-[#B08A55]/60" style={{ left: `${aLow}%`, right: `${100 - aHigh}%` }} />
+          <div className="absolute inset-y-0 rounded-full bg-gradient-to-r from-[#9A9DA1]/60 via-[#A8B0B8] to-[#9A9DA1]/60" style={{ left: `${aLow}%`, right: `${100 - aHigh}%` }} />
           <div className="absolute -top-8 whitespace-nowrap text-[13px] font-semibold text-ivory/85" style={{ left: `${pos}%`, transform: `translateX(-${clampPct(pos)}%)` }}>
             {tx(locale, "Precio pedido", "Asking")} · {usdShort(l.priceAmount)}
           </div>
-          <div className="absolute top-1/2 h-[18px] w-[18px] -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] border-[#D4B98C] bg-ivory" style={{ left: `${pos}%` }} />
+          <div className="absolute top-1/2 h-[18px] w-[18px] -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] border-[#A8B0B8] bg-ivory" style={{ left: `${pos}%` }} />
         </div>
         {/* The range ends are labelled where they sit on the bar (not at the bar's edges). Each label leans inward by its
             own position (0 % → left-aligned, 100 % → right-aligned), so it never overflows the panel; when the two ends are
@@ -130,7 +130,7 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
               </tbody>
             </table>
           </div>
-          <p className={cn("mt-3 text-sm", muted)}>{tx(locale, "Cómo lo calculamos: m² × precio de la zona, ajustado por antigüedad, amenidades y casas parecidas cerca.", "How we work it out: m² × area price, adjusted for age, amenities and similar homes nearby.")}</p>
+          <p className={cn("mt-3 text-sm", muted)}>{tx(locale, "Cómo lo calculamos: m² × precio de la zona, ajustado por antigüedad, servicios y casas parecidas cerca.", "How we work it out: m² × area price, adjusted for age, amenities and similar homes nearby.")}</p>
         </div>
       )}
       </div>

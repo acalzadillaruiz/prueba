@@ -15,11 +15,11 @@ import { cn } from "@/lib/cn";
 import { useListingsByIds } from "./useListingsByIds";
 
 const isSale = (l: Listing) => l.listingType === "SALE" || l.listingType === "COMMERCIAL_SALE";
-/** Green / amber that keep ≥ 4.5:1 on the dark card (#2A2420) too. */
+/** Green / amber that keep ≥ 4.5:1 on the dark card (#1C2025) too. */
 const OK = "text-ok dark:text-[#8FCBA6]";
 const WARN = "text-warn dark:text-[#E0A84A]";
 /** Remove ("×") on a photo: its own light/dark colours (not the remapped bg-white, which turned it dark-on-dark). */
-const REMOVE_BTN = "absolute flex items-center justify-center rounded-full bg-[#F1EBE3] text-[#1E1A18] shadow ring-1 ring-black/10 after:absolute after:content-[''] dark:bg-[#15120F]/85 dark:text-[#F1EBE3] dark:ring-[#F1EBE3]/45";
+const REMOVE_BTN = "absolute flex items-center justify-center rounded-full bg-[#EEF0F2] text-[#1F2328] shadow ring-1 ring-black/10 after:absolute after:content-[''] dark:bg-[#0E1013]/85 dark:text-[#EEF0F2] dark:ring-[#EEF0F2]/45";
 /** Pinned row (phones): the thumbnail is the "Ver ficha" link, then one 36 px text pill ("Visita" / "Fechas") filling the rest of the column. */
 const PIN_PILL = "flex h-9 min-w-0 flex-1 items-center justify-center whitespace-nowrap rounded-full px-1.5 font-display text-[13px] font-semibold leading-none";
 /** Phone actions row: full column width, the label may wrap to 2 lines in a third of 360 px. */
@@ -101,7 +101,7 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
     { label: tx(locale, "Precio", "Price"), render: (l) => <span className="font-serif text-[17px] font-medium leading-tight md:text-[22px]"><span className="whitespace-nowrap md:hidden">{shortMoney(l.priceAmount, locale)}</span><span className="hidden md:inline">{money(l.priceAmount, locale)}</span><span className="whitespace-nowrap">{unit(l)}</span></span>, val: sameUnit ? (l) => l.priceAmount : undefined, best: "min" },
     // A rent per m² next to a sale per m² (or a nightly next to a monthly one) isn't comparable: "—" for the rents.
     { label: tx(locale, "Precio por m²", "Price per m²"), render: (l) => (Number.isFinite(ppm(l)) && (sameUnit || !l.pricePeriod) ? <>{num(Math.round(ppm(l) * (l.pricePeriod ? 10 : 1)) / (l.pricePeriod ? 10 : 1), locale)} USD/m²{unit(l)}</> : <span aria-label={tx(locale, "No comparable", "Not comparable")}>—</span>), val: sameUnit ? ppm : undefined, best: "min" },
-    { label: "PlaceEstimate", render: (l) => <>{money(l.estimate.mid, locale)}{unit(l)}</> },
+    { label: tx(locale, "Valor estimado New Place", "PlaceEstimate"), render: (l) => <>{money(l.estimate.mid, locale)}{unit(l)}</> },
     {
       label: tx(locale, "Vs. estimación", "Vs. estimate"),
       render: (l) => {
@@ -187,7 +187,7 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
       {cmp.length > 0 && (
         <section className={cn("np-in mt-8 overflow-clip", k.card)} aria-label={tx(locale, "Comparación", "Comparison")}>
           <div className="flex items-center gap-2 border-b border-line bg-navy px-5 py-3 text-ivory">
-            <Scale size={18} strokeWidth={1.6} className="text-[#C9A574]" aria-hidden />
+            <Scale size={18} strokeWidth={1.6} className="text-[#C3C8CD]" aria-hidden />
             <span className="font-serif text-[20px] font-medium">{tx(locale, `${cmp.length} ${cmp.length === 1 ? "casa" : "casas"}`, `${cmp.length} ${cmp.length === 1 ? "home" : "homes"}`)}</span>
             <span className="text-sm text-mist">{cmp.length}/3</span>
           </div>
@@ -222,7 +222,7 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
               <div
                 data-compare-pinned={stuck ? "on" : "off"}
                 className={cn(
-                  "absolute inset-x-0 top-0 grid gap-2 border-b border-line bg-white/95 px-3 py-2 shadow-[0_8px_18px_-12px_rgba(30,26,24,.35)] backdrop-blur transition-[opacity,transform] duration-200 dark:bg-navy-card",
+                  "absolute inset-x-0 top-0 grid gap-2 border-b border-line bg-white/95 px-3 py-2 shadow-[0_8px_18px_-12px_rgba(31,35,40,.35)] backdrop-blur transition-[opacity,transform] duration-200 dark:bg-navy-card",
                   stuck ? "opacity-100" : "pointer-events-none invisible -translate-y-1 opacity-0",
                 )}
                 style={cols}

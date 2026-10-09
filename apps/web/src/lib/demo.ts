@@ -1,4 +1,4 @@
-/** DEMO_AUTH=true: "Entrar como…" accounts from the Venezuela seed (password NewPlace!2026). */
+/** DEMO_AUTH=true: "Entrar como…" accounts from the Venezuela seed (private preview only: /login?preview=1). */
 export const DEMO_LOGINS = [
   { email: "seeker@gmail.com", label: { es: "Buscador", en: "Seeker" }, home: "/app", initials: "DO", hue: 200 },
   { email: "owner.priv@gmail.com", label: { es: "Propietario particular", en: "Private owner" }, home: "/owner/listings", initials: "IC", hue: 25 },
@@ -16,3 +16,6 @@ const DEMO_EMAILS: ReadonlySet<string> = new Set(DEMO_LOGINS.map((d) => d.email)
 export const isDemoEmail = (email: string) => DEMO_EMAILS.has(email.trim().toLowerCase());
 
 export const DEMO_ENABLED = process.env.NEXT_PUBLIC_DEMO_AUTH === "true";
+
+/** The "sign in as…" chooser is part of the private preview flow (/login?preview=1), never of the public login. */
+export const PREVIEW_PARAM = "preview";

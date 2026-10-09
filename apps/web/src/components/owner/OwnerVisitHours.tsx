@@ -84,7 +84,7 @@ export function OwnerVisitHours({ listingId, locale, initial, onDone }: { listin
     <form
       noValidate
       data-testid="visit-hours-form"
-      className="mt-4 space-y-4 rounded-[18px] border border-line bg-[#FBF8F3] p-4 dark:bg-white/[.03]"
+      className="mt-4 space-y-4 rounded-[18px] border border-line bg-[#FBFCFC] p-4 dark:bg-white/[.03]"
       aria-label={tx(locale, "Horario de visitas", "Visit hours")}
       onSubmit={(e) => {
         e.preventDefault();

@@ -63,14 +63,15 @@ export interface PlatformHomeData {
 }
 
 export function PlatformHome({ locale, data }: { locale: Locale; data: PlatformHomeData }) {
-  const delta = data.leadsPrev7d ? Math.round(((data.leads7d - data.leadsPrev7d) / data.leadsPrev7d) * 100) : 0;
+  // Fewer than 5 leads last week: a % change is noise ("+1000 %"), so no % is shown.
+  const delta = data.leadsPrev7d >= 5 ? Math.round(((data.leads7d - data.leadsPrev7d) / data.leadsPrev7d) * 100) : null;
   return (
     <AdminShell locale={locale} area="platform" title={tx(locale, "Métricas globales", "Global metrics")}>
       <div className={kpiGrid5}>
         <Kpi label={tx(locale, "Agencias", "Agencies")} value={data.agencies.length} hint={`${data.agencies.filter((a) => a.status === "TRIAL").length} ${tx(locale, "en prueba", "on trial")}`} />
         <Kpi label={tx(locale, "Usuarios", "Users")} value={num(data.users, locale)} hint={tx(locale, "registrados", "registered")} />
         <Kpi label={tx(locale, "Inmuebles activos", "Active listings")} value={data.activeListings} hint={tx(locale, "en el buscador", "in search")} />
-        <Kpi label={tx(locale, "Leads · 7 días", "Leads · 7 days")} value={data.leads7d} delta={`${delta >= 0 ? "+" : ""}${delta} %`} down={delta < 0} hint={tx(locale, "vs. semana anterior", "vs. previous week")} />
+        <Kpi label={tx(locale, "Leads · 7 días", "Leads · 7 days")} value={data.leads7d} delta={delta === null ? undefined : `${delta >= 0 ? "+" : ""}${delta} %`} deltaNote={tx(locale, "Aún hay pocos datos para comparar", "Not enough data to compare yet")} down={(delta ?? 0) < 0} hint={tx(locale, "vs. semana anterior", "vs. previous week")} />
         <Kpi label={tx(locale, "Tiempo 1ª respuesta", "First response")} value={data.firstResponseMin === null ? "—" : `${data.firstResponseMin} min`} hint={tx(locale, "mediana plataforma", "platform median")} />
       </div>
       <div className="mt-6 grid gap-6 [&>*]:min-w-0 xl:grid-cols-[1.45fr_1fr]">
@@ -140,7 +141,7 @@ export function PlatformAgencies({ locale, agencies }: { locale: Locale; agencie
         : tx(locale, `¿Seguro? ${a.name} pasará de «${STATUS[a.status]?.[0] ?? a.status}» a «${STATUS[p.value]?.[0] ?? p.value}».`, `Sure? ${a.name} will go from “${STATUS[a.status]?.[1] ?? a.status}” to “${STATUS[p.value]?.[1] ?? p.value}”.`);
   return (
     <AdminShell locale={locale} area="platform" title={tx(locale, "Agencias", "Agencies")} actions={<Button className={k.primary} onClick={() => setCreating(!creating)} aria-expanded={creating}><Plus size={16} /> {tx(locale, "Nueva agencia", "New agency")}</Button>}>
-      {err && <div role="alert" className="mb-4 rounded-lg bg-[#B3261E33] px-3 py-2 text-sm text-[#C9A574]">{err}</div>}
+      {err && <div role="alert" className="mb-4 rounded-lg bg-[#B3261E33] px-3 py-2 text-sm text-[#C3C8CD]">{err}</div>}
       {current && (
         <div className="np-in mb-4 flex flex-wrap items-center gap-3 rounded-[18px] bg-rosa/70 px-4 py-3 text-sm text-navy dark:bg-white/[.08] dark:text-ivory">
           <LogIn size={16} strokeWidth={1.7} /> {tx(locale, `Estás dentro de ${current.name} como su equipo. Todo lo que hagas queda en el registro de auditoría.`, `You’re inside ${current.name} as its team. Everything you do is recorded in the audit log.`)}
@@ -287,7 +288,7 @@ export function PlatformUsers({ locale, users, providers }: { locale: Locale; us
                       // Suspending is confirmed inline (below the row); restoring needs no confirmation.
                       if (!u.suspended) return setSuspending(suspending === u.id ? null : u.id);
                       run(u.id, () => api(`platform/users/${u.id}`, { method: "PATCH", json: { suspended: false } }));
-                    }} className={cn("rounded-full p-2 hover:bg-[#E6DDD2] dark:hover:bg-white/5", u.suspended ? k.okText : k.dangerText)} aria-label={u.suspended ? tx(locale, "Reactivar", "Restore") : tx(locale, "Suspender", "Suspend")} title={u.suspended ? tx(locale, "Reactivar", "Restore") : tx(locale, "Suspender", "Suspend")}>
+                    }} className={cn("rounded-full p-2 hover:bg-[#E1E4E8] dark:hover:bg-white/5", u.suspended ? k.okText : k.dangerText)} aria-label={u.suspended ? tx(locale, "Reactivar", "Restore") : tx(locale, "Suspender", "Suspend")} title={u.suspended ? tx(locale, "Reactivar", "Restore") : tx(locale, "Suspender", "Suspend")}>
                       {u.suspended ? <RotateCcw size={14} /> : <Ban size={14} />}
                     </button>
                   )}
@@ -331,7 +332,7 @@ export function PlatformModeration({ locale, reports, listings }: { locale: Loca
           {reports.map((m) => (
             <div key={m.id} className={cn("border-t py-3.5 first:border-0", k.line)}>
               <div className="flex items-center gap-2">
-                <span className={cn("h-2 w-2 shrink-0 rounded-full", m.severity === "high" ? "bg-danger" : m.severity === "medium" ? "bg-warn" : "bg-[#C9C1B2]")} />
+                <span className={cn("h-2 w-2 shrink-0 rounded-full", m.severity === "high" ? "bg-danger" : m.severity === "medium" ? "bg-warn" : "bg-[#B7BEC4]")} />
                 {(() => {
                   const target = listings.find((x) => x.id === m.listingId);
                   return target ? (
@@ -458,7 +459,7 @@ export function PlatformAI({ locale, settings, fx, counts }: { locale: Locale; s
               ["heuristic", tx(locale, "Reglas internas", "Internal rules"), tx(locale, "Funciona sin servicios externos. Es la opción por defecto.", "Works without outside services. The default.")],
               ["openai-compatible", tx(locale, "Proveedor de IA externo", "External AI provider"), tx(locale, "Un servicio de IA contratado (OpenAI, Groq…). Necesita su clave.", "A paid AI service (OpenAI, Groq…). Needs its key.")],
             ] as const).map(([key, n, d]) => (
-              <button key={key} disabled={busy === "ai"} onClick={() => run("ai", () => api("platform/settings", { method: "PUT", json: { aiProvider: key } }))} aria-pressed={settings.aiProvider === key} className={cn("rounded-[18px] p-4 text-left transition-shadow duration-np", settings.aiProvider === key ? "bg-[#E6DDD2] shadow-[inset_0_0_0_2px_#1E1A18] dark:bg-white/10 dark:shadow-[inset_0_0_0_2px_#C9A574]" : cn("shadow-[inset_0_0_0_1px_#D8CBB7] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,.15)]", k.hover))}>
+              <button key={key} disabled={busy === "ai"} onClick={() => run("ai", () => api("platform/settings", { method: "PUT", json: { aiProvider: key } }))} aria-pressed={settings.aiProvider === key} className={cn("rounded-[18px] p-4 text-left transition-shadow duration-np", settings.aiProvider === key ? "bg-[#E1E4E8] shadow-[inset_0_0_0_2px_#1F2328] dark:bg-white/10 dark:shadow-[inset_0_0_0_2px_#C3C8CD]" : cn("shadow-[inset_0_0_0_1px_#D3D7DB] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,.15)]", k.hover))}>
                 <div className="flex items-center justify-between"><span className="font-display text-sm font-semibold">{n}</span>{settings.aiProvider === key && <CheckCircle2 size={16} />}</div>
                 <div className={cn("mt-1 text-xs", k.muted)}>{d}</div>
               </button>
@@ -473,7 +474,7 @@ export function PlatformAI({ locale, settings, fx, counts }: { locale: Locale; s
             </div>
           )}
           <div className="mt-5 grid gap-2 text-sm sm:grid-cols-2">
-            {[tx(locale, "Valoración de inmuebles (PlaceEstimate)", "Property valuation (PlaceEstimate)"), tx(locale, "Búsqueda escribiendo con tus palabras", "Search in plain words"), tx(locale, "Redactar anuncios", "Write listings"), tx(locale, "Puntuar contactos y sugerir el siguiente paso", "Score leads and suggest the next step")].map((t) => (
+            {[tx(locale, "Valoración de inmuebles (Valor estimado New Place)", "Property valuation (PlaceEstimate)"), tx(locale, "Búsqueda escribiendo con tus palabras", "Search in plain words"), tx(locale, "Redactar anuncios", "Write listings"), tx(locale, "Puntuar contactos y sugerir el siguiente paso", "Score leads and suggest the next step")].map((t) => (
               <div key={t} className={cn("flex items-center gap-2 rounded-xl px-3 py-2.5", k.soft)}><CheckCircle2 size={14} className={cn("shrink-0", k.okText)} /><span className="text-xs">{t}</span></div>
             ))}
           </div>

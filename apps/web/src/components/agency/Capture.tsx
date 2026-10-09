@@ -18,7 +18,7 @@ import { cn } from "@/lib/cn";
 const TONE: Record<CaptureLead["result"], "neutral" | "ok" | "danger" | "warn"> = { PENDING: "neutral", CAPTURED: "ok", REJECTED: "danger", DUPLICATE: "warn" };
 type Row = CaptureLead & { listingId?: string };
 type ListingType = keyof typeof TYPE_LABEL;
-const KINDS: [string, string, string][] = [["apartment", "Apartamento", "Apartment"], ["penthouse", "Penthouse", "Penthouse"], ["house", "Casa", "House"], ["townhouse", "Townhouse", "Townhouse"], ["studio", "Estudio", "Studio"], ["villa", "Villa", "Villa"], ["chalet", "Chalet", "Chalet"], ["office", "Oficina", "Office"], ["retail", "Local", "Retail"], ["warehouse", "Galpón", "Warehouse"], ["land", "Terreno", "Land"]];
+const KINDS: [string, string, string][] = [["apartment", "Apartamento", "Apartment"], ["penthouse", "Ático", "Penthouse"], ["house", "Casa", "House"], ["townhouse", "Townhouse", "Townhouse"], ["studio", "Estudio", "Studio"], ["villa", "Villa", "Villa"], ["chalet", "Chalet", "Chalet"], ["office", "Oficina", "Office"], ["retail", "Local", "Retail"], ["warehouse", "Galpón", "Warehouse"], ["land", "Terreno", "Land"]];
 type Dup = { id?: string; slug: string | null; title: string | null; zone?: string; areaM2?: number; fingerprint?: string } | null;
 
 export function CaptureView({ locale, rows: initialRows, zones, titles, canConvert = false }: { locale: Locale; rows: Row[]; zones: Zone[]; titles: Record<string, string>; canConvert?: boolean }) {

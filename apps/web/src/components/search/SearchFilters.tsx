@@ -41,7 +41,7 @@ export const KIND_OPTIONS = [
 ] as const;
 
 export const KIND_CHIP: Record<string, [string, string]> = {
-  penthouse: ["Ático / PH", "Penthouse"],
+  penthouse: ["Ático", "Penthouse"],
   house: ["Casa", "House"],
   apartment: ["Apartamento", "Apartment"],
   land: ["Terreno", "Land"],
@@ -276,7 +276,7 @@ export function MoreFields({ locale, f, set, withLux = false }: { locale: Locale
           </div>
         </div>
         <div className="md:col-span-2">
-          <div className={sectionTitle}>{tx(locale, "Amenidades", "Amenities")}</div>
+          <div className={sectionTitle}>{tx(locale, "Servicios", "Amenities")}</div>
           <div className="flex flex-wrap gap-2">
             {FILTER_AMENITIES.map((a) => {
               const sel = f.amen.includes(a);
@@ -409,7 +409,7 @@ export function FilterSheet({
         </div>
       </div>
       <div className="flex shrink-0 items-center gap-3 border-t border-line bg-ivory px-4 pt-3" style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}>
-        <button type="button" onClick={onClear} disabled={!activeCount} className="min-h-12 rounded-full px-3 font-display text-[15px] font-semibold underline underline-offset-4 disabled:cursor-default disabled:bg-[#E3DDD3] disabled:text-[#5E5650] disabled:no-underline dark:disabled:bg-white/10 dark:disabled:text-[#CFC4B8]">
+        <button type="button" onClick={onClear} disabled={!activeCount} className="min-h-12 rounded-full px-3 font-display text-[15px] font-semibold underline underline-offset-4 disabled:cursor-default disabled:bg-[#D7DBDF] disabled:text-[#50575E] disabled:no-underline dark:disabled:bg-white/10 dark:disabled:text-[#BEC3C9]">
           {tx(locale, "Borrar todo", "Clear all")}
         </button>
         <SeeHomes locale={locale} total={total} fetching={fetching} onClick={onClose} className="ml-auto flex-1" />

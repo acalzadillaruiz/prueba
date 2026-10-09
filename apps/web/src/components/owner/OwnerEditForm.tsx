@@ -67,7 +67,7 @@ export function OwnerEditForm({ l, locale, onDone }: { l: Listing; locale: Local
   return (
     <form
       noValidate
-      className="mt-4 space-y-4 rounded-[18px] border border-line bg-[#FBF8F3] p-4 dark:bg-white/[.03]"
+      className="mt-4 space-y-4 rounded-[18px] border border-line bg-[#FBFCFC] p-4 dark:bg-white/[.03]"
       aria-label={tx(locale, "Editar anuncio", "Edit listing")}
       onSubmit={async (ev) => {
         ev.preventDefault();
@@ -123,7 +123,7 @@ export function OwnerEditForm({ l, locale, onDone }: { l: Listing; locale: Local
         {numInput("yearBuilt", tx(locale, "Año de construcción", "Year built"), 1800, THIS_YEAR + 5)}
       </div>
       <div>
-        <div className="mb-2 text-sm font-semibold">{tx(locale, "Amenidades", "Amenities")}</div>
+        <div className="mb-2 text-sm font-semibold">{tx(locale, "Servicios", "Amenities")}</div>
         <div className="flex flex-wrap gap-2">
           {chips.map((a) => {
             const on = d.amenities.includes(a);

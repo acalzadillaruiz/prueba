@@ -1,8 +1,8 @@
 import { expect, type Page } from "@playwright/test";
 
-/** DEMO_AUTH "Entrar como…" through the real Auth.js demo provider. */
+/** DEMO_AUTH "Entrar como…" (private preview: /login?preview=1) through the real Auth.js demo provider. */
 export async function demoLogin(page: Page, label: RegExp) {
-  await page.goto("/es/login");
+  await page.goto("/es/login?preview=1");
   await page.getByRole("button", { name: label }).click();
   await page.waitForURL((u) => !u.pathname.endsWith("/login"), { timeout: 30_000 });
 }

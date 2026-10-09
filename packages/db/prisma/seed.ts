@@ -3,13 +3,12 @@
  * Reuses the prototype fixtures in apps/web/src/mock and shifts every date so the data feels "live" at seed time.
  */
 import bcrypt from "bcryptjs";
-import { existsSync, readdirSync } from "node:fs";
-import { join } from "node:path";
 import { heuristicLeadScore } from "@newplace/ai";
 import { listingQuality } from "@newplace/config";
 import { PrismaClient, type Prisma } from "@prisma/client";
 import { AGENCIES, NOW, USERS } from "./seed-data/people";
 import { LISTINGS } from "./seed-data/listings";
+import { seedPhotoAssignment } from "./seed-data/photos";
 import { ZONES } from "./seed-data/zones";
 import { AGENT_SLOTS, AUDIT, CAPTURES, EMAILS, FX_RATES, LEADS, MEDIA_JOBS, MODERATION_QUEUE, OFFERS, OWNER_THREAD, SAVED_SEARCHES, TOURS } from "./seed-data/ops";
 import { TEAM_THREADS } from "./seed-data/ops";
@@ -126,14 +125,12 @@ async function main() {
       },
     });
   }
-  // AI-generated photos (apps/web/public/photos/<listingId>-<n>.jpg), if present → real ListingPhoto rows.
-  const photoDir = join(__dirname, "../../../apps/web/public/photos");
-  if (existsSync(photoDir)) {
-    const files = readdirSync(photoDir).filter((f) => /^[a-z0-9]+-\d+\.jpg$/.test(f));
-    for (const l of LISTINGS) {
-      const mine = files.filter((f) => f.startsWith(`${l.id}-`)).sort((a, b) => Number(a.split("-")[1].split(".")[0]) - Number(b.split("-")[1].split(".")[0]));
-      if (mine.length) await prisma.listingPhoto.createMany({ data: mine.map((f, i) => ({ listingId: l.id, url: `/photos/${f}`, order: i, isCover: i === 0, scene: l.scenes[i] })) });
-    }
+  // AI-generated photos (apps/web/public/photos/<listingId>-<n>.jpg) → real ListingPhoto rows. Each file belongs to one
+  // listing only; listings without a full unique set (>= 3) get none (see seed-data/photos.ts + test/photos-unique.test.ts).
+  const photoSets = seedPhotoAssignment(LISTINGS.map((l) => l.id));
+  for (const l of LISTINGS) {
+    const mine = photoSets.get(l.id);
+    if (mine) await prisma.listingPhoto.createMany({ data: mine.map((f, i) => ({ listingId: l.id, url: `/photos/${f}`, order: i, isCover: i === 0, scene: l.scenes[i] })) });
   }
   // Quality follows the one official formula (only real photos count), same as the app's refreshQuality.
   for (const l of LISTINGS) {

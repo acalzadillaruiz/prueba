@@ -109,7 +109,7 @@ export function usePlaceSuggest({
       aria-label={tx(locale, "Zonas sugeridas", "Suggested areas")}
       hidden={!shown}
       className={cn(
-        "absolute bg-[#FBF8F4] inset-x-0 top-[calc(100%+6px)] z-50 max-h-[min(320px,50vh)] overflow-y-auto rounded-2xl p-1.5 text-left text-ink shadow-np [--np-glass:rgb(255_255_255/.94)] [html.dark_&]:!bg-[#2A2420]",
+        "absolute bg-[#FBFCFC] inset-x-0 top-[calc(100%+6px)] z-50 max-h-[min(320px,50vh)] overflow-y-auto rounded-2xl p-1.5 text-left text-ink shadow-np [--np-glass:rgb(255_255_255/.94)] [html.dark_&]:!bg-[#1C2025]",
         className,
       )}
     >

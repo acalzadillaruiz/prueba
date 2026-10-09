@@ -31,7 +31,7 @@ export function LazyMount({ className, children }: { className?: string; childre
     return () => io.disconnect();
   }, []);
   return (
-    <div ref={ref} className={cn("relative overflow-hidden bg-[#E9E2D5]", className)}>
+    <div ref={ref} className={cn("relative overflow-hidden bg-[#DCDFE2]", className)}>
       {show && children}
     </div>
   );

@@ -7,7 +7,7 @@ const stamp = Date.now().toString(36);
 test.describe.serial("Criterios de aceptación §15", () => {
   test("1 · /es muestra el mapa night centrado en Caracas con pines", async ({ page }) => {
     await page.goto("/es");
-    await expect(page.getByRole("heading", { level: 1, name: /Hay casas que se visitan/ })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: /Tu próximo lugar/ })).toBeVisible();
     // The map lives in the "#explorar" section (mounted when it nears the viewport).
     await page.locator("#explorar").scrollIntoViewIfNeeded();
     const map = page.locator('[role="application"]').first();
@@ -17,9 +17,10 @@ test.describe.serial("Criterios de aceptación §15", () => {
 
   test("2 · filtro comprar · 2+ hab · < 250.000 USD · Chacao", async ({ page }) => {
     await page.goto("/es/search?type=SALE&zone=Chacao&beds=2&max=250000");
-    await expect(page.getByText(/^3 resultados/)).toBeVisible();
+    // 19if9a left the public list (its photos were warped: plan 017 S0-4), so Chacao has 2 such homes.
+    await expect(page.getByText(/^2 resultados/)).toBeVisible();
     const api = await apiAs(page, "GET", "listings?type=SALE&zone=Chacao&beds=2&max=250000");
-    expect(api.json.total).toBe(3);
+    expect(api.json.total).toBe(2);
     for (const l of api.json.items) {
       expect(l.zone).toBe("Chacao");
       expect(l.beds).toBeGreaterThanOrEqual(2);
@@ -27,9 +28,9 @@ test.describe.serial("Criterios de aceptación §15", () => {
     }
   });
 
-  test("3 · ficha bilingüe con PlaceEstimate y pedir visita (lead creado)", async ({ page }) => {
+  test("3 · ficha bilingüe con valor estimado New Place y pedir visita (lead creado)", async ({ page }) => {
     await page.goto(LPG);
-    await expect(page.getByText("PlaceEstimate").first()).toBeVisible();
+    await expect(page.getByText("Valor estimado New Place").first()).toBeVisible();
     await expect(page.getByText("Comparables usados")).toBeVisible();
     await page.getByRole("button", { name: "EN", exact: true }).first().click();
     await expect(page.getByRole("heading", { level: 2, name: "Descripción" })).toBeVisible();
@@ -89,9 +90,9 @@ test.describe.serial("Criterios de aceptación §15", () => {
 
   test("7 · superadmin apaga un inmueble y desaparece de la búsqueda", async ({ page }) => {
     await demoLogin(page, /Superadmin/);
-    const id = "19if9a";
     const before = await apiAs(page, "GET", "listings?type=SALE&zone=Chacao&beds=2&max=250000");
-    expect(before.json.items.map((l: { id: string }) => l.id)).toContain(id);
+    const id: string = before.json.items[0]?.id;
+    expect(id).toBeTruthy();
     await page.goto("/es/platform/moderation");
     await page.locator(`[data-listing="${id}"]`).getByRole("button", { name: /Apagar/ }).click();
     await page.locator(`[data-listing="${id}"]`).getByLabel("Motivo de la retirada").fill("Prueba E2E: fotos duplicadas");
@@ -110,7 +111,7 @@ test.describe.serial("Criterios de aceptación §15", () => {
     const m = await r.json();
     expect(m.name).toBe("New Place");
     expect(m.display).toBe("standalone");
-    expect(m.theme_color).toBe("#F1EBE3"); // Cal (light-first)
+    expect(m.theme_color).toBe("#EEF0F2"); // Titanio fog (light-first)
     expect(m.id).toBe("/");
     // start_url lets the middleware pick the visitor's language (/es or /en)
     const start = await request.get(m.start_url);

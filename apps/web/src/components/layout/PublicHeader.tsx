@@ -9,7 +9,7 @@ import type { Locale } from "@/types/domain";
 import { Logo } from "@/components/brand/Logo";
 import { Avatar, Button } from "@/components/ui";
 import { useHideOnScroll } from "@/components/brand/useScrollChrome";
-import { roleHome } from "@/components/brand/PublicChrome";
+import { OnCallButton, roleHome } from "@/components/brand/PublicChrome";
 import { useDemoVisible } from "./useDemoVisible";
 import type { DrawerLink } from "./MenuDrawer";
 import { useApp } from "@/lib/store";
@@ -229,7 +229,11 @@ export function PublicHeader({ locale, variant = "light", autoHide = false }: { 
   // Narrow desktops (lg) keep only the essentials; the rest join as room allows (all of them are always in the drawer).
   // Measured (es, the longer locale): the bar has ~180 px spare at 1280 → "Vacacional" (95 px) and "Colección
   // Privada" join from xl; "Compra a distancia" (152 px) only fits from 1400. At 1024 only ~67 px are spare.
-  const nav = [buy, rent, { ...vacation, mid: true }, { ...luxury, mid: true }, { ...remote, wide: true }];
+  const sell = { href: `/${locale}/sell`, label: tx(locale, "Vender", "Sell"), active: /\/sell$/.test(pathname) };
+  const agencies = { href: `/${locale}/register`, label: tx(locale, "Agencias", "Agencies"), active: false };
+  // 022: Comprar · Alquilar · Vacacional · Vender · Agencias (Colección Privada and Compra a distancia live in the
+  // drawer and the footer). Vacacional and Agencias join from xl so 1024–1279 keeps room for the Guardia pill.
+  const nav = [buy, rent, { ...vacation, mid: true }, sell, { ...agencies, mid: true }];
   // Drawer: every way to search (the four search types the search page understands), then the rest.
   const searchTypes: DrawerLink[] = [buy, rent, vacation, { href: `/${locale}/search?type=COMMERCIAL`, label: t("commercial"), active: onSearch && type === "COMMERCIAL" }];
   const home = u ? roleHome(u.role) : "/app";
@@ -308,7 +312,7 @@ export function PublicHeader({ locale, variant = "light", autoHide = false }: { 
     >
       <div
         className={cn(
-          "mx-auto flex max-w-[1320px] items-center gap-8 transition-[background-color,box-shadow,border-color] duration-500",
+          "mx-auto flex max-w-[1320px] items-center gap-3 transition-[background-color,box-shadow,border-color] lg:gap-8 duration-500",
           float ? "h-[62px] rounded-full border pl-5 pr-2 md:pl-6" : "h-[72px] px-4 md:px-8",
           float && (variant === "light" || scrolled || menuOpen ? "np-glass" : "border-transparent bg-transparent"),
         )}
@@ -352,37 +356,20 @@ export function PublicHeader({ locale, variant = "light", autoHide = false }: { 
           ))}
         </nav>
         <div className="ml-auto flex items-center gap-1.5">
-          <div className={cn("hidden items-center font-display text-[14px] font-semibold tracking-[0.14em] md:flex", dark ? "text-ivory/70" : "text-ink/70")}>
-            {(["es", "en"] as const).map((lng, i) => (
-              <span key={lng} className="flex items-center">
-                {i > 0 && <span aria-hidden className="px-1">·</span>}
-                {lng === locale ? (
-                  <span aria-current="true" className={dark ? "text-ivory" : "text-ink"} lang={locale}>{locale.toUpperCase()}</span>
-                ) : (
-                  <Link
-                    href={switchHref}
-                    // full navigation (below): prefetching the other language's RSC payload would only waste bandwidth
-                    prefetch={false}
-                    onClick={switchLang}
-                    hrefLang={other}
-                    lang={other}
-                    aria-label={other === "en" ? "English" : "Español"}
-                    className={cn("flex min-h-11 items-center px-1 transition-colors", dark ? "hover:text-ivory" : "hover:text-ink")}
-                  >
-                    {other.toUpperCase()}
-                  </Link>
-                )}
-              </span>
-            ))}
-          </div>
-          <button
-            onClick={toggleTheme}
-            className={cn(iconBtn, "hidden md:flex")}
-            aria-label={isDark ? (locale === "es" ? "Modo claro" : "Light mode") : locale === "es" ? "Modo oscuro" : "Dark mode"}
-            aria-pressed={isDark}
+          {/* Guardia 24/7: the on-call advisor, one tap away on every size (022: glass capsule with a live dot). */}
+          <OnCallButton
+            locale={locale}
+            className={cn(
+              "flex h-10 shrink-0 items-center gap-2 whitespace-nowrap rounded-full border px-3 font-display text-[13.5px] font-medium transition-colors md:h-11 md:px-4 md:text-[14px]",
+              dark ? "border-white/20 text-ivory hover:bg-white/10" : "border-[#D3D7DB] bg-white/60 text-ink hover:border-[#9A9DA1] hover:bg-white",
+            )}
           >
-            {isDark ? <Sun size={18} aria-hidden /> : <Moon size={18} aria-hidden />}
-          </button>
+            <span className="np-live" aria-hidden />
+            <span>
+              {tx(locale, "Guardia", "On call")}
+              <span className="hidden sm:inline"> 24/7</span>
+            </span>
+          </OnCallButton>
           <Link href={`/${locale}/saved`} className={cn(iconBtn, "relative hidden sm:flex")} aria-label={t("saved")}>
             <Heart size={19} aria-hidden />
             {saved.length > 0 && <span className="absolute right-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-navy px-1 text-[11px] font-bold leading-none text-ivory ring-2 ring-ivory">{saved.length}</span>}
@@ -421,15 +408,12 @@ export function PublicHeader({ locale, variant = "light", autoHide = false }: { 
               )}
             </div>
           )}
-          <Button href={`/${locale}/sell`} variant={dark ? "dark-outline" : "outline"} size="sm" className="ml-1 hidden h-11 md:inline-flex">
-            {t("sell")}
-          </Button>
           <button
             onClick={(e) => {
               opener.current = e.currentTarget;
               setMenuOpen(true);
             }}
-            className={cn("flex h-11 w-11 items-center justify-center rounded-full min-[1400px]:hidden", dark ? "bg-white/15 backdrop-blur hover:bg-white/25" : "hover:bg-black/5")}
+            className={cn("flex h-11 w-11 items-center justify-center rounded-full xl:hidden", dark ? "bg-white/15 backdrop-blur hover:bg-white/25" : "hover:bg-black/5")}
             aria-label={t("menu")}
             aria-expanded={menuOpen}
             aria-controls="np-mobile-menu"

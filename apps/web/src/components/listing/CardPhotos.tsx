@@ -40,7 +40,7 @@ export function CardPhotos({ l, locale, label, href }: { l: Listing; locale: Loc
     ahead(i);
     el.scrollTo({ left: i * el.clientWidth, behavior: "smooth" });
   };
-  const arrow = "absolute top-1/2 z-[2] flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-[#ffffffe6] text-[#1E1A18] opacity-0 shadow-sm transition-opacity duration-np group-hover:opacity-100 disabled:!opacity-0 [@media(hover:none)]:hidden";
+  const arrow = "absolute top-1/2 z-[2] flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-[#ffffffe6] text-[#1F2328] opacity-0 shadow-sm transition-opacity duration-np group-hover:opacity-100 disabled:!opacity-0 [@media(hover:none)]:hidden";
   return (
     <>
       <div
@@ -86,7 +86,7 @@ export function CardPhotos({ l, locale, label, href }: { l: Listing; locale: Loc
       </button>
       <div aria-hidden data-photo-dots className="pointer-events-none absolute bottom-3 left-1/2 z-[2] flex -translate-x-1/2 items-center gap-1.5">
         {Array.from({ length: n }, (_, i) => (
-          <span key={i} className={cn("h-1.5 rounded-full shadow-[0_0_2px_rgba(30,26,24,.5)] transition-all duration-np", i === idx ? "w-3 bg-white" : "w-1.5 bg-white/60")} />
+          <span key={i} className={cn("h-1.5 rounded-full shadow-[0_0_2px_rgba(31,35,40,.5)] transition-all duration-np", i === idx ? "w-3 bg-white" : "w-1.5 bg-white/60")} />
         ))}
       </div>
       <span className="sr-only" aria-live="polite">{tx(locale, `Foto ${idx + 1} de ${n}`, `Photo ${idx + 1} of ${n}`)}</span>

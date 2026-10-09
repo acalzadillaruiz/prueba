@@ -126,7 +126,7 @@ export function CompareTray({ locale }: { locale: Locale }) {
       style={{ bottom: `calc(${inset}px + 0.75rem + ${inset ? "0px" : "env(safe-area-inset-bottom)"})` }}
     >
       {/* Phones: slim bar with the chosen homes. */}
-      <div className="np-glass flex items-center gap-3 rounded-[20px] p-2.5 pl-3 shadow-[0_18px_40px_-16px_rgba(30,26,24,.35)] md:hidden">
+      <div className="np-glass flex items-center gap-3 rounded-[20px] p-2.5 pl-3 shadow-[0_18px_40px_-16px_rgba(31,35,40,.35)] md:hidden">
         <ul className="flex shrink-0 gap-1.5" aria-label={tx(locale, "Casas para comparar", "Homes to compare")}>
           {compare.slice(0, 3).map((id) => {
             const l = items.find((x) => x.id === id);
@@ -168,10 +168,10 @@ export function CompareTray({ locale }: { locale: Locale }) {
       </div>
 
       {/* Tablets and desktop: a compact corner pill (stacked thumbnails · count · view · clear). */}
-      <div className="np-glass hidden items-center gap-2.5 rounded-full py-1.5 pl-1.5 pr-1.5 shadow-[0_18px_40px_-16px_rgba(30,26,24,.35)] md:flex">
+      <div className="np-glass hidden items-center gap-2.5 rounded-full py-1.5 pl-1.5 pr-1.5 shadow-[0_18px_40px_-16px_rgba(31,35,40,.35)] md:flex">
         <ul className="flex -space-x-2.5 pl-0.5" aria-hidden>
           {compare.slice(0, 3).map((id) => (
-            <li key={id} className="h-9 w-9 rounded-full ring-2 ring-[#F1EBE3]">
+            <li key={id} className="h-9 w-9 rounded-full ring-2 ring-[#EEF0F2]">
               {thumb(id, "h-full w-full rounded-full")}
             </li>
           ))}

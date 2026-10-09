@@ -15,7 +15,7 @@ export function OfflineScreen({ locale }: { locale: Locale }) {
   return (
     <main id="main" lang={locale} className="flex min-h-screen flex-col items-center justify-center gap-4 bg-navy px-6 py-16 text-center text-ivory">
       <Logo tone="ivory" size="lg" animate />
-      <WifiOff className="mt-10 text-[#C9A574]" size={30} aria-hidden />
+      <WifiOff className="mt-10 text-[#C3C8CD]" size={30} aria-hidden />
       <h1 className="text-[36px] leading-tight md:text-[44px]">{tx(locale, "Estás sin conexión", "You’re offline")}</h1>
       <p className="max-w-sm text-[16px] text-ivory/70">
         {tx(locale, "Las páginas que ya visitaste siguen aquí. Cuando vuelva la señal, inténtalo otra vez.", "Pages you’ve already visited are still here. Try again once you’re back online.")}
@@ -29,7 +29,7 @@ export function OfflineScreen({ locale }: { locale: Locale }) {
       {saved.length > 0 && (
         <section className="mt-6 w-full max-w-md text-left" aria-labelledby="offline-saved">
           <h2 id="offline-saved" className="mb-3 flex items-center gap-2 text-[24px]">
-            <Heart size={16} className="text-[#C9A574]" aria-hidden /> {tx(locale, "Tus guardados", "Your saved homes")}
+            <Heart size={16} className="text-[#C3C8CD]" aria-hidden /> {tx(locale, "Tus guardados", "Your saved homes")}
           </h2>
           <ul className="divide-y divide-navy-line rounded-2xl border border-navy-line bg-navy-card">
             {saved.map((c) => (

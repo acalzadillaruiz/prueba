@@ -154,7 +154,7 @@ export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: bo
               </span>
               <div aria-hidden className="pointer-events-none absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-1.5 md:hidden">
                 {shots.map((_, n) => (
-                  <span key={n} className={cn("h-1.5 rounded-full shadow-[0_0_2px_rgba(30,26,24,.5)] transition-all duration-np", n === idx ? "w-3 bg-white" : "w-1.5 bg-white/60")} />
+                  <span key={n} className={cn("h-1.5 rounded-full shadow-[0_0_2px_rgba(31,35,40,.5)] transition-all duration-np", n === idx ? "w-3 bg-white" : "w-1.5 bg-white/60")} />
                 ))}
               </div>
               <span className="sr-only md:hidden" aria-live="polite">{What(idx + 1)}</span>
@@ -256,7 +256,7 @@ export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: bo
           {tab === "photos" && (
             <div className="no-scrollbar flex gap-2 overflow-x-auto px-4 py-3">
               {shots.map((s, n) => (
-                <button key={n} onClick={() => setI(n)} aria-label={What(n + 1)} aria-current={n === i || undefined} className={cn("h-16 w-24 shrink-0 overflow-hidden rounded-lg ring-2", n === i ? "ring-[#C9A574]" : "ring-transparent opacity-60")}>
+                <button key={n} onClick={() => setI(n)} aria-label={What(n + 1)} aria-current={n === i || undefined} className={cn("h-16 w-24 shrink-0 overflow-hidden rounded-lg ring-2", n === i ? "ring-[#C3C8CD]" : "ring-transparent opacity-60")}>
                   <PropertyArt scene={s} seed={n === 0 ? l.id : l.id + (n - 1)} photo={listingPhoto(l, n)} className="h-full w-full" />
                 </button>
               ))}

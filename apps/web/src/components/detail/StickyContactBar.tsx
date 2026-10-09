@@ -67,7 +67,7 @@ export function StickyContactBar({ locale, price, amount, meta, suffix, tour, st
       data-hide-fab-mobile
       aria-hidden={!shown}
       className={cn(
-        "fixed inset-x-0 bottom-0 z-40 border-t px-4 pt-3 shadow-[0_-10px_30px_rgba(30,26,24,.12)] transition-transform duration-np ease-out lg:hidden print:hidden",
+        "fixed inset-x-0 bottom-0 z-40 border-t px-4 pt-3 shadow-[0_-10px_30px_rgba(31,35,40,.12)] transition-transform duration-np ease-out lg:hidden print:hidden",
         dark ? "border-navy-line bg-navy text-ivory" : "border-line bg-white text-ink",
         !shown && "pointer-events-none translate-y-full",
       )}
@@ -80,10 +80,10 @@ export function StickyContactBar({ locale, price, amount, meta, suffix, tour, st
           data-compare-chip
           className={cn(
             "-mt-1 mb-2.5 flex min-h-9 items-center gap-2 rounded-full px-3 font-display text-[13px] font-semibold",
-            dark ? "bg-white/10 text-ivory" : "bg-[#F1EBE3] text-ink",
+            dark ? "bg-white/10 text-ivory" : "bg-[#EEF0F2] text-ink",
           )}
         >
-          <Scale size={14} aria-hidden className={dark ? "text-[#D4B98C]" : "text-[#8E3B22]"} />
+          <Scale size={14} aria-hidden className={dark ? "text-[#A8B0B8]" : "text-[#8E3B22]"} />
           <span className="flex-1">{tx(locale, `Comparando ${compare.length} de 3`, `Comparing ${compare.length} of 3`)}</span>
           <span className="inline-flex items-center gap-1 underline-offset-4">{tx(locale, "Ver comparación", "View comparison")} <ArrowRight size={14} aria-hidden /></span>
         </Link>
@@ -104,14 +104,14 @@ export function StickyContactBar({ locale, price, amount, meta, suffix, tour, st
         </div>
         {whatsapp ? (
           <>
-            {/* One terracotta action: WhatsApp with the advisor. The tour form stays one tap away (navy outline). */}
-            <button onClick={go} tabIndex={shown ? 0 : -1} aria-label={label} className={cn("np-btn-outline inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-1.5 rounded-full border-[1.5px] px-3.5 font-display text-sm font-semibold max-[399px]:gap-1 max-[399px]:px-2.5", dark ? "border-ivory text-ivory" : "border-navy text-navy")}>
+            {/* One terracotta action (018/022): "Pedir visita". WhatsApp is the secondary, outlined in silver. */}
+            <button onClick={go} tabIndex={shown ? 0 : -1} aria-label={label} className="order-2 inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-1.5 rounded-full bg-coral-cta px-4 font-display text-sm font-semibold text-white hover:bg-coral-cta-hover max-[399px]:gap-1 max-[399px]:px-3">
               <Icon size={17} aria-hidden />
               <span>{short}</span>
             </button>
             {/* Below 380 px WhatsApp keeps only its (universally known) glyph; the name stays for screen readers.
                 "Disponibilidad" (vacation rentals) is longer than "Visita", so there the glyph-only button starts at 420 px. */}
-            <a href={whatsapp} target="_blank" rel="noopener noreferrer" tabIndex={shown ? 0 : -1} className={cn("inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-2 rounded-full bg-coral-cta px-3.5 font-display text-sm font-semibold text-white hover:bg-coral-cta-hover max-[399px]:px-3 max-[379px]:px-0", stay && "max-[419px]:px-0")}>
+            <a href={whatsapp} target="_blank" rel="noopener noreferrer" tabIndex={shown ? 0 : -1} className={cn("order-1 inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-2 rounded-full border-[1.5px] border-[#9A9DA1] px-3.5 font-display text-sm font-semibold text-ink hover:border-ink max-[399px]:px-3 max-[379px]:px-0", stay && "max-[419px]:px-0")}>
               <WhatsAppIcon size={17} /> <span className={stay ? "max-[419px]:sr-only" : "max-[379px]:sr-only"}>WhatsApp</span>
               {agentFirst && <span className="sr-only">{tx(locale, ` con ${agentFirst}`, ` ${agentFirst}`)}</span>}
             </a>

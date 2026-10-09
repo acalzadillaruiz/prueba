@@ -109,7 +109,7 @@ export function ListingCard({ l, locale, compact, className, compareToggle }: { 
       data-spotlight
       data-listing-card
       className={cn(
-        "group relative isolate rounded-[28px] bg-white/75 p-2 ring-1 ring-black/[.04] shadow-[0_1px_2px_rgba(30,26,24,.04),0_14px_34px_-14px_rgba(30,26,24,.18)] transition-[transform,box-shadow] duration-500 hover:-translate-y-1 hover:shadow-[0_2px_4px_rgba(30,26,24,.05),0_28px_50px_-18px_rgba(30,26,24,.28)] has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-navy has-[a:focus-visible]:ring-offset-2 has-[a:focus-visible]:ring-offset-ivory",
+        "group relative isolate rounded-[28px] bg-white/75 p-2 ring-1 ring-black/[.04] shadow-[0_1px_2px_rgba(31,35,40,.04),0_14px_34px_-14px_rgba(31,35,40,.18)] transition-[transform,box-shadow] duration-500 hover:-translate-y-1 hover:shadow-[0_2px_4px_rgba(31,35,40,.05),0_28px_50px_-18px_rgba(31,35,40,.28)] has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-navy has-[a:focus-visible]:ring-offset-2 has-[a:focus-visible]:ring-offset-ivory",
         className,
       )}
     >

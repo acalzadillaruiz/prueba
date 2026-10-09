@@ -62,7 +62,8 @@ export function toCard(l: Listing): Listing {
     body_es: "",
     body_en: "",
     priceHistory: drop,
-    estimate: { ...l.estimate, comparables: [] },
+    // Only the first 3 comparables: enough for the "Precio verificado" rule (lib/price-badge), not the full list.
+    estimate: { ...l.estimate, comparables: l.estimate.comparables.slice(0, 3) },
     photos: l.photos?.slice(0, 5),
     agent: l.agent ? { ...l.agent, phone: undefined } : undefined,
     agency: l.agency ? { ...l.agency, phone: "", whatsapp: "" } : undefined,
@@ -227,7 +228,9 @@ export function filtersFromParams(sp: URLSearchParams): SearchFilters {
 
 export function whereFromFilters(f: SearchFilters): Prisma.ListingWhereInput {
   // Search shows what can still be bought or rented; sold/rented stay reachable by link and as "sold nearby".
-  const and: Prisma.ListingWhereInput[] = [publicWhere(), { status: { in: ["COMING_SOON", "ACTIVE", "UNDER_OFFER"] } }];
+  // Plan 017 decision 2: a home without real photos stays reachable by link but is not listed (no illustrations in
+  // search, no repeated photos to fill the gap).
+  const and: Prisma.ListingWhereInput[] = [publicWhere(), { status: { in: ["COMING_SOON", "ACTIVE", "UNDER_OFFER"] } }, { photos: { some: {} } }];
   if (f.type === "COMMERCIAL") and.push({ listingType: { in: ["COMMERCIAL_SALE", "COMMERCIAL_RENT"] } });
   else if (f.type) and.push({ listingType: f.type as ListingType });
   // "El Morro" covers "Cerro El Morro" and "Canales de El Morro"; a city name covers all its zones.
@@ -391,7 +394,7 @@ async function searchByIds(f: SearchFilters, where: Prisma.ListingWhereInput, or
 }
 
 export async function publicListings(): Promise<Listing[]> {
-  const rows = await prisma.listing.findMany({ where: publicWhere(), include: cardInclude, orderBy: { publishedAt: "desc" } });
+  const rows = await prisma.listing.findMany({ where: { AND: [publicWhere(), { photos: { some: {} } }] }, include: cardInclude, orderBy: { publishedAt: "desc" } });
   return rows.map((r) => toCard(toDomain(r)));
 }
 

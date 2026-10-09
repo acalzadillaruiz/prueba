@@ -12,8 +12,8 @@ import "../globals.css";
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#F1EBE3" },
-    { media: "(prefers-color-scheme: dark)", color: "#15120F" },
+    { media: "(prefers-color-scheme: light)", color: "#EEF0F2" },
+    { media: "(prefers-color-scheme: dark)", color: "#0E1013" },
   ],
   width: "device-width", initialScale: 1, viewportFit: "cover" };
 

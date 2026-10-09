@@ -37,7 +37,7 @@ export function DemoLoginList({ locale, onDone, className }: { locale: Locale; o
             <span className="block font-semibold leading-tight">{tx(locale, d.label.es, d.label.en)}</span>
             <span className="block truncate text-xs text-mist">{d.email}</span>
           </span>
-          {busy === d.email ? <Loader2 size={14} className="animate-spin" aria-hidden /> : user?.email === d.email && <span className="h-2 w-2 rounded-full bg-[#C9A574]" aria-label={tx(locale, "Sesión actual", "Current session")} />}
+          {busy === d.email ? <Loader2 size={14} className="animate-spin" aria-hidden /> : user?.email === d.email && <span className="h-2 w-2 rounded-full bg-[#C3C8CD]" aria-label={tx(locale, "Sesión actual", "Current session")} />}
         </button>
       ))}
       {user && (

@@ -73,12 +73,12 @@ export function SavedToast({ locale, nonce, onClose }: { locale: Locale; nonce: 
       role="status"
       aria-live="polite"
       style={bottom != null ? { bottom } : undefined}
-      className="np-in fixed inset-x-0 bottom-[calc(1.25rem+env(safe-area-inset-bottom))] z-[60] mx-auto flex w-fit max-w-[calc(100vw-2rem)] items-center gap-3 rounded-full bg-navy py-2 pl-4 pr-2 font-display text-[15px] text-ivory shadow-[0_0_0_1px_rgba(201,165,116,.45),0_16px_36px_rgba(30,26,24,.32)] transition-[bottom] duration-300 print:hidden"
+      className="np-in fixed inset-x-0 bottom-[calc(1.25rem+env(safe-area-inset-bottom))] z-[60] mx-auto flex w-fit max-w-[calc(100vw-2rem)] items-center gap-3 rounded-full bg-navy py-2 pl-4 pr-2 font-display text-[15px] text-ivory shadow-[0_0_0_1px_rgba(195,200,205,.45),0_16px_36px_rgba(31,35,40,.32)] transition-[bottom] duration-300 print:hidden"
     >
-      <Heart size={16} className="shrink-0 fill-[#C9A574] text-[#C9A574]" aria-hidden />
+      <Heart size={16} className="shrink-0 fill-[#C3C8CD] text-[#C3C8CD]" aria-hidden />
       <span>{tx(locale, "Guardada", "Saved")}</span>
       <span aria-hidden className="text-ivory/40">·</span>
-      <Link href={`/${locale}/saved`} onClick={onClose} className="flex min-h-9 items-center rounded-full px-3 font-semibold text-[#C9A574] underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#C9A574]">
+      <Link href={`/${locale}/saved`} onClick={onClose} className="flex min-h-9 items-center rounded-full px-3 font-semibold text-[#C3C8CD] underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#C3C8CD]">
         {tx(locale, "Ver guardadas", "See saved")}
       </Link>
     </div>

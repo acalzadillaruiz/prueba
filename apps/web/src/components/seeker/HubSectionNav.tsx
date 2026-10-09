@@ -73,12 +73,12 @@ export function HubSectionNav({ locale, sections }: { locale: Locale; sections: 
                   onClick={() => setActive(s.id)}
                   className={cn(
                     "flex min-h-10 items-center gap-1.5 whitespace-nowrap rounded-full px-4 font-display text-[14px] font-medium transition-colors duration-np focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink",
-                    on ? "bg-ink text-ivory [html.dark_&]:bg-[#F1EBE3] [html.dark_&]:text-[#1E1A18]" : "text-ink/75 hover:bg-black/5 hover:text-ink",
+                    on ? "bg-ink text-ivory [html.dark_&]:bg-[#EEF0F2] [html.dark_&]:text-[#1F2328]" : "text-ink/75 hover:bg-black/5 hover:text-ink",
                   )}
                 >
                   {s.label}
                   {!!s.badge && (
-                    <span className={cn("flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[11px] font-bold", on ? "bg-[#C9A574] text-[#1E1A18]" : "bg-navy text-ivory")}>
+                    <span className={cn("flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[11px] font-bold", on ? "bg-[#C3C8CD] text-[#1F2328]" : "bg-navy text-ivory")}>
                       {s.badge}
                       <span className="sr-only">{tx(locale, " sin leer", " unread")}</span>
                     </span>

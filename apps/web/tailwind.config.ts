@@ -6,7 +6,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        navy: { DEFAULT: "rgb(30 26 24 / <alpha-value>)", 2: "rgb(42 36 32 / <alpha-value>)", card: "#2A2420", line: "#3A322D" },
+        navy: { DEFAULT: "rgb(31 35 40 / <alpha-value>)", 2: "rgb(28 32 37 / <alpha-value>)", card: "#1C2025", line: "#2C3137" },
         coral: { DEFAULT: "rgb(var(--np-coral-rgb) / <alpha-value>)", hover: "rgb(var(--np-coral-hover-rgb) / <alpha-value>)", cta: "rgb(var(--np-coral-cta-rgb) / <alpha-value>)", "cta-hover": "rgb(var(--np-coral-cta-hover-rgb) / <alpha-value>)" },
         ivory: "rgb(var(--np-ivory-rgb) / <alpha-value>)",
         arena: "rgb(var(--np-arena-rgb) / <alpha-value>)",

@@ -1,73 +1,25 @@
 import localFont from "next/font/local";
 
 /**
- * Self-hosted brand fonts via next/font: preloaded, latin subset only (covers Spanish and English, incl. € and ñ),
- * with a metric-matched fallback so text doesn't shift when the web font arrives (CLS).
- * Brand (Palette A · Arcilla y Obsidiana): Prata (titles and prices, 32px and up), Jost (interface and text),
- * Cinzel (the "NEW PLACE" wordmark only). Prata ships one weight; 500/600/italic map to the same file so the
- * browser never synthesises bold or slanted glyphs.
+ * Self-hosted brand fonts via next/font ("Titanio 2035", entry 022 §2): Geist for everything (Light for titles and
+ * prices, Regular for text, Medium for interface) and Geist Mono for labels, specs, times and data. Both are variable
+ * (one file each, 100–900) under the SIL Open Font License 1.1 (../fonts/geist-OFL.txt) and cover Spanish in full
+ * (á é í ó ú ñ ¿ ¡ €). A metric-matched Arial fallback keeps CLS ≈ 0 while the web font arrives.
  */
-export const prata = localFont({
-  src: [
-    { path: "../fonts/prata-latin-400-normal.woff2", weight: "400" },
-    { path: "../fonts/prata-latin-400-normal.woff2", weight: "500" },
-    { path: "../fonts/prata-latin-400-normal.woff2", weight: "600" },
-    { path: "../fonts/prata-latin-400-normal.woff2", weight: "500", style: "italic" },
-  ],
-  variable: "--font-prata",
-  display: "swap",
-  fallback: ["Georgia", "Times New Roman", "serif"],
-  adjustFontFallback: "Times New Roman",
-});
-
-/**
- * "NP Digits": Prata's "1" has no flag and reads as a lowercase "l" ("USD ll8.000", "l resultado"), which hurts trust
- * in prices. This face carries only the digits 0–9 (unicode-range) from Gilda Display, a high-contrast display serif
- * with a flagged 1 and lining figures (SIL OFL 1.1, see ../fonts/gilda-display-OFL.txt). It is listed FIRST in
- * --font-serif (globals.css), so every serif number in the app — prices, counts, years — picks it up automatically,
- * while letters, punctuation and separators still come from Prata. size-adjust scales Gilda's digits up to Prata's
- * figure height (65 → 83 units per 100px); the ascent/descent overrides keep it from growing line boxes.
- * Mapped to 400/500/600 like Prata so the browser never synthesises bold digits next to Prata's single weight.
- */
-export const npDigits = localFont({
-  src: [
-    { path: "../fonts/gilda-display-latin-400-normal.woff2", weight: "400" },
-    { path: "../fonts/gilda-display-latin-400-normal.woff2", weight: "500" },
-    { path: "../fonts/gilda-display-latin-400-normal.woff2", weight: "600" },
-  ],
-  variable: "--font-np-digits",
-  display: "swap",
-  fallback: [],
-  adjustFontFallback: false,
-  declarations: [
-    { prop: "unicode-range", value: "U+0030-0039" },
-    { prop: "size-adjust", value: "127%" },
-    { prop: "ascent-override", value: "72%" },
-    { prop: "descent-override", value: "18%" },
-    { prop: "line-gap-override", value: "0%" },
-  ],
-});
-
-export const jost = localFont({
-  src: [
-    { path: "../fonts/jost-latin-400-normal.woff2", weight: "400" },
-    { path: "../fonts/jost-latin-500-normal.woff2", weight: "500" },
-    { path: "../fonts/jost-latin-600-normal.woff2", weight: "600" },
-    { path: "../fonts/jost-latin-700-normal.woff2", weight: "700" },
-  ],
-  variable: "--font-jost",
+export const geist = localFont({
+  src: [{ path: "../fonts/geist-variable.woff2", weight: "100 900", style: "normal" }],
+  variable: "--font-geist",
   display: "swap",
   fallback: ["ui-sans-serif", "system-ui", "Arial"],
   adjustFontFallback: "Arial",
 });
 
-export const cinzel = localFont({
-  src: [{ path: "../fonts/cinzel-latin-500-normal.woff2", weight: "500" }],
-  variable: "--font-cinzel",
+export const geistMono = localFont({
+  src: [{ path: "../fonts/geist-mono-variable.woff2", weight: "100 900", style: "normal" }],
+  variable: "--font-geist-mono",
   display: "swap",
-  fallback: ["Georgia", "serif"],
-  adjustFontFallback: "Times New Roman",
-  preload: false,
+  fallback: ["ui-monospace", "Menlo", "monospace"],
+  adjustFontFallback: false,
 });
 
-export const fontVars = `${prata.variable} ${npDigits.variable} ${jost.variable} ${cinzel.variable}`;
+export const fontVars = `${geist.variable} ${geistMono.variable}`;

@@ -8,7 +8,7 @@ import { AdminShell } from "@/components/layout/AdminShell";
 import { listingPhoto } from "@/lib/photos";
 import { PropertyArt } from "@/components/art/PropertyArt";
 import { Button } from "@/components/ui";
-import { Count, Initials, Pill, StatusPill, k, tab } from "./kit";
+import { Count, Initials, Pill, Select, StatusPill, k, tab } from "./kit";
 import { ScrollRegion } from "./ScrollRegion";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
@@ -147,12 +147,14 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
     }
     return <StatusPill status={l.status} review={l.review} takedownReason={l.takedownReason} locale={locale} />;
   };
-  const agentSelect = (l: Listing, title: string, className: string, label: string) => (
-    <select value={l.agentId ?? ""} disabled={!manager || busy === l.id} onChange={(e) => assign(l, e.target.value || null)} className={className} aria-label={label}>
+  const agentSelect = (l: Listing, label: string, wrapClassName?: string, className?: string) => (
+    <Select compact wrapClassName={wrapClassName} className={className} value={l.agentId ?? ""} disabled={!manager || busy === l.id} onChange={(e) => assign(l, e.target.value || null)} aria-label={label}>
       <option value="" disabled={mandateOf.has(l.id)}>—</option>
       {agents.map((ag) => <option key={ag.id} value={ag.id}>{ag.name}</option>)}
-    </select>
+    </Select>
   );
+  /** Price and agent get their own columns from xl; below it (1024 beside the sidebar, tablets) they stack in the listing cell. */
+  const xlCol = "hidden xl:table-cell";
   const box = "h-[18px] w-[18px] shrink-0 cursor-pointer accent-navy dark:accent-[#C9A574]";
   const qualityBar = (l: Listing, w: string) => <span className={cn("inline-block h-1.5 rounded-full bg-[#ECE6DA] dark:bg-white/10", w)} aria-hidden><span className={cn("block h-full rounded-full", l.quality >= 85 ? "bg-ok" : l.quality >= 65 ? "bg-warn" : "bg-danger")} style={{ width: `${l.quality}%` }} /></span>;
   /** Columns that only fit from 2xl (≥ 1536 px); below it they ride on a meta line under the title. */
@@ -204,10 +206,10 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
                   </div>
                   <Pill tone={MANDATE_PHASE[p].tone}><span title={mandateHint(p, locale)}>{mandateLabel(p, locale)}</span></Pill>
                   {manager && (
-                    <select value={m.agentId ?? ""} disabled={busy === m.id} onChange={(e) => e.target.value && patch(m.id, { agentId: e.target.value }, `mandates/${m.id}`)} className={k.select} aria-label={tx(locale, `Agente del encargo ${title}`, `Agent for mandate ${title}`)}>
+                    <Select compact value={m.agentId ?? ""} disabled={busy === m.id} onChange={(e) => e.target.value && patch(m.id, { agentId: e.target.value }, `mandates/${m.id}`)} aria-label={tx(locale, `Agente del encargo ${title}`, `Agent for mandate ${title}`)}>
                       <option value="" disabled>{tx(locale, "Asignar agente…", "Assign agent…")}</option>
                       {agents.map((ag) => <option key={ag.id} value={ag.id}>{ag.name}</option>)}
-                    </select>
+                    </Select>
                   )}
                   {canPublishMandate(m) && (
                     <Button size="sm" variant="navy" className={k.navy} disabled={busy === m.id} onClick={() => patch(m.id, { status: "ACTIVE" }, `mandates/${m.id}`)} title={tx(locale, "Aprueba la ficha del encargo y la publica en el portal", "Approves the mandate's listing and publishes it")}><Rocket size={14} /> {tx(locale, "Revisar y publicar", "Review & publish")}</Button>
@@ -276,7 +278,7 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
               </dl>
               <label className="mt-3 flex items-center gap-3 text-sm">
                 <span className={cn("shrink-0", k.muted)}>{tx(locale, "Agente", "Agent")}</span>
-                {agentSelect(l, title, cn(k.select, "h-10 min-w-0 flex-1"), tx(locale, `Agente de ${title}`, `Agent for ${title}`))}
+                {agentSelect(l, tx(locale, `Agente de ${title}`, `Agent for ${title}`), "min-w-0 flex-1", "h-10")}
               </label>
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 {reviewActions(l, title, false)}
@@ -288,9 +290,10 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
         {rows.length === 0 && <li className={cn(k.card, "px-4 py-10 text-center text-sm", k.muted)}>{tx(locale, "No hay inmuebles con este filtro.", "No listings match this filter.")}</li>}
       </ul>
       <ScrollRegion fade={false} label={tx(locale, "Tabla de inmuebles", "Listings table")} className={cn("hidden md:block", k.card)}>
-        {/* Up to 2xl: checkbox · listing (+ quality, leads, days, updated as a meta line) · status · price · agent · action
-            ≈ 830 px, so it fits the 936 px content at 1280 without a sideways scroll. From 2xl every column has its own. */}
-        <table className="np-sticky-last w-full min-w-[800px] text-sm 2xl:min-w-[1160px]">
+        {/* Below xl (tablets, 1024 beside the sidebar = 680 px): checkbox · listing (+ price and agent, + meta line) · status ·
+            action, so nothing hides under the actions. xl: price and agent get columns (≈ 830 px, fits 936 px at 1280).
+            From 2xl every column has its own. */}
+        <table className="np-sticky-last w-full text-sm xl:min-w-[800px] 2xl:min-w-[1160px]">
           <thead className={cn("border-b text-left", k.line, k.th)}>
             <tr>
               {selectable && (
@@ -300,8 +303,8 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
               )}
               <th className="px-4 py-3 font-semibold">{tx(locale, "Inmueble", "Listing")}</th>
               <th className="px-3 py-3 font-semibold">{tx(locale, "Estado", "Status")}</th>
-              <th className="px-3 py-3 text-right font-semibold">{tx(locale, "Precio", "Price")}</th>
-              <th className="px-3 py-3 font-semibold">{tx(locale, "Agente", "Agent")}</th>
+              <th className={cn("px-3 py-3 text-right font-semibold", xlCol)}>{tx(locale, "Precio", "Price")}</th>
+              <th className={cn("px-3 py-3 font-semibold", xlCol)}>{tx(locale, "Agente", "Agent")}</th>
               <th className={cn("px-3 py-3 font-semibold", wide)}>{tx(locale, "Calidad", "Quality")}</th>
               <th className={cn("px-3 py-3 text-right font-semibold", wide)}>Leads</th>
               <th className={cn("px-3 py-3 text-right font-semibold", wide)}>{tx(locale, "Días", "Days")}</th>
@@ -329,6 +332,10 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
                         <div className={cn("text-xs", k.muted)}>{lbl(TYPE_LABEL[l.listingType], locale)} · {l.zone} · {num(l.areaM2, locale)} m²</div>
                       </div>
                     </Link>
+                    <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5 pl-[76px] xl:hidden" data-testid="listing-price-agent">
+                      <span className={cn("whitespace-nowrap text-[15px]", k.num, "tracking-normal")}>{money(l.priceAmount, locale)}<span className={cn("text-xs font-normal", k.muted)}>{priceSuffix(l, locale)}</span></span>
+                      {agentSelect(l, tx(locale, `Agente de ${title}`, `Agent for ${title}`), "max-w-[200px]")}
+                    </div>
                     <div className={cn("mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 pl-[76px] text-xs 2xl:hidden", k.muted)} data-testid="listing-meta">
                       <span className="inline-flex items-center gap-1.5" title={tx(locale, "Calidad de la ficha", "Listing quality")}>{qualityBar(l, "w-8")}<span className="font-semibold text-navy dark:text-ivory">{l.quality}</span></span>
                       <span>· {l.stats.leads} {l.stats.leads === 1 ? "lead" : "leads"}</span>
@@ -337,9 +344,9 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
                     </div>
                   </td>
                   <td className="whitespace-nowrap px-3"><div className="flex flex-col items-start gap-1">{statusPills(l, true)}{l.luxury && <Pill tone="exclusive">{tx(locale, "Exclusiva", "Exclusive")}</Pill>}</div></td>
-                  <td className={cn("whitespace-nowrap px-3 text-right", k.num, "tracking-normal")}>{money(l.priceAmount, locale)}<span className={cn("text-xs font-normal", k.muted)}>{priceSuffix(l, locale)}</span></td>
+                  <td className={cn("whitespace-nowrap px-3 text-right", xlCol, k.num, "tracking-normal")}>{money(l.priceAmount, locale)}<span className={cn("text-xs font-normal", k.muted)}>{priceSuffix(l, locale)}</span></td>
                   {/* The select sizes to its longest option, so full agent names always show. */}
-                  <td className="px-3">{agentSelect(l, title, cn(k.select, "w-auto max-w-none"), tx(locale, `Agente de ${title}`, `Agent for ${title}`))}</td>
+                  <td className={cn("px-3", xlCol)}>{agentSelect(l, tx(locale, `Agente de ${title}`, `Agent for ${title}`))}</td>
                   <td className={cn("px-3", wide)}>
                     <div className="flex items-center gap-2">
                       {qualityBar(l, "w-16")}
@@ -373,10 +380,10 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
           <div className={cn(k.card, "flex flex-wrap items-center gap-2 p-3 shadow-[0_12px_32px_rgba(30,26,24,.18)] ring-1 ring-[#E6DDD2] md:gap-3 md:px-4")}>
             <span className="text-sm font-semibold">{tx(locale, `${chosen.length} ${chosen.length === 1 ? "seleccionado" : "seleccionados"}`, `${chosen.length} selected`)}</span>
             {manager && (
-              <select value="" disabled={bulk?.running} onChange={(e) => e.target.value && bulkAssign(e.target.value)} className={cn(k.select, "h-10")} aria-label={tx(locale, "Asignar los seleccionados a…", "Assign selected to…")}>
+              <Select compact value="" disabled={bulk?.running} onChange={(e) => e.target.value && bulkAssign(e.target.value)} className="h-10" aria-label={tx(locale, "Asignar los seleccionados a…", "Assign selected to…")}>
                 <option value="" disabled>{tx(locale, "Asignar a…", "Assign to…")}</option>
                 {agents.map((ag) => <option key={ag.id} value={ag.id}>{ag.name}</option>)}
-              </select>
+              </Select>
             )}
             {manager && (
               <Button size="sm" variant="navy" className={cn(k.navy, "min-h-10", DISABLED)} disabled={bulk?.running || !approvable.length} onClick={() => runBulk(tx(locale, "Aprobar", "Approve"), approvable, (l) => api(`listings/${l.id}`, { method: "PATCH", json: { review: "APPROVED" } }))} title={tx(locale, "Solo las que están en revisión", "Only those in review")}>

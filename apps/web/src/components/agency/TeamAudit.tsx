@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { ArrowDown, ArrowUp, ArrowUpDown, Eye, Loader2, Lock, MessageSquare } from "lucide-react";
 import type { Locale } from "@/types/domain";
 import { AdminShell } from "@/components/layout/AdminShell";
-import { Empty, Initials, Panel, Pill, k, tab } from "./kit";
+import { Empty, Initials, Panel, Pill, Select, k, tab } from "./kit";
 import { ScrollRegion } from "./ScrollRegion";
 import type { AdvisorRow, ChatDetail, ChatSummary } from "@/server/team-audit";
 import { AUDIT_PERIODS, dash, formatMinutes, type AuditPeriod } from "@/lib/team-metrics";
@@ -122,9 +122,9 @@ function Performance({ locale, days, rows }: { locale: Locale; days: AuditPeriod
           <div className="px-5 md:hidden">
             <div className="flex items-center gap-2 text-sm">
               <label htmlFor="audit-sort" className={cn("shrink-0", k.muted)}>{tx(locale, "Ordenar por", "Sort by")}</label>
-              <select
+              <Select
                 id="audit-sort"
-                className={cn(k.select, "h-10 min-w-0 flex-1")}
+                compact wrapClassName="min-w-0 flex-1" className="h-10"
                 value={sort.key}
                 onChange={(e) => {
                   const key = e.target.value as SortKey;
@@ -132,7 +132,7 @@ function Performance({ locale, days, rows }: { locale: Locale; days: AuditPeriod
                 }}
               >
                 {sortOptions.map(([key, label]) => <option key={key} value={key}>{label}</option>)}
-              </select>
+              </Select>
               <button
                 type="button"
                 onClick={() => setSort((s) => ({ ...s, dir: s.dir === 1 ? -1 : 1 }))}
@@ -280,10 +280,10 @@ function Chats({ locale, advisors, threads, agentId, onAgent, pending }: { local
       action={
         <label className="flex items-center gap-2 text-sm">
           <span className={k.muted}>{tx(locale, "Asesor", "Advisor")}</span>
-          <select className={k.select} value={agentId ?? ""} disabled={pending} onChange={(e) => { setOpen(null); onAgent(e.target.value || null); }}>
+          <Select compact value={agentId ?? ""} disabled={pending} onChange={(e) => { setOpen(null); onAgent(e.target.value || null); }}>
             <option value="">{tx(locale, "Todo el equipo", "Whole team")}</option>
             {advisors.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
-          </select>
+          </Select>
         </label>
       }
     >

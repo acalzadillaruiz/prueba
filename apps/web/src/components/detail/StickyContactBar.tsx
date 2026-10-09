@@ -4,23 +4,12 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, CalendarCheck, CalendarDays, MessageSquare, Scale } from "lucide-react";
 import type { Locale } from "@/types/domain";
-import { tx } from "@/lib/i18n";
+import { shortMoney, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import { WhatsAppIcon } from "@/components/brand/PublicChrome";
 import { useApp } from "@/lib/store";
 import { compareHref } from "@/components/compare/CompareTray";
 import { useListingWhatsApp } from "./useListingWhatsApp";
-
-/** Short price for narrow bars: "USD 265k" / "USD 1,2 M" (es), "$265k" / "$1.2M" (en). Never cut with an ellipsis. */
-export function compactPrice(amount: number, locale: Locale) {
-  const es = locale === "es";
-  const pre = es ? "USD " : "$";
-  const fmt = (n: number, digits: number) => new Intl.NumberFormat(es ? "es-VE" : "en-US", { maximumFractionDigits: digits }).format(n);
-  if (amount >= 1_000_000) return `${pre}${fmt(amount / 1_000_000, amount >= 10_000_000 ? 0 : 1)}${es ? " M" : "M"}`;
-  if (amount >= 10_000) return `${pre}${fmt(Math.round(amount / 1000), 0)}k`;
-  if (amount >= 1000) return `${pre}${fmt(amount / 1000, 1)}k`;
-  return `${pre}${fmt(amount, 0)}`;
-}
 
 /**
  * Phone + tablet (below lg, where the contact card is not beside the content) bottom bar on the listing detail: price + "Request a tour" that jumps to the contact panel.
@@ -67,7 +56,7 @@ export function StickyContactBar({ locale, price, amount, meta, suffix, tour, st
     fit();
     return () => ro.disconnect();
   }, [amount, price, suffix]);
-  const shownPrice = compact && amount != null ? compactPrice(amount, locale) : price;
+  const shownPrice = compact && amount != null ? shortMoney(amount, locale) : price;
   const label = stay ? tx(locale, "Consultar disponibilidad", "Check availability") : tour ? tx(locale, "Pedir visita", "Request a tour") : tx(locale, "Contactar", "Contact");
   // Short visible word on every width (the accessible name, `label`, contains it: "Pedir visita" ⊃ "visita").
   const short = stay ? tx(locale, "Disponibilidad", "Availability") : tour ? tx(locale, "Visita", "Tour") : tx(locale, "Contactar", "Contact");

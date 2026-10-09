@@ -17,7 +17,16 @@ import { cn } from "@/lib/cn";
 
 /** "Buenos días" by the Caracas clock (UTC−4, no DST). */
 /** 11 min · 3 h · 2 d */
-const span = (mins: number) => (mins < 60 ? `${mins} min` : mins < 1440 ? `${Math.round(mins / 60)} h` : `${Math.round(mins / 1440)} d`);
+const span = (mins: number) => (mins < 60 ? `${mins}\u00a0min` : mins < 1440 ? `${Math.round(mins / 60)}\u00a0h` : `${Math.round(mins / 1440)}\u00a0d`);
+
+/** Calendar ?w= offset (Caracas weeks, Monday first) of a date, relative to this week. */
+const weekOffset = (iso: string) => {
+  const monday = (ms: number) => {
+    const d = new Date(ms - 4 * 3600e3);
+    return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() - ((d.getUTCDay() + 6) % 7));
+  };
+  return Math.round((monday(Date.parse(iso)) - monday(Date.now())) / (7 * 864e5));
+};
 
 const greeting = (locale: Locale) => {
   const h = new Date(Date.now() - 4 * 3600e3).getUTCHours();
@@ -52,7 +61,7 @@ export function AgencyDashboard({ locale, stats, listings, newLeads, tours, agen
         <Kpi label={tx(locale, "Leads · 7 días", "Leads · 7 days")} value={stats.leads7d} delta={stats.leadsDeltaPct === null ? undefined : `${sign(stats.leadsDeltaPct)} %`} deltaNote={tx(locale, "Aún hay pocos datos para comparar", "Not enough data to compare yet")} down={(stats.leadsDeltaPct ?? 0) < 0} hint={tx(locale, "vs. semana anterior", "vs. previous week")} />
         <Kpi label={tx(locale, "Conversión lead → visita", "Lead → tour")} value={`${stats.convTourPct} %`} hint={tx(locale, "últimos 30 días", "last 30 days")} />
         <Kpi label={tx(locale, "Tiempo medio a visita", "Avg. time to tour")} value={stats.avgDaysToTour === null ? "—" : `${String(stats.avgDaysToTour).replace(".", locale === "es" ? "," : ".")} d`} hint={tx(locale, "desde el lead", "from lead")} />
-        <Kpi label={tx(locale, "Respondidos en 15 min", "Answered within 15 min")} value={stats.slaPct === null ? "—" : `${stats.slaPct} %`} hint={tx(locale, "primera respuesta", "first response")} />
+        <Kpi label={tx(locale, "Respondidos en 15\u00a0min", "Answered within 15\u00a0min")} value={stats.slaPct === null ? "—" : `${stats.slaPct} %`} hint={tx(locale, "primera respuesta", "first response")} />
       </div>
 
       <div className="mt-6 grid gap-6 [&>*]:min-w-0 xl:grid-cols-[1.45fr_1fr]">
@@ -73,7 +82,7 @@ export function AgencyDashboard({ locale, stats, listings, newLeads, tours, agen
                     <div className="truncate text-[15px] font-semibold">{ld.name}</div>
                     {/* The zone truncates; the countdown (what matters) gets its own line and never does. */}
                     <div className={cn("truncate text-[13px]", k.muted)}>{l?.zone ?? "—"}</div>
-                    {late ? <div className={cn("text-[13px] font-semibold", k.dangerText)} suppressHydrationWarning>{tx(locale, "Sin respuesta a tiempo", "Not answered in time")} · {span(mins)}</div> : <div className={cn("text-[13px] font-semibold", k.warnText)} suppressHydrationWarning>{tx(locale, `Quedan ${15 - mins} min`, `${15 - mins} min left`)}</div>}
+                    {late ? <div className={cn("text-[13px] font-semibold", k.dangerText)} suppressHydrationWarning>{tx(locale, "Sin respuesta a tiempo", "Not answered in time")} · <span className="whitespace-nowrap">{span(mins)}</span></div> : <div className={cn("text-[13px] font-semibold", k.warnText)} suppressHydrationWarning>{tx(locale, `Quedan ${15 - mins}\u00a0min`, `${15 - mins}\u00a0min left`)}</div>}
                   </div>
                   {ld.score != null && <Chip>{tx(locale, "Interés", "Interest")} {ld.score}</Chip>}
                 </li>
@@ -120,7 +129,7 @@ export function AgencyDashboard({ locale, stats, listings, newLeads, tours, agen
                 <Initials name={name} size={38} />
                 <div className="min-w-0 flex-1">
                   <div className="truncate font-semibold">{name}</div>
-                  <div className={cn("text-[13px]", k.muted)}>{n} leads · {won} {tx(locale, "cierres", "won")} · {tx(locale, "resp.", "resp.")} {respMin ?? "—"} min</div>
+                  <div className={cn("text-[13px]", k.muted)}>{n} leads · {won} {tx(locale, "cierres", "won")} · <span className="whitespace-nowrap">{tx(locale, "resp.", "resp.")} {respMin == null ? "—" : `${respMin}\u00a0min`}</span></div>
                 </div>
                 <div className={cn(k.num, "text-right text-[14px] tracking-normal")}>{gmv ? money(gmv, locale) : "—"}</div>
               </li>
@@ -129,20 +138,33 @@ export function AgencyDashboard({ locale, stats, listings, newLeads, tours, agen
         </Panel>
         <Panel title={tx(locale, "Próximas visitas", "Upcoming tours")} className="lg:col-span-2 2xl:col-span-1">
           {tours.length === 0 && <p className={cn("text-[15px]", k.muted)}>{tx(locale, "Sin visitas próximas.", "No upcoming tours.")}</p>}
+          {/* Two lines per tour (date + status / visitor · zone + agent): nothing truncates to "E2…" on a phone. Each row
+              opens the calendar on that tour's week. */}
           <ul className={cn("divide-y", k.divide)}>
             {tours.slice(0, 6).map((t) => {
               const l = byId.get(t.listingId);
+              const w = weekOffset(t.start);
               return (
-                <li key={t.id} className="flex items-center gap-3 py-2.5 text-[14px] first:pt-0">
-                  <span className="w-[132px] shrink-0 font-semibold first-letter:uppercase">{dateTime(t.start, locale)}</span>
-                  <span className="line-clamp-1 min-w-0 flex-1">{t.seekerName} · <span className={k.muted}>{l?.zone}</span></span>
-                  <span title={t.agentName}><Initials name={t.agentName} size={26} /></span>
-                  <Pill tone={t.status === "CONFIRMED" ? "ok" : "warn"}>{t.status === "CONFIRMED" ? tx(locale, "Confirmada", "Confirmed") : tx(locale, "Pendiente", "Pending")}</Pill>
+                <li key={t.id}>
+                  <Link href={`/${locale}/agency/calendar${w ? `?w=${w}` : ""}`} className={cn("-mx-2 block rounded-xl px-2 py-2.5 text-[14px]", k.hover)}>
+                    <span className="flex items-center justify-between gap-3">
+                      <span className="font-semibold first-letter:uppercase">{dateTime(t.start, locale)}</span>
+                      <Pill tone={t.status === "CONFIRMED" ? "ok" : "warn"}>{t.status === "CONFIRMED" ? tx(locale, "Confirmada", "Confirmed") : tx(locale, "Pendiente", "Pending")}</Pill>
+                    </span>
+                    <span className="mt-1 flex items-center gap-2">
+                      <span className="min-w-0 flex-1 truncate">{t.seekerName}{l?.zone && <span className={k.muted}> · {l.zone}</span>}</span>
+                      <span title={t.agentName} className="shrink-0"><Initials name={t.agentName} size={24} /></span>
+                    </span>
+                  </Link>
                 </li>
               );
             })}
           </ul>
-          <div className={cn("mt-3 text-[12px]", k.muted)}>{tx(locale, "Datos en vivo desde la base de datos", "Live data from the database")}</div>
+          {tours.length > 0 && (
+            <Link href={`/${locale}/agency/calendar`} className={cn("mt-3 inline-block text-[14px]", k.link)}>
+              {tx(locale, "Ver calendario", "Open calendar")} <ArrowUpRight size={13} className="inline" />
+            </Link>
+          )}
         </Panel>
       </div>
     </AdminShell>

@@ -7,7 +7,7 @@ import type { Agency, Locale } from "@/types/domain";
 import { AdminShell } from "@/components/layout/AdminShell";
 import { Logo } from "@/components/brand/Logo";
 import { Button, Field } from "@/components/ui";
-import { k } from "./kit";
+import { Select, k } from "./kit";
 import { cn } from "@/lib/cn";
 import { useApp } from "@/lib/store";
 import { api } from "@/lib/api";
@@ -20,6 +20,26 @@ type Advisor = { id: string; name: string; owner: boolean; /** Identity checked 
 /** Sale commission accepted in settings (a Venezuelan agency charges a few %, never 250 %). */
 const SALE_MAX = 15;
 const inRange = (v: number, min: number, max: number) => Number.isFinite(v) && v >= min && v <= max;
+
+/** WCAG relative luminance of a #RRGGBB colour. */
+function luminance(hex: string) {
+  const [r, g, b] = [1, 3, 5].map((i) => {
+    const c = parseInt(hex.slice(i, i + 2), 16) / 255;
+    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+const contrast = (a: string, b: string) => {
+  const [x, y] = [luminance(a), luminance(b)].sort((m, n) => n - m);
+  return (x + 0.05) / (y + 0.05);
+};
+/** Text on the accent: white or Navy, whichever reads better; `ratio` is that pair's contrast. */
+function accentText(accent: string) {
+  const hex = /^#[0-9a-fA-F]{6}$/.test(accent) ? accent : "#1E1A18";
+  const white = contrast(hex, "#FFFFFF");
+  const dark = contrast(hex, "#1E1A18");
+  return white >= dark ? { color: "#FFFFFF", ratio: white } : { color: "#1E1A18", ratio: dark };
+}
 
 export function SettingsView({
   locale,
@@ -49,6 +69,7 @@ export function SettingsView({
   const [saved, setSaved] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const sample = 235000;
+  const onAccent = accentText(b.color);
   // Everything is checked here first: nothing is sent unless all of it is valid (no half-saved settings).
   const ruleErr = {
     salePct: inRange(r.salePct, 0, SALE_MAX) ? null : tx(locale, `La comisión de venta va de 0 a ${SALE_MAX} %.`, `Sale commission must be between 0 and ${SALE_MAX} %.`),
@@ -115,20 +136,31 @@ export function SettingsView({
               </Field>
             </div>
           </div>
-          <div className="mt-5 rounded-xl bg-ivory p-4 text-navy ring-1 ring-[#ECE6DA] dark:ring-0">
-            <div className="text-[11px] font-semibold uppercase tracking-[.12em] text-muted">{tx(locale, "Vista previa en ficha pública", "Public listing preview")}</div>
-            <div className="mt-2 flex items-center gap-3">
+          {/* The public listing is light: the preview pins the light tokens even in the dark cockpit (Cal surface, Navy ink,
+              muted #5E5248 = 6.4:1), and the button text follows the accent's luminance (white or Navy). */}
+          <div className="mt-5 rounded-xl bg-[#F1EBE3] p-4 text-[#1E1A18] ring-1 ring-[#ECE6DA] [--np-ink-rgb:30_26_24] [--np-line-rgb:216_203_183] [--np-logo-ink:#1E1A18] [--np-logo-teja:#8E3B22] [--np-muted-rgb:94_82_72] [color-scheme:light] dark:ring-white/10" data-testid="brand-preview">
+            <div className="text-[11px] font-semibold uppercase tracking-[.12em] text-[#5E5248]">{tx(locale, "Vista previa en ficha pública", "Public listing preview")}</div>
+            <div className="mt-2 flex flex-wrap items-center gap-3">
               {/^https:\/\/|^\/uploads\//.test(b.logoUrl.trim()) ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={b.logoUrl.trim()} alt="" className="h-10 w-10 rounded-lg bg-white object-contain" />
               ) : (
-                <span className="flex h-10 w-10 items-center justify-center rounded-lg font-display font-bold text-navy" style={{ background: b.color }}>{agency.initials}</span>
+                <span className="flex h-10 w-10 items-center justify-center rounded-lg font-display font-bold" style={{ background: b.color, color: onAccent.color }}>{agency.initials}</span>
               )}
-              <div className="flex-1"><div className="font-display font-semibold">{b.name}</div><div className="text-sm text-muted">{b.whatsapp}</div></div>
-              <span className="rounded-np px-3 py-2 font-display text-sm text-white" style={{ background: b.color }}>{tx(locale, "Contactar", "Contact")}</span>
+              <div className="min-w-0 flex-1"><div className="truncate font-display font-semibold">{b.name}</div><div className="text-sm text-[#5E5248]">{b.whatsapp}</div></div>
+              <span className="rounded-np px-3 py-2 font-display text-sm font-semibold" style={{ background: b.color, color: onAccent.color }}>{tx(locale, "Contactar", "Contact")}</span>
             </div>
-            <div className="mt-3 flex items-center justify-between border-t border-[#D8CBB7] pt-2 text-xs text-muted"><span>{tx(locale, "Publicado en New Place", "Listed on New Place")}</span><Logo size="sm" /></div>
+            <div className="mt-3 flex items-center justify-between border-t border-[#D8CBB7] pt-2 text-xs text-[#5E5248]"><span>{tx(locale, "Publicado en New Place", "Listed on New Place")}</span><Logo size="sm" /></div>
           </div>
+          {!brandErr.color && onAccent.ratio < 4.5 && (
+            <p className={cn("mt-3", k.warnBox)} role="status">
+              {tx(
+                locale,
+                `Con este color el texto del botón tiene un contraste de ${onAccent.ratio.toFixed(1)}:1 (mínimo recomendado 4,5:1). Prueba un tono más oscuro o más claro.`,
+                `With this colour the button text has a ${onAccent.ratio.toFixed(1)}:1 contrast (recommended minimum 4.5:1). Try a darker or lighter shade.`,
+              )}
+            </p>
+          )}
         </div>
         <div className="space-y-6">
           <div className={cn(k.card, "p-5 md:p-6")}>
@@ -185,8 +217,7 @@ export function SettingsView({
                       {label}
                       {isToday && <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[.12em]", k.soft)}>{tx(locale, "Hoy", "Today")}</span>}
                     </span>
-                    <select
-                      className={k.input}
+                    <Select
                       disabled={!owner}
                       value={onCall[d] ?? ""}
                       aria-label={tx(locale, `Guardia del ${label.toLowerCase()}`, `On call on ${label}`)}
@@ -203,7 +234,7 @@ export function SettingsView({
                           {a.verified === false ? tx(locale, " — sin verificar", " — not verified") : ""}
                         </option>
                       ))}
-                    </select>
+                    </Select>
                     {unverifiedDays.includes(d) && (
                       <span role="alert" className="mt-1 block text-xs font-semibold text-danger">{tx(locale, "Esta persona aún no está verificada: elige a otra.", "This person isn’t verified yet: pick someone else.")}</span>
                     )}

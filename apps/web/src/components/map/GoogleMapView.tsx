@@ -6,7 +6,7 @@ import { MarkerClusterer } from "@googlemaps/markerclusterer";
 import { Minus, Moon, Plus, Search, Sun } from "lucide-react";
 import type { Listing } from "@/types/domain";
 import type { LatLng } from "@/lib/geo";
-import { compactMoney, tx } from "@/lib/i18n";
+import { shortMoney, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import { GOOGLE_MAPS_KEY, GOOGLE_MAP_ID } from "./config";
 import { LIGHT_STYLE, NIGHT_STYLE } from "./nightStyle";
@@ -53,7 +53,7 @@ function Layers({ props, theme, mode, setMode, draft, setDraft }: { props: MapVi
     c.clearMarkers();
     markers.current = {};
     const list = listings.map((l: Listing) => {
-      const label = compactMoney(l.priceAmount, locale) + (l.pricePeriod === "night" ? tx(locale, "/n", "/nt") : l.pricePeriod === "month" ? tx(locale, "/m", "/mo") : "");
+      const label = shortMoney(l.priceAmount, locale) + (l.pricePeriod === "night" ? tx(locale, "/n", "/nt") : l.pricePeriod === "month" ? tx(locale, "/m", "/mo") : "");
       const m = new google.maps.Marker({ position: { lat: l.lat, lng: l.lng }, icon: pillIcon(label, l.id === selectedId || l.id === hoverId), title: tx(locale, l.title_es, l.title_en) });
       m.addListener("click", () => onSelect?.(l.id));
       markers.current[l.id] = m;

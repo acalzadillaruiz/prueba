@@ -1,7 +1,7 @@
 // No state or handlers: rendered on the server in the listing page (no hydration cost); client parents can use it too.
 import { Info } from "lucide-react";
 import type { Listing, Locale } from "@/types/domain";
-import { compactMoney, money, num, plural, priceSuffix, tx } from "@/lib/i18n";
+import { money, shortMoney, num, plural, priceSuffix, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 
 export function EstimateCard({ l, locale, dark, showComparables = true }: { l: Listing; locale: Locale; dark?: boolean; showComparables?: boolean }) {
@@ -17,7 +17,7 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
   // Ends closer than ~a third of the bar: the inward-leaning labels (each ~20 % of a phone-width bar) would overlap.
   // Hanging them outward needs room on both sides; when there isn't any, fall back to leaning inward (they can't meet then).
   const close = aHigh - aLow < 36 && aLow > 22 && aHigh < 78;
-  const usdShort = (v: number) => compactMoney(v, locale).replace("$", "USD ");
+  const usdShort = (v: number) => shortMoney(v, locale);
   const diff = ((l.priceAmount - e.mid) / e.mid) * 100;
   const verdict = Math.abs(diff) <= 4 ? tx(locale, "En línea con el mercado", "In line with the market") : diff > 0 ? tx(locale, `${diff.toFixed(0)} % sobre la estimación`, `${diff.toFixed(0)}% above estimate`) : tx(locale, `${Math.abs(diff).toFixed(0)} % bajo la estimación`, `${Math.abs(diff).toFixed(0)}% below estimate`);
   const muted = dark ? "text-mist" : "text-muted";
@@ -121,7 +121,7 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
                         <div className={cn("text-xs", muted)}>{c.zone}</div>
                       </td>
                       <td className="whitespace-nowrap px-3 py-2 text-right">{num(c.areaM2, locale)}</td>
-                      <td className="whitespace-nowrap px-3 py-2 text-right">{dark ? compactMoney(c.priceAmount, locale) : money(c.priceAmount, locale)}</td>
+                      <td className="whitespace-nowrap px-3 py-2 text-right">{dark ? shortMoney(c.priceAmount, locale) : money(c.priceAmount, locale)}</td>
                       <td className="hidden whitespace-nowrap px-3 py-2 text-right [@container(min-width:480px)]:table-cell">{num(c.pricePerM2, locale)}</td>
                       {!dark && <td className="hidden whitespace-nowrap px-3 py-2 text-right [@container(min-width:560px)]:table-cell">{c.distanceKm} km</td>}
                     </tr>

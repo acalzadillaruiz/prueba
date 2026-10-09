@@ -96,13 +96,16 @@ export function ReportsView({ locale, data, days }: { locale: Locale; data: Repo
       <div className="grid gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4 [&>*]:min-w-0">
         {/* Short one-line labels: the period goes in the line under the figure (it read "(30 D)" alone on a 2nd line). */}
         <Kpi label={tx(locale, "Volumen cerrado", "Closed volume")} value={money(data.closedVolume, locale)} hint={tx(locale, `${period} · ${data.closings} ${data.closings === 1 ? "cierre" : "cierres"} (vendidos o alquilados)`, `${period} · ${data.closings} ${data.closings === 1 ? "closing" : "closings"} (sold or rented)`)} />
-        <Kpi label={tx(locale, "Comisiones", "Commissions")} value={money(data.commissions, locale)} hint={tx(locale, `${period} · estimadas según reglas de la agencia`, `${period} · estimated per agency rules`)} />
+        {/* Not the same source as "Volumen cerrado": these are the estimated commissions recorded per won lead (the dashboard
+            funnel's "Ganados"), so they include pipeline whose listing isn't sold/rented yet. Said so on the card. */}
+        <Kpi label={tx(locale, "Comisiones registradas", "Recorded commissions")} value={money(data.commissions, locale)} hint={tx(locale, `${period} · por leads ganados, incluye pipeline aún sin cierre`, `${period} · from won leads, includes pipeline not closed yet`)} />
         <Kpi label="Leads" value={num(data.leads, locale)} hint={tx(locale, `${period} · todas las fuentes`, `${period} · all sources`)} />
         <Kpi label={tx(locale, "Días en mercado", "Days on market")} value={data.medianDom ?? "—"} hint={tx(locale, "mediana · inmuebles activos hoy", "median · listings active today")} />
       </div>
-      {/* Source + agent side by side from xl; the 6-column zone table gets the full width below, so nothing is clipped at 1024–1440. */}
+      {/* Source + agent side by side only from 2xl (at xl each half is ~410 px, narrower than the agent table); the 6-column
+          zone table gets the full width below, so nothing is clipped at 1024–1440. */}
       <div className="mt-6 grid gap-6 [&>*]:min-w-0">
-        <div className="grid content-start gap-6 [&>*]:min-w-0 xl:grid-cols-2">
+        <div className="grid content-start gap-6 [&>*]:min-w-0 2xl:grid-cols-2">
           <Panel title={tx(locale, `Leads por origen (${d})`, `Leads by source (${d})`)}>
             {data.bySource.length ? <SourceBars locale={locale} rows={data.bySource} /> : <p className={cn("text-[14px]", k.muted)}>{tx(locale, "Sin leads en este periodo.", "No leads in this period.")}</p>}
           </Panel>

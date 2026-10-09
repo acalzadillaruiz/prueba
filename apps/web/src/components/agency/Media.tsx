@@ -8,7 +8,7 @@ import { AdminShell } from "@/components/layout/AdminShell";
 import { listingPhoto } from "@/lib/photos";
 import { PropertyArt } from "@/components/art/PropertyArt";
 import { Button, Field } from "@/components/ui";
-import { Empty, Pill, k } from "./kit";
+import { Empty, Pill, Select, k } from "./kit";
 import { api } from "@/lib/api";
 import { dateTime, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
@@ -60,14 +60,14 @@ function NewJob({ locale, manage, onDone }: { locale: Locale; manage: NonNullabl
       ) : (
         <div className="mt-3 grid gap-3 md:grid-cols-[2fr_1fr_1fr_auto] md:items-end">
           <Field label={tx(locale, "Inmueble", "Listing")}>
-            <select required className={k.input} value={f.listingId} onChange={(e) => setF({ ...f, listingId: e.target.value })}>
+            <Select required value={f.listingId} onChange={(e) => setF({ ...f, listingId: e.target.value })}>
               {manage.listings.map((l) => <option key={l.id} value={l.id}>{l.title} · {l.address}</option>)}
-            </select>
+            </Select>
           </Field>
           <Field label={tx(locale, "Fotógrafo", "Photographer")}>
-            <select required className={k.input} value={f.photographerId} onChange={(e) => setF({ ...f, photographerId: e.target.value })}>
+            <Select required value={f.photographerId} onChange={(e) => setF({ ...f, photographerId: e.target.value })}>
               {manage.photographers.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
-            </select>
+            </Select>
           </Field>
           <Field label={tx(locale, "Fecha y hora (Caracas)", "Date & time (Caracas)")}>
             <input required type="datetime-local" className={k.input} value={f.date} onChange={(e) => setF({ ...f, date: e.target.value })} />
@@ -183,10 +183,10 @@ export function MediaView({ locale, jobs, listings, names = {}, manage = null }:
             {manage && (
               <div className={cn("mt-4 grid gap-3 rounded-xl p-4 sm:grid-cols-2", k.soft)}>
                 <Field label={tx(locale, "Fotógrafo asignado", "Assigned photographer")}>
-                  <select className={k.input} disabled={busy === "assign"} value={job.photographerId} onChange={(e) => run("assign", () => api(`media/${job.id}`, { method: "PATCH", json: { photographerId: e.target.value } }))}>
+                  <Select disabled={busy === "assign"} value={job.photographerId} onChange={(e) => run("assign", () => api(`media/${job.id}`, { method: "PATCH", json: { photographerId: e.target.value } }))}>
                     {!manage.photographers.some((p) => p.id === job.photographerId) && <option value={job.photographerId}>{names[job.photographerId] ?? "—"}</option>}
                     {manage.photographers.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
-                  </select>
+                  </Select>
                 </Field>
                 <Field label={tx(locale, "Fecha y hora (Caracas)", "Date & time (Caracas)")}>
                   <input

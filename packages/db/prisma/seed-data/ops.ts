@@ -77,7 +77,7 @@ export const LEAD_THREAD: Message[] = [
 ];
 
 export const EMAILS: EmailOutbox[] = [
-  { id: "em-1", to: "seeker@gmail.com", subject: "3 nuevos en Chacao · 2+ hab · < 250.000 USD", at: minutesAgo(30), kind: "ALERT", status: "SIMULATED" },
+  { id: "em-1", to: "seeker@gmail.com", subject: "3 novedades en «Compra en Chacao · 2+ hab · hasta USD 250k»", at: minutesAgo(30), kind: "ALERT", status: "SIMULATED" },
   { id: "em-2", to: "seeker@gmail.com", subject: "Visita confirmada: Torre Alba, hoy 16:00", at: minutesAgo(60 * 3), kind: "TOUR", status: "SIMULATED" },
   { id: "em-3", to: "seeker@gmail.com", subject: "Bajó de precio: Ático luminoso en Los Palos Grandes (-4 %)", at: minutesAgo(60 * 20), kind: "ALERT", status: "SIMULATED" },
   { id: "em-4", to: "seeker@gmail.com", subject: "Nuevos hoy en Altamira · alquiler", at: minutesAgo(60 * 26), kind: "ALERT", status: "SIMULATED" },

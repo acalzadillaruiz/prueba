@@ -8,12 +8,12 @@ import type { Role } from "@newplace/config";
 import type { Locale, User } from "@/types/domain";
 import { AdminShell } from "@/components/layout/AdminShell";
 import { Button } from "@/components/ui";
-import { Chip, Initials, Pill, k } from "./kit";
+import { Chip, Initials, Pill, Select, k } from "./kit";
 import { ScrollRegion } from "./ScrollRegion";
 import { cn } from "@/lib/cn";
 import { useApp } from "@/lib/store";
 import { api } from "@/lib/api";
-import { tx } from "@/lib/i18n";
+import { plural, tx } from "@/lib/i18n";
 import { TimeAgo } from "@/components/owner/TimeAgo";
 
 const ROLE_OPTS: Role[] = ["AGENCY_OWNER", "BACKOFFICE", "AGENT", "CAPTOR", "PHOTOGRAPHER"];
@@ -45,8 +45,10 @@ export function TeamView({ locale, members, listingsByAgent, invites: initialInv
       setBusy(null);
     }
   };
-  const roleSelect = (u: User, className = k.select) => (
-    <select
+  const roleSelect = (u: User, wrapClassName?: string, className?: string) => (
+    <Select
+      compact
+      wrapClassName={wrapClassName}
       value={pendingRole?.id === u.id ? pendingRole.role : u.role}
       disabled={!manager || u.id === user?.id || busy === u.id || (u.role === "AGENCY_OWNER" && !isOwner)}
       onChange={(e) => setPendingRole(e.target.value === u.role ? null : { id: u.id, role: e.target.value as Role })}
@@ -54,7 +56,14 @@ export function TeamView({ locale, members, listingsByAgent, invites: initialInv
       aria-label={tx(locale, `Rol de ${u.name}`, `Role of ${u.name}`)}
     >
       {ROLE_OPTS.filter((r) => isOwner || r !== "AGENCY_OWNER" || u.role === "AGENCY_OWNER").map((r) => <option key={r} value={r}>{tr(r)}</option>)}
-    </select>
+    </Select>
+  );
+  /** Listings + last activity, folded under the name in the table (the columns no longer fit beside the sidebar). */
+  const meta = (u: User) => (
+    <div className={cn("mt-0.5 text-xs", k.muted)}>
+      {listingsByAgent[u.id] != null && <>{plural(listingsByAgent[u.id], locale, ["inmueble", "inmuebles"], ["listing", "listings"])} · </>}
+      <span className="whitespace-nowrap">{tx(locale, "Activo ", "Active ")}<TimeAgo iso={u.lastSeen} locale={locale} /></span>
+    </div>
   );
   const verification = (u: User) => (
     <>
@@ -86,7 +95,8 @@ export function TeamView({ locale, members, listingsByAgent, invites: initialInv
   return (
     <AdminShell locale={locale} area="agency" title={tx(locale, "Equipo", "Team")}>
       {err && <div role="alert" className={cn("mb-4", k.err)}>{err}</div>}
-      <div className="grid gap-6 [&>*]:min-w-0 xl:grid-cols-[1fr_360px]">
+      {/* Invite + pending cards beside the table only from 2xl: below it the table takes the full width (no sideways scroll). */}
+      <div className="grid gap-6 [&>*]:min-w-0 2xl:grid-cols-[1fr_360px]">
         {/* Phones: one card per member (role, verification and activity stay visible); tablets and up keep the table. */}
         <ul className="space-y-3 self-start md:hidden" aria-label={tx(locale, "Miembros del equipo", "Team members")} data-testid="team-cards">
           {members.map((u) => (
@@ -100,7 +110,7 @@ export function TeamView({ locale, members, listingsByAgent, invites: initialInv
               </div>
               <label className="mt-3 flex items-center gap-3 text-sm">
                 <span className={cn("w-16 shrink-0", k.muted)}>{tx(locale, "Rol", "Role")}</span>
-                {roleSelect(u, cn(k.select, "h-10 min-w-0 flex-1"))}
+                {roleSelect(u, "min-w-0 flex-1", "h-10")}
               </label>
               {confirmRole(u) && <div className="mt-3">{confirmRole(u)}</div>}
               {u.role === "AGENT" && <div className="mt-3 flex flex-wrap items-center gap-2 [&>span]:flex-wrap">{verification(u)}</div>}
@@ -118,24 +128,34 @@ export function TeamView({ locale, members, listingsByAgent, invites: initialInv
           ))}
         </ul>
         <ScrollRegion label={tx(locale, "Miembros del equipo", "Team members")} className={cn("hidden self-start md:block", k.card)}>
-          <table className="w-full min-w-[640px] text-sm">
+          {/* Fixed layout: name/email take what is left and truncate (full email in the tooltip); the role select and the
+              verification pill keep their width; listings and last activity live in a meta line under the name. */}
+          <table className="w-full table-fixed text-sm">
+            <colgroup><col /><col className="w-[176px]" /><col className="w-[38%] xl:w-[300px]" /></colgroup>
             <thead className={cn("border-b text-left", k.line, k.th)}>
-              <tr><th className="px-4 py-3">{tx(locale, "Persona", "Member")}</th><th className="px-3 py-3">{tx(locale, "Rol", "Role")}</th><th className="px-3 py-3">{tx(locale, "Verificación", "Verification")}</th><th className="px-3 py-3 text-right">{tx(locale, "Inmuebles", "Listings")}</th><th className="px-3 py-3">{tx(locale, "Última actividad", "Last active")}</th></tr>
+              <tr><th className="px-4 py-3">{tx(locale, "Persona", "Member")}</th><th className="px-3 py-3">{tx(locale, "Rol", "Role")}</th><th className="px-3 py-3">{tx(locale, "Verificación", "Verification")}</th></tr>
             </thead>
             <tbody>
               {members.map((u) => (
                 <Fragment key={u.id}>
                 <tr className={cn("border-t first:border-t-0", k.line)}>
-                  <td className="px-4 py-3"><div className="flex items-center gap-3"><Initials name={u.name} size={38} /><div className="min-w-0"><div className="font-semibold">{u.name}</div><div className={cn("text-xs [overflow-wrap:anywhere]", k.muted)}>{u.email}</div></div></div></td>
-                  <td className="px-3">{roleSelect(u)}</td>
+                  <td className="px-4 py-3">
+                    <div className="flex min-w-0 items-center gap-3">
+                      <Initials name={u.name} size={38} />
+                      <div className="min-w-0 flex-1">
+                        <div className="truncate font-semibold" title={u.name}>{u.name}</div>
+                        <div className={cn("truncate text-xs", k.muted)} title={u.email}>{u.email}</div>
+                        {meta(u)}
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-3">{roleSelect(u, "w-full")}</td>
                   {/* Pill and "Verificar" wrap onto two lines when the column is narrow (tablets) instead of running off the edge. */}
                   <td className="px-3 py-2">{verification(u)}</td>
-                  <td className="px-3 text-right">{listingsByAgent[u.id] ?? "—"}</td>
-                  <td className={cn("px-3 text-xs", k.muted)}><TimeAgo iso={u.lastSeen} locale={locale} /></td>
                 </tr>
                 {pendingRole?.id === u.id && (
                   <tr className={cn("border-t", k.line)}>
-                    <td colSpan={5} className="px-4 py-3">{confirmRole(u)}</td>
+                    <td colSpan={3} className="px-4 py-3">{confirmRole(u)}</td>
                   </tr>
                 )}
                 </Fragment>
@@ -143,7 +163,7 @@ export function TeamView({ locale, members, listingsByAgent, invites: initialInv
             </tbody>
           </table>
         </ScrollRegion>
-        <div className="space-y-4">
+        <div className="grid content-start gap-4 lg:grid-cols-2 2xl:grid-cols-1">
           {manager && (
             <form
               className={cn(k.card, "p-5 md:p-6")}
@@ -165,9 +185,9 @@ export function TeamView({ locale, members, listingsByAgent, invites: initialInv
             >
               <h2 className={k.title}>{tx(locale, "Invitar por email", "Invite by email")}</h2>
               <input className={cn(k.input, "mt-3")} type="email" required placeholder="nombre@agencia.ve" value={email} onChange={(e) => setEmail(e.target.value)} aria-label="Email" />
-              <select className={cn(k.input, "mt-2")} value={role} onChange={(e) => setRole(e.target.value as Role)} aria-label={tx(locale, "Rol", "Role")}>
+              <Select wrapClassName="mt-2" value={role} onChange={(e) => setRole(e.target.value as Role)} aria-label={tx(locale, "Rol", "Role")}>
                 {ROLE_OPTS.filter((r) => r !== "AGENCY_OWNER").map((r) => <option key={r} value={r}>{tr(r)}</option>)}
-              </select>
+              </Select>
               <Button className={cn("mt-3 w-full", k.primary)} disabled={busy === "invite"}>{busy === "invite" ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />} {tx(locale, "Enviar invitación", "Send invite")}</Button>
             </form>
           )}

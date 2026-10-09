@@ -276,6 +276,8 @@ test.describe("Cliente · regresiones de la revisión", () => {
     const table = page.getByRole("table");
     // One distinct "best" mark (a pill), never a second ✓ next to a yes/no value.
     await expect(table.locator("[data-compare-best]").first()).toHaveText("Mejor");
+    // Days on the market is not a merit: never a "Mejor" on that row.
+    await expect(table.getByRole("row").filter({ hasText: "Días publicado" }).locator("[data-compare-best]")).toHaveCount(0);
     const visit = table.getByRole("link", { name: `Pedir visita: «${items[1].title_es}»` });
     await expect(visit).toHaveAttribute("href", `/es/listing/${items[1].slug}#contact`);
     await table.getByRole("link", { name: `Ver ficha: «${items[0].title_es}»` }).click();
@@ -294,7 +296,12 @@ test.describe("Cliente · regresiones de la revisión", () => {
     await expect(pinned).toBeVisible();
     // Compact price ("USD 118k"), never cut ("USD 1…").
     for (const t of await pinned.locator(".np-num").allTextContents()) expect(t).toMatch(/^USD [\d.,]+[kM]?(\/[nm])?$/);
+    // The thumbnail opens the listing; one text pill ("Visita", ≥ 36 px tall) opens its contact card.
     await expect(pinned.getByRole("link", { name: `Ver ficha: «${items[0].title_es}»` })).toHaveAttribute("href", `/es/listing/${items[0].slug}`);
+    const pill = pinned.getByRole("link", { name: `Pedir visita: «${items[0].title_es}»` });
+    await expect(pill).toHaveText("Visita");
+    await expect(pill).toHaveAttribute("href", `/es/listing/${items[0].slug}#contact`);
+    expect((await pill.boundingBox())!.height).toBeGreaterThanOrEqual(36);
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(360);
   });
 
@@ -507,7 +514,7 @@ test.describe("Cliente · regresiones de la revisión", () => {
   });
   test("búsqueda: un texto que no entendemos lo dice y sugiere zonas; «Lech» sugiere Lechería", async ({ page }) => {
     await page.goto("/es/search?type=SALE&q=xyzzy+castillo");
-    await expect(page.getByTestId("not-understood")).toContainText("No entendimos «xyzzy castillo»");
+    await expect(page.getByTestId("not-understood").filter({ visible: true })).toContainText("No entendimos «xyzzy castillo»", { timeout: 15_000 });
     await expect(page.getByText("Mientras tanto, todas las casas")).toBeVisible();
     const box = page.getByRole("combobox", { name: "Cuéntanos con tus palabras qué buscas" });
     await expect(async () => {

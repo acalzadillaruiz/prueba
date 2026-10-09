@@ -20,8 +20,8 @@ const OK = "text-ok dark:text-[#8FCBA6]";
 const WARN = "text-warn dark:text-[#E0A84A]";
 /** Remove ("×") on a photo: its own light/dark colours (not the remapped bg-white, which turned it dark-on-dark). */
 const REMOVE_BTN = "absolute flex items-center justify-center rounded-full bg-[#F1EBE3] text-[#1E1A18] shadow ring-1 ring-black/10 after:absolute after:content-[''] dark:bg-[#15120F]/85 dark:text-[#F1EBE3] dark:ring-[#F1EBE3]/45";
-/** Pinned-row icon actions: 28 px (three homes fit in 360 px: price above, thumbnail + 2 actions below), hit area grown by ::after. */
-const MINI_BTN = "relative flex h-7 w-7 shrink-0 items-center justify-center rounded-full after:absolute after:-inset-2 after:content-['']";
+/** Pinned row (phones): the thumbnail is the "Ver ficha" link, then one 36 px text pill ("Visita" / "Fechas") filling the rest of the column. */
+const PIN_PILL = "flex h-9 min-w-0 flex-1 items-center justify-center whitespace-nowrap rounded-full px-1.5 font-display text-[13px] font-semibold leading-none";
 /** Phone actions row: full column width, the label may wrap to 2 lines in a third of 360 px. */
 const STACK_BTN = "flex min-h-11 items-center justify-center rounded-full px-2 py-1.5 text-center font-display text-[13px] font-semibold leading-tight";
 /** Backup power ranked for the "best" mark: full > partial > none; unknown isn't ranked. */
@@ -34,6 +34,8 @@ const listingUrl = (l: Listing, locale: Locale) => `/${locale}/listing/${l.slug}
 /** The listing page's contact card (ContactPanel lives in <aside id="contact">). */
 const contactUrl = (l: Listing, locale: Locale) => `${listingUrl(l, locale)}#contact`;
 /** Vacation rentals are booked by dates, not visited (the contact card says "Disponibilidad"). */
+/** One-word pill for the pinned row (a third of 360 px); its accessible name stays the full "Pedir visita: «…»" (the visible word is part of it). */
+const pillText = (l: Listing, locale: Locale) => (l.listingType === "SHORT_RENT" ? tx(locale, "Fechas", "Dates") : tx(locale, "Visita", "Viewing"));
 const visitText = (l: Listing, locale: Locale) => (l.listingType === "SHORT_RENT" ? tx(locale, "Consultar fechas", "Check dates") : tx(locale, "Pedir visita", "Request a viewing"));
 
 type Row = {
@@ -125,7 +127,8 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
     { label: tx(locale, "Vista al mar", "Sea view"), render: (l) => yes(l.viewSea, locale), show: (l) => l.viewSea },
     ...(["pool", "security", "gym", "elevator", "terrace"] as const).map((a): Row => ({ label: lbl(AMENITY_LABEL[a], locale), render: (l) => yes(l.amenities.includes(a), locale) })),
     { label: tx(locale, "Agencia", "Agency"), render: (l) => l.agency?.name ?? tx(locale, "Dueño directo", "By owner") },
-    { label: tx(locale, "Días publicado", "Days listed"), render: (l) => l.daysOnMarket, val: (l) => l.daysOnMarket, best: "min" },
+    // Not a merit (a fresh listing isn't a better home): no "Mejor" pill on this row.
+    { label: tx(locale, "Días publicado", "Days listed"), render: (l) => l.daysOnMarket },
   ];
   const rows = allRows.filter((r) => !r.show || cmp.some(r.show));
   // Per row: which column wins (green), only when the values differ.
@@ -212,7 +215,7 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
                 );
               })}
             </div>
-            {/* The slim pinned row: per home a compact price, a thumbnail and two icon actions (listing, visit). Price and
+            {/* The slim pinned row: per home a compact price, then its thumbnail (opens the listing) and a "Visita" pill. Price and
                 thumbnail repeat the header above (hidden from assistive tech); the actions are real links, only reachable
                 while the row is shown (`invisible` otherwise). */}
             <div ref={pin} className="sticky top-[calc(env(safe-area-inset-top)+var(--np-header-offset,80px)_-_8px)] z-[2] h-0 transition-[top] duration-300 ease-[cubic-bezier(.2,.7,.2,1)]">
@@ -230,14 +233,11 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
                     <div key={l.id} className="min-w-0">
                       <div aria-hidden className="np-num truncate whitespace-nowrap text-[13px] leading-tight">{shortPrice(l, locale)}</div>
                       <div className="mt-1 flex items-center gap-1">
-                        <div aria-hidden className="relative h-7 w-7 shrink-0 overflow-hidden rounded-md bg-arena">
-                          <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} sizes="28px" className="h-full w-full" />
-                        </div>
-                        <Link href={listingUrl(l, locale)} aria-label={fichaName(title)} title={tx(locale, "Ver ficha", "View listing")} className={cn(MINI_BTN, "border border-navy/40 text-navy dark:border-ivory/40 dark:text-ivory")}>
-                          <FileText size={14} aria-hidden />
+                        <Link href={listingUrl(l, locale)} aria-label={fichaName(title)} title={tx(locale, "Ver ficha", "View listing")} className="relative h-9 w-9 shrink-0 overflow-hidden rounded-md bg-arena ring-1 ring-navy/20 dark:ring-ivory/25">
+                          <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} sizes="36px" className="h-full w-full" />
                         </Link>
-                        <Link href={contactUrl(l, locale)} aria-label={visitName(l, title)} title={visitText(l, locale)} className={cn(MINI_BTN, "np-btn-navy bg-navy text-ivory")}>
-                          <CalendarCheck size={14} aria-hidden />
+                        <Link href={contactUrl(l, locale)} aria-label={visitName(l, title)} className={cn(PIN_PILL, "np-btn-navy bg-navy text-ivory")}>
+                          {pillText(l, locale)}
                         </Link>
                       </div>
                     </div>

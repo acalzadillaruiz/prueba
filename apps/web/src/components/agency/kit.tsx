@@ -1,4 +1,5 @@
-import type { ReactNode } from "react";
+import type { ReactNode, SelectHTMLAttributes } from "react";
+import { ChevronDown } from "lucide-react";
 import type { ListingStatus, Locale } from "@/types/domain";
 import { Monogram, RoofMark } from "@/components/brand/Logo";
 import { LISTING_PHASE, listingPhase, phaseHint, phaseLabel } from "@/lib/lifecycle";
@@ -175,5 +176,29 @@ export function PageHead({ eyebrow, title, sub, action, className }: { eyebrow?:
       </div>
       {action}
     </div>
+  );
+}
+
+/**
+ * Native select in the cockpit skin (palette A): no OS chrome (appearance-none), rounded, a quiet custom chevron and a
+ * dark twin (color-scheme dark so the option list opens dark too). `compact` = the 36 px in-table size (k.select);
+ * `wrapClassName` sizes the wrapper (e.g. "flex-1 min-w-0", "w-full"); `className` reaches the <select>.
+ */
+export function Select({ compact, className, wrapClassName, children, ...props }: SelectHTMLAttributes<HTMLSelectElement> & { compact?: boolean; wrapClassName?: string }) {
+  return (
+    <span className={cn("relative inline-flex min-w-0 align-middle", compact ? "" : "w-full", wrapClassName)}>
+      <select
+        {...props}
+        className={cn(
+          compact ? k.select : k.input,
+          "w-full min-w-0 cursor-pointer appearance-none truncate hover:border-navy/60 disabled:cursor-not-allowed dark:[color-scheme:dark] dark:hover:border-white/30",
+          compact ? "pr-8" : "pr-10",
+          className,
+        )}
+      >
+        {children}
+      </select>
+      <ChevronDown aria-hidden size={compact ? 14 : 16} strokeWidth={1.8} className={cn("pointer-events-none absolute top-1/2 -translate-y-1/2 text-muted dark:text-mist", compact ? "right-2.5" : "right-3.5")} />
+    </span>
   );
 }

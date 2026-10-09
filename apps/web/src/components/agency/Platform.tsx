@@ -10,7 +10,7 @@ import type { Agency, Listing, Locale, User } from "@/types/domain";
 import { AdminShell } from "@/components/layout/AdminShell";
 import { PropertyArt } from "@/components/art/PropertyArt";
 import { Button, Field } from "@/components/ui";
-import { Chip, Count, Initials, Kpi, Panel, Pill, StatusPill, k, kpiGrid5 } from "./kit";
+import { Chip, Count, Initials, Kpi, Panel, Pill, Select, StatusPill, k, kpiGrid5 } from "./kit";
 import { ScrollRegion } from "./ScrollRegion";
 import { BarChart } from "./charts";
 import { useApp } from "@/lib/store";
@@ -166,27 +166,27 @@ export function PlatformAgencies({ locale, agencies }: { locale: Locale; agencie
               <tr className={cn("border-t first:border-t-0", k.line)}>
                 <td className="px-4 py-3"><div className="flex items-center gap-3"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl font-display text-xs font-bold text-navy" style={{ background: a.color }}>{a.initials}</span><div><div className="font-semibold">{a.name}</div><div className={cn("text-xs", k.muted)}>{a.city} · {tx(locale, "desde", "since")} {dateTime(a.createdAt, locale, { month: "short", year: "numeric" })}</div></div></div></td>
                 <td className="px-3">
-                  <select
+                  <Select
                     value={pending?.id === a.id && pending.field === "status" ? pending.value : a.status}
                     disabled={busy === a.id}
                     onChange={(e) => setPending(e.target.value === a.status ? null : { id: a.id, field: "status", value: e.target.value })}
-                    className={k.select}
+                    compact
                     aria-label={tx(locale, `Estado de ${a.name}`, `Status of ${a.name}`)}
                   >
                     {Object.entries(STATUS).map(([v, [es, en]]) => <option key={v} value={v}>{tx(locale, es, en)}</option>)}
-                  </select>
+                  </Select>
                 </td>
                 <td className="px-3">{a.verified ? <Pill tone="ok"><ShieldCheck size={12} /> {tx(locale, "Verificada", "Verified")}</Pill> : <Button size="sm" variant="outline" className={k.outline} disabled={busy === a.id} onClick={() => run(a.id, () => api(`platform/agencies/${a.id}`, { method: "PATCH", json: { verified: true } }))}><Eye size={13} /> {tx(locale, "Verificar", "Verify")}</Button>}</td>
                 <td className="px-3">
-                  <select
+                  <Select
                     value={pending?.id === a.id && pending.field === "plan" ? pending.value : a.plan}
                     disabled={busy === a.id}
                     onChange={(e) => setPending(e.target.value === a.plan ? null : { id: a.id, field: "plan", value: e.target.value })}
-                    className={k.select}
+                    compact
                     aria-label={tx(locale, `Plan de ${a.name}`, `Plan of ${a.name}`)}
                   >
                     {Object.entries(PLAN).map(([v, [es, en]]) => <option key={v} value={v}>{tx(locale, es, en)}</option>)}
-                  </select>
+                  </Select>
                 </td>
                 <td className="px-3 text-right">{a.listings}</td>
                 <td className="px-3 text-right">{a.members}</td>
@@ -266,15 +266,15 @@ export function PlatformUsers({ locale, users, providers }: { locale: Locale; us
                   {u.id === me?.id ? (
                     <Chip className="py-0.5 text-[11px]">{tr(u.role)}</Chip>
                   ) : (
-                    <select
+                    <Select
                       value={u.role}
                       disabled={busy === `role-${u.id}`}
                       onChange={(e) => changeRole(u, e.target.value as Role)}
-                      className={k.select}
+                      compact
                       aria-label={tx(locale, `Rol de ${u.name}`, `Role of ${u.name}`)}
                     >
                       {[...new Set([u.role, ...(u.agencyId ? AGENCY_ROLES : PERSONAL_ROLES)])].map((r) => <option key={r} value={r}>{tr(r)}</option>)}
-                    </select>
+                    </Select>
                   )}
                 </td>
                 <td className={cn("px-3", k.muted)}>{u.agencyName ?? "—"}</td>
@@ -382,13 +382,17 @@ export function PlatformModeration({ locale, reports, listings }: { locale: Loca
             const down = !!l.takedownReason;
             return (
               <div key={l.id} data-listing={l.id} className={cn("border-t first:border-0", k.line)}>
-              <div className={cn("flex flex-wrap items-center gap-3 px-5 py-3", down && "bg-[#B3261E0A] dark:bg-[#B3261E1F]")}>
-                <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className={cn("h-12 w-16 shrink-0 rounded-lg", down && "opacity-40 grayscale")} />
-                <div className="min-w-0 flex-1 basis-48">
+              {/* Same place for the actions on every row and width: a second line under the title (status left, buttons
+                  right), never inline on some rows and wrapped below on others. */}
+              <div className={cn("grid grid-cols-[64px_minmax(0,1fr)] items-center gap-x-3 gap-y-2 px-5 py-3", down && "bg-[#B3261E0A] dark:bg-[#B3261E1F]")}>
+                <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className={cn("row-span-2 h-12 w-16 shrink-0 self-start rounded-lg", down && "opacity-40 grayscale")} />
+                <div className="min-w-0">
                   <div className={cn("truncate font-semibold", down && cn("line-through", k.muted))}>{tx(locale, l.title_es, l.title_en)}</div>
                   <div className={cn("text-xs", k.muted)}>{l.agency?.name ?? tx(locale, "Particular", "Private owner")} · {l.zone} · {money(l.priceAmount, locale)}</div>
                 </div>
+                <div className="flex min-h-9 flex-wrap items-center gap-2">
                 <StatusPill status={l.status} review={l.review} locale={locale} />
+                <span className="ml-auto flex flex-wrap items-center justify-end gap-2">
                 {l.review === "PENDING" && !down && (
                   <Button size="sm" variant="outline" className={k.outline} disabled={busy === l.id} onClick={() => void run(l.id, () => api(`listings/${l.id}`, { method: "PATCH", json: { review: "APPROVED" } }))}>
                     {tx(locale, "Aprobar", "Approve")}
@@ -411,6 +415,8 @@ export function PlatformModeration({ locale, reports, listings }: { locale: Loca
                     {busy === l.id ? <Loader2 size={13} className="animate-spin" /> : down ? <RotateCcw size={13} /> : <Ban size={13} />} {down ? tx(locale, "Restaurar", "Restore") : tx(locale, "Apagar", "Take down")}
                   </Button>
                 )}
+                </span>
+                </div>
               </div>
               {confirming === l.id && (
                 <form
@@ -545,7 +551,7 @@ export function PlatformAudit({
       <div className="mb-4 flex flex-wrap items-end gap-3">
         <div className="w-72 max-w-full">
           <Field label={tx(locale, "Acción", "Action")}>
-            <select className={k.input} value={filters.action ?? ""} onChange={(e) => setFilter("action", e.target.value)}>
+            <Select value={filters.action ?? ""} onChange={(e) => setFilter("action", e.target.value)}>
               <option value="">{tx(locale, "Todas", "All")}</option>
               {options.prefixes.map((p) => (
                 <optgroup key={p} label={famLabel(p)}>
@@ -553,16 +559,16 @@ export function PlatformAudit({
                   {options.actions.filter((a) => a.startsWith(`${p}.`)).map((a) => <option key={a} value={a}>{auditLabel(a, locale)}</option>)}
                 </optgroup>
               ))}
-            </select>
+            </Select>
           </Field>
         </div>
         <div className="w-64 max-w-full">
           <Field label={tx(locale, "Autor", "Actor")}>
-            <select className={k.input} value={filters.actor ?? ""} onChange={(e) => setFilter("actor", e.target.value)}>
+            <Select value={filters.actor ?? ""} onChange={(e) => setFilter("actor", e.target.value)}>
               <option value="">{tx(locale, "Todos", "Everyone")}</option>
               {options.hasSystem && <option value="system">{system}</option>}
               {options.actors.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
-            </select>
+            </Select>
           </Field>
         </div>
         {(filters.action || filters.actor) && <Link href={base} className={cn("pb-2.5 text-sm", k.link)}>{tx(locale, "Quitar filtros", "Clear filters")}</Link>}

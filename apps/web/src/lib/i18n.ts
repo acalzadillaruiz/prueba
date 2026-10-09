@@ -21,21 +21,20 @@ const clean = (s: string) => s.replace(/[\u202f\u00a0]/g, " ");
 export function money(amount: number, l: Locale, currency = "USD") {
   return clean(new Intl.NumberFormat(l === "es" ? "es-VE" : "en-US", { style: "currency", currency, maximumFractionDigits: 0 }).format(amount));
 }
-export function compactMoney(amount: number, _l?: Locale) {
-  if (amount >= 1_000_000) return `$${(amount / 1_000_000).toFixed(amount >= 10_000_000 ? 0 : 2).replace(/\.?0+$/, "")}M`;
-  if (amount >= 1000) return `$${Math.round(amount / 1000)}k`;
-  return `$${amount}`;
-}
 /**
- * Short price in the same style as money() for that locale, for chips, pills and other tight spots:
- * "USD 150k" / "USD 1,5M" (es, like "USD 150.000"), "$150k" / "$1.5M" (en, like "$150,000"); under 10 000 the
- * exact amount ("USD 1.800", "$1,800").
- * compactMoney() stays "$…" in both (map pins).
+ * Short price in the same style as money() for that locale — the one short format everywhere (map pins, chips, compare
+ * pinned row, comparables table, sticky contact bar, alert names and email subjects):
+ * "USD 150k" / "USD 1,2M" (es, like "USD 150.000"), "$150k" / "$1.2M" (en, like "$150,000"). Millions keep one decimal
+ * (none from 10M), never a space before the M. Under 10 000 the exact amount ("USD 1.800", "$1,800").
  */
 export function shortMoney(amount: number, l: Locale) {
   if (amount < 10_000) return money(amount, l); // rents: "USD 1.800", not a rounded "USD 2k"
-  const c = compactMoney(amount);
-  return l === "es" ? c.replace("$", "USD ").replace(".", ",") : c;
+  const es = l === "es";
+  const pre = es ? "USD " : "$";
+  const k = Math.round(amount / 1000);
+  if (k < 1000) return `${pre}${k}k`;
+  const m = new Intl.NumberFormat(es ? "es-VE" : "en-US", { maximumFractionDigits: amount >= 10_000_000 ? 0 : 1 }).format(amount / 1_000_000);
+  return `${pre}${m}M`;
 }
 export function num(n: number, l: Locale) {
   return clean(new Intl.NumberFormat(l === "es" ? "es-VE" : "en-US").format(n));

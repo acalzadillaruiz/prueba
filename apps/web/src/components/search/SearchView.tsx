@@ -17,6 +17,7 @@ import { cn } from "@/lib/cn";
 import { useApp } from "@/lib/store";
 import { api } from "@/lib/api";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { autoMapRegion, onRegionMap, type MapRegion } from "./mapRegion";
 import { FILTER_KEYS, leftoverWords, queryToParams } from "./queryParams";
 import { URL_CHANGE_EVENT } from "@/components/layout/PublicHeader";
 import { essentialChips, essentialsFromParams } from "@/lib/essentials";
@@ -378,10 +379,12 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
   // the new filters is in.
   const [mapFilters, setMapFilters] = useState(filtersKey);
   if (!query.isPlaceholderData && mapFilters !== filtersKey) setMapFilters(filtersKey);
-  const [regionPick, setRegionPick] = useState<"caracas" | "venezuela" | null>(null);
-  const autoRegion = hasResults && results.every((l) => l.city !== "Caracas") ? "venezuela" : "caracas";
-  const region = regionPick ?? autoRegion;
-  const mapListings = useMemo(() => (region === "caracas" ? results.filter((l) => l.city === "Caracas") : results), [region, results]);
+  // The visitor's own pick (Caracas / Venezuela) always wins; otherwise the map follows where most results are.
+  const [regionPick, setRegionPick] = useState<MapRegion | null>(null);
+  const region = regionPick ?? autoMapRegion(results);
+  const mapListings = useMemo(() => onRegionMap(results, region), [region, results]);
+  // Some results fall outside the Caracas map: say so ("1 de 8 en el mapa") with one tap to the whole country.
+  const offMap = results.length - mapListings.length;
   // Fit the view to the result pins (Lechería zooms on Lechería, not on the whole country).
   const fit = useMemo(() => {
     if (mapListings.length === 0) return { focus: undefined, scale: region === "caracas" ? 1.7 : 1 };
@@ -719,6 +722,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
             fitMaxScale={MAP_FIT[region].max}
             toolbar={
               // Which map: in the tool row (top-left), out of the way of the pins and the docked bar.
+              <>
               <div role="group" aria-label={tx(locale, "Mapa de", "Map of")} className="flex gap-0.5 rounded-full border border-[#E3D7C2] bg-[#ffffff] p-1 font-display text-[13px] text-[#1E1A18] shadow-np sm:text-sm">
                 {(["caracas", "venezuela"] as const).map((r) => (
                   <button key={r} type="button" onClick={() => setRegionPick(r)} aria-pressed={region === r} className={cn("min-h-9 rounded-full border-2 px-3 sm:px-3.5", region === r ? "np-sel font-semibold" : "border-transparent text-[#1E1A18]/70")}>
@@ -726,6 +730,19 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
                   </button>
                 ))}
               </div>
+              {offMap > 0 && (
+                <button
+                  type="button"
+                  data-map-offregion
+                  onClick={() => setRegionPick("venezuela")}
+                  className="flex min-h-11 items-center gap-1 whitespace-nowrap rounded-full border border-[#E3D7C2] bg-[#ffffff] px-3.5 font-display text-[13px] text-[#1E1A18] shadow-np sm:text-sm"
+                >
+                  <span className="[font-feature-settings:'lnum']">{tx(locale, `${mapListings.length} de ${results.length} en el mapa`, `${mapListings.length} of ${results.length} on the map`)}</span>
+                  <span aria-hidden>·</span>
+                  <span className="font-semibold underline underline-offset-2">{tx(locale, "Ver Venezuela", "Show Venezuela")}</span>
+                </button>
+              )}
+              </>
             }
           />
         </div>

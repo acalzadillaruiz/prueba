@@ -10,7 +10,7 @@ import { inputCls } from "@/components/ui";
  * digits count: anything else typed or pasted is dropped, and the caret stays after the same digit it was after (the
  * separators that appear or vanish never push it around).
  */
-export function PriceInput({ locale, value, invalid, onBlur, onChange, className = inputCls, required, id }: { locale: Locale; value: number; invalid?: boolean; onBlur?: () => void; onChange: (n: number) => void; className?: string; required?: boolean; id?: string }) {
+export function PriceInput({ locale, value, invalid, onBlur, onChange, className = inputCls, required, id, placeholder }: { locale: Locale; value: number; placeholder?: string; invalid?: boolean; onBlur?: () => void; onChange: (n: number) => void; className?: string; required?: boolean; id?: string }) {
   const ref = useRef<HTMLInputElement>(null);
   /** Digits left of the caret after the last edit; applied once the formatted value has rendered. */
   const caret = useRef<number | null>(null);
@@ -33,6 +33,7 @@ export function PriceInput({ locale, value, invalid, onBlur, onChange, className
       inputMode="numeric"
       autoComplete="off"
       required={required}
+      placeholder={placeholder}
       value={shown}
       aria-invalid={invalid}
       onBlur={onBlur}

@@ -12,7 +12,7 @@ import { AdminShell } from "@/components/layout/AdminShell";
 import { listingPhoto } from "@/lib/photos";
 import { PropertyArt } from "@/components/art/PropertyArt";
 import { Button } from "@/components/ui";
-import { Chip, Count, Empty, Initials, Pill, k, tab } from "./kit";
+import { Chip, Count, Empty, Initials, Pill, Select, k, tab } from "./kit";
 import { dateTime, money, priceSuffix, tx } from "@/lib/i18n";
 import { TimeAgo } from "@/components/owner/TimeAgo";
 import { cn } from "@/lib/cn";
@@ -476,22 +476,22 @@ export function LeadsInbox({ locale, initial, listings, agents, assignable = [],
                   <label className={cn("flex items-center gap-2 text-xs", k.muted)}>
                     <UserRoundCog size={15} />
                     <span className="sr-only">{tx(locale, "Agente asignado", "Assigned agent")}</span>
-                    <select
+                    <Select
                       value={sel.agentId || ""}
                       disabled={busy === "assign"}
                       aria-label={tx(locale, "Agente asignado", "Assigned agent")}
                       onChange={(e) => run("assign", () => api(`leads/${sel.id}`, { method: "PATCH", json: { agentId: e.target.value } }))}
-                      className={k.select}
+                      compact
                     >
                       {!sel.agentId && <option value="">{tx(locale, "Sin asignar", "Unassigned")}</option>}
                       {sel.agentId && !detail.data.agents.some((a) => a.id === sel.agentId) && <option value={sel.agentId}>{agents[sel.agentId] ?? "—"}</option>}
                       {detail.data.agents.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
-                    </select>
+                    </Select>
                   </label>
                 )}
-                <select value={sel.stage} aria-label={tx(locale, "Etapa", "Stage")} onChange={(e) => run("stage", () => api(`leads/${sel.id}`, { method: "PATCH", json: { stage: e.target.value } }))} className={k.select}>
+                <Select value={sel.stage} aria-label={tx(locale, "Etapa", "Stage")} onChange={(e) => run("stage", () => api(`leads/${sel.id}`, { method: "PATCH", json: { stage: e.target.value } }))} compact>
                   {STAGES.map(([k, es, en]) => <option key={k} value={k}>{tx(locale, es, en)}</option>)}
-                </select>
+                </Select>
               </div>
             </div>
 
@@ -614,22 +614,22 @@ export function LeadsInbox({ locale, initial, listings, agents, assignable = [],
           <div className={cn(k.card, "flex flex-wrap items-center gap-2 p-3 shadow-[0_12px_32px_rgba(30,26,24,.18)] ring-1 ring-[#E6DDD2] md:gap-3 md:px-4")}>
             <span className="text-sm font-semibold">{tx(locale, `${chosen.length} ${chosen.length === 1 ? "lead seleccionado" : "leads seleccionados"}`, `${chosen.length} ${chosen.length === 1 ? "lead" : "leads"} selected`)}</span>
             {manager && assignable.length > 0 && (
-              <select value="" disabled={bulk?.running} onChange={(e) => {
+              <Select value="" disabled={bulk?.running} onChange={(e) => {
                 const to = e.target.value;
                 const name = assignable.find((a) => a.id === to)?.name ?? "";
                 if (to) runBulk(tx(locale, `Asignar a ${name}`, `Assign to ${name}`), (l) => (l.agentId === to ? null : patchLead(l.id, { agentId: to })));
-              }} className={cn(k.select, "h-10")} aria-label={tx(locale, "Asignar los leads seleccionados a…", "Assign selected leads to…")}>
+              }} compact className="h-10" aria-label={tx(locale, "Asignar los leads seleccionados a…", "Assign selected leads to…")}>
                 <option value="" disabled>{tx(locale, "Asignar a…", "Assign to…")}</option>
                 {assignable.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
-              </select>
+              </Select>
             )}
-            <select value="" disabled={bulk?.running} onChange={(e) => {
+            <Select value="" disabled={bulk?.running} onChange={(e) => {
               const to = e.target.value as LeadStage;
               if (to) runBulk(tx(locale, `Cambiar a ${stageName(to)}`, `Move to ${stageName(to)}`), (l) => (l.stage === to ? null : patchLead(l.id, { stage: to })));
-            }} className={cn(k.select, "h-10")} aria-label={tx(locale, "Cambiar el estado de los seleccionados a…", "Change status of selected to…")}>
+            }} compact className="h-10" aria-label={tx(locale, "Cambiar el estado de los seleccionados a…", "Change status of selected to…")}>
               <option value="" disabled>{tx(locale, "Cambiar estado a…", "Change status to…")}</option>
               {STAGES.map(([key, es, en]) => <option key={key} value={key}>{tx(locale, es, en)}</option>)}
-            </select>
+            </Select>
             {!archiveAsk ? (
               <Button size="sm" variant="outline" className={cn(k.outline, "min-h-10")} disabled={bulk?.running} onClick={() => setArchiveAsk(true)} title={tx(locale, "Los marca como perdidos y salen de la bandeja activa", "Marks them as lost so they leave the active inbox")}>
                 <Archive size={14} /> {tx(locale, "Archivar", "Archive")}

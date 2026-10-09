@@ -16,6 +16,8 @@ import { ScrollRegion } from "./ScrollRegion";
 export type CalEvent = { id: string; start: string; title: string; sub: string; kind: "tour" | "req" | "done" | "media" | "cancelled"; agentName: string; tourId?: string; /** Listing title (localized) and its back-office link, when known. */ listing?: string; listingHref?: string };
 
 const TZ = -4; // America/Caracas
+/** Week grid: sticky hour column + 7 day columns of ≥ 88 px (672 px fits the 680 px content box beside the lg sidebar). */
+const HOUR_COL = 56;
 
 /** Event subtitles: a solid muted tone per event surface (opacity fell to ~4:1); every pair is ≥ 4.5:1 in both themes. */
 const SUB_CLS: Record<CalEvent["kind"], string> = {
@@ -25,6 +27,9 @@ const SUB_CLS: Record<CalEvent["kind"], string> = {
   cancelled: "",
   media: "text-[#4A4038] dark:text-[#D9CFC2]",
 };
+
+/** Opaque surface behind the sticky hour column (day columns scroll under it). */
+const stickyBg = "bg-white dark:bg-navy-card";
 
 export function CalendarView({ locale, weekStart, week, events, slots, canEditSlots }: { locale: Locale; weekStart: string; week: number; events: CalEvent[]; slots: { day: number; hours: number[] }[]; canEditSlots: boolean }) {
   const router = useRouter();
@@ -45,9 +50,15 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
     const box = scroller.current;
     const col = todayCol.current;
     if (!box || !col || box.scrollWidth <= box.clientWidth) return;
+    // Centre today in the part of the box the sticky hour column leaves free (the hours always stay in view).
     const left = col.getBoundingClientRect().left - box.getBoundingClientRect().left + box.scrollLeft;
-    box.scrollLeft = Math.max(0, left - (box.clientWidth - col.offsetWidth) / 2);
+    box.scrollLeft = Math.max(0, left - HOUR_COL - (box.clientWidth - HOUR_COL - col.offsetWidth) / 2);
   }, [weekStart]);
+  // Below 2xl the detail card sits under the grid: bring it into view when an event is picked.
+  const selBox = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (sel) selBox.current?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }, [sel]);
   // Visible hours: 08–20 by default, stretched to include any event outside that range (nothing is ever hidden).
   const inWeek = events.filter((e) => {
     const di = dayIdx(Date.parse(e.start));
@@ -112,7 +123,7 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
   return (
     <AdminShell locale={locale} area="agency" title={tx(locale, "Calendario", "Calendar")}>
       {error && <div className={cn("mb-3", k.err)} role="alert">{error}</div>}
-      <div className="grid gap-6 [&>*]:min-w-0 xl:grid-cols-[1fr_300px]">
+      <div className="grid gap-6 [&>*]:min-w-0 2xl:grid-cols-[1fr_300px]">
         {/* Phones: agenda for one day with a horizontal day picker (the week grid needs ~760 px). */}
         <section className={cn("md:hidden", k.card)} aria-label={tx(locale, "Agenda del día", "Day agenda")}>
           <div className={cn("flex flex-wrap items-center gap-2.5 border-b px-4 py-3.5", k.line)}>{weekNav}</div>
@@ -171,19 +182,21 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
             )}
           </div>
         </section>
-        <ScrollRegion scrollRef={scroller} label={tx(locale, "Semana", "Week")} className={cn("hidden md:block", k.card)}>
-          <div className="min-w-[760px]">
-            <div className={cn("flex flex-wrap items-center gap-3 border-b px-5 py-4", k.line)}>
-              {weekNav}
-              <div className={cn("ml-auto flex gap-3 text-xs", k.muted)}>
+        <section className={cn("hidden md:block", k.card)} aria-label={tx(locale, "Vista semanal", "Week view")}>
+          {/* Title, week arrows and legend stay outside the sideways scroll: never cut, never scrolled away. */}
+          <div className={cn("flex flex-wrap items-center gap-x-3 gap-y-2 border-b px-5 py-4", k.line)}>
+            {weekNav}
+            <div className={cn("ml-auto flex flex-wrap gap-x-3 gap-y-1 text-xs", k.muted)}>
                 <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-navy dark:bg-ivory" /> {tx(locale, "Visita", "Tour")}</span>
                 <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm border border-dashed border-navy/60 bg-[#E6DDD2] dark:border-ivory/60 dark:bg-white/10" /> {tx(locale, "Solicitada", "Requested")}</span>
                 <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-egeo" /> {tx(locale, "Fotos", "Media")}</span>
                 <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-[#F3EEE4] ring-1 ring-[#E4DCCD] dark:bg-white/[.06] dark:ring-white/10" /> {tx(locale, "Slot libre", "Open slot")}</span>
-              </div>
             </div>
+          </div>
+          <ScrollRegion scrollRef={scroller} label={tx(locale, "Semana", "Week")} className="rounded-b-[18px]">
+          <div className="min-w-[672px]">
             <div className="grid grid-cols-[56px_repeat(7,1fr)]">
-              <div />
+              <div className={cn("sticky left-0 z-10", stickyBg)} />
               {days.map((d, i) => (
                 <div key={i} ref={i === todayIdx ? todayCol : undefined} className={cn("border-l py-2.5 text-center font-display text-[13px] font-medium first-letter:uppercase", k.line, i === todayIdx ? "bg-[#E6DDD2] font-semibold text-navy dark:bg-white/10 dark:text-ivory" : k.muted)}>{fmt(d, { weekday: "short", day: "numeric" })}</div>
               ))}
@@ -192,7 +205,7 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
               <div className="grid grid-cols-[56px_repeat(7,1fr)]">
                 {HOURS.map((h) => (
                   <div key={h} className="contents">
-                    <div className={cn("h-14 border-t pr-2 pt-1 text-right text-[11px]", k.line, k.muted)}>{String(h).padStart(2, "0")}:00</div>
+                    <div className={cn("sticky left-0 z-10 h-14 border-t pr-2 pt-1 text-right text-[11px]", stickyBg, k.line, k.muted)}>{String(h).padStart(2, "0")}:00</div>
                     {days.map((_, i) => {
                       const open = !!mySlots.find((x) => x.day === weekday(i))?.hours.includes(h);
                       return <div key={i} className={cn("h-14 border-l border-t", k.line, open && "bg-[#F6F2EA] dark:bg-white/[.04]")} />;
@@ -229,10 +242,12 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
               </div>
             </div>
           </div>
-        </ScrollRegion>
-        <div className="space-y-4">
+          </ScrollRegion>
+        </section>
+        {/* Side column from 2xl; below it the cards drop under the grid (the week needs the full width up to ~1536 px). */}
+        <div className="grid content-start gap-4 md:grid-cols-2 2xl:grid-cols-1">
           {sel && (
-            <div className={cn("np-in p-5 shadow-[inset_0_0_0_2px_#1E1A18] dark:shadow-[inset_0_0_0_2px_#C9A574]", k.card)}>
+            <div ref={selBox} className={cn("np-in scroll-mt-4 p-5 shadow-[inset_0_0_0_2px_#1E1A18] dark:shadow-[inset_0_0_0_2px_#C9A574]", k.card)}>
               <div className="flex items-start justify-between">
                 <div className={k.titleSm}>{sel.title}</div>
                 <button onClick={() => setSel(null)} className={cn("rounded-full p-1", k.hover)} aria-label={tx(locale, "Cerrar", "Close")}><X size={16} /></button>
@@ -243,14 +258,21 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
               {sel.tourId && sel.kind !== "done" && sel.kind !== "cancelled" && <TourActions key={sel.id} locale={locale} ev={sel} onSet={setTour} className="mt-3" />}
             </div>
           )}
+          <div className={cn(k.card, "p-5 text-sm", !sel && "md:col-span-2 2xl:col-span-1")}>
+            <div className={k.titleSm}>{tx(locale, "Esta semana", "This week")}</div>
+            <div className={cn("mt-2", k.muted)}>{(() => {
+              const t = inWeek.filter((e) => e.kind === "tour" || e.kind === "req").length;
+              const m = inWeek.filter((e) => e.kind === "media").length;
+              return `${plural(t, locale, ["visita", "visitas"], ["tour", "tours"])} · ${plural(m, locale, ["sesión de fotos", "sesiones de fotos"], ["photo shoot", "photo shoots"])}`;
+            })()}</div>
           {canEditSlots && (
-            <div className={cn(k.card, "p-5")}>
+            <div className={cn(k.card, "p-5 md:col-span-2 2xl:col-span-1")}>
               <div className="flex items-center justify-between">
                 <div className={k.titleSm}>{tx(locale, "Mis slots de visita", "My tour slots")}</div>
                 {saving && <Loader2 size={14} className={cn("animate-spin", k.muted)} />}
               </div>
               <p className={cn("mt-1 text-xs", k.muted)}>{tx(locale, "Los compradores solo ven estos horarios en la ficha.", "Buyers only see these slots on the listing.")}</p>
-              <div className="mt-3 space-y-3">
+              <div className="mt-3 grid gap-x-6 gap-y-3 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-1">
                 {mySlots.map((s) => (
                   <div key={s.day}>
                     <div className="mb-1 text-sm font-semibold">{[tx(locale, "Lunes", "Monday"), tx(locale, "Martes", "Tuesday"), tx(locale, "Miércoles", "Wednesday"), tx(locale, "Jueves", "Thursday"), tx(locale, "Viernes", "Friday"), tx(locale, "Sábado", "Saturday"), tx(locale, "Domingo", "Sunday")][s.day]}</div>
@@ -269,13 +291,6 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
               </div>
             </div>
           )}
-          <div className={cn(k.card, "p-5 text-sm")}>
-            <div className={k.titleSm}>{tx(locale, "Esta semana", "This week")}</div>
-            <div className={cn("mt-2", k.muted)}>{(() => {
-              const t = inWeek.filter((e) => e.kind === "tour" || e.kind === "req").length;
-              const m = inWeek.filter((e) => e.kind === "media").length;
-              return `${plural(t, locale, ["visita", "visitas"], ["tour", "tours"])} · ${plural(m, locale, ["sesión de fotos", "sesiones de fotos"], ["photo shoot", "photo shoots"])}`;
-            })()}</div>
           </div>
         </div>
       </div>

@@ -9,7 +9,7 @@ import { PropertyArt } from "@/components/art/PropertyArt";
 import { EstimateCard } from "@/components/detail/Estimate";
 import { PriceHistory } from "@/components/detail/Bits";
 import { Button, Field } from "@/components/ui";
-import { k, tab } from "./kit";
+import { Select, k, tab } from "./kit";
 import { api } from "@/lib/api";
 import { AMENITY_LABEL, STATUS_LABEL, dwell, lbl, money, num, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
@@ -162,6 +162,7 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
       locale={locale}
       area="agency"
       title={tx(locale, "Editar inmueble", "Edit listing")}
+      back={{ href: `/${locale}/agency/listings`, label: tx(locale, "Volver a Inmuebles", "Back to Listings") }}
       actions={
         <div className="flex gap-2">
           <Button variant="outline" className={k.outline} href={listingHref(locale, l)}><Eye size={15} /> <span className="sr-only sm:not-sr-only">{tx(locale, "Ver ficha", "View")}</span></Button>
@@ -207,15 +208,15 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
             <div className="grid gap-3 sm:grid-cols-3">
               <Field label={tx(locale, "Precio (USD)", "Price (USD)")}><input className={k.input} type="number" min={1} disabled={!canEdit} value={f.priceAmount} onChange={(e) => { setF({ ...f, priceAmount: +e.target.value }); dirty(); }} /></Field>
               <Field label={tx(locale, "Estado", "Status")}>
-                <select className={k.input} disabled={!canEdit} value={f.status} onChange={(e) => { setF({ ...f, status: e.target.value as ListingStatus }); dirty(); }}>
+                <Select disabled={!canEdit} value={f.status} onChange={(e) => { setF({ ...f, status: e.target.value as ListingStatus }); dirty(); }}>
                   {STATUSES.map((s) => <option key={s} value={s}>{lbl(STATUS_LABEL[s], locale)}</option>)}
-                </select>
+                </Select>
               </Field>
               <Field label={tx(locale, "Visibilidad", "Visibility")}>
-                <select className={k.input} disabled={!canEdit} value={f.privateListing ? "private" : "public"} onChange={(e) => { setF({ ...f, privateListing: e.target.value === "private" }); dirty(); }}>
+                <Select disabled={!canEdit} value={f.privateListing ? "private" : "public"} onChange={(e) => { setF({ ...f, privateListing: e.target.value === "private" }); dirty(); }}>
                   <option value="public">{tx(locale, "Pública", "Public")}</option>
                   <option value="private">{tx(locale, "Privada (solo enlace)", "Private (link only)")}</option>
-                </select>
+                </Select>
               </Field>
             </div>
             <div className="mt-4 grid gap-3 sm:grid-cols-4">

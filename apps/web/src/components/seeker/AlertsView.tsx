@@ -11,6 +11,7 @@ import { api } from "@/lib/api";
 import { EMAIL_STATUS_LABEL, ago, lbl, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import { alertTitle, isMachineName } from "./alertTitle";
+import { localizeEmailSubject } from "@/lib/emailSubject";
 
 type Search = { id: string; name: string; query: string; polygon: unknown; frequency: "INSTANT" | "DAILY" | "WEEKLY"; newCount: number; lastSentAt: string | null };
 
@@ -193,7 +194,7 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
                   <Badge tone={e.kind === "TOUR" ? "ok" : "mist"} className={e.kind === "ALERT" ? "bg-[#E6DDD2] text-navy dark:bg-white/10" : undefined}>{lbl(EMAIL_KIND_LABEL[e.kind] ?? [e.kind, e.kind], locale)}</Badge>
                   <span className="text-xs text-muted">{ago(e.at, locale)}</span>
                 </div>
-                <div className="mt-1.5 text-sm font-semibold">{e.subject}</div>
+                <div className="mt-1.5 text-sm font-semibold">{localizeEmailSubject(e.subject, locale)}</div>
                 <div className="text-xs text-muted">{e.to}{e.status !== "SIMULATED" && EMAIL_STATUS_LABEL[e.status as keyof typeof EMAIL_STATUS_LABEL] ? ` · ${lbl(EMAIL_STATUS_LABEL[e.status as keyof typeof EMAIL_STATUS_LABEL], locale)}` : ""}</div>
               </li>
             ))}

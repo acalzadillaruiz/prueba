@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AlertTriangle, Building2, CheckCircle2, ExternalLink, Fingerprint, Loader2, Plus, XCircle } from "lucide-react";
@@ -8,7 +8,7 @@ import type { CaptureLead, Locale, Zone } from "@/types/domain";
 import { AdminShell } from "@/components/layout/AdminShell";
 import { Button, Field } from "@/components/ui";
 import { PriceInput } from "@/components/ui/PriceInput";
-import { Chip, Pill, k } from "./kit";
+import { Chip, Pill, Select, k } from "./kit";
 import { ScrollRegion } from "./ScrollRegion";
 import { api, type ApiClientError } from "@/lib/api";
 import { TYPE_LABEL, lbl, money, num, tx } from "@/lib/i18n";
@@ -27,7 +27,14 @@ export function CaptureView({ locale, rows: initialRows, zones, titles, canConve
   const [converting, setConverting] = useState<{ id: string; listingType: ListingType } | null>(null);
   const [rowBusy, setRowBusy] = useState<string | null>(null);
   const [rowErr, setRowErr] = useState<string | null>(null);
-  const [f, setF] = useState({ address: "", zone: zones[0]?.name ?? "", areaM2: 100, askingPrice: 150000, ownerName: "", phone: "", kind: "apartment" });
+  // Starts empty (no made-up 100 m² / USD 150.000): placeholders show the format, the browser checks what is required.
+  const [f, setF] = useState({ address: "", zone: "", areaM2: 0, askingPrice: 0, ownerName: "", phone: "", kind: "" });
+  const formRef = useRef<HTMLFormElement>(null);
+  const addressRef = useRef<HTMLInputElement>(null);
+  const openForm = () => {
+    formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    addressRef.current?.focus({ preventScroll: true });
+  };
   const [dup, setDup] = useState<Dup>(null);
   const [fp, setFp] = useState("");
   const [checking, setChecking] = useState(false);
@@ -37,7 +44,8 @@ export function CaptureView({ locale, rows: initialRows, zones, titles, canConve
   const label: Record<CaptureLead["result"], string> = { PENDING: tx(locale, "Pendiente", "Pending"), CAPTURED: tx(locale, "Captado", "Captured"), REJECTED: tx(locale, "Rechazado", "Rejected"), DUPLICATE: tx(locale, "Duplicado", "Duplicate") };
 
   useEffect(() => {
-    if (f.address.length < 6) return setDup(null);
+    // The fingerprint needs address + zone (lat/lng) + m²: check once all three are filled in.
+    if (f.address.length < 6 || !zone || !(f.areaM2 > 0)) return setDup(null);
     setChecking(true);
     const t = setTimeout(() => {
       api<{ duplicate: Dup; fingerprint: string }>("capture/check", { method: "POST", json: { address: f.address, areaM2: f.areaM2, lat: zone?.lat, lng: zone?.lng } })
@@ -106,9 +114,9 @@ export function CaptureView({ locale, rows: initialRows, zones, titles, canConve
       <div className="flex flex-wrap items-end gap-3">
         <div className="w-56">
           <Field label={tx(locale, "Operación", "Listing type")}>
-            <select className={k.input} value={converting.listingType} onChange={(e) => setConverting({ ...converting, listingType: e.target.value as ListingType })}>
+            <Select value={converting.listingType} onChange={(e) => setConverting({ ...converting, listingType: e.target.value as ListingType })}>
               {(Object.keys(TYPE_LABEL) as ListingType[]).map((k) => <option key={k} value={k}>{lbl(TYPE_LABEL[k], locale)}</option>)}
-            </select>
+            </Select>
           </Field>
         </div>
         <p className={cn("max-w-sm flex-1 text-xs", k.muted)}>{tx(locale, "Se crea un borrador en tu agencia con la dirección, zona, m² y precio de la captación. Podrás completarlo antes de publicar.", "A draft is created in your agency with the capture’s address, area, m² and price. You can complete it before publishing.")}</p>
@@ -120,7 +128,12 @@ export function CaptureView({ locale, rows: initialRows, zones, titles, canConve
     );
 
   return (
-    <AdminShell locale={locale} area="agency" title={tx(locale, "Cola de captación", "Capture queue")}>
+    <AdminShell
+      locale={locale}
+      area="agency"
+      title={tx(locale, "Cola de captación", "Capture queue")}
+      actions={<Button className={k.primary} onClick={openForm} aria-controls="capture-form"><Plus size={16} aria-hidden /> {tx(locale, "Nueva captación", "New capture")}</Button>}
+    >
       {rowErr && <div role="alert" className={cn("mb-4", k.err)}>{rowErr}</div>}
       {/* The queue table needs ≈640 px: the form sits beside it only from 1400 px (sidebar + 340 px form leave room);
           below that it stacks under the table, laid out in two columns. */}
@@ -196,7 +209,10 @@ export function CaptureView({ locale, rows: initialRows, zones, titles, canConve
           </table>
         </ScrollRegion>
         <form
-          className={cn(k.card, "self-start p-5 md:p-6")}
+          ref={formRef}
+          id="capture-form"
+          aria-labelledby="capture-form-title"
+          className={cn(k.card, "scroll-mt-6 self-start p-5 md:p-6")}
           onSubmit={async (e) => {
             e.preventDefault();
             setErr(null);
@@ -204,7 +220,7 @@ export function CaptureView({ locale, rows: initialRows, zones, titles, canConve
             try {
               const c = await api<CaptureLead & { createdAt: string; duplicateOfId?: string }>("capture", { method: "POST", json: { ...f, lat: zone?.lat, lng: zone?.lng } });
               setRows([{ ...c, createdAt: new Date().toISOString(), duplicateOf: c.duplicateOfId ?? undefined }, ...rows]);
-              setF({ ...f, address: "", ownerName: "", phone: "" });
+              setF({ ...f, address: "", areaM2: 0, askingPrice: 0, ownerName: "", phone: "" });
               router.refresh();
             } catch (e2) {
               setErr((e2 as Error).message);
@@ -213,29 +229,31 @@ export function CaptureView({ locale, rows: initialRows, zones, titles, canConve
             }
           }}
         >
-          <h2 className={k.title}>{tx(locale, "Nueva captación", "New capture")}</h2>
+          <h2 id="capture-form-title" className={k.title}>{tx(locale, "Nueva captación", "New capture")}</h2>
           <div className="mt-3 grid gap-3 md:grid-cols-2 min-[1400px]:grid-cols-1">
-            <div className="md:col-span-2 min-[1400px]:col-span-1"><Field label={tx(locale, "Dirección", "Address")}><input required minLength={5} className={k.input} value={f.address} onChange={(e) => setF({ ...f, address: e.target.value })} /></Field></div>
+            <div className="md:col-span-2 min-[1400px]:col-span-1"><Field label={tx(locale, "Dirección", "Address")}><input ref={addressRef} required minLength={5} className={k.input} placeholder={tx(locale, "Av. Francisco de Miranda, Edif. Parque, piso 4", "Av. Francisco de Miranda, Parque bldg, 4th floor")} value={f.address} onChange={(e) => setF({ ...f, address: e.target.value })} /></Field></div>
             <Field label={tx(locale, "Zona", "Area")}>
-              <select className={k.input} value={f.zone} onChange={(e) => setF({ ...f, zone: e.target.value })}>
+              <Select required value={f.zone} onChange={(e) => setF({ ...f, zone: e.target.value })} className={cn(!f.zone && "text-muted dark:text-mist")}>
+                <option value="" disabled>{tx(locale, "Elige la zona", "Pick the area")}</option>
                 {zones.map((z) => <option key={z.slug}>{z.name}</option>)}
-              </select>
+              </Select>
             </Field>
             <Field label={tx(locale, "Tipo de inmueble", "Property type")}>
-              <select className={k.input} value={f.kind} onChange={(e) => setF({ ...f, kind: e.target.value })}>
+              <Select required value={f.kind} onChange={(e) => setF({ ...f, kind: e.target.value })} className={cn(!f.kind && "text-muted dark:text-mist")}>
+                <option value="" disabled>{tx(locale, "Elige el tipo", "Pick the type")}</option>
                 {KINDS.map(([k, es, en]) => <option key={k} value={k}>{tx(locale, es, en)}</option>)}
-              </select>
+              </Select>
             </Field>
             <div className="grid grid-cols-2 gap-2">
-              <Field label="m²"><input className={k.input} type="number" min={1} value={f.areaM2} onChange={(e) => setF({ ...f, areaM2: +e.target.value })} /></Field>
-              <Field label={tx(locale, "Precio pedido (USD)", "Asking price (USD)")}><PriceInput locale={locale} className={k.input} required value={f.askingPrice} onChange={(askingPrice) => setF({ ...f, askingPrice })} /></Field>
+              <Field label="m²"><input className={k.input} type="number" inputMode="numeric" required min={1} placeholder={tx(locale, "Ej. 95", "e.g. 95")} value={f.areaM2 || ""} onChange={(e) => setF({ ...f, areaM2: +e.target.value })} /></Field>
+              <Field label={tx(locale, "Precio pedido (USD)", "Asking price (USD)")}><PriceInput locale={locale} className={k.input} required placeholder={tx(locale, "Ej. 120.000", "e.g. 120,000")} value={f.askingPrice} onChange={(askingPrice) => setF({ ...f, askingPrice })} /></Field>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              <Field label={tx(locale, "Dueño", "Owner")}><input required minLength={2} className={k.input} value={f.ownerName} onChange={(e) => setF({ ...f, ownerName: e.target.value })} /></Field>
-              <Field label={tx(locale, "Teléfono", "Phone")}><input required minLength={6} className={k.input} value={f.phone} onChange={(e) => setF({ ...f, phone: e.target.value })} /></Field>
+              <Field label={tx(locale, "Dueño", "Owner")}><input required minLength={2} className={k.input} placeholder={tx(locale, "Nombre y apellido", "Full name")} value={f.ownerName} onChange={(e) => setF({ ...f, ownerName: e.target.value })} /></Field>
+              <Field label={tx(locale, "Teléfono", "Phone")}><input required minLength={6} type="tel" className={k.input} placeholder="+58 412 000 0000" value={f.phone} onChange={(e) => setF({ ...f, phone: e.target.value })} /></Field>
             </div>
           </div>
-          {f.address.length >= 6 && (
+          {f.address.length >= 6 && !!zone && f.areaM2 > 0 && (
             <div className={cn("np-in mt-4", dup ? k.warnBox : k.okBox)}>
               <div className="flex items-center gap-2 font-semibold">{checking ? <Loader2 size={16} className="animate-spin" /> : dup ? <AlertTriangle size={16} /> : <CheckCircle2 size={16} />}{dup ? tx(locale, "Posible duplicado", "Possible duplicate") : tx(locale, "Sin duplicados", "No duplicates")}</div>
               <div className="mt-1 text-xs text-navy/75 dark:text-ivory/75">{dup ? (dup.zone ? `${dup.title} · ${dup.zone} · ${dup.areaM2} m²` : dup.title ?? tx(locale, "Ya existe en otra agencia (no público)", "Already listed by another agency (not public)")) : tx(locale, "Fingerprint: lat/lng + m² + hash de dirección", "Fingerprint: lat/lng + m² + address hash")}</div>

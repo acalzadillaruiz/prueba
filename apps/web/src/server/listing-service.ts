@@ -7,6 +7,7 @@ import type { Scene } from "@/types/domain";
 import { queueEmail } from "./data";
 import { filtersFromParams, whereFromFilters } from "./listings";
 import { inShape } from "@/lib/geo";
+import { alertSubject, alertSubjectName } from "@/lib/emailSubject";
 
 export const slugify = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
@@ -107,7 +108,7 @@ export async function snapshotEstimate(listingId: string) {
 export async function notifySavedSearches(listingId: string, reason: "new" | "price") {
   const l = await prisma.listing.findUnique({ where: { id: listingId } });
   if (!l || l.review !== "APPROVED" || l.privateListing) return 0;
-  const searches = await prisma.savedSearch.findMany({ include: { user: { select: { email: true } } } });
+  const searches = await prisma.savedSearch.findMany({ include: { user: { select: { email: true, locale: true } } } });
   let n = 0;
   for (const s of searches) {
     const f = filtersFromParams(new URLSearchParams(s.query));
@@ -119,7 +120,12 @@ export async function notifySavedSearches(listingId: string, reason: "new" | "pr
     n++;
     await prisma.savedSearch.update({ where: { id: s.id }, data: { newCount: { increment: 1 }, ...(s.frequency === "INSTANT" ? { lastSentAt: new Date() } : {}) } });
     if (s.frequency === "INSTANT")
-      await queueEmail(s.user.email, reason === "new" ? `Algo nuevo en «${s.name}»: ${l.titleEs}` : `Ahora a mejor precio: ${l.titleEs}`, "ALERT", `https://newplace.app/es/listing/${l.slug}`);
+    {
+      // In the recipient's language: the search reads as its filters ("Compra en Chacao · 2+ hab · hasta USD 250k").
+      const loc = s.user.locale === "en" ? "en" : "es";
+      const title = loc === "en" && l.titleEn ? l.titleEn : l.titleEs;
+      await queueEmail(s.user.email, reason === "new" ? alertSubject.fresh(alertSubjectName(s, loc), title, loc) : alertSubject.price(title, loc), "ALERT", `https://newplace.app/${loc}/listing/${l.slug}`);
+    }
   }
   return n;
 }

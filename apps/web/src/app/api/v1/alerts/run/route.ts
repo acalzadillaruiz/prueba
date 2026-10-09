@@ -3,6 +3,7 @@ import type { NextRequest } from "next/server";
 import { prisma } from "@newplace/db";
 import { ApiError, currentUser, handler, ok } from "@/server/api";
 import { queueEmail } from "@/server/data";
+import { alertSubject, alertSubjectName } from "@/lib/emailSubject";
 
 /** Constant-time comparison (hashes first so lengths never differ). */
 const sameSecret = (a: string, b: string) => timingSafeEqual(createHash("sha256").update(a).digest(), createHash("sha256").update(b).digest());
@@ -28,10 +29,11 @@ export const POST = handler(async (req: NextRequest) => {
         { frequency: "WEEKLY", OR: [{ lastSentAt: null }, { lastSentAt: { lt: new Date(now - 7 * 864e5) } }] },
       ],
     },
-    include: { user: { select: { email: true } } },
+    include: { user: { select: { email: true, locale: true } } },
   });
   for (const s of due) {
-    await queueEmail(s.user.email, `${s.newCount === 1 ? "1 novedad" : `${s.newCount} novedades`} en «${s.name}»`, "ALERT", `/es/search?${s.query}`);
+    const loc = s.user.locale === "en" ? "en" : "es";
+    await queueEmail(s.user.email, alertSubject.digest(s.newCount, alertSubjectName(s, loc), loc), "ALERT", `/${loc}/search?${s.query}`);
     await prisma.savedSearch.update({ where: { id: s.id }, data: { lastSentAt: new Date(), newCount: 0 } });
   }
   return ok({ sent: due.length });

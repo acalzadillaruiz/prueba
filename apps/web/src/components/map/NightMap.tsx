@@ -4,7 +4,7 @@ import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useSta
 import { Minus, Moon, Plus, Search, Sun, X } from "lucide-react";
 import type { Listing, Locale } from "@/types/domain";
 import type { LatLng, Shape } from "@/lib/geo";
-import { compactMoney, plural, tx } from "@/lib/i18n";
+import { plural, shortMoney, tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import { VE_RINGS } from "./venezuela";
 import { ShapeTools, UnderMapTools } from "./ShapeTools";
@@ -729,7 +729,7 @@ export function NightMap({
   );
 }
 
-const pinLabel = (l: Listing, locale: Locale) => compactMoney(l.priceAmount, locale) + (l.pricePeriod === "night" ? tx(locale, "/n", "/nt") : l.pricePeriod === "month" ? tx(locale, "/m", "/mo") : "");
+const pinLabel = (l: Listing, locale: Locale) => shortMoney(l.priceAmount, locale) + (l.pricePeriod === "night" ? tx(locale, "/n", "/nt") : l.pricePeriod === "month" ? tx(locale, "/m", "/mo") : "");
 const pinWidth = (label: string) => label.length * 7.8 + 22;
 
 /**
@@ -748,7 +748,7 @@ function PricePin({ l, x, y, active, locale, onClick, k, shadow }: { l: Listing;
       className="group cursor-pointer focus-visible:outline-none"
       role="button"
       tabIndex={0}
-      aria-label={`${compactMoney(l.priceAmount, locale)}${period}${l.zone ? ` · ${l.zone}` : ""}`}
+      aria-label={`${shortMoney(l.priceAmount, locale)}${period}${l.zone ? ` · ${l.zone}` : ""}`}
       aria-pressed={active}
       onClick={(e) => {
         e.stopPropagation();

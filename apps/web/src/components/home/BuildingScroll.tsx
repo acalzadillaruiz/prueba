@@ -38,8 +38,11 @@ const SCENE_AT = [0.27, 0.5, 0.64, 1];
  *  - "list":  prefers-reduced-motion: no animation, the four chapters as a readable list.
  */
 type Mode = "list" | "lite" | "scene";
+const SCENE_OFF = true;
 
 function canRunScene() {
+  // 032 (Adolfo): no three.js on the home, so it weighs less — every device gets the light CSS tower.
+  if (SCENE_OFF) return false;
   if (typeof window === "undefined") return false;
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
   if (!window.matchMedia("(min-width: 768px)").matches) return false;

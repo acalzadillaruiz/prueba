@@ -110,7 +110,7 @@ export function HeroCinema({
   if (reduced)
     return (
       <section className="relative isolate overflow-hidden bg-navy text-ivory">
-        <Image src="/brand/hero-costa.jpg" alt="" fill priority sizes="100vw" quality={80} className="-z-10 object-cover object-[50%_38%]" />
+        <Image src="/brand/hero-costa-atardecer.jpg" alt="" fill priority sizes="100vw" quality={80} className="-z-10 object-cover object-[50%_38%]" />
         <div className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(28,29,29,.72)_0%,rgba(28,29,29,.28)_34%,rgba(28,29,29,.45)_62%,rgba(28,29,29,.92)_100%)]" aria-hidden />
         <div className="min-h-[640px] lg:min-h-[min(860px,100svh)]">{copy}</div>
       </section>
@@ -124,7 +124,7 @@ export function HeroCinema({
         </div>
         <div ref={veil} className="absolute inset-0 bg-[linear-gradient(180deg,rgba(28,29,29,.35)_0%,rgba(28,29,29,.05)_40%,rgba(28,29,29,.75)_100%)]" style={{ opacity: 0.55 }} aria-hidden />
         <div ref={hall} className="absolute inset-0 origin-[50%_44%] will-change-transform" aria-hidden>
-          <Image src="/brand/hero-costa.jpg" alt="" fill priority sizes="100vw" quality={80} className="object-cover object-[50%_38%]" />
+          <Image src="/brand/hero-costa-atardecer.jpg" alt="" fill priority sizes="100vw" quality={80} className="object-cover object-[50%_38%]" />
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(28,29,29,.7)_0%,rgba(28,29,29,.2)_34%,rgba(28,29,29,.42)_62%,rgba(28,29,29,.92)_100%)]" />
           <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(28,29,29,.5)_0%,rgba(28,29,29,0)_60%)]" />
         </div>

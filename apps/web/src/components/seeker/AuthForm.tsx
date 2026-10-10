@@ -255,7 +255,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
           {/* Brand photo in a straight frame (030 · AMALI: no arches). */}
           <div className="relative aspect-[3/4] w-full max-w-[400px] overflow-hidden rounded-[2px]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/brand/hero-costa.jpg" alt="" className="h-full w-full object-cover object-[70%_50%]" />
+            <img src="/brand/torre-atardecer.jpg" alt="" className="h-full w-full object-cover object-[70%_50%]" />
             <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-navy/80 to-transparent" />
             <div className="absolute inset-x-0 bottom-8 px-8 text-center text-ivory">
               <div className="text-[11px] font-semibold uppercase tracking-[.22em] text-[#E3DACB]">{tx(locale, "Tu próximo lugar, verificado", "Your next place, verified")}</div>

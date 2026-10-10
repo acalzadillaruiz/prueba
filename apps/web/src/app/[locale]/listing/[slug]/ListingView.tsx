@@ -205,7 +205,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
               </div>
               <div className="lg:flex lg:items-end lg:justify-between lg:gap-12">
                 <div className="min-w-0">
-                  <h1 className="mt-5 max-w-[760px] text-[38px] leading-[1.06] tracking-[-0.02em] md:text-[52px] lg:mt-4 lg:text-[48px]">{tx(locale, l.title_es, l.title_en)}</h1>
+                  <h1 className="mt-5 max-w-[760px] text-[21px] max-md:[font-size-adjust:none] md:text-[52px] lg:mt-4 lg:text-[48px]">{tx(locale, l.title_es, l.title_en)}</h1>
                   <p className="mt-2 text-[15px] text-muted">{l.address} · {l.zone}, {l.city}{l.state && l.state !== l.city ? `, ${l.state}` : ""}</p>
                 </div>
                 {/* Desktop: aligned to the title's baseline, but never higher than the title's own top margin: with a one-line

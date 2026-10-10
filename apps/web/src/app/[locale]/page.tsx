@@ -271,7 +271,7 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
           {/* Portrait only beside the copy (lg); stacked below it (phones, tablets) a landscape band. */}
           <div data-unveil className="relative mx-auto mb-10 aspect-[16/10] w-full max-w-[520px] overflow-hidden rounded-[2px] bg-[#D9CDB8] md:mb-12 lg:mb-16 lg:mr-0 lg:aspect-[4/3]">
             <div data-parallax="40" className="absolute -inset-y-[8%] inset-x-0">
-              <Image src="/brand/terraza.jpg" alt={tx(locale, "Terraza con vista a la ciudad al atardecer", "A terrace over the city at dusk")} fill sizes="(max-width: 1024px) 90vw, 520px" className="object-cover" />
+              <Image src="/brand/salon-mar.jpg" alt={tx(locale, "Imagen ilustrativa", "Illustrative image")} fill sizes="(max-width: 1024px) 90vw, 560px" className="object-cover" />
             </div>
           </div>
         </div>

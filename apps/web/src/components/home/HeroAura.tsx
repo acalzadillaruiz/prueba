@@ -57,7 +57,7 @@ export function HeroAura({ locale, available }: { locale: Locale; available: num
             className="flex min-h-11 items-center gap-2 rounded-full border border-white/30 bg-white/15 px-4 font-display text-[14px] text-white backdrop-blur-md transition-colors hover:bg-white/25"
           >
             <span className="h-2 w-2 rounded-full bg-[#3BB273]" aria-hidden />
-            {tx(locale, "Guardia 24/7", "On call 24/7")}
+            {tx(locale, "Asesor 24/7", "Advisor 24/7")}
             <span className="sr-only">{tx(locale, ": habla con un asesor ahora", ": talk to an advisor now")}</span>
           </OnCallButton>
         </div>

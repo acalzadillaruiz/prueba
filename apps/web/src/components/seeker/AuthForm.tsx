@@ -107,7 +107,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
     try {
       if (mode === "register") await api("auth/register", { method: "POST", json: { name, email, password, ...(agency && !inv ? { agencyName } : {}), ...(inv && invite ? { invite } : {}) } });
       const r = await signIn("credentials", { email, password, redirect: false });
-      if (r?.error) throw new Error(tx(locale, "El email o la contraseña no coinciden. Revísalos e inténtalo otra vez.", "That email and password don’t match. Check them and try again."));
+      if (r?.error) throw new Error(tx(locale, "El correo o la contraseña no coinciden. Revísalos e inténtalo otra vez.", "That email and password don’t match. Check them and try again."));
       // Existing account opening an invite link from the login screen: join the agency now.
       if (mode === "login" && inv && invite)
         await api(`invitations/${encodeURIComponent(invite)}`, { method: "POST" }).catch((e3: unknown) => {
@@ -116,7 +116,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
             code === "CONFLICT"
               ? tx(locale, "Ya entraste, pero tu cuenta ya forma parte de una agencia, así que no pudimos aceptar la invitación.", "You’re in, but your account already belongs to an agency, so we couldn’t accept the invitation.")
               : code === "FORBIDDEN"
-                ? tx(locale, "Ya entraste, pero esta invitación es para otro email. Entra con ese correo para aceptarla.", "You’re in, but this invitation is for a different email. Sign in with that one to accept it.")
+                ? tx(locale, "Ya entraste, pero esta invitación es para otro correo. Entra con ese para aceptarla.", "You’re in, but this invitation is for a different email. Sign in with that one to accept it.")
                 : (e3 as Error).message,
           );
         });
@@ -125,7 +125,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
     } catch (e2) {
       // "Ya existe un registro igual" says nothing to someone signing up: name the email and point to sign-in.
       const taken = mode === "register" && e2 instanceof ApiClientError && e2.code === "CONFLICT";
-      setErr(taken ? tx(locale, "Ya tienes una cuenta con este email. Entra con tu contraseña.", "You already have an account with this email. Sign in with your password.") : (e2 as Error).message);
+      setErr(taken ? tx(locale, "Ya tienes una cuenta con este correo. Entra con tu contraseña.", "You already have an account with this email. Sign in with your password.") : (e2 as Error).message);
     } finally {
       setBusy(null);
     }
@@ -258,8 +258,8 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
             <img src="/brand/torre-atardecer.jpg" alt="" className="h-full w-full object-cover object-[70%_50%]" />
             <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-navy/80 to-transparent" />
             <div className="absolute inset-x-0 bottom-8 px-8 text-center text-ivory">
-              <div className="text-[11px] font-semibold uppercase tracking-[.22em] text-[#E3DACB]">{tx(locale, "Tu próximo lugar, verificado", "Your next place, verified")}</div>
-              <div className="mt-3 font-display text-[17px] font-light leading-snug">{tx(locale, "Casas verificadas, con asesor de guardia 24/7.", "Verified homes, with an advisor on call 24/7.")}</div>
+              <div className="text-[11px] font-semibold uppercase tracking-[.22em] text-[#E3DACB]">{tx(locale, "Guarda, compara y pide visitas", "Save, compare and book visits")}</div>
+              <div className="mt-3 font-display text-[17px] font-light leading-snug">{tx(locale, "Casas revisadas y un asesor que te atiende a cualquier hora.", "Checked homes and an advisor who answers at any hour.")}</div>
             </div>
           </div>
         </div>

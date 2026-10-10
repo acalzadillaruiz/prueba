@@ -3,8 +3,8 @@ import localFont from "next/font/local";
 /**
  * Self-hosted brand fonts via next/font: preloaded, latin subset only (covers Spanish and English, incl. € and ñ),
  * with a metric-matched fallback so text doesn't shift when the web font arrives (CLS).
- * Brand (030 · estilo AMALI, approved by Adolfo): Lexend Zetta (titles and the "NEW PLACE" wordmark: wide, thin,
- * in capitals) and Barlow (text Light 300, interface Regular/Medium, prices Light with tabular figures).
+ * Brand (030/035 · estilo AMALI, approved by Adolfo): Josefin Sans Light (titles, sentence case), Lexend Zetta (the
+ * "NEW PLACE" wordmark and small capital labels only) and Barlow (text Light 300, interface Regular/Medium, prices Light with tabular figures).
  * Both SIL OFL 1.1 (see ../fonts/*-OFL.txt).
  */
 export const zetta = localFont({
@@ -31,4 +31,13 @@ export const barlow = localFont({
   adjustFontFallback: "Arial",
 });
 
-export const fontVars = `${zetta.variable} ${barlow.variable}`;
+/** Titles (035): Josefin Sans Light, in sentence case — thin and soft, less rigid than wide capitals. */
+export const josefin = localFont({
+  src: [{ path: "../fonts/josefin-sans-latin-300-normal.woff2", weight: "300" }],
+  variable: "--font-josefin",
+  display: "swap",
+  fallback: ["ui-sans-serif", "system-ui", "Arial"],
+  adjustFontFallback: "Arial",
+});
+
+export const fontVars = `${zetta.variable} ${barlow.variable} ${josefin.variable}`;

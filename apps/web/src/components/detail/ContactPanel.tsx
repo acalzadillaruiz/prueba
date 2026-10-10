@@ -91,7 +91,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
   // One plain-language message per field, shown right under it.
   const fieldMsg: Record<keyof F, string | undefined> = {
     name: errs.name && tx(locale, "Escribe tu nombre", "Enter your name"),
-    email: errs.email && tx(locale, "Escribe un email válido", "Enter a valid email"),
+    email: errs.email && tx(locale, "Escribe un correo válido", "Enter a valid email"),
     phone: errs.phone && tx(locale, "Escribe un teléfono con código de país", "Enter a phone number with country code"),
     message: errs.message && (errs.message.type === "too_big" ? tx(locale, "Tu mensaje es muy largo: máximo 1000 caracteres", "Your message is too long: 1000 characters max") : tx(locale, "Escribe tu mensaje", "Write your message")),
   };
@@ -235,7 +235,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
           {tour ? (
             <Button href={`/${locale}/app`} size="sm" variant="navy">{tx(locale, "Ver mis visitas", "See my viewings")}</Button>
           ) : (
-            user && <Button href={`/${locale}/app`} size="sm" variant="navy">{tx(locale, "Ver en mi Hub", "Open my Hub")}</Button>
+            user && <Button href={`/${locale}/app`} size="sm" variant="navy">{tx(locale, "Ver en tu espacio", "Open your space")}</Button>
           )}
           <Button size="sm" variant={dark ? "dark-outline" : "outline"} onClick={() => { setDone(null); setIso(null); setDay(null); setAsked(false); setPrefs([]); setVisitNote(""); setStayNote(""); }}>{tx(locale, "Enviar otra", "Send another")}</Button>
         </div>
@@ -269,7 +269,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
     <div id="contact-panel" tabIndex={-1} data-hide-fab className={cn("rounded-[4px] p-6 ring-1", box)}>
       {(agent || agency) && (
         <div className="flex items-center gap-4">
-          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#D8CFC1] font-serif text-[22px] font-light text-[#1C1D1D]" aria-hidden>{initials}</span>
+          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#ECE5DA] font-serif text-[22px] font-light text-[#1C1D1D]" aria-hidden>{initials}</span>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-1.5 text-[17px] font-semibold">
               {agent?.name ?? agency?.name}
@@ -278,7 +278,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
             <div className={cn("text-sm", muted)}>
               {/* FSBO: the person shown is the owner (no agent), never "Asesor". Gender-neutral wording. */}
               {fsbo
-                ? tx(locale, "Dueño/a · publica sin intermediarios", "Owner · no middlemen")
+                ? tx(locale, "Dueño · publica sin intermediarios", "Owner · no middlemen")
                 : agent?.verified
                   ? tx(locale, "Asesor verificado", "Verified advisor")
                   : tx(locale, "Asesor", "Advisor")}
@@ -287,7 +287,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
           </div>
         </div>
       )}
-      {!agent && !agency && <div className={cn("text-sm", muted)}>{tx(locale, "Publicada por su dueño/a · sin intermediarios", "Listed by the owner · no middlemen")}</div>}
+      {!agent && !agency && <div className={cn("text-sm", muted)}>{tx(locale, "Publicada por su dueño · sin intermediarios", "Listed by the owner · no middlemen")}</div>}
       <div role="tablist" aria-label={tx(locale, "Cómo quieres contactar", "How to get in touch")} className={cn("mt-5 grid gap-1 rounded-full bg-[#F1ECE4] p-1 dark:bg-white/5", modes.length > 1 ? "grid-cols-2" : "grid-cols-1")} onKeyDown={onTabKey}>
         {modes.map((m) => (
           <button
@@ -604,7 +604,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
           )}
           {agency?.verified && l.agencyId && (
             <OnCallButton locale={locale} listingSlug={l.slug} className={quietLink}>
-              <PhoneCall size={15} aria-hidden /> {tx(locale, "Guardia 24/7", "24/7 on-call")}
+              <PhoneCall size={15} aria-hidden /> {tx(locale, "Asesor 24/7", "Advisor 24/7")}
             </OnCallButton>
           )}
         </div>

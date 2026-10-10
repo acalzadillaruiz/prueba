@@ -2,10 +2,10 @@
   "brand": { "tagline": "El Caribe, con alma mediterránea.", "sub": "Bienes raíces" },
   "nav": { "buy": "Comprar", "rent": "Alquilar", "vacation": "Vacacional", "commercial": "Comercial", "luxury": "Luxury", "saved": "Guardados", "publish": "Publicar", "signIn": "Entrar", "signOut": "Cerrar sesión", "menu": "Menú", "privateCollection": "Colección Privada", "remoteBuying": "Compra a distancia", "sell": "Vender con nosotros", "home": "Inicio", "map": "Mapa", "account": "Cuenta" },
   "footer": {
-    "about": "Te acompañamos a encontrar casa en Lechería, El Morro, Margarita y Caracas.",
+    "about": "Te ayudamos a comprar, alquilar o vender casa en Lechería, El Morro, Margarita y Caracas.",
     "search": "Buscar", "owners": "Propietarios", "agencies": "Agencias",
     "listFree": "Publicar gratis", "hireAgency": "Encargar a agencia", "myProperties": "Mis inmuebles",
-    "forAgencies": "New Place para agencias", "legal": "Precios en USD. La conversión a VES/EUR es solo una referencia.", "sellWithUs": "Vender con nosotros", "valuation": "Valorar mi propiedad"
+    "forAgencies": "New Place para agencias", "legal": "Precios en USD. La conversión a VES/EUR es solo una referencia.", "sellWithUs": "Vender con nosotros", "valuation": "Saber cuánto vale mi casa"
   },
   "admin": {
     "dashboard": "Panel", "leads": "Leads", "listings": "Inmuebles", "calendar": "Calendario", "capture": "Captación", "media": "Fotografía", "team": "Equipo", "reports": "Informes", "teamAudit": "Auditoría", "settings": "Ajustes",
@@ -14,5 +14,5 @@
   },
   "roles": { "SUPERADMIN": "Superadmin", "AGENCY_OWNER": "Dueño de agencia", "AGENT": "Agente", "CAPTOR": "Captador", "PHOTOGRAPHER": "Fotógrafo", "BACKOFFICE": "Backoffice", "OWNER_PRIVATE": "Propietario", "SEEKER": "Buscador" },
   "errors": { "UNAUTHORIZED": "Inicia sesión para continuar.", "FORBIDDEN": "Tu cuenta no tiene acceso a esto.", "NOT_FOUND": "No encontramos lo que buscas.", "VALIDATION": "Revisa lo que escribiste: hay un dato que no cuadra.", "CONFLICT": "Esto ya estaba registrado.", "INTERNAL": "Algo no salió bien de nuestro lado. Inténtalo otra vez en un momento." },
-  "common": { "loading": "Un momento…", "retry": "Intentar de nuevo", "back": "Volver al inicio", "notFound": "No encontramos esta página", "notFoundBody": "Quizá esa casa ya encontró dueño o el enlace cambió. Te esperamos en el inicio.", "error": "Algo no salió bien", "errorBody": "Fue cosa nuestra, no tuya. Inténtalo otra vez en unos segundos." }
+  "common": { "loading": "Un momento…", "retry": "Intentar de nuevo", "back": "Volver al inicio", "notFound": "No encontramos esta página", "notFoundBody": "Puede que la casa ya se vendiera o que el enlace cambiara. Busca otras desde el inicio.", "error": "Algo no salió bien", "errorBody": "Fue cosa nuestra, no tuya. Inténtalo otra vez en unos segundos." }
 }

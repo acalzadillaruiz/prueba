@@ -17,7 +17,7 @@ test.describe("Smoke: login, mapa, crear inmueble · RBAC duro", () => {
     await page.getByLabel("Email").fill("seeker@gmail.com");
     await page.getByLabel("Contraseña", { exact: true }).fill("incorrecta123");
     await page.getByRole("button", { name: "Entrar", exact: true }).click();
-    await expect(page.getByText(/El email o la contraseña no coinciden/)).toBeVisible();
+    await expect(page.getByText(/El correo o la contraseña no coinciden/)).toBeVisible();
   });
 
   test("mapa: dibujar polígono filtra resultados", async ({ page }) => {

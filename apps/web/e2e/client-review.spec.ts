@@ -26,7 +26,7 @@ async function nlSearch(page: Page, label: string, text: string, until: RegExp) 
 test.describe("Cliente · regresiones de la revisión", () => {
   test("búsqueda NL: «2+ hab», rango «entre … y … mil», ciudad y sin falso «mascotas» por Petare", async ({ page }) => {
     await page.goto("/es/search");
-    await nlSearch(page, "Cuéntanos con tus palabras qué buscas", "casa 2+ hab en Caracas entre 100 y 400 mil cerca de Petare", /beds=2/);
+    await nlSearch(page, "Escribe zona, tipo de casa o presupuesto", "casa 2+ hab en Caracas entre 100 y 400 mil cerca de Petare", /beds=2/);
     const url = new URL(page.url());
     expect(url.searchParams.get("beds")).toBe("2");
     expect(url.searchParams.get("min")).toBe("100000");
@@ -41,7 +41,7 @@ test.describe("Cliente · regresiones de la revisión", () => {
 
   test("búsqueda NL: el área («más de 100 m²») no se toma como precio", async ({ page }) => {
     await page.goto("/en/search");
-    await nlSearch(page, "Describe what you’re after in your own words", "apartment over 100 m2 in Altamira", /zone=Altamira/);
+    await nlSearch(page, "Type an area, a kind of home or a budget", "apartment over 100 m2 in Altamira", /zone=Altamira/);
     const url = new URL(page.url());
     expect(url.searchParams.get("min")).toBeNull();
     expect(url.searchParams.get("max")).toBeNull();
@@ -220,7 +220,7 @@ test.describe("Cliente · regresiones de la revisión", () => {
       await page.locator('input[name="email"]').fill("seeker@gmail.com");
       await page.locator('input[name="password"]').fill("NewPlace!2026x");
       await page.getByRole("button", { name: "Crear cuenta" }).click();
-      await expect(page.getByText("Ya tienes una cuenta con este email. Entra con tu contraseña.")).toBeVisible({ timeout: 5000 });
+      await expect(page.getByText("Ya tienes una cuenta con este correo. Entra con tu contraseña.")).toBeVisible({ timeout: 5000 });
     }).toPass({ timeout: 60_000 });
   });
   test("comparador en inglés: filas «Area» y «Location» distintas (sin claves duplicadas)", async ({ page }) => {
@@ -435,7 +435,7 @@ test.describe("Cliente · regresiones de la revisión", () => {
     await expect(card.getByRole("link")).toHaveAccessibleName(title);
     expect(await page.locator("#search-results a button, #search-results a a").count()).toBe(0);
     // Owner listings say so in the agreed wording.
-    for (const t of await page.locator('[data-testid="card-advisor"][data-owner]').allInnerTexts()) expect(t).toMatch(/Dueño\/a · sin intermediarios$/);
+    for (const t of await page.locator('[data-testid="card-advisor"][data-owner]').allInnerTexts()) expect(t).toMatch(/Dueño · sin intermediarios$/);
     // Skip link: the very first Tab stop on /search (the header's), visible on focus, lands on the results.
     await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
     await page.keyboard.press("Tab");
@@ -453,19 +453,19 @@ test.describe("Cliente · regresiones de la revisión", () => {
     await expect(page.locator('[data-testid="partly-understood"]:visible')).toHaveText("No entendimos «zzqx rara»; buscamos con el resto.");
     await expect(page.getByTestId("not-understood")).toHaveCount(0);
     // The box keeps only the leftover words (the rest is the «Casa» chip).
-    await expect(page.getByRole("combobox", { name: "Cuéntanos con tus palabras qué buscas" })).toHaveValue("zzqx rara");
+    await expect(page.getByRole("combobox", { name: "Escribe zona, tipo de casa o presupuesto" })).toHaveValue("zzqx rara");
   });
   test("búsqueda: lo entendido pasa a filtros y sale de la caja; añadir palabras suma filtros", async ({ page }) => {
     await page.goto("/es/search?type=SALE");
-    const box = page.getByRole("combobox", { name: "Cuéntanos con tus palabras qué buscas" });
-    await nlSearch(page, "Cuéntanos con tus palabras qué buscas", "casa con piscina", /kind=house/);
+    const box = page.getByRole("combobox", { name: "Escribe zona, tipo de casa o presupuesto" });
+    await nlSearch(page, "Escribe zona, tipo de casa o presupuesto", "casa con piscina", /kind=house/);
     expect(new URL(page.url()).searchParams.get("q")).toBeNull();
     await expect(box).toHaveValue("");
     await expect(page.getByRole("button", { name: "Quitar filtro: Casa" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Quitar filtro: Piscina" })).toBeVisible();
     await expect(page.getByTestId("partly-understood")).toHaveCount(0);
     // Refining from the (empty) box keeps the chips already on.
-    await nlSearch(page, "Cuéntanos con tus palabras qué buscas", "con terraza", /am=pool%2Cterrace|am=pool,terrace/);
+    await nlSearch(page, "Escribe zona, tipo de casa o presupuesto", "con terraza", /am=pool%2Cterrace|am=pool,terrace/);
     await expect(page.getByRole("button", { name: "Quitar filtro: Casa" })).toBeVisible();
     // Removing a chip leaves no stale text behind.
     await page.getByRole("button", { name: "Quitar filtro: Casa" }).click();
@@ -487,7 +487,7 @@ test.describe("Cliente · regresiones de la revisión", () => {
     await page.getByRole("button", { name: "Quitar filtro: Lechería" }).click();
     await expect(page).not.toHaveURL(/zone=/);
     await expect(page.locator('[data-testid="partly-understood"]:visible')).toHaveText("No entendimos «helipuerto»; buscamos con el resto.");
-    await expect(page.getByRole("combobox", { name: "Cuéntanos con tus palabras qué buscas" })).toHaveValue("helipuerto");
+    await expect(page.getByRole("combobox", { name: "Escribe zona, tipo de casa o presupuesto" })).toHaveValue("helipuerto");
   });
   test("móvil: el mapa es un paso del historial; «Atrás» lo cierra sin salir de la búsqueda", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
@@ -518,7 +518,7 @@ test.describe("Cliente · regresiones de la revisión", () => {
     await page.goto("/es/search?type=SALE&q=xyzzy+castillo");
     await expect(page.getByTestId("not-understood").filter({ visible: true })).toContainText("No entendimos «xyzzy castillo»", { timeout: 15_000 });
     await expect(page.getByText("Mientras tanto, todas las casas")).toBeVisible();
-    const box = page.getByRole("combobox", { name: "Cuéntanos con tus palabras qué buscas" });
+    const box = page.getByRole("combobox", { name: "Escribe zona, tipo de casa o presupuesto" });
     await expect(async () => {
       await box.fill("casa en Lech");
       await expect(page.getByRole("option", { name: /Lechería/ }).first()).toBeVisible({ timeout: 1000 });
@@ -581,7 +581,7 @@ test.describe("Cliente · regresiones de la revisión", () => {
     }).toPass();
     await expect(page.getByRole("textbox", { name: "Nombre" })).not.toHaveValue("");
     await expect(page.getByText("Escribe tu nombre", { exact: true })).toHaveCount(0);
-    await expect(page.getByText("Escribe un email válido", { exact: true })).toHaveCount(0);
+    await expect(page.getByText("Escribe un correo válido", { exact: true })).toHaveCount(0);
     await page.getByRole("textbox", { name: "Mensaje" }).fill(`Consulta tras autocompletar ${stamp}`);
     await send.click();
     await expect(page.getByTestId("lead-done")).toBeVisible();
@@ -642,8 +642,8 @@ test.describe("Cliente · regresiones de la revisión", () => {
     const save = page.getByRole("button", { name: "Guardar búsqueda" });
     // Hydrated (the NL box reacts) but the session is still pending.
     await expect(async () => {
-      await page.getByRole("combobox", { name: "Cuéntanos con tus palabras qué buscas" }).fill("x");
-      await expect(page.getByRole("combobox", { name: "Cuéntanos con tus palabras qué buscas" })).toHaveValue("x", { timeout: 1000 });
+      await page.getByRole("combobox", { name: "Escribe zona, tipo de casa o presupuesto" }).fill("x");
+      await expect(page.getByRole("combobox", { name: "Escribe zona, tipo de casa o presupuesto" })).toHaveValue("x", { timeout: 1000 });
     }).toPass();
     await save.click();
     await page.waitForTimeout(1500);

@@ -30,7 +30,7 @@ export const k = {
   /** Table head / KPI label: uppercase 11–12 px, tracking .12em. */
   th: "text-[11px] font-semibold uppercase tracking-[.12em] text-muted dark:text-mist [&_th]:whitespace-nowrap",
   label: "text-[12px] font-semibold uppercase tracking-[.12em] text-muted dark:text-mist",
-  eyebrow: "text-[12px] font-semibold uppercase tracking-[.16em] text-gold-text dark:text-[#B79D83]",
+  eyebrow: "text-[12px] font-semibold uppercase tracking-[.16em] text-gold-text dark:text-[#C9B49C]",
   /** Card titles in Cormorant. */
   title: "font-serif text-[24px] font-medium leading-tight text-navy dark:text-ivory",
   titleSm: "font-serif text-[20px] font-medium leading-tight text-navy dark:text-ivory",
@@ -55,7 +55,7 @@ export const k = {
   warnText: "text-warn dark:text-[#F2B866]",
   dangerText: "text-danger dark:text-[#F3A493]",
   /** Dark-mode token remap for the admin wrapper (ui primitives use the ink/line/muted tokens). */
-  darkVars: "dark:[--np-ink-rgb:238_241_244] dark:[--np-ink:#EDE6DA] dark:[--np-line-rgb:42_62_85] dark:[--np-muted-rgb:169_180_194]",
+  darkVars: "dark:[--np-ink-rgb:238_241_244] dark:[--np-ink:#F6F2EC] dark:[--np-line-rgb:42_62_85] dark:[--np-muted-rgb:169_180_194]",
 };
 
 /** Filter tab / segmented choice. Selected = #DED5C7 with a 2 px navy border (brand interaction states). */
@@ -69,7 +69,7 @@ export const tab = (on: boolean) =>
 
 /** Counter inside a tab or nav item: neutral, never terracotta. */
 export function Count({ children, className }: { children: ReactNode; className?: string }) {
-  return <span className={cn("inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[#EDE6DA] px-1.5 text-[11px] font-semibold text-navy [font-feature-settings:'lnum','tnum']", className)}>{children}</span>;
+  return <span className={cn("inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[#F6F2EC] px-1.5 text-[11px] font-semibold text-navy [font-feature-settings:'lnum','tnum']", className)}>{children}</span>;
 }
 
 export function Panel({ title, eyebrow, action, children, className, bodyClass, id, as: As = "section" }: { title?: ReactNode; eyebrow?: ReactNode; action?: ReactNode; children: ReactNode; className?: string; bodyClass?: string; id?: string; as?: "section" | "div" | "form" }) {
@@ -109,7 +109,7 @@ type Tone = "neutral" | "egeo" | "arena" | "ok" | "warn" | "danger" | "navy" | "
 const TONE: Record<Tone, string> = {
   neutral: "bg-[#DED5C7] text-navy dark:bg-white/10 dark:text-ivory",
   egeo: "bg-egeo/55 text-[#413934] dark:bg-egeo/20 dark:text-[#E3D8CA]",
-  arena: "bg-arena text-[#5E4A2A] dark:bg-arena/15 dark:text-[#D8CFC1]",
+  arena: "bg-arena text-[#5E4A2A] dark:bg-arena/15 dark:text-[#ECE5DA]",
   ok: "bg-[#2F6B4F14] text-ok dark:bg-[#2F6B4F40] dark:text-[#9AD6B6]",
   warn: "bg-[#8A5A0014] text-warn dark:bg-[#8A5A0033] dark:text-[#F2C987]",
   danger: "bg-[#B3261E12] text-danger dark:bg-[#B3261E33] dark:text-[#F3B4A3]",

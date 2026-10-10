@@ -145,7 +145,7 @@ export function HubMessages({
 
       {!open && list.length === 0 && (
         <div className="mt-4">
-          <Empty className="py-6" title={tx(locale, "Aún no tienes mensajes", "No messages yet")} body={direct ? tx(locale, "Cuando alguien te escriba desde uno de tus anuncios, la conversación aparecerá aquí.", "When someone writes to you from one of your listings, the conversation will show up here.") : tx(locale, "Escríbele al agente desde cualquier casa que te guste y aquí podrás seguir la conversación.", "Message the agent from any home you like and you can carry on the conversation here.")} />
+          <Empty className="py-6" title={tx(locale, "Aún no tienes mensajes", "No messages yet")} body={direct ? tx(locale, "Cuando alguien te escriba desde uno de tus anuncios, la conversación aparecerá aquí.", "When someone writes to you from one of your listings, the conversation will show up here.") : tx(locale, "Escríbele al asesor desde cualquier casa que te guste y aquí seguirás la conversación.", "Message the advisor from any home you like and follow the conversation here.")} />
         </div>
       )}
 

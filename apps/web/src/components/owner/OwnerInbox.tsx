@@ -118,7 +118,7 @@ export function OwnerInbox({ locale, leads, tours, onChanged, manage = true }: {
                         {busy === `tour-${ld.id}` ? <Loader2 size={13} className="animate-spin" /> : <Check size={13} />} {tx(locale, "Confirmar visita", "Confirm visit")}
                       </Button>
                       <Button size="sm" type="button" variant="ghost" onClick={() => setProposing(null)}>{tx(locale, "Cancelar", "Cancel")}</Button>
-                      <span className="w-full text-[11px] text-muted">{tx(locale, "Le enviamos un email con la confirmación.", "We email them the confirmation.")}</span>
+                      <span className="w-full text-[11px] text-muted">{tx(locale, "Le enviamos un correo con la confirmación.", "We email them the confirmation.")}</span>
                     </form>
                   ) : (
                     manage && !booked && (

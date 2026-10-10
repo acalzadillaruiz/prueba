@@ -31,7 +31,7 @@ export function OwnerTakedown({ locale, listingId, reason, appealedAt, onAppeale
       </div>
       {sentAt ? (
         <div className="mt-2.5 rounded-lg bg-white px-3 py-2 text-xs dark:bg-white/[.05]" role="status">
-          {tx(locale, "Recibimos tu apelación", "We got your appeal")} (<TimeAgo iso={sentAt} locale={locale} />). {tx(locale, "Te escribimos por email cuando la revisemos.", "We’ll email you once we’ve reviewed it.")}
+          {tx(locale, "Recibimos tu apelación", "We got your appeal")} (<TimeAgo iso={sentAt} locale={locale} />). {tx(locale, "Te escribimos por correo cuando la revisemos.", "We’ll email you once we’ve reviewed it.")}
         </div>
       ) : open ? (
         <form

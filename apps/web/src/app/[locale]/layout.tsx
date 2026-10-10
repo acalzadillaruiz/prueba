@@ -12,7 +12,7 @@ import "../globals.css";
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#EDE6DA" },
+    { media: "(prefers-color-scheme: light)", color: "#F6F2EC" },
     { media: "(prefers-color-scheme: dark)", color: "#141617" },
   ],
   width: "device-width", initialScale: 1, viewportFit: "cover" };
@@ -31,10 +31,10 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
   const es = locale !== "en";
-  const title = es ? "New Place — Un nuevo lugar." : "New Place — Real estate. Redefined.";
+  const title = es ? "New Place — Casas en Venezuela" : "New Place — Homes in Venezuela";
   const description = es
-    ? "Compra, alquila y publica inmuebles verificados en Venezuela: mapa, estimación de precio con IA y visitas con la agenda real del agente."
-    : "Buy, rent and list verified homes in Venezuela: map search, AI price estimates and tours booked on the agent’s real calendar.";
+    ? "Compra, alquila o publica casas en Venezuela: búscalas en el mapa, mira cuánto valen y pide visita en la agenda real del asesor."
+    : "Buy, rent or list homes in Venezuela: find them on the map, see what they’re worth and book a visit on the advisor’s real calendar.";
   return {
     metadataBase: new URL(SITE_URL),
     applicationName: "New Place",
@@ -63,7 +63,7 @@ function siteJsonLd(locale: string) {
       url: home,
       logo: `${SITE_URL}/icons/icon-512.png`,
       image: `${SITE_URL}${OG_IMAGE.url}`,
-      description: es ? "Inmuebles verificados y de lujo en Venezuela." : "Verified and luxury real estate in Venezuela.",
+      description: es ? "Casas para comprar, alquilar o pasar las vacaciones en Venezuela." : "Homes to buy, rent or holiday in across Venezuela.",
       areaServed: { "@type": "Country", name: "Venezuela" },
       address: { "@type": "PostalAddress", addressCountry: "VE" },
     },

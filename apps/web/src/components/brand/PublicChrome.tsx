@@ -101,7 +101,7 @@ export function FloatingContact({ href, label, whatsapp = false, tabbar = false,
       )}
     >
       {open && (
-        <div id={menuId} role="group" aria-label={tx(locale, "Hablar con una persona", "Talk to a person")} className="np-glass-nav np-in w-[min(300px,calc(100vw-2rem))] rounded-[4px] p-2 shadow-[0_18px_40px_rgba(28,29,29,.22)]">
+        <div id={menuId} role="group" aria-label={tx(locale, "Hablar con un asesor", "Talk to an advisor")} className="np-glass-nav np-in w-[min(300px,calc(100vw-2rem))] rounded-[4px] p-2 shadow-[0_18px_40px_rgba(28,29,29,.22)]">
           <button
             type="button"
             aria-haspopup="dialog"
@@ -114,14 +114,14 @@ export function FloatingContact({ href, label, whatsapp = false, tabbar = false,
             <span className={glyph}><PhoneCall size={16} strokeWidth={1.8} aria-hidden /></span>
             <span className="min-w-0">
               <span className="block font-semibold">{tx(locale, "Llamar a un asesor", "Call an advisor")}</span>
-              <span className="block text-[13px] text-ink/65">{tx(locale, "De guardia 24/7, también hoy", "On call 24/7, today too")}</span>
+              <span className="block text-[13px] text-ink/65">{tx(locale, "Te atiende a cualquier hora", "Answers at any hour")}</span>
             </span>
           </button>
           <Link href={href} onClick={() => setOpen(false)} {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})} className={item}>
             <span className={glyph}>{whatsapp ? <WhatsAppIcon size={17} /> : <MessageCircle size={16} aria-hidden />}</span>
             <span className="min-w-0">
               <span className="block font-semibold">{whatsapp ? tx(locale, "Escribir por WhatsApp", "Message on WhatsApp") : tx(locale, "Escríbenos", "Write to us")}</span>
-              <span className="block text-[13px] text-ink/65">{tx(locale, "Te responde una persona, no un robot", "A person replies, not a bot")}</span>
+              <span className="block text-[13px] text-ink/65">{tx(locale, "Te responde un asesor, no un robot", "An advisor replies, not a bot")}</span>
             </span>
           </Link>
         </div>

@@ -89,19 +89,6 @@ function initMotion(Lenis: typeof import("lenis").default): () => void {
   document.addEventListener("click", onAnchor);
 
   const ctx = gsap.context(() => {
-    gsap.utils.toArray<HTMLElement>("[data-reveal]").forEach((el) => {
-      // Already on screen when motion starts (the hero, a deep link): leave it as painted, never hide it again.
-      if (el.getBoundingClientRect().top < window.innerHeight) return;
-      const items = el.dataset.reveal === "stagger" ? Array.from(el.children) : [el];
-      gsap.from(items, {
-        y: 42,
-        opacity: 0,
-        duration: 1.1,
-        ease: "power3.out",
-        stagger: 0.09,
-        scrollTrigger: { trigger: el, start: "top 86%", once: true },
-      });
-    });
     gsap.utils.toArray<HTMLElement>("[data-parallax]").forEach((el) => {
       const d = Number(el.dataset.parallax) || 60;
       gsap.fromTo(el, { y: -d }, { y: d, ease: "none", scrollTrigger: { trigger: el.parentElement ?? el, start: "top bottom", end: "bottom top", scrub: true } });
@@ -142,6 +129,26 @@ function initMotion(Lenis: typeof import("lenis").default): () => void {
       el.removeEventListener("pointerleave", leave);
     };
   });
+  // [data-reveal]: a soft fade-and-lift, driven by an IntersectionObserver with a tiny threshold (not by ScrollTrigger:
+  // on iOS Safari a scroll trigger that never fired left text invisible and a Taupe block empty — 035). Content is
+  // visible by default; only blocks still below the fold are primed (.np-pre), and any of them that is ever on screen
+  // is shown. A safety timer shows whatever is still primed after 6 s, so nothing can stay hidden.
+  const revealIo = new IntersectionObserver(
+    (entries) => {
+      for (const en of entries) {
+        if (!en.isIntersecting) continue;
+        en.target.classList.add("is-in");
+        revealIo.unobserve(en.target);
+      }
+    },
+    { threshold: 0.01, rootMargin: "0px 0px -4% 0px" },
+  );
+  document.querySelectorAll<HTMLElement>("[data-reveal]").forEach((el) => {
+    if (el.getBoundingClientRect().top < window.innerHeight) return;
+    el.classList.add("np-pre");
+    revealIo.observe(el);
+  });
+  const revealSafety = window.setTimeout(() => document.querySelectorAll(".np-pre:not(.is-in)").forEach((el) => el.classList.add("is-in")), 6000);
   // [data-count="62"]: numbers count up once, when they come into view.
   const io = new IntersectionObserver(
     (entries) => {
@@ -175,6 +182,9 @@ function initMotion(Lenis: typeof import("lenis").default): () => void {
     cleanups.forEach((c) => c());
     tiltOff.forEach((c) => c());
     io.disconnect();
+    revealIo.disconnect();
+    window.clearTimeout(revealSafety);
+    document.querySelectorAll(".np-pre").forEach((el) => el.classList.remove("np-pre", "is-in"));
     ctx.revert();
     gsap.ticker.remove(tick);
     lenis.destroy();

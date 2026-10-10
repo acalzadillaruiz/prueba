@@ -159,7 +159,7 @@ export function OwnerVisitHours({ listingId, locale, initial, onDone }: { listin
           <Copy size={14} aria-hidden /> {tx(locale, "Copiar el lunes de martes a viernes", "Copy Monday to Tuesday–Friday")}
         </button>
       )}
-      <p className="text-xs text-muted">{tx(locale, "Hora de Caracas. Se reserva con al menos 2 horas de antelación y hasta 8 días antes. Tus datos de contacto no se muestran: te llega cada pedido aquí y por email.", "Caracas time. Bookings need at least 2 hours’ notice, up to 8 days ahead. Your contact details aren’t shown: each request reaches you here and by email.")}</p>
+      <p className="text-xs text-muted">{tx(locale, "Hora de Caracas. Se reserva con al menos 2 horas de antelación y hasta 8 días antes. Tus datos de contacto no se muestran: te llega cada pedido aquí y por correo.", "Caracas time. Bookings need at least 2 hours’ notice, up to 8 days ahead. Your contact details aren’t shown: each request reaches you here and by email.")}</p>
       {err && <div role="alert" className="rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-sm text-danger">{err}</div>}
       {showErr && hasIssues && <p role="alert" className="text-sm font-semibold text-danger">{tx(locale, "Revisa las franjas marcadas.", "Check the highlighted ranges.")}</p>}
       <div className="flex flex-wrap gap-2">

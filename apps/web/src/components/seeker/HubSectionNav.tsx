@@ -73,7 +73,7 @@ export function HubSectionNav({ locale, sections }: { locale: Locale; sections: 
                   onClick={() => setActive(s.id)}
                   className={cn(
                     "flex min-h-10 items-center gap-1.5 whitespace-nowrap rounded-full px-4 font-display text-[14px] font-medium transition-colors duration-np focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink",
-                    on ? "bg-ink text-ivory [html.dark_&]:bg-[#EDE6DA] [html.dark_&]:text-[#1C1D1D]" : "text-ink/75 hover:bg-black/5 hover:text-ink",
+                    on ? "bg-ink text-ivory [html.dark_&]:bg-[#F6F2EC] [html.dark_&]:text-[#1C1D1D]" : "text-ink/75 hover:bg-black/5 hover:text-ink",
                   )}
                 >
                   {s.label}

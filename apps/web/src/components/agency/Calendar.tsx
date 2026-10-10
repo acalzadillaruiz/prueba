@@ -21,11 +21,11 @@ const HOUR_COL = 56;
 
 /** Event subtitles: a solid muted tone per event surface (opacity fell to ~4:1); every pair is ≥ 4.5:1 in both themes. */
 const SUB_CLS: Record<CalEvent["kind"], string> = {
-  tour: "text-[#D8CFC1] dark:text-[#5C534B]",
-  req: "text-[#5C534B] dark:text-[#D8CFC1]",
+  tour: "text-[#ECE5DA] dark:text-[#5C534B]",
+  req: "text-[#5C534B] dark:text-[#ECE5DA]",
   done: "",
   cancelled: "",
-  media: "text-[#4A4038] dark:text-[#D8CFC1]",
+  media: "text-[#4A4038] dark:text-[#ECE5DA]",
 };
 
 /** Opaque surface behind the sticky hour column (day columns scroll under it). */
@@ -143,9 +143,9 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
                     on ? "bg-navy text-ivory dark:bg-ivory dark:text-navy" : i === todayIdx ? "bg-[#DED5C7] text-navy dark:bg-white/10 dark:text-ivory" : cn("text-navy dark:text-ivory", k.hover),
                   )}
                 >
-                  <span className={cn("text-[11px] font-semibold uppercase tracking-[.08em]", on ? "text-[#D8CFC1] dark:text-[#5C534B]" : k.muted)}>{fmt(d, { weekday: "short" }).replace(".", "")}</span>
+                  <span className={cn("text-[11px] font-semibold uppercase tracking-[.08em]", on ? "text-[#ECE5DA] dark:text-[#5C534B]" : k.muted)}>{fmt(d, { weekday: "short" }).replace(".", "")}</span>
                   <span className="font-display text-[18px] font-semibold leading-none [font-feature-settings:'lnum']">{fmt(d, { day: "numeric" })}</span>
-                  <span aria-hidden className={cn("mt-0.5 h-1.5 w-1.5 rounded-full", count > 0 ? (on ? "bg-[#B79D83]" : "bg-gold-text dark:bg-[#B79D83]") : "bg-transparent")} />
+                  <span aria-hidden className={cn("mt-0.5 h-1.5 w-1.5 rounded-full", count > 0 ? (on ? "bg-[#C9B49C]" : "bg-gold-text dark:bg-[#C9B49C]") : "bg-transparent")} />
                 </button>
               );
             })}
@@ -159,7 +159,7 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
                 {byDay[day].map((e) => (
                   <li key={e.id} className={cn("rounded-2xl border p-3.5", k.line, e.kind === "req" && "border-dashed border-navy/40 dark:border-ivory/30", (e.kind === "done" || e.kind === "cancelled") && "opacity-75")}>
                     <div className="flex items-start gap-3">
-                      <div className={cn("flex w-14 shrink-0 flex-col items-center rounded-xl py-1.5", e.kind === "tour" ? "bg-navy text-ivory dark:bg-ivory dark:text-navy" : e.kind === "media" ? "bg-egeo/70 text-[#383E45] dark:bg-egeo/25 dark:text-[#EEE7DE]" : "bg-[#EDE6DA] text-navy dark:bg-white/[.06] dark:text-ivory")}>
+                      <div className={cn("flex w-14 shrink-0 flex-col items-center rounded-xl py-1.5", e.kind === "tour" ? "bg-navy text-ivory dark:bg-ivory dark:text-navy" : e.kind === "media" ? "bg-egeo/70 text-[#383E45] dark:bg-egeo/25 dark:text-[#EEE7DE]" : "bg-[#F6F2EC] text-navy dark:bg-white/[.06] dark:text-ivory")}>
                         <Clock size={12} aria-hidden className="opacity-70" />
                         <time dateTime={e.start} className="mt-0.5 whitespace-nowrap font-display text-[15px] font-semibold leading-none [font-feature-settings:'lnum','tnum']">{time(e.start)}</time>
                       </div>
@@ -228,7 +228,7 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
                         "pointer-events-auto absolute overflow-hidden rounded-lg px-2 py-1 text-left text-xs",
                         e.kind === "tour" && "bg-navy text-ivory dark:bg-ivory dark:text-navy",
                         e.kind === "req" && "border border-dashed border-navy/60 bg-[#DED5C7] text-navy dark:border-ivory/50 dark:bg-white/10 dark:text-ivory",
-                        (e.kind === "done" || e.kind === "cancelled") && "bg-[#EDE6DA] text-muted line-through dark:bg-white/[.06] dark:text-mist",
+                        (e.kind === "done" || e.kind === "cancelled") && "bg-[#F6F2EC] text-muted line-through dark:bg-white/[.06] dark:text-mist",
                         e.kind === "media" && "bg-egeo/70 text-[#383E45] dark:bg-egeo/25 dark:text-[#EEE7DE]",
                       )}
                       style={{ left: `calc(${(di / 7) * 100}% + ${(col / cols) * (100 / 7)}% + 3px)`, width: `calc(${100 / 7 / cols}% - 6px)`, top: (hr - firstH) * 56 + 3, height: 50 }}

@@ -432,14 +432,14 @@ export function PublicHeader({ locale, variant = "light", autoHide = false }: { 
           <div className={cn("ml-1 flex h-12 items-center gap-0.5 rounded-full border p-1 backdrop-blur-md", inv ? "border-white/30 bg-white/15" : "border-ink/10 bg-white/50")}>
             <OnCallButton
               locale={locale}
-              aria-label={tx(locale, "Guardia 24/7: habla con un asesor ahora", "On call 24/7: talk to an advisor now")}
+              aria-label={tx(locale, "Asesor 24/7: llama o escribe a un asesor", "Advisor 24/7: call or message an advisor")}
               className={cn("flex h-10 items-center gap-2 rounded-full pr-0 transition-colors min-[1400px]:pr-3", inv ? "hover:bg-white/10" : "hover:bg-black/5")}
             >
               <span className="flex h-10 w-10 items-center justify-center rounded-full bg-egeo text-ink">
                 <Phone size={16} strokeWidth={1.7} aria-hidden />
               </span>
               <span className="hidden items-center gap-2 whitespace-nowrap font-display text-[14px] font-normal min-[1400px]:flex">
-                {tx(locale, "Guardia 24/7", "On call 24/7")}
+                {tx(locale, "Asesor 24/7", "Advisor 24/7")}
                 <span className="h-2 w-2 rounded-full bg-[#3BB273]" aria-hidden />
               </span>
             </OnCallButton>

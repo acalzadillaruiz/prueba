@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params;
-  return pageMeta(locale, tx(locale, "Mi Hub", "My Hub"), "/app", { index: false });
+  return pageMeta(locale, tx(locale, "Tu espacio", "Your space"), "/app", { index: false });
 }
 
 const OPEN_FOR_OFFERS = ["ACTIVE", "COMING_SOON", "UNDER_OFFER"];

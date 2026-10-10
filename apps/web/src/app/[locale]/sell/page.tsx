@@ -27,25 +27,25 @@ export default async function SellPage({ params }: { params: Promise<{ locale: L
   const values = [
     {
       Icon: LineChart,
-      t: tx(locale, "Estimación gratis", "A free estimate"),
-      d: tx(locale, "El valor estimado New Place calcula cuánto vale tu casa con casas reales de tu zona, y te dice cuánta confianza tiene la cifra.", "PlaceEstimate works out what your home is worth from real homes in your area, and tells you how sure the figure is."),
+      t: tx(locale, "Sabes cuánto vale, gratis", "Know what it’s worth, free"),
+      d: tx(locale, "Calculamos su valor con casas reales de tu zona y te decimos cuánto fiarte de la cifra.", "We work out its value from real homes in your area and tell you how far to trust the figure."),
     },
     {
       Icon: Camera,
-      t: tx(locale, "Cómo la vendemos", "How we sell it"),
-      d: tx(locale, "Un anuncio cuidado en español e inglés, en el mapa y en la búsqueda, con compradores que dejan su contacto antes de visitar.", "A careful listing in Spanish and English, on the map and in search, with buyers who leave their details before visiting."),
+      t: tx(locale, "Llega a más compradores", "Reach more buyers"),
+      d: tx(locale, "Tu anuncio en español e inglés, en el mapa, con compradores que dejan sus datos antes de visitar.", "Your listing in Spanish and English, on the map, with buyers who leave their details before visiting."),
     },
     {
       Icon: CalendarClock,
-      t: tx(locale, "Tiempos", "Timing"),
+      t: tx(locale, "Tú pones el horario", "You set the schedule"),
       d: dom != null && dom > 0
-        ? tx(locale, `Publicar te lleva unos minutos. Hoy, las casas disponibles en New Place llevan una mediana de ${plural(dom, locale, ["día", "días"], ["day", "days"])} publicadas; un buen precio acorta la espera.`, `Listing takes a few minutes. Today the homes available on New Place have been listed for a median of ${plural(dom, locale, ["día", "días"], ["day", "days"])}; a good price shortens the wait.`)
-        : tx(locale, "Publicar te lleva unos minutos, y tú eliges los días y las horas de visita.", "Listing takes a few minutes, and you choose the days and times for visits."),
+        ? tx(locale, `Publicas en minutos y eliges cuándo enseñarla. Hoy las casas llevan una mediana de ${plural(dom, locale, ["día", "días"], ["day", "days"])} publicadas.`, `List in minutes and choose when to show it. Today homes have been listed a median of ${plural(dom, locale, ["día", "días"], ["day", "days"])}.`)
+        : tx(locale, "Publicas en minutos y tú eliges los días y las horas de visita.", "List in minutes, and you choose the days and times for visits."),
     },
     {
       Icon: HandCoins,
-      t: tx(locale, "Lo que cuesta", "What it costs"),
-      d: tx(locale, "Publicarla tú es gratis. Si prefieres una agencia verificada, ves su comisión antes de elegirla. Te lo explicamos sin letra pequeña.", "Listing it yourself is free. If you’d rather use a verified agency, you see its commission before you choose. No small print."),
+      t: tx(locale, "Publicar es gratis", "Listing is free"),
+      d: tx(locale, "Si prefieres una agencia verificada, ves su comisión antes de elegirla. Sin letra pequeña.", "If you’d rather use a verified agency, you see its commission before you choose. No small print."),
     },
   ];
   const steps = [
@@ -60,14 +60,14 @@ export default async function SellPage({ params }: { params: Promise<{ locale: L
           <div className="lg:pt-6">
             <p className="np-kicker text-gold-text">{tx(locale, "Vender con nosotros", "Sell with us")}</p>
             <h1 className="mt-3 max-w-[640px] text-[40px] leading-[1.04] tracking-[-0.02em] md:text-[60px]">
-              {tx(locale, "Vende tu casa con calma,", "Sell your home calmly,")} <span className="text-gold-text">{tx(locale, "y con datos.", "and with data.")}</span>
+              {tx(locale, "Vende tu casa", "Sell your home")} <span className="text-gold-text">{tx(locale, "al precio justo.", "at the right price.")}</span>
             </h1>
             <p className="mt-5 max-w-[520px] text-[17px] leading-relaxed text-ink/75">
               {tx(locale, "Te decimos cuánto vale, la mostramos bien y tú decides quién la visita y cuándo.", "We tell you what it’s worth, show it well, and you decide who visits and when.")}
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Button href={start} size="lg">
-                {tx(locale, "Empezar", "Get started")} <ArrowRight size={17} aria-hidden />
+                {tx(locale, "Publicar mi casa", "List my home")} <ArrowRight size={17} aria-hidden />
               </Button>
               <a href="#como-funciona" className="inline-flex min-h-11 items-center px-2 font-display text-[15px] font-semibold text-navy underline-offset-4 hover:underline">
                 {tx(locale, "Cómo funciona", "How it works")}
@@ -81,7 +81,7 @@ export default async function SellPage({ params }: { params: Promise<{ locale: L
       <section className="mx-auto max-w-[1320px] px-4 py-14 md:px-8 lg:py-20" aria-labelledby="sell-why">
         <p className="np-kicker text-gold-text">{tx(locale, "Lo que te damos", "What you get")}</p>
         <h2 id="sell-why" className="mt-3 max-w-[720px] text-[32px] leading-[1.08] tracking-[-0.02em] md:text-[44px]">
-          {tx(locale, "Claro desde el principio.", "Clear from the start.")}
+          {tx(locale, "Sabes qué recibes y qué pagas.", "You know what you get and what you pay.")}
         </h2>
         <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {values.map(({ Icon, t, d }) => (
@@ -97,11 +97,11 @@ export default async function SellPage({ params }: { params: Promise<{ locale: L
       <section id="como-funciona" className="scroll-mt-24 border-t border-line" aria-labelledby="sell-steps">
         <div className="mx-auto max-w-[1320px] px-4 py-14 md:px-8 lg:py-20">
           <p className="np-kicker text-gold-text">{tx(locale, "Cómo funciona", "How it works")}</p>
-          <h2 id="sell-steps" className="mt-3 text-[32px] leading-[1.08] tracking-[-0.02em] md:text-[44px]">{tx(locale, "Tres pasos, a tu ritmo.", "Three steps, at your pace.")}</h2>
+          <h2 id="sell-steps" className="mt-3 text-[32px] leading-[1.08] tracking-[-0.02em] md:text-[44px]">{tx(locale, "Publica en tres pasos", "List in three steps")}</h2>
           <ol className="mt-10 grid gap-8 md:grid-cols-3">
             {steps.map(([t, d], i) => (
               <li key={t} className="border-t border-ink/15 pt-5">
-                <span className="font-serif text-[44px] leading-none text-[#B79D83] [font-feature-settings:'lnum']">{i + 1}</span>
+                <span className="font-serif text-[44px] leading-none text-[#C9B49C] [font-feature-settings:'lnum']">{i + 1}</span>
                 <h3 className="mt-3 font-display text-[18px] font-semibold text-ink">{t}</h3>
                 <p className="mt-1.5 text-[15px] leading-relaxed text-muted">{d}</p>
               </li>
@@ -109,7 +109,7 @@ export default async function SellPage({ params }: { params: Promise<{ locale: L
           </ol>
           <div className="mt-12">
             <Button href={start} size="lg" variant="navy">
-              {tx(locale, "Empezar", "Get started")} <ArrowRight size={17} aria-hidden />
+              {tx(locale, "Publicar mi casa", "List my home")} <ArrowRight size={17} aria-hidden />
             </Button>
           </div>
         </div>

@@ -29,7 +29,7 @@ export default async function LuxuryPage({ params }: { params: Promise<{ locale:
   const privateCount = await prisma.listing.count({ where: { luxury: true, privateListing: true, status: "ACTIVE" } });
   const [hero] = lux;
   return (
-    <PublicPage locale={locale} header="transparent" tabbar contact={{ href: "#acceso", label: tx(locale, "Hablar con una persona", "Talk to a person") }}>
+    <PublicPage locale={locale} header="transparent" tabbar contact={{ href: "#acceso", label: tx(locale, "Hablar con un asesor", "Talk to an advisor") }}>
       {/* Cinema hero (AMALI): the collection's first home edge to edge, white title over a soft shade. */}
       <section className="relative isolate flex min-h-[78svh] items-end overflow-hidden bg-[#1C1D1D] text-white">
         <Image
@@ -45,14 +45,14 @@ export default async function LuxuryPage({ params }: { params: Promise<{ locale:
         <div className="relative mx-auto w-full max-w-[1320px] px-4 pb-14 pt-[140px] md:px-8 lg:pb-20">
           <p className="np-kicker text-white/85">{tx(locale, "Colección Privada", "Private Collection")}</p>
           <h1 className="mt-5 max-w-[860px] text-[34px] text-white sm:text-[48px] lg:text-[60px]">
-            {tx(locale, "Casas que no salen", "Homes that never make")} <span className="text-white/75">{tx(locale, "en ningún portal.", "it to the portals.")}</span>
+            {tx(locale, "Casas exclusivas", "Exclusive homes")} <span className="text-white/75">{tx(locale, "que ves en privado.", "you see in private.")}</span>
           </h1>
           <span aria-hidden className="mt-6 block h-px w-[min(300px,70%)] bg-white/70" />
           <p className="mt-6 max-w-[560px] text-[17px] font-light leading-relaxed text-white/90">
             {tx(
               locale,
-              `${lux.length} ${lux.length === 1 ? "casa elegida" : "casas elegidas"} una a una, revisadas y valoradas con datos reales. Algunas solo las enseñamos en privado: pide acceso y te las mostramos con calma.`,
-              `${lux.length} ${lux.length === 1 ? "home" : "homes"} chosen one by one, checked and valued with real data. Some we only show in private: ask for access and we'll take you through them, calmly.`,
+              `${lux.length} ${lux.length === 1 ? "casa elegida" : "casas elegidas"} una a una y valoradas con ventas reales. Algunas solo se ven en privado: pide acceso.`,
+              `${lux.length} ${lux.length === 1 ? "home" : "homes"} chosen one by one and valued from real sales. Some are only shown in private: ask for access.`,
             )}
           </p>
         </div>
@@ -60,8 +60,8 @@ export default async function LuxuryPage({ params }: { params: Promise<{ locale:
 
       <section className="mx-auto max-w-[1320px] px-4 py-20 md:px-8 lg:py-28">
         <div className="mb-10 flex flex-wrap items-end justify-between gap-4 border-b border-line pb-6">
-          <h2 className="text-[36px] leading-tight tracking-[-0.02em] md:text-[52px]">{tx(locale, "Una a una.", "One by one.")}</h2>
-          <p className="max-w-md text-[15px] text-muted">{tx(locale, "Cada una con su asesor de confianza y lo que vale de verdad, según ventas reales.", "Each with a trusted advisor and what it\u2019s really worth, from real sales.")}</p>
+          <h2 className="text-[36px] leading-tight tracking-[-0.02em] md:text-[52px]">{tx(locale, "Un asesor y un precio claro", "An advisor and a clear price")}</h2>
+          <p className="max-w-md text-[15px] text-muted">{tx(locale, "Cada casa tiene su asesor y un valor calculado con ventas reales de la zona.", "Each home has its own advisor and a value worked out from real sales nearby.")}</p>
         </div>
         {!hero ? (
           <EmptyState monogram title={tx(locale, "Estamos renovando la colección", "We’re refreshing the collection")} body={tx(locale, "Pide acceso y te contamos en privado cuando lleguen casas nuevas.", "Ask for access and we’ll tell you privately when new homes arrive.")} />
@@ -92,7 +92,7 @@ export default async function LuxuryPage({ params }: { params: Promise<{ locale:
       <section id="acceso" data-hide-fab className="np-navy-panel scroll-mt-24 bg-navy text-ivory">
         <div className="mx-auto grid max-w-[1320px] items-center gap-10 px-4 py-20 md:px-8 lg:grid-cols-[1.2fr_1fr] lg:py-24">
           <div>
-            <p className="np-eyebrow text-[#B79D83]">{tx(locale, "Acceso privado", "Private access")}</p>
+            <p className="np-eyebrow text-[#C9B49C]">{tx(locale, "Acceso privado", "Private access")}</p>
             <h2 className="mt-3 text-[36px] leading-tight md:text-[48px]">
               {tx(locale, `${privateCount} ${privateCount === 1 ? "casa privada disponible" : "casas privadas disponibles"}`, `${privateCount} private home${privateCount === 1 ? "" : "s"} available`)}
             </h2>
@@ -102,11 +102,11 @@ export default async function LuxuryPage({ params }: { params: Promise<{ locale:
                 tx(locale, "Visitas privadas, con la agenda real de tu asesor", "Private viewings, on your advisor’s real calendar"),
                 tx(locale, "Videovisita si compras desde fuera del país", "Video tours if you’re buying from abroad"),
               ].map((x) => (
-                <li key={x} className="flex items-center gap-3"><span aria-hidden className="h-px w-5 shrink-0 bg-[#B79D83]" /> {x}</li>
+                <li key={x} className="flex items-center gap-3"><span aria-hidden className="h-px w-5 shrink-0 bg-[#C9B49C]" /> {x}</li>
               ))}
             </ul>
           </div>
-          <div className="rounded-[4px] border border-[#B79D83]/40 p-8 text-center">
+          <div className="rounded-[4px] border border-[#C9B49C]/40 p-8 text-center">
             <p className="mx-auto max-w-sm text-[15px] text-ivory/80">{tx(locale, "Escríbele a un asesor de la colección. Tras una breve charla, te enviamos el enlace.", "Write to a collection advisor. After a short chat, we’ll send you the link.")}</p>
             {hero && (
               <Button href={`/${locale}/listing/${hero.slug}#contact`} variant="primary" size="lg" className="mt-6">

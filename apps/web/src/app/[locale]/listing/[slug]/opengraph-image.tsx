@@ -18,24 +18,24 @@ export default async function OgImage({ params }: { params: Promise<{ locale: Lo
   const facts = l ? [l.beds ? `${l.beds} ${tx(locale, "hab", "bd")}` : "", l.baths ? `${l.baths} ${tx(locale, l.baths === 1 ? "baño" : "baños", "ba")}` : "", `${l.areaM2} m²`].filter(Boolean).join("  ·  ") : "";
   return new ImageResponse(
     (
-      <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", background: "#1C1D1D", color: "#EDE6DA", padding: 64, fontFamily: "serif" }}>
+      <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", background: "#1C1D1D", color: "#F6F2EC", padding: 64, fontFamily: "serif" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
           {/* Brand roof mark: outer roof in Cal, inner "teja" in light terracotta. */}
           <svg width="96" height="34" viewBox="0 0 120 42">
-            <path d="M6 37 60 7l54 30" fill="none" stroke="#EDE6DA" strokeWidth="6" />
+            <path d="M6 37 60 7l54 30" fill="none" stroke="#F6F2EC" strokeWidth="6" />
             <path d="M30 38 60 21.5 90 38" fill="none" stroke="#9CC3CC" strokeWidth="5" />
           </svg>
-          <div style={{ fontSize: 30, letterSpacing: 8, color: "#EDE6DA" }}>NEW PLACE</div>
+          <div style={{ fontSize: 30, letterSpacing: 8, color: "#F6F2EC" }}>NEW PLACE</div>
           {l?.luxury && <div style={{ marginLeft: 18, fontSize: 20, letterSpacing: 4, color: "#1F4E5A", background: "#FFFFFF", borderRadius: 999, padding: "6px 18px" }}>{tx(locale, "EXCLUSIVA", "EXCLUSIVE")}</div>}
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-          <div style={{ width: 120, height: 2, background: "#B79D83" }} />
+          <div style={{ width: 120, height: 2, background: "#C9B49C" }} />
           <div style={{ fontSize: 66, lineHeight: 1.08, maxWidth: 1050 }}>{l ? title : tx(locale, "Tu próximo lugar, verificado.", "Your next place, verified.")}</div>
-          <div style={{ fontSize: 32, color: "#B8B2AA", fontFamily: "sans-serif" }}>{l ? where : tx(locale, "El Caribe, con alma mediterránea", "The Caribbean, with a Mediterranean soul")}</div>
+          <div style={{ fontSize: 32, color: "#B8B2AA", fontFamily: "sans-serif" }}>{l ? where : tx(locale, "Casas revisadas en Caracas, Lechería y El Morro", "Checked homes in Caracas, Lechería and El Morro")}</div>
         </div>
         <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
-          <div style={{ fontSize: 64, color: "#EDE6DA" }}>{price}</div>
-          <div style={{ fontSize: 28, color: "#B79D83", fontFamily: "sans-serif" }}>{facts}</div>
+          <div style={{ fontSize: 64, color: "#F6F2EC" }}>{price}</div>
+          <div style={{ fontSize: 28, color: "#C9B49C", fontFamily: "sans-serif" }}>{facts}</div>
         </div>
       </div>
     ),

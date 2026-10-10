@@ -159,7 +159,7 @@ export function AdminShell({
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-[264px] flex-col bg-navy text-ivory lg:flex">
         <div className="px-7 pb-6 pt-8 [@media(max-height:820px)]:pb-3 [@media(max-height:820px)]:pt-5">
           <Link href={`/${locale}`} aria-label="New Place" className="inline-block rounded-md"><Logo tone="ivory" /></Link>
-          <div className="mt-2 text-[10px] font-semibold uppercase tracking-[.22em] text-[#B79D83]/80 [@media(max-height:820px)]:mt-1">{area === "agency" ? tx(locale, "Agencia", "Agency") : tx(locale, "Plataforma", "Platform")}</div>
+          <div className="mt-2 text-[10px] font-semibold uppercase tracking-[.22em] text-[#C9B49C]/80 [@media(max-height:820px)]:mt-1">{area === "agency" ? tx(locale, "Agencia", "Agency") : tx(locale, "Plataforma", "Platform")}</div>
         </div>
         <nav className="min-h-0 flex-1 space-y-0.5 overflow-y-auto px-4 scrollbar-thin" aria-label={area === "agency" ? tx(locale, "Panel de agencia", "Agency dashboard") : tx(locale, "Consola de plataforma", "Platform console")}>
           {items.map((i) => {
@@ -171,7 +171,7 @@ export function AdminShell({
                 aria-current={active ? "page" : undefined}
                 className={cn(
                   "flex min-h-[38px] items-center gap-3.5 rounded-xl px-4 py-2 text-[14.5px] leading-[22px] transition-colors duration-np",
-                  active ? "bg-[#22262A] text-ivory shadow-[inset_3px_0_0_#B79D83]" : "text-ivory/75 hover:bg-white/[.04] hover:text-ivory",
+                  active ? "bg-[#22262A] text-ivory shadow-[inset_3px_0_0_#C9B49C]" : "text-ivory/75 hover:bg-white/[.04] hover:text-ivory",
                 )}
               >
                 <i.icon size={18} strokeWidth={1.6} className={active ? "text-ivory" : "text-ivory/70"} />
@@ -242,7 +242,7 @@ export function AdminShell({
                   key={i.href}
                   href={base + i.href}
                   aria-current={active ? "page" : undefined}
-                  className={cn("flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-2 text-[14px]", active ? "bg-[#22262A] text-ivory shadow-[inset_0_-2px_0_#B79D83]" : "text-ivory/70")}
+                  className={cn("flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-2 text-[14px]", active ? "bg-[#22262A] text-ivory shadow-[inset_0_-2px_0_#C9B49C]" : "text-ivory/70")}
                 >
                   <i.icon size={15} strokeWidth={1.6} /> {t(i.label)}
                   {(badges[i.href] ?? 0) > 0 && <Count>{badges[i.href]}</Count>}

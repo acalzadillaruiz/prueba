@@ -2,10 +2,10 @@
   "brand": { "tagline": "The Caribbean, with a Mediterranean soul.", "sub": "Real estate" },
   "nav": { "buy": "Buy", "rent": "Rent", "vacation": "Holiday rentals", "commercial": "Commercial", "luxury": "Luxury", "saved": "Saved", "publish": "List a property", "signIn": "Sign in", "signOut": "Sign out", "menu": "Menu", "privateCollection": "Private Collection", "remoteBuying": "Buy from abroad", "sell": "Sell with us", "home": "Home", "map": "Map", "account": "Account" },
   "footer": {
-    "about": "We help you find home in Lechería, El Morro, Margarita and Caracas.",
+    "about": "We help you buy, rent or sell a home in Lechería, El Morro, Margarita and Caracas.",
     "search": "Search", "owners": "Owners", "agencies": "Agencies",
     "listFree": "List for free", "hireAgency": "Hire an agency", "myProperties": "My properties",
-    "forAgencies": "New Place for agencies", "legal": "Prices in USD. VES/EUR conversions are for reference only.", "sellWithUs": "Sell with us", "valuation": "Value my property"
+    "forAgencies": "New Place for agencies", "legal": "Prices in USD. VES/EUR conversions are for reference only.", "sellWithUs": "Sell with us", "valuation": "What’s my home worth?"
   },
   "admin": {
     "dashboard": "Dashboard", "leads": "Leads", "listings": "Listings", "calendar": "Calendar", "capture": "Capture", "media": "Media", "team": "Team", "reports": "Reports", "teamAudit": "Team audit", "settings": "Settings",
@@ -14,5 +14,5 @@
   },
   "roles": { "SUPERADMIN": "Superadmin", "AGENCY_OWNER": "Agency owner", "AGENT": "Agent", "CAPTOR": "Captor", "PHOTOGRAPHER": "Photographer", "BACKOFFICE": "Backoffice", "OWNER_PRIVATE": "Owner", "SEEKER": "Seeker" },
   "errors": { "UNAUTHORIZED": "Sign in to continue.", "FORBIDDEN": "Your account doesn’t have access to this.", "NOT_FOUND": "We couldn’t find what you’re looking for.", "VALIDATION": "Something needs a second look. Check the details and try again.", "CONFLICT": "This is already on file.", "INTERNAL": "Something went wrong on our side. Please try again in a moment." },
-  "common": { "loading": "One moment…", "retry": "Try again", "back": "Back home", "notFound": "We couldn’t find this page", "notFoundBody": "That home may have found its owner, or the link has changed. Let’s take you back to the start.", "error": "Something went wrong", "errorBody": "That one’s on us, not you. Try again in a few seconds." }
+  "common": { "loading": "One moment…", "retry": "Try again", "back": "Back home", "notFound": "We couldn’t find this page", "notFoundBody": "That home may have sold, or the link changed. Find others from the home page.", "error": "Something went wrong", "errorBody": "That one’s on us, not you. Try again in a few seconds." }
 }

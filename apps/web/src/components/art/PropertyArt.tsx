@@ -9,7 +9,7 @@ import type { Scene } from "@/types/domain";
  */
 
 const WALLS = ["#EDE6DB", "#E9E2D6", "#E4E0D8", "#EFE9E1", "#E7DED2", "#E6DFD3"];
-const ACCENTS = ["#1F4E5A", "#B79D83", "#B8B2AA", "#2F6B4F", "#8A5A00", "#736A63"];
+const ACCENTS = ["#1F4E5A", "#C9B49C", "#B8B2AA", "#2F6B4F", "#8A5A00", "#736A63"];
 const SOFAS = ["#22262A", "#B8B2AA", "#C9B79C", "#463D38", "#B9725E", "#6E7C6B"];
 
 function pick<T>(arr: T[], seed: number, salt = 0): T {
@@ -38,7 +38,7 @@ function Sky({ id, dusk }: { id: string; dusk: boolean }) {
             <>
               <stop offset="0" stopColor="#CBBBA7" />
               <stop offset="0.7" stopColor="#EAE2D9" />
-              <stop offset="1" stopColor="#EDE6DA" />
+              <stop offset="1" stopColor="#F6F2EC" />
             </>
           )}
         </linearGradient>
@@ -91,7 +91,7 @@ function Windows({ x, y, w, h, cols, rows, seed, dusk }: { x: number; y: number;
           width={cw * 0.64}
           height={ch * 0.6}
           rx="1"
-          fill={dusk ? (lit ? "#B79D83" : "#37302B") : "#BDB0A2"}
+          fill={dusk ? (lit ? "#C9B49C" : "#37302B") : "#BDB0A2"}
           opacity={dusk ? (lit ? 0.95 : 0.9) : 0.8}
         />,
       );
@@ -105,7 +105,7 @@ function TowerScene({ id, seed, dusk }: { id: string; seed: number; dusk: boolea
   return (
     <>
       <Sky id={id} dusk={dusk} />
-      {dusk && <circle cx={320} cy={70} r={2} fill="#EDE6DA" opacity=".6" />}
+      {dusk && <circle cx={320} cy={70} r={2} fill="#F6F2EC" opacity=".6" />}
       <Avila dusk={dusk} y={180} />
       {/* background towers */}
       {[20, 70, 300, 350].map((x, i) => (
@@ -149,7 +149,7 @@ function HouseScene({ id, dusk, pool }: { id: string; seed: number; dusk: boolea
         </linearGradient>
       </defs>
       <Sky id={id} dusk={dusk} />
-      {dusk && [30, 90, 150, 240, 330, 370, 60, 200].map((x, i) => <circle key={x} cx={x} cy={20 + ((i * 37) % 70)} r={1.1} fill="#EDE6DA" opacity={0.7} />)}
+      {dusk && [30, 90, 150, 240, 330, 370, 60, 200].map((x, i) => <circle key={x} cx={x} cy={20 + ((i * 37) % 70)} r={1.1} fill="#F6F2EC" opacity={0.7} />)}
       <Avila dusk={dusk} y={175} />
       <rect y={196} width={400} height={104} fill={dusk ? "#1B2E23" : "#6F9A6A"} />
       {/* upper volume */}
@@ -182,8 +182,8 @@ function HouseScene({ id, dusk, pool }: { id: string; seed: number; dusk: boolea
           <rect x={190} y={232} width={130} height={8} fill={dusk ? "#F7D39A" : "#FFFFFF"} opacity=".22" />
           {[252, 262, 270].map((y, i) => <rect key={y} x={40 + i * 90} y={y} width={80} height={2} fill="#FFFFFF" opacity=".3" />)}
           <rect x={0} y={278} width={400} height={22} fill={dusk ? "#CBBFAE" : "#E9E1D4"} />
-          <rect x={60} y={283} width={46} height={8} rx={3} fill="#EDE6DA" />
-          <rect x={120} y={283} width={46} height={8} rx={3} fill="#EDE6DA" />
+          <rect x={60} y={283} width={46} height={8} rx={3} fill="#F6F2EC" />
+          <rect x={120} y={283} width={46} height={8} rx={3} fill="#F6F2EC" />
           <rect x={290} y={280} width={40} height={12} rx={6} fill="#1F4E5A" />
         </>
       ) : (
@@ -210,14 +210,14 @@ function BeachScene({ id, dusk }: { id: string; dusk: boolean }) {
       ))}
       <path d="M0 225 Q 200 200 400 228 L400 300 L0 300 Z" fill={dusk ? "#C9A57E" : "#EFDDBC"} />
       <path d="M0 232 Q 200 210 400 236" stroke="#FFFFFF" strokeWidth="3" fill="none" opacity=".6" />
-      <rect x={250} y={190} width={110} height={50} fill="#EDE6DA" />
+      <rect x={250} y={190} width={110} height={50} fill="#F6F2EC" />
       <rect x={245} y={184} width={120} height={8} fill="#1C1D1D" />
-      <rect x={262} y={202} width={40} height={30} fill={dusk ? "#B79D83" : "#B4A99F"} />
-      <rect x={310} y={202} width={40} height={30} fill={dusk ? "#B79D83" : "#B4A99F"} />
+      <rect x={262} y={202} width={40} height={30} fill={dusk ? "#C9B49C" : "#B4A99F"} />
+      <rect x={310} y={202} width={40} height={30} fill={dusk ? "#C9B49C" : "#B4A99F"} />
       <Palm x={60} y={270} s={1.3} dark={dusk} />
       <Palm x={200} y={265} s={0.9} dark={dusk} />
       <rect x={110} y={255} width={36} height={6} rx="3" fill="#1F4E5A" />
-      <rect x={150} y={258} width={36} height={6} rx="3" fill="#EDE6DA" />
+      <rect x={150} y={258} width={36} height={6} rx="3" fill="#F6F2EC" />
     </>
   );
 }
@@ -227,15 +227,15 @@ function ChaletScene({ id, dusk }: { id: string; dusk: boolean }) {
     <>
       <Sky id={id} dusk={dusk} />
       <path d="M0 190 L90 70 L140 120 L220 40 L300 130 L350 90 L400 140 L400 300 L0 300 Z" fill={dusk ? "#3B332E" : "#867C74"} />
-      <path d="M72 94 L90 70 L108 94 L98 90 L90 98 L80 90 Z M200 66 L220 40 L240 66 L228 60 L220 70 L210 60 Z M338 104 L350 90 L362 104 L350 100 Z" fill="#EDE6DA" />
+      <path d="M72 94 L90 70 L108 94 L98 90 L90 98 L80 90 Z M200 66 L220 40 L240 66 L228 60 L220 70 L210 60 Z M338 104 L350 90 L362 104 L350 100 Z" fill="#F6F2EC" />
       <path d="M0 220 Q 120 180 240 210 T 400 200 L400 300 L0 300 Z" fill={dusk ? "#1C3A2C" : "#557F52"} />
       {[30, 55, 330, 360].map((x, i) => (
         <path key={x} d={`M${x} ${250 - i * 4} l14 -48 l14 48 Z`} fill={dusk ? "#0F241A" : "#2E5237"} />
       ))}
       <rect x={140} y={200} width={130} height={70} fill={dusk ? "#8A6446" : "#A77A55"} />
       <path d="M125 204 L205 150 L285 204 Z" fill={dusk ? "#2B3035" : "#5A3B2C"} />
-      <rect x={160} y={220} width={30} height={26} fill={dusk ? "#B79D83" : "#E5DCD0"} />
-      <rect x={220} y={220} width={30} height={26} fill={dusk ? "#B79D83" : "#E5DCD0"} />
+      <rect x={160} y={220} width={30} height={26} fill={dusk ? "#C9B49C" : "#E5DCD0"} />
+      <rect x={220} y={220} width={30} height={26} fill={dusk ? "#C9B49C" : "#E5DCD0"} />
       <rect x={196} y={235} width={20} height={35} fill="#2B3035" />
       <rect x={240} y={160} width={12} height={26} fill="#2B3035" />
       {dusk && <path d="M246 150 q 6 -10 0 -20 q -6 -10 2 -20" stroke="#B8B2AA" strokeWidth="3" fill="none" opacity=".5" />}
@@ -248,7 +248,7 @@ function LandScene({ id, dusk }: { id: string; dusk: boolean }) {
     <>
       <Sky id={id} dusk={dusk} />
       <path d="M0 170 L70 110 L130 150 L200 80 L270 140 L330 100 L400 150 L400 300 L0 300 Z" fill={dusk ? "#3B332E" : "#9A9087"} />
-      <path d="M200 80 L215 95 L205 92 L200 98 L193 92 L186 94 Z" fill="#EDE6DA" />
+      <path d="M200 80 L215 95 L205 92 L200 98 L193 92 L186 94 Z" fill="#F6F2EC" />
       <path d="M0 210 Q 100 170 200 200 T 400 190 L400 300 L0 300 Z" fill={dusk ? "#2B4A33" : "#8DB36F"} />
       <path d="M0 240 Q 150 220 400 245 L400 300 L0 300 Z" fill={dusk ? "#223C2A" : "#77A05C"} />
       {[40, 90, 140, 190, 240, 290, 340].map((x) => (
@@ -259,7 +259,7 @@ function LandScene({ id, dusk }: { id: string; dusk: boolean }) {
       <path d="M40 256 L344 256 M40 266 L344 266" stroke="#64574C" strokeWidth="1.5" />
       <rect x={300} y={206} width={60} height={30} rx="3" fill="#1F4E5A" />
       <rect x={328} y={236} width={4} height={20} fill="#64574C" />
-      <text x={330} y={226} textAnchor="middle" fontSize="11" fontFamily="var(--font-display)" fill="#EDE6DA" fontWeight="700">
+      <text x={330} y={226} textAnchor="middle" fontSize="11" fontFamily="var(--font-display)" fill="#F6F2EC" fontWeight="700">
         NP
       </text>
     </>
@@ -274,7 +274,7 @@ function WindowView({ x, y, w, h, id, dusk }: { x: number; y: number; w: number;
       </clipPath>
       <g clipPath={`url(#${id}-win)`}>
         <rect x={x} y={y} width={w} height={h} fill={dusk ? "#383E45" : "#DDCCB6"} />
-        <rect x={x} y={y + h * 0.55} width={w} height={h * 0.45} fill={dusk ? "#F29A6B" : "#EDE6DA"} opacity=".45" />
+        <rect x={x} y={y + h * 0.55} width={w} height={h * 0.45} fill={dusk ? "#F29A6B" : "#F6F2EC"} opacity=".45" />
         <path
           d={`M${x} ${y + h * 0.7} L${x + w * 0.2} ${y + h * 0.42} L${x + w * 0.45} ${y + h * 0.55} L${x + w * 0.7} ${y + h * 0.35} L${x + w} ${y + h * 0.6} L${x + w} ${y + h} L${x} ${y + h} Z`}
           fill={dusk ? "#28221E" : "#7E9C8C"}
@@ -322,10 +322,10 @@ function Living({ id, seed }: { id: string; seed: number }) {
     <Interior id={id} seed={seed} dusk={dusk}>
       <WindowView x={200} y={40} w={170} h={150} id={id} dusk={dusk} />
       <rect x={30} y={60} width={70} height={54} fill={pick(ACCENTS, seed, 2)} opacity=".85" />
-      <rect x={30} y={60} width={70} height={54} fill="none" stroke="#B79D83" strokeWidth="3" />
+      <rect x={30} y={60} width={70} height={54} fill="none" stroke="#C9B49C" strokeWidth="3" />
       <path d="M142 0 L142 60" stroke="#2B3035" strokeWidth="1.5" />
-      <path d="M126 60 L158 60 L150 76 L134 76 Z" fill="#B79D83" />
-      {dusk && <circle cx={142} cy={80} r={30} fill="#B79D83" opacity=".18" />}
+      <path d="M126 60 L158 60 L150 76 L134 76 Z" fill="#C9B49C" />
+      {dusk && <circle cx={142} cy={80} r={30} fill="#C9B49C" opacity=".18" />}
       <rect x={20} y={168} width={220} height={52} rx="10" fill={sofa} />
       <rect x={20} y={150} width={220} height={34} rx="10" fill={sofa} />
       <rect x={34} y={156} width={50} height={26} rx="6" fill="#FFFFFF" opacity=".18" />
@@ -336,8 +336,8 @@ function Living({ id, seed }: { id: string; seed: number }) {
       <rect x={110} y={236} width={110} height={10} rx="4" fill="#3A4047" />
       <rect x={122} y={246} width={6} height={16} fill="#3A4047" />
       <rect x={202} y={246} width={6} height={16} fill="#3A4047" />
-      <rect x={140} y={228} width={24} height={8} rx="2" fill="#B79D83" />
-      <rect x={330} y={180} width={34} height={44} rx="4" fill="#B79D83" />
+      <rect x={140} y={228} width={24} height={8} rx="2" fill="#C9B49C" />
+      <rect x={330} y={180} width={34} height={44} rx="4" fill="#C9B49C" />
       <path d="M347 180 C 320 150 330 120 347 110 C 364 120 374 150 347 180" fill="#2F6B4F" />
       <path d="M347 180 C 340 150 355 130 368 128" stroke="#2F6B4F" strokeWidth="6" fill="none" />
     </Interior>
@@ -345,14 +345,14 @@ function Living({ id, seed }: { id: string; seed: number }) {
 }
 
 function Kitchen({ id, seed }: { id: string; seed: number }) {
-  const cab = seed % 2 ? "#22262A" : "#EDE6DA";
+  const cab = seed % 2 ? "#22262A" : "#F6F2EC";
   const counter = "#E9E6E1";
   return (
     <Interior id={id} seed={seed} floor="#B8A38A">
       <WindowView x={250} y={40} w={120} h={90} id={id} dusk={false} />
       <rect x={20} y={30} width={210} height={70} fill={cab} stroke="#00000014" />
       {[20, 90, 160].map((x) => (
-        <rect key={x} x={x + 30} y={60} width={10} height={3} fill="#B79D83" />
+        <rect key={x} x={x + 30} y={60} width={10} height={3} fill="#C9B49C" />
       ))}
       <rect x={20} y={100} width={210} height={46} fill="#E6DFD3" />
       {[0, 1, 2, 3, 4, 5, 6].map((i) => (
@@ -367,7 +367,7 @@ function Kitchen({ id, seed }: { id: string; seed: number }) {
       {[110, 170, 230].map((x) => (
         <g key={x}>
           <path d={`M${x} 0 L${x} 64`} stroke="#2B3035" strokeWidth="1.5" />
-          <path d={`M${x - 14} 64 L${x + 14} 64 L${x + 8} 80 L${x - 8} 80 Z`} fill="#B79D83" />
+          <path d={`M${x - 14} 64 L${x + 14} 64 L${x + 8} 80 L${x - 8} 80 Z`} fill="#C9B49C" />
           <rect x={x - 12} y={262} width={24} height={6} rx="2" fill="#1F4E5A" />
           <rect x={x - 2} y={268} width={4} height={26} fill="#2B3035" />
         </g>
@@ -385,20 +385,20 @@ function Bedroom({ id, seed }: { id: string; seed: number }) {
   return (
     <Interior id={id} seed={seed + 3} floor="#C4A585" dusk={dusk}>
       <WindowView x={290} y={40} w={90} h={140} id={id} dusk={dusk} />
-      <path d="M284 36 q 8 80 -2 150 L276 186 L276 36 Z" fill="#EDE6DA" opacity=".9" />
+      <path d="M284 36 q 8 80 -2 150 L276 186 L276 36 Z" fill="#F6F2EC" opacity=".9" />
       <rect x={70} y={96} width={200} height={70} rx="6" fill={pick(SOFAS, seed, 2)} />
-      <rect x={60} y={160} width={220} height={60} rx="8" fill="#EDE6DA" />
+      <rect x={60} y={160} width={220} height={60} rx="8" fill="#F6F2EC" />
       <rect x={60} y={190} width={220} height={36} rx="6" fill={throwC} opacity=".85" />
       <rect x={82} y={140} width={70} height={28} rx="10" fill="#FFFFFF" />
       <rect x={188} y={140} width={70} height={28} rx="10" fill="#FFFFFF" />
-      <rect x={20} y={176} width={34} height={46} fill="#B79D83" />
-      <rect x={286} y={176} width={34} height={46} fill="#B79D83" />
-      <path d="M30 150 L44 150 L48 170 L26 170 Z" fill="#B79D83" />
-      <path d="M296 150 L310 150 L314 170 L292 170 Z" fill="#B79D83" />
+      <rect x={20} y={176} width={34} height={46} fill="#C9B49C" />
+      <rect x={286} y={176} width={34} height={46} fill="#C9B49C" />
+      <path d="M30 150 L44 150 L48 170 L26 170 Z" fill="#C9B49C" />
+      <path d="M296 150 L310 150 L314 170 L292 170 Z" fill="#C9B49C" />
       {dusk && (
         <>
-          <circle cx={37} cy={165} r={22} fill="#B79D83" opacity=".22" />
-          <circle cx={303} cy={165} r={22} fill="#B79D83" opacity=".22" />
+          <circle cx={37} cy={165} r={22} fill="#C9B49C" opacity=".22" />
+          <circle cx={303} cy={165} r={22} fill="#C9B49C" opacity=".22" />
         </>
       )}
       <rect x={130} y={40} width={80} height={44} fill="#1C1D1D" />
@@ -417,16 +417,16 @@ function Bath({ id, seed }: { id: string; seed: number }) {
       {Array.from({ length: 14 }).map((_, i) => (
         <rect key={i} x={i * 30} y={0} width={1} height={226} fill="#FFFFFF" opacity=".5" />
       ))}
-      <rect x={60} y={40} width={120} height={90} rx="45" fill="#E8DFD4" stroke="#B79D83" strokeWidth="4" />
-      <rect x={40} y={150} width={160} height={14} fill="#EDE6DA" />
-      <rect x={50} y={164} width={140} height={60} fill={seed % 2 ? "#22262A" : "#B79D83"} />
+      <rect x={60} y={40} width={120} height={90} rx="45" fill="#E8DFD4" stroke="#C9B49C" strokeWidth="4" />
+      <rect x={40} y={150} width={160} height={14} fill="#F6F2EC" />
+      <rect x={50} y={164} width={140} height={60} fill={seed % 2 ? "#22262A" : "#C9B49C"} />
       <ellipse cx={120} cy={152} rx={34} ry={6} fill="#FFFFFF" />
-      <rect x={117} y={132} width={6} height={16} fill="#B79D83" />
+      <rect x={117} y={132} width={6} height={16} fill="#C9B49C" />
       <rect x={230} y={170} width={150} height={56} rx="26" fill="#FFFFFF" />
       <rect x={236} y={176} width={138} height={20} rx="10" fill="#E6DED3" />
-      <path d="M370 170 L370 120 L352 120" stroke="#B79D83" strokeWidth="4" fill="none" />
+      <path d="M370 170 L370 120 L352 120" stroke="#C9B49C" strokeWidth="4" fill="none" />
       <path d="M270 130 C 262 104 276 90 288 100 C 300 90 312 110 300 130 Z" fill="#2F6B4F" />
-      <rect x={278} y={130} width={16} height={20} fill="#EDE6DA" />
+      <rect x={278} y={130} width={16} height={20} fill="#F6F2EC" />
     </Interior>
   );
 }
@@ -448,14 +448,14 @@ function Terrace({ id, seed }: { id: string; seed: number }) {
         <rect key={i} x={0} y={210 + i * 8} width={400} height={1} fill="#000" opacity=".12" />
       ))}
       <rect y={170} width={400} height={40} fill="#DFD0BC" opacity=".25" />
-      <rect y={168} width={400} height={3} fill="#B79D83" />
+      <rect y={168} width={400} height={3} fill="#C9B49C" />
       {dusk && (
         <path d="M0 40 Q 100 70 200 44 T 400 50" stroke="#2B3035" fill="none" strokeWidth="1" />
       )}
-      {dusk && [30, 80, 130, 180, 230, 280, 330, 380].map((x, i) => <circle key={x} cx={x} cy={50 + Math.sin(i) * 8} r={3} fill="#B79D83" />)}
-      <rect x={60} y={236} width={90} height={18} rx="6" fill="#EDE6DA" />
-      <rect x={60} y={222} width={30} height={20} rx="6" fill="#EDE6DA" transform="rotate(-20 75 232)" />
-      <rect x={200} y={236} width={90} height={18} rx="6" fill="#EDE6DA" />
+      {dusk && [30, 80, 130, 180, 230, 280, 330, 380].map((x, i) => <circle key={x} cx={x} cy={50 + Math.sin(i) * 8} r={3} fill="#C9B49C" />)}
+      <rect x={60} y={236} width={90} height={18} rx="6" fill="#F6F2EC" />
+      <rect x={60} y={222} width={30} height={20} rx="6" fill="#F6F2EC" transform="rotate(-20 75 232)" />
+      <rect x={200} y={236} width={90} height={18} rx="6" fill="#F6F2EC" />
       <rect x={165} y={244} width={24} height={14} rx="7" fill={pick(ACCENTS, seed)} />
       <path d="M350 250 C 330 210 340 180 356 170 C 372 184 378 214 360 250 Z" fill="#2F6B4F" />
       <rect x={338} y={246} width={40} height={30} rx="4" fill="#1F4E5A" />
@@ -469,7 +469,7 @@ function Office({ id, seed }: { id: string; seed: number }) {
       <WindowView x={20} y={30} w={360} h={150} id={id} dusk={seed % 2 === 0} />
       {[60, 180, 300].map((x) => (
         <g key={x}>
-          <rect x={x - 50} y={200} width={100} height={8} fill="#EDE6DA" />
+          <rect x={x - 50} y={200} width={100} height={8} fill="#F6F2EC" />
           <rect x={x - 46} y={208} width={4} height={40} fill="#2B3035" />
           <rect x={x + 42} y={208} width={4} height={40} fill="#2B3035" />
           <rect x={x - 22} y={172} width={44} height={28} rx="2" fill="#1C1D1D" />
@@ -505,7 +505,7 @@ function Retail({ seed }: { id: string; seed: number }) {
         </g>
       ))}
       <rect x={0} y={250} width={400} height={50} fill="#B7B0A2" />
-      <text x={200} y={82} textAnchor="middle" fontSize="16" fontWeight="700" fontFamily="var(--font-display)" fill="#EDE6DA">
+      <text x={200} y={82} textAnchor="middle" fontSize="16" fontWeight="700" fontFamily="var(--font-display)" fill="#F6F2EC">
         LOCAL DISPONIBLE
       </text>
     </>
@@ -529,7 +529,7 @@ function Warehouse({ id, seed }: { id: string; seed: number }) {
       <rect x={200} y={150} width={90} height={90} fill="#3A4047" />
       <rect x={60} y={230} width={240} height={14} fill="#1F4E5A" />
       <rect x={300} y={130} width={50} height={30} fill="#B4A99F" />
-      <rect x={220} y={200} width={120} height={50} fill="#EDE6DA" />
+      <rect x={220} y={200} width={120} height={50} fill="#F6F2EC" />
       <rect x={340} y={214} width={40} height={36} fill="#1C1D1D" />
       <circle cx={250} cy={254} r={9} fill="#1C1D1D" />
       <circle cx={360} cy={254} r={9} fill="#1C1D1D" />
@@ -541,7 +541,7 @@ function Lobby({ id, seed }: { id: string; seed: number }) {
   return (
     <Interior id={id} seed={seed} wall="#22262A" floor="#E9E6E1" dusk>
       {[0, 1, 2, 3].map((i) => (
-        <rect key={i} x={40 + i * 90} y={40} width={60} height={180} fill="#22262A" stroke="#B79D83" strokeWidth="2" />
+        <rect key={i} x={40 + i * 90} y={40} width={60} height={180} fill="#22262A" stroke="#C9B49C" strokeWidth="2" />
       ))}
       {[0, 1].map((i) => (
         <g key={i}>
@@ -549,11 +549,11 @@ function Lobby({ id, seed }: { id: string; seed: number }) {
           <rect x={169 + i * 90} y={100} width={2} height={120} fill="#22262A" />
         </g>
       ))}
-      <rect x={20} y={196} width={120} height={36} fill="#B79D83" />
-      <rect x={20} y={192} width={120} height={6} fill="#EDE6DA" />
+      <rect x={20} y={196} width={120} height={36} fill="#C9B49C" />
+      <rect x={20} y={192} width={120} height={6} fill="#F6F2EC" />
       <path d="M330 222 C 310 180 320 150 336 140 C 352 154 360 184 342 222 Z" fill="#2F6B4F" />
-      <rect x={322} y={218} width={30} height={20} fill="#B79D83" />
-      <circle cx={200} cy={20} r={16} fill="#B79D83" opacity=".6" />
+      <rect x={322} y={218} width={30} height={20} fill="#C9B49C" />
+      <circle cx={200} cy={20} r={16} fill="#C9B49C" opacity=".6" />
       <path d="M0 300 L400 300 L400 280 Q 200 262 0 280 Z" fill="#FFFFFF" opacity=".3" />
     </Interior>
   );
@@ -657,7 +657,7 @@ export function Floorplan({ seed = "np", beds = 3, className }: { seed?: string;
   const rooms = Math.max(1, Math.min(beds, 4));
   return (
     <svg viewBox="0 0 400 300" className={className} role="img" aria-label="Plano">
-      <rect width="400" height="300" fill="#EDE6DA" />
+      <rect width="400" height="300" fill="#F6F2EC" />
       <g stroke="#1C1D1D" strokeWidth="4" fill="none">
         <rect x={30} y={30} width={340} height={240} />
         <path d="M200 30 L200 150 M30 150 L370 150" />
@@ -665,7 +665,7 @@ export function Floorplan({ seed = "np", beds = 3, className }: { seed?: string;
         {rooms > 1 && <path d="M115 150 L115 270" />}
         <path d="M200 150 L200 270" />
       </g>
-      <g fill="#EDE6DA">
+      <g fill="#F6F2EC">
         <rect x={80} y={146} width={26} height={8} />
         <rect x={240} y={146} width={26} height={8} />
         <rect x={150} y={266} width={30} height={8} />

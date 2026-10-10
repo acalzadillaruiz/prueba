@@ -32,7 +32,7 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
       {/* Navy valuation panel (brand): range in Cormorant, gold fillet scale, the asking price as a dot. */}
       <div className="np-navy-panel bg-navy px-6 py-7 text-ivory md:px-8">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="np-eyebrow text-[#B79D83]">{tx(locale, "Valor estimado New Place", "PlaceEstimate · Estimated value")}</div>
+          <div className="np-eyebrow text-[#C9B49C]">{tx(locale, "Valor estimado New Place", "PlaceEstimate · Estimated value")}</div>
           <div className="text-sm text-ivory/70">
             {rough ? tx(locale, "Estimación orientativa", "Indicative estimate") : conf} · {source}
           </div>
@@ -62,11 +62,11 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
           {tx(locale, "Valor central", "Mid value")} {money(e.mid, locale)}
         </div>
         <div className="relative mt-9 h-[3px] rounded-full bg-white/15">
-          <div className="absolute inset-y-0 rounded-full bg-gradient-to-r from-[#B79D83]/60 via-[#B79D83] to-[#B79D83]/60" style={{ left: `${aLow}%`, right: `${100 - aHigh}%` }} />
+          <div className="absolute inset-y-0 rounded-full bg-gradient-to-r from-[#C9B49C]/60 via-[#C9B49C] to-[#C9B49C]/60" style={{ left: `${aLow}%`, right: `${100 - aHigh}%` }} />
           <div className="absolute -top-8 whitespace-nowrap text-[13px] font-semibold text-ivory/85" style={{ left: `${pos}%`, transform: `translateX(-${clampPct(pos)}%)` }}>
             {tx(locale, "Precio pedido", "Asking")} · {usdShort(l.priceAmount)}
           </div>
-          <div className="absolute top-1/2 h-[18px] w-[18px] -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] border-[#B79D83] bg-ivory" style={{ left: `${pos}%` }} />
+          <div className="absolute top-1/2 h-[18px] w-[18px] -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] border-[#C9B49C] bg-ivory" style={{ left: `${pos}%` }} />
         </div>
         {/* The range ends are labelled where they sit on the bar (not at the bar's edges). Each label leans inward by its
             own position (0 % → left-aligned, 100 % → right-aligned), so it never overflows the panel; when the two ends are

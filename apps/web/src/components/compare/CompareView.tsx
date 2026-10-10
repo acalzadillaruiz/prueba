@@ -19,7 +19,7 @@ const isSale = (l: Listing) => l.listingType === "SALE" || l.listingType === "CO
 const OK = "text-ok dark:text-[#8FCBA6]";
 const WARN = "text-warn dark:text-[#E0A84A]";
 /** Remove ("×") on a photo: its own light/dark colours (not the remapped bg-white, which turned it dark-on-dark). */
-const REMOVE_BTN = "absolute flex items-center justify-center rounded-full bg-[#EDE6DA] text-[#1C1D1D] shadow ring-1 ring-black/10 after:absolute after:content-[''] dark:bg-[#141617]/85 dark:text-[#EDE6DA] dark:ring-[#EDE6DA]/45";
+const REMOVE_BTN = "absolute flex items-center justify-center rounded-full bg-[#F6F2EC] text-[#1C1D1D] shadow ring-1 ring-black/10 after:absolute after:content-[''] dark:bg-[#141617]/85 dark:text-[#F6F2EC] dark:ring-[#F6F2EC]/45";
 /** Pinned row (phones): the thumbnail is the "Ver ficha" link, then one 36 px text pill ("Visita" / "Fechas") filling the rest of the column. */
 const PIN_PILL = "flex h-9 min-w-0 flex-1 items-center justify-center whitespace-nowrap rounded-full px-1.5 font-display text-[13px] font-semibold leading-none";
 /** Phone actions row: full column width, the label may wrap to 2 lines in a third of 360 px. */
@@ -156,8 +156,8 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <div className={k.eyebrow}>{tx(locale, "Comparador", "Compare")}</div>
-          <h1 className="mt-1 font-serif text-[40px] font-light leading-[1.05] md:text-[48px]">{tx(locale, "Lado a lado", "Side by side")}</h1>
-          <p className="mt-1 text-muted">{tx(locale, "Hasta 3 casas, con lo que de verdad importa. La mejor de cada fila lleva la marca «Mejor».", "Up to 3 homes, with what really matters. The best of each row gets a “Best” tag.")}</p>
+          <h1 className="mt-1 font-serif text-[40px] font-light leading-[1.05] md:text-[48px]">{tx(locale, "¿Cuál te conviene más?", "Which one suits you best?")}</h1>
+          <p className="mt-1 text-muted">{tx(locale, "Pon hasta 3 casas lado a lado. La mejor de cada fila lleva la marca «Mejor».", "Put up to 3 homes side by side. The best in each row gets a “Best” tag.")}</p>
         </div>
         {cmp.length > 0 && cmp.length < 3 && (
           <Button href={`/${locale}/search`} variant="outline" className={k.outline}>

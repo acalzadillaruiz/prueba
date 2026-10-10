@@ -129,7 +129,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
               <ol className="mt-5 grid grid-cols-3 gap-2">
                 {[
                   [tx(locale, "Solicitado", "Requested"), <TimeAgo key="t" iso={m.createdAt} locale={locale} />],
-                  [tx(locale, "Agente asignado", "Agent assigned"), m.agentName ?? "—"],
+                  [tx(locale, "Asesor asignado", "Advisor assigned"), m.agentName ?? "—"],
                   [tx(locale, "Publicado", "Live"), tx(locale, "Después de la sesión de fotos", "After the photo shoot")],
                 ].map(([t, d], i) => (
                   <li key={i}>
@@ -365,8 +365,8 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
               </div>
               {threadLead && !other ? (
                 <div className="border-t border-line p-3 text-center text-sm text-muted">
-                  {tx(locale, "Te escribió sin crear una cuenta. Respóndele por email o teléfono.", "They wrote without an account. Reply by email or phone.")}{" "}
-                  <a href={`mailto:${threadLead.email}`} className="font-semibold font-semibold text-navy underline decoration-navy/30 underline-offset-4">{tx(locale, "Responder por email", "Reply by email")}</a>
+                  {tx(locale, "Te escribió sin crear una cuenta. Respóndele por correo o teléfono.", "They wrote without an account. Reply by email or phone.")}{" "}
+                  <a href={`mailto:${threadLead.email}`} className="font-semibold font-semibold text-navy underline decoration-navy/30 underline-offset-4">{tx(locale, "Responder por correo", "Reply by email")}</a>
                 </div>
               ) : (
               <form
@@ -397,7 +397,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
               <div className="pb-2 text-center text-[10px] text-muted">{tx(locale, "Tus mensajes · se actualizan cada 15 s", "Your messages · refresh every 15 s")}</div>
             </>
           ) : (
-            <div className="m-auto p-6 text-center text-sm text-muted">{tx(locale, "Cuando un comprador o tu agente te escriba, verás la conversación aquí.", "When a buyer or your agent writes, the conversation shows up here.")}</div>
+            <div className="m-auto p-6 text-center text-sm text-muted">{tx(locale, "Cuando un comprador o tu asesor te escriba, verás la conversación aquí.", "When a buyer or your advisor writes to you, you’ll see the conversation here.")}</div>
           )}
         </Card>
         </div>
@@ -413,7 +413,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
 function NoPhotos({ locale, busy, onAdd }: { locale: Locale; busy: boolean; onAdd?: () => void }) {
   return (
     <div data-testid="owner-no-photos" className="relative flex aspect-[4/3] h-full w-full flex-col items-center justify-center gap-3 overflow-hidden bg-[linear-gradient(160deg,#F6F1EA_0%,#F1EBE3_45%,#E6D8C4_100%)] p-5 text-center dark:bg-[linear-gradient(160deg,#2A2420_0%,#241F1C_55%,#1E1A18_100%)]">
-      <svg viewBox="0 0 128 60" className="w-24 text-[#B79D83] opacity-70 dark:text-[#9CC3CC]" aria-hidden fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round">
+      <svg viewBox="0 0 128 60" className="w-24 text-[#C9B49C] opacity-70 dark:text-[#9CC3CC]" aria-hidden fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round">
         <path d="M6 44 64 4l58 40" />
         <path d="M30 44 64 20l34 24" className="text-[#1F4E5A] dark:text-[#9CC3CC]" stroke="currentColor" />
         <path d="M18 44v14h92V44" opacity=".55" />
@@ -424,7 +424,7 @@ function NoPhotos({ locale, busy, onAdd }: { locale: Locale; busy: boolean; onAd
         <p className="mt-0.5 text-xs text-muted dark:text-mist">{tx(locale, "Con fotos, tu anuncio recibe muchas más visitas.", "With photos, your listing gets far more views.")}</p>
       </div>
       {onAdd && (
-        <button type="button" onClick={onAdd} disabled={busy} className="inline-flex min-h-10 items-center gap-1.5 rounded-full bg-[#1C1D1D] px-4 font-display text-sm font-semibold text-[#EDE6DA] transition-colors duration-np hover:bg-[#22262A] disabled:opacity-60 dark:bg-[#EDE6DA] dark:text-[#1C1D1D] dark:hover:bg-white">
+        <button type="button" onClick={onAdd} disabled={busy} className="inline-flex min-h-10 items-center gap-1.5 rounded-full bg-[#1C1D1D] px-4 font-display text-sm font-semibold text-[#F6F2EC] transition-colors duration-np hover:bg-[#22262A] disabled:opacity-60 dark:bg-[#F6F2EC] dark:text-[#1C1D1D] dark:hover:bg-white">
           {busy ? <Loader2 size={14} className="animate-spin" aria-hidden /> : <ImagePlus size={14} aria-hidden />} {tx(locale, "Añade fotos", "Add photos")}
         </button>
       )}

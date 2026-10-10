@@ -93,7 +93,7 @@ export function Funnel({ steps }: { steps: { label: string; value: number }[] })
       {steps.map((s, i) => (
         <div key={s.label} className="grid grid-cols-[96px_1fr_64px] items-center gap-3 text-sm">
           <span className="text-muted dark:text-mist">{s.label}</span>
-          <div className="h-6 rounded-md bg-[#EDE6DA] dark:bg-white/[.06]">
+          <div className="h-6 rounded-md bg-[#F6F2EC] dark:bg-white/[.06]">
             <div className={cn("h-full rounded-md", i === steps.length - 1 ? "bg-navy dark:bg-ivory" : "bg-[#81776F] dark:bg-[#605751]")} style={{ width: `${max > 0 ? (s.value / max) * 100 : 0}%` }} />
           </div>
           <span className="text-right font-display font-semibold [font-feature-settings:'lnum','pnum']">

@@ -83,7 +83,7 @@ export function ForgotPasswordForm({ locale, initialEmail = "" }: { locale: Loca
     <Shell
       eyebrow={tx(locale, "Recupera tu cuenta", "Get back into your account")}
       title={tx(locale, "¿Olvidaste tu contraseña?", "Forgot your password?")}
-      lead={tx(locale, "Nos pasa a todos. Escribe el email con el que te registraste y te mandamos un enlace para crear una nueva.", "It happens to everyone. Enter the email you signed up with and we’ll send you a link to create a new one.")}
+      lead={tx(locale, "Escribe el correo con el que te registraste y te mandamos un enlace para crear una nueva.", "Enter the email you signed up with and we’ll send you a link to create a new one.")}
     >
       <form className="space-y-4" onSubmit={handleSubmit(submit)} noValidate>
         <Field label="Email" error={fieldError(formState.errors.email, locale, "email")}>

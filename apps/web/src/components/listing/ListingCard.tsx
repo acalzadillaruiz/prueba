@@ -51,18 +51,18 @@ export const isOwnerListing = (l: Pick<Listing, "agentId" | "agencyId">) => !l.a
  */
 export function CardAdvisor({ agent, locale, owner }: { agent: NonNullable<Listing["agent"]>; locale: Locale; owner?: boolean }) {
   const initials = agent.name.split(/\s+/).filter(Boolean).map((p) => p[0]).slice(0, 2).join("").toUpperCase() || "?";
-  const label = tx(locale, "Asesor/a verificado/a", "Verified advisor");
+  const label = tx(locale, "Asesor verificado", "Verified advisor");
   if (owner)
     return (
       <div className="mt-2.5 flex min-w-0 items-center gap-2 text-sm text-muted" data-testid="card-advisor" data-owner>
         <span aria-hidden className="contents"><Avatar initials={initials} hue={agent.hue} size={24} /></span>
-        <span className="truncate">{tx(locale, "Dueño/a · sin intermediarios", "Owner · no middlemen")}</span>
+        <span className="truncate">{tx(locale, "Dueño · sin intermediarios", "Owner · no middlemen")}</span>
       </div>
     );
   return (
     <div className="mt-2.5 flex min-w-0 items-center gap-2 text-sm text-muted" data-testid="card-advisor">
       <span aria-hidden className="contents"><Avatar initials={initials} hue={agent.hue} size={24} /></span>
-      <span className="sr-only">{tx(locale, "Asesor/a:", "Advisor:")}</span>
+      <span className="sr-only">{tx(locale, "Asesor:", "Advisor:")}</span>
       <span className="truncate">{agent.name}</span>
       {agent.verified && (
         <span className="inline-flex shrink-0 items-center text-ok" title={label}>

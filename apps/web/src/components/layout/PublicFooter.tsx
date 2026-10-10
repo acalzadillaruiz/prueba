@@ -39,13 +39,13 @@ export async function PublicFooter({ locale }: { locale: Locale }) {
     </div>
   );
   return (
-    <footer className="relative overflow-hidden bg-[#D8CFC1] text-ink">
+    <footer className="relative overflow-hidden bg-[#ECE5DA] text-ink">
       <div className="relative mx-auto flex max-w-[1320px] flex-wrap items-end justify-between gap-6 border-b border-ink/10 px-4 pb-10 pt-12 md:px-8 md:pb-12 md:pt-20">
-        <p className="max-w-[760px] font-title text-[20px] font-extralight uppercase leading-[1.5] tracking-[.08em] md:text-[34px]">
-          {locale === "es" ? "Cuando quieras," : "Whenever you're ready,"} <span className="text-ink/55">{locale === "es" ? "aquí estamos." : "we're here."}</span>
+        <p className="max-w-[760px] font-title text-[28px] font-light leading-[1.15] tracking-[.01em] md:text-[44px]">
+          {locale === "es" ? "¿Hablamos?" : "Shall we talk?"} <span className="text-ink/55">{locale === "es" ? "Un asesor te atiende a cualquier hora." : "An advisor answers at any hour."}</span>
         </p>
         <Button href={`/${locale}/luxury#acceso`} variant="navy" size="lg">
-          {locale === "es" ? "Hablar con una persona" : "Talk to a person"}
+          {locale === "es" ? "Hablar con un asesor" : "Talk to an advisor"}
         </Button>
       </div>
       <div className="relative mx-auto grid max-w-[1320px] grid-cols-2 gap-x-6 gap-y-0 px-4 pb-10 pt-10 md:grid-cols-[1.3fr_1fr_1fr_1fr] md:gap-12 md:px-8 md:pb-14 md:pt-16">

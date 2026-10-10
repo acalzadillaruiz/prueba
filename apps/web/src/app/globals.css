@@ -12,12 +12,12 @@
   --np-coral: #1F4E5A;          /* Mar profundo: the main action, links, active states */
   --np-coral-hover: #173D47;
   --np-coral-light: #9CC3CC;    /* Mar on dark surfaces (5:1 on Pizarra) */
-  --np-ivory: #EDE6DA;          /* Travertino */
-  --np-arena: #D8CFC1;          /* Piedra */
-  --np-egeo: #B79D83;           /* Arena */
+  --np-ivory: #F6F2EC;          /* Travertino (035: lighter) */
+  --np-arena: #ECE5DA;          /* Piedra (035: lighter) */
+  --np-egeo: #C9B49C;           /* Arena (035: lighter) */
   --np-rosa: #E3DACB;
   --np-mist: #B8B2AA;           /* muted text on dark */
-  --np-gold: #B79D83;           /* Arena: fine lines and details only */
+  --np-gold: #C9B49C;           /* Arena: fine lines and details only */
   --np-gold-text: #64574C;      /* Taupe, text weight (5.6:1 on Travertino) */
   --np-ambar: #C08A4E;          /* sunset accent, very little, never text */
   --np-taupe: #6B5D52;
@@ -33,7 +33,7 @@
   /* Prices and numbers: Barlow Light with tabular figures. */
   --font-serif: var(--font-barlow), ui-sans-serif, system-ui, sans-serif;
   /* Titles and the "NEW PLACE" wordmark: Lexend Zetta, wide and thin, in capitals. */
-  --font-title: var(--font-zetta), var(--font-barlow), ui-sans-serif, sans-serif;
+  --font-title: var(--font-josefin), var(--font-barlow), ui-sans-serif, sans-serif;
   --font-logo: var(--font-zetta), ui-sans-serif, sans-serif;
   /* rgb channels for Tailwind opacity modifiers (text-ink/60, bg-ivory/90…) */
   --np-navy-rgb: 62 70 80;
@@ -43,12 +43,12 @@
   /* Mar meets WCAG AA with white text (9.2:1) and as text on Travertino (7.4:1). */
   --np-coral-cta-rgb: 31 78 90;
   --np-coral-cta-hover-rgb: 23 61 71;
-  --np-ivory-rgb: 237 230 218;
-  --np-arena-rgb: 216 207 193;
-  --np-egeo-rgb: 183 157 131;
+  --np-ivory-rgb: 246 242 236;
+  --np-arena-rgb: 236 229 218;
+  --np-egeo-rgb: 201 180 156;
   --np-rosa-rgb: 227 218 203;
   --np-mist-rgb: 184 178 170;
-  --np-gold-rgb: 183 157 131;
+  --np-gold-rgb: 201 180 156;
   --np-gold-text-rgb: 100 87 76;
   --np-ambar-rgb: 192 138 78;
   --np-taupe-rgb: 107 93 82;
@@ -73,8 +73,7 @@ body { font-family: var(--font-body); font-weight: 300; background: var(--np-ivo
 /* Titles: Lexend Zetta in capitals, wide and thin, like AMALI's «WHERE WATER MIRRORS THE SKY». Zetta is very wide
    (≈0.92 em per capital), so its size is set by cap height: the capitals are 44 % of the size a component asks for,
    which keeps every existing title on its line length. Admin panels keep Barlow (dense tables, long names). */
-h1, h2, h3, h1.font-display, h2.font-display, h3.font-display { font-family: var(--font-title); font-weight: 300; text-transform: uppercase; letter-spacing: .05em; line-height: 1.25; font-size-adjust: cap-height .44; font-feature-settings: normal; }
-h1 { font-weight: 200; }
+h1, h2, h3, h1.font-display, h2.font-display, h3.font-display { font-family: var(--font-title); font-weight: 300; letter-spacing: .01em; line-height: 1.15; font-feature-settings: normal; }
 /* Small section headings in Barlow capitals (AMALI's «BENEATH THE CLOUDS»): add .np-sub to an h2/h3. */
 :is(h1, h2, h3).np-sub { font-family: var(--font-display); font-weight: 500; letter-spacing: .14em !important; font-size-adjust: none; line-height: 1.3 !important; }
 :is([data-admin], .np-admin) :is(h1, h2) { font-family: var(--font-display); font-weight: 500; text-transform: none; letter-spacing: 0; font-size-adjust: none; line-height: 1.2; }
@@ -101,8 +100,8 @@ html.dark {
 }
 html.dark .bg-danger.text-white { color: #1C1D1D; }
 html.dark .np-public {
-  --np-ink: #EDE6DA;
-  --np-ink-rgb: 237 230 218;
+  --np-ink: #F6F2EC;
+  --np-ink-rgb: 246 242 236;
   --np-muted-rgb: 181 170 160;
   --np-line: #343A40;
   --np-line-rgb: 58 50 45;
@@ -111,7 +110,7 @@ html.dark .np-public {
   --np-gold-text-rgb: 217 197 156;
   --np-coral-cta-rgb: 168 69 42;
   --np-sel: #343A40;
-  --np-logo-ink: #EDE6DA;
+  --np-logo-ink: #F6F2EC;
   --np-logo-teja: #9CC3CC;
   --shadow: 0 12px 40px rgba(0,0,0,.35);
   color-scheme: dark;
@@ -124,17 +123,17 @@ html.dark .np-public .bg-white\/60 { background-color: rgb(42 36 32 / .6); }
 html.dark .np-public .bg-ivory { background-color: #141617; }
 html.dark .np-public .bg-ivory\/90, html.dark .np-public .bg-ivory\/95, html.dark .np-public .bg-ivory\/80 { background-color: rgb(21 18 15 / .9); }
 html.dark .np-public .hover\:bg-ivory:hover { background-color: #343A40; }
-html.dark .np-public .text-navy { color: #EDE6DA; }
+html.dark .np-public .text-navy { color: #F6F2EC; }
 html.dark .np-public .border-navy { border-color: #9CC3CC; }
 html.dark .np-public .bg-black\/5, html.dark .np-public .hover\:bg-black\/5:hover { background-color: rgb(255 255 255 / .06); }
 html.dark .np-public .bg-black\/10 { background-color: rgb(255 255 255 / .12); }
 html.dark .np-public :is(input, select, textarea) { color-scheme: dark; }
 /* Navy solid surfaces stay navy in dark mode but lift slightly so they read as panels on #141617. */
 html.dark .np-public .np-navy-panel { background-color: #22262A; }
-html.dark .np-public .np-sel { background-color: #343A40; border-color: #9CC3CC; color: #EDE6DA; }
-html.dark .np-public .np-btn-navy { background-color: #EDE6DA; color: #1C1D1D; }
+html.dark .np-public .np-sel { background-color: #343A40; border-color: #9CC3CC; color: #F6F2EC; }
+html.dark .np-public .np-btn-navy { background-color: #F6F2EC; color: #1C1D1D; }
 html.dark .np-public .np-btn-navy:hover { background-color: #fff; }
-html.dark .np-public .np-btn-outline { border-color: rgb(244 239 231 / .4); background-color: rgb(255 255 255 / .06); color: #EDE6DA; }
+html.dark .np-public .np-btn-outline { border-color: rgb(244 239 231 / .4); background-color: rgb(255 255 255 / .06); color: #F6F2EC; }
 html.dark .np-public .np-btn-outline:hover { background-color: rgb(255 255 255 / .06); }
 html.dark .np-public .text-coral-cta { color: #9CC3CC; }
 
@@ -239,7 +238,7 @@ html.dark .np-public .np-step-fill { background: #9CC3CC; }
 @keyframes np-step-fill { from { transform: scaleX(0) } to { transform: scaleX(1) } }
 /* Building (lite): a CSS tower for phones and modest devices. Floors are absolutely stacked (--i), rise out of a
    blueprint grid with a small blur-to-sharp, and carry an isometric side face; only transform/opacity/filter move. */
-.np-tower { --fh: 16px; --fw: 104px; --base: 26px; --cal: #F6F2EA; --side: #D8CFC1; --glass: #C9C2B8; --mull: rgb(30 26 24 / .16); --lit: #D9A866; --grid: rgb(176 138 85 / .32); }
+.np-tower { --fh: 16px; --fw: 104px; --base: 26px; --cal: #F6F2EA; --side: #ECE5DA; --glass: #C9C2B8; --mull: rgb(30 26 24 / .16); --lit: #D9A866; --grid: rgb(176 138 85 / .32); }
 @media (min-width: 768px) { .np-tower { --fh: 34px; --fw: 210px; --base: 64px; } }
 html.dark .np-public .np-tower { --cal: #6E6157; --side: #40372F; --glass: #343A40; --mull: rgb(255 255 255 / .09); --grid: rgb(201 165 116 / .22); }
 .np-tower-grid { position: absolute; left: -30%; right: -30%; bottom: 0; height: 62%; pointer-events: none;
@@ -276,7 +275,7 @@ html.dark .np-public .np-roof-teja { fill: #9CC3CC; }
   .np-floor, .np-tower-roof, .np-tower-label, .np-tower-halo { transition: none; filter: none; }
   .np-tower-scan, .np-step-fill.is-now { animation: none; }
 }
-.np-scroll-line::after { content: ""; position: absolute; inset: 0; background: #EDE6DA; transform: translateY(-100%); animation: np-scroll-line 2.2s cubic-bezier(.65,0,.35,1) infinite; }
+.np-scroll-line::after { content: ""; position: absolute; inset: 0; background: #F6F2EC; transform: translateY(-100%); animation: np-scroll-line 2.2s cubic-bezier(.65,0,.35,1) infinite; }
 @keyframes np-scroll-line { 0% { transform: translateY(-100%) } 55% { transform: translateY(0) } 100% { transform: translateY(100%) } }
 /* Steps light up as the route draws; text stays full-contrast, only the numeral and a rule change. */
 .np-steps li { position: relative; transition: transform .6s ease; }
@@ -324,7 +323,7 @@ html.dark .np-public :is(.np-glass-nav, [data-public-header] .np-glass, [data-st
 .np-aura i { position: absolute; border-radius: 9999px; filter: blur(70px); opacity: .55; will-change: transform; }
 .np-aura i:nth-child(1) { width: 46vw; height: 46vw; left: -8vw; top: -12vw; background: #DED5C7; animation: np-drift-a 26s ease-in-out infinite alternate; }
 .np-aura i:nth-child(2) { width: 38vw; height: 38vw; right: -6vw; top: 4vw; background: #E3DACB; animation: np-drift-b 32s ease-in-out infinite alternate; }
-.np-aura i:nth-child(3) { width: 30vw; height: 30vw; left: 34vw; bottom: -14vw; background: #D8CFC1; opacity: .38; animation: np-drift-a 38s ease-in-out infinite alternate-reverse; }
+.np-aura i:nth-child(3) { width: 30vw; height: 30vw; left: 34vw; bottom: -14vw; background: #ECE5DA; opacity: .38; animation: np-drift-a 38s ease-in-out infinite alternate-reverse; }
 @keyframes np-drift-a { to { transform: translate3d(8vw, 6vw, 0) scale(1.12); } }
 @keyframes np-drift-b { to { transform: translate3d(-7vw, 8vw, 0) scale(.92); } }
 .np-grain::after {
@@ -359,8 +358,8 @@ html.dark .np-public :is(.np-glass-nav, [data-public-header] .np-glass, [data-st
 /* Without the motion layer (no JS yet, or other pages) photos are simply shown. */
 html:not(.np-motion) [data-unveil] { clip-path: none; }
 /* Dark mode: the light 2035 panels (footer, owner band, building) take the warm dark surface. */
-html.dark .np-public :is(footer.np-grain, .bg-\[\#D8CFC1\]) { background-color: #22262A; }
-html.dark .np-public .bg-ink { background-color: #EDE6DA; color: #1C1D1D; }
+html.dark .np-public :is(footer.np-grain, .bg-\[\#ECE5DA\]) { background-color: #22262A; }
+html.dark .np-public .bg-ink { background-color: #F6F2EC; color: #1C1D1D; }
 /* Panel tables: the last column (actions) stays in view instead of hiding behind a horizontal scroll.
    Only while the table really overflows its ScrollRegion ([data-overflow], set by a ResizeObserver): when everything fits
    it is an ordinary column. A soft fade on its left edge says that more columns slide underneath. Full-width rows
@@ -371,7 +370,7 @@ html.dark [data-overflow] .np-sticky-last tr > :last-child:not([colspan]) { back
 html.dark [data-overflow] .np-sticky-last tr > :last-child:not([colspan])::before { background: linear-gradient(to left, #22262A, rgb(42 36 32 / 0)); }
 /* Dark mode for the 2035 surfaces: translucent whites become warm translucent darks, inputs stay readable. */
 html.dark .np-public :is(.bg-white\/85, .bg-white\/75, .bg-white\/70, .bg-white\/50) { background-color: rgb(255 255 255 / .06); }
-html.dark .np-public :is(input, select, textarea) { color: #EDE6DA; }
+html.dark .np-public :is(input, select, textarea) { color: #F6F2EC; }
 html.dark .np-public :is(input, textarea):not(.placeholder\:text-transparent)::placeholder { color: #B8B2AA; }
 html.dark .np-public .text-ink\/45 { color: rgb(241 235 227 / .55); }
 html.dark .np-public :is(.border-ink\/10, .border-ink\/\[\.07\], .border-ink\/\[\.06\]) { border-color: rgb(255 255 255 / .1); }
@@ -383,11 +382,17 @@ body:has([data-compare-tray]) [data-fab] { transform: translateY(-88px); }
 /* ── 030 · estilo AMALI ─────────────────────────────────────────────────────────
    Public titles: Zetta capitals keep their own spacing and air whatever the component asked for (tight tracking and
    leading were tuned for the old serif). */
-.np-public :is(h1, h2) { letter-spacing: .05em !important; line-height: 1.2 !important; }
+.np-public :is(h1, h2) { letter-spacing: .01em !important; line-height: 1.15 !important; }
 /* Hero photo: a very slow Ken Burns (1 → 1.06 over 20 s), never under reduced motion. */
 @keyframes np-kenburns { from { transform: scale(1); } to { transform: scale(1.06); } }
 .np-hero-photo { transform-origin: 60% 50%; animation: np-kenburns 20s ease-out forwards; }
 @media (prefers-reduced-motion: reduce) { .np-hero-photo { animation: none; } }
 /* Slow, soft motion (fade and lift). */
-[data-reveal] { transition-duration: 1.1s !important; }
-:is(h1, h2, h3).font-serif { font-size-adjust: none; letter-spacing: .08em !important; }
+/* Reveal (HomeMotion): primed blocks fade and lift in when they reach the screen; children of a "stagger" block
+   follow one another. Without the motion layer nothing is primed, so everything is simply visible. */
+.np-pre:not([data-reveal="stagger"]), .np-pre[data-reveal="stagger"] > * { opacity: 0; transform: translate3d(0, 24px, 0); transition: opacity 1s cubic-bezier(.16,1,.3,1), transform 1.1s cubic-bezier(.16,1,.3,1); }
+.np-pre.is-in:not([data-reveal="stagger"]), .np-pre.is-in[data-reveal="stagger"] > * { opacity: 1; transform: none; }
+.np-pre.is-in[data-reveal="stagger"] > :nth-child(2) { transition-delay: .08s; } .np-pre.is-in[data-reveal="stagger"] > :nth-child(3) { transition-delay: .16s; }
+.np-pre.is-in[data-reveal="stagger"] > :nth-child(4) { transition-delay: .24s; } .np-pre.is-in[data-reveal="stagger"] > :nth-child(n+5) { transition-delay: .32s; }
+@media (prefers-reduced-motion: reduce) { .np-pre:not([data-reveal="stagger"]), .np-pre[data-reveal="stagger"] > * { opacity: 1 !important; transform: none !important; } }
+:is(h1, h2, h3).font-serif { letter-spacing: .01em !important; }

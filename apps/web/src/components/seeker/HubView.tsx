@@ -82,7 +82,7 @@ export function HubView({ locale, data, emailOn = false }: { locale: Locale; dat
     { done: saved.length > 0, t: tx(locale, "Guarda y compara", "Save and compare"), d: `${saved.length} ${tx(locale, "guardados", "saved")}` },
     { done: tourCount > 0, t: tx(locale, "Visita tus favoritos", "Tour your favorites"), d: `${tourCount} ${tx(locale, "visitas", "tours")}` },
     { done: !!savedPrequal, t: tx(locale, "Precalificación orientativa", "Indicative pre-qualification"), d: savedPrequal ? tx(locale, `Hasta ${money(savedPrequal.price, locale)}`, `Up to ${money(savedPrequal.price, locale)}`) : tx(locale, "Sin compromiso", "No commitment") },
-    { done: offerCount > 0, t: tx(locale, "Haz una oferta", "Make an offer"), d: offerCount > 0 ? tx(locale, `${offerCount} ${offerCount === 1 ? "oferta" : "ofertas"}`, `${offerCount} ${offerCount === 1 ? "offer" : "offers"}`) : tx(locale, "Con tu agente", "With your agent") },
+    { done: offerCount > 0, t: tx(locale, "Haz una oferta", "Make an offer"), d: offerCount > 0 ? tx(locale, `${offerCount} ${offerCount === 1 ? "oferta" : "ofertas"}`, `${offerCount} ${offerCount === 1 ? "offer" : "offers"}`) : tx(locale, "Con tu asesor", "With your advisor") },
   ];
   const doneCount = steps.filter((s) => s.done).length;
   // Once every step is done the checklist has nothing left to say: visits and messages lead the page instead.
@@ -126,7 +126,7 @@ export function HubView({ locale, data, emailOn = false }: { locale: Locale; dat
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 className="flex items-center gap-2 font-serif text-[24px] font-light leading-tight"><CalendarCheck size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Tus visitas y solicitudes", "Your tours & requests")}</h2>
             {/* Only while an email provider is configured: otherwise reminders are never delivered. */}
-            {emailOn && <Badge tone="ok">{tx(locale, "Te lo recordamos por email", "We’ll remind you by email")}</Badge>}
+            {emailOn && <Badge tone="ok">{tx(locale, "Te lo recordamos por correo", "We’ll remind you by email")}</Badge>}
           </div>
           <div className="mt-4 space-y-3">
             {extraLeads.map((ld) => {
@@ -148,7 +148,7 @@ export function HubView({ locale, data, emailOn = false }: { locale: Locale; dat
             {myTours.length === 0 && extraLeads.length === 0 && (
               <Empty className="py-6"
                 title={tx(locale, "No tienes visitas próximas", "No tours coming up")}
-                body={tx(locale, "Cuando una casa te guste, pide una visita y elige entre los horarios reales del agente.", "When a home catches your eye, book a tour in one of the agent’s real time slots.")}
+                body={tx(locale, "Cuando una casa te guste, pide una visita y elige entre los horarios reales del asesor.", "When you like a home, book a visit from the advisor’s real availability.")}
                 cta={<Button href={`/${locale}/search`} size="sm" variant="outline" className={k.outline}>{tx(locale, "Ver casas", "Browse homes")}</Button>}
               />
             )}

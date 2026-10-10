@@ -72,7 +72,7 @@ export function AccountView({ locale, data }: { locale: Locale; data: AccountDat
             <div className="font-display text-xl font-semibold">{f.name}</div>
             <div className="flex flex-wrap items-center gap-2 text-sm text-muted">
               {data.email}
-              {data.verified ? <Badge tone="ok"><BadgeCheck size={12} /> {tx(locale, "Email verificado", "Email verified")}</Badge> : <Badge tone="warn">{tx(locale, "Email sin verificar", "Email not verified")}</Badge>}
+              {data.verified ? <Badge tone="ok"><BadgeCheck size={12} /> {tx(locale, "Correo verificado", "Email verified")}</Badge> : <Badge tone="warn">{tx(locale, "Correo sin verificar", "Email not verified")}</Badge>}
             </div>
           </div>
         </div>
@@ -100,7 +100,7 @@ export function AccountView({ locale, data }: { locale: Locale; data: AccountDat
           <div className="flex-1">
             <div className="font-semibold">{tx(locale, "Cómo entras", "How you sign in")}</div>
             <div className="text-sm text-muted">
-              {[data.providers.includes("google") && "Google", data.hasPassword && tx(locale, "email y contraseña", "email & password")].filter(Boolean).join(" · ") || "—"}
+              {[data.providers.includes("google") && "Google", data.hasPassword && tx(locale, "correo y contraseña", "email & password")].filter(Boolean).join(" · ") || "—"}
             </div>
           </div>
         </div>

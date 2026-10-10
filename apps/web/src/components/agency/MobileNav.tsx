@@ -84,7 +84,7 @@ export function AgencyMobileNav({
   const barItem = "relative flex min-h-[56px] flex-1 flex-col items-center justify-center gap-1 rounded-xl px-1 pb-1.5 pt-2 text-[11px] font-semibold leading-none transition-colors duration-np focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy dark:focus-visible:ring-[#9CC3CC]";
   const on = "text-navy dark:text-ivory";
   const off = "text-muted hover:text-navy dark:text-mist dark:hover:text-ivory";
-  const indicator = <span aria-hidden className="absolute inset-x-[22%] top-0 h-[3px] rounded-b-full bg-gold-text dark:bg-[#B79D83]" />;
+  const indicator = <span aria-hidden className="absolute inset-x-[22%] top-0 h-[3px] rounded-b-full bg-gold-text dark:bg-[#C9B49C]" />;
   const sheetRow = "flex w-full items-center gap-3 rounded-xl px-3.5 py-3 text-left text-[15px] text-navy transition-colors duration-np hover:bg-[#F4EFE7] dark:text-ivory dark:hover:bg-white/[.05]";
 
   return (

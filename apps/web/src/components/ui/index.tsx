@@ -82,9 +82,9 @@ type BadgeTone = "neutral" | "coral" | "gold" | "ok" | "warn" | "danger" | "navy
  */
 export function Badge({ children, tone = "neutral", className }: { children: ReactNode; tone?: BadgeTone; className?: string }) {
   const t = {
-    neutral: "bg-black/5 text-ink dark:bg-white/10 dark:text-[#EDE6DA]",
+    neutral: "bg-black/5 text-ink dark:bg-white/10 dark:text-[#F6F2EC]",
     coral: "bg-[#1F4E5A1F] text-coral-hover dark:bg-[#9CC3CC26] dark:text-[#9CC3CC]",
-    gold: "bg-[#B79D8329] text-gold-text dark:text-[#B79D83]",
+    gold: "bg-[#C9B49C29] text-gold-text dark:text-[#C9B49C]",
     ok: "bg-[#2F6B4F1F] text-ok dark:bg-[#7FC8A426] dark:text-[#7FC8A4]",
     warn: "bg-[#8A5A0024] text-[#7A4F00] dark:bg-[#F2B86626] dark:text-[#F2B866]",
     danger: "bg-[#B3261E1A] text-danger dark:bg-[#F2A09A26] dark:text-[#F2A09A]",
@@ -92,8 +92,8 @@ export function Badge({ children, tone = "neutral", className }: { children: Rea
     mist: "bg-[#B8B2AA2E] text-[#4E453F] dark:text-[#DECEB9]",
     dark: "bg-white/10 text-ivory",
     exclusive: "bg-white/90 text-[#1F4E5A] shadow-[inset_0_0_0_1px_rgba(31,78,90,.3)]",
-    egeo: "bg-[#B79D83] text-[#3E4650]",
-    arena: "bg-[#D8CFC1] text-[#1C1D1D]",
+    egeo: "bg-[#C9B49C] text-[#3E4650]",
+    arena: "bg-[#ECE5DA] text-[#1C1D1D]",
   }[tone];
   const caps = tone === "exclusive" || tone === "egeo" || tone === "arena";
   return (
@@ -178,7 +178,7 @@ export function EmptyState({ icon, title, body, cta, dark, monogram }: { icon?: 
   return (
     <div className={cn("flex flex-col items-center rounded-np border px-6 py-12 text-center", dark ? "border-navy-line" : "border-line bg-white")}>
       {monogram || !icon ? (
-        <Monogram className="mb-4 h-16 w-16" bg={dark ? "#343A40" : "#E3DACB"} ink={dark ? "#EDE6DA" : "#1C1D1D"} teja={dark ? "#9CC3CC" : "#1F4E5A"} animate />
+        <Monogram className="mb-4 h-16 w-16" bg={dark ? "#343A40" : "#E3DACB"} ink={dark ? "#F6F2EC" : "#1C1D1D"} teja={dark ? "#9CC3CC" : "#1F4E5A"} animate />
       ) : (
         <div className={cn("mb-4 flex h-14 w-14 items-center justify-center rounded-full", dark ? "bg-white/5 text-[#9CC3CC]" : "bg-rosa text-coral")}>{icon}</div>
       )}

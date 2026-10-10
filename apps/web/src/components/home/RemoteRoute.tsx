@@ -11,7 +11,7 @@ const CITIES = [
 ];
 const LECHERIA = { x: 330, y: 330 };
 
-export function RemoteRoute({ eyebrow, title, steps, children }: { eyebrow: string; title: string; steps: [string, string][]; children?: React.ReactNode }) {
+export function RemoteRoute({ eyebrow, title, subtitle, steps, children }: { eyebrow: string; title: string; subtitle?: string; steps: [string, string][]; children?: React.ReactNode }) {
   const reduced = useReducedMotion();
   const root = useRef<HTMLElement>(null);
   const paths = useRef<(SVGPathElement | null)[]>([]);
@@ -57,8 +57,8 @@ export function RemoteRoute({ eyebrow, title, steps, children }: { eyebrow: stri
   return (
     <section ref={root} id="compra-a-distancia" className={reduced ? "scroll-mt-24 bg-ivory" : "relative scroll-mt-24 bg-ivory lg:h-[240vh]"}>
       <div className={reduced ? "" : "lg:sticky lg:top-0 lg:flex lg:h-[100svh] lg:items-center lg:overflow-hidden"}>
-        <div className="mx-auto grid w-full max-w-[1320px] items-center gap-6 px-4 py-10 md:gap-10 md:px-8 md:py-16 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
-          <div className="relative overflow-hidden rounded-[4px] bg-[#D8CFC1]">
+        <div className="mx-auto grid w-full max-w-[1320px] items-center gap-6 px-4 py-14 md:gap-10 md:px-8 md:py-16 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
+          <div className="relative overflow-hidden rounded-[4px] bg-[#ECE5DA]">
             <svg viewBox="0 0 1000 460" className="block h-auto w-full" role="img" aria-label="Madrid, Miami, Panamá → Lechería">
               <defs>
                 <pattern id="np-dots" width="14" height="14" patternUnits="userSpaceOnUse">
@@ -67,8 +67,8 @@ export function RemoteRoute({ eyebrow, title, steps, children }: { eyebrow: stri
               </defs>
               <rect width="1000" height="460" fill="url(#np-dots)" />
               {/* Coastlines, abstracted: the Caribbean arc and the Iberian edge */}
-              <path d="M0 300 C 120 260, 220 360, 330 350 S 520 330, 600 380 L 600 460 L 0 460 Z" fill="#B79D83" opacity=".45" />
-              <path d="M860 60 C 900 90, 940 80, 1000 100 L 1000 0 L 840 0 Z" fill="#B79D83" opacity=".45" />
+              <path d="M0 300 C 120 260, 220 360, 330 350 S 520 330, 600 380 L 600 460 L 0 460 Z" fill="#C9B49C" opacity=".45" />
+              <path d="M860 60 C 900 90, 940 80, 1000 100 L 1000 0 L 840 0 Z" fill="#C9B49C" opacity=".45" />
               {CITIES.map((c, i) => (
                 <g key={c.name}>
                   <path d={c.d} fill="none" stroke="#1C1D1D" strokeOpacity=".14" strokeWidth="2" strokeDasharray="4 7" />
@@ -94,15 +94,16 @@ export function RemoteRoute({ eyebrow, title, steps, children }: { eyebrow: stri
           </div>
           <div>
             <p className="np-eyebrow text-gold-text">{eyebrow}</p>
-            <h2 className="mt-2 max-w-[560px] text-[28px] leading-[1.08] md:mt-3 md:text-[46px]">{title}</h2>
+            <h2 className="mt-2 max-w-[560px] text-[30px] md:mt-3 md:text-[44px]">{title}</h2>
+            {subtitle && <p className="mt-3 max-w-[480px] text-[16px] font-light text-muted md:text-[17px]">{subtitle}</p>}
             <ol className="np-steps mt-5 md:mt-8">
               {steps.map(([t, b], i) => (
                 <li key={t} ref={(el) => void (items.current[i] = el)} data-on={reduced ? "1" : "0"} className="flex items-baseline gap-5 border-b border-line py-2.5 md:items-start md:gap-6 md:py-4">
                   <span className="np-step-n w-6 shrink-0 font-serif text-[22px] leading-none md:text-[28px]">{i + 1}</span>
                   <span>
                     <span className="block text-[15px] font-semibold text-ink">{t}</span>
-                    {/* Phones: the five headlines carry the story; the detail lines join from sm. */}
-                    <span className="hidden text-sm text-muted sm:block">{b}</span>
+                    {/* One short line each, phones included (035: at most two lines per block). */}
+                    <span className="block text-sm text-muted">{b}</span>
                   </span>
                 </li>
               ))}

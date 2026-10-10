@@ -111,7 +111,7 @@ test.describe.serial("Criterios de aceptación §15", () => {
     const m = await r.json();
     expect(m.name).toBe("New Place");
     expect(m.display).toBe("standalone");
-    expect(m.theme_color).toBe("#EDE6DA"); // Travertino (light-first)
+    expect(m.theme_color).toBe("#F6F2EC"); // Travertino (light-first)
     expect(m.id).toBe("/");
     // start_url lets the middleware pick the visitor's language (/es or /en)
     const start = await request.get(m.start_url);

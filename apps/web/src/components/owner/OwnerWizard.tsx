@@ -381,12 +381,12 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               ? tx(locale, "Queda pendiente de revisión antes de publicarse.", "It’s waiting for review before going live.")
               : tx(locale, "Ya está publicado y visible en el mapa.", "It’s live and on the map.")
             : done.dupReview && done.pending
-            ? tx(locale, "Como se parece a otro anuncio, alguien de nuestro equipo lo revisará antes de publicarlo. Te escribimos por email en cuanto esté listo.", "Since it looks like another listing, someone from our team will check it before it goes live. We’ll email you as soon as it’s ready.")
+            ? tx(locale, "Como se parece a otro anuncio, alguien de nuestro equipo lo revisará antes de publicarlo. Te escribimos por correo en cuanto esté listo.", "Since it looks like another listing, someone from our team will check it before it goes live. We’ll email you as soon as it’s ready.")
             : done.mode === "FSBO" && done.pending
-            ? tx(locale, "Como tu cuenta es nueva, alguien de nuestro equipo revisará el anuncio antes de publicarlo. Te escribimos por email en cuanto esté listo.", "Since your account is new, someone from our team will look over the listing before it goes live. We’ll email you as soon as it’s ready.")
+            ? tx(locale, "Como tu cuenta es nueva, alguien de nuestro equipo revisará el anuncio antes de publicarlo. Te escribimos por correo en cuanto esté listo.", "Since your account is new, someone from our team will look over the listing before it goes live. We’ll email you as soon as it’s ready.")
             : done.mode === "FSBO"
             ? tx(locale, "Pasó nuestra revisión y ya aparece en el mapa, listo para que lo descubran.", "It passed our checks and is on the map, ready to be discovered.")
-            : tx(locale, `${agencies.find((a) => a.id === d.agency)?.name} te asignará un agente y se pondrá en contacto contigo pronto.`, `${agencies.find((a) => a.id === d.agency)?.name} will assign you an agent and be in touch soon.`)}
+            : tx(locale, `${agencies.find((a) => a.id === d.agency)?.name} te asignará un asesor y se pondrá en contacto contigo pronto.`, `${agencies.find((a) => a.id === d.agency)?.name} will assign you an advisor and be in touch soon.`)}
         </p>
         {photoWarn && <p role="alert" className="mt-4 rounded-lg bg-[#8A5A0014] px-3 py-2 text-sm text-warn">{photoWarn}</p>}
         <div className="mt-6 flex flex-wrap justify-center gap-3">
@@ -512,7 +512,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               <button className={opt(d.mode === "MANDATE")} onClick={() => set({ mode: "MANDATE" })}>
                 <Building2 strokeWidth={1.6} className="text-navy dark:text-ivory" />
                 <div className="mt-2 font-display text-lg font-semibold">{tx(locale, "Encargar a una agencia", "Hire an agency")}</div>
-                <div className="text-sm text-muted">{tx(locale, "Un agente verificado se encarga de todo.", "A verified agent handles everything.")}</div>
+                <div className="text-sm text-muted">{tx(locale, "Un asesor verificado se encarga de todo.", "A verified advisor handles everything.")}</div>
               </button>
             </div>}
             {d.mode === "MANDATE" && (
@@ -651,7 +651,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
 
         {step === 3 && (
           <div className="np-in space-y-5">
-            <h1 className="font-serif text-[36px] font-light leading-[1.05] md:text-[44px]">{tx(locale, "Fotos que venden", "Photos that sell")}</h1>
+            <h1 className="font-serif text-[36px] font-light leading-[1.05] md:text-[44px]">{tx(locale, "Fotos que atraen visitas", "Photos that bring visits")}</h1>
             <input
               ref={fileRef}
               type="file"

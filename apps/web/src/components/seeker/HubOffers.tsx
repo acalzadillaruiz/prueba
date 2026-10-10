@@ -92,7 +92,7 @@ export function HubOffers({ id, className, locale, offers: initial, offerable, l
             {errors.listing && <span role="alert" className="mt-1 block text-xs font-semibold text-danger">{errors.listing}</span>}
           </label>
           <label className="block text-sm">
-            <span className="mb-1 block font-semibold">{tx(locale, "Nota para el agente (opcional)", "Note for the agent (optional)")}</span>
+            <span className="mb-1 block font-semibold">{tx(locale, "Nota para el asesor (opcional)", "Note for the advisor (optional)")}</span>
             <input value={note} onChange={(ev) => setNote(ev.target.value)} maxLength={500} className={cn(inputCls, "h-11")} aria-invalid={!!errors.note} placeholder={tx(locale, "Ej.: pago de contado, entrega en 60 días", "E.g. cash, closing in 60 days")} />
             {errors.note && <span role="alert" className="mt-1 block text-xs font-semibold text-danger">{errors.note}</span>}
           </label>
@@ -105,12 +105,12 @@ export function HubOffers({ id, className, locale, offers: initial, offerable, l
             <Button type="submit" disabled={busy} className="w-full sm:w-auto">
               {busy && <Loader2 size={16} className="animate-spin" />} {tx(locale, "Enviar oferta", "Send offer")}
             </Button>
-            {sent && <span role="status" className="ml-0 mt-2 block text-sm font-semibold text-ok sm:ml-3 sm:mt-0 sm:inline">{tx(locale, "Listo. Tu oferta ya está con el agente.", "Done. Your offer is with the agent now.")}</span>}
+            {sent && <span role="status" className="ml-0 mt-2 block text-sm font-semibold text-ok sm:ml-3 sm:mt-0 sm:inline">{tx(locale, "Listo. Tu oferta ya está con el asesor.", "Done. Your offer is with the advisor.")}</span>}
           </div>
           {errors.form && <div role="alert" className="rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-sm text-danger sm:col-span-2">{errors.form}</div>}
         </form>
       ) : (
-        <p className="mt-3 text-sm text-muted">{tx(locale, "Para hacer una oferta, primero escríbele al agente o pide una visita desde la casa que te interesa.", "To make an offer, first message the agent or book a tour from the home you like.")}</p>
+        <p className="mt-3 text-sm text-muted">{tx(locale, "Para hacer una oferta, primero escríbele al asesor o pide una visita desde la casa que te interesa.", "To make an offer, first message the advisor or book a visit from the home you like.")}</p>
       )}
 
       <div className="mt-5">

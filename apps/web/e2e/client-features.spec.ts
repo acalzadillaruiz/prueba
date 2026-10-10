@@ -231,9 +231,9 @@ test.describe.serial("Cliente: búsqueda, Hub y precalificación", () => {
       await amountInput.fill(`${amount}x`);
       await expect(amountInput).toHaveValue(amount, { timeout: 1000 });
     }).toPass();
-    await page.getByLabel("Nota para el agente (opcional)").fill(`Oferta E2E ${stamp}`);
+    await page.getByLabel("Nota para el asesor (opcional)").fill(`Oferta E2E ${stamp}`);
     await page.getByRole("button", { name: "Enviar oferta" }).click();
-    await expect(page.getByText("Listo. Tu oferta ya está con el agente.")).toBeVisible();
+    await expect(page.getByText("Listo. Tu oferta ya está con el asesor.")).toBeVisible();
     const offers = page.getByRole("list", { name: "Ofertas enviadas" });
     await expect(offers.getByText(new RegExp(`Oferta E2E ${stamp}`))).toBeVisible();
     await page.reload();

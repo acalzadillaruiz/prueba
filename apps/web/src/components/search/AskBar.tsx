@@ -128,7 +128,7 @@ export function AskBar({ locale, className, sticky = false }: { locale: Locale; 
           </button>
         ))}
         <span className="ml-auto hidden items-center gap-1.5 pr-3 font-display text-[13px] text-white/85 sm:flex">
-          <Sparkles size={13} aria-hidden /> {tx(locale, "Escríbelo como se lo dirías a un amigo", "Say it like you'd tell a friend")}
+          <Sparkles size={13} aria-hidden /> {tx(locale, "Escribe zona, tipo de casa o presupuesto", "Type an area, a kind of home or a budget")}
         </span>
       </div>
       <div className="relative flex items-center gap-2 rounded-full bg-white/[.12] py-1 pl-5 pr-1 ring-1 ring-white/30 focus-within:ring-2 focus-within:ring-white">
@@ -139,7 +139,7 @@ export function AskBar({ locale, className, sticky = false }: { locale: Locale; 
           enterKeyHint="search"
           aria-label={tx(locale, "Describe la casa que buscas", "Describe the home you're looking for")}
           className="min-h-12 w-full bg-transparent font-display text-[16px] font-light text-white placeholder:text-white/80 focus:outline-none sm:text-[17px]"
-          placeholder={wide ? tx(locale, "Zona o casa… ej. casa con muelle en El Morro", "Area or home… e.g. a house with a pier in El Morro") : tx(locale, "Zona o casa…", "Area or home…")}
+          placeholder={wide ? tx(locale, "¿Dónde quieres vivir? Ej.: casa con muelle en El Morro", "Where do you want to live? E.g. a house with a pier in El Morro") : tx(locale, "¿Dónde quieres vivir?", "Where do you want to live?")}
         />
         {suggest.listbox}
         <button
@@ -274,7 +274,7 @@ function CompactAsk({
             value={text}
             enterKeyHint="search"
             aria-label={tx(locale, "Describe la casa que buscas", "Describe the home you're looking for")}
-            placeholder={wide ? tx(locale, "Buscar zona…", "Search area…") : tx(locale, "Zona…", "Area…")}
+            placeholder={wide ? tx(locale, "¿Dónde quieres vivir?", "Where do you want to live?") : tx(locale, "¿Dónde?", "Where?")}
             className="h-11 min-w-0 flex-1 bg-transparent px-1.5 font-display text-[16px] text-ink placeholder:text-ink/60 focus:outline-none"
           />
         </span>

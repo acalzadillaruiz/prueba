@@ -171,7 +171,7 @@ export function CompareTray({ locale }: { locale: Locale }) {
       <div className="np-glass hidden items-center gap-2.5 rounded-full py-1.5 pl-1.5 pr-1.5 shadow-[0_18px_40px_-16px_rgba(28,29,29,.35)] md:flex">
         <ul className="flex -space-x-2.5 pl-0.5" aria-hidden>
           {compare.slice(0, 3).map((id) => (
-            <li key={id} className="h-9 w-9 rounded-full ring-2 ring-[#EDE6DA]">
+            <li key={id} className="h-9 w-9 rounded-full ring-2 ring-[#F6F2EC]">
               {thumb(id, "h-full w-full rounded-full")}
             </li>
           ))}

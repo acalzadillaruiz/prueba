@@ -7,8 +7,8 @@ import { OnCallButton } from "@/components/brand/PublicChrome";
 /**
  * Cinema hero (030/032 · estilo AMALI): a realistic photo (illustrative, AI), edge to edge and full screen, with the title in white
  * Lexend Zetta, a Barlow Light line under it and the search as a translucent capsule. Phones keep the whole search
- * on the first screen (title above it, no scrolling). A soft shade at the top and bottom keeps white text readable;
- * the photo itself is not darkened.
+ * on the first screen (title above it, no scrolling). A soft shade behind the text keeps it readable; the rest of the
+ * photo is not darkened.
  */
 export function HeroAura({ locale, available }: { locale: Locale; available: number }) {
   const common = { alt: tx(locale, "Imagen ilustrativa", "Illustrative image"), sizes: "100vw", quality: 80, priority: true, width: 1280, height: 720 };
@@ -21,11 +21,12 @@ export function HeroAura({ locale, available }: { locale: Locale; available: num
       <picture>
         <source media="(min-width: 640px)" srcSet={desktop} sizes="100vw" />
         {/* eslint-disable-next-line jsx-a11y/alt-text -- next/image props via getImageProps (alt included) */}
-        <img {...mobileImg} className="np-hero-photo absolute inset-0 -z-20 h-full w-full object-cover object-[35%_50%] sm:object-[50%_50%]" />
+        <img {...mobileImg} className="np-hero-photo absolute inset-x-0 top-0 -z-20 h-[76%] w-full object-cover object-[35%_50%] [mask-image:linear-gradient(180deg,#000_80%,transparent)] sm:inset-0 sm:h-full sm:object-[50%_50%] sm:[mask-image:none]" />
       </picture>
-      {/* Shade where the text sits (top and left) and under the search: measured with the text hidden, the subtitle and the
-          small line keep ≥ 4.5:1 and the title (large text) ≥ 3:1 over the brightest sky, at 1440 and at 390. */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgb(28_29_29/.74)_0%,rgb(28_29_29/.66)_40%,rgb(28_29_29/0)_62%,rgb(28_29_29/.45)_100%)] sm:bg-[linear-gradient(180deg,rgb(28_29_29/.45)_0%,rgb(28_29_29/0)_55%,rgb(28_29_29/0)_62%,rgb(28_29_29/.45)_100%),radial-gradient(ellipse_70%_58%_at_20%_28%,rgb(28_29_29/.72)_0%,rgb(28_29_29/.6)_50%,rgb(28_29_29/0)_100%)]" />
+      {/* Shade only behind the text block (034a: the rest of the photo keeps its golden light). Measured line by line with
+          the text hidden: every hero line ≥ 4.5:1 at 390, subtitle and small line ≥ 4.5:1 at 1440. On phones the tower
+          photo ends above the search (034b), fading into the dark base, so the water stays in view. */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgb(28_29_29/.68)_0%,rgb(28_29_29/.58)_36%,rgb(28_29_29/.2)_46%,rgb(28_29_29/0)_54%)] sm:bg-[radial-gradient(ellipse_75%_58%_at_26%_26%,rgb(28_29_29/.74)_0%,rgb(28_29_29/.64)_30%,rgb(28_29_29/.36)_60%,rgb(28_29_29/.12)_80%,rgb(28_29_29/0)_100%),linear-gradient(180deg,rgb(28_29_29/0)_70%,rgb(28_29_29/.3)_100%)]" />
 
       <div className="relative mx-auto flex w-full max-w-[1320px] flex-1 flex-col px-4 pb-5 pt-[calc(env(safe-area-inset-top)+96px)] md:px-8 md:pb-10 lg:pt-[140px]">
         <div data-reveal="stagger" className="max-w-[920px]">
@@ -43,8 +44,8 @@ export function HeroAura({ locale, available }: { locale: Locale; available: num
           <p className="mt-4 max-w-[520px] text-[16px] font-light leading-relaxed text-white [text-shadow:0_1px_10px_rgb(0_0_0/.45)] sm:text-[18px] lg:mt-6">
             {tx(
               locale,
-              "Casas verificadas en Caracas, Lechería y El Morro, con asesor de guardia 24/7.",
-              "Verified homes in Caracas, Lechería and El Morro, with an advisor on call 24/7.",
+              "Casas revisadas en Caracas, Lechería y El Morro. Un asesor te atiende a cualquier hora.",
+              "Checked homes in Caracas, Lechería and El Morro. An advisor answers at any hour.",
             )}
           </p>
         </div>

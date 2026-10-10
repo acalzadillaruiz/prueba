@@ -75,8 +75,8 @@ export function OnCallDialog({ locale, listingSlug, onClose }: { locale: Locale;
       >
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
-            <div className="np-eyebrow text-gold-text">{tx(locale, "Guardia 24/7", "24/7 on-call")}</div>
-            <h2 id={titleId} className="mt-1 font-serif text-[28px] font-light leading-tight text-navy">{tx(locale, "Hoy te atienden", "Here for you today")}</h2>
+            <div className="np-eyebrow text-gold-text">{tx(locale, "Asesor 24/7", "Advisor 24/7")}</div>
+            <h2 id={titleId} className="mt-1 font-serif text-[28px] font-light leading-tight text-navy">{tx(locale, "Un asesor te atiende hoy", "An advisor can help you today")}</h2>
           </div>
           <button ref={closeBtn} type="button" onClick={onClose} aria-label={tx(locale, "Cerrar", "Close")} className={cn("-mr-2 -mt-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-navy hover:bg-navy/5", ring)}>
             <X size={20} aria-hidden />

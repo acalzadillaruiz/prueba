@@ -42,7 +42,7 @@ export function SellQuickEstimate({ locale, zones }: { locale: Locale; zones: { 
   return (
     <form onSubmit={run} className="np-glass rounded-[4px] p-5 shadow-[0_24px_60px_-30px_rgba(28,29,29,.35)] md:p-7" aria-labelledby="quick-estimate-title" noValidate>
       <div className="flex items-center gap-2 font-display text-[15px] font-semibold text-ink">
-        <Sparkles size={16} strokeWidth={1.7} className="text-[#B79D83]" aria-hidden />
+        <Sparkles size={16} strokeWidth={1.7} className="text-[#C9B49C]" aria-hidden />
         <h2 id="quick-estimate-title">{tx(locale, "¿Cuánto vale tu casa?", "What’s your home worth?")}</h2>
       </div>
       <p className="mt-1 text-sm text-muted">{tx(locale, "Gratis y sin registrarte. Una primera cifra en segundos.", "Free, no sign-up. A first figure in seconds.")}</p>

@@ -71,7 +71,7 @@ export function HeroSearch({ locale }: { locale: Locale }) {
       }}
       role="search"
       aria-label={tx(locale, "Busca tu casa", "Find your home")}
-      className="w-full max-w-[980px] rounded-[4px] bg-[#EDE6DA] p-3 text-[#1C1D1D] shadow-[0_24px_60px_rgba(21,18,15,.35)] lg:rounded-full lg:p-2"
+      className="w-full max-w-[980px] rounded-[4px] bg-[#F6F2EC] p-3 text-[#1C1D1D] shadow-[0_24px_60px_rgba(21,18,15,.35)] lg:rounded-full lg:p-2"
     >
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:gap-0">
         <div className="grid grid-cols-3 gap-1 rounded-full bg-[#EDE4D5] p-1 lg:flex lg:shrink-0" role="group" aria-label={tx(locale, "¿Qué quieres hacer?", "What are you looking to do?")}>

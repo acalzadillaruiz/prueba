@@ -1,124 +1,62 @@
 import Image from "next/image";
-import Link from "next/link";
-import { ArrowUpRight, PhoneCall, ShieldCheck } from "lucide-react";
 import type { Locale } from "@/types/domain";
 import { tx } from "@/lib/i18n";
 import { AskBar } from "@/components/search/AskBar";
 import { OnCallButton } from "@/components/brand/PublicChrome";
 
 /**
- * 2035 hero: light Lino with a slow aurora, a quiet editorial headline, the conversational search, and an arched
- * photograph that leans toward the pointer with two frosted cards floating over it (a real residence and the
- * advisors on call). No dark overlay: the photo is framed, not darkened.
+ * Cinema hero (030 · estilo AMALI): the coast at sunset, edge to edge and full screen, with the title in white
+ * Lexend Zetta, a Barlow Light line under it and the search as a translucent capsule. Phones keep the whole search
+ * on the first screen (title above it, no scrolling). A soft shade at the top and bottom keeps white text readable;
+ * the photo itself is not darkened.
  */
-export function HeroAura({
-  locale,
-  available,
-  featured,
-}: {
-  locale: Locale;
-  available: number;
-  featured?: { href: string; title: string; zone: string; price: string; photo?: string; verified?: boolean };
-}) {
+export function HeroAura({ locale, available }: { locale: Locale; available: number }) {
   return (
-    <section data-hide-fab className="np-grain relative overflow-hidden bg-ivory pt-[calc(env(safe-area-inset-top)+80px)] sm:pt-[104px] lg:pt-[100px] min-[1440px]:pt-[120px]" aria-labelledby="hero-title">
-      <div className="np-aura" aria-hidden>
-        <i />
-        <i />
-        <i />
-      </div>
-      <div className="relative mx-auto grid max-w-[1320px] grid-cols-1 items-center gap-7 px-4 pb-10 sm:gap-12 sm:pb-16 md:px-8 lg:grid-cols-[1.08fr_.92fr] lg:gap-10 lg:pb-24">
-        <div data-reveal="stagger" className="relative z-10 min-w-0">
-          <p className="np-glass inline-flex items-center gap-2.5 rounded-full px-3.5 py-1 font-display text-[13px] text-ink/80 sm:py-1.5">
+    <section data-hide-fab className="relative isolate flex min-h-[100svh] flex-col overflow-hidden bg-[#1C1D1D] text-white" aria-labelledby="hero-title">
+      <Image
+        src="/brand/hero-costa.jpg"
+        alt={tx(locale, "Ilustración 3D: villa frente al mar turquesa al atardecer, con muelle y yate", "3D illustration: a villa on a turquoise sea at sunset, with a pier and a yacht")}
+        fill
+        priority
+        fetchPriority="high"
+        sizes="100vw"
+        quality={80}
+        className="np-hero-photo -z-20 object-cover object-[66%_50%] sm:object-[60%_50%]"
+      />
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgb(28_29_29/.5)_0%,rgb(28_29_29/.28)_38%,rgb(28_29_29/0)_56%,rgb(28_29_29/.45)_100%)] sm:bg-[linear-gradient(180deg,rgb(28_29_29/.42)_0%,rgb(28_29_29/0)_26%,rgb(28_29_29/0)_48%,rgb(28_29_29/.5)_100%)]" />
+
+      <div className="relative mx-auto flex w-full max-w-[1320px] flex-1 flex-col px-4 pb-5 pt-[calc(env(safe-area-inset-top)+96px)] md:px-8 md:pb-10 lg:pt-[140px]">
+        <div data-reveal="stagger" className="max-w-[760px]">
+          <p className="flex items-center gap-2.5 font-display text-[12px] font-medium uppercase tracking-[.2em] text-white/90">
             <span className="np-live" aria-hidden />
+            {/* The real figure from the first frame (no count-up: a climbing number reads as "still loading"). */}
             <span>
-              {/* The real figure from the first frame (no count-up here: a climbing number reads as "still loading"). */}
               {available} {tx(locale, "casas disponibles hoy", "homes available today")}
             </span>
           </p>
-          {/* Short laptops (1024×768, 1280×800, 1366×768): a smaller headline and tighter spacing, so the search is on
-              the first screen; the full 76 px from 1440. */}
-          <h1 id="hero-title" className="mt-4 max-w-[680px] text-[31px] leading-[1.06] tracking-[-0.02em] text-ink sm:mt-7 sm:text-[60px] sm:leading-[1.04] lg:mt-5 lg:text-[54px] xl:text-[64px] min-[1440px]:mt-7 min-[1440px]:text-[76px]">
-            {tx(locale, "Hay casas que se visitan.", "Some homes you visit.")}{" "}
-            {/* Second line in Bronce text (6.6:1 on Lino, AA in dark too): quieter than the first, never faint. */}
-            <span className="text-gold-text">{tx(locale, "Y otras que se quedan contigo.", "Others stay with you.")}</span>
+          <h1 id="hero-title" className="mt-4 text-[34px] leading-[1.3] text-white [text-shadow:0_1px_18px_rgb(0_0_0/.25)] sm:text-[48px] lg:mt-6 lg:text-[60px]">
+            {tx(locale, "Tu próximo lugar,", "Your next place,")} <span className="whitespace-nowrap">{tx(locale, "verificado", "verified")}</span>
           </h1>
-          <p className="mt-3 max-w-[540px] text-[15px] leading-normal text-ink/75 sm:mt-6 sm:text-[17px] sm:leading-relaxed lg:mt-4 lg:text-[16px] min-[1440px]:mt-6 min-[1440px]:text-[17px]">
-            <span className="sm:hidden">
-              {tx(
-                locale,
-                "Pocas casas, bien elegidas. Te acompañamos hasta las llaves.",
-                "A few homes, well chosen. With you until the keys.",
-              )}
-            </span>
-            <span className="hidden sm:inline">
-              {tx(
-                locale,
-                "Elegimos pocas casas en Lechería, El Morro, Margarita y Caracas. Las conocemos por dentro, sabemos lo que valen y te acompañamos hasta que tengas las llaves en la mano, estés donde estés.",
-                "We choose a few homes in Lechería, El Morro, Margarita and Caracas. We know them inside out, we know what they're worth, and we stay with you until the keys are in your hand, wherever you are.",
-              )}
-            </span>
+          <span aria-hidden className="mt-5 block h-px w-[min(300px,70%)] bg-white/70 lg:mt-7" />
+          <p className="mt-4 max-w-[520px] text-[16px] font-light leading-relaxed text-white/90 sm:text-[18px] lg:mt-6">
+            {tx(
+              locale,
+              "Casas verificadas en Caracas, Lechería y El Morro, con asesor de guardia 24/7.",
+              "Verified homes in Caracas, Lechería and El Morro, with an advisor on call 24/7.",
+            )}
           </p>
-          <div className="mt-5 sm:mt-9 lg:mt-6 min-[1440px]:mt-9">
-            <AskBar locale={locale} sticky />
-          </div>
         </div>
 
-        {/* Phones: the search comes first (whole bar visible on first paint, clear of the tab bar); the arch follows
-            as a calmer band right below it. Tablets (md, one column): a wider, shorter arch (≤ ~420 px), not a 650 px
-            portrait one. */}
-        <div className="relative mx-auto w-full max-w-[360px] sm:max-w-[520px] md:max-w-[620px] lg:mr-0 lg:max-w-[520px]" data-tilt="5" style={{ transformStyle: "preserve-3d" }}>
-          <div className="np-arch relative aspect-[6/5] w-full bg-arena shadow-[0_40px_90px_-30px_rgba(30,26,24,.45)] sm:aspect-[4/5] md:aspect-[3/2] lg:aspect-[4/5]">
-            <Image
-              src="/brand/hero-arco.jpg"
-              alt={tx(locale, "Arco abierto a una terraza frente al mar", "An arch opening onto a terrace by the sea")}
-              fill
-              priority
-              fetchPriority="high"
-              sizes="(max-width: 640px) 360px, (max-width: 1024px) 90vw, 520px"
-              className="object-cover"
-            />
-          </div>
-          {/* Advisors on call: opens today's rota. */}
+        <div className="mt-auto flex flex-col items-center gap-3 pt-8 md:gap-4">
+          <AskBar locale={locale} sticky className="mx-auto" />
           <OnCallButton
             locale={locale}
-            // Hangs over the arch's edge only where the page has a margin to spare (tablets, wide screens); on laptops
-            // (the arch runs to the page edge) it sits inside the arch, never clipped.
-            className="np-glass absolute -right-2 top-[14%] hidden items-center sm:flex gap-3 rounded-2xl px-4 py-3 text-left transition-transform duration-300 hover:-translate-y-0.5 sm:-right-8 lg:right-4 min-[1400px]:-right-8"
+            className="flex min-h-11 items-center gap-2 rounded-full border border-white/30 bg-white/15 px-4 font-display text-[14px] text-white backdrop-blur-md transition-colors hover:bg-white/25"
           >
-            <span className="relative flex h-10 w-10 items-center justify-center rounded-full bg-ink text-ivory">
-              <PhoneCall size={17} aria-hidden />
-              <span className="np-live absolute -right-0.5 -top-0.5 ring-2 ring-white" aria-hidden />
-            </span>
-            <span>
-              <span className="block font-display text-[14px] font-semibold text-ink">{tx(locale, "Un asesor te atiende ya", "An advisor is here now")}</span>
-              <span className="block font-display text-[12.5px] text-ink/60">{tx(locale, "De guardia los 7 días", "On call 7 days a week")}</span>
-            </span>
+            <span className="h-2 w-2 rounded-full bg-[#3BB273]" aria-hidden />
+            {tx(locale, "Guardia 24/7", "On call 24/7")}
+            <span className="sr-only">{tx(locale, ": habla con un asesor ahora", ": talk to an advisor now")}</span>
           </OnCallButton>
-          {featured && (
-            <Link
-              href={featured.href}
-              data-spotlight
-              className="np-glass group absolute -left-2 bottom-[8%] flex w-[min(320px,92%)] items-center gap-3 rounded-2xl p-2 pr-3 sm:p-2.5 sm:pr-4 transition-transform duration-300 hover:-translate-y-0.5 sm:-left-10"
-            >
-              <span className="relative h-12 w-12 shrink-0 sm:h-16 sm:w-16 overflow-hidden rounded-xl bg-arena">
-                {featured.photo && <Image src={featured.photo} alt="" fill sizes="64px" className="object-cover transition-transform duration-700 group-hover:scale-110" />}
-              </span>
-              <span className="min-w-0 flex-1">
-                {/* Only when it is true (lib/price-badge: within ±10 % of an estimate with ≥ 3 comparables). */}
-                {featured.verified && (
-                  <span className="flex items-center gap-1 font-display text-[11.5px] font-medium uppercase tracking-[.14em] text-gold-text">
-                    <ShieldCheck size={13} aria-hidden /> {tx(locale, "Precio verificado", "Verified price")}
-                  </span>
-                )}
-                <span className="mt-0.5 block truncate font-display text-[14px] font-semibold text-ink">{featured.title}</span>
-                <span className="block truncate font-display text-[12.5px] text-ink/60">{featured.zone}</span>
-                {/* The price gets its own line and is never cut ("USD 890.…" read as a different number). */}
-                <span className="mt-0.5 block whitespace-nowrap font-display text-[15px] font-semibold text-ink [font-feature-settings:'lnum']">{featured.price}</span>
-              </span>
-              <ArrowUpRight size={18} aria-hidden className="shrink-0 text-ink/50 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-ink" />
-            </Link>
-          )}
         </div>
       </div>
     </section>

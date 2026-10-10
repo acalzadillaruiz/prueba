@@ -64,7 +64,7 @@ export function AccountView({ locale, data }: { locale: Locale; data: AccountDat
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 md:px-6">
       <div className={k.eyebrow}>{tx(locale, "Tu cuenta", "Your account")}</div>
-      <h1 className="mt-1 font-serif text-[40px] font-medium leading-[1.05] md:text-[48px]">{tx(locale, "Ajustes", "Settings")}</h1>
+      <h1 className="mt-1 font-serif text-[40px] font-light leading-[1.05] md:text-[48px]">{tx(locale, "Ajustes", "Settings")}</h1>
       <Card className={cn(k.card, "border-0 mt-6 p-6")}>
         <div className="flex flex-wrap items-center gap-4">
           <Avatar initials={data.initials} hue={data.hue} size={64} />

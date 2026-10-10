@@ -40,9 +40,9 @@ export function SellQuickEstimate({ locale, zones }: { locale: Locale; zones: { 
   };
   const suffix = op === "LONG_RENT" ? tx(locale, " / mes", " / month") : "";
   return (
-    <form onSubmit={run} className="np-glass rounded-[28px] p-5 shadow-[0_24px_60px_-30px_rgba(30,26,24,.35)] md:p-7" aria-labelledby="quick-estimate-title" noValidate>
+    <form onSubmit={run} className="np-glass rounded-[4px] p-5 shadow-[0_24px_60px_-30px_rgba(28,29,29,.35)] md:p-7" aria-labelledby="quick-estimate-title" noValidate>
       <div className="flex items-center gap-2 font-display text-[15px] font-semibold text-ink">
-        <Sparkles size={16} strokeWidth={1.7} className="text-[#B08A55]" aria-hidden />
+        <Sparkles size={16} strokeWidth={1.7} className="text-[#B79D83]" aria-hidden />
         <h2 id="quick-estimate-title">{tx(locale, "¿Cuánto vale tu casa?", "What’s your home worth?")}</h2>
       </div>
       <p className="mt-1 text-sm text-muted">{tx(locale, "Gratis y sin registrarte. Una primera cifra en segundos.", "Free, no sign-up. A first figure in seconds.")}</p>
@@ -62,7 +62,7 @@ export function SellQuickEstimate({ locale, zones }: { locale: Locale; zones: { 
               setOp(k);
               setRes(null);
             }}
-            className={cn("min-h-10 rounded-full px-4 font-display text-sm font-semibold transition-colors duration-np", op === k ? "bg-white text-ink shadow-[0_2px_8px_rgba(30,26,24,.1)]" : "text-muted hover:text-ink")}
+            className={cn("min-h-10 rounded-full px-4 font-display text-sm font-semibold transition-colors duration-np", op === k ? "bg-white text-ink shadow-[0_2px_8px_rgba(28,29,29,.1)]" : "text-muted hover:text-ink")}
           >
             {label}
           </button>
@@ -114,9 +114,9 @@ export function SellQuickEstimate({ locale, zones }: { locale: Locale; zones: { 
       )}
       <div aria-live="polite">
         {res && (
-          <div className="np-in mt-5 rounded-[20px] bg-white/70 p-4 ring-1 ring-black/[.04]" data-testid="quick-estimate">
+          <div className="np-in mt-5 rounded-[4px] bg-white/70 p-4 ring-1 ring-black/[.04]" data-testid="quick-estimate">
             <div className="np-kicker text-gold-text">{tx(locale, "Valor estimado New Place", "PlaceEstimate")}</div>
-            <div className="mt-2 font-serif text-[34px] font-semibold leading-none text-ink">
+            <div className="mt-2 font-serif text-[34px] font-light leading-none text-ink">
               {res.n < 2 ? `≈ ${money(res.mid, locale)}` : `${money(res.low, locale)} – ${money(res.high, locale)}`}
               <span className="font-display text-base font-normal text-muted">{suffix}</span>
             </div>

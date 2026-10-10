@@ -66,7 +66,7 @@ export function HubOffers({ id, className, locale, offers: initial, offerable, l
   return (
     <div id={id} className={cn("lg:col-span-2", className)}>
     <Card className={cn(k.card, "h-full border-0 p-5")}>
-      <h2 className="flex items-center gap-2 font-serif text-[24px] font-medium leading-tight"><HandCoins size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Mis ofertas", "My offers")}</h2>
+      <h2 className="flex items-center gap-2 font-serif text-[24px] font-light leading-tight"><HandCoins size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Mis ofertas", "My offers")}</h2>
 
       {offerable.length > 0 ? (
         <form

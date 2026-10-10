@@ -164,7 +164,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
   };
 
   const muted = dark ? "text-mist" : "text-muted";
-  const field = cn(inputCls, "h-12 rounded-xl border-[#D8CBB7]", dark && "border-navy-line bg-navy-2 text-ivory");
+  const field = cn(inputCls, "h-12 rounded-xl border-[#CDBFAC]", dark && "border-navy-line bg-navy-2 text-ivory");
   const fieldLbl = cn("mb-1 block px-1 text-[13px] font-semibold", muted);
   // Native date pickers follow the input's language where the browser supports it (dd/mm in Spanish); the chosen day is
   // also spelled out next to the label ("jue 18 oct"), so a mm/dd field never leaves the dates ambiguous.
@@ -206,19 +206,19 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
     const stayDone = mode === "stay" && !!done;
     const replier = agent ? agent.name.split(" ")[0] : fsbo ? tx(locale, "Su dueño", "The owner") : tx(locale, "Tu asesor", "Your advisor");
     return (
-      <div id="contact-panel" tabIndex={-1} className={cn("np-in rounded-[28px] p-6 ring-1", box)} data-testid="lead-done" role="status">
+      <div id="contact-panel" tabIndex={-1} className={cn("np-in rounded-[4px] p-6 ring-1", box)} data-testid="lead-done" role="status">
         <CheckCircle2 className="text-ok" size={30} aria-hidden />
         <div className="mt-3 font-serif text-[28px] leading-tight">
           {tour ? tx(locale, "Visita pedida", "Viewing requested") : stayDone ? tx(locale, "Tu consulta ya llegó", "Your availability request is in") : asked ? tx(locale, "Tu pedido de visita ya llegó", "Your visit request is in") : tx(locale, "Tu mensaje ya llegó", "Your message is on its way")}
         </div>
         {stayDone && (
-          <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-[#F3EEE5] px-3 py-1 font-display text-[15px] font-semibold text-ink first-letter:uppercase">
+          <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-[#F1ECE4] px-3 py-1 font-display text-[15px] font-semibold text-ink first-letter:uppercase">
             <CalendarDays size={15} aria-hidden /> {done}
           </div>
         )}
         {tour && (
           <>
-            <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-[#F3EEE5] px-3 py-1 font-display text-[15px] font-semibold text-ink">
+            <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-[#F1ECE4] px-3 py-1 font-display text-[15px] font-semibold text-ink">
               <Clock size={15} aria-hidden /> {tx(locale, `Pendiente de que ${confirmer} la confirme`, `Waiting for ${confirmer} to confirm`)}
             </div>
             <div className="mt-2 font-display text-[17px] font-semibold first-letter:uppercase">{done}</div>
@@ -266,10 +266,10 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
       : tx(locale, "Enviar mensaje", "Send message");
 
   return (
-    <div id="contact-panel" tabIndex={-1} data-hide-fab className={cn("rounded-[28px] p-6 ring-1", box)}>
+    <div id="contact-panel" tabIndex={-1} data-hide-fab className={cn("rounded-[4px] p-6 ring-1", box)}>
       {(agent || agency) && (
         <div className="flex items-center gap-4">
-          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#D9C6AB] font-serif text-[22px] font-semibold text-[#1E1A18]" aria-hidden>{initials}</span>
+          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#D8CFC1] font-serif text-[22px] font-light text-[#1C1D1D]" aria-hidden>{initials}</span>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-1.5 text-[17px] font-semibold">
               {agent?.name ?? agency?.name}
@@ -288,7 +288,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
         </div>
       )}
       {!agent && !agency && <div className={cn("text-sm", muted)}>{tx(locale, "Publicada por su dueño/a · sin intermediarios", "Listed by the owner · no middlemen")}</div>}
-      <div role="tablist" aria-label={tx(locale, "Cómo quieres contactar", "How to get in touch")} className={cn("mt-5 grid gap-1 rounded-full bg-[#F3EEE5] p-1 dark:bg-white/5", modes.length > 1 ? "grid-cols-2" : "grid-cols-1")} onKeyDown={onTabKey}>
+      <div role="tablist" aria-label={tx(locale, "Cómo quieres contactar", "How to get in touch")} className={cn("mt-5 grid gap-1 rounded-full bg-[#F1ECE4] p-1 dark:bg-white/5", modes.length > 1 ? "grid-cols-2" : "grid-cols-1")} onKeyDown={onTabKey}>
         {modes.map((m) => (
           <button
             key={m}
@@ -365,13 +365,13 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
                 {l.shortRent?.maxGuests ? <span className={cn("block text-[13px] font-normal", muted)}>{tx(locale, `Hasta ${maxGuests}`, `Up to ${maxGuests}`)}</span> : null}
               </span>
               <div className="flex items-center gap-1" role="group" aria-labelledby={`${uid}-guests`}>
-                <button type="button" onClick={() => setGuests(Math.max(1, guests - 1))} disabled={guests <= 1} aria-label={tx(locale, "Un huésped menos", "One guest fewer")} className={cn("flex h-11 w-11 items-center justify-center rounded-full border disabled:opacity-40", dark ? "border-navy-line" : "border-[#D8CBB7]")}><Minus size={16} aria-hidden /></button>
+                <button type="button" onClick={() => setGuests(Math.max(1, guests - 1))} disabled={guests <= 1} aria-label={tx(locale, "Un huésped menos", "One guest fewer")} className={cn("flex h-11 w-11 items-center justify-center rounded-full border disabled:opacity-40", dark ? "border-navy-line" : "border-[#CDBFAC]")}><Minus size={16} aria-hidden /></button>
                 <output aria-live="polite" className="w-8 text-center font-display text-[17px] font-semibold" data-testid="stay-guests">{guests}</output>
-                <button type="button" onClick={() => setGuests(Math.min(maxGuests, guests + 1))} disabled={guests >= maxGuests} aria-label={tx(locale, "Un huésped más", "One guest more")} className={cn("flex h-11 w-11 items-center justify-center rounded-full border disabled:opacity-40", dark ? "border-navy-line" : "border-[#D8CBB7]")}><Plus size={16} aria-hidden /></button>
+                <button type="button" onClick={() => setGuests(Math.min(maxGuests, guests + 1))} disabled={guests >= maxGuests} aria-label={tx(locale, "Un huésped más", "One guest more")} className={cn("flex h-11 w-11 items-center justify-center rounded-full border disabled:opacity-40", dark ? "border-navy-line" : "border-[#CDBFAC]")}><Plus size={16} aria-hidden /></button>
               </div>
             </div>
             {stayOk && (
-              <div className={cn("np-in mt-3 rounded-xl px-3.5 py-3 text-[15px]", dark ? "bg-white/5" : "bg-[#F3EEE5]")} data-testid="stay-summary" aria-live="polite">
+              <div className={cn("np-in mt-3 rounded-xl px-3.5 py-3 text-[15px]", dark ? "bg-white/5" : "bg-[#F1ECE4]")} data-testid="stay-summary" aria-live="polite">
                 <div className="flex justify-between gap-3">
                   <span>{est ? `${money(l.priceAmount, locale)} × ${plural(stayCheck.nights, locale, ["noche", "noches"], ["night", "nights"])}` : plural(stayCheck.nights, locale, ["noche", "noches"], ["night", "nights"])}</span>
                   {est && <span className="whitespace-nowrap">{money(est.subtotal, locale)}</span>}
@@ -409,7 +409,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
                     type="button"
                     aria-pressed={on}
                     onClick={() => setPrefs(on ? prefs.filter((x) => x !== p) : [...prefs, p])}
-                    className={cn("inline-flex min-h-11 items-center gap-1.5 rounded-full border px-3.5 font-display text-sm font-semibold", on ? "np-sel border-2" : dark ? "border-navy-line" : "border-[#D8CBB7] hover:border-navy/50")}
+                    className={cn("inline-flex min-h-11 items-center gap-1.5 rounded-full border px-3.5 font-display text-sm font-semibold", on ? "np-sel border-2" : dark ? "border-navy-line" : "border-[#CDBFAC] hover:border-navy/50")}
                   >
                     {on && <CheckCircle2 size={14} aria-hidden />} {tx(locale, ...VISIT_PREF_LABEL[p])}
                   </button>
@@ -426,7 +426,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
               placeholder={tx(locale, "Opcional: p. ej. sábado por la mañana", "Optional: e.g. Saturday morning")}
             />
             <label className={cn("mt-2 flex min-h-11 cursor-pointer items-center gap-2 text-sm", muted)}>
-              <input type="checkbox" checked={virtual} onChange={(e) => setVirtual(e.target.checked)} className="h-5 w-5 accent-[#1E1A18]" />
+              <input type="checkbox" checked={virtual} onChange={(e) => setVirtual(e.target.checked)} className="h-5 w-5 accent-[#1C1D1D]" />
               <Video size={14} aria-hidden /> {tx(locale, "Prefiero verla por videollamada", "I’d rather see it on a video call")}
             </label>
           </div>
@@ -456,10 +456,10 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
                     data-month={fmt(d.date, { month: "short" }).replace(".", "")}
                     className={cn(
                       "min-w-[62px] flex-1 rounded-xl border px-2 py-2.5 text-center font-display text-sm first-letter:uppercase after:mt-0.5 after:block after:text-[13px] after:text-muted after:content-[attr(data-month)]",
-                      day === i ? "np-sel border-2" : dark ? "border-navy-line" : "border-[#D8CBB7] hover:border-navy/50",
+                      day === i ? "np-sel border-2" : dark ? "border-navy-line" : "border-[#CDBFAC] hover:border-navy/50",
                     )}
                   >
-                    <span className="block">{label.slice(0, cut)}</span> <span className="mt-0.5 block font-serif text-[24px] font-semibold leading-none">{label.slice(cut + 1)}</span>
+                    <span className="block">{label.slice(0, cut)}</span> <span className="mt-0.5 block font-serif text-[24px] font-light leading-none">{label.slice(cut + 1)}</span>
                     <span className="sr-only">{fmt(d.date, { weekday: "long", day: "numeric", month: "long" })}</span>
                   </button>
                 );
@@ -485,7 +485,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
                     "min-h-11 rounded-xl border font-display text-[15px] font-semibold tracking-[0.04em] disabled:cursor-not-allowed disabled:border-dashed disabled:font-normal disabled:line-through",
                     // Taken slots stay legible (≥ 4.5:1): dashed border + strike-through, not a 40 % fade.
                     dark ? "disabled:text-mist" : "disabled:text-[#6E655E]",
-                    chosen === h.iso ? "np-sel border-2" : dark ? "border-navy-line" : "border-[#D8CBB7] hover:border-navy/50",
+                    chosen === h.iso ? "np-sel border-2" : dark ? "border-navy-line" : "border-[#CDBFAC] hover:border-navy/50",
                   )}
                 >
                   {h.label ?? `${String(h.hour).padStart(2, "0")}:00`}
@@ -507,7 +507,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
             <div className="np-in space-y-2" data-testid="contact-fields">
               {mode === "tour" && !askMode && (
                 <label className={cn("flex min-h-11 cursor-pointer items-center gap-2 text-sm", muted)}>
-                  <input type="checkbox" checked={virtual} onChange={(e) => setVirtual(e.target.checked)} className="h-5 w-5 accent-[#1E1A18]" />
+                  <input type="checkbox" checked={virtual} onChange={(e) => setVirtual(e.target.checked)} className="h-5 w-5 accent-[#1C1D1D]" />
                   <Video size={14} aria-hidden /> {tx(locale, "Prefiero verla por videollamada", "I’d rather see it on a video call")}
                 </label>
               )}
@@ -557,7 +557,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
           {err && <div role="alert" className="rounded-xl bg-[#B3261E1A] px-3 py-2 text-sm text-danger">{err}</div>}
           {/* The one terracotta action of each tab: confirm the visit (naming the chosen time) or send the message. */}
           <div ref={actions} className="!mt-3 flex items-center gap-2">
-            <Button type="submit" className="h-[52px] min-w-0 flex-1 disabled:text-[#5E5650] md:h-[52px] dark:disabled:bg-white/10 dark:disabled:text-[#CFC4B8]" size="lg" disabled={busy || (mode === "tour" && !chosen && !(askMode && askReady)) || (mode === "stay" && !stayOk)} variant="primary">
+            <Button type="submit" className="h-[52px] min-w-0 flex-1 disabled:text-[#5E5650] md:h-[52px] dark:disabled:bg-white/10 dark:disabled:text-[#CDC5B9]" size="lg" disabled={busy || (mode === "tour" && !chosen && !(askMode && askReady)) || (mode === "stay" && !stayOk)} variant="primary">
               {busy && <Loader2 size={16} className="animate-spin" aria-hidden />}
               {primaryLabel}
             </Button>

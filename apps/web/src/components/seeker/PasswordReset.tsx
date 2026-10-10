@@ -28,7 +28,7 @@ function Shell({ eyebrow, title, lead, children }: { eyebrow: string; title: str
     <div className="px-5 pb-16 pt-8 sm:px-10">
       <div className="mx-auto w-full max-w-[440px] lg:pt-10">
         <div className={k.eyebrow}>{eyebrow}</div>
-        <h1 className="mt-2 font-serif text-[40px] font-medium leading-[1.04] text-navy md:text-[48px]">{title}</h1>
+        <h1 className="mt-2 font-serif text-[40px] font-light leading-[1.04] text-navy md:text-[48px]">{title}</h1>
         {lead && <p className={cn("mt-3 text-[16px]", k.muted)}>{lead}</p>}
         <div className="mt-8">{children}</div>
       </div>

@@ -7,7 +7,7 @@ import { LazyMount } from "@/components/map/LazyMount";
 export function DetailMap({ l, locale, nearby }: { l: Listing; locale: Locale; nearby: Listing[] }) {
   const caracas = l.city === "Caracas";
   return (
-    <LazyMount className="h-[340px] rounded-[20px]">
+    <LazyMount className="h-[340px] rounded-[4px]">
       <NightMap
         listings={[l, ...nearby]}
         selectedId={l.id}

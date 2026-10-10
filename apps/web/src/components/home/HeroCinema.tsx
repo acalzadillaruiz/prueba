@@ -110,8 +110,8 @@ export function HeroCinema({
   if (reduced)
     return (
       <section className="relative isolate overflow-hidden bg-navy text-ivory">
-        <Image src="/brand/hero-arco.jpg" alt="" fill priority sizes="100vw" quality={80} className="-z-10 object-cover object-[50%_38%]" />
-        <div className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(30,26,24,.72)_0%,rgba(30,26,24,.28)_34%,rgba(30,26,24,.45)_62%,rgba(30,26,24,.92)_100%)]" aria-hidden />
+        <Image src="/brand/hero-costa.jpg" alt="" fill priority sizes="100vw" quality={80} className="-z-10 object-cover object-[50%_38%]" />
+        <div className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(28,29,29,.72)_0%,rgba(28,29,29,.28)_34%,rgba(28,29,29,.45)_62%,rgba(28,29,29,.92)_100%)]" aria-hidden />
         <div className="min-h-[640px] lg:min-h-[min(860px,100svh)]">{copy}</div>
       </section>
     );
@@ -122,18 +122,18 @@ export function HeroCinema({
         <div ref={sea} className="absolute inset-0 will-change-transform" aria-hidden>
           <Image src="/brand/marina.jpg" alt="" fill sizes="100vw" quality={80} className="object-cover" />
         </div>
-        <div ref={veil} className="absolute inset-0 bg-[linear-gradient(180deg,rgba(30,26,24,.35)_0%,rgba(30,26,24,.05)_40%,rgba(30,26,24,.75)_100%)]" style={{ opacity: 0.55 }} aria-hidden />
+        <div ref={veil} className="absolute inset-0 bg-[linear-gradient(180deg,rgba(28,29,29,.35)_0%,rgba(28,29,29,.05)_40%,rgba(28,29,29,.75)_100%)]" style={{ opacity: 0.55 }} aria-hidden />
         <div ref={hall} className="absolute inset-0 origin-[50%_44%] will-change-transform" aria-hidden>
-          <Image src="/brand/hero-arco.jpg" alt="" fill priority sizes="100vw" quality={80} className="object-cover object-[50%_38%]" />
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(30,26,24,.7)_0%,rgba(30,26,24,.2)_34%,rgba(30,26,24,.42)_62%,rgba(30,26,24,.92)_100%)]" />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(30,26,24,.5)_0%,rgba(30,26,24,0)_60%)]" />
+          <Image src="/brand/hero-costa.jpg" alt="" fill priority sizes="100vw" quality={80} className="object-cover object-[50%_38%]" />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(28,29,29,.7)_0%,rgba(28,29,29,.2)_34%,rgba(28,29,29,.42)_62%,rgba(28,29,29,.92)_100%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(28,29,29,.5)_0%,rgba(28,29,29,0)_60%)]" />
         </div>
 
         <div className="relative h-full">{copy}</div>
 
         <div ref={outro} className="pointer-events-none absolute inset-x-0 bottom-[16vh] px-4 text-center opacity-0" aria-hidden>
           <p className="font-serif text-[46px] italic leading-none text-ivory sm:text-[72px] lg:text-[104px]">{arrival}</p>
-          <p className="mt-5 text-[12px] font-semibold uppercase tracking-[0.34em] text-[#EBD5C8]">{arrivalSub}</p>
+          <p className="mt-5 text-[12px] font-semibold uppercase tracking-[0.34em] text-[#E3DACB]">{arrivalSub}</p>
         </div>
 
         <div ref={hint} className="pointer-events-none absolute bottom-6 right-6 hidden items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.3em] text-ivory/80 lg:flex" aria-hidden>
@@ -141,7 +141,7 @@ export function HeroCinema({
           <span className="np-scroll-line relative block h-12 w-px overflow-hidden bg-ivory/25" />
         </div>
         <div className="absolute inset-x-0 bottom-0 h-[2px] bg-ivory/10" aria-hidden>
-          <div ref={bar} className="h-full origin-left scale-x-0 bg-[#C9A574]" />
+          <div ref={bar} className="h-full origin-left scale-x-0 bg-[#9CC3CC]" />
         </div>
       </div>
       {/* Screen readers get the arrival line once, as text. */}

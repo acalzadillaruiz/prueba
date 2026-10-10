@@ -67,7 +67,7 @@ export function StickyContactBar({ locale, price, amount, meta, suffix, tour, st
       data-hide-fab-mobile
       aria-hidden={!shown}
       className={cn(
-        "fixed inset-x-0 bottom-0 z-40 border-t px-4 pt-3 shadow-[0_-10px_30px_rgba(30,26,24,.12)] transition-transform duration-np ease-out lg:hidden print:hidden",
+        "fixed inset-x-0 bottom-0 z-40 border-t px-4 pt-3 shadow-[0_-10px_30px_rgba(28,29,29,.12)] transition-transform duration-np ease-out lg:hidden print:hidden",
         dark ? "border-navy-line bg-navy text-ivory" : "border-line bg-white text-ink",
         !shown && "pointer-events-none translate-y-full",
       )}
@@ -80,10 +80,10 @@ export function StickyContactBar({ locale, price, amount, meta, suffix, tour, st
           data-compare-chip
           className={cn(
             "-mt-1 mb-2.5 flex min-h-9 items-center gap-2 rounded-full px-3 font-display text-[13px] font-semibold",
-            dark ? "bg-white/10 text-ivory" : "bg-[#F1EBE3] text-ink",
+            dark ? "bg-white/10 text-ivory" : "bg-[#EDE6DA] text-ink",
           )}
         >
-          <Scale size={14} aria-hidden className={dark ? "text-[#D4B98C]" : "text-[#8E3B22]"} />
+          <Scale size={14} aria-hidden className={dark ? "text-[#B79D83]" : "text-[#1F4E5A]"} />
           <span className="flex-1">{tx(locale, `Comparando ${compare.length} de 3`, `Comparing ${compare.length} of 3`)}</span>
           <span className="inline-flex items-center gap-1 underline-offset-4">{tx(locale, "Ver comparación", "View comparison")} <ArrowRight size={14} aria-hidden /></span>
         </Link>
@@ -91,11 +91,11 @@ export function StickyContactBar({ locale, price, amount, meta, suffix, tour, st
       <div className="flex items-center gap-2">
         <div ref={box} className="relative min-w-0 flex-1">
           {/* Off-screen copy of the full price + suffix, measured to decide whether the compact figure is needed. */}
-          <span ref={probe} aria-hidden className="pointer-events-none invisible absolute left-0 top-0 whitespace-nowrap font-serif text-[20px] font-semibold leading-tight min-[400px]:text-[22px]">
+          <span ref={probe} aria-hidden className="pointer-events-none invisible absolute left-0 top-0 whitespace-nowrap font-serif text-[20px] font-light leading-tight min-[400px]:text-[22px]">
             {price}
             <span className="font-display text-sm font-normal">{suffix}</span>
           </span>
-          <div className="whitespace-nowrap font-serif text-[20px] font-semibold leading-tight min-[400px]:text-[22px]" data-sticky-price>
+          <div className="whitespace-nowrap font-serif text-[20px] font-light leading-tight min-[400px]:text-[22px]" data-sticky-price>
             {compact && <span className="sr-only">{price}{suffix}</span>}
             <span aria-hidden={compact || undefined}>{shownPrice}</span>
             <span aria-hidden={compact || undefined} className={cn("font-display text-sm font-normal", dark ? "text-mist" : "text-muted")}>{suffix}</span>

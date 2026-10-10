@@ -63,20 +63,20 @@ export function OnCallDialog({ locale, listingSlug, onClose }: { locale: Locale;
   const list = q.data?.advisors ?? [];
   const ring = "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy";
   return createPortal(
-    <div className="fixed inset-0 z-[70] flex items-end justify-center bg-[#1E1A18]/55 p-0 sm:items-center sm:p-6 print:hidden" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+    <div className="fixed inset-0 z-[70] flex items-end justify-center bg-[#1C1D1D]/55 p-0 sm:items-center sm:p-6 print:hidden" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
       <div
         ref={panel}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descId}
-        className="np-in max-h-[88vh] w-full overflow-y-auto rounded-t-[24px] bg-ivory p-6 text-ink shadow-[0_24px_60px_rgba(30,26,24,.25)] sm:max-w-[480px] sm:rounded-[24px]"
+        className="np-in max-h-[88vh] w-full overflow-y-auto rounded-t-[4px] bg-ivory p-6 text-ink shadow-[0_24px_60px_rgba(28,29,29,.25)] sm:max-w-[480px] sm:rounded-[4px]"
         style={{ paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))" }}
       >
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
             <div className="np-eyebrow text-gold-text">{tx(locale, "Guardia 24/7", "24/7 on-call")}</div>
-            <h2 id={titleId} className="mt-1 font-serif text-[28px] font-medium leading-tight text-navy">{tx(locale, "Hoy te atienden", "Here for you today")}</h2>
+            <h2 id={titleId} className="mt-1 font-serif text-[28px] font-light leading-tight text-navy">{tx(locale, "Hoy te atienden", "Here for you today")}</h2>
           </div>
           <button ref={closeBtn} type="button" onClick={onClose} aria-label={tx(locale, "Cerrar", "Close")} className={cn("-mr-2 -mt-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-navy hover:bg-navy/5", ring)}>
             <X size={20} aria-hidden />

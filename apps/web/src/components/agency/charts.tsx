@@ -47,7 +47,7 @@ export function BarChart({ data, height = 180, format = (v: number) => String(v)
             const y = H - pad.b - (t / max) * (H - pad.t - pad.b);
             return (
               <g key={t}>
-                <line x1={pad.l} x2={W - pad.r} y1={y} y2={y} className={t === 0 ? "stroke-[#D8CBB7] dark:stroke-white/20" : "stroke-[#EFEAE0] dark:stroke-white/[.07]"} strokeWidth={1} />
+                <line x1={pad.l} x2={W - pad.r} y1={y} y2={y} className={t === 0 ? "stroke-[#CDBFAC] dark:stroke-white/20" : "stroke-[#EFEAE0] dark:stroke-white/[.07]"} strokeWidth={1} />
                 <text x={pad.l - 6} y={y + 4} textAnchor="end" fontSize={FONT} className="fill-muted dark:fill-mist">{t}</text>
               </g>
             );
@@ -93,7 +93,7 @@ export function Funnel({ steps }: { steps: { label: string; value: number }[] })
       {steps.map((s, i) => (
         <div key={s.label} className="grid grid-cols-[96px_1fr_64px] items-center gap-3 text-sm">
           <span className="text-muted dark:text-mist">{s.label}</span>
-          <div className="h-6 rounded-md bg-[#F1ECE3] dark:bg-white/[.06]">
+          <div className="h-6 rounded-md bg-[#EDE6DA] dark:bg-white/[.06]">
             <div className={cn("h-full rounded-md", i === steps.length - 1 ? "bg-navy dark:bg-ivory" : "bg-[#81776F] dark:bg-[#605751]")} style={{ width: `${max > 0 ? (s.value / max) * 100 : 0}%` }} />
           </div>
           <span className="text-right font-display font-semibold [font-feature-settings:'lnum','pnum']">

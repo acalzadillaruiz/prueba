@@ -301,7 +301,8 @@ test.describe("Cliente · regresiones de la revisión", () => {
     const pill = pinned.getByRole("link", { name: `Pedir visita: «${items[0].title_es}»` });
     await expect(pill).toHaveText("Visita");
     await expect(pill).toHaveAttribute("href", `/es/listing/${items[0].slug}#contact`);
-    expect((await pill.boundingBox())!.height).toBeGreaterThanOrEqual(36);
+    // Rounded: the pinned row slides in with a transform, so the box can read 35.99999 px for a 36 px pill.
+    expect(Math.round((await pill.boundingBox())!.height)).toBeGreaterThanOrEqual(36);
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(360);
   });
 
@@ -429,7 +430,8 @@ test.describe("Cliente · regresiones de la revisión", () => {
     await expect(card).toBeVisible();
     // One link per card, named by the title; no button inside a link anywhere in the results.
     await expect(card.getByRole("link")).toHaveCount(1);
-    const title = (await card.getByRole("link").innerText()).trim();
+    // textContent, not innerText: the title is shown in capitals by CSS (030), its accessible name keeps its case.
+    const title = ((await card.getByRole("link").textContent()) ?? "").trim();
     await expect(card.getByRole("link")).toHaveAccessibleName(title);
     expect(await page.locator("#search-results a button, #search-results a a").count()).toBe(0);
     // Owner listings say so in the agreed wording.

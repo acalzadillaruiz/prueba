@@ -61,14 +61,14 @@ function Essentials({ l, locale, title }: { l: Listing; locale: Locale; title: R
           // A declared absence ("no backup power") is information, not a perk: muted, dashed, with an "x" — never styled like a feature.
           if (key === "power" && l.powerBackup === "NONE")
             return (
-              <li key={key} data-absent className="flex items-center gap-3 rounded-[20px] border border-dashed border-muted/40 px-4 py-3 text-[15px] text-muted">
+              <li key={key} data-absent className="flex items-center gap-3 rounded-[4px] border border-dashed border-muted/40 px-4 py-3 text-[15px] text-muted">
                 <X size={18} strokeWidth={1.7} className="shrink-0" aria-hidden />
                 <span>{tx(locale, "Planta eléctrica: no tiene", "Backup power: none")}</span>
               </li>
             );
           const Icon = ESSENTIAL_ICON[key];
           return (
-            <li key={key} className="flex items-center gap-3 rounded-[20px] bg-white/70 ring-1 ring-black/[.04] px-4 py-3 text-[15px] font-semibold text-ink [font-feature-settings:'lnum']">
+            <li key={key} className="flex items-center gap-3 rounded-[4px] bg-white/70 ring-1 ring-black/[.04] px-4 py-3 text-[15px] font-semibold text-ink [font-feature-settings:'lnum']">
               <Icon size={18} strokeWidth={1.7} className="shrink-0 text-navy" aria-hidden />
               <span>{label}</span>
             </li>
@@ -114,7 +114,7 @@ function Facts({ l, locale }: { l: Listing; locale: Locale }) {
         {items.map(([v, t], i) => (
           <div key={t} className={cn("flex min-w-0 flex-col-reverse", i === n - 1 && lastWide)}>
             <dt className="mt-1 break-words text-[13px] font-semibold uppercase leading-snug tracking-[0.06em] text-muted">{t}</dt>
-            <dd className="break-words font-serif text-[30px] font-semibold leading-none text-ink">{v}</dd>
+            <dd className="break-words font-serif text-[30px] font-light leading-none text-ink">{v}</dd>
           </div>
         ))}
       </dl>
@@ -146,11 +146,11 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
   const eur = fx.find((f) => f.code === "EUR")?.perUsd ?? 0;
   const ppm = l.listingType === "SALE" || l.listingType === "COMMERCIAL_SALE" ? Math.round(l.priceAmount / Math.max(1, l.areaM2)) : null;
   const soldNearby = soldRows.map((r) => toCard(toDomain(r))).map((o) => ({ t: `${tx(locale, o.title_es, o.title_en)} · ${o.areaM2} m²`, p: o.priceAmount, d: tx(locale, o.status === "SOLD" ? "Vendido" : "Alquilado", o.status === "SOLD" ? "Sold" : "Rented") }));
-  const H = ({ children }: { children: React.ReactNode }) => <h3 className="mb-5 font-serif text-[28px] leading-tight">{children}</h3>;
+  const H = ({ children }: { children: React.ReactNode }) => <h3 className="np-sub mb-5 text-[15px] md:text-[16px]">{children}</h3>;
   const sec = "border-t border-line py-10";
   const amenities = amenitiesBeyondEssentials(l);
   const views = viewFeatures(l, locale);
-  const tile = "rounded-[20px] bg-white/70 ring-1 ring-black/[.04] px-4 py-3 text-[15px]";
+  const tile = "rounded-[4px] bg-white/70 ring-1 ring-black/[.04] px-4 py-3 text-[15px]";
   const searchType = l.listingType.startsWith("COMMERCIAL") ? "COMMERCIAL" : l.listingType;
 
   const crumbs: { key: string; label: string; href?: string }[] = [
@@ -212,7 +212,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
                     title the price block is the taller one, and it used to climb into the Compare/Share row. */}
                 <div className="mt-7 shrink-0 lg:mt-5 lg:pt-1 lg:text-right">
                   {/* Fluid size + nowrap: "USD 118.000" never breaks after the currency at 360 px. */}
-                  <div className="font-serif text-[clamp(34px,11vw,48px)] font-semibold leading-none text-ink md:text-[54px] lg:whitespace-nowrap" data-testid="listing-price">
+                  <div className="font-serif text-[clamp(34px,11vw,48px)] font-light leading-none text-ink md:text-[54px] lg:whitespace-nowrap" data-testid="listing-price">
                     <span className="whitespace-nowrap">{money(l.priceAmount, locale)}</span>
                     <span className="whitespace-nowrap font-display text-lg font-normal text-muted">{priceSuffix(l, locale)}</span>
                   </div>
@@ -304,11 +304,11 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
             <Fold className={sec} testId="history-section" title={tx(locale, "Historial de precio y la zona", "Price history and the area")} hint={historyHint}>
               <div className="grid grid-cols-1 gap-10 md:grid-cols-2">
                 <div>
-                  <h4 className="mb-4 font-serif text-[22px] leading-tight">{tx(locale, "Historial de precio", "Price history")}</h4>
+                  <h4 className="mb-4 font-display text-[14px] font-medium uppercase leading-tight tracking-[.14em]">{tx(locale, "Historial de precio", "Price history")}</h4>
                   <PriceHistory events={l.priceHistory} locale={locale} />
                 </div>
                 <div>
-                  <h4 className="mb-4 font-serif text-[22px] leading-tight">{tx(locale, `La zona en cifras · ${l.zone}`, `The area in numbers · ${l.zone}`)}</h4>
+                  <h4 className="mb-4 font-display text-[14px] font-medium uppercase leading-tight tracking-[.14em]">{tx(locale, `La zona en cifras · ${l.zone}`, `The area in numbers · ${l.zone}`)}</h4>
                   <p className="-mt-2 mb-4 text-sm text-muted">{zone.live ? tx(locale, "Calculado con las casas publicadas en New Place.", "Worked out from the homes listed on New Place.") : tx(locale, "Aún hay pocas casas publicadas aquí: tómalo como una referencia.", "Only a few homes listed here so far: treat these as a guide.")}</p>
                   <div className="grid grid-cols-2 gap-3">
                     {[
@@ -317,8 +317,8 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
                       [num(zone.activeListings, locale), tx(locale, "en oferta en New Place", "available on New Place")],
                       [zone.daysOnMarket, tx(locale, "días en mercado (mediana)", "median days on market")],
                     ].map(([v, t]) => (
-                      <div key={String(t)} className="rounded-[20px] bg-white/70 ring-1 ring-black/[.04] p-4">
-                        <div className="font-serif text-[26px] font-semibold leading-none">{v}</div>
+                      <div key={String(t)} className="rounded-[4px] bg-white/70 ring-1 ring-black/[.04] p-4">
+                        <div className="font-serif text-[26px] font-light leading-none">{v}</div>
                         <div className="mt-1.5 text-sm text-muted">{t}</div>
                       </div>
                     ))}
@@ -329,12 +329,12 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
 
             {soldNearby.length > 0 && (
               <Fold className={sec} testId="sold-nearby" title={tx(locale, "Se vendieron cerca", "Recently sold nearby")} hint={plural(soldNearby.length, locale, ["operación reciente en la zona", "operaciones recientes en la zona"], ["recent deal in the area", "recent deals in the area"])}>
-                <div className="divide-y divide-line rounded-[20px] bg-white/70 ring-1 ring-black/[.04]">
+                <div className="divide-y divide-line rounded-[4px] bg-white/70 ring-1 ring-black/[.04]">
                   {soldNearby.map((s) => (
                     <div key={s.t} className="flex items-center justify-between gap-3 px-4 py-3 text-[15px]">
                       <span className="font-semibold">{s.t}</span>
                       <span className="text-muted">{s.d}</span>
-                      <span className="font-serif text-lg font-semibold">{money(s.p, locale)}</span>
+                      <span className="font-serif text-lg font-light">{money(s.p, locale)}</span>
                     </div>
                   ))}
                 </div>

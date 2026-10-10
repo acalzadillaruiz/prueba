@@ -409,7 +409,7 @@ export function FilterSheet({
         </div>
       </div>
       <div className="flex shrink-0 items-center gap-3 border-t border-line bg-ivory px-4 pt-3" style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}>
-        <button type="button" onClick={onClear} disabled={!activeCount} className="min-h-12 rounded-full px-3 font-display text-[15px] font-semibold underline underline-offset-4 disabled:cursor-default disabled:bg-[#E3DDD3] disabled:text-[#5E5650] disabled:no-underline dark:disabled:bg-white/10 dark:disabled:text-[#CFC4B8]">
+        <button type="button" onClick={onClear} disabled={!activeCount} className="min-h-12 rounded-full px-3 font-display text-[15px] font-semibold underline underline-offset-4 disabled:cursor-default disabled:bg-[#E3DDD3] disabled:text-[#5E5650] disabled:no-underline dark:disabled:bg-white/10 dark:disabled:text-[#CDC5B9]">
           {tx(locale, "Borrar todo", "Clear all")}
         </button>
         <SeeHomes locale={locale} total={total} fetching={fetching} onClick={onClose} className="ml-auto flex-1" />

@@ -52,7 +52,7 @@ export function PriceHistory({ events, locale, dark }: { events: PriceEvent[]; l
               <tr key={i} className={cn(i && "border-t", dark ? "border-navy-line" : "border-line")}>
                 <td className={cn("px-4 py-2.5", dark ? "text-mist" : "text-muted")}>{dateTime(e.date, locale, { day: "numeric", month: "short", year: "numeric" })}</td>
                 <td className="px-4 py-2.5 font-semibold">{tx(locale, label[e.kind][0], label[e.kind][1])}</td>
-                <td className="px-4 py-2.5 text-right font-serif text-[17px] font-semibold">{money(e.amount, locale)}</td>
+                <td className="px-4 py-2.5 text-right font-serif text-[17px] font-light">{money(e.amount, locale)}</td>
                 <td className={cn("w-20 px-4 py-2.5 text-right text-xs font-bold", d < 0 ? "text-ok" : d > 0 ? "text-danger" : "text-transparent")}>{d ? `${d.toFixed(1)} %` : "—"}</td>
               </tr>
             );

@@ -28,18 +28,18 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
   const rough = nComp < 2;
   const source = nComp > 0 ? plural(nComp, locale, ["comparable", "comparables"], ["comparable", "comparables"]) : aiProvider === "heuristic" ? tx(locale, "modelo local", "local model") : tx(locale, "IA externa", "external AI");
   return (
-    <div className={cn("overflow-hidden rounded-[20px]", dark ? "border border-navy-line bg-navy-card" : "border border-line bg-white")}>
+    <div className={cn("overflow-hidden rounded-[4px]", dark ? "border border-navy-line bg-navy-card" : "border border-line bg-white")}>
       {/* Navy valuation panel (brand): range in Cormorant, gold fillet scale, the asking price as a dot. */}
       <div className="np-navy-panel bg-navy px-6 py-7 text-ivory md:px-8">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="np-eyebrow text-[#D4B98C]">{tx(locale, "Valor estimado New Place", "PlaceEstimate · Estimated value")}</div>
+          <div className="np-eyebrow text-[#B79D83]">{tx(locale, "Valor estimado New Place", "PlaceEstimate · Estimated value")}</div>
           <div className="text-sm text-ivory/70">
             {rough ? tx(locale, "Estimación orientativa", "Indicative estimate") : conf} · {source}
           </div>
         </div>
         {rough ? (
           <>
-            <div className="mt-4 font-serif text-[36px] font-semibold leading-tight md:text-[46px]">
+            <div className="mt-4 font-serif text-[36px] font-light leading-tight md:text-[46px]">
               ≈ {money(e.mid, locale)}
               <span className="font-display text-base font-normal text-ivory/60">{priceSuffix(l, locale)}</span>
             </div>
@@ -54,7 +54,7 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
           </>
         ) : (
           <>
-        <div className="mt-4 font-serif text-[36px] font-semibold leading-tight md:text-[46px]">
+        <div className="mt-4 font-serif text-[36px] font-light leading-tight md:text-[46px]">
           {money(e.low, locale)} – {money(e.high, locale)}
           <span className="font-display text-base font-normal text-ivory/60">{priceSuffix(l, locale)}</span>
         </div>
@@ -62,11 +62,11 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
           {tx(locale, "Valor central", "Mid value")} {money(e.mid, locale)}
         </div>
         <div className="relative mt-9 h-[3px] rounded-full bg-white/15">
-          <div className="absolute inset-y-0 rounded-full bg-gradient-to-r from-[#B08A55]/60 via-[#D4B98C] to-[#B08A55]/60" style={{ left: `${aLow}%`, right: `${100 - aHigh}%` }} />
+          <div className="absolute inset-y-0 rounded-full bg-gradient-to-r from-[#B79D83]/60 via-[#B79D83] to-[#B79D83]/60" style={{ left: `${aLow}%`, right: `${100 - aHigh}%` }} />
           <div className="absolute -top-8 whitespace-nowrap text-[13px] font-semibold text-ivory/85" style={{ left: `${pos}%`, transform: `translateX(-${clampPct(pos)}%)` }}>
             {tx(locale, "Precio pedido", "Asking")} · {usdShort(l.priceAmount)}
           </div>
-          <div className="absolute top-1/2 h-[18px] w-[18px] -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] border-[#D4B98C] bg-ivory" style={{ left: `${pos}%` }} />
+          <div className="absolute top-1/2 h-[18px] w-[18px] -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] border-[#B79D83] bg-ivory" style={{ left: `${pos}%` }} />
         </div>
         {/* The range ends are labelled where they sit on the bar (not at the bar's edges). Each label leans inward by its
             own position (0 % → left-aligned, 100 % → right-aligned), so it never overflows the panel; when the two ends are

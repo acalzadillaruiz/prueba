@@ -141,9 +141,9 @@ export function PlatformAgencies({ locale, agencies }: { locale: Locale; agencie
         : tx(locale, `¿Seguro? ${a.name} pasará de «${STATUS[a.status]?.[0] ?? a.status}» a «${STATUS[p.value]?.[0] ?? p.value}».`, `Sure? ${a.name} will go from “${STATUS[a.status]?.[1] ?? a.status}” to “${STATUS[p.value]?.[1] ?? p.value}”.`);
   return (
     <AdminShell locale={locale} area="platform" title={tx(locale, "Agencias", "Agencies")} actions={<Button className={k.primary} onClick={() => setCreating(!creating)} aria-expanded={creating}><Plus size={16} /> {tx(locale, "Nueva agencia", "New agency")}</Button>}>
-      {err && <div role="alert" className="mb-4 rounded-lg bg-[#B3261E33] px-3 py-2 text-sm text-[#C9A574]">{err}</div>}
+      {err && <div role="alert" className="mb-4 rounded-lg bg-[#B3261E33] px-3 py-2 text-sm text-[#9CC3CC]">{err}</div>}
       {current && (
-        <div className="np-in mb-4 flex flex-wrap items-center gap-3 rounded-[18px] bg-rosa/70 px-4 py-3 text-sm text-navy dark:bg-white/[.08] dark:text-ivory">
+        <div className="np-in mb-4 flex flex-wrap items-center gap-3 rounded-[4px] bg-rosa/70 px-4 py-3 text-sm text-navy dark:bg-white/[.08] dark:text-ivory">
           <LogIn size={16} strokeWidth={1.7} /> {tx(locale, `Estás dentro de ${current.name} como su equipo. Todo lo que hagas queda en el registro de auditoría.`, `You’re inside ${current.name} as its team. Everything you do is recorded in the audit log.`)}
           <a href={`/${locale}/agency`} className={cn("ml-auto", k.link)}>{tx(locale, "Abrir panel", "Open dashboard")} →</a>
           <button onClick={() => run("exit", () => api("platform/impersonate", { method: "POST", json: { agencyId: null } }))} className={cn("rounded-full px-3 py-1", k.ghost)}>{tx(locale, "Salir", "Exit")}</button>
@@ -288,7 +288,7 @@ export function PlatformUsers({ locale, users, providers }: { locale: Locale; us
                       // Suspending is confirmed inline (below the row); restoring needs no confirmation.
                       if (!u.suspended) return setSuspending(suspending === u.id ? null : u.id);
                       run(u.id, () => api(`platform/users/${u.id}`, { method: "PATCH", json: { suspended: false } }));
-                    }} className={cn("rounded-full p-2 hover:bg-[#E6DDD2] dark:hover:bg-white/5", u.suspended ? k.okText : k.dangerText)} aria-label={u.suspended ? tx(locale, "Reactivar", "Restore") : tx(locale, "Suspender", "Suspend")} title={u.suspended ? tx(locale, "Reactivar", "Restore") : tx(locale, "Suspender", "Suspend")}>
+                    }} className={cn("rounded-full p-2 hover:bg-[#DED5C7] dark:hover:bg-white/5", u.suspended ? k.okText : k.dangerText)} aria-label={u.suspended ? tx(locale, "Reactivar", "Restore") : tx(locale, "Suspender", "Suspend")} title={u.suspended ? tx(locale, "Reactivar", "Restore") : tx(locale, "Suspender", "Suspend")}>
                       {u.suspended ? <RotateCcw size={14} /> : <Ban size={14} />}
                     </button>
                   )}
@@ -459,7 +459,7 @@ export function PlatformAI({ locale, settings, fx, counts }: { locale: Locale; s
               ["heuristic", tx(locale, "Reglas internas", "Internal rules"), tx(locale, "Funciona sin servicios externos. Es la opción por defecto.", "Works without outside services. The default.")],
               ["openai-compatible", tx(locale, "Proveedor de IA externo", "External AI provider"), tx(locale, "Un servicio de IA contratado (OpenAI, Groq…). Necesita su clave.", "A paid AI service (OpenAI, Groq…). Needs its key.")],
             ] as const).map(([key, n, d]) => (
-              <button key={key} disabled={busy === "ai"} onClick={() => run("ai", () => api("platform/settings", { method: "PUT", json: { aiProvider: key } }))} aria-pressed={settings.aiProvider === key} className={cn("rounded-[18px] p-4 text-left transition-shadow duration-np", settings.aiProvider === key ? "bg-[#E6DDD2] shadow-[inset_0_0_0_2px_#1E1A18] dark:bg-white/10 dark:shadow-[inset_0_0_0_2px_#C9A574]" : cn("shadow-[inset_0_0_0_1px_#D8CBB7] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,.15)]", k.hover))}>
+              <button key={key} disabled={busy === "ai"} onClick={() => run("ai", () => api("platform/settings", { method: "PUT", json: { aiProvider: key } }))} aria-pressed={settings.aiProvider === key} className={cn("rounded-[4px] p-4 text-left transition-shadow duration-np", settings.aiProvider === key ? "bg-[#DED5C7] shadow-[inset_0_0_0_2px_#1C1D1D] dark:bg-white/10 dark:shadow-[inset_0_0_0_2px_#9CC3CC]" : cn("shadow-[inset_0_0_0_1px_#CDBFAC] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,.15)]", k.hover))}>
                 <div className="flex items-center justify-between"><span className="font-display text-sm font-semibold">{n}</span>{settings.aiProvider === key && <CheckCircle2 size={16} />}</div>
                 <div className={cn("mt-1 text-xs", k.muted)}>{d}</div>
               </button>

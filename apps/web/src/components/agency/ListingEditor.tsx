@@ -236,8 +236,8 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
               })}
             </div>
             <div className="mt-4 flex flex-wrap gap-4 text-sm">
-              <label className="flex items-center gap-2"><input type="checkbox" disabled={!canEdit} checked={f.hasFloorplan} onChange={(e) => { setF({ ...f, hasFloorplan: e.target.checked }); dirty(); }} className="h-4 w-4 accent-navy dark:accent-[#C9A574]" /> {tx(locale, "Tiene plano", "Has floor plan")}</label>
-              <label className="flex items-center gap-2"><input type="checkbox" disabled={!canEdit} checked={f.hasVirtualTour} onChange={(e) => { setF({ ...f, hasVirtualTour: e.target.checked }); dirty(); }} className="h-4 w-4 accent-navy dark:accent-[#C9A574]" /> {tx(locale, "Tour virtual", "Virtual tour")}</label>
+              <label className="flex items-center gap-2"><input type="checkbox" disabled={!canEdit} checked={f.hasFloorplan} onChange={(e) => { setF({ ...f, hasFloorplan: e.target.checked }); dirty(); }} className="h-4 w-4 accent-navy dark:accent-[#9CC3CC]" /> {tx(locale, "Tiene plano", "Has floor plan")}</label>
+              <label className="flex items-center gap-2"><input type="checkbox" disabled={!canEdit} checked={f.hasVirtualTour} onChange={(e) => { setF({ ...f, hasVirtualTour: e.target.checked }); dirty(); }} className="h-4 w-4 accent-navy dark:accent-[#9CC3CC]" /> {tx(locale, "Tour virtual", "Virtual tour")}</label>
             </div>
             {f.hasVirtualTour && (
               <div className="mt-3 max-w-md">
@@ -347,7 +347,7 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
               <h2 className={k.title}>{tx(locale, "Calidad de ficha", "Listing quality")}</h2>
               <span className={cn(k.num, "text-[36px] leading-none", quality >= 85 ? k.okText : k.warnText)}>{quality}</span>
             </div>
-            <div className="mt-3 h-2 rounded-full bg-[#ECE6DA] dark:bg-white/10"><div className="h-full rounded-full bg-ok" style={{ width: `${quality}%` }} /></div>
+            <div className="mt-3 h-2 rounded-full bg-[#E6DFD3] dark:bg-white/10"><div className="h-full rounded-full bg-ok" style={{ width: `${quality}%` }} /></div>
             <ul className="mt-4 space-y-2 text-sm">
               {checks.map(([ok, t, pts]) => (
                 <li key={t} className={cn("flex items-center gap-2", ok ? "text-navy dark:text-ivory" : k.muted)}>

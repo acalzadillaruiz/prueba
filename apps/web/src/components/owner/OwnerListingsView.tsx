@@ -88,7 +88,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <div className={k.eyebrow}>{tx(locale, "Vender con nosotros", "Sell with us")}</div>
-          <h1 className="mt-1 font-serif text-[40px] font-medium leading-[1.05] md:text-[48px]">{tx(locale, "Mis inmuebles", "My properties")}</h1>
+          <h1 className="mt-1 font-serif text-[40px] font-light leading-[1.05] md:text-[48px]">{tx(locale, "Mis inmuebles", "My properties")}</h1>
           <p className="mt-1 text-muted">{user?.name} · {tx(locale, "propietario particular", "private owner")}</p>
         </div>
         <Button href={`/${locale}/owner/new`}><Plus size={16} /> {tx(locale, "Publicar otro", "List another")}</Button>
@@ -122,7 +122,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
           {mandates.map((m) => (
             <Card key={m.id} className={cn(k.card, "border-0 p-5")}>
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <div className="font-serif text-[24px] font-medium leading-tight">{tx(locale, `Encargo a ${m.agencyName}`, `Mandate with ${m.agencyName}`)}</div>
+                <div className="font-serif text-[24px] font-light leading-tight">{tx(locale, `Encargo a ${m.agencyName}`, `Mandate with ${m.agencyName}`)}</div>
                 <Badge tone={m.status === "ACTIVE" ? "ok" : m.status === "CANCELLED" ? "danger" : "warn"}>{mandateLabel(mandatePhase(m), locale)}</Badge>
               </div>
               <div className="mt-1 text-sm text-muted">{listings.find((l) => l.id === m.listingId)?.[locale === "es" ? "title_es" : "title_en"]}</div>
@@ -168,7 +168,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
                       <span className="text-xs font-semibold text-muted">{isMandate ? tx(locale, "Encargo", "Mandate") : tx(locale, "Publicado por ti", "Listed by you")}</span>
                       <span className="text-xs text-muted">· {plural(l.photos?.length ?? 0, locale, ["foto", "fotos"], ["photo", "photos"])} · {tx(locale, "calidad", "quality")} {l.quality}</span>
                     </div>
-                    <Link href={listingHref(locale, l)} className="mt-1 block font-serif text-[24px] font-medium leading-tight underline-offset-4 hover:underline">{tx(locale, l.title_es, l.title_en)}</Link>
+                    <Link href={listingHref(locale, l)} className="mt-1 block font-serif text-[24px] font-light leading-tight underline-offset-4 hover:underline">{tx(locale, l.title_es, l.title_en)}</Link>
                     {editing === l.id ? (
                       <form
                         className="mt-2"
@@ -389,7 +389,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
                   }
                 }}
               >
-                <input value={draft} onChange={(e) => setDraft(e.target.value)} maxLength={2000} className="h-11 min-w-0 flex-1 rounded-full border border-[#D8CBB7] bg-white px-4 text-sm focus:border-navy focus:outline-none" placeholder={tx(locale, "Escribe un mensaje…", "Write a message…")} aria-label={tx(locale, "Mensaje", "Message")} />
+                <input value={draft} onChange={(e) => setDraft(e.target.value)} maxLength={2000} className="h-11 min-w-0 flex-1 rounded-full border border-[#CDBFAC] bg-white px-4 text-sm focus:border-navy focus:outline-none" placeholder={tx(locale, "Escribe un mensaje…", "Write a message…")} aria-label={tx(locale, "Mensaje", "Message")} />
                 <button disabled={sending} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-navy text-ivory hover:bg-navy-2 disabled:opacity-60 dark:bg-ivory dark:text-navy" aria-label={tx(locale, "Enviar", "Send")}>{sending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}</button>
               </form>
               )}
@@ -413,9 +413,9 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
 function NoPhotos({ locale, busy, onAdd }: { locale: Locale; busy: boolean; onAdd?: () => void }) {
   return (
     <div data-testid="owner-no-photos" className="relative flex aspect-[4/3] h-full w-full flex-col items-center justify-center gap-3 overflow-hidden bg-[linear-gradient(160deg,#F6F1EA_0%,#F1EBE3_45%,#E6D8C4_100%)] p-5 text-center dark:bg-[linear-gradient(160deg,#2A2420_0%,#241F1C_55%,#1E1A18_100%)]">
-      <svg viewBox="0 0 128 60" className="w-24 text-[#B08A55] opacity-70 dark:text-[#C9A574]" aria-hidden fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round">
+      <svg viewBox="0 0 128 60" className="w-24 text-[#B79D83] opacity-70 dark:text-[#9CC3CC]" aria-hidden fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round">
         <path d="M6 44 64 4l58 40" />
-        <path d="M30 44 64 20l34 24" className="text-[#8E3B22] dark:text-[#C9A574]" stroke="currentColor" />
+        <path d="M30 44 64 20l34 24" className="text-[#1F4E5A] dark:text-[#9CC3CC]" stroke="currentColor" />
         <path d="M18 44v14h92V44" opacity=".55" />
         <path d="M56 58V46h16v12" opacity=".55" />
       </svg>
@@ -424,7 +424,7 @@ function NoPhotos({ locale, busy, onAdd }: { locale: Locale; busy: boolean; onAd
         <p className="mt-0.5 text-xs text-muted dark:text-mist">{tx(locale, "Con fotos, tu anuncio recibe muchas más visitas.", "With photos, your listing gets far more views.")}</p>
       </div>
       {onAdd && (
-        <button type="button" onClick={onAdd} disabled={busy} className="inline-flex min-h-10 items-center gap-1.5 rounded-full bg-[#1E1A18] px-4 font-display text-sm font-semibold text-[#F1EBE3] transition-colors duration-np hover:bg-[#2A2420] disabled:opacity-60 dark:bg-[#F1EBE3] dark:text-[#1E1A18] dark:hover:bg-white">
+        <button type="button" onClick={onAdd} disabled={busy} className="inline-flex min-h-10 items-center gap-1.5 rounded-full bg-[#1C1D1D] px-4 font-display text-sm font-semibold text-[#EDE6DA] transition-colors duration-np hover:bg-[#22262A] disabled:opacity-60 dark:bg-[#EDE6DA] dark:text-[#1C1D1D] dark:hover:bg-white">
           {busy ? <Loader2 size={14} className="animate-spin" aria-hidden /> : <ImagePlus size={14} aria-hidden />} {tx(locale, "Añade fotos", "Add photos")}
         </button>
       )}

@@ -3,6 +3,7 @@ import { ChevronDown } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import type { Locale } from "@/types/domain";
 import { Logo } from "@/components/brand/Logo";
+import { Button } from "@/components/ui";
 import { FooterAccountLink } from "./FooterAccountLink";
 import { FooterPrefs } from "./FooterPrefs";
 import { DEMO_ENABLED } from "@/lib/demo";
@@ -38,14 +39,14 @@ export async function PublicFooter({ locale }: { locale: Locale }) {
     </div>
   );
   return (
-    <footer className="np-grain relative mt-12 overflow-hidden rounded-t-[32px] md:mt-24 md:rounded-t-[40px] bg-[#E9E0D3] text-ink">
+    <footer className="relative overflow-hidden bg-[#D8CFC1] text-ink">
       <div className="relative mx-auto flex max-w-[1320px] flex-wrap items-end justify-between gap-6 border-b border-ink/10 px-4 pb-10 pt-12 md:px-8 md:pb-12 md:pt-20">
-        <p className="max-w-[720px] font-serif text-[34px] leading-[1.04] tracking-[-0.02em] md:text-[64px]">
-          {locale === "es" ? "Cuando quieras," : "Whenever you're ready,"} <span className="text-ink/45">{locale === "es" ? "aquí estamos." : "we're here."}</span>
+        <p className="max-w-[760px] font-title text-[20px] font-extralight uppercase leading-[1.5] tracking-[.08em] md:text-[34px]">
+          {locale === "es" ? "Cuando quieras," : "Whenever you're ready,"} <span className="text-ink/55">{locale === "es" ? "aquí estamos." : "we're here."}</span>
         </p>
-        <Link href={`/${locale}/luxury#acceso`} className="inline-flex min-h-12 items-center gap-2 rounded-full bg-ink px-6 font-display text-[15px] font-semibold text-ivory transition-transform duration-300 hover:-translate-y-0.5">
-          {locale === "es" ? "Hablar con una persona" : "Talk to a person"} <span aria-hidden>→</span>
-        </Link>
+        <Button href={`/${locale}/luxury#acceso`} variant="navy" size="lg">
+          {locale === "es" ? "Hablar con una persona" : "Talk to a person"}
+        </Button>
       </div>
       <div className="relative mx-auto grid max-w-[1320px] grid-cols-2 gap-x-6 gap-y-0 px-4 pb-10 pt-10 md:grid-cols-[1.3fr_1fr_1fr_1fr] md:gap-12 md:px-8 md:pb-14 md:pt-16">
         <div className="col-span-2 mb-6 flex flex-col items-start md:col-span-1 md:mb-0 md:items-center md:text-center">

@@ -47,31 +47,27 @@ export function Monogram({ className, bg = "var(--np-navy)", ink = "var(--np-ivo
 }
 
 /**
- * Horizontal lockup used in headers: roof + NEW PLACE (Cinzel). `lg` is the stacked lockup with "Bienes raíces".
- * tone="ivory" for navy/photo backgrounds (teja switches to the light terracotta for contrast).
+ * Wordmark (030 · estilo AMALI): NEW PLACE in Lexend Zetta ExtraLight, wide and spaced, no symbol — like AMALI's
+ * thin lockup. `lg` stacks a small "VENEZUELA" under it. tone="ivory" for photos and dark blocks.
  */
 export function Logo({ tone = "navy", className, size = "md", animate = false }: { tone?: "navy" | "ivory"; className?: string; size?: "sm" | "md" | "lg"; animate?: boolean }) {
   const dark = tone === "ivory";
-  // --np-logo-ink / --np-logo-teja let the public dark mode turn the navy lockup into Cal + light terracotta.
-  const ink = dark ? "var(--np-ivory)" : "var(--np-logo-ink, var(--np-navy))";
-  const teja = dark ? "var(--np-coral-light)" : "var(--np-logo-teja, var(--np-coral))";
+  // --np-logo-ink lets the public dark mode turn the Noche wordmark into Travertino.
+  const ink = dark ? "#FFFFFF" : "var(--np-logo-ink, var(--np-ink))";
   if (size === "lg")
     return (
-      <span className={cn("inline-grid justify-items-center gap-2", className)} aria-label="New Place Bienes raíces">
-        <RoofMark className="h-11 w-[126px]" ink={ink} teja={teja} animate={animate} />
-        <span className={cn("font-logo text-[30px] leading-none tracking-[0.22em]", animate && "np-roof-fade")} style={{ color: ink, paddingLeft: "0.22em" }}>
+      <span className={cn("inline-grid justify-items-center gap-2", animate && "np-roof-fade", className)} aria-label="New Place Venezuela">
+        <span className="font-logo text-[30px] font-extralight leading-none tracking-[0.2em]" style={{ color: ink, paddingLeft: "0.2em" }}>
           NEW PLACE
         </span>
-        <span className={cn("text-[11px] font-medium uppercase tracking-[0.34em]", animate && "np-roof-fade")} style={{ color: dark ? "#D4B98C" : "var(--np-muted)", paddingLeft: "0.34em" }}>
-          Bienes raíces
+        <span className="text-[11px] font-medium uppercase tracking-[0.34em]" style={{ color: dark ? "rgb(255 255 255 / .8)" : "var(--np-muted)", paddingLeft: "0.34em" }}>
+          Venezuela
         </span>
       </span>
     );
-  const m = size === "sm" ? "h-[15px] w-[43px]" : "h-[18px] w-[52px]";
   return (
-    <span className={cn("inline-flex items-center gap-2.5 whitespace-nowrap", className)}>
-      <RoofMark className={m} ink={ink} teja={teja} small animate={animate} />
-      <span className={cn("font-logo leading-none tracking-[0.22em]", size === "sm" ? "text-[15px]" : "text-[17px]")} style={{ color: ink }}>
+    <span className={cn("inline-flex items-center whitespace-nowrap", animate && "np-roof-fade", className)}>
+      <span className={cn("font-logo font-extralight leading-none tracking-[0.2em]", size === "sm" ? "text-[15px]" : "text-[18px]")} style={{ color: ink }}>
         NEW PLACE
       </span>
     </span>

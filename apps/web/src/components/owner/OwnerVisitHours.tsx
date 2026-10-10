@@ -84,7 +84,7 @@ export function OwnerVisitHours({ listingId, locale, initial, onDone }: { listin
     <form
       noValidate
       data-testid="visit-hours-form"
-      className="mt-4 space-y-4 rounded-[18px] border border-line bg-[#FBF8F3] p-4 dark:bg-white/[.03]"
+      className="mt-4 space-y-4 rounded-[4px] border border-line bg-[#F6F2EA] p-4 dark:bg-white/[.03]"
       aria-label={tx(locale, "Horario de visitas", "Visit hours")}
       onSubmit={(e) => {
         e.preventDefault();
@@ -98,7 +98,7 @@ export function OwnerVisitHours({ listingId, locale, initial, onDone }: { listin
       }}
     >
       <div>
-        <div className="font-serif text-[22px] font-medium leading-tight">{tx(locale, "Horario de visitas", "Visit hours")}</div>
+        <div className="font-serif text-[22px] font-light leading-tight">{tx(locale, "Horario de visitas", "Visit hours")}</div>
         <p className="mt-1 text-sm text-muted">
           {tx(locale, "Elige cuándo puedes enseñar tu casa. Quien la vea en New Place podrá reservar una de esas horas y tú la confirmas desde aquí.", "Choose when you can show your home. People on New Place can book one of those times and you confirm it from here.")}
         </p>

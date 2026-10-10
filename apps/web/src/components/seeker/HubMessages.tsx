@@ -132,9 +132,9 @@ export function HubMessages({
     <div ref={rootRef} id="mensajes" className={cn("scroll-mt-24 lg:col-span-2", className)}>
     <Card className={cn(k.card, "border-0 p-5")}>
       <div className="flex items-center justify-between gap-2">
-        <h2 className="flex items-center gap-2 font-serif text-[24px] font-medium leading-tight">
+        <h2 className="flex items-center gap-2 font-serif text-[24px] font-light leading-tight">
           <MessageSquare size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {direct ? tx(locale, "Mensajes directos", "Direct messages") : tx(locale, "Mensajes", "Messages")}
-          {totalUnread > 0 && <Badge className="bg-[#E6DDD2] text-navy dark:bg-white/10">{totalUnread} {tx(locale, totalUnread === 1 ? "nuevo" : "nuevos", "new")}</Badge>}
+          {totalUnread > 0 && <Badge className="bg-[#DED5C7] text-navy dark:bg-white/10">{totalUnread} {tx(locale, totalUnread === 1 ? "nuevo" : "nuevos", "new")}</Badge>}
         </h2>
         {open && (
           <Button size="sm" variant="ghost" onClick={() => setOpenId(null)}>

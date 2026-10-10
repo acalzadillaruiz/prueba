@@ -77,11 +77,11 @@ export function CardAdvisor({ agent, locale, owner }: { agent: NonNullable<Listi
 /**
  * Price size by the card's own width (container query units, see .np-card-price in globals.css): the price fills the
  * row it has — a 3-column grid at 1280 px gets a smaller "USD 2.300.000" than a phone's full-width card — and never
- * wraps or runs into what follows. The vars give the text's length (in em at ~0.7 em a glyph — NP Digits figures are 0.7 em) and the suffix's room.
+ * wraps or runs into what follows. The vars give the text's length (in em at ~0.56 em a glyph: Barlow Light figures) and the suffix's room.
  */
 const priceVars = (price: string, suffix: string, compact?: boolean) =>
   ({
-    "--np-pk": (price.length * 0.7).toFixed(2),
+    "--np-pk": (price.length * 0.56).toFixed(2),
     "--np-sfx": `${Math.ceil(suffix.length * 6.6)}px`,
     "--np-pmax": compact ? "24px" : "28px",
   }) as React.CSSProperties;
@@ -109,11 +109,11 @@ export function ListingCard({ l, locale, compact, className, compareToggle }: { 
       data-spotlight
       data-listing-card
       className={cn(
-        "group relative isolate rounded-[28px] bg-white/75 p-2 ring-1 ring-black/[.04] shadow-[0_1px_2px_rgba(30,26,24,.04),0_14px_34px_-14px_rgba(30,26,24,.18)] transition-[transform,box-shadow] duration-500 hover:-translate-y-1 hover:shadow-[0_2px_4px_rgba(30,26,24,.05),0_28px_50px_-18px_rgba(30,26,24,.28)] has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-navy has-[a:focus-visible]:ring-offset-2 has-[a:focus-visible]:ring-offset-ivory",
+        "group relative isolate rounded-[2px] has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-navy has-[a:focus-visible]:ring-offset-4 has-[a:focus-visible]:ring-offset-ivory",
         className,
       )}
     >
-      <div className="relative aspect-[4/3] overflow-hidden rounded-[22px] bg-arena">
+      <div className="relative aspect-[4/3] overflow-hidden rounded-[2px] bg-arena">
         <CardPhotos l={l} locale={locale} label={label} href={href} />
         <PhotoBadge l={l} locale={locale} roomRight={compareToggle} compact={compact} />
         <SaveButton id={l.id} locale={locale} className="absolute right-2.5 top-2.5 z-[2]" />
@@ -123,27 +123,28 @@ export function ListingCard({ l, locale, compact, className, compareToggle }: { 
           <span className="np-glass pointer-events-none absolute bottom-2.5 right-2.5 z-[2] rounded-full px-2.5 py-0.5 font-display text-xs font-medium text-ink">{tx(locale, "Ilustración", "Illustration")}</span>
         )}
       </div>
-      <div className={cn("px-3.5 pb-3 pt-4", compact && "px-3 pb-2.5 pt-3.5")}>
-        <div className="np-card-meta flex flex-wrap items-baseline justify-between gap-x-2 gap-y-1" id={metaId}>
-          <div className="np-card-price np-num min-w-0 whitespace-nowrap leading-none tracking-[-0.01em] text-ink" style={priceVars(price, suffix, compact)}>
+      <div className={cn("pb-2 pt-4", compact && "pb-1.5 pt-3.5")}>
+        {/* AMALI: the title in spaced capitals with its zone, then the price in Barlow Light. Two lines reserved from md
+            so cards in a row stay aligned. */}
+        <div className="line-clamp-2 font-display text-[13.5px] font-medium uppercase leading-snug tracking-[.12em] text-ink md:min-h-[2.75em]">
+          <Link
+            href={href}
+            aria-describedby={metaId}
+            className="outline-none after:absolute after:inset-0 after:z-[1] after:rounded-[2px] after:content-['']"
+          >
+            {title}
+          </Link>
+        </div>
+        <div className="mt-1 line-clamp-1 text-[12px] font-medium uppercase tracking-[.16em] text-muted">{l.zone} · {l.city}</div>
+        <div className="np-card-meta mt-3 flex flex-wrap items-baseline justify-between gap-x-2 gap-y-1" id={metaId}>
+          <div className="np-card-price np-num min-w-0 whitespace-nowrap font-light leading-none text-ink" style={priceVars(price, suffix, compact)}>
             {price}
             <span className="font-display text-sm font-normal text-muted">{suffix}</span>
             <span className="sr-only">, {l.zone}, {l.city}</span>
           </div>
           {!compact && <span className="shrink-0 text-sm text-muted">{lbl(TYPE_LABEL[l.listingType], locale)}</span>}
         </div>
-        {/* Two lines (3 columns at 1280 cut most titles at one); from md the grid reserves both lines so cards in a row stay aligned. */}
-        <div className="mt-2.5 line-clamp-2 text-[15px] font-semibold leading-snug text-ink md:min-h-[2.75em]">
-          <Link
-            href={href}
-            aria-describedby={metaId}
-            className="outline-none after:absolute after:inset-0 after:z-[1] after:rounded-[28px] after:content-['']"
-          >
-            {title}
-          </Link>
-        </div>
-        <div className="mt-0.5 line-clamp-1 text-sm text-muted">{l.zone}, {l.city}</div>
-        <div className="mt-3.5 flex items-center justify-between gap-2 border-t border-ink/[.07] pt-3 text-sm text-muted">
+        <div className="mt-3 flex items-center justify-between gap-2 border-t border-egeo/40 pt-3 text-sm text-muted">
           <span className="flex flex-wrap gap-x-4">
             {factsLine(l, locale).map((f) => (
               <span key={f}>{f}</span>
@@ -172,8 +173,8 @@ export function MapPreviewCard({ l, locale, variant = "card" }: { l: Listing; lo
   );
   if (variant === "sheet")
     return (
-      <article className="relative isolate flex h-[120px] gap-3 overflow-hidden rounded-[20px] bg-white p-1.5 ring-1 ring-black/[.05] has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-navy">
-        <div className="relative w-[40%] max-w-[160px] shrink-0 overflow-hidden rounded-[15px] bg-arena">
+      <article className="relative isolate flex h-[120px] gap-3 overflow-hidden rounded-[4px] bg-white p-1.5 ring-1 ring-black/[.05] has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-navy">
+        <div className="relative w-[40%] max-w-[160px] shrink-0 overflow-hidden rounded-[4px] bg-arena">
           <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="h-full w-full" label={label} sizes="160px" />
         </div>
         <div className="min-w-0 flex-1 py-1.5 pr-12">
@@ -188,8 +189,8 @@ export function MapPreviewCard({ l, locale, variant = "card" }: { l: Listing; lo
       </article>
     );
   return (
-    <article className="np-glass relative isolate overflow-hidden rounded-[24px] p-1.5 has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-navy">
-      <div className="relative aspect-[16/9] overflow-hidden rounded-[18px] bg-arena">
+    <article className="np-glass relative isolate overflow-hidden rounded-[4px] p-1.5 has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-navy">
+      <div className="relative aspect-[16/9] overflow-hidden rounded-[4px] bg-arena">
         <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="h-full w-full" label={label} sizes="256px" />
         <SaveButton id={l.id} locale={locale} className="absolute right-2 top-2 z-[2]" />
       </div>

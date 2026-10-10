@@ -4,7 +4,6 @@ import type { Locale } from "@/types/domain";
 import { PublicPage } from "@/components/layout/PublicPage";
 import { listingPhoto } from "@/lib/photos";
 import { PropertyArt } from "@/components/art/PropertyArt";
-import { RoofGlyph } from "@/components/brand/Logo";
 import { Badge, Button, EmptyState } from "@/components/ui";
 import { factsLine } from "@/components/listing/ListingCard";
 import { SaveButton } from "@/components/listing/bits";
@@ -31,29 +30,31 @@ export default async function LuxuryPage({ params }: { params: Promise<{ locale:
   const [hero] = lux;
   return (
     <PublicPage locale={locale} header="transparent" tabbar contact={{ href: "#acceso", label: tx(locale, "Hablar con una persona", "Talk to a person") }}>
-      <section className="np-grain relative overflow-hidden bg-ivory pt-[104px] lg:pt-[120px]">
-        <div className="np-aura" aria-hidden>
-          <i />
-          <i />
-          <i />
-        </div>
-        <div className="relative mx-auto grid max-w-[1320px] grid-cols-1 items-end gap-10 px-4 pb-14 md:px-8 lg:grid-cols-[1fr_1.1fr] lg:pb-20">
-          <div>
-            <p className="np-kicker text-gold-text">{tx(locale, "Colección Privada", "Private Collection")}</p>
-            <h1 className="mt-5 max-w-[620px] text-[44px] leading-[1.02] tracking-[-0.02em] sm:text-[58px] lg:text-[72px]">
-              {tx(locale, "Casas que no salen", "Homes that never make")} <span className="text-ink/45">{tx(locale, "en ningún portal.", "it to the portals.")}</span>
-            </h1>
-            <p className="mt-6 max-w-[520px] text-[17px] leading-relaxed text-ink/70">
-              {tx(
-                locale,
-                `${lux.length} ${lux.length === 1 ? "casa elegida" : "casas elegidas"} una a una, revisadas y valoradas con datos reales. Algunas solo las enseñamos en privado: pide acceso y te las mostramos con calma.`,
-                `${lux.length} ${lux.length === 1 ? "home" : "homes"} chosen one by one, checked and valued with real data. Some we only show in private: ask for access and we'll take you through them, calmly.`,
-              )}
-            </p>
-          </div>
-          <div className="relative aspect-[16/11] w-full overflow-hidden rounded-[36px] bg-arena shadow-[0_40px_90px_-30px_rgba(30,26,24,.45)]">
-            <Image src="/brand/villa-arcos.jpg" alt={tx(locale, "Patio con arcos de una villa", "A villa's arched courtyard")} fill priority sizes="(max-width: 1024px) 92vw, 680px" quality={80} className="object-cover" />
-          </div>
+      {/* Cinema hero (AMALI): the collection's first home edge to edge, white title over a soft shade. */}
+      <section className="relative isolate flex min-h-[78svh] items-end overflow-hidden bg-[#1C1D1D] text-white">
+        <Image
+          src={(hero && listingPhoto(hero, 0)) || "/brand/hero-costa.jpg"}
+          alt={hero ? tx(locale, hero.title_es, hero.title_en) : tx(locale, "Villa frente al mar al atardecer", "A villa by the sea at sunset")}
+          fill
+          priority
+          sizes="100vw"
+          quality={80}
+          className="-z-20 object-cover"
+        />
+        <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgb(28_29_29/.45)_0%,rgb(28_29_29/.05)_35%,rgb(28_29_29/.6)_100%)]" />
+        <div className="relative mx-auto w-full max-w-[1320px] px-4 pb-14 pt-[140px] md:px-8 lg:pb-20">
+          <p className="np-kicker text-white/85">{tx(locale, "Colección Privada", "Private Collection")}</p>
+          <h1 className="mt-5 max-w-[860px] text-[34px] text-white sm:text-[48px] lg:text-[60px]">
+            {tx(locale, "Casas que no salen", "Homes that never make")} <span className="text-white/75">{tx(locale, "en ningún portal.", "it to the portals.")}</span>
+          </h1>
+          <span aria-hidden className="mt-6 block h-px w-[min(300px,70%)] bg-white/70" />
+          <p className="mt-6 max-w-[560px] text-[17px] font-light leading-relaxed text-white/90">
+            {tx(
+              locale,
+              `${lux.length} ${lux.length === 1 ? "casa elegida" : "casas elegidas"} una a una, revisadas y valoradas con datos reales. Algunas solo las enseñamos en privado: pide acceso y te las mostramos con calma.`,
+              `${lux.length} ${lux.length === 1 ? "home" : "homes"} chosen one by one, checked and valued with real data. Some we only show in private: ask for access and we'll take you through them, calmly.`,
+            )}
+          </p>
         </div>
       </section>
 
@@ -71,14 +72,14 @@ export default async function LuxuryPage({ params }: { params: Promise<{ locale:
               const wide = i === 0 || (i === lux.length - 1 && (lux.length - 1) % 2 === 1);
               return (
               <Link key={l.id} href={`/${locale}/listing/${l.slug}`} className={wide ? "group md:col-span-2" : "group"}>
-                <div className={(wide ? "aspect-[4/3] md:aspect-[21/9]" : "aspect-[4/3]") + " relative overflow-hidden rounded-[32px] bg-arena"} data-spotlight>
+                <div className={(wide ? "aspect-[4/3] md:aspect-[21/9]" : "aspect-[4/3]") + " relative overflow-hidden rounded-[2px] bg-arena"}>
                   <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="h-full w-full transition-transform duration-700 group-hover:scale-[1.02]" />
                   <div className="absolute left-4 top-4"><Badge tone="exclusive">{tx(locale, "Exclusiva New Place", "New Place exclusive")}</Badge></div>
                   <SaveButton id={l.id} locale={locale} className="absolute right-3 top-3" />
                 </div>
                 <div className="mt-5 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                  <span className="font-serif text-[28px] leading-tight md:text-[32px]">{tx(locale, l.title_es, l.title_en)}</span>
-                  <span className="font-serif text-[26px] font-semibold text-ink">{money(l.priceAmount, locale)}</span>
+                  <span className="font-display text-[14px] font-medium uppercase tracking-[.12em] md:text-[15px]">{tx(locale, l.title_es, l.title_en)}</span>
+                  <span className="font-serif text-[26px] font-light text-ink">{money(l.priceAmount, locale)}</span>
                 </div>
                 <div className="mt-1 text-[15px] text-muted">{l.zone}, {l.city} · {factsLine(l, locale).join(" · ")}</div>
               </Link>
@@ -91,7 +92,7 @@ export default async function LuxuryPage({ params }: { params: Promise<{ locale:
       <section id="acceso" data-hide-fab className="np-navy-panel scroll-mt-24 bg-navy text-ivory">
         <div className="mx-auto grid max-w-[1320px] items-center gap-10 px-4 py-20 md:px-8 lg:grid-cols-[1.2fr_1fr] lg:py-24">
           <div>
-            <p className="np-eyebrow text-[#D4B98C]">{tx(locale, "Acceso privado", "Private access")}</p>
+            <p className="np-eyebrow text-[#B79D83]">{tx(locale, "Acceso privado", "Private access")}</p>
             <h2 className="mt-3 text-[36px] leading-tight md:text-[48px]">
               {tx(locale, `${privateCount} ${privateCount === 1 ? "casa privada disponible" : "casas privadas disponibles"}`, `${privateCount} private home${privateCount === 1 ? "" : "s"} available`)}
             </h2>
@@ -101,11 +102,11 @@ export default async function LuxuryPage({ params }: { params: Promise<{ locale:
                 tx(locale, "Visitas privadas, con la agenda real de tu asesor", "Private viewings, on your advisor’s real calendar"),
                 tx(locale, "Videovisita si compras desde fuera del país", "Video tours if you’re buying from abroad"),
               ].map((x) => (
-                <li key={x} className="flex items-center gap-3"><RoofGlyph className="text-[#C9A574]" /> {x}</li>
+                <li key={x} className="flex items-center gap-3"><span aria-hidden className="h-px w-5 shrink-0 bg-[#B79D83]" /> {x}</li>
               ))}
             </ul>
           </div>
-          <div className="rounded-[24px] border border-[#B08A55]/40 p-8 text-center">
+          <div className="rounded-[4px] border border-[#B79D83]/40 p-8 text-center">
             <p className="mx-auto max-w-sm text-[15px] text-ivory/80">{tx(locale, "Escríbele a un asesor de la colección. Tras una breve charla, te enviamos el enlace.", "Write to a collection advisor. After a short chat, we’ll send you the link.")}</p>
             {hero && (
               <Button href={`/${locale}/listing/${hero.slug}#contact`} variant="primary" size="lg" className="mt-6">

@@ -15,11 +15,11 @@ import { cn } from "@/lib/cn";
 import { useListingsByIds } from "./useListingsByIds";
 
 const isSale = (l: Listing) => l.listingType === "SALE" || l.listingType === "COMMERCIAL_SALE";
-/** Green / amber that keep ≥ 4.5:1 on the dark card (#2A2420) too. */
+/** Green / amber that keep ≥ 4.5:1 on the dark card (#22262A) too. */
 const OK = "text-ok dark:text-[#8FCBA6]";
 const WARN = "text-warn dark:text-[#E0A84A]";
 /** Remove ("×") on a photo: its own light/dark colours (not the remapped bg-white, which turned it dark-on-dark). */
-const REMOVE_BTN = "absolute flex items-center justify-center rounded-full bg-[#F1EBE3] text-[#1E1A18] shadow ring-1 ring-black/10 after:absolute after:content-[''] dark:bg-[#15120F]/85 dark:text-[#F1EBE3] dark:ring-[#F1EBE3]/45";
+const REMOVE_BTN = "absolute flex items-center justify-center rounded-full bg-[#EDE6DA] text-[#1C1D1D] shadow ring-1 ring-black/10 after:absolute after:content-[''] dark:bg-[#141617]/85 dark:text-[#EDE6DA] dark:ring-[#EDE6DA]/45";
 /** Pinned row (phones): the thumbnail is the "Ver ficha" link, then one 36 px text pill ("Visita" / "Fechas") filling the rest of the column. */
 const PIN_PILL = "flex h-9 min-w-0 flex-1 items-center justify-center whitespace-nowrap rounded-full px-1.5 font-display text-[13px] font-semibold leading-none";
 /** Phone actions row: full column width, the label may wrap to 2 lines in a third of 360 px. */
@@ -98,7 +98,7 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
   const unit = (l: Listing) => <span className="text-xs font-normal text-muted">{priceSuffix(l, locale)}</span>;
   const ppm = (l: Listing) => (l.areaM2 > 0 ? l.priceAmount / l.areaM2 : NaN);
   const allRows: Row[] = [
-    { label: tx(locale, "Precio", "Price"), render: (l) => <span className="font-serif text-[17px] font-medium leading-tight md:text-[22px]"><span className="whitespace-nowrap md:hidden">{shortMoney(l.priceAmount, locale)}</span><span className="hidden md:inline">{money(l.priceAmount, locale)}</span><span className="whitespace-nowrap">{unit(l)}</span></span>, val: sameUnit ? (l) => l.priceAmount : undefined, best: "min" },
+    { label: tx(locale, "Precio", "Price"), render: (l) => <span className="font-serif text-[17px] font-light leading-tight md:text-[22px]"><span className="whitespace-nowrap md:hidden">{shortMoney(l.priceAmount, locale)}</span><span className="hidden md:inline">{money(l.priceAmount, locale)}</span><span className="whitespace-nowrap">{unit(l)}</span></span>, val: sameUnit ? (l) => l.priceAmount : undefined, best: "min" },
     // A rent per m² next to a sale per m² (or a nightly next to a monthly one) isn't comparable: "—" for the rents.
     { label: tx(locale, "Precio por m²", "Price per m²"), render: (l) => (Number.isFinite(ppm(l)) && (sameUnit || !l.pricePeriod) ? <>{num(Math.round(ppm(l) * (l.pricePeriod ? 10 : 1)) / (l.pricePeriod ? 10 : 1), locale)} USD/m²{unit(l)}</> : <span aria-label={tx(locale, "No comparable", "Not comparable")}>—</span>), val: sameUnit ? ppm : undefined, best: "min" },
     { label: tx(locale, "Valor estimado New Place", "PlaceEstimate"), render: (l) => <>{money(l.estimate.mid, locale)}{unit(l)}</> },
@@ -156,7 +156,7 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <div className={k.eyebrow}>{tx(locale, "Comparador", "Compare")}</div>
-          <h1 className="mt-1 font-serif text-[40px] font-medium leading-[1.05] md:text-[48px]">{tx(locale, "Lado a lado", "Side by side")}</h1>
+          <h1 className="mt-1 font-serif text-[40px] font-light leading-[1.05] md:text-[48px]">{tx(locale, "Lado a lado", "Side by side")}</h1>
           <p className="mt-1 text-muted">{tx(locale, "Hasta 3 casas, con lo que de verdad importa. La mejor de cada fila lleva la marca «Mejor».", "Up to 3 homes, with what really matters. The best of each row gets a “Best” tag.")}</p>
         </div>
         {cmp.length > 0 && cmp.length < 3 && (
@@ -167,7 +167,7 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
       </div>
 
       {mixedOperation && (
-        <div role="status" className="mt-6 flex items-start gap-3 rounded-[18px] bg-[#8A5A00]/10 px-4 py-3 text-[15px] text-[#5C3D00] dark:text-[#E9C77E]">
+        <div role="status" className="mt-6 flex items-start gap-3 rounded-[4px] bg-[#8A5A00]/10 px-4 py-3 text-[15px] text-[#5C3D00] dark:text-[#E9C77E]">
           <AlertTriangle size={18} className="mt-0.5 shrink-0" aria-hidden />
           <p>
             <strong className="font-semibold">{tx(locale, "Estás comparando una venta con un alquiler.", "You’re comparing a sale with a rental.")}</strong>{" "}
@@ -176,19 +176,19 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
         </div>
       )}
       {!mixedOperation && !sameUnit && (
-        <div role="status" className="mt-6 flex items-start gap-3 rounded-[18px] bg-[#8A5A00]/10 px-4 py-3 text-[15px] text-[#5C3D00] dark:text-[#E9C77E]">
+        <div role="status" className="mt-6 flex items-start gap-3 rounded-[4px] bg-[#8A5A00]/10 px-4 py-3 text-[15px] text-[#5C3D00] dark:text-[#E9C77E]">
           <AlertTriangle size={18} className="mt-0.5 shrink-0" aria-hidden />
           <p>{tx(locale, "Estás comparando un alquiler por mes con uno por noche: en precio no marcamos ganadora.", "You’re comparing a monthly rent with a nightly one: we don’t pick a winner on price.")}</p>
         </div>
       )}
 
-      {loading && cmp.length === 0 && <div className="np-skeleton mt-8 h-[420px] rounded-[18px]" aria-label={tx(locale, "Un momento…", "One moment…")} />}
+      {loading && cmp.length === 0 && <div className="np-skeleton mt-8 h-[420px] rounded-[4px]" aria-label={tx(locale, "Un momento…", "One moment…")} />}
 
       {cmp.length > 0 && (
         <section className={cn("np-in mt-8 overflow-clip", k.card)} aria-label={tx(locale, "Comparación", "Comparison")}>
           <div className="flex items-center gap-2 border-b border-line bg-navy px-5 py-3 text-ivory">
-            <Scale size={18} strokeWidth={1.6} className="text-[#C9A574]" aria-hidden />
-            <span className="font-serif text-[20px] font-medium">{tx(locale, `${cmp.length} ${cmp.length === 1 ? "casa" : "casas"}`, `${cmp.length} ${cmp.length === 1 ? "home" : "homes"}`)}</span>
+            <Scale size={18} strokeWidth={1.6} className="text-[#9CC3CC]" aria-hidden />
+            <span className="font-serif text-[20px] font-light">{tx(locale, `${cmp.length} ${cmp.length === 1 ? "casa" : "casas"}`, `${cmp.length} ${cmp.length === 1 ? "home" : "homes"}`)}</span>
             <span className="text-sm text-mist">{cmp.length}/3</span>
           </div>
           {/* Phones and small tablets: every home in view at once (a column each, 33–50 %), each row's label above its
@@ -208,7 +208,7 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
                         <X size={13} aria-hidden />
                       </button>
                     </div>
-                    <Link href={listingUrl(l, locale)} className="mt-1.5 line-clamp-2 block break-words font-serif text-[14px] font-medium leading-tight underline-offset-4 hover:underline">
+                    <Link href={listingUrl(l, locale)} className="mt-1.5 line-clamp-2 block break-words font-serif text-[14px] font-light leading-tight underline-offset-4 hover:underline">
                       {title}
                     </Link>
                   </div>
@@ -222,7 +222,7 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
               <div
                 data-compare-pinned={stuck ? "on" : "off"}
                 className={cn(
-                  "absolute inset-x-0 top-0 grid gap-2 border-b border-line bg-white/95 px-3 py-2 shadow-[0_8px_18px_-12px_rgba(30,26,24,.35)] backdrop-blur transition-[opacity,transform] duration-200 dark:bg-navy-card",
+                  "absolute inset-x-0 top-0 grid gap-2 border-b border-line bg-white/95 px-3 py-2 shadow-[0_8px_18px_-12px_rgba(28,29,29,.35)] backdrop-blur transition-[opacity,transform] duration-200 dark:bg-navy-card",
                   stuck ? "opacity-100" : "pointer-events-none invisible -translate-y-1 opacity-0",
                 )}
                 style={cols}
@@ -301,7 +301,7 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
                             <X size={14} aria-hidden />
                           </button>
                         </div>
-                        <Link href={listingUrl(l, locale)} className="mt-2 line-clamp-2 block font-serif text-[19px] font-medium leading-tight underline-offset-4 hover:underline">
+                        <Link href={listingUrl(l, locale)} className="mt-2 line-clamp-2 block font-serif text-[19px] font-light leading-tight underline-offset-4 hover:underline">
                           {title}
                         </Link>
                       </th>

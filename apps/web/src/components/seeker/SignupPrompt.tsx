@@ -56,25 +56,25 @@ export function SignupPrompt({ locale, reason, onClose }: { locale: Locale; reas
   const Icon = alert ? Bell : Heart;
   const ring = "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy";
   return createPortal(
-    <div className="fixed inset-0 z-[70] flex items-end justify-center bg-[#1E1A18]/45 sm:items-center sm:p-6 print:hidden" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+    <div className="fixed inset-0 z-[70] flex items-end justify-center bg-[#1C1D1D]/45 sm:items-center sm:p-6 print:hidden" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
       <div
         ref={panel}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descId}
-        className="np-in w-full rounded-t-[24px] bg-ivory p-6 text-ink shadow-[0_24px_60px_rgba(30,26,24,.25)] sm:max-w-[420px] sm:rounded-[24px]"
+        className="np-in w-full rounded-t-[4px] bg-ivory p-6 text-ink shadow-[0_24px_60px_rgba(28,29,29,.25)] sm:max-w-[420px] sm:rounded-[4px]"
         style={{ paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))" }}
       >
         <div className="flex items-start justify-between gap-4">
-          <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#8E3B22]/10 text-[#8E3B22]">
+          <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#1F4E5A]/10 text-[#1F4E5A]">
             <Icon size={20} strokeWidth={1.7} aria-hidden />
           </span>
           <button type="button" onClick={onClose} aria-label={tx(locale, "Cerrar", "Close")} className={cn("-mr-2 -mt-1 flex h-11 w-11 items-center justify-center rounded-full text-navy hover:bg-navy/5", ring)}>
             <X size={20} aria-hidden />
           </button>
         </div>
-        <h2 id={titleId} className="mt-3 font-serif text-[28px] font-medium leading-tight text-navy">
+        <h2 id={titleId} className="mt-3 font-serif text-[28px] font-light leading-tight text-navy">
           {alert ? tx(locale, "Crea tu cuenta para que te avisemos", "Create your account and we’ll let you know") : tx(locale, "Crea tu cuenta para guardar tus casas", "Create your account to keep your homes")}
         </h2>
         <p id={descId} className="mt-2 text-[15px] text-muted">

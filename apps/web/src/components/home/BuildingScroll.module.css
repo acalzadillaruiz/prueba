@@ -5,12 +5,12 @@
 .tower {
   --t-sky-top: #efd9bd;
   --t-sky-mid: #f4e6d4;
-  --t-sky-low: #f1ebe3;
+  --t-sky-low: #EDE6DA;
   --t-sun: rgb(255 226 178 / 0.7);
   --t-glass-hi: #dcd8d0;
   --t-glass-lo: #b2a89b;
   --t-reflect: rgb(255 255 255 / 0.5);
-  --t-slab: #f7f2ea;
+  --t-slab: #EFE9DF;
   --t-slab-edge: rgb(30 26 24 / 0.16);
   --t-mull: rgb(176 138 85 / 0.7);
   --t-side-hi: #c9b9a2;
@@ -27,7 +27,7 @@
 :global(html.dark) .tower {
   --t-sky-top: #3a2c22;
   --t-sky-mid: #2a221d;
-  --t-sky-low: #1e1a18;
+  --t-sky-low: #1C1D1D;
   --t-sun: rgb(201 120 70 / 0.24);
   --t-glass-hi: #4a4440;
   --t-glass-lo: #2c2724;
@@ -131,7 +131,7 @@
   background-color: transparent;
   background-image:
     linear-gradient(var(--t-slab) 0 2px, var(--t-slab-edge) 2px 3px, transparent 3px),
-    repeating-linear-gradient(90deg, rgb(142 59 34 / 0.28) 0 1px, transparent 1px calc(var(--fw) / 6)),
+    repeating-linear-gradient(90deg, rgb(31 78 90 / 0.28) 0 1px, transparent 1px calc(var(--fw) / 6)),
     linear-gradient(180deg, var(--t-lit-hi), var(--t-lit-lo));
   background-size: 100% 100%;
   background-position: 0 0;

@@ -21,11 +21,11 @@ const HOUR_COL = 56;
 
 /** Event subtitles: a solid muted tone per event surface (opacity fell to ~4:1); every pair is ≥ 4.5:1 in both themes. */
 const SUB_CLS: Record<CalEvent["kind"], string> = {
-  tour: "text-[#D9CFC2] dark:text-[#5E5248]",
-  req: "text-[#5E5248] dark:text-[#D9CFC2]",
+  tour: "text-[#D8CFC1] dark:text-[#5C534B]",
+  req: "text-[#5C534B] dark:text-[#D8CFC1]",
   done: "",
   cancelled: "",
-  media: "text-[#4A4038] dark:text-[#D9CFC2]",
+  media: "text-[#4A4038] dark:text-[#D8CFC1]",
 };
 
 /** Opaque surface behind the sticky hour column (day columns scroll under it). */
@@ -113,8 +113,8 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
   const time = (iso: string) => fmt(new Date(iso), { hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
   const weekNav = (
     <>
-      <Link href={`?w=${week - 1}`} className={cn("rounded-full p-1.5 shadow-[inset_0_0_0_1px_#D8CBB7] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,.18)]", k.hover)} aria-label={tx(locale, "Semana anterior", "Previous week")}><ChevronLeft size={18} /></Link>
-      <Link href={`?w=${week + 1}`} className={cn("rounded-full p-1.5 shadow-[inset_0_0_0_1px_#D8CBB7] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,.18)]", k.hover)} aria-label={tx(locale, "Semana siguiente", "Next week")}><ChevronRight size={18} /></Link>
+      <Link href={`?w=${week - 1}`} className={cn("rounded-full p-1.5 shadow-[inset_0_0_0_1px_#CDBFAC] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,.18)]", k.hover)} aria-label={tx(locale, "Semana anterior", "Previous week")}><ChevronLeft size={18} /></Link>
+      <Link href={`?w=${week + 1}`} className={cn("rounded-full p-1.5 shadow-[inset_0_0_0_1px_#CDBFAC] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,.18)]", k.hover)} aria-label={tx(locale, "Semana siguiente", "Next week")}><ChevronRight size={18} /></Link>
       <span className={cn(k.titleSm, "inline-block first-letter:uppercase")}>{fmt(days[0], { day: "numeric", month: "short" })} – {fmt(days[6], { day: "numeric", month: "short", year: "numeric" })}</span>
       {week !== 0 && <Link href="?w=0" className={cn("text-sm", k.link)}>{tx(locale, "Hoy", "Today")}</Link>}
     </>
@@ -140,12 +140,12 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
                   aria-label={`${fmt(d, { weekday: "long", day: "numeric", month: "long" })}${i === todayIdx ? tx(locale, " (hoy)", " (today)") : ""}: ${plural(count, locale, ["cita", "citas"], ["appointment", "appointments"])}`}
                   className={cn(
                     "flex min-w-[48px] flex-1 shrink-0 snap-start flex-col items-center gap-0.5 rounded-2xl px-1.5 py-2 transition-colors duration-np",
-                    on ? "bg-navy text-ivory dark:bg-ivory dark:text-navy" : i === todayIdx ? "bg-[#E6DDD2] text-navy dark:bg-white/10 dark:text-ivory" : cn("text-navy dark:text-ivory", k.hover),
+                    on ? "bg-navy text-ivory dark:bg-ivory dark:text-navy" : i === todayIdx ? "bg-[#DED5C7] text-navy dark:bg-white/10 dark:text-ivory" : cn("text-navy dark:text-ivory", k.hover),
                   )}
                 >
-                  <span className={cn("text-[11px] font-semibold uppercase tracking-[.08em]", on ? "text-[#D9CFC2] dark:text-[#5E5248]" : k.muted)}>{fmt(d, { weekday: "short" }).replace(".", "")}</span>
+                  <span className={cn("text-[11px] font-semibold uppercase tracking-[.08em]", on ? "text-[#D8CFC1] dark:text-[#5C534B]" : k.muted)}>{fmt(d, { weekday: "short" }).replace(".", "")}</span>
                   <span className="font-display text-[18px] font-semibold leading-none [font-feature-settings:'lnum']">{fmt(d, { day: "numeric" })}</span>
-                  <span aria-hidden className={cn("mt-0.5 h-1.5 w-1.5 rounded-full", count > 0 ? (on ? "bg-[#D4B98C]" : "bg-gold-text dark:bg-[#D4B98C]") : "bg-transparent")} />
+                  <span aria-hidden className={cn("mt-0.5 h-1.5 w-1.5 rounded-full", count > 0 ? (on ? "bg-[#B79D83]" : "bg-gold-text dark:bg-[#B79D83]") : "bg-transparent")} />
                 </button>
               );
             })}
@@ -159,7 +159,7 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
                 {byDay[day].map((e) => (
                   <li key={e.id} className={cn("rounded-2xl border p-3.5", k.line, e.kind === "req" && "border-dashed border-navy/40 dark:border-ivory/30", (e.kind === "done" || e.kind === "cancelled") && "opacity-75")}>
                     <div className="flex items-start gap-3">
-                      <div className={cn("flex w-14 shrink-0 flex-col items-center rounded-xl py-1.5", e.kind === "tour" ? "bg-navy text-ivory dark:bg-ivory dark:text-navy" : e.kind === "media" ? "bg-egeo/70 text-[#3D3530] dark:bg-egeo/25 dark:text-[#EEE7DE]" : "bg-[#F1ECE3] text-navy dark:bg-white/[.06] dark:text-ivory")}>
+                      <div className={cn("flex w-14 shrink-0 flex-col items-center rounded-xl py-1.5", e.kind === "tour" ? "bg-navy text-ivory dark:bg-ivory dark:text-navy" : e.kind === "media" ? "bg-egeo/70 text-[#383E45] dark:bg-egeo/25 dark:text-[#EEE7DE]" : "bg-[#EDE6DA] text-navy dark:bg-white/[.06] dark:text-ivory")}>
                         <Clock size={12} aria-hidden className="opacity-70" />
                         <time dateTime={e.start} className="mt-0.5 whitespace-nowrap font-display text-[15px] font-semibold leading-none [font-feature-settings:'lnum','tnum']">{time(e.start)}</time>
                       </div>
@@ -188,17 +188,17 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
             {weekNav}
             <div className={cn("ml-auto flex flex-wrap gap-x-3 gap-y-1 text-xs", k.muted)}>
                 <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-navy dark:bg-ivory" /> {tx(locale, "Visita", "Tour")}</span>
-                <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm border border-dashed border-navy/60 bg-[#E6DDD2] dark:border-ivory/60 dark:bg-white/10" /> {tx(locale, "Solicitada", "Requested")}</span>
+                <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm border border-dashed border-navy/60 bg-[#DED5C7] dark:border-ivory/60 dark:bg-white/10" /> {tx(locale, "Solicitada", "Requested")}</span>
                 <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-egeo" /> {tx(locale, "Fotos", "Media")}</span>
                 <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-[#F3EEE4] ring-1 ring-[#E4DCCD] dark:bg-white/[.06] dark:ring-white/10" /> {tx(locale, "Slot libre", "Open slot")}</span>
             </div>
           </div>
-          <ScrollRegion scrollRef={scroller} label={tx(locale, "Semana", "Week")} className="rounded-b-[18px]">
+          <ScrollRegion scrollRef={scroller} label={tx(locale, "Semana", "Week")} className="rounded-b-[4px]">
           <div className="min-w-[672px]">
             <div className="grid grid-cols-[56px_repeat(7,1fr)]">
               <div className={cn("sticky left-0 z-10", stickyBg)} />
               {days.map((d, i) => (
-                <div key={i} ref={i === todayIdx ? todayCol : undefined} className={cn("border-l py-2.5 text-center font-display text-[13px] font-medium first-letter:uppercase", k.line, i === todayIdx ? "bg-[#E6DDD2] font-semibold text-navy dark:bg-white/10 dark:text-ivory" : k.muted)}>{fmt(d, { weekday: "short", day: "numeric" })}</div>
+                <div key={i} ref={i === todayIdx ? todayCol : undefined} className={cn("border-l py-2.5 text-center font-display text-[13px] font-medium first-letter:uppercase", k.line, i === todayIdx ? "bg-[#DED5C7] font-semibold text-navy dark:bg-white/10 dark:text-ivory" : k.muted)}>{fmt(d, { weekday: "short", day: "numeric" })}</div>
               ))}
             </div>
             <div className="relative">
@@ -208,7 +208,7 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
                     <div className={cn("sticky left-0 z-10 h-14 border-t pr-2 pt-1 text-right text-[11px]", stickyBg, k.line, k.muted)}>{String(h).padStart(2, "0")}:00</div>
                     {days.map((_, i) => {
                       const open = !!mySlots.find((x) => x.day === weekday(i))?.hours.includes(h);
-                      return <div key={i} className={cn("h-14 border-l border-t", k.line, open && "bg-[#F6F2EA] dark:bg-white/[.04]")} />;
+                      return <div key={i} className={cn("h-14 border-l border-t", k.line, open && "bg-[#F4EFE7] dark:bg-white/[.04]")} />;
                     })}
                   </div>
                 ))}
@@ -227,9 +227,9 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
                       className={cn(
                         "pointer-events-auto absolute overflow-hidden rounded-lg px-2 py-1 text-left text-xs",
                         e.kind === "tour" && "bg-navy text-ivory dark:bg-ivory dark:text-navy",
-                        e.kind === "req" && "border border-dashed border-navy/60 bg-[#E6DDD2] text-navy dark:border-ivory/50 dark:bg-white/10 dark:text-ivory",
-                        (e.kind === "done" || e.kind === "cancelled") && "bg-[#F1ECE3] text-muted line-through dark:bg-white/[.06] dark:text-mist",
-                        e.kind === "media" && "bg-egeo/70 text-[#3D3530] dark:bg-egeo/25 dark:text-[#EEE7DE]",
+                        e.kind === "req" && "border border-dashed border-navy/60 bg-[#DED5C7] text-navy dark:border-ivory/50 dark:bg-white/10 dark:text-ivory",
+                        (e.kind === "done" || e.kind === "cancelled") && "bg-[#EDE6DA] text-muted line-through dark:bg-white/[.06] dark:text-mist",
+                        e.kind === "media" && "bg-egeo/70 text-[#383E45] dark:bg-egeo/25 dark:text-[#EEE7DE]",
                       )}
                       style={{ left: `calc(${(di / 7) * 100}% + ${(col / cols) * (100 / 7)}% + 3px)`, width: `calc(${100 / 7 / cols}% - 6px)`, top: (hr - firstH) * 56 + 3, height: 50 }}
                       title={`${e.title} · ${e.sub}`}
@@ -247,7 +247,7 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
         {/* Side column from 2xl; below it the cards drop under the grid (the week needs the full width up to ~1536 px). */}
         <div className="grid content-start gap-4 md:grid-cols-2 2xl:grid-cols-1">
           {sel && (
-            <div ref={selBox} className={cn("np-in scroll-mt-4 p-5 shadow-[inset_0_0_0_2px_#1E1A18] dark:shadow-[inset_0_0_0_2px_#C9A574]", k.card)}>
+            <div ref={selBox} className={cn("np-in scroll-mt-4 p-5 shadow-[inset_0_0_0_2px_#1C1D1D] dark:shadow-[inset_0_0_0_2px_#9CC3CC]", k.card)}>
               <div className="flex items-start justify-between">
                 <div className={k.titleSm}>{sel.title}</div>
                 <button onClick={() => setSel(null)} className={cn("rounded-full p-1", k.hover)} aria-label={tx(locale, "Cerrar", "Close")}><X size={16} /></button>

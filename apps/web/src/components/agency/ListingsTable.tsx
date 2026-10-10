@@ -155,8 +155,8 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
   );
   /** Price and agent get their own columns from xl; below it (1024 beside the sidebar, tablets) they stack in the listing cell. */
   const xlCol = "hidden xl:table-cell";
-  const box = "h-[18px] w-[18px] shrink-0 cursor-pointer accent-navy dark:accent-[#C9A574]";
-  const qualityBar = (l: Listing, w: string) => <span className={cn("inline-block h-1.5 rounded-full bg-[#ECE6DA] dark:bg-white/10", w)} aria-hidden><span className={cn("block h-full rounded-full", l.quality >= 85 ? "bg-ok" : l.quality >= 65 ? "bg-warn" : "bg-danger")} style={{ width: `${l.quality}%` }} /></span>;
+  const box = "h-[18px] w-[18px] shrink-0 cursor-pointer accent-navy dark:accent-[#9CC3CC]";
+  const qualityBar = (l: Listing, w: string) => <span className={cn("inline-block h-1.5 rounded-full bg-[#E6DFD3] dark:bg-white/10", w)} aria-hidden><span className={cn("block h-full rounded-full", l.quality >= 85 ? "bg-ok" : l.quality >= 65 ? "bg-warn" : "bg-danger")} style={{ width: `${l.quality}%` }} /></span>;
   /** Columns that only fit from 2xl (≥ 1536 px); below it they ride on a meta line under the title. */
   const wide = "hidden 2xl:table-cell";
 
@@ -192,7 +192,7 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
       {error && <div className={cn("mb-3", k.err)} role="alert">{error}</div>}
       {mandates.length > 0 && (
         <section className={cn(k.card, "mb-6 p-5 md:p-6")} aria-labelledby="mandates-title" data-testid="mandates">
-          <h2 id="mandates-title" className={cn(k.title, "mb-1 flex items-center gap-2.5")}><FileSignature size={18} strokeWidth={1.6} className="text-gold-text dark:text-[#D4B98C]" /> {tx(locale, "Encargos de propietarios", "Owner mandates")} <Count>{mandates.length}</Count></h2>
+          <h2 id="mandates-title" className={cn(k.title, "mb-1 flex items-center gap-2.5")}><FileSignature size={18} strokeWidth={1.6} className="text-gold-text dark:text-[#B79D83]" /> {tx(locale, "Encargos de propietarios", "Owner mandates")} <Count>{mandates.length}</Count></h2>
           <p className={cn("mb-3 text-[13px]", k.muted)}>{tx(locale, "Solicitado → Asignado → En preparación → Publicado. Asigna un agente y, cuando la ficha esté lista, revísala y publícala en un solo paso.", "Requested → Assigned → In preparation → Published. Assign an agent and, when the listing is ready, review and publish it in one step.")}</p>
           <div className={cn("divide-y", k.divide)}>
             {mandates.map((m) => {
@@ -242,7 +242,7 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
           const title = tx(locale, l.title_es, l.title_en);
           const edit = `/${locale}/agency/listings/${l.id}/edit`;
           return (
-            <li key={l.id} className={cn(k.card, "p-4", picked.has(l.id) && "ring-2 ring-navy/70 dark:ring-[#C9A574]/70")} data-listing={l.id}>
+            <li key={l.id} className={cn(k.card, "p-4", picked.has(l.id) && "ring-2 ring-navy/70 dark:ring-[#9CC3CC]/70")} data-listing={l.id}>
               <div className="flex items-start gap-3">
                 {selectable && <input type="checkbox" className={cn(box, "mt-1")} checked={picked.has(l.id)} onChange={() => toggle(l.id)} aria-label={tx(locale, `Seleccionar ${title}`, `Select ${title}`)} />}
                 <Link href={edit} className="flex min-w-0 flex-1 items-start gap-3">
@@ -263,7 +263,7 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
                 <div className="min-w-0">
                   <dt className={cn(k.label, "text-[10px]")}>{tx(locale, "Calidad", "Quality")}</dt>
                   <dd className="mt-1 flex items-center justify-center gap-1.5">
-                    <span className="h-1.5 w-10 rounded-full bg-[#ECE6DA] dark:bg-white/10" aria-hidden><span className={cn("block h-full rounded-full", l.quality >= 85 ? "bg-ok" : l.quality >= 65 ? "bg-warn" : "bg-danger")} style={{ width: `${l.quality}%` }} /></span>
+                    <span className="h-1.5 w-10 rounded-full bg-[#E6DFD3] dark:bg-white/10" aria-hidden><span className={cn("block h-full rounded-full", l.quality >= 85 ? "bg-ok" : l.quality >= 65 ? "bg-warn" : "bg-danger")} style={{ width: `${l.quality}%` }} /></span>
                     <span className="text-xs font-semibold">{l.quality}</span>
                   </dd>
                 </div>
@@ -318,7 +318,7 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
               const title = tx(locale, l.title_es, l.title_en);
               const action = reviewActions(l, title, true);
               return (
-                <tr key={l.id} className={cn("border-t first:border-t-0", k.line, picked.has(l.id) ? "bg-[#F6F2EA] dark:bg-white/[.05]" : k.hover)}>
+                <tr key={l.id} className={cn("border-t first:border-t-0", k.line, picked.has(l.id) ? "bg-[#F4EFE7] dark:bg-white/[.05]" : k.hover)}>
                   {selectable && (
                     <td className="py-3 pl-4 pr-0">
                       <input type="checkbox" className={box} checked={picked.has(l.id)} onChange={() => toggle(l.id)} aria-label={tx(locale, `Seleccionar ${title}`, `Select ${title}`)} />
@@ -377,7 +377,7 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
       )}
       {chosen.length > 0 && (
         <div className="sticky bottom-3 z-20 mt-4" role="region" aria-label={tx(locale, "Acciones en lote", "Bulk actions")}>
-          <div className={cn(k.card, "flex flex-wrap items-center gap-2 p-3 shadow-[0_12px_32px_rgba(30,26,24,.18)] ring-1 ring-[#E6DDD2] md:gap-3 md:px-4")}>
+          <div className={cn(k.card, "flex flex-wrap items-center gap-2 p-3 shadow-[0_12px_32px_rgba(28,29,29,.18)] ring-1 ring-[#DED5C7] md:gap-3 md:px-4")}>
             <span className="text-sm font-semibold">{tx(locale, `${chosen.length} ${chosen.length === 1 ? "seleccionado" : "seleccionados"}`, `${chosen.length} selected`)}</span>
             {manager && (
               <Select compact value="" disabled={bulk?.running} onChange={(e) => e.target.value && bulkAssign(e.target.value)} className="h-10" aria-label={tx(locale, "Asignar los seleccionados a…", "Assign selected to…")}>
@@ -411,7 +411,7 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
 
 /** Header / phone "select all visible" checkbox with the indeterminate state when only some rows are picked. */
 /** Disabled bulk actions still say what they are: legible text on the disabled fill (≥ 4.5:1, ≥ 3:1 in dark). */
-const DISABLED = "disabled:border-transparent disabled:bg-[#E3DDD3] disabled:text-[#5E5650] dark:disabled:bg-white/10 dark:disabled:text-[#CFC4B8]";
+const DISABLED = "disabled:border-transparent disabled:bg-[#E3DDD3] disabled:text-[#5E5650] dark:disabled:bg-white/10 dark:disabled:text-[#CDC5B9]";
 
 function SelectAll({ checked, indeterminate, onChange, label, className, disabled }: { checked: boolean; indeterminate: boolean; onChange: () => void; label: string; className?: string; disabled?: boolean }) {
   const ref = useRef<HTMLInputElement>(null);

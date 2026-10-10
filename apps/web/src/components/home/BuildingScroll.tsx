@@ -439,14 +439,14 @@ export function BuildingScroll({ locale, chapters, picks, heading, cta }: { loca
 
   if (mode === "list")
     return (
-      <section data-building className="bg-[#E9E0D3] text-ink" aria-labelledby="np-how-we-work">
+      <section data-building className="bg-[#D8CFC1] text-ink" aria-labelledby="np-how-we-work">
         <div className="mx-auto max-w-[1320px] px-4 py-20 md:px-8 lg:py-28">
           <h2 id="np-how-we-work" className="max-w-[760px] text-[36px] leading-[1.05] tracking-[-0.02em] text-ink md:text-[52px]">
             {heading}
           </h2>
           <ol className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {chapters.map((c) => (
-              <li key={c.title} className="np-glass flex flex-col rounded-[24px] p-6">
+              <li key={c.title} className="np-glass flex flex-col rounded-[4px] p-6">
                 <p className="np-eyebrow text-[12px] tracking-[0.2em] text-gold-text">{c.eyebrow}</p>
                 <h3 className="mt-3 text-[26px] leading-[1.1] text-ink">{c.title}</h3>
                 <p className="mt-3 text-[15px] leading-relaxed text-ink/75">{c.body}</p>
@@ -457,7 +457,7 @@ export function BuildingScroll({ locale, chapters, picks, heading, cta }: { loca
             <ul className="mt-6 grid gap-3 md:grid-cols-3">
               {picks.map((k) => (
                 <li key={k.href}>
-                  <Link href={k.href} className="np-glass group flex h-full flex-col rounded-[24px] p-5 transition-transform duration-300 hover:-translate-y-0.5">
+                  <Link href={k.href} className="np-glass group flex h-full flex-col rounded-[4px] p-5 transition-transform duration-300 hover:-translate-y-0.5">
                     <span className="block font-serif text-[22px] leading-tight text-ink">{k.title}</span>
                     <span className="mt-1 block text-sm text-ink/65">{k.meta}</span>
                     <span className="mt-3 flex items-center justify-between font-display text-[15px] font-semibold text-coral">
@@ -540,7 +540,7 @@ export function BuildingScroll({ locale, chapters, picks, heading, cta }: { loca
 
   if (!scene)
     return (
-      <section ref={root} data-building className="relative overflow-hidden bg-[#E9E0D3] text-ink" aria-labelledby="np-how-we-work">
+      <section ref={root} data-building className="relative overflow-hidden bg-[#D8CFC1] text-ink" aria-labelledby="np-how-we-work">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_20%,rgba(255,250,242,.85),transparent_60%)] [html.dark_&]:opacity-10" aria-hidden />
         <div className="relative mx-auto grid max-w-[1320px] items-center gap-4 px-4 pb-8 pt-6 md:grid-cols-[1fr_1fr] md:gap-10 md:px-8 md:py-20">
           <div className="md:order-2">
@@ -552,7 +552,7 @@ export function BuildingScroll({ locale, chapters, picks, heading, cta }: { loca
     );
 
   return (
-    <section ref={root} data-building className="relative h-[min(100svh,860px)] min-h-[620px] overflow-hidden bg-[#E9E0D3] text-ink" aria-labelledby="np-how-we-work">
+    <section ref={root} data-building className="relative h-[min(100svh,860px)] min-h-[620px] overflow-hidden bg-[#D8CFC1] text-ink" aria-labelledby="np-how-we-work">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_65%_35%,rgba(255,250,242,.9),transparent_62%)]" aria-hidden />
       <canvas ref={canvas} className="absolute inset-0 h-full w-full transition-opacity duration-500" aria-hidden />
       <div className="pointer-events-none relative mx-auto flex h-full max-w-[1320px] flex-col justify-end px-4 pb-14 md:px-8 lg:justify-center lg:pb-0">

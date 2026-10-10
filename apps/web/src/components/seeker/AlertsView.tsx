@@ -87,7 +87,7 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
     <div className="mx-auto grid max-w-[1180px] gap-8 px-4 py-10 md:px-6 lg:grid-cols-[1fr_380px]">
       <div>
         <div className={k.eyebrow}>{tx(locale, "Avisos a tu medida", "Made for you")}</div>
-        <h1 className="mt-1 font-serif text-[40px] font-medium leading-[1.05] md:text-[48px]">{tx(locale, "Alertas de búsqueda", "Search alerts")}</h1>
+        <h1 className="mt-1 font-serif text-[40px] font-light leading-[1.05] md:text-[48px]">{tx(locale, "Alertas de búsqueda", "Search alerts")}</h1>
         <p className="mt-1 text-muted">{tx(locale, "Te escribimos cuando llega una casa que encaja contigo o cuando alguna baja de precio.", "We’ll write when a home that fits you comes along, or when one drops in price.")}</p>
         {error && <div role="alert" className="mt-4 rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-sm text-danger">{error}</div>}
         <div className="mt-6 space-y-3">
@@ -97,7 +97,7 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
             const title = custom ? s.name : summary;
             const editing = editId === s.id;
             return (
-              <Card key={s.id} data-alert className={cn(k.card, "relative border-0 p-4 transition-shadow hover:shadow-[0_10px_30px_-18px_rgba(30,26,24,.45)]")}>
+              <Card key={s.id} data-alert className={cn(k.card, "relative border-0 p-4 transition-shadow hover:shadow-[0_10px_30px_-18px_rgba(28,29,29,.45)]")}>
                 <div className="flex items-start gap-3.5">
                   <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-egeo/40 text-navy dark:bg-white/10 dark:text-ivory">{s.polygon || /(^|&)(poly|radius)=/.test(s.query) ? <MapPin size={18} strokeWidth={1.6} aria-hidden /> : <Bell size={18} strokeWidth={1.6} aria-hidden />}</span>
                   <div className="min-w-0 flex-1">
@@ -105,7 +105,7 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
                     {custom && <div className="mt-0.5 text-[13px] leading-snug text-muted">{summary}</div>}
                     <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-muted">
                       <span>{freq[s.frequency]} · {s.lastSentAt ? `${tx(locale, "último aviso", "last sent")} ${ago(s.lastSentAt, locale)}` : tx(locale, "aún sin avisos", "nothing sent yet")}</span>
-                      {s.newCount > 0 && <Badge className="bg-[#E6DDD2] text-navy dark:bg-white/10">{s.newCount} {tx(locale, "nuevos", "new")}</Badge>}
+                      {s.newCount > 0 && <Badge className="bg-[#DED5C7] text-navy dark:bg-white/10">{s.newCount} {tx(locale, "nuevos", "new")}</Badge>}
                     </div>
                   </div>
                 </div>
@@ -152,7 +152,7 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
                         maxLength={120}
                         onChange={(e) => setDraft(e.target.value)}
                         placeholder={summary}
-                        className="h-11 rounded-xl border border-[#D8CBB7] bg-white px-3 text-[16px] font-normal text-navy focus:border-navy focus:outline-none dark:bg-white/5 dark:text-ivory sm:text-[15px]"
+                        className="h-11 rounded-xl border border-[#CDBFAC] bg-white px-3 text-[16px] font-normal text-navy focus:border-navy focus:outline-none dark:bg-white/5 dark:text-ivory sm:text-[15px]"
                       />
                     </label>
                     <label className="grid gap-1 text-[13px] font-semibold">
@@ -160,7 +160,7 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
                       <select
                         value={s.frequency}
                         onChange={(e) => void changeFrequency(s, e.target.value as Search["frequency"])}
-                        className="h-11 rounded-xl border border-[#D8CBB7] bg-white px-3 text-[15px] font-normal text-navy focus:border-navy focus:outline-none dark:bg-white/5 dark:text-ivory"
+                        className="h-11 rounded-xl border border-[#CDBFAC] bg-white px-3 text-[15px] font-normal text-navy focus:border-navy focus:outline-none dark:bg-white/5 dark:text-ivory"
                       >
                         <option value="INSTANT">{freq.INSTANT}</option>
                         <option value="DAILY">{freq.DAILY}</option>
@@ -185,13 +185,13 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
       </div>
       <aside>
         <Card className={cn(k.card, "border-0 p-5")}>
-          <div className="flex items-center gap-2 font-serif text-[24px] font-medium leading-tight"><Mail size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Avisos enviados", "Sent to you")}</div>
+          <div className="flex items-center gap-2 font-serif text-[24px] font-light leading-tight"><Mail size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Avisos enviados", "Sent to you")}</div>
           <p className="mt-1 text-xs text-muted">{tx(locale, "Lo último que te hemos escrito.", "The latest we’ve written to you.")}</p>
           <ul className="mt-4 divide-y divide-line">
             {emails.map((e) => (
               <li key={e.id} className="py-3">
                 <div className="flex items-center justify-between gap-2">
-                  <Badge tone={e.kind === "TOUR" ? "ok" : "mist"} className={e.kind === "ALERT" ? "bg-[#E6DDD2] text-navy dark:bg-white/10" : undefined}>{lbl(EMAIL_KIND_LABEL[e.kind] ?? [e.kind, e.kind], locale)}</Badge>
+                  <Badge tone={e.kind === "TOUR" ? "ok" : "mist"} className={e.kind === "ALERT" ? "bg-[#DED5C7] text-navy dark:bg-white/10" : undefined}>{lbl(EMAIL_KIND_LABEL[e.kind] ?? [e.kind, e.kind], locale)}</Badge>
                   <span className="text-xs text-muted">{ago(e.at, locale)}</span>
                 </div>
                 <div className="mt-1.5 text-sm font-semibold">{localizeEmailSubject(e.subject, locale)}</div>

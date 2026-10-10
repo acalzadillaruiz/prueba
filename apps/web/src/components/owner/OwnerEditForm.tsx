@@ -67,7 +67,7 @@ export function OwnerEditForm({ l, locale, onDone }: { l: Listing; locale: Local
   return (
     <form
       noValidate
-      className="mt-4 space-y-4 rounded-[18px] border border-line bg-[#FBF8F3] p-4 dark:bg-white/[.03]"
+      className="mt-4 space-y-4 rounded-[4px] border border-line bg-[#F6F2EA] p-4 dark:bg-white/[.03]"
       aria-label={tx(locale, "Editar anuncio", "Edit listing")}
       onSubmit={async (ev) => {
         ev.preventDefault();
@@ -100,7 +100,7 @@ export function OwnerEditForm({ l, locale, onDone }: { l: Listing; locale: Local
         }
       }}
     >
-      <div className="font-serif text-[22px] font-medium leading-tight">{tx(locale, "Editar tu anuncio", "Edit your listing")}</div>
+      <div className="font-serif text-[22px] font-light leading-tight">{tx(locale, "Editar tu anuncio", "Edit your listing")}</div>
       <div className="grid gap-3 sm:grid-cols-2">
         <Field label={tx(locale, "Título (español)", "Title (Spanish)")} error={e("title_es")}>
           <input className={inputCls} maxLength={120} value={d.title_es} aria-invalid={!!e("title_es")} onChange={(ev) => set({ title_es: ev.target.value })} />

@@ -109,7 +109,7 @@ export function usePlaceSuggest({
       aria-label={tx(locale, "Zonas sugeridas", "Suggested areas")}
       hidden={!shown}
       className={cn(
-        "absolute bg-[#FBF8F4] inset-x-0 top-[calc(100%+6px)] z-50 max-h-[min(320px,50vh)] overflow-y-auto rounded-2xl p-1.5 text-left text-ink shadow-np [--np-glass:rgb(255_255_255/.94)] [html.dark_&]:!bg-[#2A2420]",
+        "absolute bg-[#F6F2EA] inset-x-0 top-[calc(100%+6px)] z-50 max-h-[min(320px,50vh)] overflow-y-auto rounded-2xl p-1.5 text-left text-ink shadow-np [--np-glass:rgb(255_255_255/.94)] [html.dark_&]:!bg-[#22262A]",
         className,
       )}
     >
@@ -127,7 +127,7 @@ export function usePlaceSuggest({
           onMouseEnter={() => setActive(i)}
           className={cn("flex min-h-11 cursor-pointer items-center gap-2.5 rounded-xl px-3 font-display text-[15px]", i === active ? "bg-ink/[.07]" : "")}
         >
-          <MapPin size={16} aria-hidden className="shrink-0 text-[#8E3B22]" />
+          <MapPin size={16} aria-hidden className="shrink-0 text-[#1F4E5A]" />
           <span className="min-w-0 truncate">
             <span className="font-semibold">{s.name}</span>
             {s.city && <span className="text-ink/60">, {s.city}</span>}

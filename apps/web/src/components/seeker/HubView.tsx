@@ -108,7 +108,7 @@ export function HubView({ locale, data, emailOn = false }: { locale: Locale; dat
         <Avatar initials={me.initials} hue={me.hue} size={56} />
         <div>
           <div className={k.eyebrow}>{tx(locale, "Tu espacio", "Your space")}</div>
-          <h1 className="mt-1 font-serif text-[40px] font-medium leading-[1.05] md:text-[48px]">{tx(locale, `Hola, ${me.name.split(" ")[0]}`, `Hi, ${me.name.split(" ")[0]}`)}</h1>
+          <h1 className="mt-1 font-serif text-[40px] font-light leading-[1.05] md:text-[48px]">{tx(locale, `Hola, ${me.name.split(" ")[0]}`, `Hi, ${me.name.split(" ")[0]}`)}</h1>
         </div>
         {!allDone && (
           <div className="ml-auto w-full max-w-xs">
@@ -124,7 +124,7 @@ export function HubView({ locale, data, emailOn = false }: { locale: Locale; dat
         {/* tours: first thing on the page */}
         <section id="visitas" className={cn("rounded-np border border-line bg-white", k.card, anchor, "border-0 p-5", allDone ? "lg:col-span-3" : "lg:col-span-2")}>
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <h2 className="flex items-center gap-2 font-serif text-[24px] font-medium leading-tight"><CalendarCheck size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Tus visitas y solicitudes", "Your tours & requests")}</h2>
+            <h2 className="flex items-center gap-2 font-serif text-[24px] font-light leading-tight"><CalendarCheck size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Tus visitas y solicitudes", "Your tours & requests")}</h2>
             {/* Only while an email provider is configured: otherwise reminders are never delivered. */}
             {emailOn && <Badge tone="ok">{tx(locale, "Te lo recordamos por email", "We’ll remind you by email")}</Badge>}
           </div>
@@ -133,7 +133,7 @@ export function HubView({ locale, data, emailOn = false }: { locale: Locale; dat
               const l = listingById(ld.listingId);
               if (!l) return null;
               return (
-                <div key={ld.id} className="np-in flex flex-wrap items-center gap-4 rounded-2xl bg-[#F6F2EA] p-3 sm:flex-nowrap dark:bg-white/[.05]">
+                <div key={ld.id} className="np-in flex flex-wrap items-center gap-4 rounded-2xl bg-[#F4EFE7] p-3 sm:flex-nowrap dark:bg-white/[.05]">
                   <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="h-16 w-24 shrink-0 rounded-lg" />
                   {/* Mobile: the text keeps the rest of the first row; the status badge wraps below it instead of squeezing the title to "A…". */}
                   <div className="min-w-0 flex-1 basis-[calc(100%-7rem)] sm:basis-auto">
@@ -169,7 +169,7 @@ export function HubView({ locale, data, emailOn = false }: { locale: Locale; dat
         {/* next steps: beside the visits on desktop, after visits and messages on phones; gone once all done */}
         {!allDone && (
           <Card className={cn(k.card, "border-0 p-5 lg:col-start-3 lg:row-start-1")}>
-            <h2 className="font-serif text-[24px] font-medium leading-tight">{tx(locale, "Lo que sigue", "What’s next")}</h2>
+            <h2 className="font-serif text-[24px] font-light leading-tight">{tx(locale, "Lo que sigue", "What’s next")}</h2>
             <ol className="mt-4 space-y-3">
               {steps.map((s, i) => (
                 <li key={i} className="flex items-start gap-3">
@@ -187,13 +187,13 @@ export function HubView({ locale, data, emailOn = false }: { locale: Locale; dat
         {/* preapproval mock */}
         <div id="precalificacion" className={anchor}>
         <Card className={cn(k.card, "h-full border-0 p-5")}>
-          <h2 className="flex items-center gap-2 font-serif text-[24px] font-medium leading-tight"><CircleDollarSign size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Precalificación orientativa", "Indicative pre-qualification")}</h2>
+          <h2 className="flex items-center gap-2 font-serif text-[24px] font-light leading-tight"><CircleDollarSign size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Precalificación orientativa", "Indicative pre-qualification")}</h2>
           <p className="mt-1 text-xs text-muted">{tx(locale, "Es solo una referencia: New Place no otorga créditos.", "Just a reference: New Place doesn’t provide loans.")}</p>
           <div className="mt-4 space-y-4 text-sm">
-            <label className="block"><div className="flex justify-between"><span>{tx(locale, "Precio", "Price")}</span><b>{money(price, locale)}</b></div><input type="range" min={50000} max={500000} step={5000} value={price} onChange={(e) => setPrice(+e.target.value)} className="w-full accent-navy dark:accent-[#C9A574]" aria-label={tx(locale, "Precio", "Price")} /></label>
-            <label className="block"><div className="flex justify-between"><span>{tx(locale, "Inicial", "Down payment")}</span><b>{down} %</b></div><input type="range" min={10} max={70} value={down} onChange={(e) => setDown(+e.target.value)} className="w-full accent-navy dark:accent-[#C9A574]" aria-label={tx(locale, "Inicial (%)", "Down payment (%)")} /></label>
-            <label className="block"><div className="flex justify-between"><span>{tx(locale, "Plazo", "Term")}</span><b>{years} {tx(locale, "años", "yrs")}</b></div><input type="range" min={5} max={25} value={years} onChange={(e) => setYears(+e.target.value)} className="w-full accent-navy dark:accent-[#C9A574]" aria-label={tx(locale, "Plazo (años)", "Term (years)")} /></label>
-            <label className="block"><div className="flex justify-between"><span>{tx(locale, "Tasa anual", "Annual rate")}</span><b>{ratePct.toLocaleString(locale === "es" ? "es-VE" : "en-US")} %</b></div><input type="range" min={0} max={30} step={0.5} value={ratePct} onChange={(e) => setRatePct(+e.target.value)} className="w-full accent-navy dark:accent-[#C9A574]" aria-label={tx(locale, "Tasa anual (%)", "Annual rate (%)")} /></label>
+            <label className="block"><div className="flex justify-between"><span>{tx(locale, "Precio", "Price")}</span><b>{money(price, locale)}</b></div><input type="range" min={50000} max={500000} step={5000} value={price} onChange={(e) => setPrice(+e.target.value)} className="w-full accent-navy dark:accent-[#9CC3CC]" aria-label={tx(locale, "Precio", "Price")} /></label>
+            <label className="block"><div className="flex justify-between"><span>{tx(locale, "Inicial", "Down payment")}</span><b>{down} %</b></div><input type="range" min={10} max={70} value={down} onChange={(e) => setDown(+e.target.value)} className="w-full accent-navy dark:accent-[#9CC3CC]" aria-label={tx(locale, "Inicial (%)", "Down payment (%)")} /></label>
+            <label className="block"><div className="flex justify-between"><span>{tx(locale, "Plazo", "Term")}</span><b>{years} {tx(locale, "años", "yrs")}</b></div><input type="range" min={5} max={25} value={years} onChange={(e) => setYears(+e.target.value)} className="w-full accent-navy dark:accent-[#9CC3CC]" aria-label={tx(locale, "Plazo (años)", "Term (years)")} /></label>
+            <label className="block"><div className="flex justify-between"><span>{tx(locale, "Tasa anual", "Annual rate")}</span><b>{ratePct.toLocaleString(locale === "es" ? "es-VE" : "en-US")} %</b></div><input type="range" min={0} max={30} step={0.5} value={ratePct} onChange={(e) => setRatePct(+e.target.value)} className="w-full accent-navy dark:accent-[#9CC3CC]" aria-label={tx(locale, "Tasa anual (%)", "Annual rate (%)")} /></label>
           </div>
           <div className="mt-4 rounded-np bg-navy p-4 text-ivory">
             <div className="text-xs text-mist">{tx(locale, `Cuota estimada (${ratePct.toLocaleString("es-VE")} % anual)`, `Est. payment (${ratePct}% APR)`)}</div>
@@ -225,7 +225,7 @@ export function HubView({ locale, data, emailOn = false }: { locale: Locale; dat
         <div className="space-y-6">
           <Card className={cn(k.card, "border-0 p-5")}>
             <div className="flex items-center justify-between">
-              <h2 className="flex items-center gap-2 font-serif text-[24px] font-medium leading-tight"><Heart size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Guardados", "Saved")}</h2>
+              <h2 className="flex items-center gap-2 font-serif text-[24px] font-light leading-tight"><Heart size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Guardados", "Saved")}</h2>
               <Link href={`/${locale}/saved`} className={cn("text-sm", k.link)}>{tx(locale, "Ver todo", "See all")}</Link>
             </div>
             <div className="mt-4 space-y-3">
@@ -247,14 +247,14 @@ export function HubView({ locale, data, emailOn = false }: { locale: Locale; dat
           </Card>
           <Card className={cn(k.card, "border-0 p-5")}>
             <div className="flex items-center justify-between">
-              <h2 className="flex items-center gap-2 font-serif text-[24px] font-medium leading-tight"><Bell size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Alertas", "Alerts")}</h2>
+              <h2 className="flex items-center gap-2 font-serif text-[24px] font-light leading-tight"><Bell size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Alertas", "Alerts")}</h2>
               <Link href={`/${locale}/alerts`} className={cn("text-sm", k.link)}>{tx(locale, "Ver alertas", "View alerts")}</Link>
             </div>
             {SAVED_SEARCHES.length === 0 && <p className="mt-3 text-sm text-muted">{tx(locale, "Guarda una búsqueda en el mapa y te avisaremos en cuanto aparezca algo para ti.", "Save a search on the map and we’ll let you know as soon as something fits.")}</p>}
             {SAVED_SEARCHES.map((s) => (
               <div key={s.id} className="mt-3 flex items-center justify-between gap-2 text-sm">
                 <span className="line-clamp-1">{isMachineName(s.name) ? alertTitle(s.query, !!s.polygon, locale) : s.name}</span>
-                {s.newCount > 0 && <Badge className="bg-[#E6DDD2] text-navy dark:bg-white/10">+{s.newCount}</Badge>}
+                {s.newCount > 0 && <Badge className="bg-[#DED5C7] text-navy dark:bg-white/10">+{s.newCount}</Badge>}
               </div>
             ))}
           </Card>

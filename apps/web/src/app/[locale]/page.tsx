@@ -13,7 +13,6 @@ import { CollectionRail } from "@/components/home/CollectionRail";
 import { RemoteRoute } from "@/components/home/RemoteRoute";
 import { listingHref } from "@/lib/listing-href";
 import { listingPhoto } from "@/lib/photos";
-import { isPriceVerified } from "@/lib/price-badge";
 import { Button } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import { publicListings } from "@/server/listings";
@@ -75,7 +74,12 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
   }));
   const floors = ranked.slice(0, 3).map((l) => ({ href: listingHref(locale, l), title: tx(locale, l.title_es, l.title_en), meta: `${l.zone} · ${factsLine(l, locale).join(" · ")}`, price: price(l) }));
   const pins = available.map(mapListing);
-  const zones = await Promise.all(FEATURED_ZONES.map(async (z) => ({ ...z, stats: await zoneStats(z.zone), ...zoneCard(locale, z.zone, available) })));
+  // Each zone shows one of its own homes when it has one (the brand photos are the fallback).
+  const zonePhoto = (zone: string, fallback: string) => {
+    const l = available.find((x) => x.zone === zone && x.photos?.length);
+    return (l && listingPhoto(l, 0)) || fallback;
+  };
+  const zones = await Promise.all(FEATURED_ZONES.map(async (z) => ({ ...z, photo: zonePhoto(z.zone, z.photo), stats: await zoneStats(z.zone), ...zoneCard(locale, z.zone, available) })));
   const saleZones = zones.filter((z) => z.type === "SALE");
   const otherZones = zones.filter((z) => z.type !== "SALE");
   const zoneCount = (n: number) => (n > 0 ? plural(n, locale, ["propiedad", "propiedades"], ["property", "properties"]) : tx(locale, "Próximamente", "Coming soon"));
@@ -99,21 +103,20 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
     tx(locale, "Tú decides quién la ve y cuándo", "You decide who sees it, and when"),
   ];
   const marquee = ["Lechería", "El Morro", "Playa El Agua", "Pampatar", "Country Club", "Altamira", "La Castellana", "Los Palos Grandes", "Higuerote", "Tucacas"];
-  const featured = ranked[0] && { href: listingHref(locale, ranked[0]), title: tx(locale, ranked[0].title_es, ranked[0].title_en), zone: ranked[0].zone, price: price(ranked[0]), photo: listingPhoto(ranked[0], 0), verified: isPriceVerified(ranked[0]) };
 
   return (
     <PublicPage locale={locale} header="transparent" tabbar contact={{ href: `/${locale}/luxury#acceso`, label: tx(locale, "Hablar con una persona", "Talk to a person") }}>
       <HomeMotion />
-      {/* HERO — light, editorial, with the conversational search. */}
-      <HeroAura locale={locale} available={available.length} featured={featured || undefined} />
+      {/* HERO — cinema, full screen: the coast at sunset with the search on it. */}
+      <HeroAura locale={locale} available={available.length} />
 
       {/* ZONES — they glide by, endlessly. */}
-      <div className="relative overflow-hidden border-y border-ink/[.07] bg-ivory py-4 md:py-6" aria-label={tx(locale, "Dónde estamos", "Where we are")}>
+      <div className="relative overflow-hidden border-y border-egeo/40 bg-ivory py-5 md:py-7" aria-label={tx(locale, "Dónde estamos", "Where we are")}>
         <div className="np-marquee gap-12 pr-12">
           {[...marquee, ...marquee].map((z, i) => (
-            <span key={i} aria-hidden={i >= marquee.length || undefined} className="flex shrink-0 items-center gap-12 font-serif text-[24px] text-ink/80 md:text-[40px]">
+            <span key={i} aria-hidden={i >= marquee.length || undefined} className="flex shrink-0 items-center gap-12 font-title text-[15px] font-extralight uppercase tracking-[.12em] text-ink/80 md:text-[22px]">
               {z}
-              <span className="h-1.5 w-1.5 rounded-full bg-gold" aria-hidden />
+              <span className="h-px w-8 bg-egeo" aria-hidden />
             </span>
           ))}
         </div>
@@ -145,11 +148,11 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
             {saleZones.length > 0 && <p className="font-display text-[13px] font-semibold uppercase tracking-[.16em] text-muted">{tx(locale, "En venta · precio por m²", "For sale · price per m²")}</p>}
             {/* Phones: a sideways rail (one row, swipe) instead of a tall stack; md+: the stacked list. */}
             {/* Tablets (md, map above): two columns, so the list isn't four tall rows; lg: the stack beside the map. */}
-            <ul data-reveal="stagger" data-zone-rail className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 md:mx-0 md:grid md:snap-none md:grid-cols-2 md:overflow-visible md:px-0 lg:flex lg:flex-col">
+            <ul data-reveal="stagger" data-zone-rail className="no-scrollbar -mx-4 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 md:mx-0 md:grid md:snap-none md:grid-cols-2 md:overflow-visible md:px-0 lg:flex lg:flex-col">
               {saleZones.map((z) => (
                 <li key={z.zone} className="w-[78%] shrink-0 snap-start sm:w-[46%] md:w-auto">
-                  <Link href={z.href} data-spotlight className="np-glass group flex h-full min-h-[88px] items-stretch overflow-hidden rounded-[24px] transition-transform duration-500 hover:-translate-y-0.5 md:min-h-[104px]">
-                    <span className="relative m-2 w-[56px] shrink-0 overflow-hidden rounded-[18px] sm:w-[84px] lg:w-[100px]">
+                  <Link href={z.href} data-spotlight className="np-glass group flex h-full min-h-[88px] items-stretch overflow-hidden rounded-[4px] transition-transform duration-500 hover:-translate-y-0.5 md:min-h-[104px]">
+                    <span className="relative m-2 w-[56px] shrink-0 overflow-hidden rounded-[4px] sm:w-[84px] lg:w-[100px]">
                       <Image src={z.photo} alt="" fill sizes="112px" className="object-cover transition-transform duration-700 group-hover:scale-105" />
                     </span>
                     <span className="flex min-w-0 flex-1 items-center justify-between gap-2.5 px-2.5 py-3 sm:gap-3 sm:px-4 sm:py-4 lg:px-5">
@@ -173,8 +176,8 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
                 <ul className="flex flex-col gap-2">
                   {otherZones.map((z) => (
                     <li key={z.zone}>
-                      <Link href={z.href} className="np-glass group flex min-h-[64px] items-center gap-3 rounded-[20px] p-1.5 pr-4 transition-transform duration-500 hover:-translate-y-0.5">
-                        <span className="relative h-[52px] w-[52px] shrink-0 overflow-hidden rounded-[14px]">
+                      <Link href={z.href} className="np-glass group flex min-h-[64px] items-center gap-3 rounded-[4px] p-1.5 pr-4 transition-transform duration-500 hover:-translate-y-0.5">
+                        <span className="relative h-[52px] w-[52px] shrink-0 overflow-hidden rounded-[4px]">
                           <Image src={z.photo} alt="" fill sizes="56px" className="object-cover" />
                         </span>
                         <span className="min-w-0 flex-1">
@@ -226,9 +229,25 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
         </RemoteRoute>
       </div>
 
+      {/* THE PROMISE — a solid Taupe block with light text (AMALI's quote blocks). */}
+      <section className="mt-10 bg-[#6B5D52] text-[#EDE6DA] lg:mt-20" aria-label={tx(locale, "Nuestra promesa", "Our promise")}>
+        <div data-reveal className="mx-auto max-w-[1100px] px-6 py-16 text-center md:px-10 md:py-24">
+          <p className="font-display text-[12px] font-medium uppercase tracking-[.22em] text-[#EDE6DA]/80">New Place</p>
+          <blockquote className="mx-auto mt-6 max-w-[880px] font-title text-[17px] font-extralight uppercase leading-[1.7] tracking-[.08em] md:text-[26px]">
+            {tx(
+              locale,
+              "Pocas casas, bien elegidas. Las conocemos por dentro, sabemos lo que valen y te acompañamos hasta las llaves.",
+              "A few homes, well chosen. We know them inside out, we know what they're worth, and we stay with you until the keys.",
+            )}
+          </blockquote>
+          <span aria-hidden className="mx-auto mt-8 block h-px w-24 bg-[#EDE6DA]/50" />
+          <p className="mt-6 font-display text-[13px] font-light tracking-[.14em] text-[#EDE6DA]/85">{tx(locale, "Verificada. De guardia. De aquí.", "Verified. On call. From here.")}</p>
+        </div>
+      </section>
+
       {/* VENDA EN PRIVADO */}
-      <section className="np-grain relative mx-3 mt-2 overflow-hidden rounded-[32px] bg-[#E9E0D3] md:mx-6 md:rounded-[40px] lg:mt-16">
-        <div className="relative mx-auto grid max-w-[1320px] items-center gap-6 px-5 pt-10 md:gap-10 md:px-10 md:pt-16 lg:grid-cols-2 lg:gap-16 lg:pt-12">
+      <section className="relative overflow-hidden bg-ivory">
+        <div className="relative mx-auto grid max-w-[1320px] items-center gap-6 px-5 pt-12 md:gap-10 md:px-10 md:pt-16 lg:grid-cols-2 lg:gap-16 lg:pt-16">
           <div data-reveal className="pb-0 md:pb-4 lg:pb-12">
             <p className="np-kicker text-gold-text">{tx(locale, "Si vas a vender", "If you\u2019re selling")}</p>
             <h2 className="mt-3 text-[32px] leading-[1.05] md:text-[52px]">
@@ -250,9 +269,9 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
             </span>
           </div>
           {/* Portrait only beside the copy (lg); stacked below it (phones, tablets) a landscape band. */}
-          <div data-unveil className="relative mx-auto mb-5 aspect-[16/10] w-full max-w-[520px] overflow-hidden rounded-[24px] bg-[#D9CDB8] sm:rounded-[32px] md:mb-6 lg:mb-12 lg:mr-0 lg:aspect-[5/6]">
+          <div data-unveil className="relative mx-auto mb-10 aspect-[16/10] w-full max-w-[520px] overflow-hidden rounded-[2px] bg-[#D9CDB8] md:mb-12 lg:mb-16 lg:mr-0 lg:aspect-[4/3]">
             <div data-parallax="40" className="absolute -inset-y-[8%] inset-x-0">
-              <Image src="/brand/oficina.jpg" alt={tx(locale, "Despacho con ventanal en arco", "Study with an arched window")} fill sizes="(max-width: 1024px) 90vw, 520px" className="object-cover" />
+              <Image src="/brand/terraza.jpg" alt={tx(locale, "Terraza con vista a la ciudad al atardecer", "A terrace over the city at dusk")} fill sizes="(max-width: 1024px) 90vw, 520px" className="object-cover" />
             </div>
           </div>
         </div>

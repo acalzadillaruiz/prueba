@@ -33,7 +33,7 @@ export function SavedView({ locale, all }: { locale: Locale; all: Listing[] }) {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <div className={k.eyebrow}>{user ? tx(locale, "Tus favoritas", "Your favourites") : tx(locale, "Guardadas en este dispositivo", "Saved on this device")}</div>
-          <h1 className="mt-1 font-serif text-[40px] font-medium leading-[1.05] md:text-[48px]">{tx(locale, "Guardados", "Saved homes")}</h1>
+          <h1 className="mt-1 font-serif text-[40px] font-light leading-[1.05] md:text-[48px]">{tx(locale, "Guardados", "Saved homes")}</h1>
           <p className="mt-1 text-muted">{tx(locale, `${items.length} ${items.length === 1 ? "casa" : "casas"} · elige hasta 3 para compararlas`, `${items.length} ${items.length === 1 ? "home" : "homes"} · pick up to 3 to compare`)}</p>
         </div>
         {user && <Button href={`/${locale}/alerts`} variant="outline" className={k.outline}>{tx(locale, "Mis alertas", "My alerts")}</Button>}
@@ -41,7 +41,7 @@ export function SavedView({ locale, all }: { locale: Locale; all: Listing[] }) {
 
       {!user && saved.length > 0 && (
         <div className={cn("np-in mt-6 flex flex-col gap-4 p-5 sm:flex-row sm:items-center", k.card)} role="note">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#8E3B22]/10 text-[#8E3B22]">
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#1F4E5A]/10 text-[#1F4E5A]">
             <Heart size={20} strokeWidth={1.7} aria-hidden />
           </span>
           <div className="min-w-0 flex-1">
@@ -57,7 +57,7 @@ export function SavedView({ locale, all }: { locale: Locale; all: Listing[] }) {
 
       {loading && items.length === 0 && (
         <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" aria-label={tx(locale, "Un momento…", "One moment…")}>
-          {saved.slice(0, 4).map((id) => <div key={id} className="np-skeleton aspect-[4/5] rounded-[18px]" />)}
+          {saved.slice(0, 4).map((id) => <div key={id} className="np-skeleton aspect-[4/5] rounded-[4px]" />)}
         </div>
       )}
       <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

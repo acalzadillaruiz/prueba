@@ -85,8 +85,8 @@ export default async function SellPage({ params }: { params: Promise<{ locale: L
         </h2>
         <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {values.map(({ Icon, t, d }) => (
-            <li key={t} className="rounded-[24px] bg-white/70 p-6 ring-1 ring-black/[.04]">
-              <Icon size={22} strokeWidth={1.5} className="text-[#8E3B22]" aria-hidden />
+            <li key={t} className="rounded-[4px] bg-white/70 p-6 ring-1 ring-black/[.04]">
+              <Icon size={22} strokeWidth={1.5} className="text-[#1F4E5A]" aria-hidden />
               <h3 className="mt-4 font-serif text-[24px] leading-tight">{t}</h3>
               <p className="mt-2 text-[15px] leading-relaxed text-muted">{d}</p>
             </li>
@@ -101,7 +101,7 @@ export default async function SellPage({ params }: { params: Promise<{ locale: L
           <ol className="mt-10 grid gap-8 md:grid-cols-3">
             {steps.map(([t, d], i) => (
               <li key={t} className="border-t border-ink/15 pt-5">
-                <span className="font-serif text-[44px] leading-none text-[#B08A55] [font-feature-settings:'lnum']">{i + 1}</span>
+                <span className="font-serif text-[44px] leading-none text-[#B79D83] [font-feature-settings:'lnum']">{i + 1}</span>
                 <h3 className="mt-3 font-display text-[18px] font-semibold text-ink">{t}</h3>
                 <p className="mt-1.5 text-[15px] leading-relaxed text-muted">{d}</p>
               </li>

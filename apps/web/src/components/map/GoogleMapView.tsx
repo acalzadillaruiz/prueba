@@ -202,7 +202,7 @@ function SearchArea({ locale, onArea }: { locale: MapViewProps["locale"]; onArea
           setMoved(false);
           onArea([b.getSouthWest().lat(), b.getSouthWest().lng(), b.getNorthEast().lat(), b.getNorthEast().lng()]);
         }}
-        className="pointer-events-auto flex min-h-11 items-center gap-2 whitespace-nowrap rounded-full bg-[#0E1A2B] px-4 font-display text-sm font-semibold text-[#F6F2EC] shadow-np"
+        className="pointer-events-auto flex min-h-11 items-center gap-2 whitespace-nowrap rounded-[2px] bg-[#0E1A2B] px-4 font-display text-sm font-semibold text-[#F6F2EC] shadow-np"
       >
         <Search size={15} aria-hidden /> {tx(locale, "Buscar en esta zona", "Search this area")}
       </button>

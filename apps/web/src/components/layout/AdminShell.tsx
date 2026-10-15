@@ -242,15 +242,15 @@ export function AdminShell({
                   key={i.href}
                   href={base + i.href}
                   aria-current={active ? "page" : undefined}
-                  className={cn("flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-2 text-[14px]", active ? "bg-[#14243A] text-ivory shadow-[inset_0_-2px_0_#C9BFAE]" : "text-ivory/70")}
+                  className={cn("flex shrink-0 items-center gap-1.5 rounded-[2px] px-3.5 py-2 text-[14px]", active ? "bg-[#14243A] text-ivory shadow-[inset_0_-2px_0_#C9BFAE]" : "text-ivory/70")}
                 >
                   <i.icon size={15} strokeWidth={1.6} /> {t(i.label)}
                   {(badges[i.href] ?? 0) > 0 && <Count>{badges[i.href]}</Count>}
                 </Link>
               );
             })}
-            <Link href={`/${locale}`} className="flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-2 text-[14px] text-ivory/60"><ExternalLink size={15} strokeWidth={1.6} /> {t("publicSite")}</Link>
-            <button type="button" onClick={() => logout(locale)} className="flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-2 text-[14px] text-ivory/60"><LogOut size={15} strokeWidth={1.6} /> {tx(locale, "Salir", "Sign out")}</button>
+            <Link href={`/${locale}`} className="flex shrink-0 items-center gap-1.5 rounded-[2px] px-3.5 py-2 text-[14px] text-ivory/60"><ExternalLink size={15} strokeWidth={1.6} /> {t("publicSite")}</Link>
+            <button type="button" onClick={() => logout(locale)} className="flex shrink-0 items-center gap-1.5 rounded-[2px] px-3.5 py-2 text-[14px] text-ivory/60"><LogOut size={15} strokeWidth={1.6} /> {tx(locale, "Salir", "Sign out")}</button>
           </nav>}
         </div>
         {area === "agency" && (

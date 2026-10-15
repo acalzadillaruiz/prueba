@@ -222,7 +222,7 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
               <div
                 data-compare-pinned={stuck ? "on" : "off"}
                 className={cn(
-                  "absolute inset-x-0 top-0 grid gap-2 border-b border-line bg-white/95 px-3 py-2 shadow-[0_8px_18px_-12px_rgba(28,29,29,.35)] backdrop-blur transition-[opacity,transform] duration-200 dark:bg-navy-card",
+                  "absolute inset-x-0 top-0 grid gap-2 border-b border-line bg-ivory px-3 py-2 shadow-[0_8px_18px_-12px_rgba(28,29,29,.35)] transition-[opacity,transform] duration-200 dark:bg-navy-card",
                   stuck ? "opacity-100" : "pointer-events-none invisible -translate-y-1 opacity-0",
                 )}
                 style={cols}

@@ -88,7 +88,7 @@ export function CollectionRail({ eyebrow, title, items, more }: { eyebrow: strin
                     <Image src={it.photo} alt="" fill sizes="(max-width: 768px) 78vw, 420px" className="object-cover transition-transform duration-[1600ms] ease-out group-hover:scale-[1.05]" />
                   </span>
                 )}
-                <span className="absolute left-3 top-3 rounded-full border border-white/40 bg-white/20 px-3 py-1 font-display text-[11px] font-medium uppercase tracking-[.18em] text-white backdrop-blur-md">
+                <span className="absolute left-3 top-3 rounded-[2px] border border-white/40 bg-white/20 px-3 py-1 font-display text-[11px] font-medium uppercase tracking-[.18em] text-white">
                   {String(i + 1).padStart(2, "0")}{it.badge ? ` · ${it.badge}` : ""}
                 </span>
               </span>

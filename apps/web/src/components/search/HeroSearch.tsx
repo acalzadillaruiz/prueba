@@ -85,7 +85,7 @@ export function HeroSearch({ locale }: { locale: Locale }) {
               }}
               aria-pressed={tab === k}
               className={cn(
-                "min-h-11 rounded-full border-2 px-4 font-display text-[15px] transition-colors duration-np",
+                "min-h-11 rounded-[2px] border-2 px-4 font-display text-[15px] transition-colors duration-np",
                 tab === k ? "border-[#1A2026] bg-[#E9E1D3] font-semibold text-[#1A2026]" : "border-transparent text-[#1A2026]/70 hover:text-[#1A2026]",
               )}
             >
@@ -127,7 +127,7 @@ export function HeroSearch({ locale }: { locale: Locale }) {
         <button
           type="submit"
           aria-busy={busy}
-          className="flex min-h-[52px] shrink-0 items-center justify-center gap-2 rounded-full bg-coral-cta px-8 font-display text-[15px] font-semibold text-white transition-colors duration-np hover:bg-coral-cta-hover lg:min-h-12"
+          className="flex min-h-[52px] shrink-0 items-center justify-center gap-2 rounded-[2px] bg-coral-cta px-8 font-display text-[15px] font-semibold text-white transition-colors duration-np hover:bg-coral-cta-hover lg:min-h-12"
         >
           <Search size={17} aria-hidden className="lg:hidden" />
           <span className="lg:hidden">{tx(locale, "Buscar casas", "Find homes")}</span>

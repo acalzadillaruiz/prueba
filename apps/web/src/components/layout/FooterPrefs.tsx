@@ -32,7 +32,7 @@ export function FooterPrefs({ locale, className }: { locale: Locale; className?:
     } catch {}
   };
   const href = pathname.replace(/^\/(es|en)/, `/${other}`);
-  const pill = "inline-flex min-h-11 items-center gap-2 rounded-full px-3.5 font-display text-[14px] text-ink/75 ring-1 ring-ink/15 transition-colors hover:bg-black/5 hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink";
+  const pill = "inline-flex min-h-11 items-center gap-2 rounded-[2px] px-3.5 font-display text-[14px] text-ink/75 ring-1 ring-ink/15 transition-colors hover:bg-black/5 hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink";
   return (
     <div className={cn("flex flex-wrap items-center gap-2", className)}>
       <Link

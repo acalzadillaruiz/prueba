@@ -212,13 +212,13 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
           {tour ? tx(locale, "Visita pedida", "Viewing requested") : stayDone ? tx(locale, "Tu consulta ya llegó", "Your availability request is in") : asked ? tx(locale, "Tu pedido de visita ya llegó", "Your visit request is in") : tx(locale, "Tu mensaje ya llegó", "Your message is on its way")}
         </div>
         {stayDone && (
-          <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-[#F1ECE4] px-3 py-1 font-display text-[15px] font-semibold text-ink first-letter:uppercase">
+          <div className="mt-2 inline-flex items-center gap-1.5 rounded-[2px] bg-[#F1ECE4] px-3 py-1 font-display text-[15px] font-semibold text-ink first-letter:uppercase">
             <CalendarDays size={15} aria-hidden /> {done}
           </div>
         )}
         {tour && (
           <>
-            <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-[#F1ECE4] px-3 py-1 font-display text-[15px] font-semibold text-ink">
+            <div className="mt-2 inline-flex items-center gap-1.5 rounded-[2px] bg-[#F1ECE4] px-3 py-1 font-display text-[15px] font-semibold text-ink">
               <Clock size={15} aria-hidden /> {tx(locale, `Pendiente de que ${confirmer} la confirme`, `Waiting for ${confirmer} to confirm`)}
             </div>
             <div className="mt-2 font-display text-[17px] font-semibold first-letter:uppercase">{done}</div>
@@ -409,7 +409,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
                     type="button"
                     aria-pressed={on}
                     onClick={() => setPrefs(on ? prefs.filter((x) => x !== p) : [...prefs, p])}
-                    className={cn("inline-flex min-h-11 items-center gap-1.5 rounded-full border px-3.5 font-display text-sm font-semibold", on ? "np-sel border-2" : dark ? "border-navy-line" : "border-[#C9BFAE] hover:border-navy/50")}
+                    className={cn("inline-flex min-h-11 items-center gap-1.5 rounded-[2px] border px-3.5 font-display text-sm font-semibold", on ? "np-sel border-2" : dark ? "border-navy-line" : "border-[#C9BFAE] hover:border-navy/50")}
                   >
                     {on && <CheckCircle2 size={14} aria-hidden />} {tx(locale, ...VISIT_PREF_LABEL[p])}
                   </button>

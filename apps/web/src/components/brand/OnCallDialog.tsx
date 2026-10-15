@@ -124,14 +124,14 @@ export function OnCallDialog({ locale, listingSlug, onClose }: { locale: Locale;
                 </div>
                 <div className="mt-3 grid gap-2 sm:grid-cols-2">
                   {o.advisor.tel && o.advisor.phone && (
-                    <a href={o.advisor.tel} className={cn("flex min-h-11 items-center justify-center gap-2 rounded-full border-[1.5px] border-navy px-4 font-display text-[15px] font-semibold text-navy hover:bg-navy/5", ring)}>
+                    <a href={o.advisor.tel} className={cn("flex min-h-11 items-center justify-center gap-2 rounded-[2px] border-[1.5px] border-navy px-4 font-display text-[15px] font-semibold text-navy hover:bg-navy/5", ring)}>
                       <Phone size={16} aria-hidden />
                       <span className="sr-only">{tx(locale, `Llamar a ${o.advisor.name}:`, `Call ${o.advisor.name}:`)}</span>
                       <span className="whitespace-nowrap [font-feature-settings:'lnum']">{o.advisor.phone}</span>
                     </a>
                   )}
                   {o.advisor.whatsapp && (
-                    <a href={o.advisor.whatsapp} target="_blank" rel="noopener noreferrer" className={cn("flex min-h-11 items-center justify-center gap-2 rounded-full bg-navy px-4 font-display text-[15px] font-semibold text-ivory hover:bg-navy-2", ring)}>
+                    <a href={o.advisor.whatsapp} target="_blank" rel="noopener noreferrer" className={cn("flex min-h-11 items-center justify-center gap-2 rounded-[2px] bg-navy px-4 font-display text-[15px] font-semibold text-ivory hover:bg-navy-2", ring)}>
                       <WhatsAppIcon size={18} /> WhatsApp
                       <span className="sr-only">{tx(locale, `con ${o.advisor.name} (se abre en una pestaña nueva)`, `${o.advisor.name} (opens in a new tab)`)}</span>
                     </a>

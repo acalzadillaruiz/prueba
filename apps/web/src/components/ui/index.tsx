@@ -4,33 +4,30 @@ import type { HTMLAttributes, ReactNode } from "react";
 import { Monogram } from "@/components/brand/Logo";
 
 /**
- * Buttons (030 · estilo AMALI): capsules with the label in spaced capitals. The main action ("primary", Mar profundo)
- * and the dark block button ("navy", Pizarra) carry a white circle with an arrow on the right, like AMALI's
- * «REGISTER INTEREST ›». "outline" is the translucent capsule (over photos it lets the image through), "light" the
- * white capsule (AMALI's «CLOSE ✕»). No bevel, no gradient, no heavy shadow.
- * Legacy names stay valid: "coral" = primary, "gold" = light.
+ * Buttons (043 · Caracas Night, DESIGN.md §5): flat 2 px rectangles, Jost 500 in sentence case, no shadow, no arrow.
+ * Primary = night fill with bone text (bone with night text on night surfaces, see globals.css); secondary ("outline")
+ * = 1 px currentColor border on a transparent ground; "light" = bone fill for night and photo grounds.
+ * Legacy names stay valid: "coral" and "navy" = primary, "gold" = light.
  */
 type BtnVariant = "primary" | "coral" | "navy" | "ghost" | "outline" | "light" | "dark-ghost" | "dark-outline" | "gold";
 const PRIMARY = "bg-coral-cta text-white hover:bg-coral-cta-hover active:bg-coral-cta-hover";
-const LIGHT = "bg-white text-ink hover:bg-white/85";
+const LIGHT = "bg-ivory text-navy hover:bg-arena";
 const BTN: Record<BtnVariant, string> = {
   primary: PRIMARY,
   coral: PRIMARY,
   navy: "np-btn-navy bg-navy text-white hover:bg-navy-2",
-  outline: "np-btn-outline border border-ink/25 bg-white/35 text-ink backdrop-blur-md hover:bg-white/60",
-  ghost: "text-ink hover:bg-black/5",
+  outline: "np-btn-outline border border-current bg-transparent text-ink hover:bg-ink/5",
+  ghost: "text-ink hover:bg-ink/5",
   light: LIGHT,
   gold: LIGHT,
-  "dark-ghost": "text-white/80 hover:bg-white/10 hover:text-white",
-  "dark-outline": "border border-white/40 bg-white/10 text-white backdrop-blur-md hover:bg-white/20",
+  "dark-ghost": "text-white/85 hover:bg-white/10 hover:text-white",
+  "dark-outline": "border border-current bg-transparent text-ivory hover:bg-white/10",
 };
-// md is 44 px tall on touch-sized screens (tap target), 40 px from md up.
-const SIZE = { sm: "h-9 px-4 text-[11.5px]", md: "h-11 px-6 text-[12.5px] md:h-10", lg: "h-12 px-7 text-[13px]" };
-// With the arrow circle the right padding shrinks so the circle sits 4–6 px from the capsule's edge.
-const SIZE_ARROW = { sm: "h-9 pl-4 pr-1", md: "h-11 pl-6 pr-1.5 md:h-10 md:pr-1", lg: "h-12 pl-7 pr-1.5" };
+// 48 px for the main sizes (DESIGN.md: CTA 48), 40 px for the small one (dense panels).
+const SIZE = { sm: "h-10 px-4 text-[14px]", md: "h-12 px-6 text-[16px]", lg: "h-12 px-8 text-[16px]" };
+const SIZE_ARROW = { sm: "h-10 pl-4 pr-1.5", md: "h-12 pl-6 pr-1.5", lg: "h-12 pl-8 pr-1.5" };
 const CIRCLE = { sm: "h-7 w-7", md: "h-8 w-8", lg: "h-9 w-9" };
 
-/** The white circle with an arrow (›) that closes AMALI-style capsules. Decorative: the label names the action. */
 export function ArrowCircle({ className }: { className?: string }) {
   return (
     <span aria-hidden className={cn("ml-2 inline-flex shrink-0 items-center justify-center rounded-full bg-white text-ink", className)}>
@@ -53,12 +50,12 @@ export function Button({
   size?: keyof typeof SIZE;
   className?: string;
   href?: string;
-  /** The white arrow circle; on by default for the main action and the dark block button. */
+  /** The arrow circle (off by default since 043: the label names the action). */
   arrow?: boolean;
 } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
-  const withArrow = arrow ?? (variant === "primary" || variant === "coral" || variant === "navy");
+  const withArrow = arrow ?? false;
   const cls = cn(
-    "inline-flex items-center justify-center gap-2 rounded-full font-display font-medium uppercase tracking-[0.16em] transition-colors duration-300 ease-np disabled:cursor-not-allowed disabled:bg-[#E9E1D3] disabled:text-[#77706A] disabled:border-transparent whitespace-nowrap",
+    "inline-flex items-center justify-center gap-2 rounded-[2px] font-display font-medium transition-[background-color,color,transform] duration-np ease-np active:scale-[.98] disabled:cursor-not-allowed disabled:bg-[#E9E1D3] disabled:text-[#77706A] disabled:border-transparent whitespace-nowrap",
     BTN[variant],
     withArrow ? cn(SIZE[size].split(" ").filter((c) => c.startsWith("text-")).join(" "), SIZE_ARROW[size]) : SIZE[size],
     className,

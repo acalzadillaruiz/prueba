@@ -199,7 +199,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
                 <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
                   <CompareLink locale={locale} className="hidden md:inline-flex" />
                   <CompareButton id={l.id} locale={locale} className="min-h-11 px-3.5 text-[13px]" />
-                  <ShareButton locale={locale} title={tx(locale, l.title_es, l.title_en)} className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-line bg-white px-3.5 text-[13px] font-semibold" />
+                  <ShareButton locale={locale} title={tx(locale, l.title_es, l.title_en)} className="inline-flex min-h-11 items-center gap-1.5 rounded-[2px] border border-line bg-white px-3.5 text-[13px] font-semibold" />
                   <SaveButton id={l.id} locale={locale} className="border border-line" />
                 </div>
               </div>
@@ -231,7 +231,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
               <Gallery l={l} locale={locale} />
               {isPublic && <ViewBeacon id={l.id} />}
               {l.luxury && l.brochurePdf && (
-                <a href={l.brochurePdf} target="_blank" rel="noreferrer" className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-full border-[1.5px] border-navy px-5 font-display text-sm font-semibold text-navy hover:bg-navy/5">
+                <a href={l.brochurePdf} target="_blank" rel="noreferrer" className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-[2px] border-[1.5px] border-navy px-5 font-display text-sm font-semibold text-navy hover:bg-navy/5">
                   {tx(locale, "Descargar el folleto (PDF)", "Download the brochure (PDF)")}
                 </a>
               )}

@@ -532,7 +532,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               <div className="mb-2 font-semibold">{tx(locale, "Operación", "Operation")}</div>
               <div className="flex flex-wrap gap-2">
                 {[["SALE", "Venta", "Sale"], ["LONG_RENT", "Alquiler", "Rent"], ["SHORT_RENT", "Vacacional", "Vacation"], ["COMMERCIAL_SALE", "Comercial · venta", "Commercial · sale"], ["COMMERCIAL_RENT", "Comercial · alquiler", "Commercial · rent"]].map(([k, es, en]) => (
-                  <button key={k} onClick={() => setOp(k)} aria-pressed={d.op === k} className={cn("rounded-full border px-4 py-2 font-display text-sm", d.op === k ? "border-navy bg-[#E9E1D3] text-navy ring-1 ring-navy dark:bg-white/10 dark:ring-[#E9E1D3]" : "border-line bg-white")}>{tx(locale, es, en)}</button>
+                  <button key={k} onClick={() => setOp(k)} aria-pressed={d.op === k} className={cn("rounded-[2px] border px-4 py-2 font-display text-sm", d.op === k ? "border-navy bg-[#E9E1D3] text-navy ring-1 ring-navy dark:bg-white/10 dark:ring-[#E9E1D3]" : "border-line bg-white")}>{tx(locale, es, en)}</button>
                 ))}
               </div>
             </div>
@@ -540,7 +540,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               <div className="mb-2 font-semibold">{tx(locale, "Tipo de inmueble", "Property type")}</div>
               <div className="flex flex-wrap gap-2">
                 {([["apartment", "Apartamento", "Apartment"], ["house", "Casa", "House"], ["penthouse", "Ático", "Penthouse"], ["townhouse", "Townhouse", "Townhouse"], ["studio", "Estudio", "Studio"], ["office", "Oficina", "Office"], ["retail", "Local", "Retail"], ["warehouse", "Galpón", "Warehouse"], ["land", "Terreno", "Land"]] as [Kind, string, string][]).map(([k, es, en]) => (
-                  <button key={k} onClick={() => set({ kind: k })} className={cn("rounded-full border px-4 py-2 font-display text-sm", d.kind === k ? "border-navy bg-[#E9E1D3] text-navy ring-1 ring-navy dark:bg-white/10 dark:ring-[#E9E1D3]" : "border-line bg-white")}>{tx(locale, es, en)}</button>
+                  <button key={k} onClick={() => set({ kind: k })} className={cn("rounded-[2px] border px-4 py-2 font-display text-sm", d.kind === k ? "border-navy bg-[#E9E1D3] text-navy ring-1 ring-navy dark:bg-white/10 dark:ring-[#E9E1D3]" : "border-line bg-white")}>{tx(locale, es, en)}</button>
                 ))}
               </div>
             </div>
@@ -618,7 +618,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                 {(["generator", "waterTank", "security", "elevator", "terrace", "pool", "gym", "view", "garden", "bbq", "pets", "furnished", "ac"] as Amenity[]).map((a) => {
                   const on = d.amen.includes(a);
                   return (
-                    <button key={a} onClick={() => set({ amen: on ? d.amen.filter((x) => x !== a) : [...d.amen, a] })} className={cn("inline-flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-sm font-semibold", on ? "border-navy bg-navy text-ivory" : "border-line bg-white")}>
+                    <button key={a} onClick={() => set({ amen: on ? d.amen.filter((x) => x !== a) : [...d.amen, a] })} className={cn("inline-flex items-center gap-1.5 rounded-[2px] border px-3.5 py-2 text-sm font-semibold", on ? "border-navy bg-navy text-ivory" : "border-line bg-white")}>
                       {on && <Check size={14} />} {lbl(AMENITY_LABEL[a], locale)}
                     </button>
                   );
@@ -763,7 +763,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               </div>
               <div className="mt-3 flex gap-2">
                 {(["es", "en"] as Locale[]).map((x) => (
-                  <button key={x} onClick={() => setLang(x)} className={cn("rounded-full px-3 py-0.5 text-xs font-bold", lang === x ? "bg-[#E9E1D3] text-navy shadow-[inset_0_0_0_2px_#1A2026]" : "bg-black/5")}>{x.toUpperCase()}</button>
+                  <button key={x} onClick={() => setLang(x)} className={cn("rounded-[2px] px-3 py-0.5 text-xs font-bold", lang === x ? "bg-[#E9E1D3] text-navy shadow-[inset_0_0_0_2px_#1A2026]" : "bg-black/5")}>{x.toUpperCase()}</button>
                 ))}
               </div>
               <input
@@ -850,7 +850,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
           data-hide-fab-mobile
           className={cn(
             "mt-8 flex items-center justify-between gap-3 border-t border-line pt-5",
-            "max-md:sticky max-md:z-30 max-md:-mx-4 max-md:mt-6 max-md:bg-ivory/95 max-md:px-4 max-md:pb-[calc(12px+env(safe-area-inset-bottom))] max-md:pt-3 max-md:shadow-[0_-10px_24px_rgba(28,29,29,.08)] max-md:backdrop-blur dark:max-md:bg-[#0E1A2B]/95",
+            "max-md:sticky max-md:z-30 max-md:-mx-4 max-md:mt-6 max-md:bg-ivory max-md:px-4 max-md:pb-[calc(12px+env(safe-area-inset-bottom))] max-md:pt-3 max-md:shadow-[0_-10px_24px_rgba(28,29,29,.08)] dark:max-md:bg-[#0E1A2B]",
             staff ? "max-lg:sticky max-lg:bottom-[calc(57px+env(safe-area-inset-bottom))] max-md:pb-3" : "max-md:bottom-0",
           )}
         >
@@ -909,7 +909,7 @@ function DupNotice({ locale, dup, override, onOverride, hasUnit }: { locale: Loc
         {tx(locale, "Puede que ya esté publicado:", "It may already be listed:")} {link}
         {!hasUnit && <span className="block text-xs text-muted">{tx(locale, "Si es otro apartamento o casa, escribe arriba el piso / apto / casa.", "If it’s another flat or house, add the floor / unit above.")}</span>}
       </span>
-      <button type="button" onClick={onOverride} className="rounded-full border border-navy/70 bg-white px-3 py-1.5 font-display text-sm font-semibold text-navy hover:bg-[#E9E1D3]">
+      <button type="button" onClick={onOverride} className="rounded-[2px] border border-navy/70 bg-white px-3 py-1.5 font-display text-sm font-semibold text-navy hover:bg-[#E9E1D3]">
         {tx(locale, "No es la misma casa — es otra unidad", "Not the same home — it’s another unit")}
       </button>
     </span>

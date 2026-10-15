@@ -159,7 +159,7 @@ export function CompareTray({ locale }: { locale: Locale }) {
           href={href}
           aria-label={tx(locale, "Ver comparación", "View comparison")}
           className={cn(
-            "inline-flex h-11 shrink-0 items-center gap-1 rounded-full px-4 font-display text-[14px] font-semibold transition-colors duration-np",
+            "inline-flex h-11 shrink-0 items-center gap-1 rounded-[2px] px-4 font-display text-[14px] font-semibold transition-colors duration-np",
             ready ? "bg-navy text-ivory hover:bg-navy-2" : "border-[1.5px] border-navy text-navy hover:bg-navy/5",
           )}
         >
@@ -183,7 +183,7 @@ export function CompareTray({ locale }: { locale: Locale }) {
         <Link
           href={href}
           className={cn(
-            "inline-flex h-10 shrink-0 items-center gap-1 rounded-full px-4 font-display text-[14px] font-semibold transition-colors duration-np",
+            "inline-flex h-10 shrink-0 items-center gap-1 rounded-[2px] px-4 font-display text-[14px] font-semibold transition-colors duration-np",
             ready ? "bg-navy text-ivory hover:bg-navy-2" : "border-[1.5px] border-navy text-navy hover:bg-navy/5",
           )}
         >
@@ -211,7 +211,7 @@ export function CompareLink({ locale, className }: { locale: Locale; className?:
   const { compare } = useApp();
   if (!compare.length) return null;
   return (
-    <Link href={compareHref(locale, compare)} className={cn("inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 font-display text-[13px] font-semibold text-navy underline-offset-4 hover:underline", className)}>
+    <Link href={compareHref(locale, compare)} className={cn("inline-flex min-h-11 items-center gap-1.5 rounded-[2px] px-3 font-display text-[13px] font-semibold text-navy underline-offset-4 hover:underline", className)}>
       {tx(locale, `Ver comparación (${compare.length})`, `View comparison (${compare.length})`)} <ArrowRight size={14} aria-hidden />
     </Link>
   );

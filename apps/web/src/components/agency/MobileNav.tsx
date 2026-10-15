@@ -92,7 +92,7 @@ export function AgencyMobileNav({
       <nav
         aria-label={tx(locale, "Secciones", "Sections")}
         data-agency-tabbar
-        className="fixed inset-x-0 bottom-0 z-30 border-t border-[#E6DFD3] bg-white/95 shadow-[0_-8px_24px_rgba(28,29,29,.08)] backdrop-blur lg:hidden dark:border-white/10 dark:bg-[#0E1A2B]/95"
+        className="fixed inset-x-0 bottom-0 z-30 border-t border-[#E6DFD3] bg-ivory shadow-[0_-8px_24px_rgba(28,29,29,.08)] lg:hidden dark:border-white/10 dark:bg-[#0E1A2B]"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
         <ul className="mx-auto flex max-w-xl items-stretch gap-1 px-2">
@@ -132,7 +132,7 @@ export function AgencyMobileNav({
 
       {open && (
         <div className="fixed inset-0 z-[70] lg:hidden">
-          <button type="button" tabIndex={-1} aria-hidden className="absolute inset-0 h-full w-full cursor-default bg-navy/50 backdrop-blur-[2px]" onClick={() => close()} />
+          <button type="button" tabIndex={-1} aria-hidden className="absolute inset-0 h-full w-full cursor-default bg-navy/50" onClick={() => close()} />
           <div
             ref={sheet}
             id={sheetId}

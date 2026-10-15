@@ -59,7 +59,7 @@ export function ShapeTools({
   }, [open]);
 
   if (!enabled && !toolbar) return null;
-  const pillCls = "flex min-h-11 items-center gap-1.5 rounded-full border px-3.5 font-display text-sm shadow-np transition-colors duration-np";
+  const pillCls = "flex min-h-11 items-center gap-1.5 rounded-[2px] border px-3.5 font-display text-sm shadow-np transition-colors duration-np";
   const items = [
     ["draw", PenLine, tx(locale, "Dibujar zona", "Draw an area"), tx(locale, "Toca el mapa punto a punto", "Tap the map point by point")],
     ["radius", Circle, tx(locale, "Radio 1,2 km", "1.2 km radius"), tx(locale, "Toca el centro en el mapa", "Tap the centre on the map")],
@@ -137,7 +137,7 @@ export function ShapeTools({
       {enabled && mode === "draw" && draftCount >= 3 && (
         <button
           type="button"
-          className="np-btn-navy min-h-11 rounded-full bg-navy px-4 font-display text-sm font-semibold text-ivory shadow-np"
+          className="np-btn-navy min-h-11 rounded-[2px] bg-navy px-4 font-display text-sm font-semibold text-ivory shadow-np"
           onClick={(e) => {
             e.stopPropagation();
             onClosePoly();

@@ -78,7 +78,7 @@ export function SavedToast({ locale, nonce, onClose }: { locale: Locale; nonce: 
       <Heart size={16} className="shrink-0 fill-[#E9E1D3] text-[#E9E1D3]" aria-hidden />
       <span>{tx(locale, "Guardada", "Saved")}</span>
       <span aria-hidden className="text-ivory/40">·</span>
-      <Link href={`/${locale}/saved`} onClick={onClose} className="flex min-h-9 items-center rounded-full px-3 font-semibold text-[#E9E1D3] underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#E9E1D3]">
+      <Link href={`/${locale}/saved`} onClick={onClose} className="flex min-h-9 items-center rounded-[2px] px-3 font-semibold text-[#E9E1D3] underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#E9E1D3]">
         {tx(locale, "Ver guardadas", "See saved")}
       </Link>
     </div>

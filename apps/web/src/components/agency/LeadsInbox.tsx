@@ -453,7 +453,7 @@ export function LeadsInbox({ locale, initial, listings, agents, assignable = [],
             aria-label={sheet ? sel.name : undefined}
           >
             {sheet && (
-              <div className="sticky top-0 z-10 -mx-4 flex h-14 items-center border-b border-[#E6DFD3] bg-ivory/95 px-2 backdrop-blur md:-mx-10 md:px-8 xl:hidden dark:border-white/10 dark:bg-[#0E1A2B]/95">
+              <div className="sticky top-0 z-10 -mx-4 flex h-14 items-center border-b border-[#E6DFD3] bg-ivory px-2 md:-mx-10 md:px-8 xl:hidden dark:border-white/10 dark:bg-[#0E1A2B]">
                 <button ref={backRef} type="button" onClick={closeLead} className={cn("flex min-h-11 items-center gap-2 rounded-full px-3 font-display text-[15px] font-semibold", k.hover)} aria-label={tx(locale, `Volver a Leads (${visible.length})`, `Back to Leads (${visible.length})`)}>
                   <ArrowLeft size={18} aria-hidden /> Leads ({visible.length})
                 </button>

@@ -62,7 +62,7 @@ export function SellQuickEstimate({ locale, zones }: { locale: Locale; zones: { 
               setOp(k);
               setRes(null);
             }}
-            className={cn("min-h-10 rounded-full px-4 font-display text-sm font-semibold transition-colors duration-np", op === k ? "bg-white text-ink shadow-[0_2px_8px_rgba(28,29,29,.1)]" : "text-muted hover:text-ink")}
+            className={cn("min-h-10 rounded-[2px] px-4 font-display text-sm font-semibold transition-colors duration-np", op === k ? "bg-white text-ink shadow-[0_2px_8px_rgba(28,29,29,.1)]" : "text-muted hover:text-ink")}
           >
             {label}
           </button>

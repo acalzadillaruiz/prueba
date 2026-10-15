@@ -83,10 +83,10 @@ export function SignupPrompt({ locale, reason, onClose }: { locale: Locale; reas
             : tx(locale, "Tus casas guardadas te esperan en cualquier dispositivo. Es gratis.", "Your saved homes will wait for you on any device. It’s free.")}
         </p>
         <div className="mt-6 flex flex-col gap-2.5">
-          <Link ref={first} href={register} className={cn("inline-flex h-12 items-center justify-center rounded-full bg-coral-cta px-6 font-display font-semibold text-white hover:bg-coral-cta-hover", ring)}>
+          <Link ref={first} href={register} className={cn("inline-flex h-12 items-center justify-center rounded-[2px] bg-coral-cta px-6 font-display font-semibold text-white hover:bg-coral-cta-hover", ring)}>
             {tx(locale, "Crear cuenta gratis", "Create a free account")}
           </Link>
-          <Link href={login} className={cn("inline-flex h-12 items-center justify-center rounded-full border-[1.5px] border-navy px-6 font-display font-semibold text-navy hover:bg-navy/5", ring)}>
+          <Link href={login} className={cn("inline-flex h-12 items-center justify-center rounded-[2px] border-[1.5px] border-navy px-6 font-display font-semibold text-navy hover:bg-navy/5", ring)}>
             {tx(locale, "Ya tengo cuenta · Entrar", "I have an account · Sign in")}
           </Link>
         </div>

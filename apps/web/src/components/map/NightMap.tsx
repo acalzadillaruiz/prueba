@@ -343,7 +343,7 @@ export function NightMap({
 
   const selected = listings.find((l) => l.id === selectedId);
   // Map controls: white on the light map, navy glass on the night map.
-  const ctl = theme === "light" ? "border-[#E9E1D3] bg-[#ffffff] text-[#1A2026]" : "border-white/10 bg-navy/90 text-ivory backdrop-blur";
+  const ctl = theme === "light" ? "border-[#E9E1D3] bg-[#ffffff] text-[#1A2026]" : "border-white/10 bg-navy text-ivory";
   const ctlHover = theme === "light" ? "hover:bg-[#F1ECE4]" : "hover:bg-white/10";
   const ctlLine = theme === "light" ? "border-[#E9E1D3]" : "border-white/10";
 
@@ -643,7 +643,7 @@ export function NightMap({
             type="button"
             onClick={() => onSelect?.(null)}
             aria-label={tx(locale, "Cerrar vista previa", "Close preview")}
-            className="absolute left-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-[#ffffffe6] text-[#1A2026] shadow-sm backdrop-blur"
+            className="absolute left-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-[#ffffffe6] text-[#1A2026] shadow-sm"
           >
             <X size={16} aria-hidden />
           </button>
@@ -678,7 +678,7 @@ export function NightMap({
             type="button"
             onClick={searchHere}
             data-search-area
-            className="np-in pointer-events-auto flex min-h-11 items-center gap-2 whitespace-nowrap rounded-full bg-[#0E1A2B] px-4 font-display text-sm font-semibold text-[#F6F2EC] shadow-[0_12px_30px_-8px_rgba(28,29,29,.55)] [html.dark_&]:bg-[#F6F2EC] [html.dark_&]:text-[#1A2026]"
+            className="np-in pointer-events-auto flex min-h-11 items-center gap-2 whitespace-nowrap rounded-[2px] bg-[#0E1A2B] px-4 font-display text-sm font-semibold text-[#F6F2EC] shadow-[0_12px_30px_-8px_rgba(28,29,29,.55)] [html.dark_&]:bg-[#F6F2EC] [html.dark_&]:text-[#1A2026]"
           >
             <Search size={15} aria-hidden /> {tx(locale, "Buscar en esta zona", "Search this area")}
           </button>

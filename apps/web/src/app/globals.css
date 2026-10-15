@@ -162,8 +162,8 @@ html.dark .np-public .text-coral { color: var(--np-coral-light); }
 /* Header offset contract: bars pinned under the public header (the compact search) use
    `top: calc(env(safe-area-inset-top) + var(--np-header-offset, 80px))` and transition `top` (300ms, same curve as the
    header). PublicHeader sets html[data-np-header="hidden"] while it is scrolled away. */
-:root { --np-header-offset: 80px; }
-@media (min-width: 768px) { :root { --np-header-offset: 84px; } }
+:root { --np-header-offset: 64px; }
+@media (min-width: 768px) { :root { --np-header-offset: 72px; } }
 html[data-np-header="hidden"] { --np-header-offset: 8px; }
 /* While the compact search is pinned (CompactAsk sets html[data-np-compact="on"]; it carries its own logo mark and a
    menu button that opens the header's drawer via the "np:open-menu" event), the header steps aside completely so the
@@ -310,30 +310,22 @@ h1 em, h2 em, h3 em, .np-hero-title em { font-style: normal; }
 /* ── 2035 · light, glass and motion (redesign) ─────────────────────────────────────
    Light-first Palette A: Lino surfaces, frosted glass panels, hairlines, soft aurora light and a whisper of grain.
    Every moving piece stops under prefers-reduced-motion. */
-:root { --np-glass: rgb(255 255 255 / .58); --np-glass-line: rgb(255 255 255 / .75); --np-hair: rgb(30 26 24 / .08); }
-.np-glass {
-  background: var(--np-glass);
-  -webkit-backdrop-filter: blur(22px) saturate(1.4);
-          backdrop-filter: blur(22px) saturate(1.4);
-  border: 1px solid var(--np-glass-line);
-  box-shadow: 0 1px 0 rgb(255 255 255 / .6) inset, 0 20px 50px -18px rgb(30 26 24 / .22);
+:root { --np-glass: var(--np-ivory); --np-glass-line: transparent; --np-hair: rgb(26 32 38 / .08); }
+/* 043 (DESIGN.md §6): no glass. The old "glass" surfaces are solid bone (night-2 in dark mode), flat. Things that
+   really float (menus, the pinned compact search, the compare tray) carry the one "float" shadow. The only blur left
+   is the public header once the page has scrolled (see [data-public-header] below). */
+.np-glass { background: var(--np-ivory); }
+html.dark .np-public .np-glass { background: #14243A; }
+:root { --np-glass-nav: #F6F2EC; }
+html.dark { --np-glass-nav: #14243A; }
+.np-glass-nav, [data-sticky-search] .np-glass, [data-compare-tray] .np-glass { background: var(--np-glass-nav); box-shadow: var(--np-float); }
+[data-public-header] .np-glass {
+  background: rgb(246 242 236 / .92);
+  -webkit-backdrop-filter: blur(16px);
+          backdrop-filter: blur(16px);
+  box-shadow: none;
 }
-html.dark .np-public .np-glass { background: rgb(20 36 58 / .62); border-color: rgb(255 255 255 / .08); box-shadow: 0 20px 50px -18px rgb(0 0 0 / .6); }
-/* Navigation glass: chrome that floats over moving content (header pill, compact search, menus, toasts, trays) must
-   stay readable, so it is opaque Lino (.98: no ghost text behind the logo) with the same blur. The lighter `.np-glass` above is for decorative chips
-   and cards sitting on photos. The compact search sets `--np-glass` inline, so it is pinned here too. */
-:root { --np-glass-nav: rgb(251 248 244 / .98); }
-html.dark { --np-glass-nav: rgb(14 26 43 / .98); }
-.np-glass-nav, [data-public-header] .np-glass, [data-sticky-search] .np-glass, [data-compare-tray] .np-glass {
-  background: var(--np-glass-nav);
-  -webkit-backdrop-filter: blur(22px) saturate(1.4);
-          backdrop-filter: blur(22px) saturate(1.4);
-  border: 1px solid rgb(30 26 24 / .07);
-  box-shadow: 0 1px 0 rgb(255 255 255 / .6) inset, 0 20px 50px -18px rgb(30 26 24 / .22);
-}
-html.dark .np-public :is(.np-glass-nav, [data-public-header] .np-glass, [data-sticky-search] .np-glass, [data-compare-tray] .np-glass) {
-  background: var(--np-glass-nav); border-color: rgb(255 255 255 / .08); box-shadow: 0 20px 50px -18px rgb(0 0 0 / .6);
-}
+html.dark .np-public [data-public-header] .np-glass { background: rgb(14 26 43 / .92); }
 .np-hairline { border-color: var(--np-hair); }
 /* Aurora: three slow, blurred light pools in Arena, Rosa and Bronce over Lino. */
 .np-aura { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }

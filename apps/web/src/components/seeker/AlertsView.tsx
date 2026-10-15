@@ -120,7 +120,7 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
                   </Link>
                   {!editing && confirmId !== s.id && (
                     <div className="relative z-10 flex items-center gap-1">
-                      <button type="button" aria-label={`${tx(locale, "Editar", "Edit")} · ${title}`} onClick={() => { setConfirmId(null); setEditId(s.id); setDraft(custom ? s.name : ""); }} className="flex min-h-11 items-center gap-1.5 rounded-full px-3 text-[14px] font-semibold text-ink hover:bg-black/5 dark:hover:bg-white/10">
+                      <button type="button" aria-label={`${tx(locale, "Editar", "Edit")} · ${title}`} onClick={() => { setConfirmId(null); setEditId(s.id); setDraft(custom ? s.name : ""); }} className="flex min-h-11 items-center gap-1.5 rounded-[2px] px-3 text-[14px] font-semibold text-ink hover:bg-black/5 dark:hover:bg-white/10">
                         <Pencil size={15} aria-hidden /> {tx(locale, "Editar", "Edit")}
                       </button>
                       <button type="button" className="flex h-11 w-11 items-center justify-center rounded-full text-danger hover:bg-black/5 dark:hover:bg-white/10" aria-label={`${tx(locale, "Eliminar", "Delete")} · ${title}`} onClick={() => setConfirmId(s.id)}>

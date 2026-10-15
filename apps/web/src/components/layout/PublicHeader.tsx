@@ -292,7 +292,7 @@ export function PublicHeader({ locale, variant = "light", autoHide = false }: { 
             }
           : undefined
       }
-      className="sr-only-focusable fixed left-3 top-3 z-[70] rounded-full bg-navy px-4 py-2 font-display text-ivory"
+      className="sr-only-focusable fixed left-3 top-3 z-[70] rounded-[2px] bg-navy px-4 py-2 font-display text-ivory"
     >
       {onSearch ? tx(locale, "Saltar a los resultados", "Skip to results") : tx(locale, "Saltar al contenido", "Skip to content")}
     </a>
@@ -306,15 +306,16 @@ export function PublicHeader({ locale, variant = "light", autoHide = false }: { 
         "top-0 z-40 transition-[background-color,border-color,transform] duration-300 ease-[cubic-bezier(.2,.7,.2,1)]",
         away && "-translate-y-[calc(100%+12px)]",
         variant === "dark" && "np-navy-panel sticky border-b border-navy-line bg-navy text-ivory",
-        float && cn("inset-x-0 px-2.5 pt-2.5 md:px-5 md:pt-3", onPhoto ? "text-white" : "text-ink"),
+        float && cn("inset-x-0", onPhoto ? "text-white" : "text-ink"),
         variant === "transparent" ? "fixed" : variant === "light" && "sticky",
       )}
     >
       <div
         className={cn(
-          "mx-auto flex max-w-[1320px] items-center gap-8 transition-[background-color,box-shadow,border-color] duration-500",
-          float ? "h-[62px] rounded-full border pl-5 pr-2 md:pl-6" : "h-[72px] px-4 md:px-8",
-          float && (variant === "light" || scrolled || menuOpen ? "np-glass" : "border-transparent bg-transparent"),
+          "mx-auto flex items-center gap-8 transition-[background-color] duration-[240ms] ease-np",
+          // 043: a flat full-width bar (no floating pill). Transparent over the hero; solid bone (the one blur) once scrolled.
+          float ? "h-16 px-[clamp(16px,4vw,40px)] md:h-[72px]" : "h-[72px] max-w-[1320px] px-4 md:px-8",
+          float && (variant === "light" || scrolled || menuOpen ? "np-glass" : "bg-transparent"),
         )}
       >
         <div className={cn("flex shrink-0 items-center", showBack && "-ml-3 gap-0.5 md:-ml-3.5")}>
@@ -400,7 +401,7 @@ export function PublicHeader({ locale, variant = "light", autoHide = false }: { 
               <span className="hidden font-display text-sm xl:inline">{u.name.split(" ")[0]}</span>
             </Link>
           ) : (
-            <Link href={`/${locale}/login`} className={cn("hidden min-h-11 items-center gap-1.5 rounded-full px-3 font-display text-[15px] md:flex", inv ? "text-ivory/85 hover:bg-white/10" : "text-ink/80 hover:bg-black/5")}>
+            <Link href={`/${locale}/login`} className={cn("hidden min-h-11 items-center gap-1.5 rounded-[2px] px-3 font-display text-[15px] md:flex", inv ? "text-ivory/85 hover:bg-white/10" : "text-ink/80 hover:bg-black/5")}>
               <User size={17} aria-hidden /> {t("signIn")}
             </Link>
           )}
@@ -429,7 +430,7 @@ export function PublicHeader({ locale, variant = "light", autoHide = false }: { 
             {t("sell")}
           </Button>
           {/* AMALI capsule: the on-call advisor (Arena circle with a phone) and the two-line menu, always together. */}
-          <div className={cn("ml-1 flex h-12 items-center gap-0.5 rounded-full border p-1 backdrop-blur-md", inv ? "border-white/30 bg-white/15" : "border-ink/10 bg-white/50")}>
+          <div className={cn("ml-1 flex h-12 items-center gap-0.5 rounded-[2px] p-1", inv ? "bg-transparent" : "bg-arena")}>
             <OnCallButton
               locale={locale}
               aria-label={tx(locale, "Asesor 24/7: llama o escribe a un asesor", "Advisor 24/7: call or message an advisor")}

@@ -19,7 +19,7 @@ const isSale = (l: Listing) => l.listingType === "SALE" || l.listingType === "CO
 const OK = "text-ok dark:text-[#8FCBA6]";
 const WARN = "text-warn dark:text-[#E0A84A]";
 /** Remove ("×") on a photo: its own light/dark colours (not the remapped bg-white, which turned it dark-on-dark). */
-const REMOVE_BTN = "absolute flex items-center justify-center rounded-full bg-[#F6F2EC] text-[#1A2026] shadow ring-1 ring-black/10 after:absolute after:content-[''] dark:bg-[#0E1A2B]/85 dark:text-[#F6F2EC] dark:ring-[#F6F2EC]/45";
+const REMOVE_BTN = "absolute flex items-center justify-center rounded-full bg-[#F6F2EC] text-[#1A2026] ring-1 ring-black/10 after:absolute after:content-[''] dark:bg-[#0E1A2B]/85 dark:text-[#F6F2EC] dark:ring-[#F6F2EC]/45";
 /** Pinned row (phones): the thumbnail is the "Ver ficha" link, then one 36 px text pill ("Visita" / "Fechas") filling the rest of the column. */
 const PIN_PILL = "flex h-9 min-w-0 flex-1 items-center justify-center whitespace-nowrap rounded-full px-1.5 font-display text-[13px] font-semibold leading-none";
 /** Phone actions row: full column width, the label may wrap to 2 lines in a third of 360 px. */
@@ -222,7 +222,7 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
               <div
                 data-compare-pinned={stuck ? "on" : "off"}
                 className={cn(
-                  "absolute inset-x-0 top-0 grid gap-2 border-b border-line bg-ivory px-3 py-2 shadow-[0_8px_18px_-12px_rgba(28,29,29,.35)] transition-[opacity,transform] duration-200 dark:bg-navy-card",
+                  "absolute inset-x-0 top-0 grid gap-2 border-b border-line bg-ivory px-3 py-2 transition-[opacity,transform] duration-200 dark:bg-navy-card",
                   stuck ? "opacity-100" : "pointer-events-none invisible -translate-y-1 opacity-0",
                 )}
                 style={cols}

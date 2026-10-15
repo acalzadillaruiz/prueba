@@ -70,7 +70,7 @@ export function OnCallDialog({ locale, listingSlug, onClose }: { locale: Locale;
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descId}
-        className="np-in max-h-[88vh] w-full overflow-y-auto rounded-t-[4px] bg-ivory p-6 text-ink shadow-[0_24px_60px_rgba(28,29,29,.25)] sm:max-w-[480px] sm:rounded-[4px]"
+        className="np-in max-h-[88vh] w-full overflow-y-auto rounded-t-[4px] bg-ivory p-6 text-ink sm:max-w-[480px] sm:rounded-[4px]"
         style={{ paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))" }}
       >
         <div className="flex items-start justify-between gap-4">

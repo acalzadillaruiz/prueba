@@ -154,7 +154,7 @@ export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: bo
               </span>
               <div aria-hidden className="pointer-events-none absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-1.5 md:hidden">
                 {shots.map((_, n) => (
-                  <span key={n} className={cn("h-1.5 rounded-full shadow-[0_0_2px_rgba(28,29,29,.5)] transition-all duration-np", n === idx ? "w-3 bg-white" : "w-1.5 bg-white/60")} />
+                  <span key={n} className={cn("h-1.5 rounded-full transition-all duration-np", n === idx ? "w-3 bg-white" : "w-1.5 bg-white/60")} />
                 ))}
               </div>
               <span className="sr-only md:hidden" aria-live="polite">{What(idx + 1)}</span>

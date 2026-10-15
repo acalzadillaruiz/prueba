@@ -377,7 +377,7 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
       )}
       {chosen.length > 0 && (
         <div className="sticky bottom-3 z-20 mt-4" role="region" aria-label={tx(locale, "Acciones en lote", "Bulk actions")}>
-          <div className={cn(k.card, "flex flex-wrap items-center gap-2 p-3 shadow-[0_12px_32px_rgba(28,29,29,.18)] ring-1 ring-[#E9E1D3] md:gap-3 md:px-4")}>
+          <div className={cn(k.card, "flex flex-wrap items-center gap-2 p-3 ring-1 ring-[#E9E1D3] md:gap-3 md:px-4")}>
             <span className="text-sm font-semibold">{tx(locale, `${chosen.length} ${chosen.length === 1 ? "seleccionado" : "seleccionados"}`, `${chosen.length} selected`)}</span>
             {manager && (
               <Select compact value="" disabled={bulk?.running} onChange={(e) => e.target.value && bulkAssign(e.target.value)} className="h-10" aria-label={tx(locale, "Asignar los seleccionados a…", "Assign selected to…")}>

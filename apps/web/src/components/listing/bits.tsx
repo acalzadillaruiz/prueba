@@ -19,7 +19,7 @@ export function SaveButton({ id, className, locale }: { id: string; className?: 
         e.stopPropagation();
         toggleSaved(id);
       }}
-      className={cn("flex h-11 w-11 items-center justify-center rounded-full bg-[#ffffffe6] text-[#1A2026] shadow-sm transition-transform duration-np hover:scale-105", className)}
+      className={cn("flex h-11 w-11 items-center justify-center rounded-full bg-[#ffffffe6] text-[#1A2026] transition-transform duration-np hover:scale-105", className)}
     >
       <Heart size={18} strokeWidth={1.7} aria-hidden className={on ? "fill-[#0E1A2B] text-[#0E1A2B]" : "text-[#1A2026]"} />
     </button>
@@ -80,7 +80,7 @@ export function CardCompareToggle({ id, locale }: { id: string; locale: Locale }
         onClick={click}
         data-card-compare
         className={cn(
-          "absolute right-[3.75rem] top-2.5 z-[2] flex h-11 w-11 items-center justify-center rounded-full shadow-sm transition-transform duration-np hover:scale-105 [@media(hover:hover)]:hidden",
+          "absolute right-[3.75rem] top-2.5 z-[2] flex h-11 w-11 items-center justify-center rounded-full shadow-float transition-transform duration-np hover:scale-105 [@media(hover:hover)]:hidden",
           on ? "bg-[#0E1A2B] text-[#F6F2EC]" : "bg-[#ffffffe6] text-[#1A2026]",
         )}
       >
@@ -92,14 +92,14 @@ export function CardCompareToggle({ id, locale }: { id: string; locale: Locale }
         onClick={click}
         data-card-compare
         className={cn(
-          "absolute bottom-2.5 left-2.5 z-[2] hidden min-h-9 items-center gap-1.5 rounded-[2px] px-3 font-display text-[13px] font-semibold shadow-sm transition-opacity duration-np focus-visible:opacity-100 [@media(hover:hover)]:inline-flex",
+          "absolute bottom-2.5 left-2.5 z-[2] hidden min-h-9 items-center gap-1.5 rounded-[2px] px-3 font-display text-[13px] font-semibold shadow-float transition-opacity duration-np focus-visible:opacity-100 [@media(hover:hover)]:inline-flex",
           on ? "bg-[#0E1A2B] text-[#F6F2EC] opacity-100" : "bg-[#ffffffe6] text-[#1A2026] opacity-0 group-hover:opacity-100",
         )}
       >
         <Scale size={14} aria-hidden /> {on ? tx(locale, "Comparando", "Comparing") : label}
       </button>
       {full && (
-        <span role="status" className="np-in absolute inset-x-2.5 bottom-14 z-[3] rounded-2xl bg-[#0E1A2B] px-3.5 py-2.5 text-[13px] leading-snug text-[#F6F2EC] shadow-np">
+        <span role="status" className="np-in absolute inset-x-2.5 bottom-14 z-[3] rounded-2xl bg-[#0E1A2B] px-3.5 py-2.5 text-[13px] leading-snug text-[#F6F2EC] shadow-float">
           {tx(locale, "Ya tienes 3 casas para comparar. Quita una del comparador y añade esta.", "You already have 3 homes to compare. Remove one and add this one.")}
         </span>
       )}

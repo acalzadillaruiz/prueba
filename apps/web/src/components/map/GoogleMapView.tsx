@@ -146,7 +146,7 @@ export function GoogleMapView(props: MapViewProps) {
       {controls && (
         <>
           <div className="absolute right-3 top-24 z-10">
-            <button aria-label={theme === "light" ? tx(locale, "Mapa nocturno", "Night map") : tx(locale, "Mapa claro", "Light map")} aria-pressed={theme === "night"} className={cn("flex h-11 w-11 items-center justify-center rounded-xl border shadow-np", ctl)} onClick={() => setTheme((t) => (t === "night" ? "light" : "night"))}>
+            <button aria-label={theme === "light" ? tx(locale, "Mapa nocturno", "Night map") : tx(locale, "Mapa claro", "Light map")} aria-pressed={theme === "night"} className={cn("flex h-11 w-11 items-center justify-center rounded-xl border ", ctl)} onClick={() => setTheme((t) => (t === "night" ? "light" : "night"))}>
               {theme === "night" ? <Sun size={16} /> : <Moon size={16} />}
             </button>
           </div>
@@ -202,7 +202,7 @@ function SearchArea({ locale, onArea }: { locale: MapViewProps["locale"]; onArea
           setMoved(false);
           onArea([b.getSouthWest().lat(), b.getSouthWest().lng(), b.getNorthEast().lat(), b.getNorthEast().lng()]);
         }}
-        className="pointer-events-auto flex min-h-11 items-center gap-2 whitespace-nowrap rounded-[2px] bg-[#0E1A2B] px-4 font-display text-sm font-semibold text-[#F6F2EC] shadow-np"
+        className="pointer-events-auto flex min-h-11 items-center gap-2 whitespace-nowrap rounded-[2px] bg-[#0E1A2B] px-4 font-display text-sm font-semibold text-[#F6F2EC] "
       >
         <Search size={15} aria-hidden /> {tx(locale, "Buscar en esta zona", "Search this area")}
       </button>
@@ -213,7 +213,7 @@ function SearchArea({ locale, onArea }: { locale: MapViewProps["locale"]; onArea
 function ZoomButtons({ className }: { className: string }) {
   const map = useMap();
   return (
-    <div className={cn("absolute right-3 top-3 z-10 flex flex-col overflow-hidden rounded-xl border shadow-np", className)}>
+    <div className={cn("absolute right-3 top-3 z-10 flex flex-col overflow-hidden rounded-xl border shadow-float", className)}>
       <button aria-label="Zoom in" className="flex h-11 w-11 items-center justify-center hover:bg-black/5" onClick={() => map?.setZoom((map.getZoom() ?? 12) + 1)}><Plus size={16} /></button>
       <button aria-label="Zoom out" className="flex h-11 w-11 items-center justify-center border-t border-inherit hover:bg-black/5" onClick={() => map?.setZoom((map.getZoom() ?? 12) - 1)}><Minus size={16} /></button>
     </div>

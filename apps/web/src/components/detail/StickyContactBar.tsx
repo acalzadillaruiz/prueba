@@ -67,7 +67,7 @@ export function StickyContactBar({ locale, price, amount, meta, suffix, tour, st
       data-hide-fab-mobile
       aria-hidden={!shown}
       className={cn(
-        "fixed inset-x-0 bottom-0 z-40 border-t px-4 pt-3 shadow-[0_-10px_30px_rgba(28,29,29,.12)] transition-transform duration-np ease-out lg:hidden print:hidden",
+        "fixed inset-x-0 bottom-0 z-40 border-t px-4 pt-3 shadow-float transition-transform duration-np ease-out lg:hidden print:hidden",
         dark ? "border-navy-line bg-navy text-ivory" : "border-line bg-white text-ink",
         !shown && "pointer-events-none translate-y-full",
       )}

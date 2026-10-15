@@ -34,13 +34,13 @@ export function DemoBar({ locale }: { locale: Locale }) {
       <div className="fixed bottom-[calc(1rem+env(safe-area-inset-bottom))] left-0 z-50 print:hidden lg:hidden [body:has([data-agency-tabbar])_&]:hidden" data-demobar data-demobar-admin>
         {open && (
           <div className="absolute bottom-full left-2 mb-2">
-            <div className="np-in max-h-[70svh] w-64 overflow-y-auto rounded-np border border-navy-line bg-navy py-1 text-ivory shadow-np">
+            <div className="np-in max-h-[70svh] w-64 overflow-y-auto rounded-np border border-navy-line bg-navy py-1 text-ivory ">
               <div className="border-b border-navy-line px-3 py-2 text-xs font-semibold uppercase tracking-wide text-mist">{tx(locale, "Entrar como… (modo demo)", "Sign in as… (demo mode)")}</div>
               <DemoLoginList locale={locale} onDone={() => setOpen(false)} className="p-1" />
             </div>
           </div>
         )}
-        <button onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label={tx(locale, "Modo demo: entrar como…", "Demo mode: sign in as…")} className="relative flex h-10 w-6 items-center justify-center rounded-r-full border border-l-0 border-navy-line bg-navy text-sm text-ivory opacity-75 shadow-np transition-opacity after:absolute after:-inset-y-1 after:-right-2 after:left-0 after:content-[''] hover:opacity-100">
+        <button onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label={tx(locale, "Modo demo: entrar como…", "Demo mode: sign in as…")} className="relative flex h-10 w-6 items-center justify-center rounded-r-full border border-l-0 border-navy-line bg-navy text-sm text-ivory opacity-75 transition-opacity after:absolute after:-inset-y-1 after:-right-2 after:left-0 after:content-[''] hover:opacity-100">
           <FlaskConical size={13} className="text-[#E9E1D3]" aria-hidden />
         </button>
       </div>
@@ -50,13 +50,13 @@ export function DemoBar({ locale }: { locale: Locale }) {
     <div className="fixed right-0 top-[42%] z-50 print:hidden sm:bottom-4 sm:left-4 sm:right-auto sm:top-auto sm:mb-[env(safe-area-inset-bottom)]" data-demobar>
       {open && (
         <div className="absolute right-full top-1/2 mr-2 -translate-y-1/2 sm:static sm:mr-0 sm:translate-y-0">
-          <div className="np-in max-h-[85svh] w-64 overflow-y-auto rounded-np border border-navy-line bg-navy py-1 text-ivory shadow-np sm:mb-2">
+          <div className="np-in max-h-[85svh] w-64 overflow-y-auto rounded-np border border-navy-line bg-navy py-1 text-ivory sm:mb-2">
             <div className="border-b border-navy-line px-3 py-2 text-xs font-semibold uppercase tracking-wide text-mist">{tx(locale, "Entrar como… (modo demo)", "Sign in as… (demo mode)")}</div>
             <DemoLoginList locale={locale} onDone={() => setOpen(false)} className="p-1" />
           </div>
         </div>
       )}
-      <button onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label={tx(locale, "Modo demo: entrar como…", "Demo mode: sign in as…")} className="flex h-11 w-7 items-center justify-center rounded-l-full border border-r-0 border-navy-line bg-navy text-sm text-ivory opacity-75 shadow-np transition-opacity hover:opacity-100 sm:h-auto sm:min-h-11 sm:w-auto sm:min-w-11 sm:gap-2 sm:rounded-full sm:border-r sm:p-1.5 sm:pr-3.5 sm:opacity-100">
+      <button onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label={tx(locale, "Modo demo: entrar como…", "Demo mode: sign in as…")} className="flex h-11 w-7 items-center justify-center rounded-l-full border border-r-0 border-navy-line bg-navy text-sm text-ivory opacity-75 transition-opacity hover:opacity-100 sm:h-auto sm:min-h-11 sm:w-auto sm:min-w-11 sm:gap-2 sm:rounded-full sm:border-r sm:p-1.5 sm:pr-3.5 sm:opacity-100">
         <span className="hidden sm:contents">{user ? <Avatar initials={user.initials} hue={user.hue} size={26} /> : <span className="flex h-[26px] w-[26px] items-center justify-center rounded-full bg-white/10"><LogIn size={14} /></span>}</span>
         <FlaskConical size={14} className="text-[#E9E1D3]" />
         <span className="hidden font-display sm:inline">Demo</span>
@@ -76,7 +76,7 @@ export function DemoSidebarItem({ locale }: { locale: Locale }) {
   return (
     <div className="relative print:hidden" data-demobar-sidebar>
       {open && (
-        <div className="np-in absolute bottom-full left-0 z-10 mb-2 max-h-[70svh] w-full overflow-y-auto rounded-np border border-navy-line bg-navy py-1 text-ivory shadow-np">
+        <div className="np-in absolute bottom-full left-0 z-10 mb-2 max-h-[70svh] w-full overflow-y-auto rounded-np border border-navy-line bg-navy py-1 text-ivory shadow-float">
           <div className="border-b border-navy-line px-3 py-2 text-xs font-semibold uppercase tracking-wide text-mist">{tx(locale, "Entrar como… (modo demo)", "Sign in as… (demo mode)")}</div>
           <DemoLoginList locale={locale} onDone={() => setOpen(false)} className="p-1" />
         </div>

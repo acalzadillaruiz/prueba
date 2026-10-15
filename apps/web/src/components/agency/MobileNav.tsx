@@ -92,7 +92,7 @@ export function AgencyMobileNav({
       <nav
         aria-label={tx(locale, "Secciones", "Sections")}
         data-agency-tabbar
-        className="fixed inset-x-0 bottom-0 z-30 border-t border-[#E6DFD3] bg-ivory shadow-[0_-8px_24px_rgba(28,29,29,.08)] lg:hidden dark:border-white/10 dark:bg-[#0E1A2B]"
+        className="fixed inset-x-0 bottom-0 z-30 border-t border-[#E6DFD3] bg-ivory shadow-float lg:hidden dark:border-white/10 dark:bg-[#0E1A2B]"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
         <ul className="mx-auto flex max-w-xl items-stretch gap-1 px-2">
@@ -139,7 +139,7 @@ export function AgencyMobileNav({
             role="dialog"
             aria-modal="true"
             aria-labelledby={titleId}
-            className="np-in absolute inset-x-0 bottom-0 max-h-[85vh] overflow-y-auto rounded-t-[4px] bg-ivory pb-4 shadow-[0_-12px_32px_rgba(28,29,29,.18)] dark:bg-[#0E1A2B]"
+            className="np-in absolute inset-x-0 bottom-0 max-h-[85vh] overflow-y-auto rounded-t-[4px] bg-ivory pb-4 dark:bg-[#0E1A2B]"
             style={{ paddingBottom: "calc(1rem + env(safe-area-inset-bottom))" }}
           >
             <div className="sticky top-0 z-10 bg-ivory px-5 pb-2 pt-2.5 dark:bg-[#0E1A2B]">
@@ -178,8 +178,8 @@ export function AgencyMobileNav({
                         aria-current={i.active ? "page" : undefined}
                         onClick={() => (i.active ? close() : setOpenAt(null))}
                         className={cn(
-                          "flex min-h-[64px] items-center gap-3 rounded-2xl bg-white px-3.5 py-3 text-[15px] font-medium text-navy shadow-[inset_0_0_0_1px_#E6DFD3] transition-colors duration-np hover:bg-[#F6F2EA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy dark:bg-white/[.04] dark:text-ivory dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,.1)] dark:focus-visible:ring-[#E9E1D3]",
-                          i.active && "bg-[#E9E1D3] shadow-[inset_0_0_0_2px_#1A2026] dark:bg-white/10 dark:shadow-[inset_0_0_0_2px_#E9E1D3]",
+                          "flex min-h-[64px] items-center gap-3 rounded-2xl bg-white px-3.5 py-3 text-[15px] font-medium text-navy outline outline-1 -outline-offset-1 outline-[#E6DFD3] transition-colors duration-np hover:bg-[#F6F2EA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy dark:bg-white/[.04] dark:text-ivory dark:outline dark:outline-1 dark:-outline-offset-1 dark:outline-[rgba(255,255,255,.1)] dark:focus-visible:ring-[#E9E1D3]",
+                          i.active && "bg-[#E9E1D3] outline outline-2 -outline-offset-2 outline-[#1A2026] dark:bg-white/10 dark:outline dark:outline-2 dark:-outline-offset-2 dark:outline-[#E9E1D3]",
                         )}
                       >
                         <i.icon size={19} strokeWidth={1.6} aria-hidden className="shrink-0" />

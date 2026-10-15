@@ -419,7 +419,7 @@ export function PublicHeader({ locale, variant = "light", autoHide = false }: { 
                 <FlaskConical size={17} aria-hidden />
               </button>
               {deskDemo && (
-                <div className="np-in absolute right-0 top-full z-50 mt-2 max-h-[70vh] w-72 overflow-y-auto rounded-np border border-navy-line bg-navy p-1 text-ivory shadow-np">
+                <div className="np-in absolute right-0 top-full z-50 mt-2 max-h-[70vh] w-72 overflow-y-auto rounded-np border border-navy-line bg-navy p-1 text-ivory shadow-float">
                   <div className="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-mist">{tx(locale, "Entrar como… (modo demo)", "Sign in as… (demo mode)")}</div>
                   <DemoLoginList locale={locale} onDone={() => setDeskDemo(false)} />
                 </div>

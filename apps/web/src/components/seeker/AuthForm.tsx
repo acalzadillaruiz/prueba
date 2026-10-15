@@ -177,7 +177,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
               <button
                 type="button"
                 onClick={() => signIn("google", { callbackUrl: next ?? `/${locale}/app` })}
-                className="mt-8 flex h-12 w-full items-center justify-center gap-3 rounded-full bg-white font-display font-medium text-navy shadow-[inset_0_0_0_1px_#C9BFAE] transition-shadow hover:shadow-[inset_0_0_0_1px_#1A2026]"
+                className="mt-8 flex h-12 w-full items-center justify-center gap-3 rounded-full bg-white font-display font-medium text-navy outline outline-1 -outline-offset-1 outline-[#C9BFAE] transition-shadow hover:outline hover:outline-1 hover:-outline-offset-1 hover:outline-[#1A2026]"
               >
                 <GoogleG /> {tx(locale, "Continuar con Google", "Continue with Google")}
               </button>
@@ -203,7 +203,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
               </div>
             )}
             {mode === "register" && !inv && (
-              <label className={cn("flex cursor-pointer items-start gap-3 rounded-[4px] p-4", agency ? "bg-[#E9E1D3] shadow-[inset_0_0_0_2px_#1A2026]" : "bg-white shadow-[inset_0_0_0_1px_#C9BFAE]")}>
+              <label className={cn("flex cursor-pointer items-start gap-3 rounded-[4px] p-4", agency ? "bg-[#E9E1D3] outline outline-2 -outline-offset-2 outline-[#1A2026]" : "bg-white outline outline-1 -outline-offset-1 outline-[#C9BFAE]")}>
                 <input type="checkbox" checked={agency} onChange={(e) => setAgency(e.target.checked)} className="mt-1 h-4 w-4 accent-navy" />
                 <span>
                   <span className="flex items-center gap-1.5 font-display font-semibold"><Building2 size={16} strokeWidth={1.7} /> {tx(locale, "¿Eres agencia?", "Are you an agency?")}</span>
@@ -238,7 +238,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
                       await signIn("demo", { email: d.email, redirect: false });
                       finish(d.home);
                     }}
-                    className="flex items-center gap-2 rounded-xl bg-white p-2 text-left text-sm shadow-[inset_0_0_0_1px_#E4DCCD] transition-shadow hover:shadow-[inset_0_0_0_1px_#1A2026]"
+                    className="flex items-center gap-2 rounded-xl bg-white p-2 text-left text-sm outline outline-1 -outline-offset-1 outline-[#E4DCCD] transition-shadow hover:outline hover:outline-1 hover:-outline-offset-1 hover:outline-[#1A2026]"
                   >
                     {busy === d.email ? <Loader2 size={18} className="animate-spin" /> : <Avatar initials={d.initials} hue={d.hue} size={26} />}
                     <span className="font-semibold leading-tight">{tx(locale, d.label.es, d.label.en)}</span>

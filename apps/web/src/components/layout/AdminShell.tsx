@@ -145,7 +145,7 @@ export function AdminShell({
     // Bell = new leads waiting (real count, polled); opens the inbox.
     <Link
       href={`${base}/leads`}
-      className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-navy shadow-[inset_0_0_0_1px_#C9BFAE] hover:bg-white dark:text-ivory dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,.18)] dark:hover:bg-white/5"
+      className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-navy outline outline-1 -outline-offset-1 outline-[#C9BFAE] hover:bg-white dark:text-ivory dark:outline dark:outline-1 dark:-outline-offset-1 dark:outline-[rgba(255,255,255,.18)] dark:hover:bg-white/5"
       aria-label={`${t("notifications")}: ${nNew}`}
     >
       <Bell size={17} strokeWidth={1.7} />
@@ -171,7 +171,7 @@ export function AdminShell({
                 aria-current={active ? "page" : undefined}
                 className={cn(
                   "flex min-h-[38px] items-center gap-3.5 rounded-xl px-4 py-2 text-[14.5px] leading-[22px] transition-colors duration-np",
-                  active ? "bg-[#14243A] text-ivory shadow-[inset_3px_0_0_#C9BFAE]" : "text-ivory/75 hover:bg-white/[.04] hover:text-ivory",
+                  active ? "bg-[#14243A] text-ivory border-l-[3px] border-l-[#C9BFAE]" : "text-ivory/75 hover:bg-white/[.04] hover:text-ivory",
                 )}
               >
                 <i.icon size={18} strokeWidth={1.6} className={active ? "text-ivory" : "text-ivory/70"} />
@@ -242,7 +242,7 @@ export function AdminShell({
                   key={i.href}
                   href={base + i.href}
                   aria-current={active ? "page" : undefined}
-                  className={cn("flex shrink-0 items-center gap-1.5 rounded-[2px] px-3.5 py-2 text-[14px]", active ? "bg-[#14243A] text-ivory shadow-[inset_0_-2px_0_#C9BFAE]" : "text-ivory/70")}
+                  className={cn("flex shrink-0 items-center gap-1.5 rounded-[2px] px-3.5 py-2 text-[14px]", active ? "bg-[#14243A] text-ivory border-b-[2px] border-b-[#C9BFAE]" : "text-ivory/70")}
                 >
                   <i.icon size={15} strokeWidth={1.6} /> {t(i.label)}
                   {(badges[i.href] ?? 0) > 0 && <Count>{badges[i.href]}</Count>}
@@ -331,7 +331,7 @@ function SidebarAccount({ locale, card, children }: { locale: Locale; card: Reac
       }}
     >
       {open && (
-        <div id="np-account-menu" className="np-in absolute inset-x-0 bottom-full z-20 mb-2 space-y-0.5 rounded-np border border-navy-line bg-[#14243A] p-1 shadow-np">
+        <div id="np-account-menu" className="np-in absolute inset-x-0 bottom-full z-20 mb-2 space-y-0.5 rounded-np border border-navy-line bg-[#14243A] p-1 shadow-float">
           {children(close)}
         </div>
       )}

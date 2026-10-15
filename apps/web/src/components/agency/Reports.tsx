@@ -80,7 +80,7 @@ export function ReportsView({ locale, data, days }: { locale: Locale; data: Repo
       area="agency"
       title={tx(locale, "Informes", "Reports")}
       actions={
-        <a href="/api/v1/agency/report" download className={cn("inline-flex h-11 items-center gap-2 rounded-np bg-coral-cta px-4 font-display text-[15px] font-medium text-white shadow-sm transition-colors duration-np hover:bg-coral-cta-hover md:h-10", k.primary)}>
+        <a href="/api/v1/agency/report" download className={cn("inline-flex h-11 items-center gap-2 rounded-np bg-coral-cta px-4 font-display text-[15px] font-medium text-white transition-colors duration-np hover:bg-coral-cta-hover md:h-10", k.primary)}>
           <Download size={16} /> {tx(locale, "Exportar CSV", "Export CSV")}
         </a>
       }

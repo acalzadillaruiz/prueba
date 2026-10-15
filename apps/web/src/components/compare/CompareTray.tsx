@@ -126,7 +126,7 @@ export function CompareTray({ locale }: { locale: Locale }) {
       style={{ bottom: `calc(${inset}px + 0.75rem + ${inset ? "0px" : "env(safe-area-inset-bottom)"})` }}
     >
       {/* Phones: slim bar with the chosen homes. */}
-      <div className="np-glass flex items-center gap-3 rounded-[4px] p-2.5 pl-3 shadow-[0_18px_40px_-16px_rgba(28,29,29,.35)] md:hidden">
+      <div className="np-glass flex items-center gap-3 rounded-[4px] p-2.5 pl-3 md:hidden">
         <ul className="flex shrink-0 gap-1.5" aria-label={tx(locale, "Casas para comparar", "Homes to compare")}>
           {compare.slice(0, 3).map((id) => {
             const l = items.find((x) => x.id === id);
@@ -138,7 +138,7 @@ export function CompareTray({ locale }: { locale: Locale }) {
                   type="button"
                   onClick={() => toggleCompare(id)}
                   aria-label={title ? tx(locale, `Quitar «${title}» del comparador`, `Remove “${title}” from compare`) : tx(locale, "Quitar del comparador", "Remove from compare")}
-                  className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-white text-ink shadow ring-1 ring-black/10 after:absolute after:-inset-2.5 after:content-['']"
+                  className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-white text-ink ring-1 ring-black/10 after:absolute after:-inset-2.5 after:content-['']"
                 >
                   <X size={11} strokeWidth={2.2} aria-hidden />
                 </button>
@@ -168,7 +168,7 @@ export function CompareTray({ locale }: { locale: Locale }) {
       </div>
 
       {/* Tablets and desktop: a compact corner pill (stacked thumbnails · count · view · clear). */}
-      <div className="np-glass hidden items-center gap-2.5 rounded-full py-1.5 pl-1.5 pr-1.5 shadow-[0_18px_40px_-16px_rgba(28,29,29,.35)] md:flex">
+      <div className="np-glass hidden items-center gap-2.5 rounded-full py-1.5 pl-1.5 pr-1.5 md:flex">
         <ul className="flex -space-x-2.5 pl-0.5" aria-hidden>
           {compare.slice(0, 3).map((id) => (
             <li key={id} className="h-9 w-9 rounded-full ring-2 ring-[#F6F2EC]">

@@ -403,7 +403,7 @@ export function PlatformModeration({ locale, reports, listings }: { locale: Loca
                   <Button
                     size="sm"
                     variant={down ? "outline" : "ghost"}
-                    className={down ? k.outline : cn("shadow-[inset_0_0_0_1px_rgb(179_38_30/.35)] hover:bg-[#B3261E0D] dark:shadow-[inset_0_0_0_1px_rgb(243_164_147/.4)] dark:hover:bg-white/5", k.dangerText)}
+                    className={down ? k.outline : cn("outline outline-1 -outline-offset-1 outline-[rgb(179_38_30/.35)] hover:bg-[#B3261E0D] dark:outline dark:outline-1 dark:-outline-offset-1 dark:outline-[rgb(243_164_147/.4)] dark:hover:bg-white/5", k.dangerText)}
                     disabled={busy === l.id}
                     onClick={() => {
                       if (down) void run(l.id, () => api(`platform/listings/${l.id}`, { method: "PATCH", json: { takedown: false } }));
@@ -459,7 +459,7 @@ export function PlatformAI({ locale, settings, fx, counts }: { locale: Locale; s
               ["heuristic", tx(locale, "Reglas internas", "Internal rules"), tx(locale, "Funciona sin servicios externos. Es la opción por defecto.", "Works without outside services. The default.")],
               ["openai-compatible", tx(locale, "Proveedor de IA externo", "External AI provider"), tx(locale, "Un servicio de IA contratado (OpenAI, Groq…). Necesita su clave.", "A paid AI service (OpenAI, Groq…). Needs its key.")],
             ] as const).map(([key, n, d]) => (
-              <button key={key} disabled={busy === "ai"} onClick={() => run("ai", () => api("platform/settings", { method: "PUT", json: { aiProvider: key } }))} aria-pressed={settings.aiProvider === key} className={cn("rounded-[4px] p-4 text-left transition-shadow duration-np", settings.aiProvider === key ? "bg-[#E9E1D3] shadow-[inset_0_0_0_2px_#1A2026] dark:bg-white/10 dark:shadow-[inset_0_0_0_2px_#E9E1D3]" : cn("shadow-[inset_0_0_0_1px_#C9BFAE] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,.15)]", k.hover))}>
+              <button key={key} disabled={busy === "ai"} onClick={() => run("ai", () => api("platform/settings", { method: "PUT", json: { aiProvider: key } }))} aria-pressed={settings.aiProvider === key} className={cn("rounded-[4px] p-4 text-left transition-shadow duration-np", settings.aiProvider === key ? "bg-[#E9E1D3] outline outline-2 -outline-offset-2 outline-[#1A2026] dark:bg-white/10 dark:outline dark:outline-2 dark:-outline-offset-2 dark:outline-[#E9E1D3]" : cn("outline outline-1 -outline-offset-1 outline-[#C9BFAE] dark:outline dark:outline-1 dark:-outline-offset-1 dark:outline-[rgba(255,255,255,.15)]", k.hover))}>
                 <div className="flex items-center justify-between"><span className="font-display text-sm font-semibold">{n}</span>{settings.aiProvider === key && <CheckCircle2 size={16} />}</div>
                 <div className={cn("mt-1 text-xs", k.muted)}>{d}</div>
               </button>

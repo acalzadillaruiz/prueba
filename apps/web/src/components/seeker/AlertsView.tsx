@@ -97,7 +97,7 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
             const title = custom ? s.name : summary;
             const editing = editId === s.id;
             return (
-              <Card key={s.id} data-alert className={cn(k.card, "relative border-0 p-4 transition-shadow hover:shadow-[0_10px_30px_-18px_rgba(28,29,29,.45)]")}>
+              <Card key={s.id} data-alert className={cn(k.card, "relative border-0 p-4 transition-shadow ")}>
                 <div className="flex items-start gap-3.5">
                   <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-egeo/40 text-navy dark:bg-white/10 dark:text-ivory">{s.polygon || /(^|&)(poly|radius)=/.test(s.query) ? <MapPin size={18} strokeWidth={1.6} aria-hidden /> : <Bell size={18} strokeWidth={1.6} aria-hidden />}</span>
                   <div className="min-w-0 flex-1">

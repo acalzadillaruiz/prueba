@@ -554,7 +554,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
           <div role="alert" className="border-t border-line bg-[#B3261E1A] px-4 py-2 text-sm text-danger md:px-5">{alertError}</div>
         )}
         {moreOpen && desktop && (
-          <div ref={morePanel} id="search-more-filters" role="dialog" aria-label={tx(locale, "Más filtros", "More filters")} className="np-in absolute inset-x-0 top-full max-h-[70vh] overflow-y-auto border-b border-line bg-white px-5 py-5 shadow-np">
+          <div ref={morePanel} id="search-more-filters" role="dialog" aria-label={tx(locale, "Más filtros", "More filters")} className="np-in absolute inset-x-0 top-full max-h-[70vh] overflow-y-auto border-b border-line bg-white px-5 py-5 ">
             <MoreFields locale={locale} f={f} set={set} withLux />
             <div className="mt-5 flex items-center justify-end gap-4 border-t border-line pt-4">
               <button type="button" onClick={() => setMoreOpen(false)} className="min-h-11 px-2 font-display text-sm font-semibold underline underline-offset-4">
@@ -723,7 +723,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
             toolbar={
               // Which map: in the tool row (top-left), out of the way of the pins and the docked bar.
               <>
-              <div role="group" aria-label={tx(locale, "Mapa de", "Map of")} className="flex gap-0.5 rounded-full border border-[#E9E1D3] bg-[#ffffff] p-1 font-display text-[13px] text-[#1A2026] shadow-np sm:text-sm">
+              <div role="group" aria-label={tx(locale, "Mapa de", "Map of")} className="flex gap-0.5 rounded-full border border-[#E9E1D3] bg-[#ffffff] p-1 font-display text-[13px] text-[#1A2026] sm:text-sm">
                 {(["caracas", "venezuela"] as const).map((r) => (
                   <button key={r} type="button" onClick={() => setRegionPick(r)} aria-pressed={region === r} className={cn("min-h-9 rounded-[2px] border-2 px-3 sm:px-3.5", region === r ? "np-sel font-semibold" : "border-transparent text-[#1A2026]/70")}>
                     {r === "caracas" ? "Caracas" : "Venezuela"}
@@ -735,7 +735,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
                   type="button"
                   data-map-offregion
                   onClick={() => setRegionPick("venezuela")}
-                  className="flex min-h-11 items-center gap-1 whitespace-nowrap rounded-[2px] border border-[#E9E1D3] bg-[#ffffff] px-3.5 font-display text-[13px] text-[#1A2026] shadow-np sm:text-sm"
+                  className="flex min-h-11 items-center gap-1 whitespace-nowrap rounded-[2px] border border-[#E9E1D3] bg-[#ffffff] px-3.5 font-display text-[13px] text-[#1A2026] sm:text-sm"
                 >
                   <span className="[font-feature-settings:'lnum']">{tx(locale, `${mapListings.length} de ${results.length} en el mapa`, `${mapListings.length} of ${results.length} on the map`)}</span>
                   <span aria-hidden>·</span>
@@ -764,7 +764,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
         )}
         data-search-toggle
       >
-        <div className="pointer-events-auto flex max-w-full overflow-hidden whitespace-nowrap rounded-full bg-[#0E1A2B] font-display text-[15px] font-semibold text-[#F6F2EC] shadow-[0_12px_30px_-8px_rgba(28,29,29,.55)] [html.dark_&]:bg-[#F6F2EC] [html.dark_&]:text-[#1A2026]">
+        <div className="pointer-events-auto flex max-w-full overflow-hidden whitespace-nowrap rounded-full bg-[#0E1A2B] font-display text-[15px] font-semibold text-[#F6F2EC] [html.dark_&]:bg-[#F6F2EC] [html.dark_&]:text-[#1A2026]">
           {view === "list" ? (
             // Nothing found: no map to open (the empty state keeps the whole screen; the comparator stays).
             hasResults && (

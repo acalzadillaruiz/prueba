@@ -63,7 +63,7 @@ export function MenuDrawer({
     // Not lg:hidden: on desktop it only opens from the compact search's menu button (np:open-menu).
     <div className="fixed inset-0 z-[65]" role="dialog" aria-modal="true" aria-label={t("menu")} id="np-mobile-menu">
       <button className="absolute inset-0 bg-navy/60" aria-label={locale === "es" ? "Cerrar menú" : "Close menu"} onClick={() => onClose()} />
-      <div className="np-in absolute inset-y-0 right-0 flex w-[min(340px,88vw)] flex-col bg-navy text-ivory shadow-np" style={{ paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}>
+      <div className="np-in absolute inset-y-0 right-0 flex w-[min(340px,88vw)] flex-col bg-navy text-ivory " style={{ paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}>
         <div className="flex h-[72px] items-center justify-between px-5">
           <Logo tone="ivory" />
           <button autoFocus onClick={() => onClose()} className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-white/10" aria-label={locale === "es" ? "Cerrar menú" : "Close menu"}>

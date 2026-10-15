@@ -71,7 +71,7 @@ export function PlacesSearch({ locale, zones, value, onPick, describedBy }: { lo
           aria-describedby={describedBy}
         />
         {open && suggestions.length > 0 && (
-          <div className="np-in absolute inset-x-0 top-full z-20 mt-1 overflow-hidden rounded-np border border-line bg-white shadow-np" role="listbox">
+          <div className="np-in absolute inset-x-0 top-full z-20 mt-1 overflow-hidden rounded-np border border-line bg-white shadow-float" role="listbox">
             {suggestions.map((z) => (
               <button key={z.slug} role="option" aria-selected={false} onClick={() => pick(z)} className="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-ivory">
                 <MapPin size={17} className="mt-0.5 text-coral" />

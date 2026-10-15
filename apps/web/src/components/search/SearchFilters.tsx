@@ -132,7 +132,7 @@ export function FilterPopover({ label, title, active, open, onOpenChange, childr
         <ChevronDown size={14} aria-hidden className={cn("transition-transform", open && "rotate-180")} />
       </button>
       {open && (
-        <div ref={panel} id={`${id}-pop`} role="dialog" aria-label={title} className={cn("np-in absolute left-0 top-[calc(100%+8px)] z-40 rounded-2xl border border-line bg-white p-4 text-ink shadow-np", width)}>
+        <div ref={panel} id={`${id}-pop`} role="dialog" aria-label={title} className={cn("np-in absolute left-0 top-[calc(100%+8px)] z-40 rounded-2xl border border-line bg-white p-4 text-ink shadow-float", width)}>
           {children}
         </div>
       )}

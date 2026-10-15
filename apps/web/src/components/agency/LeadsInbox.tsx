@@ -399,7 +399,7 @@ export function LeadsInbox({ locale, initial, listings, agents, assignable = [],
             const tint = selId === l.id ? "" : sel?.id === l.id ? "xl" : null;
             const onTint = tint === "" ? "bg-white dark:bg-white/15" : tint === "xl" ? "xl:bg-white xl:dark:bg-white/15" : "";
             return (
-              <div key={l.id} className={cn("flex items-stretch border-b last:border-b-0", k.line, tint === "" ? "bg-[#E9E1D3] shadow-[inset_3px_0_0_#1A2026] dark:bg-white/[.07] dark:shadow-[inset_3px_0_0_#E9E1D3]" : picked.has(l.id) ? k.soft : k.hover, tint === "xl" && "xl:bg-[#E9E1D3] xl:shadow-[inset_3px_0_0_#1A2026] xl:dark:bg-white/[.07] xl:dark:shadow-[inset_3px_0_0_#E9E1D3]")}>
+              <div key={l.id} className={cn("flex items-stretch border-b last:border-b-0", k.line, tint === "" ? "bg-[#E9E1D3] border-l-[3px] border-l-[#1A2026] dark:bg-white/[.07] dark:border-l-[3px] dark:border-l-[#E9E1D3]" : picked.has(l.id) ? k.soft : k.hover, tint === "xl" && "xl:bg-[#E9E1D3] xl:border-l-[3px] xl:border-l-[#1A2026] xl:dark:bg-white/[.07] xl:dark:border-l-[3px] xl:dark:border-l-[#E9E1D3]")}>
               <label className="flex shrink-0 cursor-pointer items-start py-3.5 pl-4 pr-1">
                 <input type="checkbox" className={BOX} checked={picked.has(l.id)} onChange={() => toggle(l.id)} aria-label={tx(locale, `Seleccionar ${l.name}`, `Select ${l.name}`)} />
               </label>
@@ -422,12 +422,12 @@ export function LeadsInbox({ locale, initial, listings, agents, assignable = [],
                   <div className="mt-1 truncate text-sm text-navy/75 dark:text-ivory/70">{l.message}</div>
                   <div className="mt-2 flex flex-wrap items-center gap-2 sm:hidden">
                     {mounted && minsAgo(l.createdAt) < 60 && l.stage === "NEW" && <Pill tone="neutral" className={onTint}>{tx(locale, "Nuevo", "New")}</Pill>}
-                    <Chip className={score < 45 ? "bg-transparent text-muted shadow-[inset_0_0_0_1px_#C9BFAE] dark:text-mist" : onTint}>{tx(locale, "Interés", "Interest")} {score}</Chip>
+                    <Chip className={score < 45 ? "bg-transparent text-muted outline outline-1 -outline-offset-1 outline-[#C9BFAE] dark:text-mist" : onTint}>{tx(locale, "Interés", "Interest")} {score}</Chip>
                     <Sla lead={l} locale={locale} />
                   </div>
                 </div>
                 <div className="hidden flex-col items-end gap-1.5 sm:flex">
-                  <Chip className={score < 45 ? "bg-transparent text-muted shadow-[inset_0_0_0_1px_#C9BFAE] dark:text-mist" : onTint}>{tx(locale, "Interés", "Interest")} {score}</Chip>
+                  <Chip className={score < 45 ? "bg-transparent text-muted outline outline-1 -outline-offset-1 outline-[#C9BFAE] dark:text-mist" : onTint}>{tx(locale, "Interés", "Interest")} {score}</Chip>
                   <Sla lead={l} locale={locale} />
                 </div>
               </button>
@@ -611,7 +611,7 @@ export function LeadsInbox({ locale, initial, listings, agents, assignable = [],
       )}
       {chosen.length > 0 && (
         <div className="sticky bottom-3 z-20 mt-4" role="region" aria-label={tx(locale, "Acciones en lote", "Bulk actions")}>
-          <div className={cn(k.card, "flex flex-wrap items-center gap-2 p-3 shadow-[0_12px_32px_rgba(28,29,29,.18)] ring-1 ring-[#E9E1D3] md:gap-3 md:px-4")}>
+          <div className={cn(k.card, "flex flex-wrap items-center gap-2 p-3 ring-1 ring-[#E9E1D3] md:gap-3 md:px-4")}>
             <span className="text-sm font-semibold">{tx(locale, `${chosen.length} ${chosen.length === 1 ? "lead seleccionado" : "leads seleccionados"}`, `${chosen.length} ${chosen.length === 1 ? "lead" : "leads"} selected`)}</span>
             {manager && assignable.length > 0 && (
               <Select value="" disabled={bulk?.running} onChange={(e) => {

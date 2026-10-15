@@ -113,8 +113,8 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
   const time = (iso: string) => fmt(new Date(iso), { hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
   const weekNav = (
     <>
-      <Link href={`?w=${week - 1}`} className={cn("rounded-full p-1.5 shadow-[inset_0_0_0_1px_#C9BFAE] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,.18)]", k.hover)} aria-label={tx(locale, "Semana anterior", "Previous week")}><ChevronLeft size={18} /></Link>
-      <Link href={`?w=${week + 1}`} className={cn("rounded-full p-1.5 shadow-[inset_0_0_0_1px_#C9BFAE] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,.18)]", k.hover)} aria-label={tx(locale, "Semana siguiente", "Next week")}><ChevronRight size={18} /></Link>
+      <Link href={`?w=${week - 1}`} className={cn("rounded-full p-1.5 outline outline-1 -outline-offset-1 outline-[#C9BFAE] dark:outline dark:outline-1 dark:-outline-offset-1 dark:outline-[rgba(255,255,255,.18)]", k.hover)} aria-label={tx(locale, "Semana anterior", "Previous week")}><ChevronLeft size={18} /></Link>
+      <Link href={`?w=${week + 1}`} className={cn("rounded-full p-1.5 outline outline-1 -outline-offset-1 outline-[#C9BFAE] dark:outline dark:outline-1 dark:-outline-offset-1 dark:outline-[rgba(255,255,255,.18)]", k.hover)} aria-label={tx(locale, "Semana siguiente", "Next week")}><ChevronRight size={18} /></Link>
       <span className={cn(k.titleSm, "inline-block first-letter:uppercase")}>{fmt(days[0], { day: "numeric", month: "short" })} – {fmt(days[6], { day: "numeric", month: "short", year: "numeric" })}</span>
       {week !== 0 && <Link href="?w=0" className={cn("text-sm", k.link)}>{tx(locale, "Hoy", "Today")}</Link>}
     </>
@@ -247,7 +247,7 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
         {/* Side column from 2xl; below it the cards drop under the grid (the week needs the full width up to ~1536 px). */}
         <div className="grid content-start gap-4 md:grid-cols-2 2xl:grid-cols-1">
           {sel && (
-            <div ref={selBox} className={cn("np-in scroll-mt-4 p-5 shadow-[inset_0_0_0_2px_#1A2026] dark:shadow-[inset_0_0_0_2px_#E9E1D3]", k.card)}>
+            <div ref={selBox} className={cn("np-in scroll-mt-4 p-5 outline outline-2 -outline-offset-2 outline-[#1A2026] dark:outline dark:outline-2 dark:-outline-offset-2 dark:outline-[#E9E1D3]", k.card)}>
               <div className="flex items-start justify-between">
                 <div className={k.titleSm}>{sel.title}</div>
                 <button onClick={() => setSel(null)} className={cn("rounded-full p-1", k.hover)} aria-label={tx(locale, "Cerrar", "Close")}><X size={16} /></button>

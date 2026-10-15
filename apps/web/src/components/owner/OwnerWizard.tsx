@@ -345,9 +345,9 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
     }
   };
 
-  const opt = (active: boolean) => cn("rounded-[4px] p-4 text-left transition-shadow duration-np", active ? "bg-[#E9E1D3] shadow-[inset_0_0_0_2px_#1A2026] dark:bg-white/10 dark:shadow-[inset_0_0_0_2px_#E9E1D3]" : "bg-white shadow-[inset_0_0_0_1px_#C9BFAE] hover:shadow-[inset_0_0_0_1px_#1A2026]");
+  const opt = (active: boolean) => cn("rounded-[4px] p-4 text-left transition-shadow duration-np", active ? "bg-[#E9E1D3] outline outline-2 -outline-offset-2 outline-[#1A2026] dark:bg-white/10 dark:outline dark:outline-2 dark:-outline-offset-2 dark:outline-[#E9E1D3]" : "bg-white outline outline-1 -outline-offset-1 outline-[#C9BFAE] hover:outline hover:outline-1 hover:-outline-offset-1 hover:outline-[#1A2026]");
   const stepper = (label: string, v: number, onChange: (n: number) => void) => (
-    <div className="flex items-center justify-between rounded-[4px] bg-white shadow-[0_8px_24px_rgba(28,29,29,.06)] px-4 py-3">
+    <div className="flex items-center justify-between rounded-[4px] bg-white px-4 py-3">
       <span className="font-semibold">{label}</span>
       <div className="flex items-center gap-3">
         <button type="button" aria-label={`${label} −`} onClick={() => onChange(Math.max(0, v - 1))} className="h-8 w-8 rounded-full border border-line text-lg">−</button>
@@ -625,7 +625,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                 })}
               </div>
             </div>
-            <div data-wiz="ess" className="rounded-[4px] bg-white p-5 shadow-[0_8px_24px_rgba(28,29,29,.06)]">
+            <div data-wiz="ess" className="rounded-[4px] bg-white p-5 ">
               <EssentialsFields locale={locale} value={d.ess} onChange={(x) => set({ ess: x })} showErrors={showExtrasErr} />
             </div>
             {!listingType.startsWith("COMMERCIAL") && RESIDENTIAL_KINDS.includes(d.kind) && (
@@ -713,7 +713,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
         {step === 4 && (
           <div className="np-in space-y-5">
             <h1 className="font-serif text-[36px] font-light leading-[1.05] md:text-[44px]">{tx(locale, "Precio y descripción", "Price & description")}</h1>
-            <div className="rounded-[4px] bg-white shadow-[0_8px_24px_rgba(28,29,29,.06)] p-5">
+            <div className="rounded-[4px] bg-white p-5">
               <div className="flex items-center gap-2 font-display font-semibold"><Sparkles size={17} strokeWidth={1.6} /> {tx(locale, "Valor estimado New Place", "PlaceEstimate")} · {zone?.name}</div>
               {estimate ? (
                 <>
@@ -754,7 +754,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               )}
               {fxVes > 0 && d.price > 0 && <div className="mt-2 text-xs text-muted">≈ Bs. {num(Math.round(d.price * fxVes), locale)} ({tx(locale, "tasa referencial", "reference rate")})</div>}
             </div>
-            <div className="rounded-[4px] bg-white shadow-[0_8px_24px_rgba(28,29,29,.06)] p-5">
+            <div className="rounded-[4px] bg-white p-5">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="font-display font-semibold">{tx(locale, "Título y descripción (ES / EN)", "Title & description (ES / EN)")}</div>
                 <Button size="sm" variant="navy" onClick={writeAI} disabled={writing}>
@@ -763,7 +763,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               </div>
               <div className="mt-3 flex gap-2">
                 {(["es", "en"] as Locale[]).map((x) => (
-                  <button key={x} onClick={() => setLang(x)} className={cn("rounded-[2px] px-3 py-0.5 text-xs font-bold", lang === x ? "bg-[#E9E1D3] text-navy shadow-[inset_0_0_0_2px_#1A2026]" : "bg-black/5")}>{x.toUpperCase()}</button>
+                  <button key={x} onClick={() => setLang(x)} className={cn("rounded-[2px] px-3 py-0.5 text-xs font-bold", lang === x ? "bg-[#E9E1D3] text-navy outline outline-2 -outline-offset-2 outline-[#1A2026]" : "bg-black/5")}>{x.toUpperCase()}</button>
                 ))}
               </div>
               <input
@@ -795,7 +795,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                 <DupNotice locale={locale} dup={dup} override={dupOverride} onOverride={() => { setDupOverride(true); setErr(null); }} hasUnit={!!d.unit.trim()} />
               </div>
             )}
-            <div className="overflow-hidden rounded-[4px] bg-white shadow-[0_8px_24px_rgba(28,29,29,.06)]">
+            <div className="overflow-hidden rounded-[4px] bg-white ">
               <div className="grid sm:grid-cols-[260px_1fr]">
                 {files.length ? (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -813,7 +813,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                 </div>
               </div>
             </div>
-            <div className="rounded-[4px] bg-white shadow-[0_8px_24px_rgba(28,29,29,.06)] p-5">
+            <div className="rounded-[4px] bg-white p-5">
               <div className="flex items-center justify-between"><span className="font-display font-semibold">{tx(locale, "Calidad del anuncio", "Listing quality")}</span><span className="font-display text-2xl font-semibold text-ok">{quality}/100</span></div>
               <Progress value={quality} tone="ok" className="mt-2" />
               <ul className="mt-3 grid gap-1.5 text-sm sm:grid-cols-2">
@@ -850,7 +850,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
           data-hide-fab-mobile
           className={cn(
             "mt-8 flex items-center justify-between gap-3 border-t border-line pt-5",
-            "max-md:sticky max-md:z-30 max-md:-mx-4 max-md:mt-6 max-md:bg-ivory max-md:px-4 max-md:pb-[calc(12px+env(safe-area-inset-bottom))] max-md:pt-3 max-md:shadow-[0_-10px_24px_rgba(28,29,29,.08)] dark:max-md:bg-[#0E1A2B]",
+            "max-md:sticky max-md:z-30 max-md:-mx-4 max-md:mt-6 max-md:bg-ivory max-md:px-4 max-md:pb-[calc(12px+env(safe-area-inset-bottom))] max-md:pt-3 max-md:shadow-float dark:max-md:bg-[#0E1A2B]",
             staff ? "max-lg:sticky max-lg:bottom-[calc(57px+env(safe-area-inset-bottom))] max-md:pb-3" : "max-md:bottom-0",
           )}
         >
@@ -868,7 +868,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
 
       <aside className="hidden lg:block">
         <div className="sticky top-24 space-y-4">
-          <div className="overflow-hidden rounded-[4px] bg-white shadow-[0_8px_24px_rgba(28,29,29,.06)]">
+          <div className="overflow-hidden rounded-[4px] bg-white ">
             {files.length ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={previews[cover]} alt="" className="aspect-[4/3] w-full object-cover" />

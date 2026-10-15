@@ -643,7 +643,7 @@ export function NightMap({
             type="button"
             onClick={() => onSelect?.(null)}
             aria-label={tx(locale, "Cerrar vista previa", "Close preview")}
-            className="absolute left-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-[#ffffffe6] text-[#1A2026] shadow-sm"
+            className="absolute left-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-[#ffffffe6] text-[#1A2026] "
           >
             <X size={16} aria-hidden />
           </button>
@@ -651,7 +651,7 @@ export function NightMap({
       )}
       {selected && renderPreview && sheetItems.length > 0 && (
         <div data-map-sheet role="region" aria-label={tx(locale, "Casa seleccionada", "Selected home")} className="np-in pointer-events-auto absolute inset-x-0 z-20 px-3" style={{ bottom: previewInset }}>
-          <div className="np-glass rounded-[4px] p-1.5 shadow-np">
+          <div className="np-glass rounded-[4px] p-1.5 ">
             <div className="flex min-h-11 items-center justify-between gap-2 pl-3">
               <p className="text-[13px] text-muted [font-feature-settings:'lnum']" aria-live="polite">
                 {sheetItems.length > 1 && selIdx >= 0 ? tx(locale, `${selIdx + 1} de ${sheetItems.length} en el mapa · desliza para ver más`, `${selIdx + 1} of ${sheetItems.length} on the map · swipe for more`) : ""}
@@ -678,7 +678,7 @@ export function NightMap({
             type="button"
             onClick={searchHere}
             data-search-area
-            className="np-in pointer-events-auto flex min-h-11 items-center gap-2 whitespace-nowrap rounded-[2px] bg-[#0E1A2B] px-4 font-display text-sm font-semibold text-[#F6F2EC] shadow-[0_12px_30px_-8px_rgba(28,29,29,.55)] [html.dark_&]:bg-[#F6F2EC] [html.dark_&]:text-[#1A2026]"
+            className="np-in pointer-events-auto flex min-h-11 items-center gap-2 whitespace-nowrap rounded-[2px] bg-[#0E1A2B] px-4 font-display text-sm font-semibold text-[#F6F2EC] [html.dark_&]:bg-[#F6F2EC] [html.dark_&]:text-[#1A2026]"
           >
             <Search size={15} aria-hidden /> {tx(locale, "Buscar en esta zona", "Search this area")}
           </button>
@@ -688,7 +688,7 @@ export function NightMap({
       {controls && (
         <>
           <div className="absolute right-3 top-3 z-10 flex flex-col gap-2">
-            <div className={cn("flex flex-col overflow-hidden rounded-xl border shadow-np", ctl)}>
+            <div className={cn("flex flex-col overflow-hidden rounded-xl border ", ctl)}>
               <button aria-label={tx(locale, "Acercar", "Zoom in")} className={cn("flex h-11 w-11 items-center justify-center", ctlHover)} onClick={() => zoom(1.4)}>
                 <Plus size={16} />
               </button>
@@ -699,7 +699,7 @@ export function NightMap({
             <button
               aria-label={theme === "light" ? tx(locale, "Mapa nocturno", "Night map") : tx(locale, "Mapa claro", "Light map")}
               aria-pressed={theme === "night"}
-              className={cn("flex h-11 w-11 items-center justify-center rounded-xl border shadow-np", ctl, ctlHover)}
+              className={cn("flex h-11 w-11 items-center justify-center rounded-xl border ", ctl, ctlHover)}
               onClick={() => setTheme((t) => (t === "night" ? "light" : "night"))}
             >
               {theme === "night" ? <Sun size={16} /> : <Moon size={16} />}

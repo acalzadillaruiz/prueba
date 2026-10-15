@@ -136,7 +136,7 @@ function Performance({ locale, days, rows }: { locale: Locale; days: AuditPeriod
               <button
                 type="button"
                 onClick={() => setSort((s) => ({ ...s, dir: s.dir === 1 ? -1 : 1 }))}
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-navy shadow-[inset_0_0_0_1px_#C9BFAE] dark:text-ivory dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,.18)]"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-navy outline outline-1 -outline-offset-1 outline-[#C9BFAE] dark:text-ivory dark:outline dark:outline-1 dark:-outline-offset-1 dark:outline-[rgba(255,255,255,.18)]"
                 aria-label={sort.dir === 1 ? tx(locale, "Orden ascendente (cambiar a descendente)", "Ascending order (switch to descending)") : tx(locale, "Orden descendente (cambiar a ascendente)", "Descending order (switch to ascending)")}
               >
                 {sort.dir === 1 ? <ArrowUp size={16} aria-hidden /> : <ArrowDown size={16} aria-hidden />}

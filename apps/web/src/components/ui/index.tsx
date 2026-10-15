@@ -88,7 +88,7 @@ export function Badge({ children, tone = "neutral", className }: { children: Rea
     navy: "bg-navy text-ivory",
     mist: "bg-[#A9B1BC2E] text-[#4E453F] dark:text-[#DECEB9]",
     dark: "bg-white/10 text-ivory",
-    exclusive: "bg-white/90 text-[#0E1A2B] shadow-[inset_0_0_0_1px_rgba(31,78,90,.3)]",
+    exclusive: "bg-white/90 text-[#0E1A2B] outline outline-1 -outline-offset-1 outline-[rgba(31,78,90,.3)]",
     egeo: "bg-[#C9BFAE] text-[#0E1A2B]",
     arena: "bg-[#E9E1D3] text-[#1A2026]",
   }[tone];

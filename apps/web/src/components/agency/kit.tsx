@@ -20,8 +20,8 @@ export const kpiGrid5 =
 export const k = {
   /** White card, radius 18, soft navy shadow. */
   /** Last table column stays in view (actions never hide behind a horizontal scroll). */
-  stickyCol: "bg-white shadow-[-14px_0_18px_-14px_rgba(28,29,29,.22)] dark:bg-navy-card",
-  card: "rounded-[4px] bg-white shadow-[0_8px_24px_rgba(28,29,29,.06)] dark:bg-navy-card dark:shadow-none dark:ring-1 dark:ring-white/[.07]",
+  stickyCol: "bg-white dark:bg-navy-card",
+  card: "rounded-[4px] bg-white dark:bg-navy-card dark:shadow-none dark:ring-1 dark:ring-white/[.07]",
   line: "border-[#E6DFD3] dark:border-white/10",
   divide: "divide-[#E6DFD3] dark:divide-white/10",
   muted: "text-muted dark:text-mist",
@@ -63,8 +63,8 @@ export const tab = (on: boolean) =>
   cn(
     "inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 font-display text-[14px] font-medium transition-colors duration-np",
     on
-      ? "bg-[#E9E1D3] text-navy shadow-[inset_0_0_0_2px_#1A2026] dark:bg-white/10 dark:text-ivory dark:shadow-[inset_0_0_0_2px_#E9E1D3]"
-      : "bg-white text-navy/80 shadow-[inset_0_0_0_1px_#C9BFAE] hover:text-navy hover:shadow-[inset_0_0_0_1px_#1A2026] dark:bg-transparent dark:text-ivory/75 dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,.18)] dark:hover:text-ivory",
+      ? "bg-[#E9E1D3] text-navy outline outline-2 -outline-offset-2 outline-[#1A2026] dark:bg-white/10 dark:text-ivory dark:outline dark:outline-2 dark:-outline-offset-2 dark:outline-[#E9E1D3]"
+      : "bg-white text-navy/80 outline outline-1 -outline-offset-1 outline-[#C9BFAE] hover:text-navy hover:outline hover:outline-1 hover:-outline-offset-1 hover:outline-[#1A2026] dark:bg-transparent dark:text-ivory/75 dark:outline dark:outline-1 dark:-outline-offset-1 dark:outline-[rgba(255,255,255,.18)] dark:hover:text-ivory",
   );
 
 /** Counter inside a tab or nav item: neutral, never terracotta. */
@@ -114,8 +114,8 @@ const TONE: Record<Tone, string> = {
   warn: "bg-[#8A5A0014] text-warn dark:bg-[#8A5A0033] dark:text-[#F2C987]",
   danger: "bg-[#B3261E12] text-danger dark:bg-[#B3261E33] dark:text-[#F3B4A3]",
   navy: "bg-navy text-ivory dark:bg-ivory dark:text-navy",
-  muted: "bg-transparent text-muted shadow-[inset_0_0_0_1px_#C9BFAE] dark:text-mist dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,.18)]",
-  exclusive: "bg-white text-coral shadow-[inset_0_0_0_1px_rgb(168_69_42/.3)] dark:bg-transparent dark:text-[#E9E1D3] dark:shadow-[inset_0_0_0_1px_rgb(231_154_127/.4)]",
+  muted: "bg-transparent text-muted outline outline-1 -outline-offset-1 outline-[#C9BFAE] dark:text-mist dark:outline dark:outline-1 dark:-outline-offset-1 dark:outline-[rgba(255,255,255,.18)]",
+  exclusive: "bg-white text-coral outline outline-1 -outline-offset-1 outline-[rgb(168_69_42/.3)] dark:bg-transparent dark:text-[#E9E1D3] dark:outline dark:outline-1 dark:-outline-offset-1 dark:outline-[rgb(231_154_127/.4)]",
 };
 
 /** Status badge: uppercase, tracking .12em; "Exclusiva" carries the roof glyph. */

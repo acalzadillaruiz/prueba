@@ -308,6 +308,8 @@ html.js-reveal [data-reveal="stagger"].is-in > :nth-child(n+3) { transition-dela
 /* ── 043 · Caracas Night type scale (DESIGN.md): six sizes. Cormorant only at ≥ 24 px; nothing read below 13 px.
    In the components layer so a utility (e.g. max-md:text-[30px]) can still adjust one use. ── */
 @layer components {
+/* Hero (043-C): up to 128 px; the floor stays 44 px so «ENTRE EL ÁVILA / Y EL MAR» keeps two lines at 390 px
+   (Cormorant capitals at 56 px need three). */
 .np-t-hero { font-family: var(--font-title); font-weight: 300; font-size: clamp(44px, 9vw, 128px); line-height: .95; letter-spacing: .02em; text-transform: uppercase; text-wrap: balance; }
 /* 043-C · band titles on public pages: big, light Cormorant. */
 .np-t-band { font-family: var(--font-title); font-weight: 300; font-size: clamp(40px, 6vw, 80px); line-height: 1.02; text-wrap: balance; }

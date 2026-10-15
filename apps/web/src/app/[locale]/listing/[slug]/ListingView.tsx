@@ -287,10 +287,10 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
           {/* Desktop: the sticky card never outgrows the viewport (it scrolls inside if a long form opens). The scroller's
               padding is as wide as the card's soft shadow (0 20px 50px -18px), so overflow never clips it into a hard edge. */}
           <aside id="contact" className="scroll-mt-24 lg:sticky lg:top-[84px] lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:-mx-8 lg:-mb-12 lg:-mt-3 lg:max-h-[calc(100dvh-84px)] lg:self-start lg:overflow-y-auto lg:overscroll-contain lg:px-8 lg:pb-12 lg:pt-3">
-            {/* 043 · Airbnb rail: the price in Cormorant 44 px (tabular) and its badge above the visit card, desktop only
+            {/* 043 · Airbnb rail: the price in Cormorant 56 px on desktop (043-C, tabular) and its badge above the visit card, desktop only
                 (phones have the sticky bar with price + «Pedir visita»). */}
             <div className="mb-4 hidden lg:block" data-testid="rail-price">
-              <div className="font-title text-[44px] leading-none text-ink [font-variant-numeric:lining-nums_tabular-nums]">
+              <div className="font-title text-[56px] font-light leading-none text-ink [font-variant-numeric:lining-nums_tabular-nums]">
                 <span className="whitespace-nowrap">{moneyUi(l.priceAmount, locale)}</span>
                 <span className="whitespace-nowrap font-display text-[17px] text-muted">{priceSuffix(l, locale)}</span>
               </div>

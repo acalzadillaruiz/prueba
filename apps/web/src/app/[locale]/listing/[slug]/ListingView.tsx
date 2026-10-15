@@ -54,7 +54,7 @@ function Essentials({ l, locale, title }: { l: Listing; locale: Locale; title: R
   const items = essentialServices(l, locale);
   if (!items.length) return null;
   return (
-    <div className=" py-10" data-testid="essentials">
+    <div className="py-10" data-testid="essentials">
       {title}
       <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {items.map(({ key, label }) => {
@@ -147,7 +147,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
   const ppm = l.listingType === "SALE" || l.listingType === "COMMERCIAL_SALE" ? Math.round(l.priceAmount / Math.max(1, l.areaM2)) : null;
   const soldNearby = soldRows.map((r) => toCard(toDomain(r))).map((o) => ({ t: `${tx(locale, o.title_es, o.title_en)} · ${o.areaM2} m²`, p: o.priceAmount, d: tx(locale, o.status === "SOLD" ? "Vendido" : "Alquilado", o.status === "SOLD" ? "Sold" : "Rented") }));
   const H = ({ children }: { children: React.ReactNode }) => <h3 className="mb-4 font-display text-[20px] font-medium text-ink">{children}</h3>;
-  const sec = " py-10";
+  const sec = "py-10";
   const amenities = amenitiesBeyondEssentials(l);
   const views = viewFeatures(l, locale);
   const tile = "py-1 text-[16px]";
@@ -200,7 +200,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
                   <CompareLink locale={locale} className="hidden md:inline-flex" />
                   <CompareButton id={l.id} locale={locale} className="min-h-11 px-3.5 text-[13px]" />
                   <ShareButton locale={locale} title={tx(locale, l.title_es, l.title_en)} className="inline-flex min-h-11 items-center gap-1.5 rounded-[2px] bg-arena px-3.5 text-[14px] font-medium" />
-                  <SaveButton id={l.id} locale={locale} className="bg-arena" />
+                  <SaveButton id={l.id} locale={locale} className="bg-[#E9E1D3]" />
                 </div>
               </div>
               <div className="lg:flex lg:items-end lg:justify-between lg:gap-12">
@@ -210,7 +210,8 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
                 </div>
                 {/* Desktop: aligned to the title's baseline, but never higher than the title's own top margin: with a one-line
                     title the price block is the taller one, and it used to climb into the Compare/Share row. */}
-                <div className="mt-7 shrink-0 lg:mt-5 lg:pt-1 lg:text-right">
+                {/* Desktop shows the price in the sticky rail instead (one price on screen). */}
+                <div className="mt-7 shrink-0 lg:hidden">
                   {/* Fluid size + nowrap: "USD 118.000" never breaks after the currency at 360 px. */}
                   <div className="font-title text-[clamp(36px,10vw,44px)] leading-none text-ink [font-variant-numeric:lining-nums_tabular-nums] lg:whitespace-nowrap" data-testid="listing-price">
                     <span className="whitespace-nowrap">{moneyUi(l.priceAmount, locale)}</span>
@@ -292,6 +293,11 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
               <div className="font-title text-[44px] leading-none text-ink [font-variant-numeric:lining-nums_tabular-nums]">
                 <span className="whitespace-nowrap">{moneyUi(l.priceAmount, locale)}</span>
                 <span className="whitespace-nowrap font-display text-[17px] text-muted">{priceSuffix(l, locale)}</span>
+              </div>
+              <div className="mt-1.5 text-[14px] text-muted">
+                {stayTerms && <div className="font-semibold text-ink">{stayTerms}</div>}
+                {ppm ? <><span className="whitespace-nowrap">{moneyUi(ppm, locale)} / m²</span> · </> : ""}
+                <span className="whitespace-nowrap">≈ Bs. {num(Math.round(l.priceAmount * ves), locale)}</span> · <span className="whitespace-nowrap">€ {num(Math.round(l.priceAmount * eur), locale)}</span>
               </div>
               <div className="mt-2"><Badge tone={isPriceVerified(l) ? "ok" : "mist"}>{priceBadgeLabel(l, locale)}</Badge></div>
             </div>

@@ -119,7 +119,7 @@ export function ListingCard({ l, locale, compact, className, compareToggle }: { 
         {compareToggle && <CardCompareToggle id={l.id} locale={locale} />}
         {/* Honest label for illustration-only listings. Several photos: dots on the carousel (no static "1/N"). */}
         {!l.photos?.length && (
-          <span className="np-glass pointer-events-none absolute bottom-2.5 right-2.5 z-[2] rounded-full px-2.5 py-0.5 font-display text-[13px] font-medium text-ink">{tx(locale, "Ilustración", "Illustration")}</span>
+          <span className="pointer-events-none absolute bottom-2.5 right-2.5 z-[2] rounded-[2px] bg-[#F6F2EC] px-2.5 py-0.5 font-display text-[13px] font-medium text-[#1A2026]">{tx(locale, "Ilustración", "Illustration")}</span>
         )}
       </div>
       <div className={cn("pb-2 pt-4", compact && "pb-1.5 pt-3.5")}>

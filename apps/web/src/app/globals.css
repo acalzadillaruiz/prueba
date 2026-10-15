@@ -75,7 +75,9 @@ html { -webkit-font-smoothing: antialiased; }
 :is(a, button, [role="button"], [role="tab"], summary, label, select, input) { touch-action: manipulation; -webkit-tap-highlight-color: rgb(14 26 43 / .12); }
 html:not(.dark) { color-scheme: light; }
 html.dark { color-scheme: dark; }
-body { font-family: var(--font-body); font-weight: 400; font-size: 17px; line-height: 1.6; background: var(--np-ivory); color: var(--np-ink); }
+body { font-family: var(--font-body); font-weight: 400; background: var(--np-ivory); color: var(--np-ink); }
+/* Public pages read at body size (17/1.6); panels keep their own dense sizes. */
+.np-public { font-size: 17px; line-height: 1.6; }
 /* Interface text (controls, labels, table cells) reads at Regular like the running text. */
 :is(button, input, select, textarea, label, th, td, nav, [role="tab"], [role="button"]) { font-weight: 400; }
 /* Lining figures everywhere: prices and data align (keeps prices and data aligned). */
@@ -203,7 +205,7 @@ body:has([data-public-header]) [data-demobar] { display: none; }
 .np-card-meta { container-type: inline-size; }
 .np-card-price { font-size: var(--np-pmax, 24px); }
 @supports (width: 1cqi) {
-  .np-card-price { font-size: clamp(16px, calc((100cqi - var(--np-sfx, 0px)) / var(--np-pk, 7)), var(--np-pmax, 24px)); }
+  .np-card-price { font-size: clamp(18px, calc((100cqi - var(--np-sfx, 0px)) / var(--np-pk, 7)), var(--np-pmax, 24px)); }
 }
 
 .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -287,7 +289,7 @@ html.dark .np-public .bg-ink { background-color: #F6F2EC; color: #1A2026; }
    (colSpan panels, empty states) never pin. */
 [data-overflow] .np-sticky-last tr > :last-child:not([colspan]) { position: sticky; right: 0; z-index: 1; background: #fff; }
 html.dark [data-overflow] .np-sticky-last tr > :last-child:not([colspan]) { background: #14243A; }
-html.dark /* Dark mode for the 2035 surfaces: translucent whites become warm translucent darks, inputs stay readable. */
+/* Dark mode for the 2035 surfaces: translucent whites become warm translucent darks, inputs stay readable. */
 html.dark .np-public :is(.bg-white\/85, .bg-white\/75, .bg-white\/70, .bg-white\/50) { background-color: rgb(255 255 255 / .06); }
 html.dark .np-public :is(input, select, textarea) { color: #F6F2EC; }
 html.dark .np-public :is(input, textarea):not([class*="placeholder:text-transp"])::placeholder { color: #A9B1BC; }
@@ -300,7 +302,6 @@ body:has([data-compare-tray]) [data-fab] { transform: translateY(-88px); }
 /* ── 030 · estilo AMALI ─────────────────────────────────────────────────────────
    Public titles: Zetta capitals keep their own spacing and air whatever the component asked for (tight tracking and
    leading were tuned for the old serif). */
-.np-public :is(h1, h2) { letter-spacing: 0; line-height: 1.1; }
 /* Hero loop (043-C): never shown under reduced motion, even if mounted. */
 @media (prefers-reduced-motion: reduce) { .np-hero-video { display: none; } }
 /* Slow, soft motion (fade and lift). */
@@ -313,13 +314,16 @@ body:has([data-compare-tray]) [data-fab] { transform: translateY(-88px); }
 @media (prefers-reduced-motion: reduce) { .np-pre:not([data-reveal="stagger"]), .np-pre[data-reveal="stagger"] > * { opacity: 1 !important; transform: none !important; } }
 :is(h1, h2, h3).font-serif { letter-spacing: 0; }
 
-/* ── 043 · Caracas Night type scale (DESIGN.md): six sizes. Cormorant only at ≥ 24 px; nothing read below 13 px. ── */
-:is(.np-t-hero, .np-public .np-t-hero) { font-family: var(--font-title); font-weight: 300; font-size: clamp(44px, 9vw, 128px); line-height: .95; letter-spacing: .02em; text-transform: uppercase; text-wrap: balance; }
+/* ── 043 · Caracas Night type scale (DESIGN.md): six sizes. Cormorant only at ≥ 24 px; nothing read below 13 px.
+   In the components layer so a utility (e.g. max-md:text-[30px]) can still adjust one use. ── */
+@layer components {
+.np-t-hero { font-family: var(--font-title); font-weight: 300; font-size: clamp(44px, 9vw, 128px); line-height: .95; letter-spacing: .02em; text-transform: uppercase; text-wrap: balance; }
 /* 043-C · band titles on public pages: big, light Cormorant. */
-:is(.np-t-band, .np-public .np-t-band) { font-family: var(--font-title); font-weight: 300; font-size: clamp(40px, 6vw, 80px); line-height: 1.02; text-wrap: balance; }
+.np-t-band { font-family: var(--font-title); font-weight: 300; font-size: clamp(40px, 6vw, 80px); line-height: 1.02; text-wrap: balance; }
 /* 043-C · space between blocks on public pages (panels keep their density). */
 :root { --np-section: clamp(96px, 14vw, 200px); }
 .np-gutter { padding-inline: clamp(20px, 6vw, 96px); }
+}
 :is(.np-t-h1, .np-public .np-t-h1) { font-family: var(--font-title); font-weight: 400; font-size: clamp(34px, 4.5vw, 56px); line-height: 1.08; text-wrap: balance; }
 :is(.np-t-h2, .np-public .np-t-h2) { font-family: var(--font-title); font-weight: 400; font-size: clamp(26px, 3vw, 36px); line-height: 1.15; text-wrap: balance; }
 .np-t-lead { font-family: var(--font-body); font-weight: 300; font-size: 20px; line-height: 1.5; }

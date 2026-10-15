@@ -138,7 +138,7 @@ export function ListingTypeFields({
         <div>
           {title(tx(locale, "Lujo", "Luxury"))}
           <Field label={tx(locale, "Folleto PDF (URL) · opcional", "Brochure PDF (URL) · optional")} error={err("brochurePdf")}>
-            <input className={cls} type="url" inputMode="url" maxLength={500} disabled={disabled} aria-invalid={!!err("brochurePdf")} value={value.brochurePdf} onChange={(e) => set({ brochurePdf: e.target.value })} placeholder="https://…/folleto.pdf…" />
+            <input className={cls} type="url" inputMode="url" maxLength={500} disabled={disabled} aria-invalid={!!err("brochurePdf")} value={value.brochurePdf} onChange={(e) => set({ brochurePdf: e.target.value })} placeholder="https://…/folleto.pdf" />
           </Field>
         </div>
       )}

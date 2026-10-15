@@ -66,7 +66,7 @@ export function StickyContactBar({ locale, price, amount, meta, suffix, tour, st
     <div
       data-sticky-cta={shown ? "shown" : "hidden"}
       data-hide-fab-mobile
-      aria-hidden={!shown}
+      aria-hidden={!shown} inert={!shown}
       className={cn(
         "fixed inset-x-0 bottom-0 z-40 px-4 pt-3 shadow-float transition-transform duration-np ease-out lg:hidden print:hidden",
         dark ? "border-navy-line bg-navy text-ivory" : "border-line bg-white text-ink",

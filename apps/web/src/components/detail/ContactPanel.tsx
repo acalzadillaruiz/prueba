@@ -383,7 +383,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
                   </div>
                 )}
                 {est && (
-                  <div className="mt-1 flex justify-between gap-3 pt-1 font-semibold">
+                  <div className="mt-2 flex justify-between gap-3 border-t border-current/15 pt-2 text-[17px] font-semibold">
                     <span>{tx(locale, "Total estimado", "Estimated total")}</span>
                     <span className="whitespace-nowrap" data-testid="stay-total">{money(est.total, locale)}</span>
                   </div>
@@ -520,12 +520,12 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
               <div className="grid grid-cols-2 gap-2">
                 <div className="min-w-0">
                   <label htmlFor={`${uid}-email`} className={fieldLbl}>Email</label>
-                  <input id={`${uid}-email`} className={field} type="email" placeholder={tx(locale, "tu@correo.com…", "you@example.com…")} autoComplete="email" {...form.register("email")} {...a11y("email")}  spellCheck={false} />
+                  <input id={`${uid}-email`} className={field} type="email" placeholder={tx(locale, "tu@correo.com", "you@example.com")} autoComplete="email" {...form.register("email")} {...a11y("email")}  spellCheck={false} />
                   {fieldErr("email")}
                 </div>
                 <div className="min-w-0">
                   <label htmlFor={`${uid}-phone`} className={fieldLbl}>{tx(locale, "Teléfono", "Phone")} <span className="font-normal">{tx(locale, "(opcional)", "(optional)")}</span></label>
-                  <input id={`${uid}-phone`} className={field} type="tel" placeholder="+58 412…" autoComplete="tel" {...form.register("phone")} {...a11y("phone")} />
+                  <input id={`${uid}-phone`} className={field} type="tel" placeholder="+58 412" autoComplete="tel" {...form.register("phone")} {...a11y("phone")} />
                   {fieldErr("phone")}
                 </div>
               </div>
@@ -538,7 +538,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
                     maxLength={800}
                     value={stayNote}
                     onChange={(e) => setStayNote(e.target.value)}
-                    placeholder={tx(locale, "¿Algo que deba saber?…", "Anything they should know?…")}
+                    placeholder={tx(locale, "¿Algo que deba saber?", "Anything they should know?")}
                   />
                 </div>
               ) : showNote ? (

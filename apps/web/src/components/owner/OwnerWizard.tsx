@@ -351,9 +351,9 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
     <div className="flex items-center justify-between rounded-[4px] bg-white px-4 py-3">
       <span className="font-semibold">{label}</span>
       <div className="flex items-center gap-3">
-        <button type="button" aria-label={`${label} −`} onClick={() => onChange(Math.max(0, v - 1))} className="h-8 w-8 rounded-full border border-line text-lg">−</button>
+        <button type="button" aria-label={`${label} −`} onClick={() => onChange(Math.max(0, v - 1))} className="h-11 w-11 rounded-[2px] border border-line text-lg">−</button>
         <span className="w-5 text-center font-display text-lg">{v}</span>
-        <button type="button" aria-label={`${label} +`} onClick={() => onChange(v + 1)} className="h-8 w-8 rounded-full border border-line text-lg">+</button>
+        <button type="button" aria-label={`${label} +`} onClick={() => onChange(v + 1)} className="h-11 w-11 rounded-[2px] border border-line text-lg">+</button>
       </div>
     </div>
   );
@@ -371,8 +371,8 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
       input.removeAttribute("aria-describedby");
     }
   }, [addrInvalid]);
-  // Photos live only in memory (the text draft autosaves): warn before the tab closes with work in progress.
-  useUnsavedGuard(!done && (step > 0 || files.length > 0));
+  // Photos live only in memory (the text draft autosaves in sessionStorage): warn before the tab closes with photos picked.
+  useUnsavedGuard(!done && files.length > 0);
   if (done)
     return (
       <div className="mx-auto max-w-xl px-4 py-20 text-center" data-testid="owner-published">
@@ -696,9 +696,9 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                     <span className="absolute left-1.5 top-1.5 rounded bg-navy/80 px-1.5 text-[13px] font-bold text-ivory">{i + 1}</span>
                     <button onClick={() => { setFiles(files.filter((_, j) => j !== i)); if (cover >= i && cover > 0) setCover(cover - 1); }} className="absolute right-1.5 top-1.5 rounded-full bg-navy/70 p-0.5 text-white" aria-label={tx(locale, "Quitar", "Remove")}><X size={14} /></button>
                     {cover === i ? (
-                      <span className="absolute bottom-1.5 left-1.5 inline-flex items-center gap-1 rounded-full bg-navy px-2 py-0.5 text-[13px] font-bold text-ivory"><Star size={11} /> {tx(locale, "Portada", "Cover")}</span>
+                      <span className="absolute bottom-1.5 left-1.5 inline-flex items-center gap-1 rounded-[2px] bg-navy px-2 py-0.5 text-[13px] font-bold text-ivory"><Star size={11} /> {tx(locale, "Portada", "Cover")}</span>
                     ) : (
-                      <button onClick={() => setCover(i)} className="absolute bottom-1.5 left-1.5 rounded-full bg-white/90 px-2 py-0.5 text-[13px] font-bold">{tx(locale, "Usar de portada", "Set cover")}</button>
+                      <button onClick={() => setCover(i)} className="absolute bottom-1.5 left-1.5 rounded-[2px] bg-white/90 px-2 py-0.5 text-[13px] font-bold">{tx(locale, "Usar de portada", "Set cover")}</button>
                     )}
                   </div>
                 ))}
@@ -778,7 +778,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               />
               <textarea
                 className={cn(inputCls, "mt-2 h-32 py-2")}
-                placeholder={tx(locale, "Cuenta qué lo hace especial… o deja que la IA te ayude…", "Tell people what makes it special… or let AI help…")}
+                placeholder={tx(locale, "Cuenta qué lo hace especial… o deja que la IA te ayude", "Tell people what makes it special… or let AI help")}
                 aria-label={tx(locale, "Descripción", "Description")}
                 value={lang === "es" ? d.copy.body_es : d.copy.body_en}
                 onChange={(e) => set({ copy: { ...d.copy, [lang === "es" ? "body_es" : "body_en"]: e.target.value } })}
@@ -812,7 +812,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                   <div className="text-sm text-muted" data-testid="review-address">{address}</div>
                   <div className="mt-2 text-sm" data-testid="review-facts">{facts}</div>
                   {extrasSummary && <div className="mt-1 text-sm text-muted">{extrasSummary}</div>}
-                  <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#E9E1D3] px-2.5 py-1 text-[13px] font-semibold uppercase tracking-[.12em] text-navy">{d.mode === "AGENCY" ? tx(locale, "Inventario de la agencia", "Agency inventory") : d.mode === "FSBO" ? tx(locale, "Publicado por el propietario", "Listed by the owner") : tx(locale, "Encargo a agencia", "Agency mandate")}</div>
+                  <div className="mt-3 inline-flex items-center gap-1.5 rounded-[2px] bg-[#E9E1D3] px-2.5 py-1 text-[13px] font-semibold text-navy">{d.mode === "AGENCY" ? tx(locale, "Inventario de la agencia", "Agency inventory") : d.mode === "FSBO" ? tx(locale, "Publicado por el propietario", "Listed by the owner") : tx(locale, "Encargo a agencia", "Agency mandate")}</div>
                 </div>
               </div>
             </div>

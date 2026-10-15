@@ -27,7 +27,7 @@ export function Fold({ title, hint, children, className, testId, openFrom = 1024
           className="group flex min-h-11 w-full items-center gap-4 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ink"
         >
           <span className="min-w-0 flex-1">{title}</span>
-          <span aria-hidden className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-arena transition-colors duration-np group-hover:bg-[#DDD3C2]">
+          <span aria-hidden className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-arena transition-colors duration-np group-hover:bg-arena/60">
             <ChevronDown size={18} strokeWidth={1.8} className={cn("transition-transform duration-300", open && "rotate-180")} />
           </span>
         </button>

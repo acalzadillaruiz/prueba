@@ -132,7 +132,7 @@ export function SettingsView({
             <Field label="WhatsApp" hint={tx(locale, "Se muestra el número para que te escriban directamente.", "The number is shown so people can message you directly.")}><input className={k.input} disabled={!owner} value={b.whatsapp} onChange={(e) => { setB({ ...b, whatsapp: e.target.value }); dirty(); }} /></Field>
             <div className="sm:col-span-2">
               <Field label={tx(locale, "Logo (URL https)", "Logo (https URL)")} hint={tx(locale, "Opcional. Imagen cuadrada; si falta se usan las iniciales.", "Optional. Square image; initials are used when empty.")} error={brandErr.logoUrl ?? undefined}>
-                <input className={k.input} aria-invalid={!!brandErr.logoUrl} type="url" inputMode="url" placeholder="https://…" disabled={!owner} value={b.logoUrl} onChange={(e) => { setB({ ...b, logoUrl: e.target.value }); dirty(); }} />
+                <input className={k.input} aria-invalid={!!brandErr.logoUrl} type="url" inputMode="url" placeholder="https://" disabled={!owner} value={b.logoUrl} onChange={(e) => { setB({ ...b, logoUrl: e.target.value }); dirty(); }} />
               </Field>
             </div>
           </div>

@@ -43,9 +43,12 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
   const [err, setErr] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const [changed, setChanged] = useState(false);
+  // Edits typed while a save is in flight keep the guard: only the version that was sent is cleared.
+  const edits = useRef(0);
   const dirty = () => {
     setSaved(false);
     setChanged(true);
+    edits.current++;
   };
   useUnsavedGuard(changed);
   const extrasCheck = validateExtras(locale, l.listingType, l.luxury, extras);
@@ -74,6 +77,7 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
     }
     setBusy("save");
     setErr(null);
+    const sentAt = edits.current;
     try {
       const p = extrasCheck.payload;
       const typeFields = {
@@ -83,7 +87,7 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
       };
       await api(`listings/${l.id}`, { method: "PATCH", json: { ...copy, ...f, ...essCheck.payload, ...typeFields, virtualTourUrl: (f.hasVirtualTour && tourUrl.trim()) || null } });
       setSaved(true);
-      setChanged(false);
+      if (edits.current === sentAt) setChanged(false);
       router.refresh();
     } catch (e) {
       setErr((e as Error).message);
@@ -191,7 +195,7 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
               <div className="flex items-center gap-2">
                 <h2 className={k.title}>{tx(locale, "Texto de la ficha", "Listing copy")}</h2>
                 {(["es", "en"] as Locale[]).map((x) => (
-                  <button key={x} onClick={() => setLang(x)} aria-pressed={lang === x} className={cn(tab(lang === x), "px-2.5 py-0.5 text-xs font-semibold")}>{x.toUpperCase()}</button>
+                  <button key={x} onClick={() => setLang(x)} aria-pressed={lang === x} className={cn(tab(lang === x), "px-2.5 py-0.5 text-[13px] font-semibold")}>{x.toUpperCase()}</button>
                 ))}
               </div>
               {canEdit && (
@@ -236,7 +240,7 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
               {AMENITIES.map((a) => {
                 const on = f.amenities.includes(a);
                 return (
-                  <button key={a} disabled={!canEdit} onClick={() => { setF({ ...f, amenities: on ? f.amenities.filter((x) => x !== a) : [...f.amenities, a] }); dirty(); }} aria-pressed={on} className={cn(tab(on), "px-3 py-1 text-xs font-semibold")}>
+                  <button key={a} disabled={!canEdit} onClick={() => { setF({ ...f, amenities: on ? f.amenities.filter((x) => x !== a) : [...f.amenities, a] }); dirty(); }} aria-pressed={on} className={cn(tab(on), "px-3 py-1 text-[13px] font-semibold")}>
                     {lbl(AMENITY_LABEL[a], locale)}
                   </button>
                 );
@@ -318,7 +322,7 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
                     <PropertyArt scene={s} seed={i === 0 ? l.id : l.id + (i - 1)} className="aspect-[4/3] w-full" />
                   </div>
                 ))}
-                <p className={cn("col-span-full text-xs", k.muted)}>{tx(locale, "Se muestran ilustraciones de marca mientras no haya fotos reales; no cuentan para la calidad. Sube al menos 8 fotos para +35.", "Brand illustrations are shown until real photos are uploaded; they don’t count towards quality. Upload at least 8 photos for +35.")}</p>
+                <p className={cn("col-span-full text-[13px]", k.muted)}>{tx(locale, "Se muestran ilustraciones de marca mientras no haya fotos reales; no cuentan para la calidad. Sube al menos 8 fotos para +35.", "Brand illustrations are shown until real photos are uploaded; they don’t count towards quality. Upload at least 8 photos for +35.")}</p>
               </div>
             ) : (
               <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">
@@ -332,9 +336,9 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
                       <button onClick={() => move(i, 1)} className="rounded-full bg-navy/85 p-1 text-ivory" aria-label={tx(locale, "Mover después", "Move later")}><ArrowRight size={12} /></button>
                     </div>}
                     {p.isCover ? (
-                      <span className="absolute bottom-1 left-1 rounded-full bg-navy px-1.5 text-[10px] font-bold text-ivory"><Star size={9} className="inline" /> {tx(locale, "Portada", "Cover")}</span>
+                      <span className="absolute bottom-1 left-1 rounded-[2px] bg-navy px-1.5 text-[13px] font-bold text-ivory"><Star size={9} className="inline" /> {tx(locale, "Portada", "Cover")}</span>
                     ) : canPhotos && (
-                      <button onClick={() => photoOp({ cover: p.id })} className="absolute bottom-1 left-1 rounded-full bg-white/90 px-1.5 text-[10px] font-bold text-navy [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 [@media(hover:hover)]:group-focus-within:opacity-100">{tx(locale, "Portada", "Cover")}</button>
+                      <button onClick={() => photoOp({ cover: p.id })} className="absolute bottom-1 left-1 rounded-[2px] bg-white/90 px-1.5 text-[13px] font-bold text-navy [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 [@media(hover:hover)]:group-focus-within:opacity-100">{tx(locale, "Portada", "Cover")}</button>
                     )}
                   </div>
                 ))}
@@ -359,7 +363,7 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
               {checks.map(([ok, t, pts]) => (
                 <li key={t} className={cn("flex items-center gap-2", ok ? "text-navy dark:text-ivory" : k.muted)}>
                   {ok ? <Check size={15} className={k.okText} /> : <span className="h-3.5 w-3.5 rounded-full border-2 border-current" />} {t}
-                  <span className={cn("ml-auto text-xs", k.muted)}>+{pts}</span>
+                  <span className={cn("ml-auto text-[13px]", k.muted)}>+{pts}</span>
                 </li>
               ))}
             </ul>
@@ -374,7 +378,7 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
             <h2 className={cn(k.title, "mb-3")}>{tx(locale, "Rendimiento", "Performance")}</h2>
             <div className="grid grid-cols-2 gap-3 text-sm">
               {[[tx(locale, "Impresiones", "Impressions"), num2(l.stats.impressions, locale)], [tx(locale, "Guardados", "Saves"), l.stats.saves], ["Leads", l.stats.leads], [tx(locale, "Tiempo medio", "Avg. time"), dwell(l.stats.avgTimeSec)], [tx(locale, "Interacciones", "Interactions"), l.stats.interactions], [tx(locale, "Días en mercado", "Days on market"), l.daysOnMarket]].map(([t, v]) => (
-                <div key={String(t)} className={cn("rounded-xl p-3.5", k.soft)}><div className={cn("text-[11px] font-semibold uppercase tracking-[.1em]", k.muted)}>{t}</div><div className={cn(k.num, "mt-1 text-[22px] leading-none")}>{v}</div></div>
+                <div key={String(t)} className={cn("rounded-xl p-3.5", k.soft)}><div className={cn("text-[13px] font-semibold", k.muted)}>{t}</div><div className={cn(k.num, "mt-1 text-[22px] leading-none")}>{v}</div></div>
               ))}
             </div>
           </div>

@@ -477,7 +477,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
               {...suggest.inputProps}
               value={nl}
               enterKeyHint="search"
-              placeholder={tx(locale, "¿Dónde quieres vivir?…", "Where do you want to live?…")}
+              placeholder={tx(locale, "¿Dónde quieres vivir?", "Where do you want to live?")}
               aria-label={tx(locale, "Escribe zona, tipo de casa o presupuesto", "Type an area, a kind of home or a budget")}
               className="h-full min-w-0 flex-1 self-stretch bg-transparent text-[16px] focus:outline-none lg:text-sm"
             />
@@ -585,7 +585,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
             className="scrollbar-thin lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:overscroll-contain"
           >
             {/* one row: count · sort · filters — phones: pinned under the header (follows it as it hides) */}
-            <div className="sticky top-[calc(env(safe-area-inset-top)+var(--np-header-offset,80px)_-_8px)] z-20 flex min-h-[52px] items-center gap-2 bg-ivory px-4 py-1 transition-[top] duration-300 ease-[cubic-bezier(.2,.7,.2,1)] lg:top-0 lg:z-10 lg:px-5">
+            <div className="sticky top-[calc(env(safe-area-inset-top)+var(--np-header-offset,80px)_-_8px)] z-20 flex min-h-[52px] items-center gap-2 bg-arena px-4 py-1 transition-[top] duration-300 ease-[cubic-bezier(.2,.7,.2,1)] lg:top-0 lg:z-10 lg:px-5">
               <div className="flex min-w-0 flex-1 items-center gap-2">
                 <p className="shrink-0 whitespace-nowrap font-serif text-[16px] leading-tight min-[390px]:text-[18px] sm:text-[20px] lg:text-[22px]" aria-live="polite">
                   {notUnderstood ? tx(locale, `${total} casas en total`, `${total} homes in all`) : plural(total, locale, ["resultado", "resultados"], ["result", "results"])}

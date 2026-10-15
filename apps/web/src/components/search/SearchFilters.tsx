@@ -363,7 +363,7 @@ export function FilterSheet({
   const panel = useRef<HTMLDivElement>(null);
   useDismiss(true, onClose, panel, opener, { outside: false });
   const titleId = useId();
-  const section = " px-4 py-5";
+  const section = "px-4 py-5";
   return (
     <div ref={panel} id="search-filters-sheet" role="dialog" aria-modal="true" aria-labelledby={titleId} className="np-in fixed inset-0 z-[70] flex flex-col bg-ivory text-ink lg:hidden">
       <div className="flex h-14 shrink-0 items-center justify-between px-2 pl-4">
@@ -408,7 +408,7 @@ export function FilterSheet({
           <MoreFields locale={locale} f={f} set={set} />
         </div>
       </div>
-      <div className="flex shrink-0 items-center gap-3 bg-ivory px-4 pt-3" style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}>
+      <div className="flex shrink-0 items-center gap-3 bg-arena px-4 pt-3" style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}>
         <button type="button" onClick={onClear} disabled={!activeCount} className="min-h-12 rounded-[2px] px-3 font-display text-[15px] font-semibold underline underline-offset-4 disabled:cursor-default disabled:bg-[#E3DDD3] disabled:text-[#5E5650] disabled:no-underline dark:disabled:bg-white/10 dark:disabled:text-[#CDC5B9]">
           {tx(locale, "Borrar todo", "Clear all")}
         </button>

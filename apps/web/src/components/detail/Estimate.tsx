@@ -32,7 +32,7 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
       {/* Navy valuation panel (brand): range in Cormorant, gold fillet scale, the asking price as a dot. */}
       <div className="np-navy-panel bg-navy px-6 py-7 text-ivory md:px-8">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h3 className="font-display text-[20px] font-medium text-ivory">{tx(locale, "Valor estimado New Place", "PlaceEstimate · Estimated value")}</h3>
+          <h4 className="font-display text-[20px] font-medium text-ivory">{tx(locale, "Valor estimado New Place", "PlaceEstimate · Estimated value")}</h4>
         </div>
         {rough ? (
           <>
@@ -107,7 +107,7 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
               <tbody>
                 {e.comparables.map((c) => {
                   return (
-                    <tr key={c.id} className={cn("", dark ? "" : "")}>
+                    <tr key={c.id} className={cn("border-t", dark ? "border-white/10" : "border-line")}>
                       <td className="px-3 py-2">
                         <div className="line-clamp-2 break-words text-[16px] font-semibold leading-snug">{(locale === "en" && (c as { title_en?: string }).title_en) || c.title}</div>
                         <div className={cn("text-[13px]", muted)}>{c.zone}</div>

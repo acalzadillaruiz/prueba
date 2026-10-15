@@ -77,7 +77,7 @@ export function CardAdvisor({ agent, locale, owner }: { agent: NonNullable<Listi
 /**
  * Price size by the card's own width (container query units, see .np-card-price in globals.css): the price fills the
  * row it has — a 3-column grid at 1280 px gets a smaller "USD 2.300.000" than a phone's full-width card — and never
- * wraps or runs into what follows. The vars give the text's length (in em at ~0.56 em a glyph: Barlow Light figures) and the suffix's room.
+ * wraps or runs into what follows. The vars give the text's length (in em at ~0.56 em a glyph: Jost tabular figures) and the suffix's room.
  */
 const priceVars = (price: string, suffix: string, compact?: boolean) =>
   ({
@@ -124,7 +124,7 @@ export function ListingCard({ l, locale, compact, className, compareToggle }: { 
         )}
       </div>
       <div className={cn("pb-2 pt-4", compact && "pb-1.5 pt-3.5")}>
-        {/* AMALI: the title in spaced capitals with its zone, then the price in Barlow Light. Two lines reserved from md
+        {/* AMALI: the title in spaced capitals with its zone, then the price in Jost tabular. Two lines reserved from md
             so cards in a row stay aligned. */}
         <div className="line-clamp-2 font-display text-[13.5px] font-medium uppercase leading-snug tracking-[.12em] text-ink md:min-h-[2.75em]">
           <Link

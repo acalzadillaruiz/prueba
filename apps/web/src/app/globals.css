@@ -33,12 +33,12 @@
   --np-scrim: rgb(14 26 43 / .55);
   --np-float: 0 8px 24px rgb(14 26 43 / .18);   /* the one shadow: menus, dialogs, sheets, the sticky rail */
   --np-ease: cubic-bezier(.2,.7,.2,1);
-  --font-display: var(--font-barlow), ui-sans-serif, system-ui, sans-serif;   /* interface (buttons, labels) */
-  --font-body: var(--font-barlow), ui-sans-serif, system-ui, sans-serif;
-  /* Prices and numbers: Barlow Light with tabular figures. */
-  --font-serif: var(--font-barlow), ui-sans-serif, system-ui, sans-serif;
-  /* Titles and the "NEW PLACE" wordmark: Lexend Zetta, wide and thin, in capitals. */
-  --font-title: var(--font-josefin), var(--font-barlow), ui-sans-serif, sans-serif;
+  /* Type (043): Jost for interface and text, Cormorant Garamond for display, h1, h2 and the large price (≥ 24 px),
+     Lexend Zetta for the wordmark only. --font-serif is the numbers face (prices, m²): Jost with tabular figures. */
+  --font-display: var(--font-jost), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-jost), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-jost), ui-sans-serif, system-ui, sans-serif;
+  --font-title: var(--font-cormorant), "Times New Roman", serif;
   --font-logo: var(--font-zetta), ui-sans-serif, sans-serif;
   /* rgb channels for Tailwind opacity modifiers (text-ink/60, bg-ivory/90…) */
   --np-navy-rgb: 14 26 43;
@@ -69,24 +69,25 @@
 }
 
 html { -webkit-font-smoothing: antialiased; }
-body { font-family: var(--font-body); font-weight: 300; background: var(--np-ivory); color: var(--np-ink); }
-/* Interface text (controls, labels, table cells) reads at Regular; running text stays Light. */
+body { font-family: var(--font-body); font-weight: 400; background: var(--np-ivory); color: var(--np-ink); }
+/* Interface text (controls, labels, table cells) reads at Regular like the running text. */
 :is(button, input, select, textarea, label, th, td, nav, [role="tab"], [role="button"]) { font-weight: 400; }
 /* Lining figures everywhere: prices and data align (keeps prices and data aligned). */
 * { font-feature-settings: "lnum", "tnum"; }
 .font-display { font-family: var(--font-display); letter-spacing: 0; }
-/* Titles: Lexend Zetta in capitals, wide and thin, like AMALI's «WHERE WATER MIRRORS THE SKY». Zetta is very wide
-   (≈0.92 em per capital), so its size is set by cap height: the capitals are 44 % of the size a component asks for,
-   which keeps every existing title on its line length. Admin panels keep Barlow (dense tables, long names). */
-h1, h2, h3, h1.font-display, h2.font-display, h3.font-display { font-family: var(--font-title); font-weight: 300; letter-spacing: .01em; line-height: 1.15; font-feature-settings: normal; }
-/* Small section headings in Barlow capitals (AMALI's «BENEATH THE CLOUDS»): add .np-sub to an h2/h3. */
+/* Titles (043): h1 and h2 in Cormorant Garamond 400 (the hero sets 300); h3 and anything under 24 px stays in Jost
+   (Cormorant's small x-height reads poorly small). Admin panels keep Jost throughout. */
+h1, h2, h1.font-display, h2.font-display { font-family: var(--font-title); font-weight: 400; letter-spacing: 0; line-height: 1.1; font-feature-settings: "lnum"; }
+h3, h3.font-display { font-family: var(--font-display); font-weight: 500; letter-spacing: 0; line-height: 1.25; }
+/* Small section headings in Jost capitals: add .np-sub to an h2/h3. */
 :is(h1, h2, h3).np-sub { font-family: var(--font-display); font-weight: 500; letter-spacing: .14em !important; font-size-adjust: none; line-height: 1.3 !important; }
 :is([data-admin], .np-admin) :is(h1, h2) { font-family: var(--font-display); font-weight: 500; text-transform: none; letter-spacing: 0; font-size-adjust: none; line-height: 1.2; }
 h1, h2, h3 { text-wrap: balance; }
-/* Prices and figures: Barlow Light, tabular. */
-.font-serif { font-family: var(--font-serif); font-weight: 300; letter-spacing: .01em; font-variant-numeric: lining-nums tabular-nums; }
+p { text-wrap: pretty; }
+/* Prices and figures: Jost, tabular. */
+.font-serif { font-family: var(--font-serif); font-weight: 400; letter-spacing: 0; font-variant-numeric: lining-nums tabular-nums; }
 .font-logo { font-family: var(--font-logo); font-weight: 200; }
-/* Numbers that must read unambiguously (prices, counts, m², nights): Barlow, lining + tabular so columns align. */
+/* Numbers that must read unambiguously (prices, counts, m², nights): Jost, lining + tabular so columns align. */
 .np-num { font-family: var(--font-serif); font-variant-numeric: lining-nums tabular-nums; font-feature-settings: "lnum", "tnum"; }
 /* Labels in capitals with wide tracking, like AMALI's «BENEATH THE CLOUDS». */
 .np-label { font-family: var(--font-display); font-size: 12px; font-weight: 500; letter-spacing: .2em; text-transform: uppercase; }
@@ -391,7 +392,7 @@ body:has([data-compare-tray]) [data-fab] { transform: translateY(-88px); }
 /* ── 030 · estilo AMALI ─────────────────────────────────────────────────────────
    Public titles: Zetta capitals keep their own spacing and air whatever the component asked for (tight tracking and
    leading were tuned for the old serif). */
-.np-public :is(h1, h2) { letter-spacing: .01em !important; line-height: 1.15 !important; }
+.np-public :is(h1, h2) { letter-spacing: 0; line-height: 1.1; }
 /* Hero photo: a very slow Ken Burns (1 → 1.06 over 20 s), never under reduced motion. */
 @keyframes np-kenburns { from { transform: scale(1); } to { transform: scale(1.06); } }
 .np-hero-photo { transform-origin: 60% 50%; animation: np-kenburns 20s ease-out forwards; }
@@ -404,4 +405,4 @@ body:has([data-compare-tray]) [data-fab] { transform: translateY(-88px); }
 .np-pre.is-in[data-reveal="stagger"] > :nth-child(2) { transition-delay: .08s; } .np-pre.is-in[data-reveal="stagger"] > :nth-child(3) { transition-delay: .16s; }
 .np-pre.is-in[data-reveal="stagger"] > :nth-child(4) { transition-delay: .24s; } .np-pre.is-in[data-reveal="stagger"] > :nth-child(n+5) { transition-delay: .32s; }
 @media (prefers-reduced-motion: reduce) { .np-pre:not([data-reveal="stagger"]), .np-pre[data-reveal="stagger"] > * { opacity: 1 !important; transform: none !important; } }
-:is(h1, h2, h3).font-serif { letter-spacing: .01em !important; }
+:is(h1, h2, h3).font-serif { letter-spacing: 0; }

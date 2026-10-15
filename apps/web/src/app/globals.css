@@ -301,10 +301,8 @@ body:has([data-compare-tray]) [data-fab] { transform: translateY(-88px); }
    Public titles: Zetta capitals keep their own spacing and air whatever the component asked for (tight tracking and
    leading were tuned for the old serif). */
 .np-public :is(h1, h2) { letter-spacing: 0; line-height: 1.1; }
-/* Hero photo: a very slow Ken Burns (1 → 1.06 over 20 s), never under reduced motion. */
-@keyframes np-kenburns { from { transform: scale(1); } to { transform: scale(1.06); } }
-.np-hero-photo { transform-origin: 60% 50%; animation: np-kenburns 20s ease-out forwards; }
-@media (prefers-reduced-motion: reduce) { .np-hero-photo { animation: none; } }
+/* Hero loop (043-C): never shown under reduced motion, even if mounted. */
+@media (prefers-reduced-motion: reduce) { .np-hero-video { display: none; } }
 /* Slow, soft motion (fade and lift). */
 /* Reveal (HomeMotion): primed blocks fade and lift in when they reach the screen; children of a "stagger" block
    follow one another. Without the motion layer nothing is primed, so everything is simply visible. */

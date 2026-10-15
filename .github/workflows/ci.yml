@@ -33,6 +33,8 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: npm run db:setup
       - run: npm run lint
+      - name: Media budget (videos < 3 MB, posters < 150 KB)
+        run: node apps/web/scripts/check-media-size.mjs
       - run: npm run typecheck -w apps/web
       - run: npm test
       - run: npm run build

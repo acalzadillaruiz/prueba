@@ -9,6 +9,12 @@ const intl = createIntlMiddleware(routing);
 
 const { auth } = NextAuth(authConfig);
 
+/** 043-C: a visitor asking to save data (Save-Data: on) gets a readable cookie, so the hero never loads its video. */
+function saveData<T extends NextResponse | Response>(req: Request, res: T): T {
+  if ((req.headers.get("save-data") ?? "").toLowerCase() === "on" && res instanceof NextResponse) res.cookies.set("np-save-data", "1", { path: "/", sameSite: "lax", maxAge: 60 * 60 * 24 });
+  return res;
+}
+
 const AGENCY_ROLES = ["AGENCY_OWNER", "AGENT", "CAPTOR", "PHOTOGRAPHER", "BACKOFFICE", "SUPERADMIN"];
 
 export default auth(async (req) => {
@@ -28,7 +34,7 @@ export default auth(async (req) => {
   if (isApi) return NextResponse.next();
   const m = pathname.match(/^\/(es|en)\/(agency|platform|owner|app|account|saved|alerts|preview)(\/|$)/);
   // locale detection / prefixing (Accept-Language + NEXT_LOCALE cookie)
-  if (!m) return intl(req);
+  if (!m) return saveData(req, intl(req));
   const [, locale, area] = m;
   const user = req.auth?.user;
   const login = new URL(`/${locale}/login`, req.url);

@@ -15,7 +15,8 @@
     "vercel-build": "cd ../.. && npm run generate -w packages/db && npm run db:setup && cd apps/web && next build",
     "audit:taste": "node ../../.agents/skills/design-taste-frontend/scripts/lint.mjs src",
     "audit:inspect": "CHROME_PATH=${CHROME_PATH:-/opt/pw-browsers/chromium} node ../../.agents/skills/design-taste-frontend/scripts/inspect.mjs",
-    "audit:ui": "node scripts/audit-ui.mjs"
+    "audit:ui": "node scripts/audit-ui.mjs",
+    "check:media": "node scripts/check-media-size.mjs"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.3",

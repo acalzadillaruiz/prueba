@@ -12,7 +12,10 @@
     "photos": "tsx scripts/gen-photos.ts",
     "test": "vitest run",
     "e2e": "playwright test",
-    "vercel-build": "cd ../.. && npm run generate -w packages/db && npm run db:setup && cd apps/web && next build"
+    "vercel-build": "cd ../.. && npm run generate -w packages/db && npm run db:setup && cd apps/web && next build",
+    "audit:taste": "node ../../.agents/skills/design-taste-frontend/scripts/lint.mjs src",
+    "audit:inspect": "CHROME_PATH=${CHROME_PATH:-/opt/pw-browsers/chromium} node ../../.agents/skills/design-taste-frontend/scripts/inspect.mjs",
+    "audit:ui": "node scripts/audit-ui.mjs"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.3",
@@ -47,6 +50,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.7",
+    "@playwright/cli": "^0.1.22",
     "@playwright/test": "1.56.1",
     "@types/google.maps": "^3.66.4",
     "@types/node": "^22",

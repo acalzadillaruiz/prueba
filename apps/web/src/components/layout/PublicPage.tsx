@@ -26,7 +26,7 @@ export function PublicPage({
   contact?: { href: string; label: string; whatsapp?: boolean };
 }) {
   return (
-    <div className={cn("np-public min-h-screen", tabbar && "pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0")}>
+    <div className={cn("np-public min-h-svh", tabbar && "pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0")}>
       <PublicHeader locale={locale} variant={header} autoHide />
       <main id="main">{children}</main>
       {footer && <PublicFooter locale={locale} />}

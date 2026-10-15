@@ -15,6 +15,8 @@ export const viewport: Viewport = {
     { media: "(prefers-color-scheme: light)", color: "#F6F2EC" },
     { media: "(prefers-color-scheme: dark)", color: "#0E1A2B" },
   ],
+  // 043: the site supports both schemes (meta color-scheme); globals.css pins the one actually shown (html.dark or not).
+  colorScheme: "light dark",
   width: "device-width", initialScale: 1, viewportFit: "cover" };
 
 /**
@@ -96,7 +98,7 @@ export default async function LocaleLayout({ children, params }: { children: Rea
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdHtml(siteJsonLd(locale)) }} />
       </head>
-      <body className="min-h-screen">
+      <body className="min-h-svh">
         <NextIntlClientProvider>
           <AppStateProvider>
             {children}

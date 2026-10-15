@@ -14,7 +14,7 @@ export default function ErrorPage({ error, reset }: { error: Error & { digest?: 
     if (process.env.NEXT_PUBLIC_SENTRY_DSN) import("@sentry/nextjs").then((S) => S.captureException(error));
   }, [error]);
   return (
-    <main id="main" className="np-public flex min-h-screen flex-col items-center justify-center px-6 py-16 text-center">
+    <main id="main" className="np-public flex min-h-svh flex-col items-center justify-center px-6 py-16 text-center">
       <Logo size="lg" animate />
       <h1 className="mt-14 max-w-xl text-[40px] leading-tight md:text-[48px]">{t("error")}</h1>
       <p className="mt-3 max-w-sm text-[16px] text-muted">{t("errorBody")}</p>

@@ -111,7 +111,7 @@ test.describe.serial("Criterios de aceptación §15", () => {
     const m = await r.json();
     expect(m.name).toBe("New Place");
     expect(m.display).toBe("standalone");
-    expect(m.theme_color).toBe("#F6F2EC"); // Travertino (light-first)
+    expect(m.theme_color).toBe("#0E1A2B"); // Caracas Night (043): the PWA chrome is night
     expect(m.id).toBe("/");
     // start_url lets the middleware pick the visitor's language (/es or /en)
     const start = await request.get(m.start_url);

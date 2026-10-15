@@ -13,7 +13,7 @@ export function OfflineScreen({ locale }: { locale: Locale }) {
   const [saved, setSaved] = useState<OfflineCard[]>([]);
   useEffect(() => setSaved(readSavedOffline()), []);
   return (
-    <main id="main" lang={locale} className="flex min-h-screen flex-col items-center justify-center gap-4 bg-navy px-6 py-16 text-center text-ivory">
+    <main id="main" lang={locale} className="flex min-h-svh flex-col items-center justify-center gap-4 bg-navy px-6 py-16 text-center text-ivory">
       <Logo tone="ivory" size="lg" animate />
       <WifiOff className="mt-10 text-[#E9E1D3]" size={30} aria-hidden />
       <h1 className="text-[36px] leading-tight md:text-[44px]">{tx(locale, "Estás sin conexión", "You’re offline")}</h1>

@@ -153,7 +153,7 @@ export function AdminShell({
     </Link>
   );
   return (
-    <div data-admin className={cn("min-h-screen bg-ivory text-navy dark:bg-[#0E1A2B] dark:text-ivory", k.darkVars)}>
+    <div data-admin className={cn("min-h-svh bg-ivory text-navy dark:bg-[#0E1A2B] dark:text-ivory", k.darkVars)}>
       {/* Laptop heights (1024×768, 1280×720): compact logo block, 38 px rows and a one-row footer, so every section shows
           without the nav scrolling; secondary actions live in the account menu at the bottom. */}
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-[264px] flex-col bg-navy text-ivory lg:flex">

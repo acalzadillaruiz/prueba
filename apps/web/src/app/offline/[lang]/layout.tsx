@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { fontVars } from "../../fonts";
 import "../../globals.css";
 
-export const viewport: Viewport = { themeColor: "#1A2026", width: "device-width", initialScale: 1, viewportFit: "cover" };
+export const viewport: Viewport = { themeColor: "#0E1A2B", width: "device-width", initialScale: 1, viewportFit: "cover" };
 export const metadata: Metadata = { title: "Offline · New Place", robots: { index: false, follow: false }, manifest: "/manifest.webmanifest" };
 
 /** Standalone root layout: the offline fallback must render with no session, data or locale middleware. */
@@ -10,7 +10,7 @@ export default async function OfflineLayout({ children, params }: { children: Re
   const { lang } = await params;
   return (
     <html lang={lang === "en" ? "en" : "es"} className={fontVars}>
-      <body className="min-h-screen">{children}</body>
+      <body className="min-h-svh">{children}</body>
     </html>
   );
 }

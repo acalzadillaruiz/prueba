@@ -11,8 +11,8 @@ export default function GlobalError({ error, reset }: { error: Error & { digest?
   }, [error]);
   return (
     <html lang="es">
-      <body className="min-h-screen bg-ivory text-ink">
-        <main id="main" className="flex min-h-screen flex-col items-center justify-center gap-4 px-6 text-center">
+      <body className="min-h-svh bg-ivory text-ink">
+        <main id="main" className="flex min-h-svh flex-col items-center justify-center gap-4 px-6 text-center">
           <h1 className="font-display text-3xl font-semibold">New Place</h1>
           <p className="max-w-sm text-ink/70">Algo no salió bien de nuestro lado. Inténtalo otra vez en unos segundos. · Something went wrong on our side. Please try again in a moment.</p>
           {error.digest && <code className="text-xs text-muted">{error.digest}</code>}

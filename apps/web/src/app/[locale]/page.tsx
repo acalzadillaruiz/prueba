@@ -229,8 +229,7 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
       {/* THE PROMISE — a solid Taupe block with light text (AMALI's quote blocks). */}
       <section className="bg-[#6B5D52] text-[#F6F2EC]" aria-label={tx(locale, "Nuestra promesa", "Our promise")}>
         <div className="mx-auto max-w-[1100px] px-6 py-14 text-center md:px-10 md:py-20">
-          <p className="font-display text-[13px] font-medium text-[#F6F2EC]/80">New Place</p>
-          <blockquote className="mx-auto mt-5 max-w-[820px] font-title text-[24px] font-light leading-[1.25] tracking-[.01em] md:text-[34px]">
+          <blockquote className="mx-auto max-w-[820px] font-title text-[24px] font-light leading-[1.25] tracking-[.01em] md:text-[34px]">
             {tx(
               locale,
               "Pocas casas, bien elegidas. Sabemos lo que valen y te acompañamos hasta las llaves.",

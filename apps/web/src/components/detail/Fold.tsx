@@ -22,18 +22,18 @@ export function Fold({ title, hint, children, className, testId, openFrom = 1024
           type="button"
           aria-expanded={open}
           aria-controls={id}
+          aria-describedby={hint && !open ? `${id}-hint` : undefined}
           onClick={() => setOpen((o) => !o)}
           className="group flex min-h-11 w-full items-center gap-4 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ink"
         >
-          <span className="min-w-0 flex-1">
-            {title}
-            {hint && !open && <span className="mt-1 block font-display text-[14px] leading-snug text-muted">{hint}</span>}
-          </span>
+          <span className="min-w-0 flex-1">{title}</span>
           <span aria-hidden className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-arena transition-colors duration-np group-hover:bg-[#DDD3C2]">
             <ChevronDown size={18} strokeWidth={1.8} className={cn("transition-transform duration-300", open && "rotate-180")} />
           </span>
         </button>
       </h3>
+      {/* The hint sits under the heading (not inside it), so the heading itself stays short. */}
+      {hint && !open && <p id={`${id}-hint`} className="mt-1 pr-14 font-display text-[14px] leading-snug text-muted">{hint}</p>}
       <div id={id} hidden={!open} className="pt-5">
         {children}
       </div>

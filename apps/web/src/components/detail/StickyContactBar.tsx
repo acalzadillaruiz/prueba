@@ -13,7 +13,7 @@ import { useListingWhatsApp } from "./useListingWhatsApp";
 
 /**
  * Phone + tablet (below lg, where the contact card is not beside the content) bottom bar on the listing detail: price + "Request a tour" that jumps to the contact panel.
- * Hidden while the panel itself or the footer is on screen, so it never covers them. On listing pages it also carries the
+ * Hidden while the panel itself, the header price or the footer is on screen, so it never covers them. On listing pages it also carries the
  * comparator (a slim chip on top) instead of a floating tray over the form, and the floating contact buttons stay
  * hidden while it is up ([data-hide-fab-mobile]).
  */
@@ -23,7 +23,8 @@ export function StickyContactBar({ locale, price, amount, meta, suffix, tour, st
   const { compare } = useApp();
   const [shown, setShown] = useState(true);
   useEffect(() => {
-    const targets = [document.getElementById("contact"), document.querySelector("footer")].filter((el): el is HTMLElement => !!el);
+    // 043: also stays down while the header price is on screen (never two prices, never over the first one).
+    const targets = [document.getElementById("contact"), document.querySelector("footer"), document.querySelector("[data-testid=listing-price]")].filter((el): el is HTMLElement => !!el);
     if (!targets.length || typeof IntersectionObserver === "undefined") return;
     const visible = new Set<Element>();
     const io = new IntersectionObserver((entries) => {

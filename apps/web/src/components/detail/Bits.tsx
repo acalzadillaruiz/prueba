@@ -10,7 +10,9 @@ export function BilingualBody({ l, locale, dark }: { l: Listing; locale: Locale;
   const [lang, setLang] = useState<Locale>(locale);
   return (
     <div>
-      <div className="mb-3 flex items-center gap-2">
+      {/* The title is already the page's H1: this section is the description. */}
+      <h2 className="np-t-h2">{tx(locale, "Descripción", "Description")}</h2>
+      <div className="mb-1 mt-2 flex items-center gap-2">
         <Languages size={16} className={dark ? "text-mist" : "text-muted"} />
         {(["es", "en"] as Locale[]).map((x) => (
           // 44 px tap area around the small pill
@@ -20,14 +22,12 @@ export function BilingualBody({ l, locale, dark }: { l: Listing; locale: Locale;
         ))}
         <span className={cn("text-sm", dark ? "text-mist" : "text-muted")}>{tx(locale, "En español e inglés", "In Spanish and English")}</span>
       </div>
-      {/* The title is already the page's H1: this section is the description. */}
-      <h2 className="np-t-h2 font-serif">{tx(locale, "Descripción", "Description")}</h2>
       {lang !== locale && (
         <p lang={lang} className="mt-2 text-[17px] font-semibold">
           {lang === "es" ? l.title_es : l.title_en}
         </p>
       )}
-      <p lang={lang} className={cn("mt-3 max-w-[680px] text-[16px] leading-[1.75]", dark ? "text-ivory/80" : "text-ink/80")}>{lang === "es" ? l.body_es : l.body_en}</p>
+      <p lang={lang} className={cn("np-t-body mt-3 max-w-[680px]", dark ? "text-ivory" : "text-ink")}>{lang === "es" ? l.body_es : l.body_en}</p>
     </div>
   );
 }

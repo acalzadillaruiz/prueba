@@ -11,7 +11,7 @@ import { factsLine } from "@/components/listing/ListingCard";
 import { SaveButton } from "@/components/listing/bits";
 import { publicListings } from "@/server/listings";
 import { prisma } from "@newplace/db";
-import { money, tx, moneyUi } from "@/lib/i18n";
+import { tx, moneyUi } from "@/lib/i18n";
 import { pageMeta } from "@/lib/seo";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }) {

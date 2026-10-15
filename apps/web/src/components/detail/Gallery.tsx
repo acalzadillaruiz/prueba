@@ -17,6 +17,7 @@ const safeTour = (u?: string | null) => (u && /^https:\/\//i.test(u) ? u : null)
 export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: boolean }) {
   const [open, setOpen] = useState(false);
   const [i, setI] = useState(0);
+  const [tab, setTab] = useState<Tab>("photos");
   const opener = useRef<HTMLElement | null>(null);
   // Real uploaded photos replace the illustrations entirely (no mixing, no empty cells).
   const illustrated = !l.photos?.length;
@@ -29,13 +30,12 @@ export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: bo
   // Descriptive alt for the photos shown on their own (title + zone); thumbnails inside labelled buttons stay decorative.
   const alt = `${tx(locale, l.title_es, l.title_en)}, ${l.zone}`;
   const tour = safeTour(l.virtualTourUrl);
-  const dialog = useRef<HTMLDivElement>(null);
+  const dialog = useRef<HTMLDialogElement>(null);
   const swipe = useRef<{ x: number; y: number } | null>(null);
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
-      else if (e.key === "ArrowRight") setI((x) => (x + 1) % total);
+      if (e.key === "ArrowRight") setI((x) => (x + 1) % total);
       else if (e.key === "ArrowLeft") setI((x) => (x - 1 + total) % total);
       else if (e.key === "Tab" && dialog.current) {
         // Focus trap: Tab / Shift+Tab cycle inside the viewer.
@@ -55,6 +55,7 @@ export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: bo
     };
     document.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
+    if (dialog.current && !dialog.current.open) dialog.current.showModal();
     return () => {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = "";
@@ -62,6 +63,22 @@ export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: bo
       opener.current?.focus();
     };
   }, [open, total]);
+  // Deep link (043-C): ?foto=3 opens the viewer on the third photo; the URL follows the photo shown and is cleaned on close.
+  useEffect(() => {
+    const n = Number(new URLSearchParams(window.location.search).get("foto"));
+    if (Number.isInteger(n) && n >= 1 && n <= total) {
+      setI(n - 1);
+      setTab("photos");
+      setOpen(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (open && tab === "photos") url.searchParams.set("foto", String(i + 1));
+    else url.searchParams.delete("foto");
+    if (url.href !== window.location.href) window.history.replaceState(window.history.state, "", url);
+  }, [open, tab, i]);
   const onTouchStart = (e: React.TouchEvent) => {
     const t = e.touches[0];
     swipe.current = t ? { x: t.clientX, y: t.clientY } : null;
@@ -77,7 +94,6 @@ export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: bo
     if (Math.abs(dx) < 45 || Math.abs(dx) < Math.abs(dy) * 1.3) return;
     setI((x) => (dx < 0 ? (x + 1) % total : (x - 1 + total) % total));
   };
-  const [tab, setTab] = useState<Tab>("photos");
   // Phone hero carousel: the photo on screen, and how many are mounted (the first up front, then one step ahead).
   const track = useRef<HTMLDivElement>(null);
   const [idx, setIdx] = useState(0);
@@ -98,17 +114,15 @@ export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: bo
   const tag = illustrated && (
     <span className="pointer-events-none absolute bottom-4 left-4 np-glass rounded-[2px] px-3 py-1 font-display text-[13px] text-ink">{tx(locale, "Ilustración · aún sin fotos reales", "Illustration · real photos to come")}</span>
   );
-  const thumbs = shots.slice(1, 5);
-  const allLabel = illustrated ? tx(locale, `Ver las ${total} ilustraciones`, `View all ${total} illustrations`) : tx(locale, `Ver las ${total} fotos`, `View all ${total} photos`);
-  // With three pictures or fewer every one is already on screen: no "Ver las 3 fotos" overlay.
-  const showAll = total > 3;
-  const chip = "inline-flex min-h-11 items-center gap-1.5 rounded-[2px] border border-ink/10 bg-white/75 px-4 font-display text-sm text-ink transition-colors duration-np hover:border-navy/40";
+    const allLabel = illustrated ? tx(locale, `Ver las ${total} ilustraciones`, `View all ${total} illustrations`) : tx(locale, `Ver las ${total} fotos`, `View all ${total} photos`);
+  const chip = "inline-flex min-h-11 items-center gap-1.5 rounded-[2px] bg-arena px-4 font-display text-[15px] text-ink transition-colors duration-np ease-np hover:bg-[#DDD3C2]";
   return (
     <>
       {/* Main photo with the brand's arched top-left corner; four thumbnails on the right (desktop). Phones: the main photo
           is a swipeable scroll-snap carousel of every picture (dots + "1 / N"); a tap opens the viewer on the photo shown. */}
-      <div className={cn("grid h-[320px] gap-3 sm:h-[420px] md:h-[min(540px,60vh)] lg:h-[clamp(380px,55vh,600px)]", thumbs.length > 0 && "md:grid-cols-2")}>
-        <div className="relative overflow-hidden rounded-[4px] bg-arena" data-testid="gallery-hero">
+      {/* 043-C: the first photo edge to edge, 100vw × 80svh (70svh on phones); «Ver las N fotos» opens the viewer. */}
+      <div className="relative ml-[calc(50%-50vw)] h-[70svh] w-screen md:h-[80svh]">
+        <div className="relative h-full overflow-hidden bg-arena" data-testid="gallery-hero">
           <div
             ref={track}
             onTouchStart={() => ahead(idx)}
@@ -128,6 +142,7 @@ export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: bo
                 // Only the photo on screen is in the tab order; from md up only the first one exists (thumbnails do the rest).
                 tabIndex={n === idx ? 0 : -1}
                 className={cn("relative block h-full w-full shrink-0 snap-start snap-always overflow-hidden", n > 0 && "md:hidden")}
+                aria-label={n === 0 ? undefined : view(n + 1)}
               >
                 <span className="sr-only">{view(n + 1)}</span>
                 {n < loaded && (
@@ -136,9 +151,9 @@ export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: bo
                     seed={n === 0 ? l.id : l.id + (n - 1)}
                     photo={listingPhoto(l, n)}
                     label={n === 0 ? alt : `${alt} · ${what(n + 1)}`}
-                    sizes="(max-width: 768px) 100vw, 50vw"
+                    sizes="100vw"
                     priority={n === 0}
-                    className="h-full w-full transition-transform duration-700 hover:scale-[1.02]"
+                    className="h-full w-full"
                   />
                 )}
               </button>
@@ -161,28 +176,14 @@ export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: bo
             </>
           )}
         </div>
-        {thumbs.length > 0 && (
-          <div className={cn("hidden gap-3 md:grid", thumbs.length > 1 ? "grid-cols-2" : "grid-cols-1", thumbs.length > 2 ? "grid-rows-2" : "grid-rows-1")}>
-            {thumbs.map((sc, n, arr) => (
-              <button
-                key={n}
-                onClick={() => show(n + 1)}
-                className={cn(
-                  "relative overflow-hidden rounded-[4px] bg-arena",
-                  arr.length === 3 && n === 2 && "col-span-2",
-                )}
-                aria-label={n === arr.length - 1 ? undefined : view(n + 2)}
-              >
-                {n === arr.length - 1 && <span className="sr-only">{view(n + 2)}</span>}
-                <PropertyArt scene={sc} seed={l.id + n} photo={listingPhoto(l, n + 1)} className="h-full w-full transition-transform duration-700 hover:scale-[1.03]" />
-                {showAll && n === arr.length - 1 && (
-                  <span className="absolute bottom-4 right-4 np-glass rounded-[2px] px-4 py-2 font-display text-[14px] font-semibold text-ink">
-                    {allLabel}
-                  </span>
-                )}
-              </button>
-            ))}
-          </div>
+        {total > 1 && (
+          <button
+            type="button"
+            onClick={() => show(0)}
+            className="absolute bottom-[clamp(16px,3vw,32px)] right-[clamp(16px,4vw,40px)] z-[2] inline-flex min-h-12 items-center gap-2 rounded-[2px] bg-[#F6F2EC] px-5 font-display text-[16px] font-medium text-[#0E1A2B] transition-[background-color,transform] duration-np ease-np hover:bg-[#E9E1D3] active:scale-[.98] max-md:bottom-10"
+          >
+            <Camera size={17} aria-hidden /> {allLabel}
+          </button>
         )}
       </div>
       <div className="mt-4 flex flex-wrap gap-2">
@@ -201,7 +202,16 @@ export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: bo
       </div>
 
       {open && (
-        <div ref={dialog} className="fixed inset-0 z-[60] flex flex-col bg-[#0d0b0a] text-ivory" role="dialog" aria-modal="true" aria-label={tx(locale, l.title_es, l.title_en)} data-testid="gallery-lightbox">
+        <dialog
+          ref={dialog}
+          onCancel={(e) => {
+            e.preventDefault();
+            setOpen(false);
+          }}
+          className="fixed inset-0 z-[60] m-0 flex h-[100dvh] max-h-none w-screen max-w-none flex-col overscroll-contain bg-[rgb(14_26_43/.96)] p-0 text-ivory backdrop:bg-transparent"
+          aria-label={tx(locale, l.title_es, l.title_en)}
+          data-testid="gallery-lightbox"
+        >
           <div className="no-scrollbar flex items-center gap-2 overflow-x-auto px-4 py-3">
             {tabs.filter((t) => t[3]).map(([k, Icon, label]) => (
               <button key={k} onClick={() => setTab(k)} aria-pressed={tab === k} className={cn("inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-[2px] px-3 font-display text-sm", tab === k ? "border-2 border-ivory bg-white/15 text-ivory" : "border-2 border-transparent text-ivory/75 hover:bg-white/10")}>
@@ -222,10 +232,17 @@ export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: bo
               <>
                 {/* Photos: object-contain at the full available height. Illustrations (SVG, 4:3) keep their frame. */}
                 <div className="flex h-full w-full touch-pan-y select-none items-center justify-center" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
-                  <div className={cn("relative", listingPhoto(l, i) ? "h-full w-full" : "aspect-[4/3] w-[min(100%,calc((100dvh-180px)*4/3))]")}>
+                  <div key={i} className={cn("np-photo-in relative", listingPhoto(l, i) ? "h-full w-full" : "aspect-[4/3] w-[min(100%,calc((100dvh-180px)*4/3))]")}>
                     <PropertyArt scene={shots[i]} seed={i === 0 ? l.id : l.id + (i - 1)} photo={listingPhoto(l, i)} label={`${alt} · ${what(i + 1)}`} sizes="100vw" className="h-full w-full !object-contain" />
                     {tag}
                   </div>
+                  {/* Only the next and the previous photo are fetched ahead. */}
+                  {total > 1 &&
+                    [(i + 1) % total, (i - 1 + total) % total].map((n) => (
+                      <div key={`pre-${n}`} aria-hidden className="pointer-events-none invisible absolute h-px w-px overflow-hidden">
+                        <PropertyArt scene={shots[n]} seed={n === 0 ? l.id : l.id + (n - 1)} photo={listingPhoto(l, n)} sizes="100vw" className="h-full w-full" />
+                      </div>
+                    ))}
                 </div>
                 {total > 1 && (
                   <>
@@ -262,7 +279,7 @@ export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: bo
               ))}
             </div>
           )}
-        </div>
+        </dialog>
       )}
     </>
   );

@@ -227,6 +227,9 @@ body:has([data-public-header]) [data-demobar] { display: none; }
 .np-roof-draw path { stroke-dasharray: 1; stroke-dashoffset: 1; animation: np-roof 0.55s cubic-bezier(.4,0,.2,1) forwards; }
 .np-roof-draw path + path { animation-delay: 0.35s; }
 @keyframes np-fade { from { opacity: 0 } to { opacity: 1 } }
+/* Gallery viewer (043-C): photos cross-fade in 300 ms, no sliding. */
+.np-photo-in { animation: np-fade 300ms var(--np-ease) both; }
+@media (prefers-reduced-motion: reduce) { .np-photo-in { animation: none; } }
 .np-roof-fade { animation: np-fade 0.5s ease-out 0.45s both; }
 @media (prefers-reduced-motion: reduce) {
   .np-roof-draw path { animation: none; stroke-dashoffset: 0; }

@@ -41,9 +41,10 @@ export async function PublicFooter({ locale }: { locale: Locale }) {
   return (
     <footer className="relative overflow-hidden bg-navy text-ivory">
       <div className="np-gutter relative mx-auto flex max-w-[1280px] box-content flex-wrap items-end justify-between gap-10 pb-12 pt-[var(--np-section)]">
-        <p className="np-t-band max-w-[860px] text-ivory">
-          {locale === "es" ? "¿Hablamos?" : "Shall we talk?"} <span className="text-mist">{locale === "es" ? "Un asesor te atiende a cualquier hora." : "An advisor answers at any hour."}</span>
-        </p>
+        <div data-reveal="stagger">
+          <p className="np-t-band text-ivory">{locale === "es" ? "¿Hablamos?" : "Shall we talk?"}</p>
+          <p className="np-t-lead mt-6 text-mist">{locale === "es" ? "Un asesor te atiende a cualquier hora." : "An advisor answers at any hour."}</p>
+        </div>
         <Button href={`/${locale}/luxury#acceso`} variant="light" size="lg">
           {locale === "es" ? "Hablar con un asesor" : "Talk to an advisor"}
         </Button>

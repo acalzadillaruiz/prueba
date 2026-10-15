@@ -33,7 +33,7 @@ export function HeroAura({ locale, available }: { locale: Locale; available: num
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-[rgb(14_26_43/.55)]" />
 
       <div className="relative mx-auto flex w-full max-w-[1280px] flex-1 flex-col px-[clamp(16px,4vw,40px)] pb-5 pt-[calc(env(safe-area-inset-top)+104px)] md:pb-10 lg:pt-[148px]">
-        <div className="max-w-[980px]">
+        <div className="max-w-[1200px]">
           <h1 id="hero-title" className="np-t-hero text-ivory">
             {tx(locale, "Entre el Ávila y el mar", "Between the Ávila and the sea")}
           </h1>

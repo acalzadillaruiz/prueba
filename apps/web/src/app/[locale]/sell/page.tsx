@@ -57,7 +57,7 @@ export default async function SellPage({ params }: { params: Promise<{ locale: L
     <PublicPage locale={locale} tabbar>
       <section className="relative overflow-hidden">
         <div className="mx-auto grid max-w-[1320px] items-start gap-10 px-4 pb-16 pt-10 md:px-8 lg:grid-cols-[1.1fr_480px] lg:gap-16 lg:pb-24 lg:pt-20">
-          <div className="lg:pt-6">
+          <div data-reveal="stagger" className="lg:pt-6">
             <h1 className="np-t-h1 max-w-[640px]">
               {tx(locale, "Vende tu casa", "Sell your home")} <span className="text-muted">{tx(locale, "al precio justo.", "at the right price.")}</span>
             </h1>
@@ -73,7 +73,7 @@ export default async function SellPage({ params }: { params: Promise<{ locale: L
               </a>
             </div>
           </div>
-          <div id="estimar" className="scroll-mt-24"><SellQuickEstimate locale={locale} zones={zones.map((z) => ({ name: z.name, city: z.city }))} /></div>
+          <div id="estimar" data-reveal className="scroll-mt-24"><SellQuickEstimate locale={locale} zones={zones.map((z) => ({ name: z.name, city: z.city }))} /></div>
         </div>
       </section>
 
@@ -93,7 +93,7 @@ export default async function SellPage({ params }: { params: Promise<{ locale: L
           </div>
           <div>
             <h2 id="sell-steps" className="np-t-band">{tx(locale, "Publica en tres pasos", "List in three steps")}</h2>
-            <ol className="mt-8 space-y-7">
+            <ol data-reveal="stagger" className="mt-8 space-y-7">
               {steps.map(([t, d], i) => (
                 <li key={t} className="grid grid-cols-[2.5rem_1fr] gap-x-4">
                   <span aria-hidden className="font-title text-[36px] leading-none text-muted">{i + 1}</span>
@@ -116,10 +116,15 @@ export default async function SellPage({ params }: { params: Promise<{ locale: L
       {/* Sand band: what you get, as plain text (term + detail), no boxes. */}
       <section className="bg-arena" aria-labelledby="sell-why">
         <div className="mx-auto max-w-[1280px] px-[clamp(16px,4vw,40px)] py-[clamp(64px,10vw,128px)]">
-          <h2 id="sell-why" className="np-t-h1 max-w-[720px]">
-            {tx(locale, "Sabes qué recibes y qué pagas.", "You know what you get and what you pay.")}
-          </h2>
-          <dl className="mt-10 grid gap-x-12 gap-y-8 md:grid-cols-2">
+          <div className="grid items-end gap-10 lg:grid-cols-[1fr_1fr] lg:gap-16">
+            <h2 id="sell-why" className="np-t-band max-w-[720px]">
+              {tx(locale, "Sabes qué recibes y qué pagas.", "You know what you get and what you pay.")}
+            </h2>
+            <div data-reveal className="relative aspect-[16/10] w-full overflow-hidden bg-ivory">
+              <Image src={PHOTOS.costaAtardecer.src} alt={tx(locale, PHOTOS.costaAtardecer.alt.es, PHOTOS.costaAtardecer.alt.en)} fill sizes="(max-width: 1024px) 92vw, 600px" className="object-cover" style={{ objectPosition: PHOTOS.costaAtardecer.focus }} />
+            </div>
+          </div>
+          <dl data-reveal="stagger" className="mt-10 grid gap-x-12 gap-y-8 md:grid-cols-2">
             {values.map(({ t, d }) => (
               <div key={t}>
                 <dt className="font-display text-[20px] font-medium text-ink">{t}</dt>

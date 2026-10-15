@@ -54,7 +54,7 @@ function Essentials({ l, locale, title }: { l: Listing; locale: Locale; title: R
   const items = essentialServices(l, locale);
   if (!items.length) return null;
   return (
-    <div className="py-10" data-testid="essentials">
+    <div data-reveal className="py-10" data-testid="essentials">
       {title}
       <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {items.map(({ key, label }) => {
@@ -109,7 +109,7 @@ function Facts({ l, locale }: { l: Listing; locale: Locale }) {
     : "grid-cols-2 [@container(min-width:420px)]:grid-cols-3";
   const lastWide = n > 3 && n % 2 === 1 ? (n === 7 ? "col-span-2 [@container(min-width:600px)]:col-span-1" : "col-span-2 [@container(min-width:680px)]:col-span-1") : "";
   return (
-    <div className="[container-type:inline-size]">
+    <div data-reveal className="[container-type:inline-size]">
       <dl className={cn("grid gap-x-6 gap-y-5 py-6", cols)} data-testid="facts">
         {items.map(([v, t], i) => (
           <div key={t} className={cn("flex min-w-0 flex-col-reverse", i === n - 1 && lastWide)}>
@@ -246,7 +246,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
             <Facts l={l} locale={locale} />
 
 
-            <div className="mt-8 py-6"><BilingualBody l={l} locale={locale} /></div>
+            <div data-reveal className="mt-8 py-6"><BilingualBody l={l} locale={locale} /></div>
             <div className="-mt-2 mb-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted">
               <Freshness iso={l.updatedAt} locale={locale} />
               {savesLabel && <span className="inline-flex items-center gap-1.5"><Heart size={15} aria-hidden /> {savesLabel}</span>}

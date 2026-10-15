@@ -107,6 +107,7 @@ export function ListingCard({ l, locale, compact, className, compareToggle }: { 
   return (
     <article
       data-listing-card
+      data-reveal
       className={cn(
         "group relative isolate rounded-[2px] has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-navy has-[a:focus-visible]:ring-offset-4 has-[a:focus-visible]:ring-offset-ivory",
         className,

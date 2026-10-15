@@ -21,6 +21,10 @@ const clean = (s: string) => s.replace(/[\u202f\u00a0]/g, " ");
 export function money(amount: number, l: Locale, currency = "USD") {
   return clean(new Intl.NumberFormat(l === "es" ? "es-VE" : "en-US", { style: "currency", currency, maximumFractionDigits: 0 }).format(amount));
 }
+/** On-screen price (043): money() with a narrow no-break space (U+202F), so «USD 235.000» never breaks after USD. */
+export const moneyUi = (amount: number, l: Locale, currency = "USD") => money(amount, l, currency).replace(/ /g, "\u202f");
+/** «142 m²» with a narrow no-break space. */
+export const m2Ui = (n: number, l: Locale) => `${num(n, l)}\u202fm²`;
 /**
  * Short price in the same style as money() for that locale — the one short format everywhere (map pins, chips, compare
  * pinned row, comparables table, sticky contact bar, alert names and email subjects):

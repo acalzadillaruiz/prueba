@@ -68,7 +68,7 @@ export async function PublicFooter({ locale }: { locale: Locale }) {
         {/* TODO(legal): Privacidad · Términos · Cookies links go here once the client provides and approves the texts. */}
         <div className="mx-auto flex max-w-[1320px] flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 py-5 text-sm text-ink/55 md:px-8">
           <span>
-            © {new Date().getFullYear()} New Place · {t("legal")}
+            © {new Date().getFullYear()} <span translate="no">New Place</span> · {t("legal")}
             {/* Demo login (DEMO_AUTH) only: a quiet link to the "sign in as…" chooser, never a floating control. */}
             {DEMO_ENABLED && (
               <>

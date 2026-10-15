@@ -4,7 +4,7 @@ import type { Listing, Locale } from "@/types/domain";
 import { listingPhoto } from "@/lib/photos";
 import { PropertyArt } from "@/components/art/PropertyArt";
 import { Avatar, Badge } from "@/components/ui";
-import { TYPE_LABEL, lbl, money, num, priceSuffix, tx } from "@/lib/i18n";
+import { TYPE_LABEL, lbl, money, num, priceSuffix, tx, moneyUi } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import { CardCompareToggle, SaveButton, StatusBadge } from "./bits";
 import { CardPhotos } from "./CardPhotos";
@@ -98,7 +98,7 @@ const priceVars = (price: string, suffix: string, compact?: boolean) =>
  * ("Venta"): the search already filters by it, and the price gets the whole row.
  */
 export function ListingCard({ l, locale, compact, className, compareToggle }: { l: Listing; locale: Locale; compact?: boolean; className?: string; compareToggle?: boolean }) {
-  const price = money(l.priceAmount, locale);
+  const price = moneyUi(l.priceAmount, locale);
   const suffix = priceSuffix(l, locale);
   const title = tx(locale, l.title_es, l.title_en);
   const label = `${title}, ${l.zone}`;

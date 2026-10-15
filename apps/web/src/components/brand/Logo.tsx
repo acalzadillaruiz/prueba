@@ -56,7 +56,7 @@ export function Logo({ tone = "navy", className, size = "md", animate = false }:
   const ink = dark ? "#FFFFFF" : "var(--np-logo-ink, var(--np-ink))";
   if (size === "lg")
     return (
-      <span className={cn("inline-grid justify-items-center gap-2", animate && "np-roof-fade", className)} aria-label="New Place Venezuela">
+      <span translate="no" className={cn("inline-grid justify-items-center gap-2", animate && "np-roof-fade", className)} aria-label="New Place Venezuela">
         <span className="font-logo text-[30px] font-extralight leading-none tracking-[0.2em]" style={{ color: ink, paddingLeft: "0.2em" }}>
           NEW PLACE
         </span>
@@ -66,7 +66,7 @@ export function Logo({ tone = "navy", className, size = "md", animate = false }:
       </span>
     );
   return (
-    <span className={cn("inline-flex items-center whitespace-nowrap", animate && "np-roof-fade", className)}>
+    <span translate="no" className={cn("inline-flex items-center whitespace-nowrap", animate && "np-roof-fade", className)}>
       <span className={cn("font-logo font-extralight leading-none tracking-[0.2em]", size === "sm" ? "text-[15px]" : "text-[18px]")} style={{ color: ink }}>
         NEW PLACE
       </span>

@@ -15,7 +15,7 @@ import { CompareButton, Freshness, SaveButton, ShareButton, StatusBadge } from "
 import { prisma } from "@newplace/db";
 import { PUBLIC_STATUSES, listingInclude, publicWhere, toCard, toDomain } from "@/server/listings";
 import { getFx } from "@/server/data";
-import { AMENITY_LABEL, TYPE_LABEL, lbl, money, num, priceSuffix, tx, plural } from "@/lib/i18n";
+import { AMENITY_LABEL, TYPE_LABEL, lbl, money, num, priceSuffix, tx, plural, moneyUi, m2Ui } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import { ViewBeacon } from "@/components/detail/ViewBeacon";
 import { StickyContactBar } from "@/components/detail/StickyContactBar";
@@ -90,8 +90,8 @@ function Facts({ l, locale }: { l: Listing; locale: Locale }) {
   const items = [
     l.beds > 0 && [`${l.beds}`, tx(locale, l.beds === 1 ? "habitación" : "habitaciones", l.beds === 1 ? "bedroom" : "bedrooms")],
     l.baths > 0 && [`${l.baths}`, l.baths === 1 ? tx(locale, "baño", "bath") : tx(locale, "baños", "baths")],
-    [`${num(l.areaM2, locale)} m²`, tx(locale, "construcción", "built")],
-    l.plotM2 && [`${num(l.plotM2, locale)} m²`, tx(locale, "parcela", "plot")],
+    [m2Ui(l.areaM2, locale), tx(locale, "construcción", "built")],
+    l.plotM2 && [m2Ui(l.plotM2, locale), tx(locale, "parcela", "plot")],
     l.parking > 0 && [`${l.parking}`, l.parking === 1 ? tx(locale, "puesto", "parking spot") : tx(locale, "puestos", "parking")],
     l.kind !== "land" && [`${l.yearBuilt}`, tx(locale, "año", "year built")],
     l.shortRent && [`${l.shortRent.maxGuests}`, tx(locale, "huéspedes", "guests")],
@@ -213,7 +213,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
                 <div className="mt-7 shrink-0 lg:mt-5 lg:pt-1 lg:text-right">
                   {/* Fluid size + nowrap: "USD 118.000" never breaks after the currency at 360 px. */}
                   <div className="font-title text-[clamp(36px,10vw,44px)] leading-none text-ink [font-variant-numeric:lining-nums_tabular-nums] lg:whitespace-nowrap" data-testid="listing-price">
-                    <span className="whitespace-nowrap">{money(l.priceAmount, locale)}</span>
+                    <span className="whitespace-nowrap">{moneyUi(l.priceAmount, locale)}</span>
                     <span className="whitespace-nowrap font-display text-[17px] font-normal text-muted">{priceSuffix(l, locale)}</span>
                   </div>
                   <div className="mt-1.5 text-[14px] text-muted">
@@ -289,7 +289,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
                 (phones have the sticky bar with price + «Pedir visita»). */}
             <div className="mb-4 hidden lg:block" data-testid="rail-price">
               <div className="font-title text-[44px] leading-none text-ink [font-variant-numeric:lining-nums_tabular-nums]">
-                <span className="whitespace-nowrap">{money(l.priceAmount, locale)}</span>
+                <span className="whitespace-nowrap">{moneyUi(l.priceAmount, locale)}</span>
                 <span className="whitespace-nowrap font-display text-[17px] text-muted">{priceSuffix(l, locale)}</span>
               </div>
               <div className="mt-2"><Badge tone={isPriceVerified(l) ? "ok" : "mist"}>{priceBadgeLabel(l, locale)}</Badge></div>

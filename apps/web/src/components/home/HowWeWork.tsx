@@ -24,7 +24,7 @@ export function HowWeWork({ heading, intro, steps, photoAlt }: { heading: string
             {steps.map((s) => (
               <li key={s.title} className="bg-ivory p-5">
                 <h3 className="text-[20px] text-ink">{s.title}</h3>
-                <p className="np-t-small mt-2 text-muted">{s.body}</p>
+                <p className="np-t-body mt-2 text-ink">{s.body}</p>
               </li>
             ))}
           </ol>

@@ -89,7 +89,7 @@ export function CollectionRail({ title, items, more }: { title: string; items: R
                   {it.title} <span className="text-muted">· {it.zone}</span>
                 </span>
                 <span className="mt-2 block font-serif text-[20px] font-semibold leading-none text-ink">{it.price}</span>
-                <span className="mt-2 block truncate font-display text-[14px] text-muted">{it.facts}</span>
+                <span className="mt-2 block truncate font-display text-[16px] text-muted">{it.facts}</span>
               </span>
             </Link>
           ))}

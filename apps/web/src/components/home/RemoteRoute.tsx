@@ -102,7 +102,7 @@ export function RemoteRoute({ title, subtitle, steps, children }: { title: strin
                   <span>
                     <span className="block text-[15px] font-semibold text-ink">{t}</span>
                     {/* One short line each, phones included (035: at most two lines per block). */}
-                    <span className="block text-sm text-muted">{b}</span>
+                    <span className="np-t-body block text-ink">{b}</span>
                   </span>
                 </li>
               ))}

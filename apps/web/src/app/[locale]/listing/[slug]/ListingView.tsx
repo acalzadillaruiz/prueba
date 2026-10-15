@@ -75,7 +75,7 @@ function Essentials({ l, locale, title }: { l: Listing; locale: Locale; title: R
           );
         })}
       </ul>
-      <p className="mt-3 text-sm text-muted">{tx(locale, "Lo indica quien publica la casa. Si un servicio no aparece, es porque no lo informó.", "As stated by the lister. If a service isn’t shown, it wasn’t reported.")}</p>
+      <p className="mt-3 text-[16px] text-muted">{tx(locale, "Lo indica quien publica la casa. Si un servicio no aparece, es porque no lo informó.", "As stated by the lister. If a service isn’t shown, it wasn’t reported.")}</p>
     </div>
   );
 }
@@ -240,7 +240,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
         </div>
 
         {/* Phones: the essentials, then the contact card, then the secondary sections (folded). Desktop: the card sticks on the right. */}
-        <div className="mx-auto grid max-w-[1320px] grid-cols-[minmax(0,1fr)] gap-12 px-4 pt-8 md:px-8 lg:grid-cols-[minmax(0,1fr)_420px] lg:gap-x-16 lg:gap-y-0">
+        <div className="mx-auto grid max-w-[1320px] grid-cols-[minmax(0,1fr)] gap-12 px-4 pt-14 md:px-8 lg:pt-8 lg:grid-cols-[minmax(0,1fr)_420px] lg:gap-x-16 lg:gap-y-0">
           <div className="lg:col-start-1 lg:row-start-1">
             <Facts l={l} locale={locale} />
 
@@ -306,7 +306,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
             <div className={sec}>
               <H>{tx(locale, "Ubicación", "Location")}</H>
               <DetailMap l={mapListing(l)} locale={locale} nearby={nearby.map(mapListing)} />
-              <p className="mt-3 text-sm text-muted">
+              <p className="mt-3 text-[16px] text-muted">
                 {tx(locale, "Te mostramos colegios y tiempos de trayecto solo cuando los hemos verificado en la zona.", "We show schools and travel times only once we’ve verified them for the area.")}
               </p>
             </div>
@@ -329,7 +329,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
                     ].map(([v, t]) => (
                       <div key={String(t)} className="bg-arena p-4">
                         <div className="font-title text-[28px] leading-none [font-variant-numeric:lining-nums_tabular-nums]">{v}</div>
-                        <div className="mt-1.5 text-sm text-muted">{t}</div>
+                        <div className="mt-1.5 text-[16px] text-muted">{t}</div>
                       </div>
                     ))}
                   </div>

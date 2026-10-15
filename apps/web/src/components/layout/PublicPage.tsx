@@ -4,6 +4,7 @@ import { CompareTray } from "@/components/compare/CompareTray";
 import { cn } from "@/lib/cn";
 import { PublicHeader } from "./PublicHeader";
 import { PublicFooter } from "./PublicFooter";
+import { RevealRoot } from "@/lib/useReveal";
 
 /**
  * Public page shell. `tabbar` adds the phone bottom navigation (and bottom padding so nothing ends under it);
@@ -33,6 +34,7 @@ export function PublicPage({
       {contact && <FloatingContact {...contact} tabbar={tabbar} />}
       {tabbar && <MobileTabBar locale={locale} />}
       <CompareTray locale={locale} />
+      <RevealRoot />
     </div>
   );
 }

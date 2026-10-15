@@ -6,7 +6,6 @@ import { PublicPage } from "@/components/layout/PublicPage";
 import { HomeMap } from "@/components/search/HomeMap";
 import { mapListing } from "@/components/map/mapListing";
 import { factsLine } from "@/components/listing/ListingCard";
-import { HomeMotion } from "@/components/home/HomeMotion";
 import { HeroAura } from "@/components/home/HeroAura";
 import { HowWeWork } from "@/components/home/HowWeWork";
 import { PhotoBand } from "@/components/home/PhotoBand";
@@ -108,30 +107,13 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
 
   return (
     <PublicPage locale={locale} header="transparent" tabbar contact={{ href: `/${locale}/luxury#acceso`, label: tx(locale, "Hablar con un asesor", "Talk to an advisor") }}>
-      <HomeMotion />
       {/* HERO — cinema, full screen: the coast at sunset with the search on it. */}
       <HeroAura locale={locale} available={available.length} />
 
-      {/* ZONES (043): a still line of places, no endless marquee. */}
-      <div className="bg-ivory px-[clamp(16px,4vw,40px)] py-6 md:py-8">
-        <ul aria-label={tx(locale, "Dónde estamos", "Where we are")} className="mx-auto flex max-w-[1280px] flex-wrap gap-x-6 gap-y-1 font-title text-[24px] text-ink md:gap-x-10 md:text-[32px]">
-          {marquee.map((z) => (
-            <li key={z}>{z}</li>
-          ))}
-        </ul>
-      </div>
-
-      {/* COLECCIÓN PRIVADA — real homes right after the hero: horizontal gallery */}
-      <CollectionRail
-        title={tx(locale, "Casas elegidas una a una", "Homes chosen one by one")}
-        items={rail}
-        more={{ href: `/${locale}/luxury`, label: tx(locale, "Ver toda la colección", "See the whole collection") }}
-      />
-
       {/* EXPLORE EN EL MAPA */}
-      <section id="explorar" className="mx-auto max-w-[1320px] px-4 pb-14 pt-14 md:px-8 md:pb-20 md:pt-20 lg:pt-24">
-        <div data-reveal className="mb-5 grid items-end gap-2 md:mb-8 md:grid-cols-[1fr_auto] md:gap-4 lg:mb-10">
-          <div><h2 className="np-t-h1">{tx(locale, "Busca por zona", "Search by area")}</h2></div>
+      <section id="explorar" className="np-gutter mx-auto max-w-[1280px] box-content py-[var(--np-section)]">
+        <div data-reveal className="mb-10 grid items-end gap-6 md:grid-cols-[1fr_auto] md:gap-8 lg:mb-12">
+          <div><h2 className="np-t-band">{tx(locale, "Busca por zona", "Search by area")}</h2></div>
           <p className="np-t-body max-w-[380px] text-ink md:text-right">
             {tx(locale, "Mira en el mapa dónde está cada casa y cuánto cuesta.", "See on the map where each home is and what it costs.")}
           </p>
@@ -207,27 +189,6 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
         </div>
       </section>
 
-      {/* HOW WE WORK — a realistic photo and four short steps (035: no 3D). */}
-      <HowWeWork
-        heading={tx(locale, "Compra sin sorpresas", "Buy without surprises")}
-        intro={tx(locale, "Así trabajamos contigo, de la primera visita a las llaves.", "How we work with you, from the first viewing to the keys.")}
-        steps={chapters}
-        photoAlt={tx(locale, "Imagen ilustrativa", "Illustrative image")}
-      />
-
-      {/* COMPRA A DISTANCIA — the diaspora's routes draw in to Lechería as the steps light up. */}
-      <div>
-        <RemoteRoute
-          title={tx(locale, "Compra desde donde vivas", "Buy from wherever you live")}
-          subtitle={tx(locale, "Visita en video, firma con poder y paga en dólares de forma segura.", "View by video, sign by power of attorney and pay in dollars, safely.")}
-          steps={steps as [string, string][]}
-        >
-          <Button href={`/${locale}/search?type=SALE`} variant="outline" className="mt-6 md:mt-8">
-            {tx(locale, "Ver casas disponibles", "See available homes")}
-          </Button>
-        </RemoteRoute>
-      </div>
-
       {/* 043-C · night band, full-bleed photo: «Entre el Ávila y el mar», one idea on it. */}
       <PhotoBand
         id="entre-el-avila-y-el-mar"
@@ -241,27 +202,65 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
         </Button>
       </PhotoBand>
 
+      {/* ZONES (043): a still line of places, no endless marquee. */}
+      <div className="np-gutter bg-arena pt-[var(--np-section)]">
+        <ul aria-label={tx(locale, "Dónde estamos", "Where we are")} data-reveal className="mx-auto flex max-w-[1280px] flex-wrap gap-x-6 gap-y-1 font-title text-[28px] font-light text-ink md:gap-x-10 md:text-[40px]">
+          {marquee.map((z) => (
+            <li key={z}>{z}</li>
+          ))}
+        </ul>
+      </div>
+
+      {/* HOW WE WORK — a realistic photo and four short steps (035: no 3D). */}
+      <HowWeWork
+        heading={tx(locale, "Compra sin sorpresas", "Buy without surprises")}
+        intro={tx(locale, "Así trabajamos contigo, de la primera visita a las llaves.", "How we work with you, from the first viewing to the keys.")}
+        steps={chapters}
+        photoAlt={tx(locale, PHOTOS.torreMarina.alt.es, PHOTOS.torreMarina.alt.en)}
+      />
+
+      {/* COLECCIÓN PRIVADA — real homes right after the hero: horizontal gallery */}
+      <CollectionRail
+        title={tx(locale, "Casas elegidas una a una", "Homes chosen one by one")}
+        lead={tx(locale, "La Colección Privada: casas que vemos en persona y enseñamos con cita.", "The Private Collection: homes we see in person and show by appointment.")}
+        photo={PHOTOS.salonMar}
+        photoAlt={tx(locale, PHOTOS.salonMar.alt.es, PHOTOS.salonMar.alt.en)}
+        items={rail}
+        more={{ href: `/${locale}/luxury`, label: tx(locale, "Ver toda la colección", "See the whole collection") }}
+      />
+
+      {/* COMPRA A DISTANCIA — the diaspora's routes draw in to Lechería as the steps light up. */}
+      <RemoteRoute
+          title={tx(locale, "Compra desde donde vivas", "Buy from wherever you live")}
+          subtitle={tx(locale, "Visita en video, firma con poder y paga en dólares de forma segura.", "View by video, sign by power of attorney and pay in dollars, safely.")}
+          steps={steps as [string, string][]}
+        >
+          <Button href={`/${locale}/search?type=SALE`} variant="outline" className="mt-6 md:mt-8">
+            {tx(locale, "Ver casas disponibles", "See available homes")}
+          </Button>
+        </RemoteRoute>
+
       {/* VENDA EN PRIVADO */}
-      <section className="relative overflow-hidden bg-ivory">
-        <div className="relative mx-auto grid max-w-[1320px] items-center gap-6 px-5 pt-14 md:gap-10 md:px-10 md:pt-16 lg:grid-cols-2 lg:gap-16 lg:pt-16">
-          <div data-reveal className="pb-0 md:pb-4 lg:pb-12">
-            <h2 className="np-t-h1 mt-3">{tx(locale, "Vende tu casa al precio justo", "Sell your home at a fair price")}</h2>
-            <ul className="mt-5 space-y-2.5 md:mt-7 md:space-y-3">
+      <section className="np-band relative overflow-hidden bg-ivory">
+        <div className="np-gutter relative mx-auto grid max-w-[1280px] box-content items-center gap-10 py-[var(--np-section)] lg:grid-cols-2 lg:gap-16">
+          <div data-reveal="stagger">
+            <h2 className="np-t-band">{tx(locale, "Vende tu casa al precio justo", "Sell your home at a fair price")}</h2>
+            <ul className="mt-7 space-y-3">
               {owner.map((o) => (
-                <li key={o} className="flex items-center gap-3 text-[15px] text-ink/80">
+                <li key={o} className="flex items-center gap-3 text-[17px] text-ink">
                   <Check size={16} strokeWidth={2.4} className="shrink-0 text-gold-text" aria-hidden /> {o}
                 </li>
               ))}
             </ul>
-            <span data-magnetic className="mt-6 inline-block md:mt-9">
+            <span className="mt-10 inline-block">
               <Button href={`/${locale}/sell`} variant="navy" size="lg">
                 {tx(locale, "¿Cuánto vale mi casa?", "What\u2019s my home worth?")} <ArrowUpRight size={18} aria-hidden />
               </Button>
             </span>
           </div>
           {/* Portrait only beside the copy (lg); stacked below it (phones, tablets) a landscape band. */}
-          <div data-unveil className="relative mx-auto mb-10 aspect-[16/10] w-full max-w-[520px] overflow-hidden rounded-[2px] bg-[#E9E1D3] md:mb-12 lg:mb-16 lg:mr-0 lg:aspect-[4/3]">
-            <div data-parallax="40" className="absolute -inset-y-[8%] inset-x-0">
+          <div data-reveal className="relative aspect-[16/10] w-full overflow-hidden bg-[#E9E1D3] lg:aspect-[4/3]">
+            <div className="absolute inset-0">
               <Image src={salonMar} alt={tx(locale, "Imagen ilustrativa", "Illustrative image")} fill placeholder="blur" sizes="(max-width: 1024px) 90vw, 560px" className="object-cover" />
             </div>
           </div>

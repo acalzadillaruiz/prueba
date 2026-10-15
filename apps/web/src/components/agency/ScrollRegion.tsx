@@ -51,8 +51,8 @@ export function ScrollRegion({ label, className, fade = true, children, scrollRe
       >
         {children}
       </div>
-      <span aria-hidden className={cn("pointer-events-none absolute inset-y-0 left-0 w-6 bg-gradient-to-r from-white to-transparent transition-opacity duration-np dark:from-navy-card", edge.l ? "opacity-100" : "opacity-0")} />
-      {fade && <span aria-hidden className={cn("pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-white to-transparent transition-opacity duration-np dark:from-navy-card", edge.r ? "opacity-100" : "opacity-0")} />}
+      <span aria-hidden className={cn("pointer-events-none absolute inset-y-0 left-0 w-1 bg-ink/15 transition-opacity duration-np dark:bg-white/20", edge.l ? "opacity-100" : "opacity-0")} />
+      {fade && <span aria-hidden className={cn("pointer-events-none absolute inset-y-0 right-0 w-1 bg-ink/15 transition-opacity duration-np dark:bg-white/20", edge.r ? "opacity-100" : "opacity-0")} />}
     </div>
   );
 }

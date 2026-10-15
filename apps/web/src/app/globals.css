@@ -286,13 +286,11 @@ html.dark .np-public .bg-ink { background-color: #F6F2EC; color: #1A2026; }
    it is an ordinary column. A soft fade on its left edge says that more columns slide underneath. Full-width rows
    (colSpan panels, empty states) never pin. */
 [data-overflow] .np-sticky-last tr > :last-child:not([colspan]) { position: sticky; right: 0; z-index: 1; background: #fff; }
-[data-overflow] .np-sticky-last tr > :last-child:not([colspan])::before { content: ""; position: absolute; inset-block: 0; right: 100%; width: 16px; pointer-events: none; background: linear-gradient(to left, #fff, rgb(255 255 255 / 0)); }
 html.dark [data-overflow] .np-sticky-last tr > :last-child:not([colspan]) { background: #14243A; }
-html.dark [data-overflow] .np-sticky-last tr > :last-child:not([colspan])::before { background: linear-gradient(to left, #14243A, rgb(20 36 58 / 0)); }
-/* Dark mode for the 2035 surfaces: translucent whites become warm translucent darks, inputs stay readable. */
+html.dark /* Dark mode for the 2035 surfaces: translucent whites become warm translucent darks, inputs stay readable. */
 html.dark .np-public :is(.bg-white\/85, .bg-white\/75, .bg-white\/70, .bg-white\/50) { background-color: rgb(255 255 255 / .06); }
 html.dark .np-public :is(input, select, textarea) { color: #F6F2EC; }
-html.dark .np-public :is(input, textarea):not(.placeholder\:text-transparent)::placeholder { color: #A9B1BC; }
+html.dark .np-public :is(input, textarea):not([class*="placeholder:text-transp"])::placeholder { color: #A9B1BC; }
 html.dark .np-public .text-ink\/45 { color: rgb(246 242 236 / .62); }
 html.dark .np-public :is(.border-ink\/10, .border-ink\/\[\.07\], .border-ink\/\[\.06\]) { border-color: rgb(255 255 255 / .1); }
 html.dark .np-public .bg-ivory { background-color: #0E1A2B; }

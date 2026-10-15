@@ -1,5 +1,5 @@
 /** Cockpit skeleton (brand v4): navy sidebar, Cal canvas, warm sand placeholders. */
-const bone = "rounded-[4px] bg-gradient-to-r from-[#E9E1D3] via-[#EFE9DF] to-[#E9E1D3] dark:from-white/[.05] dark:via-white/[.08] dark:to-white/[.05]";
+const bone = "rounded-[4px] bg-[#E9E1D3] dark:bg-white/[.06]";
 
 export default function Loading() {
   return (

@@ -41,7 +41,7 @@ export default async function LuxuryPage({ params }: { params: Promise<{ locale:
           quality={80}
           className="-z-20 object-cover"
         />
-        <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgb(28_29_29/.45)_0%,rgb(28_29_29/.05)_35%,rgb(28_29_29/.6)_100%)]" />
+        <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-[rgb(14_26_43/.55)]" />
         <div className="relative mx-auto w-full max-w-[1320px] px-4 pb-14 pt-[140px] md:px-8 lg:pb-20">
                     <h1 className="np-t-h1 mt-5 max-w-[860px] text-white">
             {tx(locale, "Casas exclusivas", "Exclusive homes")} <span className="text-white/75">{tx(locale, "que ves en privado.", "you see in private.")}</span>

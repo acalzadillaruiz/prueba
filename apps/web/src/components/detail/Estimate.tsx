@@ -62,7 +62,7 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
           {tx(locale, "Valor central", "Mid value")} {money(e.mid, locale)}
         </div>
         <div className="relative mt-9 h-[3px] rounded-full bg-white/15">
-          <div className="absolute inset-y-0 rounded-full bg-gradient-to-r from-[#C9BFAE]/60 via-[#C9BFAE] to-[#C9BFAE]/60" style={{ left: `${aLow}%`, right: `${100 - aHigh}%` }} />
+          <div className="absolute inset-y-0 rounded-full bg-[#C9BFAE]" style={{ left: `${aLow}%`, right: `${100 - aHigh}%` }} />
           <div className="absolute -top-8 whitespace-nowrap text-[13px] font-semibold text-ivory/85" style={{ left: `${pos}%`, transform: `translateX(-${clampPct(pos)}%)` }}>
             {tx(locale, "Precio pedido", "Asking")} · {usdShort(l.priceAmount)}
           </div>
@@ -95,12 +95,7 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
             tabIndex={0}
             role="region"
             aria-label={tx(locale, "Casas comparables", "Comparable homes")}
-            className="overflow-x-auto rounded-lg border border-inherit [--np-fade:255_255_255] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 [html.dark_.np-public_&]:[--np-fade:42_36_32]"
-            style={{
-              ...(dark ? { ["--np-fade" as string]: "42 36 32" } : {}),
-              background:
-                "linear-gradient(to right, rgb(var(--np-fade)) 30%, rgb(var(--np-fade) / 0)) left / 32px 100% no-repeat local, linear-gradient(to left, rgb(var(--np-fade)) 30%, rgb(var(--np-fade) / 0)) right / 32px 100% no-repeat local, linear-gradient(to right, rgb(0 0 0 / .14), rgb(0 0 0 / 0)) left / 14px 100% no-repeat scroll, linear-gradient(to left, rgb(0 0 0 / .14), rgb(0 0 0 / 0)) right / 14px 100% no-repeat scroll",
-            }}
+            className="overflow-x-auto rounded-lg border border-inherit focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
           >
             <table className="w-full text-sm">
               <thead className={cn("text-left text-[13px]", dark ? "bg-white/5 text-mist" : "bg-ivory text-muted")}>

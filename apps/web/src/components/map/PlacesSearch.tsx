@@ -66,7 +66,7 @@ export function PlacesSearch({ locale, zones, value, onPick, describedBy }: { lo
           }}
           onFocus={() => setOpen(true)}
           // Short enough not to be cut on a 360 px phone; the wizard explains the rest in helper text (describedBy).
-          placeholder={tx(locale, "Calle y edificio", "Street and building")}
+          placeholder={tx(locale, "Calle y edificio…", "Street and building…")}
           aria-label={tx(locale, "Dirección", "Address")}
           aria-describedby={describedBy}
         />

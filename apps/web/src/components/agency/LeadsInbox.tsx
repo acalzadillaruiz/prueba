@@ -589,7 +589,7 @@ export function LeadsInbox({ locale, initial, listings, agents, assignable = [],
                   run("msg", () => api(`leads/${sel.id}/messages`, { method: "POST", json: { body } }).catch((e) => { setDraft(body); throw e; }));
                 }}
               >
-                <input ref={replyRef} value={draft} onChange={(e) => setDraft(e.target.value)} className={cn(k.input, "h-11 flex-1 rounded-full px-4 md:h-11")} placeholder={tx(locale, "Responder… (se envía también por email)", "Reply… (also sent by email)")} aria-label={tx(locale, "Respuesta", "Reply")} />
+                <input ref={replyRef} value={draft} onChange={(e) => setDraft(e.target.value)} className={cn(k.input, "h-11 flex-1 rounded-full px-4 md:h-11")} placeholder={tx(locale, "Responder… (se envía también por email)…", "Reply… (also sent by email)…")} aria-label={tx(locale, "Respuesta", "Reply")} />
                 <button className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-navy text-ivory hover:bg-navy-2 dark:bg-ivory dark:text-navy" aria-label={tx(locale, "Enviar", "Send")}><Send size={16} /></button>
               </form>
             </div>

@@ -231,7 +231,7 @@ export function CaptureView({ locale, rows: initialRows, zones, titles, canConve
         >
           <h2 id="capture-form-title" className={k.title}>{tx(locale, "Nueva captación", "New capture")}</h2>
           <div className="mt-3 grid gap-3 md:grid-cols-2 min-[1400px]:grid-cols-1">
-            <div className="md:col-span-2 min-[1400px]:col-span-1"><Field label={tx(locale, "Dirección", "Address")}><input ref={addressRef} required minLength={5} className={k.input} placeholder={tx(locale, "Av. Francisco de Miranda, Edif. Parque, piso 4", "Av. Francisco de Miranda, Parque bldg, 4th floor")} value={f.address} onChange={(e) => setF({ ...f, address: e.target.value })} /></Field></div>
+            <div className="md:col-span-2 min-[1400px]:col-span-1"><Field label={tx(locale, "Dirección", "Address")}><input ref={addressRef} required minLength={5} className={k.input} placeholder={tx(locale, "Av. Francisco de Miranda, Edif. Parque, piso 4…", "Av. Francisco de Miranda, Parque bldg, 4th floor…")} value={f.address} onChange={(e) => setF({ ...f, address: e.target.value })} /></Field></div>
             <Field label={tx(locale, "Zona", "Area")}>
               <Select required value={f.zone} onChange={(e) => setF({ ...f, zone: e.target.value })} className={cn(!f.zone && "text-muted dark:text-mist")}>
                 <option value="" disabled>{tx(locale, "Elige la zona", "Pick the area")}</option>
@@ -245,12 +245,12 @@ export function CaptureView({ locale, rows: initialRows, zones, titles, canConve
               </Select>
             </Field>
             <div className="grid grid-cols-2 gap-2">
-              <Field label="m²"><input className={k.input} type="number" inputMode="numeric" required min={1} placeholder={tx(locale, "Ej. 95", "e.g. 95")} value={f.areaM2 || ""} onChange={(e) => setF({ ...f, areaM2: +e.target.value })} /></Field>
-              <Field label={tx(locale, "Precio pedido (USD)", "Asking price (USD)")}><PriceInput locale={locale} className={k.input} required placeholder={tx(locale, "Ej. 120.000", "e.g. 120,000")} value={f.askingPrice} onChange={(askingPrice) => setF({ ...f, askingPrice })} /></Field>
+              <Field label="m²"><input className={k.input} type="number" inputMode="numeric" required min={1} placeholder={tx(locale, "Ej. 95…", "e.g. 95…")} value={f.areaM2 || ""} onChange={(e) => setF({ ...f, areaM2: +e.target.value })} /></Field>
+              <Field label={tx(locale, "Precio pedido (USD)", "Asking price (USD)")}><PriceInput locale={locale} className={k.input} required placeholder={tx(locale, "Ej. 120.000…", "e.g. 120,000…")} value={f.askingPrice} onChange={(askingPrice) => setF({ ...f, askingPrice })} /></Field>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              <Field label={tx(locale, "Dueño", "Owner")}><input required minLength={2} className={k.input} placeholder={tx(locale, "Nombre y apellido", "Full name")} value={f.ownerName} onChange={(e) => setF({ ...f, ownerName: e.target.value })} /></Field>
-              <Field label={tx(locale, "Teléfono", "Phone")}><input required minLength={6} type="tel" className={k.input} placeholder="+58 412 000 0000" value={f.phone} onChange={(e) => setF({ ...f, phone: e.target.value })} /></Field>
+              <Field label={tx(locale, "Dueño", "Owner")}><input required minLength={2} className={k.input} placeholder={tx(locale, "Nombre y apellido…", "Full name…")} value={f.ownerName} onChange={(e) => setF({ ...f, ownerName: e.target.value })} /></Field>
+              <Field label={tx(locale, "Teléfono", "Phone")}><input required minLength={6} type="tel" className={k.input} placeholder="+58 412 000 0000…" value={f.phone} onChange={(e) => setF({ ...f, phone: e.target.value })} /></Field>
             </div>
           </div>
           {f.address.length >= 6 && !!zone && f.areaM2 > 0 && (

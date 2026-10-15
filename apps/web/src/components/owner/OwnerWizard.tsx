@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useUnsavedGuard } from "@/lib/useUnsavedGuard";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AlertTriangle, ArrowLeft, ArrowRight, Building2, Check, CheckCircle2, ImagePlus, Loader2, MapPin, ShieldCheck, Sparkles, Star, User, X } from "lucide-react";
@@ -370,6 +371,8 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
       input.removeAttribute("aria-describedby");
     }
   }, [addrInvalid]);
+  // Photos live only in memory (the text draft autosaves): warn before the tab closes with work in progress.
+  useUnsavedGuard(!done && (step > 0 || files.length > 0));
   if (done)
     return (
       <div className="mx-auto max-w-xl px-4 py-20 text-center" data-testid="owner-published">
@@ -557,7 +560,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               {tried && !d.addr && <p role="alert" id="wizard-street-error" className="-mt-1 text-sm font-semibold text-danger">{tx(locale, "Falta la dirección: escríbela y elige una opción.", "Address missing: type it and pick an option.")}</p>}
             </div>
             <div className="grid gap-3 sm:grid-cols-3">
-              <Field label={tx(locale, "Piso / apto / casa", "Floor / unit")}><input className={inputCls} value={d.unit} onChange={(e) => set({ unit: e.target.value })} placeholder="Piso 6, apto 6-B" /></Field>
+              <Field label={tx(locale, "Piso / apto / casa", "Floor / unit")}><input className={inputCls} value={d.unit} onChange={(e) => set({ unit: e.target.value })} placeholder="Piso 6, apto 6-B…" /></Field>
               <Field label={tx(locale, "Urbanización", "Neighborhood")}><input className={inputCls} value={d.addr?.zone ?? ""} readOnly /></Field>
               <Field label={tx(locale, "Ciudad", "City")}><input className={inputCls} value={d.addr?.city ?? ""} readOnly /></Field>
             </div>
@@ -768,14 +771,14 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               </div>
               <input
                 className={cn(inputCls, "mt-3")}
-                placeholder={tx(locale, "Título", "Title")}
+                placeholder={tx(locale, "Título…", "Title…")}
                 aria-label={tx(locale, "Título", "Title")}
                 value={lang === "es" ? d.copy.title_es : d.copy.title_en}
                 onChange={(e) => set({ copy: { ...d.copy, [lang === "es" ? "title_es" : "title_en"]: e.target.value } })}
               />
               <textarea
                 className={cn(inputCls, "mt-2 h-32 py-2")}
-                placeholder={tx(locale, "Cuenta qué lo hace especial… o deja que la IA te ayude.", "Tell people what makes it special… or let AI help.")}
+                placeholder={tx(locale, "Cuenta qué lo hace especial… o deja que la IA te ayude…", "Tell people what makes it special… or let AI help…")}
                 aria-label={tx(locale, "Descripción", "Description")}
                 value={lang === "es" ? d.copy.body_es : d.copy.body_en}
                 onChange={(e) => set({ copy: { ...d.copy, [lang === "es" ? "body_es" : "body_en"]: e.target.value } })}

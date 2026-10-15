@@ -124,7 +124,7 @@ export function ListingTypeFields({
           <div className="grid gap-3 sm:grid-cols-3">
             {input("ceilingHeight", tx(locale, "Altura libre (m)", "Clear height (m)"), { min: 2, max: 40, step: 0.1 })}
             <Field label={tx(locale, "Zonificación", "Zoning")} error={err("zoning")}>
-              <input className={cls} maxLength={60} disabled={disabled} aria-invalid={!!err("zoning")} value={value.zoning} onChange={(e) => set({ zoning: e.target.value })} placeholder="C-3 Comercial" />
+              <input className={cls} maxLength={60} disabled={disabled} aria-invalid={!!err("zoning")} value={value.zoning} onChange={(e) => set({ zoning: e.target.value })} placeholder="C-3 Comercial…" />
             </Field>
             {input("capRate", tx(locale, "Cap rate (%) · opcional", "Cap rate (%) · optional"), { min: 0, max: 30, step: 0.1 })}
           </div>
@@ -138,7 +138,7 @@ export function ListingTypeFields({
         <div>
           {title(tx(locale, "Lujo", "Luxury"))}
           <Field label={tx(locale, "Folleto PDF (URL) · opcional", "Brochure PDF (URL) · optional")} error={err("brochurePdf")}>
-            <input className={cls} type="url" inputMode="url" maxLength={500} disabled={disabled} aria-invalid={!!err("brochurePdf")} value={value.brochurePdf} onChange={(e) => set({ brochurePdf: e.target.value })} placeholder="https://…/folleto.pdf" />
+            <input className={cls} type="url" inputMode="url" maxLength={500} disabled={disabled} aria-invalid={!!err("brochurePdf")} value={value.brochurePdf} onChange={(e) => set({ brochurePdf: e.target.value })} placeholder="https://…/folleto.pdf…" />
           </Field>
         </div>
       )}

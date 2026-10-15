@@ -99,7 +99,7 @@ export function SellQuickEstimate({ locale, zones }: { locale: Locale; zones: { 
               setM2(e.target.value);
               setRes(null);
             }}
-            placeholder={tx(locale, "p. ej. 110", "e.g. 110")}
+            placeholder={tx(locale, "p. ej. 110…", "e.g. 110…")}
           />
         </Field>
       </div>

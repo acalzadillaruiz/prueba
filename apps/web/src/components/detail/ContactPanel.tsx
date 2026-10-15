@@ -423,7 +423,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
               maxLength={200}
               value={visitNote}
               onChange={(e) => setVisitNote(e.target.value)}
-              placeholder={tx(locale, "Opcional: p. ej. sábado por la mañana", "Optional: e.g. Saturday morning")}
+              placeholder={tx(locale, "Opcional: p. ej. sábado por la mañana…", "Optional: e.g. Saturday morning…")}
             />
             <label className={cn("mt-2 flex min-h-11 cursor-pointer items-center gap-2 text-sm", muted)}>
               <input type="checkbox" checked={virtual} onChange={(e) => setVirtual(e.target.checked)} className="h-5 w-5 accent-[#1A2026]" />
@@ -520,7 +520,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
               <div className="grid grid-cols-2 gap-2">
                 <div className="min-w-0">
                   <label htmlFor={`${uid}-email`} className={fieldLbl}>Email</label>
-                  <input id={`${uid}-email`} className={field} type="email" placeholder={tx(locale, "tu@correo.com", "you@example.com")} autoComplete="email" {...form.register("email")} {...a11y("email")} />
+                  <input id={`${uid}-email`} className={field} type="email" placeholder={tx(locale, "tu@correo.com…", "you@example.com…")} autoComplete="email" {...form.register("email")} {...a11y("email")}  spellCheck={false} />
                   {fieldErr("email")}
                 </div>
                 <div className="min-w-0">
@@ -538,7 +538,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
                     maxLength={800}
                     value={stayNote}
                     onChange={(e) => setStayNote(e.target.value)}
-                    placeholder={tx(locale, "¿Algo que deba saber?", "Anything they should know?")}
+                    placeholder={tx(locale, "¿Algo que deba saber?…", "Anything they should know?…")}
                   />
                 </div>
               ) : showNote ? (

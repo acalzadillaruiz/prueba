@@ -429,7 +429,7 @@ export function PlatformModeration({ locale, reports, listings }: { locale: Loca
                   }}
                 >
                   <label className="sr-only" htmlFor={`reason-${l.id}`}>{tx(locale, "Motivo de la retirada", "Take-down reason")}</label>
-                  <input id={`reason-${l.id}`} autoFocus value={reason} onChange={(e) => setReason(e.target.value)} maxLength={200} placeholder={tx(locale, "Motivo (lo verá la agencia)", "Reason (the agency will see it)")} className={cn(k.input, "h-9 min-w-0 flex-1 md:h-9")} />
+                  <input id={`reason-${l.id}`} autoFocus value={reason} onChange={(e) => setReason(e.target.value)} maxLength={200} placeholder={tx(locale, "Motivo (lo verá la agencia)…", "Reason (the agency will see it)…")} className={cn(k.input, "h-9 min-w-0 flex-1 md:h-9")} />
                   <Button size="sm" type="submit" className="bg-danger hover:bg-[#962019] dark:bg-[#F3A493] dark:text-navy">{tx(locale, "Confirmar retirada", "Confirm take-down")}</Button>
                   <Button size="sm" type="button" variant="ghost" className={k.ghost} onClick={() => setConfirming(null)}>{tx(locale, "Cancelar", "Cancel")}</Button>
                 </form>

@@ -184,7 +184,7 @@ export function TeamView({ locale, members, listingsByAgent, invites: initialInv
               }}
             >
               <h2 className={k.title}>{tx(locale, "Invitar por email", "Invite by email")}</h2>
-              <input className={cn(k.input, "mt-3")} type="email" required placeholder="nombre@agencia.ve" value={email} onChange={(e) => setEmail(e.target.value)} aria-label="Email" />
+              <input className={cn(k.input, "mt-3")} type="email" required placeholder="nombre@agencia.ve…" value={email} onChange={(e) => setEmail(e.target.value)} aria-label="Email"  spellCheck={false} />
               <Select wrapClassName="mt-2" value={role} onChange={(e) => setRole(e.target.value as Role)} aria-label={tx(locale, "Rol", "Role")}>
                 {ROLE_OPTS.filter((r) => r !== "AGENCY_OWNER").map((r) => <option key={r} value={r}>{tr(r)}</option>)}
               </Select>

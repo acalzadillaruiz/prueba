@@ -60,7 +60,7 @@ export function OwnerTakedown({ locale, listingId, reason, appealedAt, onAppeale
             onChange={(e) => setMsg(e.target.value)}
             maxLength={1000}
             className="h-24 w-full rounded-lg border border-line bg-white px-3 py-2 text-sm focus:border-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#735D3F]"
-            placeholder={tx(locale, "Por ejemplo: las fotos son de mi casa y puedo mostrar el documento de propiedad.", "For example: the photos are of my home and I can show the title deed.")}
+            placeholder={tx(locale, "Por ejemplo: las fotos son de mi casa y puedo mostrar el documento de propiedad…", "For example: the photos are of my home and I can show the title deed…")}
             aria-label={tx(locale, "¿Por qué debería volver a publicarse?", "Why should it go back online?")}
           />
           {err && <p role="alert" className="text-[13px] font-semibold text-danger">{err}</p>}

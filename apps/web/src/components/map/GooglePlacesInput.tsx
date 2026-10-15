@@ -43,7 +43,7 @@ function Inner({ locale, zones, value, onPick, country, describedBy }: { locale:
     });
     return () => l.remove();
   }, [places, country, zones, onPick]);
-  return <input ref={ref} defaultValue={value?.main} className={inputCls} placeholder={tx(locale, "Calle y edificio", "Street and building")} aria-label={tx(locale, "Dirección", "Address")} aria-describedby={describedBy} />;
+  return <input ref={ref} defaultValue={value?.main} className={inputCls} placeholder={tx(locale, "Calle y edificio…", "Street and building…")} aria-label={tx(locale, "Dirección", "Address")} aria-describedby={describedBy} />;
 }
 
 /** Google Places Autocomplete (componentRestrictions country, VE by default) + country selector. */

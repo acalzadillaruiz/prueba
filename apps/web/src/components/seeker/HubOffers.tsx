@@ -93,7 +93,7 @@ export function HubOffers({ id, className, locale, offers: initial, offerable, l
           </label>
           <label className="block text-sm">
             <span className="mb-1 block font-semibold">{tx(locale, "Nota para el asesor (opcional)", "Note for the advisor (optional)")}</span>
-            <input value={note} onChange={(ev) => setNote(ev.target.value)} maxLength={500} className={cn(inputCls, "h-11")} aria-invalid={!!errors.note} placeholder={tx(locale, "Ej.: pago de contado, entrega en 60 días", "E.g. cash, closing in 60 days")} />
+            <input value={note} onChange={(ev) => setNote(ev.target.value)} maxLength={500} className={cn(inputCls, "h-11")} aria-invalid={!!errors.note} placeholder={tx(locale, "Ej.: pago de contado, entrega en 60 días…", "E.g. cash, closing in 60 days…")} />
             {errors.note && <span role="alert" className="mt-1 block text-[13px] font-semibold text-danger">{errors.note}</span>}
           </label>
           <label className="block text-sm">

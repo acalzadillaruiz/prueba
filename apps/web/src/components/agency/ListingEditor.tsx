@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useUnsavedGuard } from "@/lib/useUnsavedGuard";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, Check, Eye, ImagePlus, Loader2, Save, Sparkles, Star, Trash2 } from "lucide-react";
 import type { Amenity, Listing, ListingStatus, Locale } from "@/types/domain";
@@ -41,7 +42,12 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
   const [saved, setSaved] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
-  const dirty = () => setSaved(false);
+  const [changed, setChanged] = useState(false);
+  const dirty = () => {
+    setSaved(false);
+    setChanged(true);
+  };
+  useUnsavedGuard(changed);
   const extrasCheck = validateExtras(locale, l.listingType, l.luxury, extras);
   const essCheck = validateEssentials(locale, ess);
   // The brochure isn't part of the domain Listing: the listing API returns it alongside.
@@ -77,6 +83,7 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
       };
       await api(`listings/${l.id}`, { method: "PATCH", json: { ...copy, ...f, ...essCheck.payload, ...typeFields, virtualTourUrl: (f.hasVirtualTour && tourUrl.trim()) || null } });
       setSaved(true);
+      setChanged(false);
       router.refresh();
     } catch (e) {
       setErr((e as Error).message);

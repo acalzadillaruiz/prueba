@@ -190,7 +190,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
             {mode === "register" && (
               <Field label={tx(locale, "Nombre completo", "Full name")} error={fieldError(errs.name, locale, "name")}><input className={inputCls} {...register("name")} aria-invalid={!!errs.name} autoComplete="name" /></Field>
             )}
-            <Field label="Email" error={fieldError(errs.email, locale, "email")}><input className={inputCls} type="email" readOnly={!!inv} {...register("email")} aria-invalid={!!errs.email} autoComplete="email" placeholder={tx(locale, "tu@correo.com", "you@example.com")} /></Field>
+            <Field label="Email" error={fieldError(errs.email, locale, "email")}><input className={inputCls} type="email" readOnly={!!inv} {...register("email")} aria-invalid={!!errs.email} autoComplete="email" placeholder={tx(locale, "tu@correo.com…", "you@example.com…")}  spellCheck={false} /></Field>
             <Field label={tx(locale, "Contraseña", "Password")} error={fieldError(errs.password, locale, "password")} hint={(mode === "register" ? tx(locale, "Usa al menos 8 caracteres.", "Use at least 8 characters.") : undefined)}>
               <div className="relative">
                 <input className={inputCls} type={show ? "text" : "password"} {...register("password")} aria-invalid={!!errs.password} autoComplete={mode === "login" ? "current-password" : "new-password"} />
@@ -211,7 +211,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
                 </span>
               </label>
             )}
-            {agency && !inv && <Field label={tx(locale, "Nombre de la agencia", "Agency name")} error={fieldError(errs.agencyName, locale, "agencyName")}><input className={inputCls} {...register("agencyName")} placeholder="Andes Prime" /></Field>}
+            {agency && !inv && <Field label={tx(locale, "Nombre de la agencia", "Agency name")} error={fieldError(errs.agencyName, locale, "agencyName")}><input className={inputCls} {...register("agencyName")} placeholder="Andes Prime…" /></Field>}
             {err && <div className={k.err} role="alert">{err}</div>}
             <Button className="w-full rounded-full" size="lg" disabled={!!busy}>
               {busy === "form" && <Loader2 size={16} className="animate-spin" />}

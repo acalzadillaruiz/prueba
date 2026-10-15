@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getImageProps } from "next/image";
 import type { Locale } from "@/types/domain";
 import { tx } from "@/lib/i18n";
@@ -5,61 +6,56 @@ import { AskBar } from "@/components/search/AskBar";
 import { OnCallButton } from "@/components/brand/PublicChrome";
 
 /**
- * Cinema hero (030/032 · estilo AMALI): a realistic photo (illustrative, AI), edge to edge and full screen, with the title in white
- * Lexend Zetta, a Barlow Light line under it and the search as a translucent capsule. Phones keep the whole search
- * on the first screen (title above it, no scrolling). A soft shade behind the text keeps it readable; the rest of the
- * photo is not darkened.
+ * Hero (043 · D2, DESIGN.md): the coast at sunset edge to edge under the night scrim, «ENTRE EL ÁVILA Y EL MAR» in
+ * Cormorant Garamond 300 capitals (two lines at most on a 390 px phone), a lead that carries the live count, the
+ * primary «Ver casas» (bone on night) beside «Habla con un asesor», and the search. No kicker, no text-shadow: the
+ * night scrim rgba(14,26,43,.55) alone keeps every line readable.
  */
 export function HeroAura({ locale, available }: { locale: Locale; available: number }) {
-  const common = { alt: tx(locale, "Imagen ilustrativa", "Illustrative image"), sizes: "100vw", quality: 80, priority: true, width: 1280, height: 720 };
+  const common = { alt: tx(locale, "Torre frente al mar al atardecer en Lechería", "Seafront tower at sunset in Lechería"), sizes: "100vw", quality: 80, priority: true, width: 1280, height: 720 };
   const desktop = getImageProps({ ...common, src: "/brand/hero-costa-atardecer.jpg" }).props.srcSet;
   const mobileImg = getImageProps({ ...common, src: "/brand/hero-torre-marina.jpg" }).props;
   return (
-    <section data-hide-fab className="relative isolate flex min-h-[100svh] flex-col overflow-hidden bg-[#0E1A2B] text-white" aria-labelledby="hero-title">
-      {/* Art direction: the coast at sunset on wide screens, the tower over the marina on phones (portrait crop on the
-          tower). One <img> (the LCP), two sources. Illustrative images (AI), as the alt says. */}
+    <section data-hide-fab className="relative isolate flex min-h-[100svh] flex-col overflow-hidden bg-navy text-ivory" aria-labelledby="hero-title">
+      {/* Art direction: the coast at sunset on wide screens, the tower over the marina on phones. One <img> (the LCP), two sources. */}
       <picture>
         <source media="(min-width: 640px)" srcSet={desktop} sizes="100vw" />
         {/* eslint-disable-next-line jsx-a11y/alt-text -- next/image props via getImageProps (alt included) */}
-        <img {...mobileImg} className="np-hero-photo absolute inset-x-0 top-0 -z-20 h-[76%] w-full object-cover object-[35%_50%] [mask-image:linear-gradient(180deg,#000_80%,transparent)] sm:inset-0 sm:h-full sm:object-[50%_50%] sm:[mask-image:none]" />
+        <img {...mobileImg} className="np-hero-photo absolute inset-0 -z-20 h-full w-full object-cover object-[35%_50%] sm:object-[50%_50%]" />
       </picture>
-      {/* Shade only behind the text block (034a: the rest of the photo keeps its golden light). Measured line by line with
-          the text hidden: every hero line ≥ 4.5:1 at 390, subtitle and small line ≥ 4.5:1 at 1440. On phones the tower
-          photo ends above the search (034b), fading into the dark base, so the water stays in view. */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgb(28_29_29/.68)_0%,rgb(28_29_29/.58)_36%,rgb(28_29_29/.2)_46%,rgb(28_29_29/0)_54%)] sm:bg-[radial-gradient(ellipse_75%_58%_at_26%_26%,rgb(28_29_29/.74)_0%,rgb(28_29_29/.64)_30%,rgb(28_29_29/.36)_60%,rgb(28_29_29/.12)_80%,rgb(28_29_29/0)_100%),linear-gradient(180deg,rgb(28_29_29/0)_70%,rgb(28_29_29/.3)_100%)]" />
+      {/* The night scrim: the one veil over the photo (DESIGN.md §2.4), flat, no gradient. */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-[rgb(14_26_43/.55)]" />
 
-      <div className="relative mx-auto flex w-full max-w-[1320px] flex-1 flex-col px-4 pb-5 pt-[calc(env(safe-area-inset-top)+96px)] md:px-8 md:pb-10 lg:pt-[140px]">
-        <div data-reveal="stagger" className="max-w-[920px]">
-          <p className="flex items-center gap-2.5 font-display text-[12px] font-medium uppercase tracking-[.2em] text-white/90">
-            <span className="np-live" aria-hidden />
-            {/* The real figure from the first frame (no count-up: a climbing number reads as "still loading"). */}
-            <span>
-              {available} {tx(locale, "casas disponibles hoy", "homes available today")}
-            </span>
-          </p>
-          <h1 id="hero-title" className="mt-4 max-w-[920px] text-[clamp(28px,3.2vw,48px)] font-extralight text-white [text-shadow:0_1px_14px_rgb(0_0_0/.35)] lg:mt-6">
-            {tx(locale, "Tu próximo lugar,", "Your next place,")} <span className="whitespace-nowrap">{tx(locale, "verificado", "verified")}</span>
+      <div className="relative mx-auto flex w-full max-w-[1280px] flex-1 flex-col px-[clamp(16px,4vw,40px)] pb-5 pt-[calc(env(safe-area-inset-top)+104px)] md:pb-10 lg:pt-[148px]">
+        <div data-reveal="stagger" className="max-w-[980px]">
+          <h1 id="hero-title" className="np-t-hero text-ivory">
+            {tx(locale, "Entre el Ávila y el mar", "Between the Ávila and the sea")}
           </h1>
-          <span aria-hidden className="mt-5 block h-px w-[min(300px,70%)] bg-white/70 lg:mt-7" />
-          <p className="mt-4 max-w-[520px] text-[16px] font-light leading-relaxed text-white [text-shadow:0_1px_10px_rgb(0_0_0/.45)] sm:text-[18px] lg:mt-6">
+          <p className="mt-5 max-w-[540px] text-[18px] font-light leading-[1.5] text-ivory sm:text-[20px] lg:mt-7">
             {tx(
               locale,
-              "Casas revisadas en Caracas, Lechería y El Morro. Un asesor te atiende a cualquier hora.",
-              "Checked homes in Caracas, Lechería and El Morro. An advisor answers at any hour.",
+              `${available} casas revisadas hoy en Caracas, Lechería y El Morro. Un asesor te atiende a cualquier hora.`,
+              `${available} checked homes today in Caracas, Lechería and El Morro. An advisor answers at any hour.`,
             )}
           </p>
+          <div className="mt-7 flex flex-wrap items-center gap-3 lg:mt-9">
+            <Link
+              href={`/${locale}/search`}
+              className="inline-flex min-h-12 items-center rounded-[2px] bg-ivory px-6 font-display text-[16px] font-medium text-navy transition-colors duration-np ease-np hover:bg-arena focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ivory"
+            >
+              {tx(locale, "Ver casas", "See homes")}
+            </Link>
+            <OnCallButton
+              locale={locale}
+              className="inline-flex min-h-12 items-center rounded-[2px] border border-current px-6 font-display text-[16px] font-medium text-ivory transition-colors duration-np ease-np hover:bg-ivory/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ivory"
+            >
+              {tx(locale, "Habla con un asesor", "Talk to an advisor")}
+            </OnCallButton>
+          </div>
         </div>
 
-        <div className="mt-auto flex flex-col items-center gap-3 pt-8 md:gap-4">
-          <AskBar locale={locale} sticky className="mx-auto" />
-          <OnCallButton
-            locale={locale}
-            className="flex min-h-11 items-center gap-2 rounded-full border border-white/30 bg-white/15 px-4 font-display text-[14px] text-white backdrop-blur-md transition-colors hover:bg-white/25"
-          >
-            <span className="h-2 w-2 rounded-full bg-[#2F6F4E]" aria-hidden />
-            {tx(locale, "Asesor 24/7", "Advisor 24/7")}
-            <span className="sr-only">{tx(locale, ": habla con un asesor ahora", ": talk to an advisor now")}</span>
-          </OnCallButton>
+        <div className="mt-auto pt-10">
+          <AskBar locale={locale} sticky />
         </div>
       </div>
     </section>

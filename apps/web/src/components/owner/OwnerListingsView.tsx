@@ -412,7 +412,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
  */
 function NoPhotos({ locale, busy, onAdd }: { locale: Locale; busy: boolean; onAdd?: () => void }) {
   return (
-    <div data-testid="owner-no-photos" className="relative flex aspect-[4/3] h-full w-full flex-col items-center justify-center gap-3 overflow-hidden bg-[linear-gradient(160deg,#F6F1EA_0%,#F1EBE3_45%,#E6D8C4_100%)] p-5 text-center dark:bg-[linear-gradient(160deg,#2A2420_0%,#241F1C_55%,#1E1A18_100%)]">
+    <div data-testid="owner-no-photos" className="relative flex aspect-[4/3] h-full w-full flex-col items-center justify-center gap-3 overflow-hidden bg-arena p-5 text-center dark:bg-[#14243A]">
       <svg viewBox="0 0 128 60" className="w-24 text-[#C9BFAE] opacity-70 dark:text-[#E9E1D3]" aria-hidden fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round">
         <path d="M6 44 64 4l58 40" />
         <path d="M30 44 64 20l34 24" className="text-[#0E1A2B] dark:text-[#E9E1D3]" stroke="currentColor" />

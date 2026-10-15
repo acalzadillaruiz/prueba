@@ -115,7 +115,7 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
               <tbody>
                 {e.comparables.map((c) => {
                   return (
-                    <tr key={c.id} className={cn("border-t", dark ? "border-navy-line" : "border-line")}>
+                    <tr key={c.id} className={cn("", dark ? "" : "")}>
                       <td className="px-3 py-2">
                         <div className="line-clamp-2 break-words font-semibold leading-snug">{(locale === "en" && (c as { title_en?: string }).title_en) || c.title}</div>
                         <div className={cn("text-[13px]", muted)}>{c.zone}</div>

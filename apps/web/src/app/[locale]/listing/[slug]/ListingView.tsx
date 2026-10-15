@@ -54,7 +54,7 @@ function Essentials({ l, locale, title }: { l: Listing; locale: Locale; title: R
   const items = essentialServices(l, locale);
   if (!items.length) return null;
   return (
-    <div className="border-t border-line py-10" data-testid="essentials">
+    <div className=" py-10" data-testid="essentials">
       {title}
       <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {items.map(({ key, label }) => {
@@ -110,7 +110,7 @@ function Facts({ l, locale }: { l: Listing; locale: Locale }) {
   const lastWide = n > 3 && n % 2 === 1 ? (n === 7 ? "col-span-2 [@container(min-width:600px)]:col-span-1" : "col-span-2 [@container(min-width:680px)]:col-span-1") : "";
   return (
     <div className="[container-type:inline-size]">
-      <dl className={cn("grid gap-x-6 gap-y-5 border-y border-line py-6", cols)} data-testid="facts">
+      <dl className={cn("grid gap-x-6 gap-y-5 py-6", cols)} data-testid="facts">
         {items.map(([v, t], i) => (
           <div key={t} className={cn("flex min-w-0 flex-col-reverse", i === n - 1 && lastWide)}>
             <dt className="mt-1 break-words text-[13px] font-semibold leading-snug text-muted">{t}</dt>
@@ -147,7 +147,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
   const ppm = l.listingType === "SALE" || l.listingType === "COMMERCIAL_SALE" ? Math.round(l.priceAmount / Math.max(1, l.areaM2)) : null;
   const soldNearby = soldRows.map((r) => toCard(toDomain(r))).map((o) => ({ t: `${tx(locale, o.title_es, o.title_en)} · ${o.areaM2} m²`, p: o.priceAmount, d: tx(locale, o.status === "SOLD" ? "Vendido" : "Alquilado", o.status === "SOLD" ? "Sold" : "Rented") }));
   const H = ({ children }: { children: React.ReactNode }) => <h3 className="np-sub mb-5 text-[15px] md:text-[16px]">{children}</h3>;
-  const sec = "border-t border-line py-10";
+  const sec = " py-10";
   const amenities = amenitiesBeyondEssentials(l);
   const views = viewFeatures(l, locale);
   const tile = "rounded-[4px] bg-white/70 outline outline-1 -outline-offset-1 outline-black/[.04] px-4 py-3 text-[15px]";

@@ -305,7 +305,7 @@ export function PublicHeader({ locale, variant = "light", autoHide = false }: { 
       className={cn(
         "top-0 z-40 transition-[background-color,border-color,transform] duration-300 ease-[cubic-bezier(.2,.7,.2,1)]",
         away && "-translate-y-[calc(100%+12px)]",
-        variant === "dark" && "np-navy-panel sticky border-b border-navy-line bg-navy text-ivory",
+        variant === "dark" && "np-navy-panel sticky bg-navy text-ivory",
         float && cn("inset-x-0", onPhoto ? "text-white" : "text-ink"),
         variant === "transparent" ? "fixed" : variant === "light" && "sticky",
       )}

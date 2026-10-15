@@ -92,12 +92,12 @@ export default async function SellPage({ params }: { params: Promise<{ locale: L
         </ul>
       </section>
 
-      <section id="como-funciona" className="scroll-mt-24 border-t border-line" aria-labelledby="sell-steps">
+      <section id="como-funciona" className="scroll-mt-24 " aria-labelledby="sell-steps">
         <div className="mx-auto max-w-[1320px] px-4 py-14 md:px-8 lg:py-20">
           <h2 id="sell-steps" className="np-t-h1 mt-3">{tx(locale, "Publica en tres pasos", "List in three steps")}</h2>
           <ol className="mt-10 grid gap-8 md:grid-cols-3">
             {steps.map(([t, d], i) => (
-              <li key={t} className="border-t border-ink/15 pt-5">
+              <li key={t} className=" pt-5">
                 <span className="font-serif text-[44px] leading-none text-[#C9BFAE] [font-feature-settings:'lnum']">{i + 1}</span>
                 <h3 className="mt-3 font-display text-[18px] font-semibold text-ink">{t}</h3>
                 <p className="np-t-body mt-1.5 text-ink">{d}</p>

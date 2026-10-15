@@ -77,7 +77,7 @@ export function MenuDrawer({
               <span className={cn(n.active && "underline decoration-[#E9E1D3] decoration-2 underline-offset-[7px]")}>{n.label}</span>
             </Link>
           ))}
-          <div className="mx-3 my-3 h-px bg-[#C9BFAE]/40" aria-hidden />
+          <div className="my-3" aria-hidden />
           <Link href={luxury.href} onClick={() => onClose()} aria-current={luxury.active ? "page" : undefined} className={drawerItem}>
             <Gem size={18} strokeWidth={1.6} aria-hidden className="text-[#E9E1D3]" />
             <span className={cn(luxury.active && "underline decoration-[#E9E1D3] decoration-2 underline-offset-[6px]")}>{luxury.label}</span>
@@ -104,7 +104,7 @@ export function MenuDrawer({
               ))}
             </>
           )}
-          <div className="mx-3 my-3 h-px bg-[#C9BFAE]/40" aria-hidden />
+          <div className="my-3" aria-hidden />
           <div className="flex items-center gap-2 px-1">
             <Link href={switchHref} prefetch={false} onClick={onSwitchLang} hrefLang={other} lang={other} className="flex min-h-12 items-center rounded-lg px-2 font-display text-[16px] hover:bg-white/5">
               {other === "en" ? "English" : "Español"}
@@ -123,7 +123,7 @@ export function MenuDrawer({
             </div>
           )}
         </nav>
-        <div className="shrink-0 space-y-3 border-t border-navy-line p-5">
+        <div className="shrink-0 space-y-3 p-5">
           <Link href={`/${locale}/sell`} className="flex min-h-12 items-center justify-center rounded-full border-[1.5px] border-ivory/60 font-display font-semibold text-ivory hover:bg-white/5">
             {t("sell")}
           </Link>

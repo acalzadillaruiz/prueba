@@ -451,7 +451,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
   const compareLabel = tx(locale, `Comparar (${compare.length})`, `Compare (${compare.length})`);
   const compareSeg = compare.length > 0 && (
     <>
-      {(hasResults || phoneMap) && <span aria-hidden className="my-3 w-px bg-current opacity-30" />}
+      {(hasResults || phoneMap) &&}
       <Link href={compareHref(locale, compare)} aria-label={phoneMap ? compareLabel : undefined} className={cn("flex h-12 items-center gap-1.5 pr-5", hasResults || phoneMap ? "pl-4" : "pl-5")}>
         <Scale size={16} aria-hidden className="shrink-0 text-[#E9E1D3] [html.dark_&]:text-[#0E1A2B]" />
         {phoneMap ? <span className="[font-feature-settings:'lnum']">{compare.length}</span> : <>{compareLabel} <ArrowRight size={15} aria-hidden /></>}
@@ -462,7 +462,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
   return (
     <div className={cn("lg:flex lg:h-[calc(100dvh-72px)] lg:flex-col", phoneMap && "flex h-[calc(100dvh-72px)] flex-col")}>
       {/* search + filter bar */}
-      <div className="relative z-30 border-b border-ink/[.06] bg-ivory">
+      <div className="relative z-30 bg-ivory">
         {/* Below 1440 (lg): row 1 = the words box (≥ 240 px, takes the room left) + operation; row 2 = the filters. From
             1440 it's one row. The box is never squeezed to "Cuéntanos qué b". */}
         <div className="flex items-center gap-2 px-4 py-2.5 lg:flex-wrap lg:gap-y-1 lg:px-5 min-[1440px]:flex-nowrap min-[1440px]:gap-y-2">
@@ -551,12 +551,12 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
           </div>
         </div>
         {alertError && (
-          <div role="alert" className="border-t border-line bg-[#B3261E1A] px-4 py-2 text-sm text-danger md:px-5">{alertError}</div>
+          <div role="alert" className=" bg-[#B3261E1A] px-4 py-2 text-sm text-danger md:px-5">{alertError}</div>
         )}
         {moreOpen && desktop && (
           <div ref={morePanel} id="search-more-filters" role="dialog" aria-label={tx(locale, "Más filtros", "More filters")} className="np-in absolute inset-x-0 top-full max-h-[70vh] overflow-y-auto bg-ivory px-5 py-5 shadow-float">
             <MoreFields locale={locale} f={f} set={set} withLux />
-            <div className="mt-5 flex items-center justify-end gap-4 border-t border-line pt-4">
+            <div className="mt-5 flex items-center justify-end gap-4 pt-4">
               <button type="button" onClick={() => setMoreOpen(false)} className="min-h-11 px-2 font-display text-sm font-semibold underline underline-offset-4">
                 {tx(locale, "Cerrar", "Close")}
               </button>
@@ -576,7 +576,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
         <div
           data-search-sheet={view}
           inert={listHidden || undefined}
-          className={cn("bg-ivory lg:order-2 lg:flex lg:min-w-0 lg:flex-1 lg:basis-[60%] lg:flex-col lg:border-l lg:border-line", listHidden && "hidden")}
+          className={cn("bg-ivory lg:order-2 lg:flex lg:min-w-0 lg:flex-1 lg:basis-[60%] lg:flex-col ", listHidden && "hidden")}
         >
           <div
             ref={listRef}
@@ -586,7 +586,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
             className="scrollbar-thin lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:overscroll-contain"
           >
             {/* one row: count · sort · filters — phones: pinned under the header (follows it as it hides) */}
-            <div className="sticky top-[calc(env(safe-area-inset-top)+var(--np-header-offset,80px)_-_8px)] z-20 flex min-h-[52px] items-center gap-2 border-b border-line bg-ivory px-4 py-1 transition-[top] duration-300 ease-[cubic-bezier(.2,.7,.2,1)] lg:top-0 lg:z-10 lg:px-5">
+            <div className="sticky top-[calc(env(safe-area-inset-top)+var(--np-header-offset,80px)_-_8px)] z-20 flex min-h-[52px] items-center gap-2 bg-ivory px-4 py-1 transition-[top] duration-300 ease-[cubic-bezier(.2,.7,.2,1)] lg:top-0 lg:z-10 lg:px-5">
               <div className="flex min-w-0 flex-1 items-center gap-2">
                 <p className="shrink-0 whitespace-nowrap font-serif text-[16px] leading-tight min-[390px]:text-[18px] sm:text-[20px] lg:text-[22px]" aria-live="polite">
                   {notUnderstood ? tx(locale, `${total} casas en total`, `${total} homes in all`) : plural(total, locale, ["resultado", "resultados"], ["result", "results"])}
@@ -759,7 +759,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
         className={cn(
           "pointer-events-none fixed inset-x-0 z-[35] flex justify-center px-4 lg:hidden print:hidden",
           view === "list"
-            ? "bottom-[calc(4rem+env(safe-area-inset-bottom)+12px)] md:pointer-events-auto md:bottom-0 md:border-t md:border-line md:bg-ivory md:pb-[calc(env(safe-area-inset-bottom)+10px)] md:pt-2.5 md:dark:bg-[#0E1A2B]"
+            ? "bottom-[calc(4rem+env(safe-area-inset-bottom)+12px)] md:pointer-events-auto md:bottom-0 md:bg-ivory md:pb-[calc(env(safe-area-inset-bottom)+10px)] md:pt-2.5 md:dark:bg-[#0E1A2B]"
             : "bottom-[calc(4rem+env(safe-area-inset-bottom)+12px)] md:bottom-[calc(env(safe-area-inset-bottom)+16px)]",
         )}
         data-search-toggle
@@ -777,7 +777,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
               <button type="button" onClick={() => changeView("list")} className="flex h-12 items-center gap-2 pl-5 pr-4">
                 <List size={17} aria-hidden /> {tx(locale, `Lista · ${total}`, `List · ${total}`)}
               </button>
-              <span aria-hidden className="my-3 w-px bg-current opacity-30" />
+
               <button type="button" onClick={openSheet} aria-haspopup="dialog" aria-label={filtersAria} className={cn("flex h-12 items-center gap-1.5 pl-4", compare.length ? "pr-4" : "pr-5")}>
                 <SlidersHorizontal size={16} aria-hidden /> {filtersLabel}
                 {filterCount > 0 && <span aria-hidden className="rounded-full bg-[#C9BFAE] px-1.5 text-[13px] text-[#1A2026]">{filterCount}</span>}

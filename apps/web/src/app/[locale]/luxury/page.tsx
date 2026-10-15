@@ -46,7 +46,7 @@ export default async function LuxuryPage({ params }: { params: Promise<{ locale:
                     <h1 className="np-t-h1 mt-5 max-w-[860px] text-white">
             {tx(locale, "Casas exclusivas", "Exclusive homes")} <span className="text-white/75">{tx(locale, "que ves en privado.", "you see in private.")}</span>
           </h1>
-          <span aria-hidden className="mt-6 block h-px w-[min(300px,70%)] bg-white/70" />
+
           <p className="mt-6 max-w-[560px] text-[17px] font-light leading-relaxed text-white/90">
             {tx(
               locale,
@@ -58,7 +58,7 @@ export default async function LuxuryPage({ params }: { params: Promise<{ locale:
       </section>
 
       <section className="mx-auto max-w-[1320px] px-4 py-20 md:px-8 lg:py-28">
-        <div className="mb-10 flex flex-wrap items-end justify-between gap-4 border-b border-line pb-6">
+        <div className="mb-10 flex flex-wrap items-end justify-between gap-4 pb-6">
           <h2 className="np-t-h1">{tx(locale, "Un asesor y un precio claro", "An advisor and a clear price")}</h2>
           <p className="np-t-body max-w-md text-ink">{tx(locale, "Cada casa tiene su asesor y un valor calculado con ventas reales de la zona.", "Each home has its own advisor and a value worked out from real sales nearby.")}</p>
         </div>
@@ -100,7 +100,7 @@ export default async function LuxuryPage({ params }: { params: Promise<{ locale:
                 tx(locale, "Visitas privadas, con la agenda real de tu asesor", "Private viewings, on your advisor’s real calendar"),
                 tx(locale, "Videovisita si compras desde fuera del país", "Video tours if you’re buying from abroad"),
               ].map((x) => (
-                <li key={x} className="flex items-center gap-3"><span aria-hidden className="h-px w-5 shrink-0 bg-[#C9BFAE]" /> {x}</li>
+                <li key={x} className="flex items-center gap-3"> {x}</li>
               ))}
             </ul>
           </div>

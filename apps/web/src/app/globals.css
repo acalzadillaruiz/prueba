@@ -221,7 +221,7 @@ body:has([data-public-header]) [data-demobar] { display: none; }
 .np-sel { background-color: var(--np-sel); border: 2px solid var(--np-navy); color: var(--np-navy); }
 /* The active nav item carries a fine line under it (AMALI). */
 .np-navroof { position: relative; }
-.np-navroof::after { content: ""; position: absolute; left: 50%; bottom: -8px; width: 22px; height: 1px; transform: translateX(-50%); background: currentColor; }
+.np-navroof::after { content: ""; position: absolute; left: 50%; bottom: -8px; width: 22px; height: 2px; transform: translateX(-50%); background: currentColor; }
 /* Signature: the roof strokes draw themselves in 0.9 s (first load, empty states). */
 @keyframes np-roof { from { stroke-dashoffset: 1 } to { stroke-dashoffset: 0 } }
 .np-roof-draw path { stroke-dasharray: 1; stroke-dashoffset: 1; animation: np-roof 0.55s cubic-bezier(.4,0,.2,1) forwards; }

@@ -49,7 +49,7 @@ export function PriceHistory({ events, locale, dark }: { events: PriceEvent[]; l
             const prev = arr[i + 1];
             const d = prev ? ((e.amount - prev.amount) / prev.amount) * 100 : 0;
             return (
-              <tr key={i} className={cn(i && "border-t", dark ? "border-navy-line" : "border-line")}>
+              <tr key={i} className={cn(i && "", dark ? "" : "")}>
                 <td className={cn("px-4 py-2.5", dark ? "text-mist" : "text-muted")}>{dateTime(e.date, locale, { day: "numeric", month: "short", year: "numeric" })}</td>
                 <td className="px-4 py-2.5 font-semibold">{tx(locale, label[e.kind][0], label[e.kind][1])}</td>
                 <td className="px-4 py-2.5 text-right font-serif text-[17px] font-light">{money(e.amount, locale)}</td>

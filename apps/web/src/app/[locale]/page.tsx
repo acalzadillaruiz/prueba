@@ -111,12 +111,12 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
       <HeroAura locale={locale} available={available.length} />
 
       {/* ZONES — they glide by, endlessly. */}
-      <div className="relative overflow-hidden border-y border-egeo/40 bg-ivory py-5 md:py-7" aria-label={tx(locale, "Dónde estamos", "Where we are")}>
+      <div className="relative overflow-hidden bg-ivory py-5 md:py-7" aria-label={tx(locale, "Dónde estamos", "Where we are")}>
         <div className="np-marquee gap-12 pr-12">
           {[...marquee, ...marquee].map((z, i) => (
             <span key={i} aria-hidden={i >= marquee.length || undefined} className="flex shrink-0 items-center gap-12 font-title text-[24px] font-light tracking-[.01em] text-ink/80 md:text-[36px]">
               {z}
-              <span className="h-px w-8 bg-egeo" aria-hidden />
+              <span className="text-muted" aria-hidden>·</span>
             </span>
           ))}
         </div>
@@ -240,7 +240,7 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
               "A few homes, well chosen. We know what they're worth and we stay with you until the keys.",
             )}
           </blockquote>
-          <span aria-hidden className="mx-auto mt-8 block h-px w-24 bg-[#F6F2EC]/50" />
+
           <p className="mt-6 font-display text-[13px] font-light tracking-[.14em] text-[#F6F2EC]/85">{tx(locale, "Un asesor te atiende a cualquier hora", "An advisor answers at any hour")}</p>
         </div>
       </section>

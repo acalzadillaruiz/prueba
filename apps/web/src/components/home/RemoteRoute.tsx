@@ -97,7 +97,7 @@ export function RemoteRoute({ title, subtitle, steps, children }: { title: strin
             {subtitle && <p className="np-t-body mt-3 max-w-[480px] text-ink">{subtitle}</p>}
             <ol className="np-steps mt-5 md:mt-8">
               {steps.map(([t, b], i) => (
-                <li key={t} ref={(el) => void (items.current[i] = el)} data-on={reduced ? "1" : "0"} className="flex items-baseline gap-5 border-b border-line py-2.5 md:items-start md:gap-6 md:py-4">
+                <li key={t} ref={(el) => void (items.current[i] = el)} data-on={reduced ? "1" : "0"} className="flex items-baseline gap-5 py-2.5 md:items-start md:gap-6 md:py-4">
                   <span className="np-step-n w-6 shrink-0 font-serif text-[22px] leading-none md:text-[28px]">{i + 1}</span>
                   <span>
                     <span className="block text-[15px] font-semibold text-ink">{t}</span>

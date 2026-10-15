@@ -25,7 +25,7 @@ export async function PublicFooter({ locale }: { locale: Locale }) {
   );
   const col = (title: string, links: [string, string][], extra?: React.ReactNode) => (
     <div className="col-span-2 md:col-span-1">
-      <details data-footer-group className="group border-b border-ink/10 md:hidden">
+      <details data-footer-group className="group md:hidden">
         <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between font-display text-[15px] font-semibold text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink [&::-webkit-details-marker]:hidden">
           {title}
           <ChevronDown size={18} aria-hidden className="text-ink/55 transition-transform duration-300 group-open:rotate-180" />
@@ -40,7 +40,7 @@ export async function PublicFooter({ locale }: { locale: Locale }) {
   );
   return (
     <footer className="relative overflow-hidden bg-[#E9E1D3] text-ink">
-      <div className="relative mx-auto flex max-w-[1320px] flex-wrap items-end justify-between gap-6 border-b border-ink/10 px-4 pb-10 pt-12 md:px-8 md:pb-12 md:pt-20">
+      <div className="relative mx-auto flex max-w-[1320px] flex-wrap items-end justify-between gap-6 px-4 pb-10 pt-12 md:px-8 md:pb-12 md:pt-20">
         <p className="max-w-[760px] font-title text-[28px] font-light leading-[1.15] tracking-[.01em] md:text-[44px]">
           {locale === "es" ? "¿Hablamos?" : "Shall we talk?"} <span className="text-ink/55">{locale === "es" ? "Un asesor te atiende a cualquier hora." : "An advisor answers at any hour."}</span>
         </p>
@@ -64,7 +64,7 @@ export async function PublicFooter({ locale }: { locale: Locale }) {
         {col(t("owners"), [[t("sellWithUs"), `/${locale}/sell`], [t("valuation"), `/${locale}/sell#estimar`], [t("myProperties"), `/${locale}/owner/listings`]])}
         {col(t("agencies"), [[t("forAgencies"), `/${locale}/register`]], <FooterAccountLink locale={locale} signIn={nav("signIn")} className={linkCls} />)}
       </div>
-      <div className="relative border-t border-ink/10">
+      <div className="relative >
         {/* TODO(legal): Privacidad · Términos · Cookies links go here once the client provides and approves the texts. */}
         <div className="mx-auto flex max-w-[1320px] flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 py-5 text-sm text-ink/55 md:px-8">
           <span>

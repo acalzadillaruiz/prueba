@@ -383,7 +383,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
                   </div>
                 )}
                 {est && (
-                  <div className="mt-1 flex justify-between gap-3 border-t border-black/10 pt-1 font-semibold dark:border-white/10">
+                  <div className="mt-1 flex justify-between gap-3 pt-1 font-semibold >
                     <span>{tx(locale, "Total estimado", "Estimated total")}</span>
                     <span className="whitespace-nowrap" data-testid="stay-total">{money(est.total, locale)}</span>
                   </div>

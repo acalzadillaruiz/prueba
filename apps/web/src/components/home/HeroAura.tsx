@@ -41,7 +41,7 @@ export function HeroAura({ locale, available }: { locale: Locale; available: num
           <div className="mt-7 flex flex-wrap items-center gap-3 lg:mt-9">
             <Link
               href={`/${locale}/search`}
-              className="inline-flex min-h-12 items-center rounded-[2px] bg-ivory px-6 font-display text-[16px] font-medium text-navy transition-colors duration-np ease-np hover:bg-arena focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ivory"
+              className="inline-flex min-h-12 items-center rounded-[2px] bg-[#F6F2EC] px-6 font-display text-[16px] font-medium text-[#0E1A2B] transition-colors duration-np ease-np hover:bg-[#E9E1D3] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ivory"
             >
               {tx(locale, "Ver casas", "See homes")}
             </Link>

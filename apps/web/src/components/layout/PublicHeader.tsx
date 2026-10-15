@@ -390,7 +390,7 @@ export function PublicHeader({ locale, variant = "light", autoHide = false }: { 
           </button>
           <Link href={`/${locale}/saved`} className={cn(iconBtn, "relative hidden sm:flex")} aria-label={t("saved")}>
             <Heart size={19} aria-hidden />
-            {saved.length > 0 && <span className="absolute right-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-navy px-1 text-[11px] font-bold leading-none text-ivory outline outline-2 -outline-offset-2 outline-ivory">{saved.length}</span>}
+            {saved.length > 0 && <span className="absolute right-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-navy px-1 text-[11px] font-bold leading-none text-ivory outline outline-2 outline-offset-0 outline-ivory">{saved.length}</span>}
           </Link>
           {!ready ? (
             // session still loading (public pages are cached without it): keep the slot's size, no flash

@@ -554,7 +554,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
           <div role="alert" className="border-t border-line bg-[#B3261E1A] px-4 py-2 text-sm text-danger md:px-5">{alertError}</div>
         )}
         {moreOpen && desktop && (
-          <div ref={morePanel} id="search-more-filters" role="dialog" aria-label={tx(locale, "Más filtros", "More filters")} className="np-in absolute inset-x-0 top-full max-h-[70vh] overflow-y-auto border-b border-line bg-white px-5 py-5 ">
+          <div ref={morePanel} id="search-more-filters" role="dialog" aria-label={tx(locale, "Más filtros", "More filters")} className="np-in absolute inset-x-0 top-full max-h-[70vh] overflow-y-auto bg-ivory px-5 py-5 shadow-float">
             <MoreFields locale={locale} f={f} set={set} withLux />
             <div className="mt-5 flex items-center justify-end gap-4 border-t border-line pt-4">
               <button type="button" onClick={() => setMoreOpen(false)} className="min-h-11 px-2 font-display text-sm font-semibold underline underline-offset-4">

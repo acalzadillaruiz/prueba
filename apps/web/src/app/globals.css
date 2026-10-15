@@ -240,6 +240,8 @@ body:has([data-public-header]) [data-demobar] { display: none; }
 @media (prefers-reduced-motion: reduce) { .np-skeleton { animation: none; } }
 /* Keyboard focus stays visible on navy surfaces and in dark mode (light terracotta ring). */
 :is(.bg-navy, .np-navy-panel, .text-ivory) *:focus-visible, html.dark .np-public *:focus-visible { outline-color: var(--np-coral-light); }
+/* …but a light surface inside a night block (the hero search) brings back the gold-deep ring. */
+html:not(.dark) :is(.bg-ivory, .bg-arena, .bg-white) *:focus-visible { outline-color: var(--np-gold-text); }
 
 /* ── Immersive home (components/home) ───────────────────────────────────────── */
 /* Steps light up as the route draws; text stays full-contrast, only the numeral and a rule change. */

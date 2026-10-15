@@ -11,7 +11,7 @@ import { Monogram } from "@/components/brand/Logo";
  */
 type BtnVariant = "primary" | "coral" | "navy" | "ghost" | "outline" | "light" | "dark-ghost" | "dark-outline" | "gold";
 const PRIMARY = "bg-coral-cta text-white hover:bg-coral-cta-hover active:bg-coral-cta-hover";
-const LIGHT = "bg-ivory text-navy hover:bg-arena";
+const LIGHT = "bg-[#F6F2EC] text-[#0E1A2B] hover:bg-[#E9E1D3]"; // fixed hexes: stays bone on night in dark mode too
 const BTN: Record<BtnVariant, string> = {
   primary: PRIMARY,
   coral: PRIMARY,
@@ -88,7 +88,7 @@ export function Badge({ children, tone = "neutral", className }: { children: Rea
     navy: "bg-navy text-ivory",
     mist: "bg-[#A9B1BC2E] text-[#4E453F] dark:text-[#DECEB9]",
     dark: "bg-white/10 text-ivory",
-    exclusive: "bg-white/90 text-[#0E1A2B] outline outline-1 -outline-offset-1 outline-[rgba(31,78,90,.3)]",
+    exclusive: "bg-white/90 text-[#0E1A2B] outline outline-1 -outline-offset-1 outline-[rgb(14_26_43/.3)]",
     egeo: "bg-[#C9BFAE] text-[#0E1A2B]",
     arena: "bg-[#E9E1D3] text-[#1A2026]",
   }[tone];

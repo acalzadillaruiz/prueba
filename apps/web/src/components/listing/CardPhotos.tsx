@@ -86,7 +86,7 @@ export function CardPhotos({ l, locale, label, href }: { l: Listing; locale: Loc
       </button>
       <div aria-hidden data-photo-dots className="pointer-events-none absolute bottom-3 left-1/2 z-[2] flex -translate-x-1/2 items-center gap-1.5">
         {Array.from({ length: n }, (_, i) => (
-          <span key={i} className={cn("h-1.5 rounded-full transition-all duration-np", i === idx ? "w-3 bg-white" : "w-1.5 bg-white/60")} />
+          <span key={i} className={cn("h-1.5 rounded-full outline outline-1 outline-[rgb(14_26_43/.25)] transition-[width,background-color] duration-np", i === idx ? "w-3 bg-white" : "w-1.5 bg-white/60")} />
         ))}
       </div>
       <span className="sr-only" aria-live="polite">{tx(locale, `Foto ${idx + 1} de ${n}`, `Photo ${idx + 1} of ${n}`)}</span>

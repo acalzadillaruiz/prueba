@@ -177,7 +177,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
               <button
                 type="button"
                 onClick={() => signIn("google", { callbackUrl: next ?? `/${locale}/app` })}
-                className="mt-8 flex h-12 w-full items-center justify-center gap-3 rounded-full bg-white font-display font-medium text-navy outline outline-1 -outline-offset-1 outline-[#C9BFAE] transition-shadow hover:outline hover:outline-1 hover:-outline-offset-1 hover:outline-[#1A2026]"
+                className="mt-8 flex h-12 w-full items-center justify-center gap-3 rounded-full bg-white font-display font-medium text-navy outline outline-1 -outline-offset-1 outline-[#C9BFAE] transition-[outline-color] hover:outline hover:outline-1 hover:-outline-offset-1 hover:outline-[#1A2026]"
               >
                 <GoogleG /> {tx(locale, "Continuar con Google", "Continue with Google")}
               </button>
@@ -238,7 +238,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
                       await signIn("demo", { email: d.email, redirect: false });
                       finish(d.home);
                     }}
-                    className="flex items-center gap-2 rounded-xl bg-white p-2 text-left text-sm outline outline-1 -outline-offset-1 outline-[#E4DCCD] transition-shadow hover:outline hover:outline-1 hover:-outline-offset-1 hover:outline-[#1A2026]"
+                    className="flex items-center gap-2 rounded-xl bg-white p-2 text-left text-sm outline outline-1 -outline-offset-1 outline-[#E4DCCD] transition-[outline-color] hover:outline hover:outline-1 hover:-outline-offset-1 hover:outline-[#1A2026]"
                   >
                     {busy === d.email ? <Loader2 size={18} className="animate-spin" /> : <Avatar initials={d.initials} hue={d.hue} size={26} />}
                     <span className="font-semibold leading-tight">{tx(locale, d.label.es, d.label.en)}</span>

@@ -135,7 +135,7 @@ export function FloatingContact({ href, label, whatsapp = false, tabbar = false,
         aria-controls={open ? menuId : undefined}
         tabIndex={hidden ? -1 : undefined}
         onClick={() => setOpen((o) => !o)}
-        className="flex h-14 w-14 items-center justify-center rounded-full bg-navy text-ivory transition-colors hover:bg-navy-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-navy"
+        className="flex h-14 w-14 items-center justify-center rounded-full bg-navy text-ivory transition-colors hover:bg-navy-2 [html.dark_&]:bg-[#F6F2EC] [html.dark_&]:text-[#0E1A2B] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-navy"
       >
         {open ? <X size={22} aria-hidden /> : <MessageCircle size={23} aria-hidden />}
       </button>
@@ -199,7 +199,7 @@ export function MobileTabBar({ locale }: { locale: Locale }) {
       data-tabbar
       aria-label={locale === "es" ? "Navegación inferior" : "Bottom navigation"}
       data-away={away || undefined}
-      className="fixed inset-x-0 bottom-0 z-40 bg-ivory shadow-float transition-transform duration-[320ms] ease-np focus-within:translate-y-0 data-[away]:translate-y-full md:hidden print:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 bg-ivory shadow-float transition-transform duration-[320ms] ease-np motion-reduce:transition-none [&[data-away]:not(:focus-within)]:translate-y-full md:hidden print:hidden"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <ul className="grid grid-cols-4">

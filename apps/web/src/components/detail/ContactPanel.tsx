@@ -173,7 +173,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
   const first = agent?.name.split(" ")[0] ?? agency?.name ?? "";
   const confirmer = first || (fsbo ? tx(locale, "su dueño", "the owner") : tx(locale, "el anunciante", "the lister"));
   const initials = (agent?.name ?? agency?.name ?? "NP").split(" ").map((p) => p[0]).slice(0, 2).join("");
-  const box = dark ? "bg-navy-card text-ivory ring-navy-line" : "np-glass ring-0";
+  const box = dark ? "bg-navy-card text-ivory outline-navy-line" : "np-glass outline-0";
   const seg = (active: boolean) => cn("flex min-h-11 items-center justify-center gap-1.5 rounded-full border-2 font-display text-sm transition-colors duration-np focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2", dark ? "focus-visible:outline-ivory" : "focus-visible:outline-ink", active ? "np-sel font-semibold" : "border-transparent text-muted hover:text-ink");
   const quietLink = cn("inline-flex min-h-11 items-center gap-1.5 rounded-full px-1 text-sm font-semibold underline decoration-current/30 underline-offset-4 hover:decoration-current focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-60", dark ? "text-ivory focus-visible:outline-ivory" : "text-navy focus-visible:outline-navy");
   const modes: Mode[] = stay ? ["stay", "msg"] : bookable ? ["tour", "msg"] : ["msg"];

@@ -149,7 +149,7 @@ export function AskBar({ locale, className, sticky = false }: { locale: Locale; 
           type="submit"
           aria-busy={busy}
           aria-label={tx(locale, "Buscar casas", "Find homes")}
-          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-navy text-ivory transition-[background-color,transform] duration-np ease-np hover:bg-navy-2 active:scale-[.98]"
+          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-navy text-ivory transition-[background-color,transform] duration-np ease-np hover:bg-navy-2 active:scale-[.98] [html.dark_&]:bg-[#F6F2EC] [html.dark_&]:text-[#0E1A2B]"
         >
           <Search size={20} strokeWidth={1.8} aria-hidden />
         </button>
@@ -294,7 +294,7 @@ function CompactAsk({
         {/* Desktop: the compact bar replaces the header, so it keeps the header's everyday shortcuts. */}
         <Link href={`/${locale}/saved`} aria-label={tx(locale, "Guardados", "Saved")} className={cn("relative ml-1 hidden h-11 w-11 shrink-0 items-center justify-center rounded-full hover:bg-black/5 lg:flex", ring)}>
           <Heart size={19} aria-hidden />
-          {saved.length > 0 && <span className="absolute right-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-navy px-1 text-[11px] font-bold leading-none text-ivory outline outline-2 -outline-offset-2 outline-ivory">{saved.length}</span>}
+          {saved.length > 0 && <span className="absolute right-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-navy px-1 text-[11px] font-bold leading-none text-ivory outline outline-2 outline-offset-0 outline-ivory">{saved.length}</span>}
         </Link>
         {ready && (
           <Link

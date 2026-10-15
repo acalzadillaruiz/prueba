@@ -451,7 +451,6 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
   const compareLabel = tx(locale, `Comparar (${compare.length})`, `Compare (${compare.length})`);
   const compareSeg = compare.length > 0 && (
     <>
-      {(hasResults || phoneMap) &&}
       <Link href={compareHref(locale, compare)} aria-label={phoneMap ? compareLabel : undefined} className={cn("flex h-12 items-center gap-1.5 pr-5", hasResults || phoneMap ? "pl-4" : "pl-5")}>
         <Scale size={16} aria-hidden className="shrink-0 text-[#E9E1D3] [html.dark_&]:text-[#0E1A2B]" />
         {phoneMap ? <span className="[font-feature-settings:'lnum']">{compare.length}</span> : <>{compareLabel} <ArrowRight size={15} aria-hidden /></>}

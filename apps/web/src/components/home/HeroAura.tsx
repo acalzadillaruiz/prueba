@@ -15,7 +15,7 @@ export function HeroAura({ locale, available }: { locale: Locale; available: num
   const desktop = getImageProps({ ...common, src: "/brand/hero-costa-atardecer.jpg" }).props.srcSet;
   const mobileImg = getImageProps({ ...common, src: "/brand/hero-torre-marina.jpg" }).props;
   return (
-    <section data-hide-fab className="relative isolate flex min-h-[100svh] flex-col overflow-hidden bg-[#1C1D1D] text-white" aria-labelledby="hero-title">
+    <section data-hide-fab className="relative isolate flex min-h-[100svh] flex-col overflow-hidden bg-[#0E1A2B] text-white" aria-labelledby="hero-title">
       {/* Art direction: the coast at sunset on wide screens, the tower over the marina on phones (portrait crop on the
           tower). One <img> (the LCP), two sources. Illustrative images (AI), as the alt says. */}
       <picture>
@@ -56,7 +56,7 @@ export function HeroAura({ locale, available }: { locale: Locale; available: num
             locale={locale}
             className="flex min-h-11 items-center gap-2 rounded-full border border-white/30 bg-white/15 px-4 font-display text-[14px] text-white backdrop-blur-md transition-colors hover:bg-white/25"
           >
-            <span className="h-2 w-2 rounded-full bg-[#3BB273]" aria-hidden />
+            <span className="h-2 w-2 rounded-full bg-[#2F6F4E]" aria-hidden />
             {tx(locale, "Asesor 24/7", "Advisor 24/7")}
             <span className="sr-only">{tx(locale, ": habla con un asesor ahora", ": talk to an advisor now")}</span>
           </OnCallButton>

@@ -20,8 +20,8 @@ const BOUNDS: Record<Region, { latMin: number; latMax: number; lngMin: number; l
 // "light" is the default brand map (Mediterranean: Cal/arena land, Egeo sea, sand roads, warm-grey labels);
 // "night" is kept as the alternative style behind the toggle.
 const PAL: Record<Theme, Record<string, string>> = {
-  night: { land: "#1D1917", land2: "#29231F", water: "#1C1D1D", mountain: "#27221E", contour: "#322B26", park: "#13261F", road: "#302925", hwy: "#3E4650", label: "#B8B2AA", label2: "#81776F", runway: "#312A26", pin: "#1F4E5A", note: "#B8B2AA" },
-  light: { land: "#F1ECE4", land2: "#E3DACB", water: "#ECE5DA", mountain: "#E3DACB", contour: "#ECE5DA", park: "#E6E5D3", road: "#ECE5DA", hwy: "#CDBFAC", label: "#8F8370", label2: "#A3977F", runway: "#E8DFCF", pin: "#1F4E5A", note: "#5A534D" },
+  night: { land: "#1D1917", land2: "#29231F", water: "#1A2026", mountain: "#27221E", contour: "#322B26", park: "#13261F", road: "#302925", hwy: "#0E1A2B", label: "#A9B1BC", label2: "#81776F", runway: "#312A26", pin: "#0E1A2B", note: "#A9B1BC" },
+  light: { land: "#F1ECE4", land2: "#E9E1D3", water: "#E9E1D3", mountain: "#E9E1D3", contour: "#E9E1D3", park: "#E6E5D3", road: "#E9E1D3", hwy: "#C9BFAE", label: "#8F8370", label2: "#A3977F", runway: "#E8DFCF", pin: "#0E1A2B", note: "#5A534D" },
 };
 
 const L = (lat: number, lng: number) => ({ lat, lng });
@@ -343,9 +343,9 @@ export function NightMap({
 
   const selected = listings.find((l) => l.id === selectedId);
   // Map controls: white on the light map, navy glass on the night map.
-  const ctl = theme === "light" ? "border-[#ECE5DA] bg-[#ffffff] text-[#1C1D1D]" : "border-white/10 bg-navy/90 text-ivory backdrop-blur";
+  const ctl = theme === "light" ? "border-[#E9E1D3] bg-[#ffffff] text-[#1A2026]" : "border-white/10 bg-navy/90 text-ivory backdrop-blur";
   const ctlHover = theme === "light" ? "hover:bg-[#F1ECE4]" : "hover:bg-white/10";
-  const ctlLine = theme === "light" ? "border-[#ECE5DA]" : "border-white/10";
+  const ctlLine = theme === "light" ? "border-[#E9E1D3]" : "border-white/10";
 
   // CSS px inside the map box ⇄ map coordinates (same "slice" geometry as the pins).
   const toPx = useCallback(
@@ -416,15 +416,15 @@ export function NightMap({
 
   const shapeEl =
     shape?.type === "poly" ? (
-      <path data-shape="poly" d={path(shape.pts, true)} fill="#1F4E5A1c" stroke="#1F4E5A" strokeWidth={2} strokeDasharray="6 4" vectorEffect="non-scaling-stroke" />
+      <path data-shape="poly" d={path(shape.pts, true)} fill="#0E1A2B1c" stroke="#0E1A2B" strokeWidth={2} strokeDasharray="6 4" vectorEffect="non-scaling-stroke" />
     ) : shape?.type === "radius" ? (
       (() => {
         const c = P(shape.center.lat, shape.center.lng);
         const rx = (shape.km / 111 / Math.cos((shape.center.lat * Math.PI) / 180) / (B.lngMax - B.lngMin)) * B.W;
         return (
           <g>
-            <ellipse data-shape="radius" cx={c.x} cy={c.y} rx={rx} ry={rx} fill="#1F4E5A1c" stroke="#1F4E5A" strokeWidth={2} vectorEffect="non-scaling-stroke" />
-            <circle cx={c.x} cy={c.y} r={4 / view.s} fill="#1F4E5A" />
+            <ellipse data-shape="radius" cx={c.x} cy={c.y} rx={rx} ry={rx} fill="#0E1A2B1c" stroke="#0E1A2B" strokeWidth={2} vectorEffect="non-scaling-stroke" />
+            <circle cx={c.x} cy={c.y} r={4 / view.s} fill="#0E1A2B" />
           </g>
         );
       })()
@@ -451,7 +451,7 @@ export function NightMap({
       >
         <defs>
           <filter id={`${uid}-pin`} x="-50%" y="-80%" width="200%" height="260%">
-            <feDropShadow dx="0" dy="4" stdDeviation="4" floodColor="#1C1D1D" floodOpacity="0.2" />
+            <feDropShadow dx="0" dy="4" stdDeviation="4" floodColor="#1A2026" floodOpacity="0.2" />
           </filter>
         </defs>
         <rect x={-5000} y={-5000} width={12000} height={12000} fill={pal.water} />
@@ -572,11 +572,11 @@ export function NightMap({
           )}
           {shapeEl}
           {draft.length > 0 && (
-            <path d={path(draft)} fill="#1F4E5A18" stroke="#1F4E5A" strokeWidth={2} vectorEffect="non-scaling-stroke" />
+            <path d={path(draft)} fill="#0E1A2B18" stroke="#0E1A2B" strokeWidth={2} vectorEffect="non-scaling-stroke" />
           )}
           {draft.map((p, i) => {
             const c = P(p.lat, p.lng);
-            return <circle key={i} cx={c.x} cy={c.y} r={5 / view.s} fill="#F6F2EC" stroke="#1F4E5A" strokeWidth={2 / view.s} />;
+            return <circle key={i} cx={c.x} cy={c.y} r={5 / view.s} fill="#F6F2EC" stroke="#0E1A2B" strokeWidth={2 / view.s} />;
           })}
         </g>
 
@@ -602,10 +602,10 @@ export function NightMap({
             >
               <g className="opacity-0 group-focus-visible:opacity-100">
                 <circle r={26} fill="none" stroke="#F6F2EC" strokeWidth={4.5} />
-                <circle r={26} fill="none" stroke="#1C1D1D" strokeWidth={2} />
+                <circle r={26} fill="none" stroke="#1A2026" strokeWidth={2} />
               </g>
-              <circle r={22} fill="#1C1D1D" opacity={0.14} />
-              <circle r={16.5} fill="#1C1D1D" stroke="#F6F2EC" strokeWidth={2} filter={`url(#${uid}-pin)`} />
+              <circle r={22} fill="#1A2026" opacity={0.14} />
+              <circle r={16.5} fill="#1A2026" stroke="#F6F2EC" strokeWidth={2} filter={`url(#${uid}-pin)`} />
               <text textAnchor="middle" dy={4.5} fontSize={13} fontWeight={600} fill="#F6F2EC" fontFamily="var(--font-display)">
                 {g.items.length}
               </text>
@@ -632,7 +632,7 @@ export function NightMap({
         const y = p.y * view.s + view.y;
         return (
           <div className="pointer-events-none absolute z-10" style={{ left: x / k - (B.W / k - box.w) / 2, top: y / k - (B.H / k - box.h) / 2, transform: "translate(-50%, -100%)" }}>
-            <svg viewBox="0 0 32 36" width="30" height="34" aria-hidden><path d="M16 35C14.6 35 13.8 34.2 13 33L3.2 16.4C-.6 9.8 4.2 1.5 11.8 1.5H20.2C27.8 1.5 32.6 9.8 28.8 16.4L19 33C18.2 34.2 17.4 35 16 35Z" fill="#1C1D1D" stroke="#F6F2EC" strokeWidth="1.5" /><path d="M9.5 14.5 16 9.5l6.5 5" fill="none" stroke="#9CC3CC" strokeWidth="2.2" /></svg>
+            <svg viewBox="0 0 32 36" width="30" height="34" aria-hidden><path d="M16 35C14.6 35 13.8 34.2 13 33L3.2 16.4C-.6 9.8 4.2 1.5 11.8 1.5H20.2C27.8 1.5 32.6 9.8 28.8 16.4L19 33C18.2 34.2 17.4 35 16 35Z" fill="#1A2026" stroke="#F6F2EC" strokeWidth="1.5" /><path d="M9.5 14.5 16 9.5l6.5 5" fill="none" stroke="#E9E1D3" strokeWidth="2.2" /></svg>
           </div>
         );
       })()}
@@ -643,7 +643,7 @@ export function NightMap({
             type="button"
             onClick={() => onSelect?.(null)}
             aria-label={tx(locale, "Cerrar vista previa", "Close preview")}
-            className="absolute left-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-[#ffffffe6] text-[#1C1D1D] shadow-sm backdrop-blur"
+            className="absolute left-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-[#ffffffe6] text-[#1A2026] shadow-sm backdrop-blur"
           >
             <X size={16} aria-hidden />
           </button>
@@ -678,7 +678,7 @@ export function NightMap({
             type="button"
             onClick={searchHere}
             data-search-area
-            className="np-in pointer-events-auto flex min-h-11 items-center gap-2 whitespace-nowrap rounded-full bg-[#1C1D1D] px-4 font-display text-sm font-semibold text-[#F6F2EC] shadow-[0_12px_30px_-8px_rgba(28,29,29,.55)] [html.dark_&]:bg-[#F6F2EC] [html.dark_&]:text-[#1C1D1D]"
+            className="np-in pointer-events-auto flex min-h-11 items-center gap-2 whitespace-nowrap rounded-full bg-[#0E1A2B] px-4 font-display text-sm font-semibold text-[#F6F2EC] shadow-[0_12px_30px_-8px_rgba(28,29,29,.55)] [html.dark_&]:bg-[#F6F2EC] [html.dark_&]:text-[#1A2026]"
           >
             <Search size={15} aria-hidden /> {tx(locale, "Buscar en esta zona", "Search this area")}
           </button>
@@ -762,13 +762,13 @@ function PricePin({ l, x, y, active, locale, onClick, k, shadow }: { l: Listing;
     >
       <g className="opacity-0 group-focus-visible:opacity-100">
         <rect x={-w / 2 - 6} y={top - 18} width={w + 12} height={H + 24} rx={10} fill="none" stroke="#F6F2EC" strokeWidth={4.5} />
-        <rect x={-w / 2 - 6} y={top - 18} width={w + 12} height={H + 24} rx={10} fill="none" stroke="#1C1D1D" strokeWidth={2} />
+        <rect x={-w / 2 - 6} y={top - 18} width={w + 12} height={H + 24} rx={10} fill="none" stroke="#1A2026" strokeWidth={2} />
       </g>
       {active ? (
         <g>
-          <path d={`M-20 ${top - 5} L0 ${top - 17} L20 ${top - 5} Z`} fill="#1F4E5A" />
-          <rect x={-w / 2 - 4} y={top - 4} width={w + 8} height={H + 8} rx={10} fill="#E3DACB" opacity={0.95} />
-          <rect x={-w / 2} y={top} width={w} height={H} rx={7} fill="#1C1D1D" filter={shadow} />
+          <path d={`M-20 ${top - 5} L0 ${top - 17} L20 ${top - 5} Z`} fill="#0E1A2B" />
+          <rect x={-w / 2 - 4} y={top - 4} width={w + 8} height={H + 8} rx={10} fill="#E9E1D3" opacity={0.95} />
+          <rect x={-w / 2} y={top} width={w} height={H} rx={7} fill="#1A2026" filter={shadow} />
           <text textAnchor="middle" y={top + 17} fontSize={13} fontWeight={600} fontFamily="var(--font-display)" fill="#FFFFFF">
             {label}
           </text>
@@ -777,7 +777,7 @@ function PricePin({ l, x, y, active, locale, onClick, k, shadow }: { l: Listing;
         <g filter={shadow}>
           <path d={`M-16 ${top + 1} L0 ${top - 9} L16 ${top + 1} Z`} fill="#FFFFFF" />
           <rect x={-w / 2} y={top} width={w} height={H} rx={7} fill="#FFFFFF" />
-          <text textAnchor="middle" y={top + 17} fontSize={13} fontWeight={600} fontFamily="var(--font-display)" fill="#1C1D1D">
+          <text textAnchor="middle" y={top + 17} fontSize={13} fontWeight={600} fontFamily="var(--font-display)" fill="#1A2026">
             {label}
           </text>
         </g>

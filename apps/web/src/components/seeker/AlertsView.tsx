@@ -105,7 +105,7 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
                     {custom && <div className="mt-0.5 text-[13px] leading-snug text-muted">{summary}</div>}
                     <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-muted">
                       <span>{freq[s.frequency]} · {s.lastSentAt ? `${tx(locale, "último aviso", "last sent")} ${ago(s.lastSentAt, locale)}` : tx(locale, "aún sin avisos", "nothing sent yet")}</span>
-                      {s.newCount > 0 && <Badge className="bg-[#DED5C7] text-navy dark:bg-white/10">{s.newCount} {tx(locale, "nuevos", "new")}</Badge>}
+                      {s.newCount > 0 && <Badge className="bg-[#E9E1D3] text-navy dark:bg-white/10">{s.newCount} {tx(locale, "nuevos", "new")}</Badge>}
                     </div>
                   </div>
                 </div>
@@ -152,7 +152,7 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
                         maxLength={120}
                         onChange={(e) => setDraft(e.target.value)}
                         placeholder={summary}
-                        className="h-11 rounded-xl border border-[#CDBFAC] bg-white px-3 text-[16px] font-normal text-navy focus:border-navy focus:outline-none dark:bg-white/5 dark:text-ivory sm:text-[15px]"
+                        className="h-11 rounded-xl border border-[#C9BFAE] bg-white px-3 text-[16px] font-normal text-navy focus:border-navy focus:outline-none dark:bg-white/5 dark:text-ivory sm:text-[15px]"
                       />
                     </label>
                     <label className="grid gap-1 text-[13px] font-semibold">
@@ -160,7 +160,7 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
                       <select
                         value={s.frequency}
                         onChange={(e) => void changeFrequency(s, e.target.value as Search["frequency"])}
-                        className="h-11 rounded-xl border border-[#CDBFAC] bg-white px-3 text-[15px] font-normal text-navy focus:border-navy focus:outline-none dark:bg-white/5 dark:text-ivory"
+                        className="h-11 rounded-xl border border-[#C9BFAE] bg-white px-3 text-[15px] font-normal text-navy focus:border-navy focus:outline-none dark:bg-white/5 dark:text-ivory"
                       >
                         <option value="INSTANT">{freq.INSTANT}</option>
                         <option value="DAILY">{freq.DAILY}</option>
@@ -191,7 +191,7 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
             {emails.map((e) => (
               <li key={e.id} className="py-3">
                 <div className="flex items-center justify-between gap-2">
-                  <Badge tone={e.kind === "TOUR" ? "ok" : "mist"} className={e.kind === "ALERT" ? "bg-[#DED5C7] text-navy dark:bg-white/10" : undefined}>{lbl(EMAIL_KIND_LABEL[e.kind] ?? [e.kind, e.kind], locale)}</Badge>
+                  <Badge tone={e.kind === "TOUR" ? "ok" : "mist"} className={e.kind === "ALERT" ? "bg-[#E9E1D3] text-navy dark:bg-white/10" : undefined}>{lbl(EMAIL_KIND_LABEL[e.kind] ?? [e.kind, e.kind], locale)}</Badge>
                   <span className="text-xs text-muted">{ago(e.at, locale)}</span>
                 </div>
                 <div className="mt-1.5 text-sm font-semibold">{localizeEmailSubject(e.subject, locale)}</div>

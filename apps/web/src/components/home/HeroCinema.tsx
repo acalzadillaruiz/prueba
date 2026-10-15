@@ -133,7 +133,7 @@ export function HeroCinema({
 
         <div ref={outro} className="pointer-events-none absolute inset-x-0 bottom-[16vh] px-4 text-center opacity-0" aria-hidden>
           <p className="font-serif text-[46px] italic leading-none text-ivory sm:text-[72px] lg:text-[104px]">{arrival}</p>
-          <p className="mt-5 text-[12px] font-semibold uppercase tracking-[0.34em] text-[#E3DACB]">{arrivalSub}</p>
+          <p className="mt-5 text-[12px] font-semibold uppercase tracking-[0.34em] text-[#E9E1D3]">{arrivalSub}</p>
         </div>
 
         <div ref={hint} className="pointer-events-none absolute bottom-6 right-6 hidden items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.3em] text-ivory/80 lg:flex" aria-hidden>
@@ -141,7 +141,7 @@ export function HeroCinema({
           <span className="np-scroll-line relative block h-12 w-px overflow-hidden bg-ivory/25" />
         </div>
         <div className="absolute inset-x-0 bottom-0 h-[2px] bg-ivory/10" aria-hidden>
-          <div ref={bar} className="h-full origin-left scale-x-0 bg-[#9CC3CC]" />
+          <div ref={bar} className="h-full origin-left scale-x-0 bg-[#E9E1D3]" />
         </div>
       </div>
       {/* Screen readers get the arrival line once, as text. */}

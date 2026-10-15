@@ -267,7 +267,7 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
             </span>
           </div>
           {/* Portrait only beside the copy (lg); stacked below it (phones, tablets) a landscape band. */}
-          <div data-unveil className="relative mx-auto mb-10 aspect-[16/10] w-full max-w-[520px] overflow-hidden rounded-[2px] bg-[#D9CDB8] md:mb-12 lg:mb-16 lg:mr-0 lg:aspect-[4/3]">
+          <div data-unveil className="relative mx-auto mb-10 aspect-[16/10] w-full max-w-[520px] overflow-hidden rounded-[2px] bg-[#E9E1D3] md:mb-12 lg:mb-16 lg:mr-0 lg:aspect-[4/3]">
             <div data-parallax="40" className="absolute -inset-y-[8%] inset-x-0">
               <Image src={salonMar} alt={tx(locale, "Imagen ilustrativa", "Illustrative image")} fill placeholder="blur" sizes="(max-width: 1024px) 90vw, 560px" className="object-cover" />
             </div>

@@ -56,7 +56,7 @@ export function SignupPrompt({ locale, reason, onClose }: { locale: Locale; reas
   const Icon = alert ? Bell : Heart;
   const ring = "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy";
   return createPortal(
-    <div className="fixed inset-0 z-[70] flex items-end justify-center bg-[#1C1D1D]/45 sm:items-center sm:p-6 print:hidden" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+    <div className="fixed inset-0 z-[70] flex items-end justify-center bg-[#0E1A2B]/45 sm:items-center sm:p-6 print:hidden" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
       <div
         ref={panel}
         role="dialog"
@@ -67,7 +67,7 @@ export function SignupPrompt({ locale, reason, onClose }: { locale: Locale; reas
         style={{ paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))" }}
       >
         <div className="flex items-start justify-between gap-4">
-          <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#1F4E5A]/10 text-[#1F4E5A]">
+          <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#0E1A2B]/10 text-[#0E1A2B]">
             <Icon size={20} strokeWidth={1.7} aria-hidden />
           </span>
           <button type="button" onClick={onClose} aria-label={tx(locale, "Cerrar", "Close")} className={cn("-mr-2 -mt-1 flex h-11 w-11 items-center justify-center rounded-full text-navy hover:bg-navy/5", ring)}>

@@ -177,11 +177,11 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
               <button
                 type="button"
                 onClick={() => signIn("google", { callbackUrl: next ?? `/${locale}/app` })}
-                className="mt-8 flex h-12 w-full items-center justify-center gap-3 rounded-full bg-white font-display font-medium text-navy shadow-[inset_0_0_0_1px_#CDBFAC] transition-shadow hover:shadow-[inset_0_0_0_1px_#1C1D1D]"
+                className="mt-8 flex h-12 w-full items-center justify-center gap-3 rounded-full bg-white font-display font-medium text-navy shadow-[inset_0_0_0_1px_#C9BFAE] transition-shadow hover:shadow-[inset_0_0_0_1px_#1A2026]"
               >
                 <GoogleG /> {tx(locale, "Continuar con Google", "Continue with Google")}
               </button>
-              <div className={cn("my-6 flex items-center gap-3 text-[12px] uppercase tracking-[.14em]", k.muted)}><span className="h-px flex-1 bg-[#CDBFAC]" />{tx(locale, "o con tu correo", "or with your email")}<span className="h-px flex-1 bg-[#CDBFAC]" /></div>
+              <div className={cn("my-6 flex items-center gap-3 text-[12px] uppercase tracking-[.14em]", k.muted)}><span className="h-px flex-1 bg-[#C9BFAE]" />{tx(locale, "o con tu correo", "or with your email")}<span className="h-px flex-1 bg-[#C9BFAE]" /></div>
             </>
           ) : (
             <div className="mt-8" />
@@ -203,7 +203,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
               </div>
             )}
             {mode === "register" && !inv && (
-              <label className={cn("flex cursor-pointer items-start gap-3 rounded-[4px] p-4", agency ? "bg-[#DED5C7] shadow-[inset_0_0_0_2px_#1C1D1D]" : "bg-white shadow-[inset_0_0_0_1px_#CDBFAC]")}>
+              <label className={cn("flex cursor-pointer items-start gap-3 rounded-[4px] p-4", agency ? "bg-[#E9E1D3] shadow-[inset_0_0_0_2px_#1A2026]" : "bg-white shadow-[inset_0_0_0_1px_#C9BFAE]")}>
                 <input type="checkbox" checked={agency} onChange={(e) => setAgency(e.target.checked)} className="mt-1 h-4 w-4 accent-navy" />
                 <span>
                   <span className="flex items-center gap-1.5 font-display font-semibold"><Building2 size={16} strokeWidth={1.7} /> {tx(locale, "¿Eres agencia?", "Are you an agency?")}</span>
@@ -226,7 +226,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
             )}
           </p>
           {mode === "login" && preview && (
-            <div className="mt-10 rounded-[4px] border border-dashed border-[#CDBFAC] bg-white/60 p-4" data-private-preview>
+            <div className="mt-10 rounded-[4px] border border-dashed border-[#C9BFAE] bg-white/60 p-4" data-private-preview>
               <div className={cn("flex items-center gap-2", k.label)}><FlaskConical size={14} /> {tx(locale, "Vista previa privada · Entrar como…", "Private preview · Sign in as…")}</div>
               <div className="mt-3 grid grid-cols-2 gap-2">
                 {DEMO_LOGINS.map((d) => (
@@ -238,7 +238,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
                       await signIn("demo", { email: d.email, redirect: false });
                       finish(d.home);
                     }}
-                    className="flex items-center gap-2 rounded-xl bg-white p-2 text-left text-sm shadow-[inset_0_0_0_1px_#E4DCCD] transition-shadow hover:shadow-[inset_0_0_0_1px_#1C1D1D]"
+                    className="flex items-center gap-2 rounded-xl bg-white p-2 text-left text-sm shadow-[inset_0_0_0_1px_#E4DCCD] transition-shadow hover:shadow-[inset_0_0_0_1px_#1A2026]"
                   >
                     {busy === d.email ? <Loader2 size={18} className="animate-spin" /> : <Avatar initials={d.initials} hue={d.hue} size={26} />}
                     <span className="font-semibold leading-tight">{tx(locale, d.label.es, d.label.en)}</span>
@@ -258,7 +258,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
             <img src="/brand/torre-atardecer.jpg" alt="" className="h-full w-full object-cover object-[70%_50%]" />
             <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-navy/80 to-transparent" />
             <div className="absolute inset-x-0 bottom-8 px-8 text-center text-ivory">
-              <div className="text-[11px] font-semibold uppercase tracking-[.22em] text-[#E3DACB]">{tx(locale, "Guarda, compara y pide visitas", "Save, compare and book visits")}</div>
+              <div className="text-[11px] font-semibold uppercase tracking-[.22em] text-[#E9E1D3]">{tx(locale, "Guarda, compara y pide visitas", "Save, compare and book visits")}</div>
               <div className="mt-3 font-display text-[17px] font-light leading-snug">{tx(locale, "Casas revisadas y un asesor que te atiende a cualquier hora.", "Checked homes and an advisor who answers at any hour.")}</div>
             </div>
           </div>

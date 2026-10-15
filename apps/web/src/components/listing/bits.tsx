@@ -19,9 +19,9 @@ export function SaveButton({ id, className, locale }: { id: string; className?: 
         e.stopPropagation();
         toggleSaved(id);
       }}
-      className={cn("flex h-11 w-11 items-center justify-center rounded-full bg-[#ffffffe6] text-[#1C1D1D] shadow-sm backdrop-blur transition-transform duration-np hover:scale-105", className)}
+      className={cn("flex h-11 w-11 items-center justify-center rounded-full bg-[#ffffffe6] text-[#1A2026] shadow-sm backdrop-blur transition-transform duration-np hover:scale-105", className)}
     >
-      <Heart size={18} strokeWidth={1.7} aria-hidden className={on ? "fill-[#1F4E5A] text-[#1F4E5A]" : "text-[#1C1D1D]"} />
+      <Heart size={18} strokeWidth={1.7} aria-hidden className={on ? "fill-[#0E1A2B] text-[#0E1A2B]" : "text-[#1A2026]"} />
     </button>
   );
 }
@@ -81,7 +81,7 @@ export function CardCompareToggle({ id, locale }: { id: string; locale: Locale }
         data-card-compare
         className={cn(
           "absolute right-[3.75rem] top-2.5 z-[2] flex h-11 w-11 items-center justify-center rounded-full shadow-sm backdrop-blur transition-transform duration-np hover:scale-105 [@media(hover:hover)]:hidden",
-          on ? "bg-[#1C1D1D] text-[#F6F2EC]" : "bg-[#ffffffe6] text-[#1C1D1D]",
+          on ? "bg-[#0E1A2B] text-[#F6F2EC]" : "bg-[#ffffffe6] text-[#1A2026]",
         )}
       >
         <Scale size={17} strokeWidth={1.8} aria-hidden />
@@ -93,13 +93,13 @@ export function CardCompareToggle({ id, locale }: { id: string; locale: Locale }
         data-card-compare
         className={cn(
           "absolute bottom-2.5 left-2.5 z-[2] hidden min-h-9 items-center gap-1.5 rounded-full px-3 font-display text-[13px] font-semibold shadow-sm backdrop-blur transition-opacity duration-np focus-visible:opacity-100 [@media(hover:hover)]:inline-flex",
-          on ? "bg-[#1C1D1D] text-[#F6F2EC] opacity-100" : "bg-[#ffffffe6] text-[#1C1D1D] opacity-0 group-hover:opacity-100",
+          on ? "bg-[#0E1A2B] text-[#F6F2EC] opacity-100" : "bg-[#ffffffe6] text-[#1A2026] opacity-0 group-hover:opacity-100",
         )}
       >
         <Scale size={14} aria-hidden /> {on ? tx(locale, "Comparando", "Comparing") : label}
       </button>
       {full && (
-        <span role="status" className="np-in absolute inset-x-2.5 bottom-14 z-[3] rounded-2xl bg-[#1C1D1D] px-3.5 py-2.5 text-[13px] leading-snug text-[#F6F2EC] shadow-np">
+        <span role="status" className="np-in absolute inset-x-2.5 bottom-14 z-[3] rounded-2xl bg-[#0E1A2B] px-3.5 py-2.5 text-[13px] leading-snug text-[#F6F2EC] shadow-np">
           {tx(locale, "Ya tienes 3 casas para comparar. Quita una del comparador y añade esta.", "You already have 3 homes to compare. Remove one and add this one.")}
         </span>
       )}
@@ -110,11 +110,11 @@ export function CardCompareToggle({ id, locale }: { id: string; locale: Locale }
 // Brand pills: egeo / arena for market states, navy for closed deals; status colours only where they warn.
 const STATUS_TONE: Record<ListingStatus, string> = {
   DRAFT: "bg-[#5A534D] text-white",
-  COMING_SOON: "bg-[#C9B49C] text-[#3E4650]",
-  ACTIVE: "bg-[#2F6B4F] text-white",
-  UNDER_OFFER: "bg-[#ECE5DA] text-[#1C1D1D]",
-  SOLD: "bg-[#1C1D1D] text-[#F6F2EC]",
-  RENTED: "bg-[#1C1D1D] text-[#F6F2EC]",
+  COMING_SOON: "bg-[#C9BFAE] text-[#0E1A2B]",
+  ACTIVE: "bg-[#2F6F4E] text-white",
+  UNDER_OFFER: "bg-[#E9E1D3] text-[#1A2026]",
+  SOLD: "bg-[#0E1A2B] text-[#F6F2EC]",
+  RENTED: "bg-[#0E1A2B] text-[#F6F2EC]",
   WITHDRAWN: "bg-danger text-white",
   EXPIRED: "bg-[#5A534D] text-white",
 };
@@ -143,7 +143,7 @@ export function Freshness({ iso, locale, className }: { iso: string; locale: Loc
   return (
     <span className={cn("inline-flex items-center gap-1.5 text-xs", className)}>
       {/* Relative time differs between the cached server HTML and the browser: not a hydration error. */}
-      <span className={cn("relative h-2 w-2 rounded-full", minutes < 60 ? "np-pulse bg-[#2F6B4F]" : "bg-mist")} suppressHydrationWarning />
+      <span className={cn("relative h-2 w-2 rounded-full", minutes < 60 ? "np-pulse bg-[#2F6F4E]" : "bg-mist")} suppressHydrationWarning />
       <span>
         {tx(locale, "Actualizado", "Updated")}{" "}
         <time dateTime={iso} suppressHydrationWarning>

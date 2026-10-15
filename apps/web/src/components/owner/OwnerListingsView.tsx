@@ -389,7 +389,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
                   }
                 }}
               >
-                <input value={draft} onChange={(e) => setDraft(e.target.value)} maxLength={2000} className="h-11 min-w-0 flex-1 rounded-full border border-[#CDBFAC] bg-white px-4 text-sm focus:border-navy focus:outline-none" placeholder={tx(locale, "Escribe un mensaje…", "Write a message…")} aria-label={tx(locale, "Mensaje", "Message")} />
+                <input value={draft} onChange={(e) => setDraft(e.target.value)} maxLength={2000} className="h-11 min-w-0 flex-1 rounded-full border border-[#C9BFAE] bg-white px-4 text-sm focus:border-navy focus:outline-none" placeholder={tx(locale, "Escribe un mensaje…", "Write a message…")} aria-label={tx(locale, "Mensaje", "Message")} />
                 <button disabled={sending} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-navy text-ivory hover:bg-navy-2 disabled:opacity-60 dark:bg-ivory dark:text-navy" aria-label={tx(locale, "Enviar", "Send")}>{sending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}</button>
               </form>
               )}
@@ -413,9 +413,9 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
 function NoPhotos({ locale, busy, onAdd }: { locale: Locale; busy: boolean; onAdd?: () => void }) {
   return (
     <div data-testid="owner-no-photos" className="relative flex aspect-[4/3] h-full w-full flex-col items-center justify-center gap-3 overflow-hidden bg-[linear-gradient(160deg,#F6F1EA_0%,#F1EBE3_45%,#E6D8C4_100%)] p-5 text-center dark:bg-[linear-gradient(160deg,#2A2420_0%,#241F1C_55%,#1E1A18_100%)]">
-      <svg viewBox="0 0 128 60" className="w-24 text-[#C9B49C] opacity-70 dark:text-[#9CC3CC]" aria-hidden fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round">
+      <svg viewBox="0 0 128 60" className="w-24 text-[#C9BFAE] opacity-70 dark:text-[#E9E1D3]" aria-hidden fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round">
         <path d="M6 44 64 4l58 40" />
-        <path d="M30 44 64 20l34 24" className="text-[#1F4E5A] dark:text-[#9CC3CC]" stroke="currentColor" />
+        <path d="M30 44 64 20l34 24" className="text-[#0E1A2B] dark:text-[#E9E1D3]" stroke="currentColor" />
         <path d="M18 44v14h92V44" opacity=".55" />
         <path d="M56 58V46h16v12" opacity=".55" />
       </svg>
@@ -424,7 +424,7 @@ function NoPhotos({ locale, busy, onAdd }: { locale: Locale; busy: boolean; onAd
         <p className="mt-0.5 text-xs text-muted dark:text-mist">{tx(locale, "Con fotos, tu anuncio recibe muchas más visitas.", "With photos, your listing gets far more views.")}</p>
       </div>
       {onAdd && (
-        <button type="button" onClick={onAdd} disabled={busy} className="inline-flex min-h-10 items-center gap-1.5 rounded-full bg-[#1C1D1D] px-4 font-display text-sm font-semibold text-[#F6F2EC] transition-colors duration-np hover:bg-[#22262A] disabled:opacity-60 dark:bg-[#F6F2EC] dark:text-[#1C1D1D] dark:hover:bg-white">
+        <button type="button" onClick={onAdd} disabled={busy} className="inline-flex min-h-10 items-center gap-1.5 rounded-full bg-[#0E1A2B] px-4 font-display text-sm font-semibold text-[#F6F2EC] transition-colors duration-np hover:bg-[#14243A] disabled:opacity-60 dark:bg-[#F6F2EC] dark:text-[#1A2026] dark:hover:bg-white">
           {busy ? <Loader2 size={14} className="animate-spin" aria-hidden /> : <ImagePlus size={14} aria-hidden />} {tx(locale, "Añade fotos", "Add photos")}
         </button>
       )}

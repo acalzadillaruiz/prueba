@@ -39,7 +39,7 @@ export async function PublicFooter({ locale }: { locale: Locale }) {
     </div>
   );
   return (
-    <footer className="relative overflow-hidden bg-[#ECE5DA] text-ink">
+    <footer className="relative overflow-hidden bg-[#E9E1D3] text-ink">
       <div className="relative mx-auto flex max-w-[1320px] flex-wrap items-end justify-between gap-6 border-b border-ink/10 px-4 pb-10 pt-12 md:px-8 md:pb-12 md:pt-20">
         <p className="max-w-[760px] font-title text-[28px] font-light leading-[1.15] tracking-[.01em] md:text-[44px]">
           {locale === "es" ? "¿Hablamos?" : "Shall we talk?"} <span className="text-ink/55">{locale === "es" ? "Un asesor te atiende a cualquier hora." : "An advisor answers at any hour."}</span>

@@ -11,7 +11,7 @@ export function HowWeWork({ heading, intro, steps, photoAlt }: { heading: string
   return (
     <section className="bg-arena" aria-labelledby="np-how-we-work">
       <div className="mx-auto grid max-w-[1320px] items-center gap-8 px-4 py-14 md:px-8 md:py-20 lg:grid-cols-[1fr_1.05fr] lg:gap-16 lg:py-24">
-        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[2px] bg-[#D9CDB8] lg:aspect-[4/5]">
+        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[2px] bg-[#E9E1D3] lg:aspect-[4/5]">
           {/* Static import: a blurred preview of the photo itself shows until it loads (037b), never an empty block. */}
           <Image src={torreAtardecer} alt={photoAlt} fill placeholder="blur" sizes="(max-width: 1024px) 92vw, 600px" className="object-cover object-[60%_50%]" />
         </div>

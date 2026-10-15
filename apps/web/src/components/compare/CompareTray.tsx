@@ -148,7 +148,7 @@ export function CompareTray({ locale }: { locale: Locale }) {
         </ul>
         <div className="min-w-0 flex-1 leading-tight">
           <div className="flex items-center gap-1.5 font-display text-[14px] font-semibold text-ink">
-            <Scale size={14} aria-hidden className="shrink-0 text-[#1F4E5A]" />
+            <Scale size={14} aria-hidden className="shrink-0 text-[#0E1A2B]" />
             <span aria-live="polite">{tx(locale, `Comparar (${compare.length}/3)`, `Compare (${compare.length}/3)`)}</span>
           </div>
           <button type="button" onClick={clearCompare} className="mt-0.5 text-[12px] text-muted underline-offset-4 hover:underline">
@@ -177,7 +177,7 @@ export function CompareTray({ locale }: { locale: Locale }) {
           ))}
         </ul>
         <span className="flex items-center gap-1.5 whitespace-nowrap font-display text-[14px] font-semibold text-ink">
-          <Scale size={14} aria-hidden className="shrink-0 text-[#1F4E5A]" />
+          <Scale size={14} aria-hidden className="shrink-0 text-[#0E1A2B]" />
           <span aria-live="polite">{tx(locale, `Comparar (${compare.length}/3)`, `Compare (${compare.length}/3)`)}</span>
         </span>
         <Link

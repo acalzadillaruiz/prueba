@@ -135,7 +135,7 @@ export function FloatingContact({ href, label, whatsapp = false, tabbar = false,
         aria-controls={open ? menuId : undefined}
         tabIndex={hidden ? -1 : undefined}
         onClick={() => setOpen((o) => !o)}
-        className="flex h-14 w-14 items-center justify-center rounded-full bg-navy text-ivory shadow-[0_0_0_2px_#9CC3CC,0_14px_30px_rgba(28,29,29,.35)] transition-colors hover:bg-navy-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-navy"
+        className="flex h-14 w-14 items-center justify-center rounded-full bg-navy text-ivory shadow-[0_0_0_2px_#E9E1D3,0_14px_30px_rgba(28,29,29,.35)] transition-colors hover:bg-navy-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-navy"
       >
         {open ? <X size={22} aria-hidden /> : <MessageCircle size={23} aria-hidden />}
       </button>

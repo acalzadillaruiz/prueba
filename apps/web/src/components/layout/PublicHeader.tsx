@@ -440,7 +440,7 @@ export function PublicHeader({ locale, variant = "light", autoHide = false }: { 
               </span>
               <span className="hidden items-center gap-2 whitespace-nowrap font-display text-[14px] font-normal min-[1400px]:flex">
                 {tx(locale, "Asesor 24/7", "Advisor 24/7")}
-                <span className="h-2 w-2 rounded-full bg-[#3BB273]" aria-hidden />
+                <span className="h-2 w-2 rounded-full bg-[#2F6F4E]" aria-hidden />
               </span>
             </OnCallButton>
             <button

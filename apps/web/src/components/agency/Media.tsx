@@ -145,7 +145,7 @@ export function MediaView({ locale, jobs, listings, names = {}, manage = null }:
             const jl = byId.get(j.listingId);
             if (!jl) return null;
             return (
-              <button key={j.id} onClick={() => setSel(j.id)} aria-pressed={sel === j.id} className={cn("flex w-full gap-3 rounded-[4px] p-3 text-left transition-shadow duration-np", sel === j.id ? "bg-[#DED5C7] shadow-[inset_0_0_0_2px_#1C1D1D] dark:bg-white/[.08] dark:shadow-[inset_0_0_0_2px_#9CC3CC]" : cn(k.card, "hover:shadow-[0_8px_24px_rgba(28,29,29,.1)]"))}>
+              <button key={j.id} onClick={() => setSel(j.id)} aria-pressed={sel === j.id} className={cn("flex w-full gap-3 rounded-[4px] p-3 text-left transition-shadow duration-np", sel === j.id ? "bg-[#E9E1D3] shadow-[inset_0_0_0_2px_#1A2026] dark:bg-white/[.08] dark:shadow-[inset_0_0_0_2px_#E9E1D3]" : cn(k.card, "hover:shadow-[0_8px_24px_rgba(28,29,29,.1)]"))}>
                 <PropertyArt scene={jl.scenes[0]} seed={jl.id} photo={listingPhoto(jl, 0)} className="h-16 w-20 shrink-0 rounded-xl" />
                 <div className="min-w-0 flex-1">
                   <div className="line-clamp-1 font-semibold">{tx(locale, jl.title_es, jl.title_en)}</div>

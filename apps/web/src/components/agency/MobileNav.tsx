@@ -81,10 +81,10 @@ export function AgencyMobileNav({
     };
   }, [open, close]);
 
-  const barItem = "relative flex min-h-[56px] flex-1 flex-col items-center justify-center gap-1 rounded-xl px-1 pb-1.5 pt-2 text-[11px] font-semibold leading-none transition-colors duration-np focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy dark:focus-visible:ring-[#9CC3CC]";
+  const barItem = "relative flex min-h-[56px] flex-1 flex-col items-center justify-center gap-1 rounded-xl px-1 pb-1.5 pt-2 text-[11px] font-semibold leading-none transition-colors duration-np focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy dark:focus-visible:ring-[#E9E1D3]";
   const on = "text-navy dark:text-ivory";
   const off = "text-muted hover:text-navy dark:text-mist dark:hover:text-ivory";
-  const indicator = <span aria-hidden className="absolute inset-x-[22%] top-0 h-[3px] rounded-b-full bg-gold-text dark:bg-[#C9B49C]" />;
+  const indicator = <span aria-hidden className="absolute inset-x-[22%] top-0 h-[3px] rounded-b-full bg-gold-text dark:bg-[#C9BFAE]" />;
   const sheetRow = "flex w-full items-center gap-3 rounded-xl px-3.5 py-3 text-left text-[15px] text-navy transition-colors duration-np hover:bg-[#F4EFE7] dark:text-ivory dark:hover:bg-white/[.05]";
 
   return (
@@ -92,7 +92,7 @@ export function AgencyMobileNav({
       <nav
         aria-label={tx(locale, "Secciones", "Sections")}
         data-agency-tabbar
-        className="fixed inset-x-0 bottom-0 z-30 border-t border-[#E6DFD3] bg-white/95 shadow-[0_-8px_24px_rgba(28,29,29,.08)] backdrop-blur lg:hidden dark:border-white/10 dark:bg-[#1C1D1D]/95"
+        className="fixed inset-x-0 bottom-0 z-30 border-t border-[#E6DFD3] bg-white/95 shadow-[0_-8px_24px_rgba(28,29,29,.08)] backdrop-blur lg:hidden dark:border-white/10 dark:bg-[#0E1A2B]/95"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
         <ul className="mx-auto flex max-w-xl items-stretch gap-1 px-2">
@@ -102,7 +102,7 @@ export function AgencyMobileNav({
                 {i.active && indicator}
                 <span className="relative">
                   <i.icon size={21} strokeWidth={i.active ? 2 : 1.6} aria-hidden />
-                  {(i.badge ?? 0) > 0 && <Count className="absolute -right-3 -top-2 h-[18px] min-w-[18px] bg-navy px-1 text-[10px] text-ivory dark:bg-[#9CC3CC] dark:text-navy">{i.badge}</Count>}
+                  {(i.badge ?? 0) > 0 && <Count className="absolute -right-3 -top-2 h-[18px] min-w-[18px] bg-navy px-1 text-[10px] text-ivory dark:bg-[#E9E1D3] dark:text-navy">{i.badge}</Count>}
                 </span>
                 <span className="max-w-full truncate">{i.label}</span>
               </Link>
@@ -121,7 +121,7 @@ export function AgencyMobileNav({
               {moreActive && indicator}
               <span className="relative">
                 <Menu size={21} strokeWidth={moreActive ? 2 : 1.6} aria-hidden />
-                {moreBadge > 0 && <Count className="absolute -right-3 -top-2 h-[18px] min-w-[18px] bg-navy px-1 text-[10px] text-ivory dark:bg-[#9CC3CC] dark:text-navy">{moreBadge}</Count>}
+                {moreBadge > 0 && <Count className="absolute -right-3 -top-2 h-[18px] min-w-[18px] bg-navy px-1 text-[10px] text-ivory dark:bg-[#E9E1D3] dark:text-navy">{moreBadge}</Count>}
               </span>
               <span>{tx(locale, "Más", "More")}</span>
               {moreActive && <span className="sr-only">{tx(locale, ` (estás en ${moreActive.label})`, ` (you are in ${moreActive.label})`)}</span>}
@@ -139,18 +139,18 @@ export function AgencyMobileNav({
             role="dialog"
             aria-modal="true"
             aria-labelledby={titleId}
-            className="np-in absolute inset-x-0 bottom-0 max-h-[85vh] overflow-y-auto rounded-t-[4px] bg-ivory pb-4 shadow-[0_-12px_32px_rgba(28,29,29,.18)] dark:bg-[#1C1D1D]"
+            className="np-in absolute inset-x-0 bottom-0 max-h-[85vh] overflow-y-auto rounded-t-[4px] bg-ivory pb-4 shadow-[0_-12px_32px_rgba(28,29,29,.18)] dark:bg-[#0E1A2B]"
             style={{ paddingBottom: "calc(1rem + env(safe-area-inset-bottom))" }}
           >
-            <div className="sticky top-0 z-10 bg-ivory px-5 pb-2 pt-2.5 dark:bg-[#1C1D1D]">
-              <div aria-hidden className="mx-auto h-1 w-10 rounded-full bg-[#CDBFAC] dark:bg-white/20" />
+            <div className="sticky top-0 z-10 bg-ivory px-5 pb-2 pt-2.5 dark:bg-[#0E1A2B]">
+              <div aria-hidden className="mx-auto h-1 w-10 rounded-full bg-[#C9BFAE] dark:bg-white/20" />
               <div className="mt-3 flex items-center justify-between gap-3">
                 <h2 id={titleId} className={k.titleSm}>{tx(locale, "Más secciones", "More sections")}</h2>
                 <button
                   type="button"
                   data-autofocus
                   onClick={() => close()}
-                  className="flex h-11 w-11 items-center justify-center rounded-full text-navy hover:bg-[#DED5C7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy dark:text-ivory dark:hover:bg-white/[.06] dark:focus-visible:ring-[#9CC3CC]"
+                  className="flex h-11 w-11 items-center justify-center rounded-full text-navy hover:bg-[#E9E1D3] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy dark:text-ivory dark:hover:bg-white/[.06] dark:focus-visible:ring-[#E9E1D3]"
                   aria-label={tx(locale, "Cerrar", "Close")}
                 >
                   <X size={20} aria-hidden />
@@ -178,8 +178,8 @@ export function AgencyMobileNav({
                         aria-current={i.active ? "page" : undefined}
                         onClick={() => (i.active ? close() : setOpenAt(null))}
                         className={cn(
-                          "flex min-h-[64px] items-center gap-3 rounded-2xl bg-white px-3.5 py-3 text-[15px] font-medium text-navy shadow-[inset_0_0_0_1px_#E6DFD3] transition-colors duration-np hover:bg-[#F6F2EA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy dark:bg-white/[.04] dark:text-ivory dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,.1)] dark:focus-visible:ring-[#9CC3CC]",
-                          i.active && "bg-[#DED5C7] shadow-[inset_0_0_0_2px_#1C1D1D] dark:bg-white/10 dark:shadow-[inset_0_0_0_2px_#9CC3CC]",
+                          "flex min-h-[64px] items-center gap-3 rounded-2xl bg-white px-3.5 py-3 text-[15px] font-medium text-navy shadow-[inset_0_0_0_1px_#E6DFD3] transition-colors duration-np hover:bg-[#F6F2EA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy dark:bg-white/[.04] dark:text-ivory dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,.1)] dark:focus-visible:ring-[#E9E1D3]",
+                          i.active && "bg-[#E9E1D3] shadow-[inset_0_0_0_2px_#1A2026] dark:bg-white/10 dark:shadow-[inset_0_0_0_2px_#E9E1D3]",
                         )}
                       >
                         <i.icon size={19} strokeWidth={1.6} aria-hidden className="shrink-0" />

@@ -98,7 +98,7 @@ export function CaptureView({ locale, rows: initialRows, zones, titles, canConve
               <Building2 size={14} /> {tx(locale, "Convertir en inmueble", "Convert to listing")}
             </button>
           )}
-          <button onClick={() => setResult(c.id, "CAPTURED")} className={cn("rounded-full p-3 hover:bg-[#2F6B4F14] md:p-1.5 dark:hover:bg-white/5", k.okText)} aria-label={tx(locale, "Marcar como captado", "Mark as captured")} title={tx(locale, "Marcar como captado", "Mark as captured")}><CheckCircle2 size={15} /></button>
+          <button onClick={() => setResult(c.id, "CAPTURED")} className={cn("rounded-full p-3 hover:bg-[#2F6F4E14] md:p-1.5 dark:hover:bg-white/5", k.okText)} aria-label={tx(locale, "Marcar como captado", "Mark as captured")} title={tx(locale, "Marcar como captado", "Mark as captured")}><CheckCircle2 size={15} /></button>
           <button onClick={() => setResult(c.id, "REJECTED")} className={cn("rounded-full p-3 hover:bg-[#B3261E12] md:p-1.5 dark:hover:bg-white/5", k.dangerText)} aria-label={tx(locale, "Rechazar", "Reject")} title={tx(locale, "Rechazar", "Reject")}><XCircle size={15} /></button>
         </div>
       )}

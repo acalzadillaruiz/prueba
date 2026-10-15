@@ -47,7 +47,7 @@ export function BarChart({ data, height = 180, format = (v: number) => String(v)
             const y = H - pad.b - (t / max) * (H - pad.t - pad.b);
             return (
               <g key={t}>
-                <line x1={pad.l} x2={W - pad.r} y1={y} y2={y} className={t === 0 ? "stroke-[#CDBFAC] dark:stroke-white/20" : "stroke-[#EFEAE0] dark:stroke-white/[.07]"} strokeWidth={1} />
+                <line x1={pad.l} x2={W - pad.r} y1={y} y2={y} className={t === 0 ? "stroke-[#C9BFAE] dark:stroke-white/20" : "stroke-[#EFEAE0] dark:stroke-white/[.07]"} strokeWidth={1} />
                 <text x={pad.l - 6} y={y + 4} textAnchor="end" fontSize={FONT} className="fill-muted dark:fill-mist">{t}</text>
               </g>
             );

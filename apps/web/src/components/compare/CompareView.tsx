@@ -15,11 +15,11 @@ import { cn } from "@/lib/cn";
 import { useListingsByIds } from "./useListingsByIds";
 
 const isSale = (l: Listing) => l.listingType === "SALE" || l.listingType === "COMMERCIAL_SALE";
-/** Green / amber that keep ≥ 4.5:1 on the dark card (#22262A) too. */
+/** Green / amber that keep ≥ 4.5:1 on the dark card (#14243A) too. */
 const OK = "text-ok dark:text-[#8FCBA6]";
 const WARN = "text-warn dark:text-[#E0A84A]";
 /** Remove ("×") on a photo: its own light/dark colours (not the remapped bg-white, which turned it dark-on-dark). */
-const REMOVE_BTN = "absolute flex items-center justify-center rounded-full bg-[#F6F2EC] text-[#1C1D1D] shadow ring-1 ring-black/10 after:absolute after:content-[''] dark:bg-[#141617]/85 dark:text-[#F6F2EC] dark:ring-[#F6F2EC]/45";
+const REMOVE_BTN = "absolute flex items-center justify-center rounded-full bg-[#F6F2EC] text-[#1A2026] shadow ring-1 ring-black/10 after:absolute after:content-[''] dark:bg-[#0E1A2B]/85 dark:text-[#F6F2EC] dark:ring-[#F6F2EC]/45";
 /** Pinned row (phones): the thumbnail is the "Ver ficha" link, then one 36 px text pill ("Visita" / "Fechas") filling the rest of the column. */
 const PIN_PILL = "flex h-9 min-w-0 flex-1 items-center justify-center whitespace-nowrap rounded-full px-1.5 font-display text-[13px] font-semibold leading-none";
 /** Phone actions row: full column width, the label may wrap to 2 lines in a third of 360 px. */
@@ -141,7 +141,7 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
   });
   // The winner of a row: green cell + a small "Mejor" pill (distinct from the ✓ of the yes/no rows).
   const bestMark = (cls: string) => (
-    <span className={cn("inline-flex items-center whitespace-nowrap rounded-full bg-[#2F6B4F1F] px-1.5 py-px align-[2px] font-display text-[11px] font-semibold leading-4 text-ok dark:bg-[#8FCBA626] dark:text-[#8FCBA6]", cls)} data-compare-best>
+    <span className={cn("inline-flex items-center whitespace-nowrap rounded-full bg-[#2F6F4E1F] px-1.5 py-px align-[2px] font-display text-[11px] font-semibold leading-4 text-ok dark:bg-[#8FCBA626] dark:text-[#8FCBA6]", cls)} data-compare-best>
       {tx(locale, "Mejor", "Best")}
     </span>
   );
@@ -187,7 +187,7 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
       {cmp.length > 0 && (
         <section className={cn("np-in mt-8 overflow-clip", k.card)} aria-label={tx(locale, "Comparación", "Comparison")}>
           <div className="flex items-center gap-2 border-b border-line bg-navy px-5 py-3 text-ivory">
-            <Scale size={18} strokeWidth={1.6} className="text-[#9CC3CC]" aria-hidden />
+            <Scale size={18} strokeWidth={1.6} className="text-[#E9E1D3]" aria-hidden />
             <span className="font-serif text-[20px] font-light">{tx(locale, `${cmp.length} ${cmp.length === 1 ? "casa" : "casas"}`, `${cmp.length} ${cmp.length === 1 ? "home" : "homes"}`)}</span>
             <span className="text-sm text-mist">{cmp.length}/3</span>
           </div>
@@ -251,7 +251,7 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
                   <dt className="text-[13px] font-semibold text-muted">{label}</dt>
                   <dd className="mt-1 grid gap-2" style={cols}>
                     {cmp.map((l, i) => (
-                      <span key={l.id} className={cn("min-w-0 break-words rounded-md px-1.5 py-1 text-[14px] leading-snug", wins[r](i) && "bg-[#2F6B4F14] dark:bg-[#8FCBA61A]")}>
+                      <span key={l.id} className={cn("min-w-0 break-words rounded-md px-1.5 py-1 text-[14px] leading-snug", wins[r](i) && "bg-[#2F6F4E14] dark:bg-[#8FCBA61A]")}>
                         {render(l)} {wins[r](i) && bestMark("ml-0.5")}
                       </span>
                     ))}
@@ -314,7 +314,7 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
                   <tr key={label} className="border-t border-line">
                     <td className={cn("sticky left-0 z-[1] px-4 py-2.5 font-semibold text-muted", k.stickyCol)}>{label}</td>
                     {cmp.map((l, i) => (
-                      <td key={l.id} className={cn("break-words px-4 py-2.5", wins[r](i) && "bg-[#2F6B4F0F] dark:bg-[#8FCBA614]")}>
+                      <td key={l.id} className={cn("break-words px-4 py-2.5", wins[r](i) && "bg-[#2F6F4E0F] dark:bg-[#8FCBA614]")}>
                         {render(l)} {wins[r](i) && bestMark("ml-1")}
                       </td>
                     ))}

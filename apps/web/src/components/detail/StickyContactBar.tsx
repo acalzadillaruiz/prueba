@@ -83,7 +83,7 @@ export function StickyContactBar({ locale, price, amount, meta, suffix, tour, st
             dark ? "bg-white/10 text-ivory" : "bg-[#F6F2EC] text-ink",
           )}
         >
-          <Scale size={14} aria-hidden className={dark ? "text-[#C9B49C]" : "text-[#1F4E5A]"} />
+          <Scale size={14} aria-hidden className={dark ? "text-[#C9BFAE]" : "text-[#0E1A2B]"} />
           <span className="flex-1">{tx(locale, `Comparando ${compare.length} de 3`, `Comparing ${compare.length} of 3`)}</span>
           <span className="inline-flex items-center gap-1 underline-offset-4">{tx(locale, "Ver comparación", "View comparison")} <ArrowRight size={14} aria-hidden /></span>
         </Link>

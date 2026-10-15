@@ -31,7 +31,7 @@ export default async function LuxuryPage({ params }: { params: Promise<{ locale:
   return (
     <PublicPage locale={locale} header="transparent" tabbar contact={{ href: "#acceso", label: tx(locale, "Hablar con un asesor", "Talk to an advisor") }}>
       {/* Cinema hero (AMALI): the collection's first home edge to edge, white title over a soft shade. */}
-      <section className="relative isolate flex min-h-[78svh] items-end overflow-hidden bg-[#1C1D1D] text-white">
+      <section className="relative isolate flex min-h-[78svh] items-end overflow-hidden bg-[#0E1A2B] text-white">
         <Image
           src={(hero && listingPhoto(hero, 0)) || "/brand/hero-costa-atardecer.jpg"}
           alt={hero ? tx(locale, hero.title_es, hero.title_en) : tx(locale, "Villa frente al mar al atardecer", "A villa by the sea at sunset")}
@@ -92,7 +92,7 @@ export default async function LuxuryPage({ params }: { params: Promise<{ locale:
       <section id="acceso" data-hide-fab className="np-navy-panel scroll-mt-24 bg-navy text-ivory">
         <div className="mx-auto grid max-w-[1320px] items-center gap-10 px-4 py-20 md:px-8 lg:grid-cols-[1.2fr_1fr] lg:py-24">
           <div>
-            <p className="np-eyebrow text-[#C9B49C]">{tx(locale, "Acceso privado", "Private access")}</p>
+            <p className="np-eyebrow text-[#C9BFAE]">{tx(locale, "Acceso privado", "Private access")}</p>
             <h2 className="mt-3 text-[36px] leading-tight md:text-[48px]">
               {tx(locale, `${privateCount} ${privateCount === 1 ? "casa privada disponible" : "casas privadas disponibles"}`, `${privateCount} private home${privateCount === 1 ? "" : "s"} available`)}
             </h2>
@@ -102,11 +102,11 @@ export default async function LuxuryPage({ params }: { params: Promise<{ locale:
                 tx(locale, "Visitas privadas, con la agenda real de tu asesor", "Private viewings, on your advisor’s real calendar"),
                 tx(locale, "Videovisita si compras desde fuera del país", "Video tours if you’re buying from abroad"),
               ].map((x) => (
-                <li key={x} className="flex items-center gap-3"><span aria-hidden className="h-px w-5 shrink-0 bg-[#C9B49C]" /> {x}</li>
+                <li key={x} className="flex items-center gap-3"><span aria-hidden className="h-px w-5 shrink-0 bg-[#C9BFAE]" /> {x}</li>
               ))}
             </ul>
           </div>
-          <div className="rounded-[4px] border border-[#C9B49C]/40 p-8 text-center">
+          <div className="rounded-[4px] border border-[#C9BFAE]/40 p-8 text-center">
             <p className="mx-auto max-w-sm text-[15px] text-ivory/80">{tx(locale, "Escríbele a un asesor de la colección. Tras una breve charla, te enviamos el enlace.", "Write to a collection advisor. After a short chat, we’ll send you the link.")}</p>
             {hero && (
               <Button href={`/${locale}/listing/${hero.slug}#contact`} variant="primary" size="lg" className="mt-6">

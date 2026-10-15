@@ -58,7 +58,7 @@ export function Button({
 } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
   const withArrow = arrow ?? (variant === "primary" || variant === "coral" || variant === "navy");
   const cls = cn(
-    "inline-flex items-center justify-center gap-2 rounded-full font-display font-medium uppercase tracking-[0.16em] transition-colors duration-300 ease-np disabled:cursor-not-allowed disabled:bg-[#DED5C7] disabled:text-[#77706A] disabled:border-transparent whitespace-nowrap",
+    "inline-flex items-center justify-center gap-2 rounded-full font-display font-medium uppercase tracking-[0.16em] transition-colors duration-300 ease-np disabled:cursor-not-allowed disabled:bg-[#E9E1D3] disabled:text-[#77706A] disabled:border-transparent whitespace-nowrap",
     BTN[variant],
     withArrow ? cn(SIZE[size].split(" ").filter((c) => c.startsWith("text-")).join(" "), SIZE_ARROW[size]) : SIZE[size],
     className,
@@ -83,17 +83,17 @@ type BadgeTone = "neutral" | "coral" | "gold" | "ok" | "warn" | "danger" | "navy
 export function Badge({ children, tone = "neutral", className }: { children: ReactNode; tone?: BadgeTone; className?: string }) {
   const t = {
     neutral: "bg-black/5 text-ink dark:bg-white/10 dark:text-[#F6F2EC]",
-    coral: "bg-[#1F4E5A1F] text-coral-hover dark:bg-[#9CC3CC26] dark:text-[#9CC3CC]",
-    gold: "bg-[#C9B49C29] text-gold-text dark:text-[#C9B49C]",
-    ok: "bg-[#2F6B4F1F] text-ok dark:bg-[#7FC8A426] dark:text-[#7FC8A4]",
+    coral: "bg-[#0E1A2B1F] text-coral-hover dark:bg-[#E9E1D326] dark:text-[#E9E1D3]",
+    gold: "bg-[#C9BFAE29] text-gold-text dark:text-[#C9BFAE]",
+    ok: "bg-[#2F6F4E1F] text-ok dark:bg-[#7FC8A426] dark:text-[#7FC8A4]",
     warn: "bg-[#8A5A0024] text-[#7A4F00] dark:bg-[#F2B86626] dark:text-[#F2B866]",
     danger: "bg-[#B3261E1A] text-danger dark:bg-[#F2A09A26] dark:text-[#F2A09A]",
     navy: "bg-navy text-ivory",
-    mist: "bg-[#B8B2AA2E] text-[#4E453F] dark:text-[#DECEB9]",
+    mist: "bg-[#A9B1BC2E] text-[#4E453F] dark:text-[#DECEB9]",
     dark: "bg-white/10 text-ivory",
-    exclusive: "bg-white/90 text-[#1F4E5A] shadow-[inset_0_0_0_1px_rgba(31,78,90,.3)]",
-    egeo: "bg-[#C9B49C] text-[#3E4650]",
-    arena: "bg-[#ECE5DA] text-[#1C1D1D]",
+    exclusive: "bg-white/90 text-[#0E1A2B] shadow-[inset_0_0_0_1px_rgba(31,78,90,.3)]",
+    egeo: "bg-[#C9BFAE] text-[#0E1A2B]",
+    arena: "bg-[#E9E1D3] text-[#1A2026]",
   }[tone];
   const caps = tone === "exclusive" || tone === "egeo" || tone === "arena";
   return (
@@ -128,7 +128,7 @@ export function Field({ label, children, hint, dark, error }: { label: string; c
       <span className={cn("mb-1.5 block text-sm font-semibold", dark ? "text-ivory/80" : "text-ink/80")}>{label}</span>
       {children}
       {error ? (
-        <span role="alert" className={cn("mt-1 block text-xs font-semibold", dark ? "text-[#9CC3CC]" : "text-danger")}>{error}</span>
+        <span role="alert" className={cn("mt-1 block text-xs font-semibold", dark ? "text-[#E9E1D3]" : "text-danger")}>{error}</span>
       ) : (
         hint && <span className={cn("mt-1 block text-xs", dark ? "text-mist" : "text-muted")}>{hint}</span>
       )}
@@ -178,9 +178,9 @@ export function EmptyState({ icon, title, body, cta, dark, monogram }: { icon?: 
   return (
     <div className={cn("flex flex-col items-center rounded-np border px-6 py-12 text-center", dark ? "border-navy-line" : "border-line bg-white")}>
       {monogram || !icon ? (
-        <Monogram className="mb-4 h-16 w-16" bg={dark ? "#343A40" : "#E3DACB"} ink={dark ? "#F6F2EC" : "#1C1D1D"} teja={dark ? "#9CC3CC" : "#1F4E5A"} animate />
+        <Monogram className="mb-4 h-16 w-16" bg={dark ? "#1E3049" : "#E9E1D3"} ink={dark ? "#F6F2EC" : "#1A2026"} teja={dark ? "#E9E1D3" : "#0E1A2B"} animate />
       ) : (
-        <div className={cn("mb-4 flex h-14 w-14 items-center justify-center rounded-full", dark ? "bg-white/5 text-[#9CC3CC]" : "bg-rosa text-coral")}>{icon}</div>
+        <div className={cn("mb-4 flex h-14 w-14 items-center justify-center rounded-full", dark ? "bg-white/5 text-[#E9E1D3]" : "bg-rosa text-coral")}>{icon}</div>
       )}
       <div className="font-serif text-2xl">{title}</div>
       <p className={cn("mt-1.5 max-w-sm text-[15px]", dark ? "text-mist" : "text-muted")}>{body}</p>

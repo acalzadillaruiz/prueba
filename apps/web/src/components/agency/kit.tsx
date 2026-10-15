@@ -7,7 +7,7 @@ import { cn } from "@/lib/cn";
 
 /**
  * Private-area kit (brand v4): light "Cal" cockpit with white cards, Cormorant titles and Manrope UI.
- * Every class carries its dark-mode twin (navy surfaces #22262A, accent #9CC3CC) for the theme toggle.
+ * Every class carries its dark-mode twin (navy surfaces #14243A, accent #E9E1D3) for the theme toggle.
  * Terracotta is reserved for the single main action of a view: never in charts, chips or data.
  */
 /**
@@ -30,27 +30,27 @@ export const k = {
   /** Table head / KPI label: uppercase 11–12 px, tracking .12em. */
   th: "text-[11px] font-semibold uppercase tracking-[.12em] text-muted dark:text-mist [&_th]:whitespace-nowrap",
   label: "text-[12px] font-semibold uppercase tracking-[.12em] text-muted dark:text-mist",
-  eyebrow: "text-[12px] font-semibold uppercase tracking-[.16em] text-gold-text dark:text-[#C9B49C]",
+  eyebrow: "text-[12px] font-semibold uppercase tracking-[.16em] text-gold-text dark:text-[#C9BFAE]",
   /** Card titles in Cormorant. */
   title: "font-serif text-[24px] font-medium leading-tight text-navy dark:text-ivory",
   titleSm: "font-serif text-[20px] font-medium leading-tight text-navy dark:text-ivory",
   /** Data figures: Manrope 600 with lining proportional numerals, tight tracking so "14" never splits. */
   num: "font-display font-semibold tracking-[-0.05em] [font-feature-settings:'lnum','pnum'] text-navy dark:text-ivory",
   input:
-    "h-11 w-full rounded-xl border border-[#CDBFAC] bg-white px-3.5 text-[15px] text-navy placeholder:text-muted/70 transition-colors duration-np focus:border-navy focus:outline-none disabled:cursor-not-allowed disabled:bg-[#F4EFE7] disabled:text-muted md:h-10 dark:border-white/15 dark:bg-navy dark:text-ivory dark:placeholder:text-mist/60 dark:focus:border-[#9CC3CC] dark:disabled:bg-white/[.04] dark:disabled:text-mist",
+    "h-11 w-full rounded-xl border border-[#C9BFAE] bg-white px-3.5 text-[15px] text-navy placeholder:text-muted/70 transition-colors duration-np focus:border-navy focus:outline-none disabled:cursor-not-allowed disabled:bg-[#F4EFE7] disabled:text-muted md:h-10 dark:border-white/15 dark:bg-navy dark:text-ivory dark:placeholder:text-mist/60 dark:focus:border-[#E9E1D3] dark:disabled:bg-white/[.04] dark:disabled:text-mist",
   /** Compact select inside tables. */
   select:
-    "h-9 rounded-lg border border-[#CDBFAC] bg-white px-2.5 text-[13px] text-navy focus:border-navy focus:outline-none disabled:cursor-not-allowed disabled:opacity-60 dark:border-white/15 dark:bg-navy dark:text-ivory",
-  link: "font-semibold text-navy underline decoration-navy/30 underline-offset-4 hover:decoration-navy dark:text-[#9CC3CC] dark:decoration-[#9CC3CC]/40",
-  err: "rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-sm text-danger dark:border-[#9CC3CC]/30 dark:bg-[#B3261E26] dark:text-[#F3B4A3]",
+    "h-9 rounded-lg border border-[#C9BFAE] bg-white px-2.5 text-[13px] text-navy focus:border-navy focus:outline-none disabled:cursor-not-allowed disabled:opacity-60 dark:border-white/15 dark:bg-navy dark:text-ivory",
+  link: "font-semibold text-navy underline decoration-navy/30 underline-offset-4 hover:decoration-navy dark:text-[#E9E1D3] dark:decoration-[#E9E1D3]/40",
+  err: "rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-sm text-danger dark:border-[#E9E1D3]/30 dark:bg-[#B3261E26] dark:text-[#F3B4A3]",
   warnBox: "rounded-xl border border-warn/25 bg-[#8A5A000F] px-3.5 py-2.5 text-sm text-warn dark:border-[#F2B866]/30 dark:bg-[#8A5A0026] dark:text-[#F2C987]",
-  okBox: "rounded-xl border border-ok/25 bg-[#2F6B4F0F] px-3.5 py-2.5 text-sm text-ok dark:border-[#7FC8A4]/30 dark:bg-[#2F6B4F33] dark:text-[#9AD6B6]",
+  okBox: "rounded-xl border border-ok/25 bg-[#2F6F4E0F] px-3.5 py-2.5 text-sm text-ok dark:border-[#7FC8A4]/30 dark:bg-[#2F6F4E33] dark:text-[#9AD6B6]",
   /** Button skins (pass as className to ui/Button). */
-  primary: "dark:bg-[#9CC3CC] dark:text-navy dark:hover:bg-[#EDAE97]",
+  primary: "dark:bg-[#E9E1D3] dark:text-navy dark:hover:bg-[#EDAE97]",
   navy: "dark:bg-ivory dark:text-navy dark:hover:bg-white",
   /** On top of ui/Button "outline" (1.5 px navy): selected-state hover + dark-theme twin. */
-  outline: "border-navy bg-transparent text-navy hover:bg-[#DED5C7] dark:border-ivory/50 dark:bg-transparent dark:text-ivory dark:hover:bg-white/[.06]",
-  ghost: "text-navy hover:bg-[#DED5C7] dark:text-ivory dark:hover:bg-white/[.06]",
+  outline: "border-navy bg-transparent text-navy hover:bg-[#E9E1D3] dark:border-ivory/50 dark:bg-transparent dark:text-ivory dark:hover:bg-white/[.06]",
+  ghost: "text-navy hover:bg-[#E9E1D3] dark:text-ivory dark:hover:bg-white/[.06]",
   okText: "text-ok dark:text-[#7FC8A4]",
   warnText: "text-warn dark:text-[#F2B866]",
   dangerText: "text-danger dark:text-[#F3A493]",
@@ -58,13 +58,13 @@ export const k = {
   darkVars: "dark:[--np-ink-rgb:238_241_244] dark:[--np-ink:#F6F2EC] dark:[--np-line-rgb:42_62_85] dark:[--np-muted-rgb:169_180_194]",
 };
 
-/** Filter tab / segmented choice. Selected = #DED5C7 with a 2 px navy border (brand interaction states). */
+/** Filter tab / segmented choice. Selected = #E9E1D3 with a 2 px navy border (brand interaction states). */
 export const tab = (on: boolean) =>
   cn(
     "inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 font-display text-[14px] font-medium transition-colors duration-np",
     on
-      ? "bg-[#DED5C7] text-navy shadow-[inset_0_0_0_2px_#1C1D1D] dark:bg-white/10 dark:text-ivory dark:shadow-[inset_0_0_0_2px_#9CC3CC]"
-      : "bg-white text-navy/80 shadow-[inset_0_0_0_1px_#CDBFAC] hover:text-navy hover:shadow-[inset_0_0_0_1px_#1C1D1D] dark:bg-transparent dark:text-ivory/75 dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,.18)] dark:hover:text-ivory",
+      ? "bg-[#E9E1D3] text-navy shadow-[inset_0_0_0_2px_#1A2026] dark:bg-white/10 dark:text-ivory dark:shadow-[inset_0_0_0_2px_#E9E1D3]"
+      : "bg-white text-navy/80 shadow-[inset_0_0_0_1px_#C9BFAE] hover:text-navy hover:shadow-[inset_0_0_0_1px_#1A2026] dark:bg-transparent dark:text-ivory/75 dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,.18)] dark:hover:text-ivory",
   );
 
 /** Counter inside a tab or nav item: neutral, never terracotta. */
@@ -107,15 +107,15 @@ export function Kpi({ label, value, delta, hint, down, deltaNote, className }: {
 
 type Tone = "neutral" | "egeo" | "arena" | "ok" | "warn" | "danger" | "navy" | "exclusive" | "muted";
 const TONE: Record<Tone, string> = {
-  neutral: "bg-[#DED5C7] text-navy dark:bg-white/10 dark:text-ivory",
+  neutral: "bg-[#E9E1D3] text-navy dark:bg-white/10 dark:text-ivory",
   egeo: "bg-egeo/55 text-[#413934] dark:bg-egeo/20 dark:text-[#E3D8CA]",
-  arena: "bg-arena text-[#5E4A2A] dark:bg-arena/15 dark:text-[#ECE5DA]",
-  ok: "bg-[#2F6B4F14] text-ok dark:bg-[#2F6B4F40] dark:text-[#9AD6B6]",
+  arena: "bg-arena text-[#5E4A2A] dark:bg-arena/15 dark:text-[#E9E1D3]",
+  ok: "bg-[#2F6F4E14] text-ok dark:bg-[#2F6F4E40] dark:text-[#9AD6B6]",
   warn: "bg-[#8A5A0014] text-warn dark:bg-[#8A5A0033] dark:text-[#F2C987]",
   danger: "bg-[#B3261E12] text-danger dark:bg-[#B3261E33] dark:text-[#F3B4A3]",
   navy: "bg-navy text-ivory dark:bg-ivory dark:text-navy",
-  muted: "bg-transparent text-muted shadow-[inset_0_0_0_1px_#CDBFAC] dark:text-mist dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,.18)]",
-  exclusive: "bg-white text-coral shadow-[inset_0_0_0_1px_rgb(168_69_42/.3)] dark:bg-transparent dark:text-[#9CC3CC] dark:shadow-[inset_0_0_0_1px_rgb(231_154_127/.4)]",
+  muted: "bg-transparent text-muted shadow-[inset_0_0_0_1px_#C9BFAE] dark:text-mist dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,.18)]",
+  exclusive: "bg-white text-coral shadow-[inset_0_0_0_1px_rgb(168_69_42/.3)] dark:bg-transparent dark:text-[#E9E1D3] dark:shadow-[inset_0_0_0_1px_rgb(231_154_127/.4)]",
 };
 
 /** Status badge: uppercase, tracking .12em; "Exclusiva" carries the roof glyph. */
@@ -130,7 +130,7 @@ export function Pill({ tone = "neutral", children, className }: { tone?: Tone; c
 
 /** Neutral data chip (e.g. "Interés 92"): never terracotta. */
 export function Chip({ children, className }: { children: ReactNode; className?: string }) {
-  return <span className={cn("inline-flex items-center whitespace-nowrap rounded-full bg-[#DED5C7] px-2.5 py-1 text-[12px] font-semibold text-navy [font-feature-settings:'lnum','pnum'] dark:bg-white/10 dark:text-ivory", className)}>{children}</span>;
+  return <span className={cn("inline-flex items-center whitespace-nowrap rounded-full bg-[#E9E1D3] px-2.5 py-1 text-[12px] font-semibold text-navy [font-feature-settings:'lnum','pnum'] dark:bg-white/10 dark:text-ivory", className)}>{children}</span>;
 }
 
 /** Listing status for the private areas, with the shared lifecycle labels (@/lib/lifecycle): review wins while it isn't approved. */
@@ -157,7 +157,7 @@ export function Initials({ name, size = 44, className }: { name: string; size?: 
 export function Empty({ title, body, cta, className }: { title: string; body?: string; cta?: ReactNode; className?: string }) {
   return (
     <div className={cn("flex flex-col items-center px-6 py-12 text-center", className)}>
-      <Monogram className="h-20 w-20" bg="#E3DACB" ink="#1C1D1D" teja="#1F4E5A" />
+      <Monogram className="h-20 w-20" bg="#E9E1D3" ink="#1A2026" teja="#0E1A2B" />
       <div className="mt-4 max-w-sm font-serif text-[26px] font-light leading-tight text-navy dark:text-ivory">{title}</div>
       {body && <p className={cn("mt-2 max-w-sm text-[15px]", k.muted)}>{body}</p>}
       {cta && <div className="mt-5">{cta}</div>}

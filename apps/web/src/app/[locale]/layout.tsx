@@ -13,7 +13,7 @@ import "../globals.css";
 export const viewport: Viewport = {
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#F6F2EC" },
-    { media: "(prefers-color-scheme: dark)", color: "#141617" },
+    { media: "(prefers-color-scheme: dark)", color: "#0E1A2B" },
   ],
   width: "device-width", initialScale: 1, viewportFit: "cover" };
 

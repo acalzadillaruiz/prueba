@@ -40,7 +40,7 @@ export function CardPhotos({ l, locale, label, href }: { l: Listing; locale: Loc
     ahead(i);
     el.scrollTo({ left: i * el.clientWidth, behavior: "smooth" });
   };
-  const arrow = "absolute top-1/2 z-[2] flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-[#ffffffe6] text-[#1C1D1D] opacity-0 shadow-sm transition-opacity duration-np group-hover:opacity-100 disabled:!opacity-0 [@media(hover:none)]:hidden";
+  const arrow = "absolute top-1/2 z-[2] flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-[#ffffffe6] text-[#1A2026] opacity-0 shadow-sm transition-opacity duration-np group-hover:opacity-100 disabled:!opacity-0 [@media(hover:none)]:hidden";
   return (
     <>
       <div

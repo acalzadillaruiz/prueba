@@ -41,7 +41,7 @@ export function SavedView({ locale, all }: { locale: Locale; all: Listing[] }) {
 
       {!user && saved.length > 0 && (
         <div className={cn("np-in mt-6 flex flex-col gap-4 p-5 sm:flex-row sm:items-center", k.card)} role="note">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#1F4E5A]/10 text-[#1F4E5A]">
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#0E1A2B]/10 text-[#0E1A2B]">
             <Heart size={20} strokeWidth={1.7} aria-hidden />
           </span>
           <div className="min-w-0 flex-1">

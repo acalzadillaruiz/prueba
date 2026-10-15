@@ -9,7 +9,7 @@ import { PropertyArt } from "@/components/art/PropertyArt";
 import { tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 
-const IMG = "h-full w-full transition-transform duration-700 ease-out group-hover:scale-[1.03]";
+const IMG = "h-full w-full"; // the 1 → 1.03 lean on hover lives in globals.css (.np-card-media, pointer: fine only)
 /** Cards are at most a third of the screen on desktop, full width on phones. */
 const SIZES = "(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw";
 

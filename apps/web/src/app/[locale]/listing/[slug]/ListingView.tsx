@@ -177,7 +177,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
               {crumbs.map((c, i) => (
                 <span key={c.key} className={cn("inline-flex shrink-0 items-center", i < crumbs.length - 2 && "max-sm:hidden")}>
                   {i > 0 && <span aria-hidden className={cn("px-1.5", i === crumbs.length - 2 && "max-sm:hidden")}>·</span>}
-                  {c.href ? <Link className="inline-flex min-h-11 items-center underline-offset-4 hover:text-ink hover:underline" href={c.href}>{c.label}</Link> : c.label}
+                  {c.href ? <Link className="np-link inline-flex min-h-11 items-center hover:text-ink" href={c.href}>{c.label}</Link> : c.label}
                 </span>
               ))}
             </nav>

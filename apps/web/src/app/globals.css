@@ -325,3 +325,21 @@ html.js-reveal [data-reveal="stagger"].is-in > :nth-child(n+3) { transition-dela
 .np-t-lead { font-family: var(--font-body); font-weight: 300; font-size: 20px; line-height: 1.5; }
 .np-t-body { font-family: var(--font-body); font-weight: 400; font-size: 17px; line-height: 1.6; }
 .np-t-small { font-family: var(--font-body); font-weight: 400; font-size: 14px; line-height: 1.45; }
+
+/* ── 043-C · discreet micro-interactions (explicit properties; all off under reduced motion) ── */
+/* Cards: the photo leans in (1 → 1.03, 600 ms) under a fine pointer; the card itself never lifts or casts a shadow. */
+.np-card-media img, .np-card-photo { transition: transform 600ms var(--np-ease); }
+@media (hover: hover) and (pointer: fine) {
+  [data-listing-card]:hover .np-card-media img, .np-card:hover .np-card-photo, a:hover > span > .np-card-photo, .group:hover .np-card-photo { transform: scale(1.03); }
+}
+/* Text links: an underline that grows from the left in 240 ms. */
+.np-link { position: relative; text-decoration: none; }
+.np-link::after { content: ""; position: absolute; left: 0; right: 0; bottom: .55em; height: .08em; background: currentColor; transform: scaleX(0); transform-origin: left; transition: transform 240ms var(--np-ease); }
+.np-link:hover::after, .np-link:focus-visible::after { transform: scaleX(1); }
+/* Save: the heart settles from 1.15 to 1 in 200 ms. */
+@keyframes np-heart-pop { from { transform: scale(1.15); } to { transform: scale(1); } }
+.np-heart-pop { animation: np-heart-pop 200ms var(--np-ease); }
+@media (prefers-reduced-motion: reduce) {
+  .np-card-media img, .np-card-photo, .np-link::after { transition: none; }
+  .np-heart-pop { animation: none; }
+}

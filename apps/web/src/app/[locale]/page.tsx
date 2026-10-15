@@ -130,9 +130,9 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
             <ul data-reveal="stagger" data-zone-rail className="no-scrollbar -mx-4 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 md:mx-0 md:grid md:snap-none md:grid-cols-2 md:overflow-visible md:px-0 lg:flex lg:flex-col">
               {saleZones.map((z) => (
                 <li key={z.zone} className="w-[78%] shrink-0 snap-start sm:w-[46%] md:w-auto">
-                  <Link href={z.href} className="np-glass group flex h-full min-h-[88px] items-stretch overflow-hidden rounded-[4px] transition-transform duration-500 hover:-translate-y-0.5 md:min-h-[104px]">
+                  <Link href={z.href} className="np-glass group flex h-full min-h-[88px] items-stretch overflow-hidden rounded-[4px] md:min-h-[104px]">
                     <span className="relative m-2 w-[56px] shrink-0 overflow-hidden rounded-[4px] sm:w-[84px] lg:w-[100px]">
-                      <Image src={z.photo} alt="" fill sizes="112px" className="object-cover transition-transform duration-700 group-hover:scale-105" />
+                      <Image src={z.photo} alt="" fill sizes="112px" className="np-card-photo object-cover" />
                     </span>
                     <span className="flex min-w-0 flex-1 items-center justify-between gap-2.5 px-2.5 py-3 sm:gap-3 sm:px-4 sm:py-4 lg:px-5">
                       <span className="min-w-0">
@@ -155,7 +155,7 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
                 <ul className="flex flex-col gap-2">
                   {otherZones.map((z) => (
                     <li key={z.zone}>
-                      <Link href={z.href} className="np-glass group flex min-h-[64px] items-center gap-3 rounded-[4px] p-1.5 pr-4 transition-transform duration-500 hover:-translate-y-0.5">
+                      <Link href={z.href} className="np-glass group flex min-h-[64px] items-center gap-3 rounded-[4px] p-1.5 pr-4">
                         <span className="relative h-[52px] w-[52px] shrink-0 overflow-hidden rounded-[4px]">
                           <Image src={z.photo} alt="" fill sizes="56px" className="object-cover" />
                         </span>

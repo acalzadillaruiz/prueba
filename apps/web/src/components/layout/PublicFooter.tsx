@@ -12,7 +12,7 @@ import { tx } from "@/lib/i18n";
 export async function PublicFooter({ locale }: { locale: Locale }) {
   const t = await getTranslations({ locale, namespace: "footer" });
   const nav = await getTranslations({ locale, namespace: "nav" });
-  const linkCls = "inline-flex min-h-11 items-center text-[16px] text-mist transition-colors duration-np hover:text-ivory md:min-h-0 md:py-1";
+  const linkCls = "np-link inline-flex min-h-11 items-center text-[16px] text-mist transition-colors duration-np hover:text-ivory md:min-h-0 md:py-1";
   // Phones: each column is a closed accordion (native details/summary: keyboard and screen-reader ready), so the
   // footer doesn't repeat ~1,000 px of links the tab bar and the menu already offer. md+: the open columns as before.
   const list = (links: [string, string][], extra?: React.ReactNode) => (

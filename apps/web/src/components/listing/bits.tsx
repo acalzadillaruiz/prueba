@@ -10,7 +10,11 @@ import { STATUS_LABEL, ago, lbl, tx } from "@/lib/i18n";
 export function SaveButton({ id, className, locale }: { id: string; className?: string; locale: Locale }) {
   const { saved, toggleSaved } = useApp();
   const on = saved.includes(id);
+  // 043-C: the heart fills at once and settles from 1.15 to 1 in 200 ms; screen readers hear «Guardado».
+  const [pop, setPop] = useState(0);
+  const [said, setSaid] = useState("");
   return (
+    <>
     <button
       aria-label={on ? tx(locale, "Quitar de guardados", "Remove from saved") : tx(locale, "Guardar", "Save")}
       aria-pressed={on}
@@ -18,11 +22,15 @@ export function SaveButton({ id, className, locale }: { id: string; className?: 
         e.preventDefault();
         e.stopPropagation();
         toggleSaved(id);
+        if (!on) setPop((n) => n + 1);
+        setSaid(on ? tx(locale, "Quitado de guardados", "Removed from saved") : tx(locale, "Guardado", "Saved"));
       }}
-      className={cn("flex h-11 w-11 items-center justify-center rounded-full bg-[#ffffffe6] text-[#1A2026] transition-transform duration-np hover:scale-105", className)}
+      className={cn("flex h-11 w-11 items-center justify-center rounded-full bg-[#ffffffe6] text-[#1A2026] transition-[background-color] duration-np ease-np hover:bg-[#F6F2EC]", className)}
     >
-      <Heart size={18} strokeWidth={1.7} aria-hidden className={on ? "fill-[#0E1A2B] text-[#0E1A2B]" : "text-[#1A2026]"} />
+      <Heart key={pop} size={18} strokeWidth={1.7} aria-hidden className={cn(on ? "fill-[#0E1A2B] text-[#0E1A2B]" : "text-[#1A2026]", pop > 0 && on && "np-heart-pop")} />
     </button>
+    <span className="sr-only" aria-live="polite">{said}</span>
+    </>
   );
 }
 

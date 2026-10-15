@@ -112,7 +112,7 @@ export function ListingCard({ l, locale, compact, className, compareToggle }: { 
         className,
       )}
     >
-      <div className="relative aspect-[4/3] overflow-hidden bg-arena">
+      <div className="np-card-media relative aspect-[4/3] overflow-hidden bg-arena">
         <CardPhotos l={l} locale={locale} label={label} href={href} />
         <PhotoBadge l={l} locale={locale} roomRight={compareToggle} compact={compact} />
         <SaveButton id={l.id} locale={locale} className="absolute right-2.5 top-2.5 z-[2]" />

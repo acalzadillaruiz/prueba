@@ -17,7 +17,7 @@ export function HeroAura({ locale, available }: { locale: Locale; available: num
   // The poster is the LCP: priority + fetchpriority high, art-directed (16:9 desktop, 4:5 phone). The loop (HeroVideo)
   // is laid over it after load and only when motion and data allow (043-C).
   const { poster } = HERO_MEDIA;
-  const common = { alt: tx(locale, "Torre frente al mar al atardecer en Lechería", "Seafront tower at sunset in Lechería"), sizes: "100vw", quality: 80, priority: true, fetchPriority: "high" as const };
+  const common = { alt: tx(locale, "Torre frente al mar al atardecer en Lechería", "Seafront tower at sunset in Lechería"), sizes: "100vw", quality: 60, priority: true, fetchPriority: "high" as const };
   const desktop = getImageProps({ ...common, src: poster.desktop, width: poster.width, height: poster.height }).props.srcSet;
   const mobileImg = getImageProps({ ...common, src: poster.mobile, width: poster.mobileWidth, height: poster.mobileHeight }).props;
   return (

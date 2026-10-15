@@ -5,7 +5,6 @@ import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { ArrowUp, ChevronDown, Heart, House, KeyRound, Menu, Palmtree, Search, Sparkles, User } from "lucide-react";
 import Link from "next/link";
-import { heuristicSearchParse } from "@newplace/ai";
 import type { Locale } from "@/types/domain";
 import { tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
@@ -77,6 +76,8 @@ export function AskBar({ locale, className, sticky = false }: { locale: Locale; 
   const go = async (typed: string) => {
     const raw = typed.trim();
     setBusy(true);
+    // The local parser loads on the first search, not with the page (043-C: less JS before the hero paints).
+    const { heuristicSearchParse } = await import("@newplace/ai");
     let q = heuristicSearchParse(raw);
     if (raw.trim()) {
       try {
@@ -244,7 +245,7 @@ function CompactAsk({
         className={cn("np-glass relative mx-auto flex h-14 max-w-[720px] items-center gap-1 rounded-[2px] p-1.5 text-ink lg:max-w-[940px]", shown && "pointer-events-auto")}
       >
         <Link href={`/${locale}`} aria-label={tx(locale, "New Place, inicio", "New Place, home")} className={cn("flex h-11 w-11 shrink-0 items-center justify-center rounded-full hover:bg-black/5", ring)}>
-          <span aria-hidden className="font-logo text-[13px] font-extralight tracking-[.16em] text-ink">NP</span>
+          <span aria-hidden className="font-display text-[14px] font-light tracking-[.16em] text-ink">NP</span>
         </Link>
         <label htmlFor={`${id}-mode`} className="sr-only">
           {tx(locale, "Qué buscas", "What you're after")}

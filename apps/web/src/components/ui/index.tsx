@@ -94,7 +94,7 @@ export function Badge({ children, tone = "neutral", className }: { children: Rea
   }[tone];
   const caps = tone === "exclusive" || tone === "egeo" || tone === "arena";
   return (
-    <span className={cn("inline-flex items-center gap-1.5 whitespace-nowrap rounded-full", caps ? "px-3 py-1 text-[13px] font-semibold" : "px-2.5 py-0.5 text-[13px] font-semibold", t, className)}>
+    <span className={cn("inline-flex items-center gap-1.5 whitespace-nowrap rounded-[2px]", caps ? "px-3 py-1 text-[13px] font-semibold" : "px-2.5 py-0.5 text-[13px] font-semibold", t, className)}>
       {children}
     </span>
   );

@@ -43,7 +43,7 @@ export function CompareButton({ id, locale, dark, className }: { id: string; loc
       }}
       className={cn(
         // after: invisible 44 px hit area around the compact pill (tap target) without changing the card layout
-        "relative inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[13px] font-semibold transition-colors duration-np after:absolute after:-inset-x-1 after:-inset-y-2.5 after:content-['']",
+        "relative inline-flex items-center gap-1.5 rounded-[2px] border px-2.5 py-1 text-[13px] font-semibold transition-colors duration-np after:absolute after:-inset-x-1 after:-inset-y-2.5 after:content-['']",
         on ? "np-sel border-2" : dark ? "border-white/20 text-ivory" : "border-line bg-white text-ink/70 hover:border-navy/40",
         className,
       )}
@@ -126,13 +126,13 @@ const STATUS_TONE: Record<ListingStatus, string> = {
 export function StatusBadge({ status, locale, className, review }: { status: ListingStatus; locale: Locale; className?: string; review?: "PENDING" | "APPROVED" | "REJECTED" }) {
   if (review && review !== "APPROVED" && status !== "DRAFT" && status !== "WITHDRAWN") {
     return (
-      <span className={cn("inline-flex items-center whitespace-nowrap rounded-full px-2 py-0.5 text-[13px] font-bold", review === "PENDING" ? "bg-[#8A5A00] text-white" : "bg-danger text-white", className)}>
+      <span className={cn("inline-flex items-center whitespace-nowrap rounded-[2px] px-2 py-0.5 text-[13px] font-bold", review === "PENDING" ? "bg-[#8A5A00] text-white" : "bg-danger text-white", className)}>
         {review === "PENDING" ? tx(locale, "En revisión", "In review") : tx(locale, "Rechazado", "Rejected")}
       </span>
     );
   }
   return (
-    <span className={cn("inline-flex items-center whitespace-nowrap rounded-full px-2.5 py-0.5 text-[13px] font-semibold", STATUS_TONE[status], className)}>
+    <span className={cn("inline-flex items-center whitespace-nowrap rounded-[2px] px-2.5 py-0.5 text-[13px] font-semibold", STATUS_TONE[status], className)}>
       <span className="min-w-0 truncate">{lbl(STATUS_LABEL[status], locale)}</span>
     </span>
   );

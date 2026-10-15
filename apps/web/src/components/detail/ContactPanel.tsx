@@ -174,8 +174,8 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
   const confirmer = first || (fsbo ? tx(locale, "su dueño", "the owner") : tx(locale, "el anunciante", "the lister"));
   const initials = (agent?.name ?? agency?.name ?? "NP").split(" ").map((p) => p[0]).slice(0, 2).join("");
   const box = dark ? "bg-navy-card text-ivory outline-navy-line" : "np-glass outline-0";
-  const seg = (active: boolean) => cn("flex min-h-11 items-center justify-center gap-1.5 rounded-full border-2 font-display text-sm transition-colors duration-np focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2", dark ? "focus-visible:outline-ivory" : "focus-visible:outline-ink", active ? "np-sel font-semibold" : "border-transparent text-muted hover:text-ink");
-  const quietLink = cn("inline-flex min-h-11 items-center gap-1.5 rounded-full px-1 text-sm font-semibold underline decoration-current/30 underline-offset-4 hover:decoration-current focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-60", dark ? "text-ivory focus-visible:outline-ivory" : "text-navy focus-visible:outline-navy");
+  const seg = (active: boolean) => cn("flex min-h-11 items-center justify-center gap-1.5 rounded-[2px] border-2 font-display text-sm transition-colors duration-np focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2", dark ? "focus-visible:outline-ivory" : "focus-visible:outline-ink", active ? "np-sel font-semibold" : "border-transparent text-muted hover:text-ink");
+  const quietLink = cn("inline-flex min-h-11 items-center gap-1.5 rounded-[2px] px-1 text-sm font-semibold underline decoration-current/30 underline-offset-4 hover:decoration-current focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-60", dark ? "text-ivory focus-visible:outline-ivory" : "text-navy focus-visible:outline-navy");
   const modes: Mode[] = stay ? ["stay", "msg"] : bookable ? ["tour", "msg"] : ["msg"];
   const onTabKey = (e: React.KeyboardEvent) => {
     if (e.key !== "ArrowRight" && e.key !== "ArrowLeft" && e.key !== "Home" && e.key !== "End") return;
@@ -288,7 +288,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
         </div>
       )}
       {!agent && !agency && <div className={cn("text-sm", muted)}>{tx(locale, "Publicada por su dueño · sin intermediarios", "Listed by the owner · no middlemen")}</div>}
-      <div role="tablist" aria-label={tx(locale, "Cómo quieres contactar", "How to get in touch")} className={cn("mt-5 grid gap-1 rounded-full bg-[#F1ECE4] p-1 dark:bg-white/5", modes.length > 1 ? "grid-cols-2" : "grid-cols-1")} onKeyDown={onTabKey}>
+      <div role="tablist" aria-label={tx(locale, "Cómo quieres contactar", "How to get in touch")} className={cn("mt-5 grid gap-1 rounded-[2px] bg-[#F1ECE4] p-1 dark:bg-white/5", modes.length > 1 ? "grid-cols-2" : "grid-cols-1")} onKeyDown={onTabKey}>
         {modes.map((m) => (
           <button
             key={m}

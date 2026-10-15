@@ -493,14 +493,14 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
             <ChevronDown size={14} aria-hidden className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2" />
           </span>
           <div className="hidden lg:contents">
-            <div className="flex shrink-0 gap-0.5 rounded-full border border-ink/10 bg-arena p-1" role="group" aria-label={tx(locale, "Qué buscas", "What you're after")}>
+            <div className="flex shrink-0 gap-0.5 rounded-[2px] border border-ink/10 bg-arena p-1" role="group" aria-label={tx(locale, "Qué buscas", "What you're after")}>
               {TYPES.map(([k, es, en]) => (
                 <button
                   key={k}
                   type="button"
                   onClick={() => set({ type: k, max: null, min: null })}
                   aria-pressed={type === k}
-                  className={cn("min-h-8 rounded-full border-2 px-3.5 font-display text-sm", type === k ? "np-sel font-semibold" : "border-transparent text-ink/70 hover:text-ink")}
+                  className={cn("min-h-8 rounded-[2px] border-2 px-3.5 font-display text-sm", type === k ? "np-sel font-semibold" : "border-transparent text-ink/70 hover:text-ink")}
                 >
                   {tx(locale, es, en)}
                 </button>
@@ -599,7 +599,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
                   value={sort}
                   onChange={(e) => set({ sort: e.target.value === "rec" ? null : e.target.value })}
                   aria-label={tx(locale, "Ordenar por", "Sort by")}
-                  className="h-11 max-w-[11rem] appearance-none rounded-full border border-ink/10 bg-arena pl-3 pr-7 text-[13px] lg:h-9 lg:max-w-[14rem] lg:pl-3.5 lg:pr-8 lg:text-sm"
+                  className="h-11 max-w-[11rem] appearance-none rounded-[2px] border border-ink/10 bg-arena pl-3 pr-7 text-[13px] lg:h-9 lg:max-w-[14rem] lg:pl-3.5 lg:pr-8 lg:text-sm"
                 >
                   {SORTS.map((k) => {
                     const [es, en, esFull, enFull] = SORT_LABEL[k];
@@ -722,7 +722,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
             toolbar={
               // Which map: in the tool row (top-left), out of the way of the pins and the docked bar.
               <>
-              <div role="group" aria-label={tx(locale, "Mapa de", "Map of")} className="flex gap-0.5 rounded-full border border-[#E9E1D3] bg-[#ffffff] p-1 font-display text-[13px] text-[#1A2026] sm:text-sm">
+              <div role="group" aria-label={tx(locale, "Mapa de", "Map of")} className="flex gap-0.5 rounded-[2px] border border-[#E9E1D3] bg-[#ffffff] p-1 font-display text-[13px] text-[#1A2026] sm:text-sm">
                 {(["caracas", "venezuela"] as const).map((r) => (
                   <button key={r} type="button" onClick={() => setRegionPick(r)} aria-pressed={region === r} className={cn("min-h-9 rounded-[2px] border-2 px-3 sm:px-3.5", region === r ? "np-sel font-semibold" : "border-transparent text-[#1A2026]/70")}>
                     {r === "caracas" ? "Caracas" : "Venezuela"}
@@ -763,7 +763,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
         )}
         data-search-toggle
       >
-        <div className="pointer-events-auto flex max-w-full overflow-hidden whitespace-nowrap rounded-full bg-[#0E1A2B] font-display text-[15px] font-semibold text-[#F6F2EC] [html.dark_&]:bg-[#F6F2EC] [html.dark_&]:text-[#1A2026]">
+        <div className="pointer-events-auto flex max-w-full overflow-hidden whitespace-nowrap rounded-[2px] bg-[#0E1A2B] font-display text-[15px] font-semibold text-[#F6F2EC] [html.dark_&]:bg-[#F6F2EC] [html.dark_&]:text-[#1A2026]">
           {view === "list" ? (
             // Nothing found: no map to open (the empty state keeps the whole screen; the comparator stays).
             hasResults && (

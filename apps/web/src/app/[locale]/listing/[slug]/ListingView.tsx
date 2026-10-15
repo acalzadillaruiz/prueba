@@ -61,14 +61,14 @@ function Essentials({ l, locale, title }: { l: Listing; locale: Locale; title: R
           // A declared absence ("no backup power") is information, not a perk: muted, dashed, with an "x" — never styled like a feature.
           if (key === "power" && l.powerBackup === "NONE")
             return (
-              <li key={key} data-absent className="flex items-center gap-3 rounded-[4px] border border-dashed border-muted/40 px-4 py-3 text-[15px] text-muted">
+              <li key={key} data-absent className="flex items-center gap-3 py-1 text-[16px] text-muted">
                 <X size={18} strokeWidth={1.7} className="shrink-0" aria-hidden />
                 <span>{tx(locale, "Planta eléctrica: no tiene", "Backup power: none")}</span>
               </li>
             );
           const Icon = ESSENTIAL_ICON[key];
           return (
-            <li key={key} className="flex items-center gap-3 rounded-[4px] bg-white/70 outline outline-1 -outline-offset-1 outline-black/[.04] px-4 py-3 text-[15px] font-semibold text-ink [font-feature-settings:'lnum']">
+            <li key={key} className="flex items-center gap-3 py-1 text-[16px] font-medium text-ink [font-feature-settings:'lnum']">
               <Icon size={18} strokeWidth={1.7} className="shrink-0 text-navy" aria-hidden />
               <span>{label}</span>
             </li>
@@ -113,8 +113,8 @@ function Facts({ l, locale }: { l: Listing; locale: Locale }) {
       <dl className={cn("grid gap-x-6 gap-y-5 py-6", cols)} data-testid="facts">
         {items.map(([v, t], i) => (
           <div key={t} className={cn("flex min-w-0 flex-col-reverse", i === n - 1 && lastWide)}>
-            <dt className="mt-1 break-words text-[13px] font-semibold leading-snug text-muted">{t}</dt>
-            <dd className="break-words font-serif text-[30px] font-light leading-none text-ink">{v}</dd>
+            <dt className="mt-1.5 break-words text-[14px] leading-snug text-muted">{t}</dt>
+            <dd className="break-words font-title text-[30px] leading-none text-ink [font-variant-numeric:lining-nums_tabular-nums]">{v}</dd>
           </div>
         ))}
       </dl>
@@ -146,11 +146,11 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
   const eur = fx.find((f) => f.code === "EUR")?.perUsd ?? 0;
   const ppm = l.listingType === "SALE" || l.listingType === "COMMERCIAL_SALE" ? Math.round(l.priceAmount / Math.max(1, l.areaM2)) : null;
   const soldNearby = soldRows.map((r) => toCard(toDomain(r))).map((o) => ({ t: `${tx(locale, o.title_es, o.title_en)} · ${o.areaM2} m²`, p: o.priceAmount, d: tx(locale, o.status === "SOLD" ? "Vendido" : "Alquilado", o.status === "SOLD" ? "Sold" : "Rented") }));
-  const H = ({ children }: { children: React.ReactNode }) => <h3 className="np-sub mb-5 text-[15px] md:text-[16px]">{children}</h3>;
+  const H = ({ children }: { children: React.ReactNode }) => <h3 className="mb-4 font-display text-[20px] font-medium text-ink">{children}</h3>;
   const sec = " py-10";
   const amenities = amenitiesBeyondEssentials(l);
   const views = viewFeatures(l, locale);
-  const tile = "rounded-[4px] bg-white/70 outline outline-1 -outline-offset-1 outline-black/[.04] px-4 py-3 text-[15px]";
+  const tile = "py-1 text-[16px]";
   const searchType = l.listingType.startsWith("COMMERCIAL") ? "COMMERCIAL" : l.listingType;
 
   const crumbs: { key: string; label: string; href?: string }[] = [
@@ -199,24 +199,24 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
                 <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
                   <CompareLink locale={locale} className="hidden md:inline-flex" />
                   <CompareButton id={l.id} locale={locale} className="min-h-11 px-3.5 text-[13px]" />
-                  <ShareButton locale={locale} title={tx(locale, l.title_es, l.title_en)} className="inline-flex min-h-11 items-center gap-1.5 rounded-[2px] border border-line bg-white px-3.5 text-[13px] font-semibold" />
-                  <SaveButton id={l.id} locale={locale} className="border border-line" />
+                  <ShareButton locale={locale} title={tx(locale, l.title_es, l.title_en)} className="inline-flex min-h-11 items-center gap-1.5 rounded-[2px] bg-arena px-3.5 text-[14px] font-medium" />
+                  <SaveButton id={l.id} locale={locale} className="bg-arena" />
                 </div>
               </div>
               <div className="lg:flex lg:items-end lg:justify-between lg:gap-12">
                 <div className="min-w-0">
-                  <h1 className="np-t-h1 mt-5 max-w-[760px] max-md:[font-size-adjust:none] lg:mt-4">{tx(locale, l.title_es, l.title_en)}</h1>
+                  <h1 className="np-t-h1 mt-5 max-w-[760px] max-md:text-[30px] lg:mt-4">{tx(locale, l.title_es, l.title_en)}</h1>
                   <p className="np-t-body mt-2 text-ink">{l.address} · {l.zone}, {l.city}{l.state && l.state !== l.city ? `, ${l.state}` : ""}</p>
                 </div>
                 {/* Desktop: aligned to the title's baseline, but never higher than the title's own top margin: with a one-line
                     title the price block is the taller one, and it used to climb into the Compare/Share row. */}
                 <div className="mt-7 shrink-0 lg:mt-5 lg:pt-1 lg:text-right">
                   {/* Fluid size + nowrap: "USD 118.000" never breaks after the currency at 360 px. */}
-                  <div className="font-serif text-[clamp(34px,11vw,48px)] font-light leading-none text-ink md:text-[54px] lg:whitespace-nowrap" data-testid="listing-price">
+                  <div className="font-title text-[clamp(36px,10vw,44px)] leading-none text-ink [font-variant-numeric:lining-nums_tabular-nums] lg:whitespace-nowrap" data-testid="listing-price">
                     <span className="whitespace-nowrap">{money(l.priceAmount, locale)}</span>
-                    <span className="whitespace-nowrap font-display text-lg font-normal text-muted">{priceSuffix(l, locale)}</span>
+                    <span className="whitespace-nowrap font-display text-[17px] font-normal text-muted">{priceSuffix(l, locale)}</span>
                   </div>
-                  <div className="mt-1.5 text-[15px] text-muted">
+                  <div className="mt-1.5 text-[14px] text-muted">
                     {stayTerms && <div className="font-semibold text-ink" data-testid="stay-terms">{stayTerms}</div>}
                     {ppm ? <><span className="whitespace-nowrap">{money(ppm, locale)} / m²</span> · </> : ""}
                     <span className="whitespace-nowrap">≈ Bs. {num(Math.round(l.priceAmount * ves), locale)}</span> · <span className="whitespace-nowrap">€ {num(Math.round(l.priceAmount * eur), locale)}</span>{" "}
@@ -285,6 +285,15 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
           {/* Desktop: the sticky card never outgrows the viewport (it scrolls inside if a long form opens). The scroller's
               padding is as wide as the card's soft shadow (0 20px 50px -18px), so overflow never clips it into a hard edge. */}
           <aside id="contact" className="scroll-mt-24 lg:sticky lg:top-[84px] lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:-mx-8 lg:-mb-12 lg:-mt-3 lg:max-h-[calc(100dvh-84px)] lg:self-start lg:overflow-y-auto lg:overscroll-contain lg:px-8 lg:pb-12 lg:pt-3">
+            {/* 043 · Airbnb rail: the price in Cormorant 44 px (tabular) and its badge above the visit card, desktop only
+                (phones have the sticky bar with price + «Pedir visita»). */}
+            <div className="mb-4 hidden lg:block" data-testid="rail-price">
+              <div className="font-title text-[44px] leading-none text-ink [font-variant-numeric:lining-nums_tabular-nums]">
+                <span className="whitespace-nowrap">{money(l.priceAmount, locale)}</span>
+                <span className="whitespace-nowrap font-display text-[17px] text-muted">{priceSuffix(l, locale)}</span>
+              </div>
+              <div className="mt-2"><Badge tone={isPriceVerified(l) ? "ok" : "mist"}>{priceBadgeLabel(l, locale)}</Badge></div>
+            </div>
             <ContactPanel l={l} locale={locale} />
           </aside>
 
@@ -317,8 +326,8 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
                       [num(zone.activeListings, locale), tx(locale, "en oferta en New Place", "available on New Place")],
                       [zone.daysOnMarket, tx(locale, "días en mercado (mediana)", "median days on market")],
                     ].map(([v, t]) => (
-                      <div key={String(t)} className="rounded-[4px] bg-white/70 outline outline-1 -outline-offset-1 outline-black/[.04] p-4">
-                        <div className="font-serif text-[26px] font-light leading-none">{v}</div>
+                      <div key={String(t)} className="bg-arena p-4">
+                        <div className="font-title text-[28px] leading-none [font-variant-numeric:lining-nums_tabular-nums]">{v}</div>
                         <div className="mt-1.5 text-sm text-muted">{t}</div>
                       </div>
                     ))}
@@ -329,12 +338,12 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
 
             {soldNearby.length > 0 && (
               <Fold className={sec} testId="sold-nearby" title={tx(locale, "Se vendieron cerca", "Recently sold nearby")} hint={plural(soldNearby.length, locale, ["operación reciente en la zona", "operaciones recientes en la zona"], ["recent deal in the area", "recent deals in the area"])}>
-                <div className="divide-y divide-line rounded-[4px] bg-white/70 outline outline-1 -outline-offset-1 outline-black/[.04]">
+                <div className="space-y-1">
                   {soldNearby.map((s) => (
-                    <div key={s.t} className="flex items-center justify-between gap-3 px-4 py-3 text-[15px]">
+                    <div key={s.t} className="flex items-center justify-between gap-3 bg-arena px-4 py-3 text-[16px]">
                       <span className="font-semibold">{s.t}</span>
                       <span className="text-muted">{s.d}</span>
-                      <span className="font-serif text-lg font-light">{money(s.p, locale)}</span>
+                      <span className="np-num font-semibold">{money(s.p, locale)}</span>
                     </div>
                   ))}
                 </div>

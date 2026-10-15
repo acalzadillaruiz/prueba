@@ -17,7 +17,7 @@ export function Fold({ title, hint, children, className, testId, openFrom = 1024
   }, [openFrom]);
   return (
     <section className={className} data-testid={testId} data-open={open || undefined}>
-      <h3 className="font-serif text-[28px] leading-tight">
+      <h3 className="font-title text-[26px] font-normal leading-[1.15] [text-wrap:balance] md:text-[30px]">
         <button
           type="button"
           aria-expanded={open}
@@ -27,9 +27,9 @@ export function Fold({ title, hint, children, className, testId, openFrom = 1024
         >
           <span className="min-w-0 flex-1">
             {title}
-            {hint && !open && <span className="mt-1 block font-display text-[15px] leading-snug text-muted">{hint}</span>}
+            {hint && !open && <span className="mt-1 block font-display text-[14px] leading-snug text-muted">{hint}</span>}
           </span>
-          <span aria-hidden className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-line transition-colors duration-np group-hover:border-navy/40">
+          <span aria-hidden className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-arena transition-colors duration-np group-hover:bg-[#DDD3C2]">
             <ChevronDown size={18} strokeWidth={1.8} className={cn("transition-transform duration-300", open && "rotate-180")} />
           </span>
         </button>

@@ -91,11 +91,11 @@ export function StickyContactBar({ locale, price, amount, meta, suffix, tour, st
       <div className="flex items-center gap-2">
         <div ref={box} className="relative min-w-0 flex-1">
           {/* Off-screen copy of the full price + suffix, measured to decide whether the compact figure is needed. */}
-          <span ref={probe} aria-hidden className="pointer-events-none invisible absolute left-0 top-0 whitespace-nowrap font-serif text-[20px] font-light leading-tight min-[400px]:text-[22px]">
+          <span ref={probe} aria-hidden className="pointer-events-none invisible absolute left-0 top-0 whitespace-nowrap font-title text-[24px] leading-tight [font-variant-numeric:lining-nums_tabular-nums] min-[400px]:text-[26px]">
             {price}
             <span className="font-display text-sm font-normal">{suffix}</span>
           </span>
-          <div className="whitespace-nowrap font-serif text-[20px] font-light leading-tight min-[400px]:text-[22px]" data-sticky-price>
+          <div className="whitespace-nowrap font-title text-[24px] leading-tight [font-variant-numeric:lining-nums_tabular-nums] min-[400px]:text-[26px]" data-sticky-price>
             {compact && <span className="sr-only">{price}{suffix}</span>}
             <span aria-hidden={compact || undefined}>{shownPrice}</span>
             <span aria-hidden={compact || undefined} className={cn("font-display text-sm font-normal", dark ? "text-mist" : "text-muted")}>{suffix}</span>

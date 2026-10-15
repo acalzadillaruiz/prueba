@@ -32,7 +32,12 @@ const PROBE = `() => {
   const overflow = Math.max(0, doc.scrollWidth - doc.clientWidth);
   const small = [];
   for (const el of document.querySelectorAll('a[href],button,input:not([type=hidden]),select,textarea,[role=button],[role=tab],summary')) {
-    const r = el.getBoundingClientRect(); const cs = getComputedStyle(el);
+    // The real hit area: a control inside its <label> is hit through the label; a link stretched over its card by an
+    // absolutely positioned ::after is hit through the card.
+    const lab = el.matches('input') && el.closest('label');
+    const after = getComputedStyle(el, '::after');
+    const hit = lab || (after.content !== 'none' && after.position === 'absolute' && el.offsetParent) ? (lab || el.offsetParent) : el;
+    const r = hit.getBoundingClientRect(); const cs = getComputedStyle(el);
     if (!r.width || !r.height || cs.visibility === 'hidden' || el.closest('[aria-hidden=true],[inert]')) continue;
     if (cs.clip !== 'auto' || cs.clipPath !== 'none') continue; // visually hidden until focused (skip link)
     if (cs.position !== 'fixed' && (r.bottom < 0 || r.top > innerHeight * 3)) continue;

@@ -199,7 +199,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
             </Field>
             {mode === "login" && (
               <div className="-mt-1 text-right">
-                <Link className={cn(k.link, "text-[14px]")} href={forgotHref} onClick={rememberForgotEmail}>{tx(locale, "¿Olvidaste tu contraseña?", "Forgot your password?")}</Link>
+                <Link className={cn(k.link, "inline-flex min-h-11 items-center text-[14px]")} href={forgotHref} onClick={rememberForgotEmail}>{tx(locale, "¿Olvidaste tu contraseña?", "Forgot your password?")}</Link>
               </div>
             )}
             {mode === "register" && !inv && (

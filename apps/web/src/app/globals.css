@@ -71,6 +71,8 @@
 html { -webkit-font-smoothing: antialiased; }
 /* 043: the page declares both schemes (meta color-scheme: light dark); the one shown follows html.dark (device setting
    unless the visitor chose), so native controls and scrollbars always match the canvas. */
+/* Touch (043): no double-tap zoom delay on controls, and a night-tinted tap flash instead of the platform grey. */
+:is(a, button, [role="button"], [role="tab"], summary, label, select, input) { touch-action: manipulation; -webkit-tap-highlight-color: rgb(14 26 43 / .12); }
 html:not(.dark) { color-scheme: light; }
 html.dark { color-scheme: dark; }
 body { font-family: var(--font-body); font-weight: 400; background: var(--np-ivory); color: var(--np-ink); }

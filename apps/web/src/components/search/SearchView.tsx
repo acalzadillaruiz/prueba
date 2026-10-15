@@ -480,7 +480,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
               enterKeyHint="search"
               placeholder={tx(locale, "¿Dónde quieres vivir?", "Where do you want to live?")}
               aria-label={tx(locale, "Escribe zona, tipo de casa o presupuesto", "Type an area, a kind of home or a budget")}
-              className="min-w-0 flex-1 bg-transparent text-[16px] focus:outline-none lg:text-sm"
+              className="h-full min-w-0 flex-1 self-stretch bg-transparent text-[16px] focus:outline-none lg:text-sm"
             />
             {suggest.listbox}
           </form>

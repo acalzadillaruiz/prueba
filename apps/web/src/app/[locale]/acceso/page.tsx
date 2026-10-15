@@ -45,7 +45,7 @@ export default async function Acceso({ params, searchParams }: { params: Promise
           aria-invalid={error === "code" || undefined}
           aria-describedby={msg ? "gate-error" : undefined}
           placeholder="••••••"
-          className="h-14 w-full rounded-full border border-ivory/30 bg-white/10 px-6 text-center font-display text-[24px] tracking-[0.5em] text-ivory placeholder:text-ivory/40 focus:border-ivory focus:outline-none"
+          className="h-14 w-full rounded-full border border-ivory/30 bg-white/10 px-6 text-center font-display text-[24px] tracking-[0.5em] text-ivory placeholder:text-ivory/40 focus:border-ivory focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E9E1D3]"
         />
         {msg && (
           <p id="gate-error" role="alert" className="text-[14px] font-semibold text-[#F3B4A3]">

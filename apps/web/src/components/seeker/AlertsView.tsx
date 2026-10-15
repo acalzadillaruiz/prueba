@@ -152,7 +152,7 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
                         maxLength={120}
                         onChange={(e) => setDraft(e.target.value)}
                         placeholder={summary}
-                        className="h-11 rounded-xl border border-[#C9BFAE] bg-white px-3 text-[16px] font-normal text-navy focus:border-navy focus:outline-none dark:bg-white/5 dark:text-ivory sm:text-[15px]"
+                        className="h-11 rounded-xl border border-[#C9BFAE] bg-white px-3 text-[16px] font-normal text-navy focus:border-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E9E1D3] dark:bg-white/5 dark:text-ivory sm:text-[15px]"
                       />
                     </label>
                     <label className="grid gap-1 text-[13px] font-semibold">
@@ -160,7 +160,7 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
                       <select
                         value={s.frequency}
                         onChange={(e) => void changeFrequency(s, e.target.value as Search["frequency"])}
-                        className="h-11 rounded-xl border border-[#C9BFAE] bg-white px-3 text-[15px] font-normal text-navy focus:border-navy focus:outline-none dark:bg-white/5 dark:text-ivory"
+                        className="h-11 rounded-xl border border-[#C9BFAE] bg-white px-3 text-[15px] font-normal text-navy focus:border-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E9E1D3] dark:bg-white/5 dark:text-ivory"
                       >
                         <option value="INSTANT">{freq.INSTANT}</option>
                         <option value="DAILY">{freq.DAILY}</option>

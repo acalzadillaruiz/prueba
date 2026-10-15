@@ -37,10 +37,10 @@ export const k = {
   /** Data figures: Manrope 600 with lining proportional numerals, tight tracking so "14" never splits. */
   num: "font-display font-semibold tracking-[-0.05em] [font-feature-settings:'lnum','pnum'] text-navy dark:text-ivory",
   input:
-    "h-11 w-full rounded-xl border border-[#C9BFAE] bg-white px-3.5 text-[15px] text-navy placeholder:text-muted/70 transition-colors duration-np focus:border-navy focus:outline-none disabled:cursor-not-allowed disabled:bg-[#F4EFE7] disabled:text-muted md:h-10 dark:border-white/15 dark:bg-navy dark:text-ivory dark:placeholder:text-mist/60 dark:focus:border-[#E9E1D3] dark:disabled:bg-white/[.04] dark:disabled:text-mist",
+    "h-11 w-full rounded-xl border border-[#C9BFAE] bg-white px-3.5 text-[15px] text-navy placeholder:text-muted/70 transition-colors duration-np focus:border-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E9E1D3] disabled:cursor-not-allowed disabled:bg-[#F4EFE7] disabled:text-muted md:h-10 dark:border-white/15 dark:bg-navy dark:text-ivory dark:placeholder:text-mist/60 dark:focus:border-[#E9E1D3] dark:disabled:bg-white/[.04] dark:disabled:text-mist",
   /** Compact select inside tables. */
   select:
-    "h-9 rounded-lg border border-[#C9BFAE] bg-white px-2.5 text-[13px] text-navy focus:border-navy focus:outline-none disabled:cursor-not-allowed disabled:opacity-60 dark:border-white/15 dark:bg-navy dark:text-ivory",
+    "h-9 rounded-lg border border-[#C9BFAE] bg-white px-2.5 text-[13px] text-navy focus:border-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E9E1D3] disabled:cursor-not-allowed disabled:opacity-60 dark:border-white/15 dark:bg-navy dark:text-ivory",
   link: "font-semibold text-navy underline decoration-navy/30 underline-offset-4 hover:decoration-navy dark:text-[#E9E1D3] dark:decoration-[#E9E1D3]/40",
   err: "rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-sm text-danger dark:border-[#E9E1D3]/30 dark:bg-[#B3261E26] dark:text-[#F3B4A3]",
   warnBox: "rounded-xl border border-warn/25 bg-[#8A5A000F] px-3.5 py-2.5 text-sm text-warn dark:border-[#F2B866]/30 dark:bg-[#8A5A0026] dark:text-[#F2C987]",

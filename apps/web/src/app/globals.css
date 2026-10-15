@@ -95,7 +95,8 @@ p { text-wrap: pretty; }
 .np-num { font-family: var(--font-serif); font-variant-numeric: lining-nums tabular-nums; font-feature-settings: "lnum", "tnum"; }
 /* Labels in capitals with wide tracking, like AMALI's «BENEATH THE CLOUDS». */
 .np-label { font-family: var(--font-display); font-size: 12px; font-weight: 500; letter-spacing: .2em; text-transform: uppercase; }
-*:focus-visible { outline: 2px solid var(--np-navy); outline-offset: 3px; }
+/* Focus (043): a 2 px gold-deep ring, 2 px off the control; sand on night surfaces and in dark mode. */
+*:focus-visible { outline: 2px solid var(--np-gold-text); outline-offset: 2px; }
 
 /* Public dark mode (toggle). Admin is always dark; only light surfaces of the public scope are remapped,
    so navy sections (hero, footer, trust strip) keep their Cal text. Committee dark panel:

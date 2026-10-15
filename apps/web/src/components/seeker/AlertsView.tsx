@@ -86,7 +86,7 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
   return (
     <div className="mx-auto grid max-w-[1180px] gap-8 px-4 py-10 md:px-6 lg:grid-cols-[1fr_380px]">
       <div>
-        <div className={k.eyebrow}>{tx(locale, "Avisos a tu medida", "Made for you")}</div>
+        <div className={k.caption}>{tx(locale, "Avisos a tu medida", "Made for you")}</div>
         <h1 className="mt-1 font-serif text-[40px] font-light leading-[1.05] md:text-[48px]">{tx(locale, "Alertas de búsqueda", "Search alerts")}</h1>
         <p className="mt-1 text-muted">{tx(locale, "Te escribimos cuando llega una casa que encaja contigo o cuando alguna baja de precio.", "We’ll write when a home that fits you comes along, or when one drops in price.")}</p>
         {error && <div role="alert" className="mt-4 rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-sm text-danger">{error}</div>}

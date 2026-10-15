@@ -107,7 +107,7 @@ export function HubView({ locale, data, emailOn = false }: { locale: Locale; dat
       <div className="flex flex-wrap items-center gap-4">
         <Avatar initials={me.initials} hue={me.hue} size={56} />
         <div>
-          <div className={k.eyebrow}>{tx(locale, "Tu espacio", "Your space")}</div>
+          <div className={k.caption}>{tx(locale, "Tu espacio", "Your space")}</div>
           <h1 className="mt-1 font-serif text-[40px] font-light leading-[1.05] md:text-[48px]">{tx(locale, `Hola, ${me.name.split(" ")[0]}`, `Hi, ${me.name.split(" ")[0]}`)}</h1>
         </div>
         {!allDone && (

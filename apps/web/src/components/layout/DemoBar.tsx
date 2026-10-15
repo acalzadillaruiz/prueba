@@ -35,7 +35,7 @@ export function DemoBar({ locale }: { locale: Locale }) {
         {open && (
           <div className="absolute bottom-full left-2 mb-2">
             <div className="np-in max-h-[70svh] w-64 overflow-y-auto rounded-np border border-navy-line bg-navy py-1 text-ivory ">
-              <div className="border-b border-navy-line px-3 py-2 text-xs font-semibold uppercase tracking-wide text-mist">{tx(locale, "Entrar como… (modo demo)", "Sign in as… (demo mode)")}</div>
+              <div className="border-b border-navy-line px-3 py-2 text-[13px] font-semibold text-mist">{tx(locale, "Entrar como… (modo demo)", "Sign in as… (demo mode)")}</div>
               <DemoLoginList locale={locale} onDone={() => setOpen(false)} className="p-1" />
             </div>
           </div>
@@ -51,7 +51,7 @@ export function DemoBar({ locale }: { locale: Locale }) {
       {open && (
         <div className="absolute right-full top-1/2 mr-2 -translate-y-1/2 sm:static sm:mr-0 sm:translate-y-0">
           <div className="np-in max-h-[85svh] w-64 overflow-y-auto rounded-np border border-navy-line bg-navy py-1 text-ivory sm:mb-2">
-            <div className="border-b border-navy-line px-3 py-2 text-xs font-semibold uppercase tracking-wide text-mist">{tx(locale, "Entrar como… (modo demo)", "Sign in as… (demo mode)")}</div>
+            <div className="border-b border-navy-line px-3 py-2 text-[13px] font-semibold text-mist">{tx(locale, "Entrar como… (modo demo)", "Sign in as… (demo mode)")}</div>
             <DemoLoginList locale={locale} onDone={() => setOpen(false)} className="p-1" />
           </div>
         </div>
@@ -77,7 +77,7 @@ export function DemoSidebarItem({ locale }: { locale: Locale }) {
     <div className="relative print:hidden" data-demobar-sidebar>
       {open && (
         <div className="np-in absolute bottom-full left-0 z-10 mb-2 max-h-[70svh] w-full overflow-y-auto rounded-np border border-navy-line bg-navy py-1 text-ivory shadow-float">
-          <div className="border-b border-navy-line px-3 py-2 text-xs font-semibold uppercase tracking-wide text-mist">{tx(locale, "Entrar como… (modo demo)", "Sign in as… (demo mode)")}</div>
+          <div className="border-b border-navy-line px-3 py-2 text-[13px] font-semibold text-mist">{tx(locale, "Entrar como… (modo demo)", "Sign in as… (demo mode)")}</div>
           <DemoLoginList locale={locale} onDone={() => setOpen(false)} className="p-1" />
         </div>
       )}

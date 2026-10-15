@@ -115,7 +115,7 @@ export function SellQuickEstimate({ locale, zones }: { locale: Locale; zones: { 
       <div aria-live="polite">
         {res && (
           <div className="np-in mt-5 rounded-[4px] bg-white/70 p-4 outline outline-1 -outline-offset-1 outline-black/[.04]" data-testid="quick-estimate">
-            <div className="np-kicker text-gold-text">{tx(locale, "Valor estimado New Place", "PlaceEstimate")}</div>
+            <div className="font-display text-[14px] font-medium text-gold-text">{tx(locale, "Valor estimado New Place", "PlaceEstimate")}</div>
             <div className="mt-2 font-serif text-[34px] font-light leading-none text-ink">
               {res.n < 2 ? `≈ ${money(res.mid, locale)}` : `${money(res.low, locale)} – ${money(res.high, locale)}`}
               <span className="font-display text-base font-normal text-muted">{suffix}</span>

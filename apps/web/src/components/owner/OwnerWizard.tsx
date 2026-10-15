@@ -876,7 +876,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               <PropertyArt scene={d.kind === "house" ? "house-dusk" : "tower-day"} seed="ph" className="aspect-[4/3] w-full opacity-40" />
             )}
             <div className="p-4">
-              <div className="text-xs font-semibold uppercase tracking-wide text-muted">{tx(locale, "Vista previa", "Preview")}</div>
+              <div className="text-[13px] font-semibold text-muted">{tx(locale, "Vista previa", "Preview")}</div>
               <div className="font-display text-xl font-semibold">{d.price ? <>{money(d.price, locale)}<span className="text-sm font-normal text-muted">{priceUnit}</span></> : <span className="text-muted">{tx(locale, "Precio pendiente", "Price to come")}</span>}</div>
               <div className="text-sm">{d.m2 ? facts : <span className="text-muted">{tx(locale, "Aquí verás los datos de tu casa", "Your home's details will show here")}</span>}</div>
               <div className="text-sm text-muted">{d.addr ? fullAddress([d.addr.zone, d.addr.city]) : tx(locale, "Dirección pendiente", "Address pending")}</div>

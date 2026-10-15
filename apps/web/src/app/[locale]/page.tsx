@@ -85,10 +85,10 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
 
   // "Así trabajamos": what the buyer gets, then how (035: short, concrete, at most two lines on a phone).
   const chapters = [
-    { eyebrow: tx(locale, "01 · Antes de firmar", "01 · Before you sign"), title: tx(locale, "Papeles en regla, sin sorpresas", "Paperwork in order, no surprises"), body: tx(locale, "Revisamos títulos, deudas y gravámenes antes de que pagues nada.", "We check titles, debts and liens before you pay anything.") },
-    { eyebrow: tx(locale, "02 · El precio", "02 · The price"), title: tx(locale, "Sabes lo que vale", "You know what it's worth"), body: tx(locale, "Cada casa trae su precio verificado con ventas reales de la zona.", "Every home comes with a price checked against real sales nearby.") },
-    { eyebrow: tx(locale, "03 · Las visitas", "03 · Viewings"), title: tx(locale, "Visitas cuando te venga bien", "Viewings when it suits you"), body: tx(locale, "En persona o por video, con el mismo asesor y su agenda real.", "In person or by video, with the same advisor and their real calendar.") },
-    { eyebrow: tx(locale, "04 · Las llaves", "04 · The keys"), title: tx(locale, "Te acompañamos hasta el final", "With you to the end"), body: tx(locale, "Firmas, pagas y recibes tu casa con un asesor a tu lado.", "You sign, pay and get your keys with an advisor beside you.") },
+    { title: tx(locale, "Papeles en regla, sin sorpresas", "Paperwork in order, no surprises"), body: tx(locale, "Revisamos títulos, deudas y gravámenes antes de que pagues nada.", "We check titles, debts and liens before you pay anything.") },
+    { title: tx(locale, "Sabes lo que vale", "You know what it's worth"), body: tx(locale, "Cada casa trae su precio verificado con ventas reales de la zona.", "Every home comes with a price checked against real sales nearby.") },
+    { title: tx(locale, "Visitas cuando te venga bien", "Viewings when it suits you"), body: tx(locale, "En persona o por video, con el mismo asesor y su agenda real.", "In person or by video, with the same advisor and their real calendar.") },
+    { title: tx(locale, "Te acompañamos hasta el final", "With you to the end"), body: tx(locale, "Firmas, pagas y recibes tu casa con un asesor a tu lado.", "You sign, pay and get your keys with an advisor beside you.") },
   ];
   const steps = [
     [tx(locale, "Visita en video", "Video viewing"), tx(locale, "Recorremos la casa contigo, en vivo.", "We walk you through the home, live.")],
@@ -124,7 +124,6 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
 
       {/* COLECCIÓN PRIVADA — real homes right after the hero: horizontal gallery */}
       <CollectionRail
-        eyebrow={tx(locale, "Colección Privada", "Private Collection")}
         title={tx(locale, "Casas elegidas una a una", "Homes chosen one by one")}
         items={rail}
         more={{ href: `/${locale}/luxury`, label: tx(locale, "Ver toda la colección", "See the whole collection") }}
@@ -133,7 +132,7 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
       {/* EXPLORE EN EL MAPA */}
       <section id="explorar" className="mx-auto max-w-[1320px] px-4 pb-14 pt-14 md:px-8 md:pb-20 md:pt-20 lg:pt-24">
         <div data-reveal className="mb-5 grid items-end gap-2 md:mb-8 md:grid-cols-[1fr_auto] md:gap-4 lg:mb-10">
-          <div><p className="np-kicker text-gold-text">{tx(locale, "Mapa", "Map")}</p><h2 className="mt-2 text-[30px] md:mt-3 md:text-[48px]">{tx(locale, "Busca por zona", "Search by area")}</h2></div>
+          <div><h2 className="np-t-h1">{tx(locale, "Busca por zona", "Search by area")}</h2></div>
           <p className="max-w-[380px] text-[15px] leading-relaxed text-muted md:text-right">
             {tx(locale, "Mira en el mapa dónde está cada casa y cuánto cuesta.", "See on the map where each home is and what it costs.")}
           </p>
@@ -144,7 +143,7 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
           <div className="flex min-w-0 flex-col gap-3">
             {/* One metric per list: the sale zones show the price per m²; zones that today only have rentals (Lechería:
                 vacation homes) go in their own small group, with their "from" price per night / month. */}
-            {saleZones.length > 0 && <p className="font-display text-[13px] font-semibold uppercase tracking-[.16em] text-muted">{tx(locale, "En venta · precio por m²", "For sale · price per m²")}</p>}
+            {saleZones.length > 0 && <p className="font-display text-[13px] font-semibold text-muted">{tx(locale, "En venta · precio por m²", "For sale · price per m²")}</p>}
             {/* Phones: a sideways rail (one row, swipe) instead of a tall stack; md+: the stacked list. */}
             {/* Tablets (md, map above): two columns, so the list isn't four tall rows; lg: the stack beside the map. */}
             <ul data-reveal="stagger" data-zone-rail className="no-scrollbar -mx-4 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 md:mx-0 md:grid md:snap-none md:grid-cols-2 md:overflow-visible md:px-0 lg:flex lg:flex-col">
@@ -171,7 +170,7 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
             </ul>
             {otherZones.length > 0 && (
               <>
-                <p className={cn("font-display text-[13px] font-semibold uppercase tracking-[.16em] text-muted", saleZones.length > 0 && "mt-1 md:mt-3")}>{tx(locale, "Solo en alquiler · desde", "Rentals only · from")}</p>
+                <p className={cn("font-display text-[13px] font-semibold text-muted", saleZones.length > 0 && "mt-1 md:mt-3")}>{tx(locale, "Solo en alquiler · desde", "Rentals only · from")}</p>
                 <ul className="flex flex-col gap-2">
                   {otherZones.map((z) => (
                     <li key={z.zone}>
@@ -220,7 +219,6 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
       {/* COMPRA A DISTANCIA — the diaspora's routes draw in to Lechería as the steps light up. */}
       <div>
         <RemoteRoute
-          eyebrow={tx(locale, "Si vives fuera", "If you live abroad")}
           title={tx(locale, "Compra desde donde vivas", "Buy from wherever you live")}
           subtitle={tx(locale, "Visita en video, firma con poder y paga en dólares de forma segura.", "View by video, sign by power of attorney and pay in dollars, safely.")}
           steps={steps as [string, string][]}
@@ -234,7 +232,7 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
       {/* THE PROMISE — a solid Taupe block with light text (AMALI's quote blocks). */}
       <section className="bg-[#6B5D52] text-[#F6F2EC]" aria-label={tx(locale, "Nuestra promesa", "Our promise")}>
         <div className="mx-auto max-w-[1100px] px-6 py-14 text-center md:px-10 md:py-20">
-          <p className="font-display text-[12px] font-medium uppercase tracking-[.22em] text-[#F6F2EC]/80">New Place</p>
+          <p className="font-display text-[12px] font-medium text-[#F6F2EC]/80">New Place</p>
           <blockquote className="mx-auto mt-5 max-w-[820px] font-title text-[24px] font-light leading-[1.25] tracking-[.01em] md:text-[34px]">
             {tx(
               locale,
@@ -251,7 +249,6 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
       <section className="relative overflow-hidden bg-ivory">
         <div className="relative mx-auto grid max-w-[1320px] items-center gap-6 px-5 pt-14 md:gap-10 md:px-10 md:pt-16 lg:grid-cols-2 lg:gap-16 lg:pt-16">
           <div data-reveal className="pb-0 md:pb-4 lg:pb-12">
-            <p className="np-kicker text-gold-text">{tx(locale, "Si vas a vender", "If you\u2019re selling")}</p>
             <h2 className="mt-3 text-[30px] md:text-[48px]">{tx(locale, "Vende tu casa al precio justo", "Sell your home at a fair price")}</h2>
             <ul className="mt-5 space-y-2.5 md:mt-7 md:space-y-3">
               {owner.map((o) => (

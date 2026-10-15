@@ -155,7 +155,7 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
     <div className="mx-auto max-w-[1280px] px-4 pb-32 pt-10 md:px-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <div className={k.eyebrow}>{tx(locale, "Comparador", "Compare")}</div>
+          <div className={k.caption}>{tx(locale, "Comparador", "Compare")}</div>
           <h1 className="mt-1 font-serif text-[40px] font-light leading-[1.05] md:text-[48px]">{tx(locale, "¿Cuál te conviene más?", "Which one suits you best?")}</h1>
           <p className="mt-1 text-muted">{tx(locale, "Pon hasta 3 casas lado a lado. La mejor de cada fila lleva la marca «Mejor».", "Put up to 3 homes side by side. The best in each row gets a “Best” tag.")}</p>
         </div>

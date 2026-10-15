@@ -83,7 +83,7 @@ const priceVars = (price: string, suffix: string, compact?: boolean) =>
   ({
     "--np-pk": (price.length * 0.56).toFixed(2),
     "--np-sfx": `${Math.ceil(suffix.length * 6.6)}px`,
-    "--np-pmax": compact ? "24px" : "28px",
+    "--np-pmax": compact ? "20px" : "22px",
   }) as React.CSSProperties;
 
 /**
@@ -113,7 +113,7 @@ export function ListingCard({ l, locale, compact, className, compareToggle }: { 
         className,
       )}
     >
-      <div className="relative aspect-[4/3] overflow-hidden rounded-[2px] bg-arena">
+      <div className="relative aspect-[4/3] overflow-hidden bg-arena">
         <CardPhotos l={l} locale={locale} label={label} href={href} />
         <PhotoBadge l={l} locale={locale} roomRight={compareToggle} compact={compact} />
         <SaveButton id={l.id} locale={locale} className="absolute right-2.5 top-2.5 z-[2]" />
@@ -124,9 +124,9 @@ export function ListingCard({ l, locale, compact, className, compareToggle }: { 
         )}
       </div>
       <div className={cn("pb-2 pt-4", compact && "pb-1.5 pt-3.5")}>
-        {/* AMALI: the title in spaced capitals with its zone, then the price in Jost tabular. Two lines reserved from md
-            so cards in a row stay aligned. */}
-        <div className="line-clamp-2 font-display text-[13.5px] font-medium uppercase leading-snug tracking-[.12em] text-ink md:min-h-[2.75em]">
+        {/* 043 (Airbnb property card): the title (the link), zone · city in stone, the price in Jost 600 tabular, the
+            facts. Sentence case throughout; two title lines reserved from md so cards in a row stay aligned. */}
+        <div className="line-clamp-2 font-display text-[16px] font-medium leading-snug text-ink md:min-h-[2.75em]">
           <Link
             href={href}
             aria-describedby={metaId}
@@ -135,17 +135,17 @@ export function ListingCard({ l, locale, compact, className, compareToggle }: { 
             {title}
           </Link>
         </div>
-        <div className="mt-1 line-clamp-1 text-[12px] font-medium uppercase tracking-[.16em] text-muted">{l.zone} · {l.city}</div>
+        <div className="mt-1 line-clamp-1 text-[14px] text-muted">{l.zone} · {l.city}</div>
         {/* Above the stretched link (z-[2]) so nothing paints over the price; clicks still fall through to the link. */}
         <div className="np-card-meta pointer-events-none relative z-[2] mt-3 flex flex-wrap items-baseline justify-between gap-x-2 gap-y-1" id={metaId}>
-          <div className="np-card-price np-num min-w-0 whitespace-nowrap font-light leading-none text-ink" style={priceVars(price, suffix, compact)}>
+          <div className="np-card-price np-num min-w-0 whitespace-nowrap font-semibold leading-none text-ink" style={priceVars(price, suffix, compact)}>
             {price}
             <span className="font-display text-sm font-normal text-muted">{suffix}</span>
             <span className="sr-only">, {l.zone}, {l.city}</span>
           </div>
           {!compact && <span className="shrink-0 text-sm text-muted">{lbl(TYPE_LABEL[l.listingType], locale)}</span>}
         </div>
-        <div className="mt-3 flex items-center justify-between gap-2 border-t border-egeo/40 pt-3 text-sm text-muted">
+        <div className="mt-2 flex items-center justify-between gap-2 text-[14px] text-muted">
           <span className="flex flex-wrap gap-x-4">
             {factsLine(l, locale).map((f) => (
               <span key={f}>{f}</span>

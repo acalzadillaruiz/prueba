@@ -113,7 +113,7 @@ function Facts({ l, locale }: { l: Listing; locale: Locale }) {
       <dl className={cn("grid gap-x-6 gap-y-5 border-y border-line py-6", cols)} data-testid="facts">
         {items.map(([v, t], i) => (
           <div key={t} className={cn("flex min-w-0 flex-col-reverse", i === n - 1 && lastWide)}>
-            <dt className="mt-1 break-words text-[13px] font-semibold uppercase leading-snug tracking-[0.06em] text-muted">{t}</dt>
+            <dt className="mt-1 break-words text-[13px] font-semibold leading-snug text-muted">{t}</dt>
             <dd className="break-words font-serif text-[30px] font-light leading-none text-ink">{v}</dd>
           </div>
         ))}
@@ -304,11 +304,11 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
             <Fold className={sec} testId="history-section" title={tx(locale, "Historial de precio y la zona", "Price history and the area")} hint={historyHint}>
               <div className="grid grid-cols-1 gap-10 md:grid-cols-2">
                 <div>
-                  <h4 className="mb-4 font-display text-[14px] font-medium uppercase leading-tight tracking-[.14em]">{tx(locale, "Historial de precio", "Price history")}</h4>
+                  <h4 className="mb-4 font-display text-[14px] font-medium leading-tight">{tx(locale, "Historial de precio", "Price history")}</h4>
                   <PriceHistory events={l.priceHistory} locale={locale} />
                 </div>
                 <div>
-                  <h4 className="mb-4 font-display text-[14px] font-medium uppercase leading-tight tracking-[.14em]">{tx(locale, `La zona en cifras · ${l.zone}`, `The area in numbers · ${l.zone}`)}</h4>
+                  <h4 className="mb-4 font-display text-[14px] font-medium leading-tight">{tx(locale, `La zona en cifras · ${l.zone}`, `The area in numbers · ${l.zone}`)}</h4>
                   <p className="-mt-2 mb-4 text-sm text-muted">{zone.live ? tx(locale, "Calculado con las casas publicadas en New Place.", "Worked out from the homes listed on New Place.") : tx(locale, "Aún hay pocas casas publicadas aquí: tómalo como una referencia.", "Only a few homes listed here so far: treat these as a guide.")}</p>
                   <div className="grid grid-cols-2 gap-3">
                     {[

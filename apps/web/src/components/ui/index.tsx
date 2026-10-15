@@ -94,7 +94,7 @@ export function Badge({ children, tone = "neutral", className }: { children: Rea
   }[tone];
   const caps = tone === "exclusive" || tone === "egeo" || tone === "arena";
   return (
-    <span className={cn("inline-flex items-center gap-1.5 whitespace-nowrap rounded-full", caps ? "px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em]" : "px-2.5 py-0.5 text-xs font-semibold", t, className)}>
+    <span className={cn("inline-flex items-center gap-1.5 whitespace-nowrap rounded-full", caps ? "px-3 py-1 text-[11px] font-semibold" : "px-2.5 py-0.5 text-xs font-semibold", t, className)}>
       {children}
     </span>
   );
@@ -142,7 +142,7 @@ export function Stat({ label, value, delta, dark, hint }: { label: string; value
   const up = delta?.startsWith("+");
   return (
     <div className={cn("rounded-np p-4", dark ? "border border-navy-line bg-navy-card" : "border border-line bg-white")}>
-      <div className={cn("text-xs font-semibold uppercase tracking-wide", dark ? "text-mist" : "text-muted")}>{label}</div>
+      <div className={cn("text-[13px] font-semibold", dark ? "text-mist" : "text-muted")}>{label}</div>
       <div className="mt-1.5 flex items-baseline gap-2">
         <span className="font-display text-2xl font-semibold">{value}</span>
         {delta && <span className={cn("text-xs font-semibold", up ? "text-[#5FBF8F]" : "text-coral")}>{delta}</span>}

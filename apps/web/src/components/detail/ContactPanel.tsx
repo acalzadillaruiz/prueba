@@ -312,7 +312,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
       <div role="tabpanel" id={`${uid}-panel`} aria-labelledby={`${uid}-tab-${mode}`}>
         {mode === "stay" && (
           <div className="mt-5" data-testid="stay-ask">
-            <div className="np-eyebrow text-gold-text">{tx(locale, "¿Cuándo quieres venir?", "When would you like to stay?")}</div>
+            <div className="font-display text-[14px] font-medium text-gold-text">{tx(locale, "¿Cuándo quieres venir?", "When would you like to stay?")}</div>
             <p className={cn("mb-3 mt-1 text-sm", muted)} data-testid="stay-card-terms">
               {tx(locale, "Mín.", "Min.")} {plural(minNights, locale, ["noche", "noches"], ["night", "nights"])}
               {cleaningFee > 0 && ` · ${tx(locale, "limpieza", "cleaning")} ${money(cleaningFee, locale)}`}
@@ -394,7 +394,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
         )}
         {mode === "tour" && askMode && (
           <div className="mt-5" data-testid="visit-ask">
-            <div className="np-eyebrow mb-2 text-gold-text">{tx(locale, "Pide una visita", "Ask for a visit")}</div>
+            <div className="font-display text-[14px] font-medium mb-2 text-gold-text">{tx(locale, "Pide una visita", "Ask for a visit")}</div>
             <p className={cn("text-[15px]", muted)}>
               {slots.data?.hasCalendar
                 ? tx(locale, "Esta semana ya no quedan horas libres. Cuéntale a su dueño cuándo te viene bien y te propone un momento.", "No free times left this week. Tell the owner when suits you and they’ll suggest a time.")
@@ -433,7 +433,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
         )}
         {mode === "tour" && !askMode && (
           <div className="mt-5">
-            <div className="np-eyebrow mb-3 text-gold-text">{tx(locale, "Elige cuándo quieres verla", "Choose when to see it")}</div>
+            <div className="font-display text-[14px] font-medium mb-3 text-gold-text">{tx(locale, "Elige cuándo quieres verla", "Choose when to see it")}</div>
             {slots.isLoading && (
               <div className="grid grid-cols-4 gap-2" aria-label={tx(locale, "Buscando horarios libres…", "Finding free times…")}>
                 {[0, 1, 2, 3].map((i) => <div key={i} className="np-skeleton h-[86px] rounded-xl" />)}

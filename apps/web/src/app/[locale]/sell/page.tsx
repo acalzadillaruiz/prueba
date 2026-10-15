@@ -58,7 +58,6 @@ export default async function SellPage({ params }: { params: Promise<{ locale: L
       <section className="np-grain relative overflow-hidden">
         <div className="mx-auto grid max-w-[1320px] items-start gap-10 px-4 pb-16 pt-10 md:px-8 lg:grid-cols-[1.1fr_480px] lg:gap-16 lg:pb-24 lg:pt-20">
           <div className="lg:pt-6">
-            <p className="np-kicker text-gold-text">{tx(locale, "Vender con nosotros", "Sell with us")}</p>
             <h1 className="mt-3 max-w-[640px] text-[40px] leading-[1.04] tracking-[-0.02em] md:text-[60px]">
               {tx(locale, "Vende tu casa", "Sell your home")} <span className="text-gold-text">{tx(locale, "al precio justo.", "at the right price.")}</span>
             </h1>
@@ -79,7 +78,6 @@ export default async function SellPage({ params }: { params: Promise<{ locale: L
       </section>
 
       <section className="mx-auto max-w-[1320px] px-4 py-14 md:px-8 lg:py-20" aria-labelledby="sell-why">
-        <p className="np-kicker text-gold-text">{tx(locale, "Lo que te damos", "What you get")}</p>
         <h2 id="sell-why" className="mt-3 max-w-[720px] text-[32px] leading-[1.08] tracking-[-0.02em] md:text-[44px]">
           {tx(locale, "Sabes qué recibes y qué pagas.", "You know what you get and what you pay.")}
         </h2>
@@ -96,7 +94,6 @@ export default async function SellPage({ params }: { params: Promise<{ locale: L
 
       <section id="como-funciona" className="scroll-mt-24 border-t border-line" aria-labelledby="sell-steps">
         <div className="mx-auto max-w-[1320px] px-4 py-14 md:px-8 lg:py-20">
-          <p className="np-kicker text-gold-text">{tx(locale, "Cómo funciona", "How it works")}</p>
           <h2 id="sell-steps" className="mt-3 text-[32px] leading-[1.08] tracking-[-0.02em] md:text-[44px]">{tx(locale, "Publica en tres pasos", "List in three steps")}</h2>
           <ol className="mt-10 grid gap-8 md:grid-cols-3">
             {steps.map(([t, d], i) => (

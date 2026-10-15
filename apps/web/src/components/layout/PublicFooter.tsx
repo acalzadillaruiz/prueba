@@ -33,7 +33,7 @@ export async function PublicFooter({ locale }: { locale: Locale }) {
         <div className="pb-3">{list(links, extra)}</div>
       </details>
       <div className="hidden md:block">
-        <div className="np-kicker mb-4 text-gold-text">{title}</div>
+        <div className="font-display text-[14px] font-medium mb-4 text-gold-text">{title}</div>
         {list(links, extra)}
       </div>
     </div>

@@ -59,7 +59,7 @@ export function OwnerInbox({ locale, leads, tours, onChanged, manage = true }: {
       {err && <div role="alert" className="rounded-lg bg-[#B3261E1A] px-3 py-2 text-xs text-danger">{err}</div>}
       {upcoming.length > 0 && (
         <div className="rounded-lg border border-line" data-testid="owner-tours">
-          <div className="border-b border-line px-3 py-2 text-xs font-bold uppercase tracking-wide text-muted">{tx(locale, "Visitas", "Visits")} · {upcoming.length}</div>
+          <div className="border-b border-line px-3 py-2 text-[13px] font-bold text-muted">{tx(locale, "Visitas", "Visits")} · {upcoming.length}</div>
           <ul className="divide-y divide-line">
             {upcoming.map((t) => (
               <li key={t.id} className="flex flex-wrap items-center gap-x-3 gap-y-1.5 px-3 py-2.5 text-sm">
@@ -87,7 +87,7 @@ export function OwnerInbox({ locale, leads, tours, onChanged, manage = true }: {
       )}
       {leads.length > 0 && (
         <div className="rounded-lg border border-line" data-testid="owner-leads">
-          <div className="border-b border-line px-3 py-2 text-xs font-bold uppercase tracking-wide text-muted">{tx(locale, "Personas interesadas", "Interested people")} · {leads.length}</div>
+          <div className="border-b border-line px-3 py-2 text-[13px] font-bold text-muted">{tx(locale, "Personas interesadas", "Interested people")} · {leads.length}</div>
           <ul className="divide-y divide-line">
             {shown.map((ld) => {
               const booked = upcoming.some((t) => t.leadId === ld.id);

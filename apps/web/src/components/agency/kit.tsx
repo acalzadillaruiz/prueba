@@ -29,8 +29,8 @@ export const k = {
   hover: "hover:bg-[#F6F2EA] dark:hover:bg-white/[.04]",
   /** Table head / KPI label: uppercase 11–12 px, tracking .12em. */
   th: "text-[11px] font-semibold uppercase tracking-[.12em] text-muted dark:text-mist [&_th]:whitespace-nowrap",
-  label: "text-[12px] font-semibold uppercase tracking-[.12em] text-muted dark:text-mist",
-  eyebrow: "text-[12px] font-semibold uppercase tracking-[.16em] text-gold-text dark:text-[#C9BFAE]",
+  label: "text-[13px] font-semibold text-muted dark:text-mist",
+  caption: "text-[13px] font-medium text-gold-text dark:text-[#C9BFAE]",
   /** Card titles in Cormorant. */
   title: "font-serif text-[24px] font-medium leading-tight text-navy dark:text-ivory",
   titleSm: "font-serif text-[20px] font-medium leading-tight text-navy dark:text-ivory",
@@ -170,7 +170,7 @@ export function PageHead({ eyebrow, title, sub, action, className }: { eyebrow?:
   return (
     <div className={cn("flex flex-wrap items-end justify-between gap-4", className)}>
       <div className="min-w-0">
-        {eyebrow && <div className={k.eyebrow}>{eyebrow}</div>}
+        {eyebrow && <div className={k.caption}>{eyebrow}</div>}
         <h1 className="mt-1.5 font-serif text-[40px] font-light leading-[1.05] text-navy md:text-[48px] dark:text-ivory">{title}</h1>
         {sub && <p className={cn("mt-2 text-[15px]", k.muted)}>{sub}</p>}
       </div>

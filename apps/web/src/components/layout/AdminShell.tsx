@@ -278,7 +278,7 @@ export function AdminShell({
                 <ArrowLeft size={16} strokeWidth={1.8} aria-hidden /> {back.label}
               </Link>
             )}
-            <div className={cn(k.eyebrow, "truncate")}>{headless ? `${kicker} · ${title}` : kicker}</div>
+            <div className={cn(k.caption, "truncate")}>{headless ? `${kicker} · ${title}` : kicker}</div>
             {!headless && <h1 className="mt-1.5 font-serif text-[34px] font-light leading-[1.05] text-navy md:text-[44px] dark:text-ivory" suppressHydrationWarning>{title}</h1>}
           </div>
           <div className="flex flex-wrap items-center gap-2.5">

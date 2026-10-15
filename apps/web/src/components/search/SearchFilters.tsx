@@ -77,7 +77,7 @@ export type SetFilters = (patch: Record<string, string | null>) => void;
 export const pill = "flex h-11 md:h-10 shrink-0 items-center gap-1.5 rounded-[2px] border px-4 font-display text-sm transition-colors duration-np";
 // Selected filter = navy tint + 2 px navy border (brand v4).
 export const on = "np-sel border-2 px-[15px]";
-const sectionTitle = "mb-2.5 block text-xs font-semibold uppercase tracking-wide text-muted";
+const sectionTitle = "mb-2.5 block text-[13px] font-semibold text-muted";
 
 /** "Precio" / "Hasta USD 400k" / "USD 150k – USD 400k" / "Desde USD 1M" (en: "Up to $400k"…): what the price button says. Same currency style as the cards. */
 export function priceLabel(locale: Locale, min?: number, max?: number) {

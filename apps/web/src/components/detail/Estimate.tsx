@@ -32,7 +32,7 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
       {/* Navy valuation panel (brand): range in Cormorant, gold fillet scale, the asking price as a dot. */}
       <div className="np-navy-panel bg-navy px-6 py-7 text-ivory md:px-8">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="np-eyebrow text-[#C9BFAE]">{tx(locale, "Valor estimado New Place", "PlaceEstimate · Estimated value")}</div>
+          <div className="font-display text-[14px] font-medium text-[#C9BFAE]">{tx(locale, "Valor estimado New Place", "PlaceEstimate · Estimated value")}</div>
           <div className="text-sm text-ivory/70">
             {rough ? tx(locale, "Estimación orientativa", "Indicative estimate") : conf} · {source}
           </div>

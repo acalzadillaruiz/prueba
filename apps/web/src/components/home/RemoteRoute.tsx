@@ -11,7 +11,7 @@ const CITIES = [
 ];
 const LECHERIA = { x: 330, y: 330 };
 
-export function RemoteRoute({ eyebrow, title, subtitle, steps, children }: { eyebrow: string; title: string; subtitle?: string; steps: [string, string][]; children?: React.ReactNode }) {
+export function RemoteRoute({ title, subtitle, steps, children }: { title: string; subtitle?: string; steps: [string, string][]; children?: React.ReactNode }) {
   const reduced = useReducedMotion();
   const root = useRef<HTMLElement>(null);
   const paths = useRef<(SVGPathElement | null)[]>([]);
@@ -93,8 +93,7 @@ export function RemoteRoute({ eyebrow, title, subtitle, steps, children }: { eye
             </svg>
           </div>
           <div>
-            <p className="np-eyebrow text-gold-text">{eyebrow}</p>
-            <h2 className="mt-2 max-w-[560px] text-[30px] md:mt-3 md:text-[44px]">{title}</h2>
+            <h2 className="np-t-h1 max-w-[560px]">{title}</h2>
             {subtitle && <p className="mt-3 max-w-[480px] text-[16px] font-light text-muted md:text-[17px]">{subtitle}</p>}
             <ol className="np-steps mt-5 md:mt-8">
               {steps.map(([t, b], i) => (

@@ -43,8 +43,7 @@ export default async function LuxuryPage({ params }: { params: Promise<{ locale:
         />
         <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgb(28_29_29/.45)_0%,rgb(28_29_29/.05)_35%,rgb(28_29_29/.6)_100%)]" />
         <div className="relative mx-auto w-full max-w-[1320px] px-4 pb-14 pt-[140px] md:px-8 lg:pb-20">
-          <p className="np-kicker text-white/85">{tx(locale, "Colección Privada", "Private Collection")}</p>
-          <h1 className="mt-5 max-w-[860px] text-[34px] text-white sm:text-[48px] lg:text-[60px]">
+                    <h1 className="mt-5 max-w-[860px] text-[34px] text-white sm:text-[48px] lg:text-[60px]">
             {tx(locale, "Casas exclusivas", "Exclusive homes")} <span className="text-white/75">{tx(locale, "que ves en privado.", "you see in private.")}</span>
           </h1>
           <span aria-hidden className="mt-6 block h-px w-[min(300px,70%)] bg-white/70" />
@@ -78,7 +77,7 @@ export default async function LuxuryPage({ params }: { params: Promise<{ locale:
                   <SaveButton id={l.id} locale={locale} className="absolute right-3 top-3" />
                 </div>
                 <div className="mt-5 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                  <span className="font-display text-[14px] font-medium uppercase tracking-[.12em] md:text-[15px]">{tx(locale, l.title_es, l.title_en)}</span>
+                  <span className="font-display text-[14px] font-medium md:text-[15px]">{tx(locale, l.title_es, l.title_en)}</span>
                   <span className="font-serif text-[26px] font-light text-ink">{money(l.priceAmount, locale)}</span>
                 </div>
                 <div className="mt-1 text-[15px] text-muted">{l.zone}, {l.city} · {factsLine(l, locale).join(" · ")}</div>
@@ -92,7 +91,6 @@ export default async function LuxuryPage({ params }: { params: Promise<{ locale:
       <section id="acceso" data-hide-fab className="np-navy-panel scroll-mt-24 bg-navy text-ivory">
         <div className="mx-auto grid max-w-[1320px] items-center gap-10 px-4 py-20 md:px-8 lg:grid-cols-[1.2fr_1fr] lg:py-24">
           <div>
-            <p className="np-eyebrow text-[#C9BFAE]">{tx(locale, "Acceso privado", "Private access")}</p>
             <h2 className="mt-3 text-[36px] leading-tight md:text-[48px]">
               {tx(locale, `${privateCount} ${privateCount === 1 ? "casa privada disponible" : "casas privadas disponibles"}`, `${privateCount} private home${privateCount === 1 ? "" : "s"} available`)}
             </h2>

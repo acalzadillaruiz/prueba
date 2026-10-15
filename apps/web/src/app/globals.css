@@ -219,7 +219,6 @@ body:has([data-public-header]) [data-demobar] { display: none; }
 /* ——— Brand v4 devices ——— */
 :root { --np-sel: #E9E1D3; }  /* selected state: navy tint + 2px navy border */
 .np-sel { background-color: var(--np-sel); border: 2px solid var(--np-navy); color: var(--np-navy); }
-.np-eyebrow { font-family: var(--font-display); font-size: 12px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; }
 /* The active nav item carries a fine line under it (AMALI). */
 .np-navroof { position: relative; }
 .np-navroof::after { content: ""; position: absolute; left: 50%; bottom: -8px; width: 22px; height: 1px; transform: translateX(-50%); background: currentColor; }
@@ -301,7 +300,6 @@ html.dark .np-public [data-public-header] .np-glass { background: rgb(14 26 43 /
 /* Image reveal: photos open like a curtain when they enter the viewport (HomeMotion toggles .is-in). */
 [data-unveil] { clip-path: inset(12% 8% 12% 8% round 4px); transition: clip-path 1.4s cubic-bezier(.16,1,.3,1); }
 [data-unveil].is-in { clip-path: inset(0 0 0 0 round 4px); }
-.np-kicker { font-family: var(--font-display); font-size: 12px; font-weight: 500; letter-spacing: .22em; text-transform: uppercase; }
 @media (prefers-reduced-motion: reduce) {
   .np-aura i, .np-marquee { animation: none; }
   [data-unveil] { clip-path: none; transition: none; }

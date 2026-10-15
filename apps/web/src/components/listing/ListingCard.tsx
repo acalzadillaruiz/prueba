@@ -134,7 +134,7 @@ export function ListingCard({ l, locale, compact, className, compareToggle }: { 
             {title}
           </Link>
         </div>
-        <div className="mt-1 line-clamp-1 text-[14px] text-muted">{l.zone} · {l.city}</div>
+        <div className="mt-1 line-clamp-1 text-[16px] text-muted">{l.zone} · {l.city}</div>
         {/* Above the stretched link (z-[2]) so nothing paints over the price; clicks still fall through to the link. */}
         <div className="np-card-meta pointer-events-none relative z-[2] mt-3 flex flex-wrap items-baseline justify-between gap-x-2 gap-y-1" id={metaId}>
           <div className="np-card-price np-num min-w-0 whitespace-nowrap font-semibold leading-none text-ink" style={priceVars(price, suffix, compact)}>
@@ -144,7 +144,7 @@ export function ListingCard({ l, locale, compact, className, compareToggle }: { 
           </div>
           {!compact && <span className="shrink-0 text-sm text-muted">{lbl(TYPE_LABEL[l.listingType], locale)}</span>}
         </div>
-        <div className="mt-2 flex items-center justify-between gap-2 text-[14px] text-muted">
+        <div className="mt-2 flex items-center justify-between gap-2 text-[16px] text-muted">
           <span className="flex flex-wrap gap-x-4">
             {factsLine(l, locale).map((f) => (
               <span key={f}>{f}</span>

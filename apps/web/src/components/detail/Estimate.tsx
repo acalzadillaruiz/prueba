@@ -33,18 +33,15 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
       <div className="np-navy-panel bg-navy px-6 py-7 text-ivory md:px-8">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h3 className="font-display text-[20px] font-medium text-ivory">{tx(locale, "Valor estimado New Place", "PlaceEstimate · Estimated value")}</h3>
-          <div className="text-sm text-ivory/70">
-            {rough ? tx(locale, "Estimación orientativa", "Indicative estimate") : conf} · {source}
-          </div>
         </div>
         {rough ? (
           <>
-            <div className="mt-4 font-serif text-[36px] font-light leading-tight md:text-[46px]">
+            <div className="mt-4 font-title text-[36px] leading-tight md:text-[44px]">
               ≈ {money(e.mid, locale)}
               <span className="font-display text-base font-normal text-ivory/60">{priceSuffix(l, locale)}</span>
             </div>
             <p className="mt-2 max-w-[520px] text-sm leading-relaxed text-ivory/70">
-              {nComp === 1
+              {source} · {nComp === 1
                 ? tx(locale, "Estimación orientativa: por ahora solo hay una casa comparable cerca, así que no te damos un rango.", "Indicative estimate: there’s only one comparable home nearby for now, so we don’t show a range.")
                 : tx(locale, "Estimación orientativa: aún no hay casas comparables cerca, así que no te damos un rango.", "Indicative estimate: there are no comparable homes nearby yet, so we don’t show a range.")}
             </p>
@@ -54,12 +51,12 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
           </>
         ) : (
           <>
-        <div className="mt-4 font-serif text-[36px] font-light leading-tight md:text-[46px]">
+        <div className="mt-4 font-title text-[36px] leading-tight md:text-[44px]">
           {money(e.low, locale)} – {money(e.high, locale)}
           <span className="font-display text-base font-normal text-ivory/60">{priceSuffix(l, locale)}</span>
         </div>
         <div className="mt-1 text-sm text-ivory/70">
-          {tx(locale, "Valor central", "Mid value")} {money(e.mid, locale)}
+          {conf} · {source} · {tx(locale, "Valor central", "Mid value")} {money(e.mid, locale)}
         </div>
         <div className="relative mt-9 h-[3px] rounded-full bg-white/15">
           <div className="absolute inset-y-0 rounded-full bg-[#C9BFAE]" style={{ left: `${aLow}%`, right: `${100 - aHigh}%` }} />

@@ -243,13 +243,14 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
         <div className="mx-auto grid max-w-[1320px] grid-cols-[minmax(0,1fr)] gap-12 px-4 pt-8 md:px-8 lg:grid-cols-[minmax(0,1fr)_420px] lg:gap-x-16 lg:gap-y-0">
           <div className="lg:col-start-1 lg:row-start-1">
             <Facts l={l} locale={locale} />
-            <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted">
+
+
+            <div className="mt-8 py-6"><BilingualBody l={l} locale={locale} /></div>
+            <div className="-mt-2 mb-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted">
               <Freshness iso={l.updatedAt} locale={locale} />
               {savesLabel && <span className="inline-flex items-center gap-1.5"><Heart size={15} aria-hidden /> {savesLabel}</span>}
               <span className="inline-flex items-center gap-1.5"><Clock size={15} aria-hidden /> {l.daysOnMarket === 0 ? tx(locale, "Publicado hoy", "Listed today") : plural(l.daysOnMarket, locale, ["día en New Place", "días en New Place"], ["day on New Place", "days on New Place"])}</span>
             </div>
-
-            <div className="mt-8 py-6"><BilingualBody l={l} locale={locale} /></div>
 
             <Essentials l={l} locale={locale} title={<H>{tx(locale, "Servicios esenciales", "Essential services")}</H>} />
 

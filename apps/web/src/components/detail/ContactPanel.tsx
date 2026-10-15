@@ -206,7 +206,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
     const stayDone = mode === "stay" && !!done;
     const replier = agent ? agent.name.split(" ")[0] : fsbo ? tx(locale, "Su dueño", "The owner") : tx(locale, "Tu asesor", "Your advisor");
     return (
-      <div id="contact-panel" tabIndex={-1} className={cn("np-in rounded-[4px] p-6 ring-1", box)} data-testid="lead-done" role="status">
+      <div id="contact-panel" tabIndex={-1} className={cn("np-in rounded-[4px] p-6 outline outline-1 -outline-offset-1", box)} data-testid="lead-done" role="status">
         <CheckCircle2 className="text-ok" size={30} aria-hidden />
         <div className="mt-3 font-serif text-[28px] leading-tight">
           {tour ? tx(locale, "Visita pedida", "Viewing requested") : stayDone ? tx(locale, "Tu consulta ya llegó", "Your availability request is in") : asked ? tx(locale, "Tu pedido de visita ya llegó", "Your visit request is in") : tx(locale, "Tu mensaje ya llegó", "Your message is on its way")}
@@ -266,7 +266,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
       : tx(locale, "Enviar mensaje", "Send message");
 
   return (
-    <div id="contact-panel" tabIndex={-1} data-hide-fab className={cn("rounded-[4px] p-6 ring-1", box)}>
+    <div id="contact-panel" tabIndex={-1} data-hide-fab className={cn("rounded-[4px] p-6 outline outline-1 -outline-offset-1", box)}>
       {(agent || agency) && (
         <div className="flex items-center gap-4">
           <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#E9E1D3] font-serif text-[22px] font-light text-[#1A2026]" aria-hidden>{initials}</span>

@@ -136,7 +136,8 @@ export function ListingCard({ l, locale, compact, className, compareToggle }: { 
           </Link>
         </div>
         <div className="mt-1 line-clamp-1 text-[12px] font-medium uppercase tracking-[.16em] text-muted">{l.zone} · {l.city}</div>
-        <div className="np-card-meta mt-3 flex flex-wrap items-baseline justify-between gap-x-2 gap-y-1" id={metaId}>
+        {/* Above the stretched link (z-[2]) so nothing paints over the price; clicks still fall through to the link. */}
+        <div className="np-card-meta pointer-events-none relative z-[2] mt-3 flex flex-wrap items-baseline justify-between gap-x-2 gap-y-1" id={metaId}>
           <div className="np-card-price np-num min-w-0 whitespace-nowrap font-light leading-none text-ink" style={priceVars(price, suffix, compact)}>
             {price}
             <span className="font-display text-sm font-normal text-muted">{suffix}</span>
@@ -173,12 +174,12 @@ export function MapPreviewCard({ l, locale, variant = "card" }: { l: Listing; lo
   );
   if (variant === "sheet")
     return (
-      <article className="relative isolate flex h-[120px] gap-3 overflow-hidden rounded-[4px] bg-white p-1.5 ring-1 ring-black/[.05] has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-navy">
+      <article className="relative isolate flex h-[120px] gap-3 overflow-hidden rounded-[4px] bg-white p-1.5 outline outline-1 -outline-offset-1 outline-black/[.05] has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-navy">
         <div className="relative w-[40%] max-w-[160px] shrink-0 overflow-hidden rounded-[4px] bg-arena">
           <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="h-full w-full" label={label} sizes="160px" />
         </div>
         <div className="min-w-0 flex-1 py-1.5 pr-12">
-          <div id={metaId} className="np-num whitespace-nowrap text-[20px] leading-none text-ink">
+          <div id={metaId} className="np-num pointer-events-none relative z-[2] whitespace-nowrap text-[20px] leading-none text-ink">
             {money(l.priceAmount, locale)}
             <span className="font-display text-[13px] font-normal text-muted">{priceSuffix(l, locale)}</span>
           </div>
@@ -195,7 +196,7 @@ export function MapPreviewCard({ l, locale, variant = "card" }: { l: Listing; lo
         <SaveButton id={l.id} locale={locale} className="absolute right-2 top-2 z-[2]" />
       </div>
       <div className="p-3.5">
-        <div id={metaId} className="np-num whitespace-nowrap text-[22px] leading-none text-ink">
+        <div id={metaId} className="np-num pointer-events-none relative z-[2] whitespace-nowrap text-[22px] leading-none text-ink">
           {money(l.priceAmount, locale)}
           <span className="font-display text-sm font-normal text-muted">{priceSuffix(l, locale)}</span>
         </div>

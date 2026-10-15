@@ -190,7 +190,7 @@ export function CalendarView({ locale, weekStart, week, events, slots, canEditSl
                 <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-navy dark:bg-ivory" /> {tx(locale, "Visita", "Tour")}</span>
                 <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm border border-dashed border-navy/60 bg-[#E9E1D3] dark:border-ivory/60 dark:bg-white/10" /> {tx(locale, "Solicitada", "Requested")}</span>
                 <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-egeo" /> {tx(locale, "Fotos", "Media")}</span>
-                <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-[#F3EEE4] ring-1 ring-[#E4DCCD] dark:bg-white/[.06] dark:ring-white/10" /> {tx(locale, "Slot libre", "Open slot")}</span>
+                <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-[#F3EEE4] outline outline-1 -outline-offset-1 outline-[#E4DCCD] dark:bg-white/[.06] dark:outline-white/10" /> {tx(locale, "Slot libre", "Open slot")}</span>
             </div>
           </div>
           <ScrollRegion scrollRef={scroller} label={tx(locale, "Semana", "Week")} className="rounded-b-[4px]">

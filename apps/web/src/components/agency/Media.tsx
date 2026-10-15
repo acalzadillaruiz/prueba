@@ -221,7 +221,7 @@ export function MediaView({ locale, jobs, listings, names = {}, manage = null }:
             {photos.length ? (
               <div className="mt-5 grid grid-cols-3 gap-2 sm:grid-cols-5 lg:grid-cols-6">
                 {photos.map((src, i) => (
-                  <div key={src} className={cn("relative overflow-hidden rounded-lg ring-2", i === 0 ? "ring-navy dark:ring-ivory" : "ring-transparent")}>
+                  <div key={src} className={cn("relative overflow-hidden rounded-lg outline outline-2 -outline-offset-2", i === 0 ? "ring-navy dark:ring-ivory" : "ring-transparent")}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={src} alt="" className="aspect-[4/3] w-full object-cover" />
                     <span className="absolute left-1 top-1 rounded bg-navy/80 px-1 text-[10px] font-bold text-ivory">{i + 1}</span>

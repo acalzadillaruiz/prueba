@@ -138,7 +138,7 @@ export function CompareTray({ locale }: { locale: Locale }) {
                   type="button"
                   onClick={() => toggleCompare(id)}
                   aria-label={title ? tx(locale, `Quitar «${title}» del comparador`, `Remove “${title}” from compare`) : tx(locale, "Quitar del comparador", "Remove from compare")}
-                  className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-white text-ink ring-1 ring-black/10 after:absolute after:-inset-2.5 after:content-['']"
+                  className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-white text-ink outline outline-1 -outline-offset-1 outline-black/10 after:absolute after:-inset-2.5 after:content-['']"
                 >
                   <X size={11} strokeWidth={2.2} aria-hidden />
                 </button>
@@ -171,7 +171,7 @@ export function CompareTray({ locale }: { locale: Locale }) {
       <div className="np-glass hidden items-center gap-2.5 rounded-full py-1.5 pl-1.5 pr-1.5 md:flex">
         <ul className="flex -space-x-2.5 pl-0.5" aria-hidden>
           {compare.slice(0, 3).map((id) => (
-            <li key={id} className="h-9 w-9 rounded-full ring-2 ring-[#F6F2EC]">
+            <li key={id} className="h-9 w-9 rounded-full outline outline-2 -outline-offset-2 outline-[#F6F2EC]">
               {thumb(id, "h-full w-full rounded-full")}
             </li>
           ))}

@@ -316,7 +316,7 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
             ) : (
               <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">
                 {photos.map((p, i) => (
-                  <div key={p.id} className={cn("group relative overflow-hidden rounded-xl ring-2", p.isCover ? "ring-navy dark:ring-ivory" : "ring-transparent")}>
+                  <div key={p.id} className={cn("group relative overflow-hidden rounded-xl outline outline-2 -outline-offset-2", p.isCover ? "ring-navy dark:ring-ivory" : "ring-transparent")}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={p.url} alt="" className="aspect-[4/3] w-full object-cover" />
                     {canPhotos && <div className="absolute inset-x-1 top-1 flex justify-between transition-opacity [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 [@media(hover:hover)]:group-focus-within:opacity-100">

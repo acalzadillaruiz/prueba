@@ -85,7 +85,7 @@ export default async function SellPage({ params }: { params: Promise<{ locale: L
         </h2>
         <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {values.map(({ Icon, t, d }) => (
-            <li key={t} className="rounded-[4px] bg-white/70 p-6 ring-1 ring-black/[.04]">
+            <li key={t} className="rounded-[4px] bg-white/70 p-6 outline outline-1 -outline-offset-1 outline-black/[.04]">
               <Icon size={22} strokeWidth={1.5} className="text-[#0E1A2B]" aria-hidden />
               <h3 className="mt-4 font-serif text-[24px] leading-tight">{t}</h3>
               <p className="mt-2 text-[15px] leading-relaxed text-muted">{d}</p>

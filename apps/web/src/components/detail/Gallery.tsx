@@ -256,7 +256,7 @@ export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: bo
           {tab === "photos" && (
             <div className="no-scrollbar flex gap-2 overflow-x-auto px-4 py-3">
               {shots.map((s, n) => (
-                <button key={n} onClick={() => setI(n)} aria-label={What(n + 1)} aria-current={n === i || undefined} className={cn("h-16 w-24 shrink-0 overflow-hidden rounded-lg ring-2", n === i ? "ring-[#E9E1D3]" : "ring-transparent opacity-60")}>
+                <button key={n} onClick={() => setI(n)} aria-label={What(n + 1)} aria-current={n === i || undefined} className={cn("h-16 w-24 shrink-0 overflow-hidden rounded-lg outline outline-2 -outline-offset-2", n === i ? "ring-[#E9E1D3]" : "ring-transparent opacity-60")}>
                   <PropertyArt scene={s} seed={n === 0 ? l.id : l.id + (n - 1)} photo={listingPhoto(l, n)} className="h-full w-full" />
                 </button>
               ))}

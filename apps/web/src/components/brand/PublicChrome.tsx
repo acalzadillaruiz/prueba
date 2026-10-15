@@ -171,10 +171,12 @@ export function useUnreadMessages(enabled: boolean, opts: { refetchOnWindowFocus
 /**
  * Phones: bottom tab bar (Inicio · Buscar · Guardados · Cuenta). The active item carries the roof glyph. "Buscar" opens
  * the search (list first; its own floating toggle switches to the map). "Cuenta" opens the user's own space when signed
- * in (seekers: /app "Tu espacio"), the sign-in page otherwise.
+ * in (seekers: /app "Tu espacio"), the sign-in page otherwise. 043: it slides away while the reader scrolls down and
+ * comes back on the way up (or after a pause), so it never sits on a heading; keyboard focus inside keeps it shown.
  */
 export function MobileTabBar({ locale }: { locale: Locale }) {
   const pathname = usePathname();
+  const away = useHideOnScroll({ from: 240, idleMs: 1600 });
   const { saved, user } = useApp();
   const t = msg(locale, "nav");
   const seeker = !!user && roleHome(user.role) === "/app";
@@ -196,7 +198,8 @@ export function MobileTabBar({ locale }: { locale: Locale }) {
     <nav
       data-tabbar
       aria-label={locale === "es" ? "Navegación inferior" : "Bottom navigation"}
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-ivory md:hidden print:hidden"
+      data-away={away || undefined}
+      className="fixed inset-x-0 bottom-0 z-40 bg-ivory shadow-float transition-transform duration-[320ms] ease-np focus-within:translate-y-0 data-[away]:translate-y-full md:hidden print:hidden"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <ul className="grid grid-cols-4">

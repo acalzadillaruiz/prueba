@@ -138,7 +138,7 @@ export function SettingsView({
           </div>
           {/* The public listing is light: the preview pins the light tokens even in the dark cockpit (Cal surface, Navy ink,
               muted #57534D = 6.4:1), and the button text follows the accent's luminance (white or Navy). */}
-          <div className="mt-5 rounded-xl bg-[#F6F2EC] p-4 text-[#1A2026] ring-1 ring-[#E6DFD3] [--np-ink-rgb:30_26_24] [--np-line-rgb:216_203_183] [--np-logo-ink:#1A2026] [--np-logo-teja:#0E1A2B] [--np-muted-rgb:94_82_72] [color-scheme:light] dark:ring-white/10" data-testid="brand-preview">
+          <div className="mt-5 rounded-xl bg-[#F6F2EC] p-4 text-[#1A2026] outline outline-1 -outline-offset-1 outline-[#E6DFD3] [--np-ink-rgb:30_26_24] [--np-line-rgb:216_203_183] [--np-logo-ink:#1A2026] [--np-logo-teja:#0E1A2B] [--np-muted-rgb:94_82_72] [color-scheme:light] dark:outline-white/10" data-testid="brand-preview">
             <div className="text-[11px] font-semibold uppercase tracking-[.12em] text-[#57534D]">{tx(locale, "Vista previa en ficha pública", "Public listing preview")}</div>
             <div className="mt-2 flex flex-wrap items-center gap-3">
               {/^https:\/\/|^\/uploads\//.test(b.logoUrl.trim()) ? (

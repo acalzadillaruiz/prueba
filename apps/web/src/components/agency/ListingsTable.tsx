@@ -242,7 +242,7 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
           const title = tx(locale, l.title_es, l.title_en);
           const edit = `/${locale}/agency/listings/${l.id}/edit`;
           return (
-            <li key={l.id} className={cn(k.card, "p-4", picked.has(l.id) && "ring-2 ring-navy/70 dark:ring-[#E9E1D3]/70")} data-listing={l.id}>
+            <li key={l.id} className={cn(k.card, "p-4", picked.has(l.id) && "outline outline-2 -outline-offset-2 outline-navy/70 dark:outline-[#E9E1D3]/70")} data-listing={l.id}>
               <div className="flex items-start gap-3">
                 {selectable && <input type="checkbox" className={cn(box, "mt-1")} checked={picked.has(l.id)} onChange={() => toggle(l.id)} aria-label={tx(locale, `Seleccionar ${title}`, `Select ${title}`)} />}
                 <Link href={edit} className="flex min-w-0 flex-1 items-start gap-3">
@@ -377,7 +377,7 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
       )}
       {chosen.length > 0 && (
         <div className="sticky bottom-3 z-20 mt-4" role="region" aria-label={tx(locale, "Acciones en lote", "Bulk actions")}>
-          <div className={cn(k.card, "flex flex-wrap items-center gap-2 p-3 ring-1 ring-[#E9E1D3] md:gap-3 md:px-4")}>
+          <div className={cn(k.card, "flex flex-wrap items-center gap-2 p-3 outline outline-1 -outline-offset-1 outline-[#E9E1D3] md:gap-3 md:px-4")}>
             <span className="text-sm font-semibold">{tx(locale, `${chosen.length} ${chosen.length === 1 ? "seleccionado" : "seleccionados"}`, `${chosen.length} selected`)}</span>
             {manager && (
               <Select compact value="" disabled={bulk?.running} onChange={(e) => e.target.value && bulkAssign(e.target.value)} className="h-10" aria-label={tx(locale, "Asignar los seleccionados a…", "Assign selected to…")}>

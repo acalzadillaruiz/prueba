@@ -80,7 +80,7 @@ export function CardCompareToggle({ id, locale }: { id: string; locale: Locale }
         onClick={click}
         data-card-compare
         className={cn(
-          "absolute right-[3.75rem] top-2.5 z-[2] flex h-11 w-11 items-center justify-center rounded-full shadow-float transition-transform duration-np hover:scale-105 [@media(hover:hover)]:hidden",
+          "absolute right-[3.75rem] top-2.5 z-[2] flex h-11 w-11 items-center justify-center rounded-full transition-transform duration-np hover:scale-105 [@media(hover:hover)]:hidden",
           on ? "bg-[#0E1A2B] text-[#F6F2EC]" : "bg-[#ffffffe6] text-[#1A2026]",
         )}
       >
@@ -92,7 +92,7 @@ export function CardCompareToggle({ id, locale }: { id: string; locale: Locale }
         onClick={click}
         data-card-compare
         className={cn(
-          "absolute bottom-2.5 left-2.5 z-[2] hidden min-h-9 items-center gap-1.5 rounded-[2px] px-3 font-display text-[13px] font-semibold shadow-float transition-opacity duration-np focus-visible:opacity-100 [@media(hover:hover)]:inline-flex",
+          "absolute bottom-2.5 left-2.5 z-[2] hidden min-h-9 items-center gap-1.5 rounded-[2px] px-3 font-display text-[13px] font-semibold transition-opacity duration-np focus-visible:opacity-100 [@media(hover:hover)]:inline-flex",
           on ? "bg-[#0E1A2B] text-[#F6F2EC] opacity-100" : "bg-[#ffffffe6] text-[#1A2026] opacity-0 group-hover:opacity-100",
         )}
       >

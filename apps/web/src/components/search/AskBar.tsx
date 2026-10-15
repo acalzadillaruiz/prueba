@@ -142,7 +142,7 @@ export function AskBar({ locale, className, sticky = false }: { locale: Locale; 
           spellCheck={false}
           aria-label={tx(locale, "Describe la casa que buscas", "Describe the home you're looking for")}
           className="min-h-12 w-full bg-transparent font-display text-[16px] text-ink placeholder:text-muted focus:outline-none sm:text-[17px]"
-          placeholder={wide ? tx(locale, "¿Dónde quieres vivir? Ej.: casa con muelle en El Morro…", "Where do you want to live? E.g. a house with a pier in El Morro…") : tx(locale, "¿Dónde quieres vivir?…", "Where do you want to live?…")}
+          placeholder={wide ? tx(locale, "¿Dónde quieres vivir? Ej.: casa con muelle en El Morro…", "Where do you want to live? E.g. a house with a pier in El Morro…") : tx(locale, "Zona, casa o presupuesto…", "Area, home or budget…")}
         />
         {suggest.listbox}
         <button
@@ -294,7 +294,7 @@ function CompactAsk({
         {/* Desktop: the compact bar replaces the header, so it keeps the header's everyday shortcuts. */}
         <Link href={`/${locale}/saved`} aria-label={tx(locale, "Guardados", "Saved")} className={cn("relative ml-1 hidden h-11 w-11 shrink-0 items-center justify-center rounded-full hover:bg-black/5 lg:flex", ring)}>
           <Heart size={19} aria-hidden />
-          {saved.length > 0 && <span className="absolute right-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-navy px-1 text-[11px] font-bold leading-none text-ivory ring-2 ring-ivory">{saved.length}</span>}
+          {saved.length > 0 && <span className="absolute right-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-navy px-1 text-[11px] font-bold leading-none text-ivory outline outline-2 -outline-offset-2 outline-ivory">{saved.length}</span>}
         </Link>
         {ready && (
           <Link

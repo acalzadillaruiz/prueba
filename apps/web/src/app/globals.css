@@ -163,6 +163,8 @@ html.dark .np-public .text-coral { color: var(--np-coral-light); }
 :root { --np-header-offset: 64px; }
 @media (min-width: 768px) { :root { --np-header-offset: 72px; } }
 html[data-np-header="hidden"] { --np-header-offset: 8px; }
+/* Anchored headings and sections land below the header, never under it (043). */
+:is(h1, h2, h3, section, [id]):target, :is(h2, h3, section)[id] { scroll-margin-top: calc(env(safe-area-inset-top) + var(--np-header-offset) + 16px); }
 /* While the compact search is pinned (CompactAsk sets html[data-np-compact="on"]; it carries its own logo mark and a
    menu button that opens the header's drawer via the "np:open-menu" event), the header steps aside completely so the
    two bars never stack. The drawer is outside <header>, so it still opens. */

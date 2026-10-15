@@ -532,7 +532,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               <div className="mb-2 font-semibold">{tx(locale, "Operación", "Operation")}</div>
               <div className="flex flex-wrap gap-2">
                 {[["SALE", "Venta", "Sale"], ["LONG_RENT", "Alquiler", "Rent"], ["SHORT_RENT", "Vacacional", "Vacation"], ["COMMERCIAL_SALE", "Comercial · venta", "Commercial · sale"], ["COMMERCIAL_RENT", "Comercial · alquiler", "Commercial · rent"]].map(([k, es, en]) => (
-                  <button key={k} onClick={() => setOp(k)} aria-pressed={d.op === k} className={cn("rounded-[2px] border px-4 py-2 font-display text-sm", d.op === k ? "border-navy bg-[#E9E1D3] text-navy ring-1 ring-navy dark:bg-white/10 dark:ring-[#E9E1D3]" : "border-line bg-white")}>{tx(locale, es, en)}</button>
+                  <button key={k} onClick={() => setOp(k)} aria-pressed={d.op === k} className={cn("rounded-[2px] border px-4 py-2 font-display text-sm", d.op === k ? "border-navy bg-[#E9E1D3] text-navy outline outline-1 -outline-offset-1 outline-navy dark:bg-white/10 dark:outline-[#E9E1D3]" : "border-line bg-white")}>{tx(locale, es, en)}</button>
                 ))}
               </div>
             </div>
@@ -540,7 +540,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               <div className="mb-2 font-semibold">{tx(locale, "Tipo de inmueble", "Property type")}</div>
               <div className="flex flex-wrap gap-2">
                 {([["apartment", "Apartamento", "Apartment"], ["house", "Casa", "House"], ["penthouse", "Ático", "Penthouse"], ["townhouse", "Townhouse", "Townhouse"], ["studio", "Estudio", "Studio"], ["office", "Oficina", "Office"], ["retail", "Local", "Retail"], ["warehouse", "Galpón", "Warehouse"], ["land", "Terreno", "Land"]] as [Kind, string, string][]).map(([k, es, en]) => (
-                  <button key={k} onClick={() => set({ kind: k })} className={cn("rounded-[2px] border px-4 py-2 font-display text-sm", d.kind === k ? "border-navy bg-[#E9E1D3] text-navy ring-1 ring-navy dark:bg-white/10 dark:ring-[#E9E1D3]" : "border-line bg-white")}>{tx(locale, es, en)}</button>
+                  <button key={k} onClick={() => set({ kind: k })} className={cn("rounded-[2px] border px-4 py-2 font-display text-sm", d.kind === k ? "border-navy bg-[#E9E1D3] text-navy outline outline-1 -outline-offset-1 outline-navy dark:bg-white/10 dark:outline-[#E9E1D3]" : "border-line bg-white")}>{tx(locale, es, en)}</button>
                 ))}
               </div>
             </div>
@@ -687,7 +687,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
             {files.length > 0 && (
               <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
                 {previews.map((src, i) => (
-                  <div key={src} className={cn("group relative overflow-hidden rounded-lg ring-2", cover === i ? "ring-navy" : "ring-transparent")}>
+                  <div key={src} className={cn("group relative overflow-hidden rounded-lg outline outline-2 -outline-offset-2", cover === i ? "ring-navy" : "ring-transparent")}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={src} alt="" className="aspect-[4/3] w-full object-cover" />
                     <span className="absolute left-1.5 top-1.5 rounded bg-navy/80 px-1.5 text-xs font-bold text-ivory">{i + 1}</span>

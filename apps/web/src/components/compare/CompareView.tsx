@@ -19,7 +19,7 @@ const isSale = (l: Listing) => l.listingType === "SALE" || l.listingType === "CO
 const OK = "text-ok dark:text-[#8FCBA6]";
 const WARN = "text-warn dark:text-[#E0A84A]";
 /** Remove ("×") on a photo: its own light/dark colours (not the remapped bg-white, which turned it dark-on-dark). */
-const REMOVE_BTN = "absolute flex items-center justify-center rounded-full bg-[#F6F2EC] text-[#1A2026] ring-1 ring-black/10 after:absolute after:content-[''] dark:bg-[#0E1A2B]/85 dark:text-[#F6F2EC] dark:ring-[#F6F2EC]/45";
+const REMOVE_BTN = "absolute flex items-center justify-center rounded-full bg-[#F6F2EC] text-[#1A2026] outline outline-1 -outline-offset-1 outline-black/10 after:absolute after:content-[''] dark:bg-[#0E1A2B]/85 dark:text-[#F6F2EC] dark:outline-[#F6F2EC]/45";
 /** Pinned row (phones): the thumbnail is the "Ver ficha" link, then one 36 px text pill ("Visita" / "Fechas") filling the rest of the column. */
 const PIN_PILL = "flex h-9 min-w-0 flex-1 items-center justify-center whitespace-nowrap rounded-full px-1.5 font-display text-[13px] font-semibold leading-none";
 /** Phone actions row: full column width, the label may wrap to 2 lines in a third of 360 px. */
@@ -233,7 +233,7 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
                     <div key={l.id} className="min-w-0">
                       <div aria-hidden className="np-num truncate whitespace-nowrap text-[13px] leading-tight">{shortPrice(l, locale)}</div>
                       <div className="mt-1 flex items-center gap-1">
-                        <Link href={listingUrl(l, locale)} aria-label={fichaName(title)} title={tx(locale, "Ver ficha", "View listing")} className="relative h-9 w-9 shrink-0 overflow-hidden rounded-md bg-arena ring-1 ring-navy/20 dark:ring-ivory/25">
+                        <Link href={listingUrl(l, locale)} aria-label={fichaName(title)} title={tx(locale, "Ver ficha", "View listing")} className="relative h-9 w-9 shrink-0 overflow-hidden rounded-md bg-arena outline outline-1 -outline-offset-1 outline-navy/20 dark:outline-ivory/25">
                           <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} sizes="36px" className="h-full w-full" />
                         </Link>
                         <Link href={contactUrl(l, locale)} aria-label={visitName(l, title)} className={cn(PIN_PILL, "np-btn-navy bg-navy text-ivory")}>

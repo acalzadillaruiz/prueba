@@ -611,7 +611,7 @@ export function LeadsInbox({ locale, initial, listings, agents, assignable = [],
       )}
       {chosen.length > 0 && (
         <div className="sticky bottom-3 z-20 mt-4" role="region" aria-label={tx(locale, "Acciones en lote", "Bulk actions")}>
-          <div className={cn(k.card, "flex flex-wrap items-center gap-2 p-3 ring-1 ring-[#E9E1D3] md:gap-3 md:px-4")}>
+          <div className={cn(k.card, "flex flex-wrap items-center gap-2 p-3 outline outline-1 -outline-offset-1 outline-[#E9E1D3] md:gap-3 md:px-4")}>
             <span className="text-sm font-semibold">{tx(locale, `${chosen.length} ${chosen.length === 1 ? "lead seleccionado" : "leads seleccionados"}`, `${chosen.length} ${chosen.length === 1 ? "lead" : "leads"} selected`)}</span>
             {manager && assignable.length > 0 && (
               <Select value="" disabled={bulk?.running} onChange={(e) => {

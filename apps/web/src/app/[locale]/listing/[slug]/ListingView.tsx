@@ -68,7 +68,7 @@ function Essentials({ l, locale, title }: { l: Listing; locale: Locale; title: R
             );
           const Icon = ESSENTIAL_ICON[key];
           return (
-            <li key={key} className="flex items-center gap-3 rounded-[4px] bg-white/70 ring-1 ring-black/[.04] px-4 py-3 text-[15px] font-semibold text-ink [font-feature-settings:'lnum']">
+            <li key={key} className="flex items-center gap-3 rounded-[4px] bg-white/70 outline outline-1 -outline-offset-1 outline-black/[.04] px-4 py-3 text-[15px] font-semibold text-ink [font-feature-settings:'lnum']">
               <Icon size={18} strokeWidth={1.7} className="shrink-0 text-navy" aria-hidden />
               <span>{label}</span>
             </li>
@@ -150,7 +150,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
   const sec = "border-t border-line py-10";
   const amenities = amenitiesBeyondEssentials(l);
   const views = viewFeatures(l, locale);
-  const tile = "rounded-[4px] bg-white/70 ring-1 ring-black/[.04] px-4 py-3 text-[15px]";
+  const tile = "rounded-[4px] bg-white/70 outline outline-1 -outline-offset-1 outline-black/[.04] px-4 py-3 text-[15px]";
   const searchType = l.listingType.startsWith("COMMERCIAL") ? "COMMERCIAL" : l.listingType;
 
   const crumbs: { key: string; label: string; href?: string }[] = [
@@ -317,7 +317,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
                       [num(zone.activeListings, locale), tx(locale, "en oferta en New Place", "available on New Place")],
                       [zone.daysOnMarket, tx(locale, "días en mercado (mediana)", "median days on market")],
                     ].map(([v, t]) => (
-                      <div key={String(t)} className="rounded-[4px] bg-white/70 ring-1 ring-black/[.04] p-4">
+                      <div key={String(t)} className="rounded-[4px] bg-white/70 outline outline-1 -outline-offset-1 outline-black/[.04] p-4">
                         <div className="font-serif text-[26px] font-light leading-none">{v}</div>
                         <div className="mt-1.5 text-sm text-muted">{t}</div>
                       </div>
@@ -329,7 +329,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
 
             {soldNearby.length > 0 && (
               <Fold className={sec} testId="sold-nearby" title={tx(locale, "Se vendieron cerca", "Recently sold nearby")} hint={plural(soldNearby.length, locale, ["operación reciente en la zona", "operaciones recientes en la zona"], ["recent deal in the area", "recent deals in the area"])}>
-                <div className="divide-y divide-line rounded-[4px] bg-white/70 ring-1 ring-black/[.04]">
+                <div className="divide-y divide-line rounded-[4px] bg-white/70 outline outline-1 -outline-offset-1 outline-black/[.04]">
                   {soldNearby.map((s) => (
                     <div key={s.t} className="flex items-center justify-between gap-3 px-4 py-3 text-[15px]">
                       <span className="font-semibold">{s.t}</span>

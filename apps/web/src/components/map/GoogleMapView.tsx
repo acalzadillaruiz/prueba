@@ -213,7 +213,7 @@ function SearchArea({ locale, onArea }: { locale: MapViewProps["locale"]; onArea
 function ZoomButtons({ className }: { className: string }) {
   const map = useMap();
   return (
-    <div className={cn("absolute right-3 top-3 z-10 flex flex-col overflow-hidden rounded-xl border shadow-float", className)}>
+    <div className={cn("absolute right-3 top-3 z-10 flex flex-col overflow-hidden rounded-xl border", className)}>
       <button aria-label="Zoom in" className="flex h-11 w-11 items-center justify-center hover:bg-black/5" onClick={() => map?.setZoom((map.getZoom() ?? 12) + 1)}><Plus size={16} /></button>
       <button aria-label="Zoom out" className="flex h-11 w-11 items-center justify-center border-t border-inherit hover:bg-black/5" onClick={() => map?.setZoom((map.getZoom() ?? 12) - 1)}><Minus size={16} /></button>
     </div>

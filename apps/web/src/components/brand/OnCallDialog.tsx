@@ -99,7 +99,7 @@ export function OnCallDialog({ locale, listingSlug, onClose }: { locale: Locale;
           </div>
         )}
         {q.isSuccess && list.length === 0 && (
-          <p className="mt-5 rounded-2xl bg-white p-4 text-[15px] text-muted ring-1 ring-black/[.04]">
+          <p className="mt-5 rounded-2xl bg-white p-4 text-[15px] text-muted outline outline-1 -outline-offset-1 outline-black/[.04]">
             {listingSlug
               ? tx(locale, "Hoy no hay nadie de guardia en esta agencia. Escríbele desde esta página y te responde en horario de oficina.", "No one at this agency is on call today. Write from this page and they’ll reply during office hours.")
               : tx(locale, "Hoy no hay nadie de guardia. Escríbenos desde cualquier casa y te respondemos en horario de oficina.", "No one is on call today. Write to us from any home and we’ll reply during office hours.")}
@@ -108,7 +108,7 @@ export function OnCallDialog({ locale, listingSlug, onClose }: { locale: Locale;
         {list.length > 0 && (
           <ul className="mt-5 space-y-3">
             {list.map((o, i) => (
-              <li key={o.agency.id} className="rounded-2xl bg-white p-4 ring-1 ring-black/[.04]">
+              <li key={o.agency.id} className="rounded-2xl bg-white p-4 outline outline-1 -outline-offset-1 outline-black/[.04]">
                 <div className="flex items-center gap-3">
                   <Avatar initials={o.advisor.initials} hue={o.advisor.hue} size={48} />
                   <div className="min-w-0 flex-1">

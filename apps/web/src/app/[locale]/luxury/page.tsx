@@ -43,7 +43,7 @@ export default async function LuxuryPage({ params }: { params: Promise<{ locale:
         />
         <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgb(28_29_29/.45)_0%,rgb(28_29_29/.05)_35%,rgb(28_29_29/.6)_100%)]" />
         <div className="relative mx-auto w-full max-w-[1320px] px-4 pb-14 pt-[140px] md:px-8 lg:pb-20">
-                    <h1 className="mt-5 max-w-[860px] text-[34px] text-white sm:text-[48px] lg:text-[60px]">
+                    <h1 className="np-t-h1 mt-5 max-w-[860px] text-white">
             {tx(locale, "Casas exclusivas", "Exclusive homes")} <span className="text-white/75">{tx(locale, "que ves en privado.", "you see in private.")}</span>
           </h1>
           <span aria-hidden className="mt-6 block h-px w-[min(300px,70%)] bg-white/70" />
@@ -59,8 +59,8 @@ export default async function LuxuryPage({ params }: { params: Promise<{ locale:
 
       <section className="mx-auto max-w-[1320px] px-4 py-20 md:px-8 lg:py-28">
         <div className="mb-10 flex flex-wrap items-end justify-between gap-4 border-b border-line pb-6">
-          <h2 className="text-[36px] leading-tight tracking-[-0.02em] md:text-[52px]">{tx(locale, "Un asesor y un precio claro", "An advisor and a clear price")}</h2>
-          <p className="max-w-md text-[15px] text-muted">{tx(locale, "Cada casa tiene su asesor y un valor calculado con ventas reales de la zona.", "Each home has its own advisor and a value worked out from real sales nearby.")}</p>
+          <h2 className="np-t-h1">{tx(locale, "Un asesor y un precio claro", "An advisor and a clear price")}</h2>
+          <p className="np-t-body max-w-md text-ink">{tx(locale, "Cada casa tiene su asesor y un valor calculado con ventas reales de la zona.", "Each home has its own advisor and a value worked out from real sales nearby.")}</p>
         </div>
         {!hero ? (
           <EmptyState monogram title={tx(locale, "Estamos renovando la colección", "We’re refreshing the collection")} body={tx(locale, "Pide acceso y te contamos en privado cuando lleguen casas nuevas.", "Ask for access and we’ll tell you privately when new homes arrive.")} />
@@ -91,7 +91,7 @@ export default async function LuxuryPage({ params }: { params: Promise<{ locale:
       <section id="acceso" data-hide-fab className="np-navy-panel scroll-mt-24 bg-navy text-ivory">
         <div className="mx-auto grid max-w-[1320px] items-center gap-10 px-4 py-20 md:px-8 lg:grid-cols-[1.2fr_1fr] lg:py-24">
           <div>
-            <h2 className="mt-3 text-[36px] leading-tight md:text-[48px]">
+            <h2 className="np-t-h1 mt-3">
               {tx(locale, `${privateCount} ${privateCount === 1 ? "casa privada disponible" : "casas privadas disponibles"}`, `${privateCount} private home${privateCount === 1 ? "" : "s"} available`)}
             </h2>
             <ul className="mt-6 space-y-3 text-[15px] text-ivory/80">

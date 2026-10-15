@@ -158,7 +158,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
       <div className="flex flex-col px-5 pb-12 pt-6 sm:px-10 lg:px-16">
         <div className="mx-auto my-auto w-full max-w-[440px] pt-4 lg:pt-10">
           <div className={k.caption}>{mode === "login" ? tx(locale, "Entrar", "Sign in") : tx(locale, "Te damos la bienvenida", "Welcome to New Place")}</div>
-          <h1 className="mt-2 font-serif text-[44px] font-light leading-[1.02] text-navy md:text-[52px]">{title}</h1>
+          <h1 className="np-t-h1 mt-2 font-serif text-navy">{title}</h1>
           {inv && (
             <div className="mt-5 rounded-[4px] bg-rosa/60 p-4 text-sm text-navy" role="status">
               {tx(locale, `${inv.agencyName} te invita a su equipo como ${ROLE_LABEL[inv.role]?.[0] ?? inv.role}.`, `${inv.agencyName} invited you to their team as ${ROLE_LABEL[inv.role]?.[1] ?? inv.role}.`)}{" "}
@@ -181,7 +181,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
               >
                 <GoogleG /> {tx(locale, "Continuar con Google", "Continue with Google")}
               </button>
-              <div className={cn("my-6 flex items-center gap-3 text-[12px]", k.muted)}><span className="h-px flex-1 bg-[#C9BFAE]" />{tx(locale, "o con tu correo", "or with your email")}<span className="h-px flex-1 bg-[#C9BFAE]" /></div>
+              <div className={cn("my-6 flex items-center gap-3 text-[13px]", k.muted)}><span className="h-px flex-1 bg-[#C9BFAE]" />{tx(locale, "o con tu correo", "or with your email")}<span className="h-px flex-1 bg-[#C9BFAE]" /></div>
             </>
           ) : (
             <div className="mt-8" />
@@ -258,7 +258,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
             <img src="/brand/torre-atardecer.jpg" alt="" className="h-full w-full object-cover object-[70%_50%]" />
             <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-navy/80 to-transparent" />
             <div className="absolute inset-x-0 bottom-8 px-8 text-center text-ivory">
-              <div className="text-[11px] font-semibold text-[#E9E1D3]">{tx(locale, "Guarda, compara y pide visitas", "Save, compare and book visits")}</div>
+              <div className="text-[13px] font-semibold text-[#E9E1D3]">{tx(locale, "Guarda, compara y pide visitas", "Save, compare and book visits")}</div>
               <div className="mt-3 font-display text-[17px] font-light leading-snug">{tx(locale, "Casas revisadas y un asesor que te atiende a cualquier hora.", "Checked homes and an advisor who answers at any hour.")}</div>
             </div>
           </div>

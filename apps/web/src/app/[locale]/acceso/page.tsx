@@ -27,7 +27,7 @@ export default async function Acceso({ params, searchParams }: { params: Promise
       <form action="/api/access" method="post" className="grid w-full max-w-[400px] justify-items-center gap-6 text-center">
         <Logo tone="ivory" size="lg" />
         <div className="grid gap-2">
-          <h1 className="text-[34px] leading-tight text-ivory">{tx(locale, "Acceso privado", "Private access")}</h1>
+          <h1 className="np-t-h2 text-ivory">{tx(locale, "Acceso privado", "Private access")}</h1>
           <p className="text-[15px] text-ivory/80">{tx(locale, "Estamos en vista previa privada. Escribe el código que te compartimos.", "We’re in private preview. Enter the code we shared with you.")}</p>
         </div>
         <input type="hidden" name="locale" value={locale} />

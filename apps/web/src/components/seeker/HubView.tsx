@@ -108,7 +108,7 @@ export function HubView({ locale, data, emailOn = false }: { locale: Locale; dat
         <Avatar initials={me.initials} hue={me.hue} size={56} />
         <div>
           <div className={k.caption}>{tx(locale, "Tu espacio", "Your space")}</div>
-          <h1 className="mt-1 font-serif text-[40px] font-light leading-[1.05] md:text-[48px]">{tx(locale, `Hola, ${me.name.split(" ")[0]}`, `Hi, ${me.name.split(" ")[0]}`)}</h1>
+          <h1 className="np-t-h1 mt-1 font-serif">{tx(locale, `Hola, ${me.name.split(" ")[0]}`, `Hi, ${me.name.split(" ")[0]}`)}</h1>
         </div>
         {!allDone && (
           <div className="ml-auto w-full max-w-xs">
@@ -124,7 +124,7 @@ export function HubView({ locale, data, emailOn = false }: { locale: Locale; dat
         {/* tours: first thing on the page */}
         <section id="visitas" className={cn("rounded-np border border-line bg-white", k.card, anchor, "border-0 p-5", allDone ? "lg:col-span-3" : "lg:col-span-2")}>
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <h2 className="flex items-center gap-2 font-serif text-[24px] font-light leading-tight"><CalendarCheck size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Tus visitas y solicitudes", "Your tours & requests")}</h2>
+            <h2 className="np-t-h2 flex items-center gap-2 font-serif"><CalendarCheck size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Tus visitas y solicitudes", "Your tours & requests")}</h2>
             {/* Only while an email provider is configured: otherwise reminders are never delivered. */}
             {emailOn && <Badge tone="ok">{tx(locale, "Te lo recordamos por correo", "We’ll remind you by email")}</Badge>}
           </div>
@@ -169,11 +169,11 @@ export function HubView({ locale, data, emailOn = false }: { locale: Locale; dat
         {/* next steps: beside the visits on desktop, after visits and messages on phones; gone once all done */}
         {!allDone && (
           <Card className={cn(k.card, "border-0 p-5 lg:col-start-3 lg:row-start-1")}>
-            <h2 className="font-serif text-[24px] font-light leading-tight">{tx(locale, "Lo que sigue", "What’s next")}</h2>
+            <h2 className="np-t-h2 font-serif">{tx(locale, "Lo que sigue", "What’s next")}</h2>
             <ol className="mt-4 space-y-3">
               {steps.map((s, i) => (
                 <li key={i} className="flex items-start gap-3">
-                  <span className={cn("mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold", s.done ? "bg-ok text-white" : "border-2 border-line text-muted")}>{s.done ? <Check size={14} /> : i + 1}</span>
+                  <span className={cn("mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[13px] font-bold", s.done ? "bg-ok text-white" : "border-2 border-line text-muted")}>{s.done ? <Check size={14} /> : i + 1}</span>
                   <div>
                     <div className={cn("font-semibold", s.done && "text-muted line-through")}>{s.t}</div>
                     <div className="text-sm text-muted">{s.d}</div>
@@ -187,8 +187,8 @@ export function HubView({ locale, data, emailOn = false }: { locale: Locale; dat
         {/* preapproval mock */}
         <div id="precalificacion" className={anchor}>
         <Card className={cn(k.card, "h-full border-0 p-5")}>
-          <h2 className="flex items-center gap-2 font-serif text-[24px] font-light leading-tight"><CircleDollarSign size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Precalificación orientativa", "Indicative pre-qualification")}</h2>
-          <p className="mt-1 text-xs text-muted">{tx(locale, "Es solo una referencia: New Place no otorga créditos.", "Just a reference: New Place doesn’t provide loans.")}</p>
+          <h2 className="np-t-h2 flex items-center gap-2 font-serif"><CircleDollarSign size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Precalificación orientativa", "Indicative pre-qualification")}</h2>
+          <p className="mt-1 text-[13px] text-muted">{tx(locale, "Es solo una referencia: New Place no otorga créditos.", "Just a reference: New Place doesn’t provide loans.")}</p>
           <div className="mt-4 space-y-4 text-sm">
             <label className="block"><div className="flex justify-between"><span>{tx(locale, "Precio", "Price")}</span><b>{money(price, locale)}</b></div><input type="range" min={50000} max={500000} step={5000} value={price} onChange={(e) => setPrice(+e.target.value)} className="w-full accent-navy dark:accent-[#E9E1D3]" aria-label={tx(locale, "Precio", "Price")} /></label>
             <label className="block"><div className="flex justify-between"><span>{tx(locale, "Inicial", "Down payment")}</span><b>{down} %</b></div><input type="range" min={10} max={70} value={down} onChange={(e) => setDown(+e.target.value)} className="w-full accent-navy dark:accent-[#E9E1D3]" aria-label={tx(locale, "Inicial (%)", "Down payment (%)")} /></label>
@@ -196,7 +196,7 @@ export function HubView({ locale, data, emailOn = false }: { locale: Locale; dat
             <label className="block"><div className="flex justify-between"><span>{tx(locale, "Tasa anual", "Annual rate")}</span><b>{ratePct.toLocaleString(locale === "es" ? "es-VE" : "en-US")} %</b></div><input type="range" min={0} max={30} step={0.5} value={ratePct} onChange={(e) => setRatePct(+e.target.value)} className="w-full accent-navy dark:accent-[#E9E1D3]" aria-label={tx(locale, "Tasa anual (%)", "Annual rate (%)")} /></label>
           </div>
           <div className="mt-4 rounded-np bg-navy p-4 text-ivory">
-            <div className="text-xs text-mist">{tx(locale, `Cuota estimada (${ratePct.toLocaleString("es-VE")} % anual)`, `Est. payment (${ratePct}% APR)`)}</div>
+            <div className="text-[13px] text-mist">{tx(locale, `Cuota estimada (${ratePct.toLocaleString("es-VE")} % anual)`, `Est. payment (${ratePct}% APR)`)}</div>
             <div className="font-display text-3xl font-semibold">{money(Math.round(monthly), locale)}<span className="text-sm font-normal text-mist"> / {tx(locale, "mes", "mo")}</span></div>
           </div>
           <Button className={cn("mt-3 w-full", k.outline)} variant="outline" onClick={savePrequal} disabled={prequalBusy || !dirty}>
@@ -205,7 +205,7 @@ export function HubView({ locale, data, emailOn = false }: { locale: Locale; dat
           </Button>
           {prequalErr && <div role="alert" className="mt-2 rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-sm text-danger">{prequalErr}</div>}
           {savedPrequal && (
-            <div className="np-in mt-3 rounded-np border border-dashed border-line p-3 text-xs leading-relaxed text-ink/70" data-testid="prequal-letter">
+            <div className="np-in mt-3 rounded-np border border-dashed border-line p-3 text-[13px] leading-relaxed text-ink/70" data-testid="prequal-letter">
               <b>{tx(locale, "Carta de precalificación orientativa", "Indicative pre-qualification letter")}</b>
               <br />
               {tx(
@@ -225,7 +225,7 @@ export function HubView({ locale, data, emailOn = false }: { locale: Locale; dat
         <div className="space-y-6">
           <Card className={cn(k.card, "border-0 p-5")}>
             <div className="flex items-center justify-between">
-              <h2 className="flex items-center gap-2 font-serif text-[24px] font-light leading-tight"><Heart size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Guardados", "Saved")}</h2>
+              <h2 className="np-t-h2 flex items-center gap-2 font-serif"><Heart size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Guardados", "Saved")}</h2>
               <Link href={`/${locale}/saved`} className={cn("text-sm", k.link)}>{tx(locale, "Ver todo", "See all")}</Link>
             </div>
             <div className="mt-4 space-y-3">
@@ -247,7 +247,7 @@ export function HubView({ locale, data, emailOn = false }: { locale: Locale; dat
           </Card>
           <Card className={cn(k.card, "border-0 p-5")}>
             <div className="flex items-center justify-between">
-              <h2 className="flex items-center gap-2 font-serif text-[24px] font-light leading-tight"><Bell size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Alertas", "Alerts")}</h2>
+              <h2 className="np-t-h2 flex items-center gap-2 font-serif"><Bell size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Alertas", "Alerts")}</h2>
               <Link href={`/${locale}/alerts`} className={cn("text-sm", k.link)}>{tx(locale, "Ver alertas", "View alerts")}</Link>
             </div>
             {SAVED_SEARCHES.length === 0 && <p className="mt-3 text-sm text-muted">{tx(locale, "Guarda una búsqueda en el mapa y te avisaremos en cuanto aparezca algo para ti.", "Save a search on the map and we’ll let you know as soon as something fits.")}</p>}

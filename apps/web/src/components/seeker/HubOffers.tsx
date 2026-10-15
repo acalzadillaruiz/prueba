@@ -66,7 +66,7 @@ export function HubOffers({ id, className, locale, offers: initial, offerable, l
   return (
     <div id={id} className={cn("lg:col-span-2", className)}>
     <Card className={cn(k.card, "h-full border-0 p-5")}>
-      <h2 className="flex items-center gap-2 font-serif text-[24px] font-light leading-tight"><HandCoins size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Mis ofertas", "My offers")}</h2>
+      <h2 className="np-t-h2 flex items-center gap-2 font-serif"><HandCoins size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Mis ofertas", "My offers")}</h2>
 
       {offerable.length > 0 ? (
         <form
@@ -89,17 +89,17 @@ export function HubOffers({ id, className, locale, offers: initial, offerable, l
                 );
               })}
             </select>
-            {errors.listing && <span role="alert" className="mt-1 block text-xs font-semibold text-danger">{errors.listing}</span>}
+            {errors.listing && <span role="alert" className="mt-1 block text-[13px] font-semibold text-danger">{errors.listing}</span>}
           </label>
           <label className="block text-sm">
             <span className="mb-1 block font-semibold">{tx(locale, "Nota para el asesor (opcional)", "Note for the advisor (optional)")}</span>
             <input value={note} onChange={(ev) => setNote(ev.target.value)} maxLength={500} className={cn(inputCls, "h-11")} aria-invalid={!!errors.note} placeholder={tx(locale, "Ej.: pago de contado, entrega en 60 días", "E.g. cash, closing in 60 days")} />
-            {errors.note && <span role="alert" className="mt-1 block text-xs font-semibold text-danger">{errors.note}</span>}
+            {errors.note && <span role="alert" className="mt-1 block text-[13px] font-semibold text-danger">{errors.note}</span>}
           </label>
           <label className="block text-sm">
             <span className="mb-1 block font-semibold">{tx(locale, "Monto (USD)", "Amount (USD)")}</span>
             <input value={amount} onChange={(ev) => setAmount(ev.target.value.replace(/[^\d]/g, ""))} inputMode="numeric" className={cn(inputCls, "h-11")} aria-invalid={!!errors.amount} placeholder={listingById(listingId) ? String(listingById(listingId)!.priceAmount) : "150000"} />
-            {errors.amount && <span role="alert" className="mt-1 block text-xs font-semibold text-danger">{errors.amount}</span>}
+            {errors.amount && <span role="alert" className="mt-1 block text-[13px] font-semibold text-danger">{errors.amount}</span>}
           </label>
           <div className="sm:col-span-2">
             <Button type="submit" disabled={busy} className="w-full sm:w-auto">

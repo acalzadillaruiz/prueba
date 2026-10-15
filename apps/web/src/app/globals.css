@@ -75,7 +75,7 @@ html { -webkit-font-smoothing: antialiased; }
 :is(a, button, [role="button"], [role="tab"], summary, label, select, input) { touch-action: manipulation; -webkit-tap-highlight-color: rgb(14 26 43 / .12); }
 html:not(.dark) { color-scheme: light; }
 html.dark { color-scheme: dark; }
-body { font-family: var(--font-body); font-weight: 400; background: var(--np-ivory); color: var(--np-ink); }
+body { font-family: var(--font-body); font-weight: 400; font-size: 17px; line-height: 1.6; background: var(--np-ivory); color: var(--np-ink); }
 /* Interface text (controls, labels, table cells) reads at Regular like the running text. */
 :is(button, input, select, textarea, label, th, td, nav, [role="tab"], [role="button"]) { font-weight: 400; }
 /* Lining figures everywhere: prices and data align (keeps prices and data aligned). */

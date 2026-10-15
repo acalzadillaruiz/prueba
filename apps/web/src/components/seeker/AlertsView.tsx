@@ -87,7 +87,7 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
     <div className="mx-auto grid max-w-[1180px] gap-8 px-4 py-10 md:px-6 lg:grid-cols-[1fr_380px]">
       <div>
         <div className={k.caption}>{tx(locale, "Avisos a tu medida", "Made for you")}</div>
-        <h1 className="mt-1 font-serif text-[40px] font-light leading-[1.05] md:text-[48px]">{tx(locale, "Alertas de búsqueda", "Search alerts")}</h1>
+        <h1 className="np-t-h1 mt-1 font-serif">{tx(locale, "Alertas de búsqueda", "Search alerts")}</h1>
         <p className="mt-1 text-muted">{tx(locale, "Te escribimos cuando llega una casa que encaja contigo o cuando alguna baja de precio.", "We’ll write when a home that fits you comes along, or when one drops in price.")}</p>
         {error && <div role="alert" className="mt-4 rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-sm text-danger">{error}</div>}
         <div className="mt-6 space-y-3">
@@ -186,16 +186,16 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
       <aside>
         <Card className={cn(k.card, "border-0 p-5")}>
           <div className="flex items-center gap-2 font-serif text-[24px] font-light leading-tight"><Mail size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Avisos enviados", "Sent to you")}</div>
-          <p className="mt-1 text-xs text-muted">{tx(locale, "Lo último que te hemos escrito.", "The latest we’ve written to you.")}</p>
+          <p className="mt-1 text-[13px] text-muted">{tx(locale, "Lo último que te hemos escrito.", "The latest we’ve written to you.")}</p>
           <ul className="mt-4 divide-y divide-line">
             {emails.map((e) => (
               <li key={e.id} className="py-3">
                 <div className="flex items-center justify-between gap-2">
                   <Badge tone={e.kind === "TOUR" ? "ok" : "mist"} className={e.kind === "ALERT" ? "bg-[#E9E1D3] text-navy dark:bg-white/10" : undefined}>{lbl(EMAIL_KIND_LABEL[e.kind] ?? [e.kind, e.kind], locale)}</Badge>
-                  <span className="text-xs text-muted">{ago(e.at, locale)}</span>
+                  <span className="text-[13px] text-muted">{ago(e.at, locale)}</span>
                 </div>
                 <div className="mt-1.5 text-sm font-semibold">{localizeEmailSubject(e.subject, locale)}</div>
-                <div className="text-xs text-muted">{e.to}{e.status !== "SIMULATED" && EMAIL_STATUS_LABEL[e.status as keyof typeof EMAIL_STATUS_LABEL] ? ` · ${lbl(EMAIL_STATUS_LABEL[e.status as keyof typeof EMAIL_STATUS_LABEL], locale)}` : ""}</div>
+                <div className="text-[13px] text-muted">{e.to}{e.status !== "SIMULATED" && EMAIL_STATUS_LABEL[e.status as keyof typeof EMAIL_STATUS_LABEL] ? ` · ${lbl(EMAIL_STATUS_LABEL[e.status as keyof typeof EMAIL_STATUS_LABEL], locale)}` : ""}</div>
               </li>
             ))}
           </ul>

@@ -440,7 +440,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
   const filterCount = activeChips.length;
   const filtersLabel = tx(locale, "Filtros", "Filters");
   const filtersAria = filterCount ? tx(locale, `Filtros, ${filterCount} activos`, `Filters, ${filterCount} on`) : filtersLabel;
-  const countBadge = filterCount > 0 && <span aria-hidden className="rounded-full bg-navy px-1.5 text-xs font-semibold text-ivory [font-feature-settings:'lnum']">{filterCount}</span>;
+  const countBadge = filterCount > 0 && <span aria-hidden className="rounded-full bg-navy px-1.5 text-[13px] font-semibold text-ivory [font-feature-settings:'lnum']">{filterCount}</span>;
   const mapHidden = !desktop && view === "list";
   const listHidden = !desktop && view === "map";
   // Phones in map view: the page is exactly one screen (the map fills it). Phones in list view: the document scrolls.
@@ -531,7 +531,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
               className={cn(pill, "border-line bg-white", (moreOpen || baths || minM2 || essCount || pub || furnished || pets || verified || lux || amen.length) && on)}
             >
               <SlidersHorizontal size={15} aria-hidden /> {tx(locale, "Más filtros", "More filters")}
-              {essCount > 0 && <span className="rounded-full bg-navy px-1.5 text-xs font-semibold text-ivory [font-feature-settings:'lnum']" aria-label={tx(locale, `${essCount} filtros de servicios esenciales activos`, `${essCount} essential-service filters on`)}>{essCount}</span>}
+              {essCount > 0 && <span className="rounded-full bg-navy px-1.5 text-[13px] font-semibold text-ivory [font-feature-settings:'lnum']" aria-label={tx(locale, `${essCount} filtros de servicios esenciales activos`, `${essCount} essential-service filters on`)}>{essCount}</span>}
               <ChevronDown size={14} aria-hidden />
             </button>
             {/* Secondary (outline): the filters are the bar's main job. Below 1536 only the bell shows (the words box keeps
@@ -592,7 +592,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
                   {notUnderstood ? tx(locale, `${total} casas en total`, `${total} homes in all`) : plural(total, locale, ["resultado", "resultados"], ["result", "results"])}
                 </p>
                 {query.isFetching && <Loader2 size={15} aria-hidden className="shrink-0 animate-spin text-muted" />}
-                {shape && <span className="hidden shrink-0 rounded-full bg-[#C9BFAE] px-2.5 py-0.5 font-display text-xs font-semibold text-[#0E1A2B] sm:inline-block">{tx(locale, "en la zona que dibujaste", "in the area you drew")}</span>}
+                {shape && <span className="hidden shrink-0 rounded-full bg-[#C9BFAE] px-2.5 py-0.5 font-display text-[13px] font-semibold text-[#0E1A2B] sm:inline-block">{tx(locale, "en la zona que dibujaste", "in the area you drew")}</span>}
               </div>
               {/* As wide as its longest label (short ones below lg: "Precio ↑"); the full wording on desktop. */}
               <span className="relative flex-none">
@@ -780,7 +780,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
               <span aria-hidden className="my-3 w-px bg-current opacity-30" />
               <button type="button" onClick={openSheet} aria-haspopup="dialog" aria-label={filtersAria} className={cn("flex h-12 items-center gap-1.5 pl-4", compare.length ? "pr-4" : "pr-5")}>
                 <SlidersHorizontal size={16} aria-hidden /> {filtersLabel}
-                {filterCount > 0 && <span aria-hidden className="rounded-full bg-[#C9BFAE] px-1.5 text-xs text-[#1A2026]">{filterCount}</span>}
+                {filterCount > 0 && <span aria-hidden className="rounded-full bg-[#C9BFAE] px-1.5 text-[13px] text-[#1A2026]">{filterCount}</span>}
               </button>
             </>
           )}

@@ -210,7 +210,7 @@ export function MobileTabBar({ locale }: { locale: Locale }) {
               <span className="relative">
                 <Icon size={21} strokeWidth={1.6} aria-hidden />
                 {!!badge && (
-                  <span className={cn("absolute -right-2.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-bold", badgeLabel ? "bg-coral-cta text-white" : "bg-navy text-ivory")}>
+                  <span className={cn("absolute -right-2.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[13px] font-bold", badgeLabel ? "bg-coral-cta text-white" : "bg-navy text-ivory")}>
                     {badge}
                     {badgeLabel && <span className="sr-only"> {badgeLabel}</span>}
                   </span>

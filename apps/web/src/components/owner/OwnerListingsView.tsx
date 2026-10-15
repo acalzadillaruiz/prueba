@@ -88,7 +88,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <div className={k.caption}>{tx(locale, "Vender con nosotros", "Sell with us")}</div>
-          <h1 className="mt-1 font-serif text-[40px] font-light leading-[1.05] md:text-[48px]">{tx(locale, "Mis inmuebles", "My properties")}</h1>
+          <h1 className="np-t-h1 mt-1 font-serif">{tx(locale, "Mis inmuebles", "My properties")}</h1>
           <p className="mt-1 text-muted">{user?.name} · {tx(locale, "propietario particular", "private owner")}</p>
         </div>
         <Button href={`/${locale}/owner/new`}><Plus size={16} /> {tx(locale, "Publicar otro", "List another")}</Button>
@@ -135,7 +135,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
                   <li key={i}>
                     <div className={cn("h-1.5 rounded-full", i <= stageIdx[m.status] ? "bg-navy dark:bg-ivory" : "bg-black/10")} />
                     <div className="mt-2 flex items-center gap-1.5 font-display text-sm font-semibold">{i <= stageIdx[m.status] ? <Check size={14} className="text-ok" /> : <span className="h-3 w-3 rounded-full border-2 border-black/20" />}{t}</div>
-                    <div className="text-xs text-muted">{d as React.ReactNode}</div>
+                    <div className="text-[13px] text-muted">{d as React.ReactNode}</div>
                   </li>
                 ))}
               </ol>
@@ -165,8 +165,8 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
                   <div className="p-5">
                     <div className="flex flex-wrap items-center gap-2">
                       <StatusPill status={l.status} review={l.review} takedownReason={l.takedownReason} locale={locale} />
-                      <span className="text-xs font-semibold text-muted">{isMandate ? tx(locale, "Encargo", "Mandate") : tx(locale, "Publicado por ti", "Listed by you")}</span>
-                      <span className="text-xs text-muted">· {plural(l.photos?.length ?? 0, locale, ["foto", "fotos"], ["photo", "photos"])} · {tx(locale, "calidad", "quality")} {l.quality}</span>
+                      <span className="text-[13px] font-semibold text-muted">{isMandate ? tx(locale, "Encargo", "Mandate") : tx(locale, "Publicado por ti", "Listed by you")}</span>
+                      <span className="text-[13px] text-muted">· {plural(l.photos?.length ?? 0, locale, ["foto", "fotos"], ["photo", "photos"])} · {tx(locale, "calidad", "quality")} {l.quality}</span>
                     </div>
                     <Link href={listingHref(locale, l)} className="mt-1 block font-serif text-[24px] font-light leading-tight underline-offset-4 hover:underline">{tx(locale, l.title_es, l.title_en)}</Link>
                     {editing === l.id ? (
@@ -212,7 +212,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
                           </Button>
                           <Button size="sm" type="button" variant="ghost" onClick={() => { setEditing(null); setPriceErr(null); }}>{tx(locale, "Cancelar", "Cancel")}</Button>
                         </div>
-                        {priceErr && <p id={`price-err-${l.id}`} role="alert" className="mt-1 text-xs font-semibold text-danger">{priceErr}</p>}
+                        {priceErr && <p id={`price-err-${l.id}`} role="alert" className="mt-1 text-[13px] font-semibold text-danger">{priceErr}</p>}
                       </form>
                     ) : (
                       <div className="text-sm text-muted">{l.zone}, {l.city} · {money(l.priceAmount, locale)}{priceSuffix(l, locale)}</div>
@@ -224,7 +224,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
                           <div key={i} className="rounded-lg bg-ivory py-2">
                             <Icon size={14} className="mx-auto text-muted" />
                             <div className="font-display font-semibold">{v as string}</div>
-                            <div className="text-[11px] text-muted">{t as string}</div>
+                            <div className="text-[13px] text-muted">{t as string}</div>
                           </div>
                         );
                       })}
@@ -289,7 +289,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
                       </div>
                     )}
                     {ownVisits && !takenDown && editingHours !== l.id && (
-                      <p className="mt-2 flex items-start gap-1.5 text-xs text-muted" data-testid="visit-hours-summary">
+                      <p className="mt-2 flex items-start gap-1.5 text-[13px] text-muted" data-testid="visit-hours-summary">
                         <CalendarClock size={13} className="mt-px shrink-0" aria-hidden />
                         {hours
                           ? `${tx(locale, "Visitas", "Visits")}: ${summarizeVisitHours(hours, locale)} · ${hours.slotMin} min`
@@ -298,7 +298,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
                     )}
                     {ownVisits && editingHours === l.id && <OwnerVisitHours listingId={l.id} locale={locale} initial={hours} onDone={(saved) => { setEditingHours(null); if (saved) router.refresh(); }} />}
                     {!isMandate && editingListing === l.id && <OwnerEditForm l={l} locale={locale} onDone={(saved) => { setEditingListing(null); if (saved) router.refresh(); }} />}
-                    {paused && !isMandate && <p className="mt-2 text-xs text-muted">{tx(locale, "En pausa: no aparece en el buscador. Reactívala cuando quieras.", "Paused: it doesn’t show in search. Resume it whenever you like.")}</p>}
+                    {paused && !isMandate && <p className="mt-2 text-[13px] text-muted">{tx(locale, "En pausa: no aparece en el buscador. Reactívala cuando quieras.", "Paused: it doesn’t show in search. Resume it whenever you like.")}</p>}
                     <OwnerInbox locale={locale} leads={ll} tours={lt} manage={!isMandate} onChanged={() => router.refresh()} />
                     {lo.length > 0 && (
                       <div className="mt-4 rounded-lg border border-line">
@@ -315,10 +315,10 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
                                 <Button size="sm" variant="ghost" disabled={busy === o.id} onClick={() => act(() => api(`offers/${o.id}`, { method: "PATCH", json: { status: "REJECTED" } }), o.id)}>{tx(locale, "Rechazar", "Reject")}</Button>
                               </span>
                             )}
-                            {o.note && <div className="w-full text-xs text-muted">{o.note}</div>}
+                            {o.note && <div className="w-full text-[13px] text-muted">{o.note}</div>}
                           </div>
                         ))}
-                        <div className="border-t border-line px-3 py-2 text-[11px] text-muted">{tx(locale, "Aquí ves cada oferta. Por ahora, la firma se hace fuera de New Place.", "Every offer, in one place. For now, signing happens outside New Place.")}</div>
+                        <div className="border-t border-line px-3 py-2 text-[13px] text-muted">{tx(locale, "Aquí ves cada oferta. Por ahora, la firma se hace fuera de New Place.", "Every offer, in one place. For now, signing happens outside New Place.")}</div>
                       </div>
                     )}
                   </div>
@@ -336,10 +336,10 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
                 <Avatar initials={otherName.split(" ").map((p) => p[0]).slice(0, 2).join("")} hue={other?.hue ?? 200} size={40} />
                 <div className="min-w-0 flex-1">
                   <div className="font-display font-semibold">{otherName}</div>
-                  <div className="truncate text-xs text-muted">{thread.subject}</div>
+                  <div className="truncate text-[13px] text-muted">{thread.subject}</div>
                 </div>
                 {live.data.threads.length > 1 && (
-                  <select className="h-8 max-w-[160px] rounded-lg border border-line text-xs" value={thread.id} onChange={(e) => setActive(e.target.value)} aria-label={tx(locale, "Conversación", "Conversation")}>
+                  <select className="h-8 max-w-[160px] rounded-lg border border-line text-[13px]" value={thread.id} onChange={(e) => setActive(e.target.value)} aria-label={tx(locale, "Conversación", "Conversation")}>
                     {live.data.threads.map((t) => {
                       // Several buyers write about the same listing: name who is on the other side, then the subject.
                       const who = t.participants.filter((p) => p.id !== user?.id).map((p) => p.name).join(", ") || leads.find((ld) => ld.id === t.leadId)?.name;
@@ -351,15 +351,15 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
               <div className="flex-1 space-y-3 overflow-y-auto p-4 scrollbar-thin">
                 {threadLead && !other && (
                   <div className="rounded-2xl rounded-bl-md bg-ivory px-3.5 py-2 text-sm">
-                    <div className="text-xs font-semibold text-ink/70">{threadLead.name} · {threadLead.email}{threadLead.phone ? ` · ${threadLead.phone}` : ""}</div>
+                    <div className="text-[13px] font-semibold text-ink/70">{threadLead.name} · {threadLead.email}{threadLead.phone ? ` · ${threadLead.phone}` : ""}</div>
                     <div className="whitespace-pre-wrap">{threadLead.message}</div>
-                    <TimeAgo iso={threadLead.createdAt} locale={locale} className="mt-1 block text-[10px] text-muted" />
+                    <TimeAgo iso={threadLead.createdAt} locale={locale} className="mt-1 block text-[13px] text-muted" />
                   </div>
                 )}
                 {thread.messages.map((m) => (
                   <div key={m.id} className={cn("max-w-[85%] rounded-2xl px-3.5 py-2 text-sm", m.mine ? "ml-auto rounded-br-md bg-navy text-ivory" : "rounded-bl-md bg-ivory")}>
                     {m.body}
-                    <TimeAgo iso={m.at} locale={locale} className={cn("mt-1 block text-[10px]", m.mine ? "text-mist" : "text-muted")} />
+                    <TimeAgo iso={m.at} locale={locale} className={cn("mt-1 block text-[13px]", m.mine ? "text-mist" : "text-muted")} />
                   </div>
                 ))}
               </div>
@@ -393,8 +393,8 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
                 <button disabled={sending} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-navy text-ivory hover:bg-navy-2 disabled:opacity-60 dark:bg-ivory dark:text-navy" aria-label={tx(locale, "Enviar", "Send")}>{sending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}</button>
               </form>
               )}
-              {chatErr && <div role="alert" className="mx-3 mb-2 rounded-lg bg-[#B3261E1A] px-3 py-2 text-xs text-danger">{chatErr}</div>}
-              <div className="pb-2 text-center text-[10px] text-muted">{tx(locale, "Tus mensajes · se actualizan cada 15 s", "Your messages · refresh every 15 s")}</div>
+              {chatErr && <div role="alert" className="mx-3 mb-2 rounded-lg bg-[#B3261E1A] px-3 py-2 text-[13px] text-danger">{chatErr}</div>}
+              <div className="pb-2 text-center text-[13px] text-muted">{tx(locale, "Tus mensajes · se actualizan cada 15 s", "Your messages · refresh every 15 s")}</div>
             </>
           ) : (
             <div className="m-auto p-6 text-center text-sm text-muted">{tx(locale, "Cuando un comprador o tu asesor te escriba, verás la conversación aquí.", "When a buyer or your advisor writes to you, you’ll see the conversation here.")}</div>
@@ -421,7 +421,7 @@ function NoPhotos({ locale, busy, onAdd }: { locale: Locale; busy: boolean; onAd
       </svg>
       <div>
         <div className="font-serif text-[19px] leading-tight text-ink dark:text-ivory">{tx(locale, "Aún sin fotos", "No photos yet")}</div>
-        <p className="mt-0.5 text-xs text-muted dark:text-mist">{tx(locale, "Con fotos, tu anuncio recibe muchas más visitas.", "With photos, your listing gets far more views.")}</p>
+        <p className="mt-0.5 text-[13px] text-muted dark:text-mist">{tx(locale, "Con fotos, tu anuncio recibe muchas más visitas.", "With photos, your listing gets far more views.")}</p>
       </div>
       {onAdd && (
         <button type="button" onClick={onAdd} disabled={busy} className="inline-flex min-h-10 items-center gap-1.5 rounded-[2px] bg-[#0E1A2B] px-4 font-display text-sm font-semibold text-[#F6F2EC] transition-colors duration-np hover:bg-[#14243A] disabled:opacity-60 dark:bg-[#F6F2EC] dark:text-[#1A2026] dark:hover:bg-white">

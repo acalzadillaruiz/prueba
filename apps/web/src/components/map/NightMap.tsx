@@ -720,7 +720,7 @@ export function NightMap({
             ctlHover={ctlHover}
             toolbar={toolbar}
           />
-          <div className="pointer-events-none absolute bottom-2 left-3 z-10 text-xs" style={{ color: pal.note }}>
+          <div className="pointer-events-none absolute bottom-2 left-3 z-10 text-[13px]" style={{ color: pal.note }}>
             {tx(locale, "Mapa ilustrativo · la ubicación es aproximada", "Illustrative map · locations are approximate")}
           </div>
         </>

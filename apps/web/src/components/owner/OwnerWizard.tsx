@@ -374,7 +374,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
     return (
       <div className="mx-auto max-w-xl px-4 py-20 text-center" data-testid="owner-published">
         <CheckCircle2 size={56} className="mx-auto text-ok" />
-        <h1 className="mt-4 font-serif text-[36px] font-light leading-[1.05] md:text-[44px]">{done.mode === "AGENCY" ? tx(locale, "Anuncio creado", "Listing created") : done.mode === "FSBO" ? (done.pending ? tx(locale, "Lo estamos revisando", "We’re reviewing it") : tx(locale, `Ya está publicado en ${d.addr?.zone}`, `Now live in ${d.addr?.zone}`)) : tx(locale, "Tu encargo va en camino", "Your request is on its way")}</h1>
+        <h1 className="np-t-h1 mt-4 font-serif">{done.mode === "AGENCY" ? tx(locale, "Anuncio creado", "Listing created") : done.mode === "FSBO" ? (done.pending ? tx(locale, "Lo estamos revisando", "We’re reviewing it") : tx(locale, `Ya está publicado en ${d.addr?.zone}`, `Now live in ${d.addr?.zone}`)) : tx(locale, "Tu encargo va en camino", "Your request is on its way")}</h1>
         <p className="mt-2 text-muted">
           {done.mode === "AGENCY"
             ? user?.role === "AGENT" || done.pending
@@ -488,13 +488,13 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
         <div className="mb-6">
           <div className="mb-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5 text-sm">
             <span className="whitespace-nowrap font-display font-semibold">{tx(locale, `Paso ${step + 1} de 6`, `Step ${step + 1} of 6`)} · {tx(locale, STEPS[step][0], STEPS[step][1])}</span>
-            <span className="w-full text-xs text-muted sm:w-auto sm:text-sm">{tx(locale, "Tu borrador se guarda en este dispositivo", "Your draft is saved on this device")}</span>
+            <span className="w-full text-[13px] text-muted sm:w-auto sm:text-sm">{tx(locale, "Tu borrador se guarda en este dispositivo", "Your draft is saved on this device")}</span>
           </div>
           <div className="grid grid-cols-6 gap-1.5">
             {STEPS.map((s, i) => (
               <button key={i} onClick={() => i <= step && setStep(i)} className="min-h-11 py-2 text-left" aria-label={tx(locale, s[0], s[1])} aria-current={i === step ? "step" : undefined}>
                 <div className={cn("h-1.5 rounded-full", i <= step ? "bg-navy dark:bg-ivory" : "bg-black/10")} />
-                <div className={cn("mt-1.5 hidden text-xs sm:block", i === step ? "font-semibold text-ink" : "text-muted")}>{tx(locale, s[0], s[1])}</div>
+                <div className={cn("mt-1.5 hidden text-[13px] sm:block", i === step ? "font-semibold text-ink" : "text-muted")}>{tx(locale, s[0], s[1])}</div>
               </button>
             ))}
           </div>
@@ -502,7 +502,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
 
         {step === 0 && (
           <div className="np-in space-y-6">
-            <h1 className="font-serif text-[36px] font-light leading-[1.05] md:text-[44px]">{staff ? tx(locale, "Nuevo inmueble de la agencia", "New agency listing") : tx(locale, "¿Cómo quieres vender o alquilar?", "How do you want to sell or rent?")}</h1>
+            <h1 className="np-t-h1 font-serif">{staff ? tx(locale, "Nuevo inmueble de la agencia", "New agency listing") : tx(locale, "¿Cómo quieres vender o alquilar?", "How do you want to sell or rent?")}</h1>
             {!staff && <div className="grid gap-3 sm:grid-cols-2">
               <button className={opt(d.mode === "FSBO")} onClick={() => set({ mode: "FSBO" })}>
                 <User strokeWidth={1.6} className="text-navy dark:text-ivory" />
@@ -520,10 +520,10 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                 {agencies.map((a) => (
                   <button key={a.id} onClick={() => set({ agency: a.id })} className={opt(d.agency === a.id)}>
                     <div className="flex items-center gap-2">
-                      <span className="flex h-8 w-8 items-center justify-center rounded-lg font-display text-xs font-bold text-navy" style={{ background: a.color }}>{a.initials}</span>
+                      <span className="flex h-8 w-8 items-center justify-center rounded-lg font-display text-[13px] font-bold text-navy" style={{ background: a.color }}>{a.initials}</span>
                       <span className="font-semibold">{a.name}</span>
                     </div>
-                    <div className="mt-1 flex items-center gap-1 text-xs text-muted">{a.verified && <ShieldCheck size={12} className="text-ok" />} {a.verified ? tx(locale, "Verificada", "Verified") : tx(locale, "En verificación", "Pending verification")} · {a.commissionPct} %</div>
+                    <div className="mt-1 flex items-center gap-1 text-[13px] text-muted">{a.verified && <ShieldCheck size={12} className="text-ok" />} {a.verified ? tx(locale, "Verificada", "Verified") : tx(locale, "En verificación", "Pending verification")} · {a.commissionPct} %</div>
                   </button>
                 ))}
               </div>
@@ -549,7 +549,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
 
         {step === 1 && (
           <div className="np-in space-y-5">
-            <h1 className="font-serif text-[36px] font-light leading-[1.05] md:text-[44px]">{tx(locale, "¿Dónde está?", "Where is it?")}</h1>
+            <h1 className="np-t-h1 font-serif">{tx(locale, "¿Dónde está?", "Where is it?")}</h1>
             <div data-wiz="addr" className="space-y-3">
               <PlacesSearch locale={locale} zones={zones} value={d.addr} onPick={(p) => set({ addr: p })} describedBy="wizard-addr-help" />
               <p id="wizard-addr-help" className="-mt-1 text-sm text-muted dark:text-mist">{tx(locale, "Escribe la calle y el edificio (o el nombre de la casa) y elige la urbanización en la lista.", "Type the street and building (or the house name), then pick the neighborhood from the list.")}</p>
@@ -573,7 +573,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               className="h-72 rounded-np"
               controls={false}
             />
-            {d.addr && <p className="text-xs text-muted">{tx(locale, "Toca el mapa para ajustar el punto exacto.", "Tap the map to fine-tune the exact point.")}</p>}
+            {d.addr && <p className="text-[13px] text-muted">{tx(locale, "Toca el mapa para ajustar el punto exacto.", "Tap the map to fine-tune the exact point.")}</p>}
             {d.addr && !streetErr && (
               <div data-wiz="dup" className={cn("np-in flex items-start gap-3 rounded-np border p-3 text-sm", dup && !dupOverride ? "border-warn/60 bg-[#8A5A0014]" : "border-[#2F6F4E55] bg-[#2F6F4E0D]")}>
                 {checking ? <Loader2 size={18} className="mt-px shrink-0 animate-spin" /> : dup && !dupOverride ? <AlertTriangle size={18} className="mt-px shrink-0 text-warn" /> : <CheckCircle2 size={18} className="mt-px shrink-0 text-ok" />}
@@ -595,7 +595,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
 
         {step === 2 && (
           <div className="np-in space-y-5">
-            <h1 className="font-serif text-[36px] font-light leading-[1.05] md:text-[44px]">{tx(locale, "Cuéntanos cómo es", "Tell us about it")}</h1>
+            <h1 className="np-t-h1 font-serif">{tx(locale, "Cuéntanos cómo es", "Tell us about it")}</h1>
             <div className="grid gap-3 sm:grid-cols-2">
               {/* Empty while typing is allowed (0); the step can't continue until the value is valid. */}
               <div data-wiz="m2">
@@ -651,7 +651,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
 
         {step === 3 && (
           <div className="np-in space-y-5">
-            <h1 className="font-serif text-[36px] font-light leading-[1.05] md:text-[44px]">{tx(locale, "Fotos que atraen visitas", "Photos that bring visits")}</h1>
+            <h1 className="np-t-h1 font-serif">{tx(locale, "Fotos que atraen visitas", "Photos that bring visits")}</h1>
             <input
               ref={fileRef}
               type="file"
@@ -690,12 +690,12 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                   <div key={src} className={cn("group relative overflow-hidden rounded-lg outline outline-2 -outline-offset-2", cover === i ? "ring-navy" : "ring-transparent")}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={src} alt="" className="aspect-[4/3] w-full object-cover" />
-                    <span className="absolute left-1.5 top-1.5 rounded bg-navy/80 px-1.5 text-xs font-bold text-ivory">{i + 1}</span>
+                    <span className="absolute left-1.5 top-1.5 rounded bg-navy/80 px-1.5 text-[13px] font-bold text-ivory">{i + 1}</span>
                     <button onClick={() => { setFiles(files.filter((_, j) => j !== i)); if (cover >= i && cover > 0) setCover(cover - 1); }} className="absolute right-1.5 top-1.5 rounded-full bg-navy/70 p-0.5 text-white" aria-label={tx(locale, "Quitar", "Remove")}><X size={14} /></button>
                     {cover === i ? (
-                      <span className="absolute bottom-1.5 left-1.5 inline-flex items-center gap-1 rounded-full bg-navy px-2 py-0.5 text-[11px] font-bold text-ivory"><Star size={11} /> {tx(locale, "Portada", "Cover")}</span>
+                      <span className="absolute bottom-1.5 left-1.5 inline-flex items-center gap-1 rounded-full bg-navy px-2 py-0.5 text-[13px] font-bold text-ivory"><Star size={11} /> {tx(locale, "Portada", "Cover")}</span>
                     ) : (
-                      <button onClick={() => setCover(i)} className="absolute bottom-1.5 left-1.5 rounded-full bg-white/90 px-2 py-0.5 text-[11px] font-bold">{tx(locale, "Usar de portada", "Set cover")}</button>
+                      <button onClick={() => setCover(i)} className="absolute bottom-1.5 left-1.5 rounded-full bg-white/90 px-2 py-0.5 text-[13px] font-bold">{tx(locale, "Usar de portada", "Set cover")}</button>
                     )}
                   </div>
                 ))}
@@ -712,7 +712,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
 
         {step === 4 && (
           <div className="np-in space-y-5">
-            <h1 className="font-serif text-[36px] font-light leading-[1.05] md:text-[44px]">{tx(locale, "Precio y descripción", "Price & description")}</h1>
+            <h1 className="np-t-h1 font-serif">{tx(locale, "Precio y descripción", "Price & description")}</h1>
             <div className="rounded-[4px] bg-white p-5">
               <div className="flex items-center gap-2 font-display font-semibold"><Sparkles size={17} strokeWidth={1.6} /> {tx(locale, "Valor estimado New Place", "PlaceEstimate")} · {zone?.name}</div>
               {estimate ? (
@@ -752,7 +752,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                   </div>
                 </div>
               )}
-              {fxVes > 0 && d.price > 0 && <div className="mt-2 text-xs text-muted">≈ Bs. {num(Math.round(d.price * fxVes), locale)} ({tx(locale, "tasa referencial", "reference rate")})</div>}
+              {fxVes > 0 && d.price > 0 && <div className="mt-2 text-[13px] text-muted">≈ Bs. {num(Math.round(d.price * fxVes), locale)} ({tx(locale, "tasa referencial", "reference rate")})</div>}
             </div>
             <div className="rounded-[4px] bg-white p-5">
               <div className="flex flex-wrap items-center justify-between gap-2">
@@ -763,7 +763,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               </div>
               <div className="mt-3 flex gap-2">
                 {(["es", "en"] as Locale[]).map((x) => (
-                  <button key={x} onClick={() => setLang(x)} className={cn("rounded-[2px] px-3 py-0.5 text-xs font-bold", lang === x ? "bg-[#E9E1D3] text-navy outline outline-2 -outline-offset-2 outline-[#1A2026]" : "bg-black/5")}>{x.toUpperCase()}</button>
+                  <button key={x} onClick={() => setLang(x)} className={cn("rounded-[2px] px-3 py-0.5 text-[13px] font-bold", lang === x ? "bg-[#E9E1D3] text-navy outline outline-2 -outline-offset-2 outline-[#1A2026]" : "bg-black/5")}>{x.toUpperCase()}</button>
                 ))}
               </div>
               <input
@@ -781,14 +781,14 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                 onChange={(e) => set({ copy: { ...d.copy, [lang === "es" ? "body_es" : "body_en"]: e.target.value } })}
               />
               {aiErr && <div role="alert" className="mt-2 rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-sm text-danger">{aiErr}</div>}
-              <div className="mt-2 text-xs text-muted">{tx(locale, "Si lo dejas en blanco, escribimos un primer texto por ti al publicar.", "Leave it blank and we’ll write a first draft for you when you publish.")}</div>
+              <div className="mt-2 text-[13px] text-muted">{tx(locale, "Si lo dejas en blanco, escribimos un primer texto por ti al publicar.", "Leave it blank and we’ll write a first draft for you when you publish.")}</div>
             </div>
           </div>
         )}
 
         {step === 5 && (
           <div className="np-in space-y-5">
-            <h1 className="font-serif text-[36px] font-light leading-[1.05] md:text-[44px]">{tx(locale, "Revisa y publica", "Review & publish")}</h1>
+            <h1 className="np-t-h1 font-serif">{tx(locale, "Revisa y publica", "Review & publish")}</h1>
             {dup && (
               <div className={cn("flex items-start gap-2 rounded-np border p-3 text-sm [&>svg]:mt-px [&>svg]:shrink-0", dupOverride ? "border-[#2F6F4E55] bg-[#2F6F4E0D]" : "border-warn/60 bg-[#8A5A0014]")} role="alert">
                 {dupOverride ? <CheckCircle2 size={18} className="text-ok" /> : <AlertTriangle size={18} className="text-warn" />}
@@ -809,7 +809,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                   <div className="text-sm text-muted" data-testid="review-address">{address}</div>
                   <div className="mt-2 text-sm" data-testid="review-facts">{facts}</div>
                   {extrasSummary && <div className="mt-1 text-sm text-muted">{extrasSummary}</div>}
-                  <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#E9E1D3] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[.12em] text-navy">{d.mode === "AGENCY" ? tx(locale, "Inventario de la agencia", "Agency inventory") : d.mode === "FSBO" ? tx(locale, "Publicado por el propietario", "Listed by the owner") : tx(locale, "Encargo a agencia", "Agency mandate")}</div>
+                  <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#E9E1D3] px-2.5 py-1 text-[13px] font-semibold uppercase tracking-[.12em] text-navy">{d.mode === "AGENCY" ? tx(locale, "Inventario de la agencia", "Agency inventory") : d.mode === "FSBO" ? tx(locale, "Publicado por el propietario", "Listed by the owner") : tx(locale, "Encargo a agencia", "Agency mandate")}</div>
                 </div>
               </div>
             </div>
@@ -823,7 +823,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               </ul>
             </div>
             <label className="flex items-start gap-2 text-sm text-muted"><input type="checkbox" checked={confirm} onChange={(e) => setConfirm(e.target.checked)} className="mt-1 h-4 w-4 shrink-0 accent-navy dark:accent-[#E9E1D3]" /> {tx(locale, "Confirmo que soy el propietario o tengo autorización para publicar.", "I confirm I’m the owner or authorised to list.")}</label>
-            {!confirm && <p className="text-xs text-muted">{tx(locale, "Marca la casilla para poder publicar.", "Tick the box to publish.")}</p>}
+            {!confirm && <p className="text-[13px] text-muted">{tx(locale, "Marca la casilla para poder publicar.", "Tick the box to publish.")}</p>}
             {!user && <p className="rounded-lg bg-[#0E1A2B0D] px-3 py-2 text-sm">{tx(locale, "Para publicar te pediremos que entres a tu cuenta. Tu borrador no se pierde.", "We’ll ask you to sign in before publishing. Your draft stays safe.")}</p>}
             {err && <div className="rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-sm text-danger" role="alert">{err}</div>}
           </div>
@@ -885,7 +885,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
           <div className="rounded-np bg-navy p-4 text-ivory">
             <div className="flex items-center gap-2 font-display font-semibold"><Sparkles size={16} className="text-[#E9E1D3]" /> {tx(locale, "Valor estimado New Place", "PlaceEstimate")}</div>
             <div className="mt-1 font-display text-2xl">{estimate ? money(estimate.mid, locale) : "—"}</div>
-            <div className="text-xs text-mist">{tx(locale, "Cambia a medida que avanzas", "Updates as you go")}</div>
+            <div className="text-[13px] text-mist">{tx(locale, "Cambia a medida que avanzas", "Updates as you go")}</div>
           </div>
           <Link href={`/${locale}/owner/listings`} className="block text-center text-sm text-muted underline-offset-4 hover:text-navy hover:underline"><MapPin size={13} className="inline" /> {tx(locale, "Guardar y salir", "Save & exit")}</Link>
         </div>
@@ -907,7 +907,7 @@ function DupNotice({ locale, dup, override, onOverride, hasUnit }: { locale: Loc
     <span className="flex flex-1 flex-wrap items-center gap-x-3 gap-y-2">
       <span>
         {tx(locale, "Puede que ya esté publicado:", "It may already be listed:")} {link}
-        {!hasUnit && <span className="block text-xs text-muted">{tx(locale, "Si es otro apartamento o casa, escribe arriba el piso / apto / casa.", "If it’s another flat or house, add the floor / unit above.")}</span>}
+        {!hasUnit && <span className="block text-[13px] text-muted">{tx(locale, "Si es otro apartamento o casa, escribe arriba el piso / apto / casa.", "If it’s another flat or house, add the floor / unit above.")}</span>}
       </span>
       <button type="button" onClick={onOverride} className="rounded-[2px] border border-navy/70 bg-white px-3 py-1.5 font-display text-sm font-semibold text-navy hover:bg-[#E9E1D3]">
         {tx(locale, "No es la misma casa — es otra unidad", "Not the same home — it’s another unit")}

@@ -151,7 +151,7 @@ export function CompareTray({ locale }: { locale: Locale }) {
             <Scale size={14} aria-hidden className="shrink-0 text-[#0E1A2B]" />
             <span aria-live="polite">{tx(locale, `Comparar (${compare.length}/3)`, `Compare (${compare.length}/3)`)}</span>
           </div>
-          <button type="button" onClick={clearCompare} className="mt-0.5 text-[12px] text-muted underline-offset-4 hover:underline">
+          <button type="button" onClick={clearCompare} className="mt-0.5 text-[13px] text-muted underline-offset-4 hover:underline">
             {tx(locale, "Vaciar", "Clear")}
           </button>
         </div>

@@ -33,7 +33,7 @@ export function SavedView({ locale, all }: { locale: Locale; all: Listing[] }) {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <div className={k.caption}>{user ? tx(locale, "Tus favoritas", "Your favourites") : tx(locale, "Guardadas en este dispositivo", "Saved on this device")}</div>
-          <h1 className="mt-1 font-serif text-[40px] font-light leading-[1.05] md:text-[48px]">{tx(locale, "Guardados", "Saved homes")}</h1>
+          <h1 className="np-t-h1 mt-1 font-serif">{tx(locale, "Guardados", "Saved homes")}</h1>
           <p className="mt-1 text-muted">{tx(locale, `${items.length} ${items.length === 1 ? "casa" : "casas"} · elige hasta 3 para compararlas`, `${items.length} ${items.length === 1 ? "home" : "homes"} · pick up to 3 to compare`)}</p>
         </div>
         {user && <Button href={`/${locale}/alerts`} variant="outline" className={k.outline}>{tx(locale, "Mis alertas", "My alerts")}</Button>}

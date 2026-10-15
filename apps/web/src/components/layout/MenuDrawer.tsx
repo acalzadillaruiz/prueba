@@ -90,12 +90,12 @@ export function MenuDrawer({
           </Link>
           {seeker && (
             <>
-              <div className="mx-3 mb-1 mt-4 font-display text-[12px] font-semibold text-[#E9E1D3]">{tx(locale, "Tu espacio", "Your space")}</div>
+              <div className="mx-3 mb-1 mt-4 font-display text-[13px] font-semibold text-[#E9E1D3]">{tx(locale, "Tu espacio", "Your space")}</div>
               {space.map(({ href, label, Icon, badge }) => (
                 <Link key={href} href={href} onClick={() => onClose()} className={drawerItem}>
                   <Icon size={18} aria-hidden /> {label}
                   {!!badge && (
-                    <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-[#E9E1D3] px-1.5 text-[11px] font-bold text-navy">
+                    <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-[#E9E1D3] px-1.5 text-[13px] font-bold text-navy">
                       {badge}
                       <span className="sr-only">{tx(locale, " sin leer", " unread")}</span>
                     </span>

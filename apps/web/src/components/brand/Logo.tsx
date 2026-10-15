@@ -60,7 +60,7 @@ export function Logo({ tone = "navy", className, size = "md", animate = false }:
         <span className="font-logo text-[30px] font-extralight leading-none tracking-[0.2em]" style={{ color: ink, paddingLeft: "0.2em" }}>
           NEW PLACE
         </span>
-        <span className="text-[11px] font-medium uppercase tracking-[0.34em]" style={{ color: dark ? "rgb(255 255 255 / .8)" : "var(--np-muted)", paddingLeft: "0.34em" }}>
+        <span className="text-[13px] font-medium uppercase tracking-[0.34em]" style={{ color: dark ? "rgb(255 255 255 / .8)" : "var(--np-muted)", paddingLeft: "0.34em" }}>
           Venezuela
         </span>
       </span>

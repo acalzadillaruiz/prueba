@@ -126,7 +126,7 @@ export function ShapeTools({
                   <Icon size={15} aria-hidden className="shrink-0" />
                   <span className="leading-tight">
                     {label}
-                    <span className="block text-[12px] opacity-70">{hint}</span>
+                    <span className="block text-[13px] opacity-70">{hint}</span>
                   </span>
                 </button>
               ))}

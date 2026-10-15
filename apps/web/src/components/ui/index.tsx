@@ -94,7 +94,7 @@ export function Badge({ children, tone = "neutral", className }: { children: Rea
   }[tone];
   const caps = tone === "exclusive" || tone === "egeo" || tone === "arena";
   return (
-    <span className={cn("inline-flex items-center gap-1.5 whitespace-nowrap rounded-full", caps ? "px-3 py-1 text-[11px] font-semibold" : "px-2.5 py-0.5 text-xs font-semibold", t, className)}>
+    <span className={cn("inline-flex items-center gap-1.5 whitespace-nowrap rounded-full", caps ? "px-3 py-1 text-[13px] font-semibold" : "px-2.5 py-0.5 text-[13px] font-semibold", t, className)}>
       {children}
     </span>
   );
@@ -125,9 +125,9 @@ export function Field({ label, children, hint, dark, error }: { label: string; c
       <span className={cn("mb-1.5 block text-sm font-semibold", dark ? "text-ivory/80" : "text-ink/80")}>{label}</span>
       {children}
       {error ? (
-        <span role="alert" className={cn("mt-1 block text-xs font-semibold", dark ? "text-[#E9E1D3]" : "text-danger")}>{error}</span>
+        <span role="alert" className={cn("mt-1 block text-[13px] font-semibold", dark ? "text-[#E9E1D3]" : "text-danger")}>{error}</span>
       ) : (
-        hint && <span className={cn("mt-1 block text-xs", dark ? "text-mist" : "text-muted")}>{hint}</span>
+        hint && <span className={cn("mt-1 block text-[13px]", dark ? "text-mist" : "text-muted")}>{hint}</span>
       )}
     </label>
   );
@@ -145,9 +145,9 @@ export function Stat({ label, value, delta, dark, hint }: { label: string; value
       <div className={cn("text-[13px] font-semibold", dark ? "text-mist" : "text-muted")}>{label}</div>
       <div className="mt-1.5 flex items-baseline gap-2">
         <span className="font-display text-2xl font-semibold">{value}</span>
-        {delta && <span className={cn("text-xs font-semibold", up ? "text-[#5FBF8F]" : "text-coral")}>{delta}</span>}
+        {delta && <span className={cn("text-[13px] font-semibold", up ? "text-[#5FBF8F]" : "text-coral")}>{delta}</span>}
       </div>
-      {hint && <div className={cn("mt-1 text-xs", dark ? "text-mist/80" : "text-muted")}>{hint}</div>}
+      {hint && <div className={cn("mt-1 text-[13px]", dark ? "text-mist/80" : "text-muted")}>{hint}</div>}
     </div>
   );
 }
@@ -155,7 +155,7 @@ export function Stat({ label, value, delta, dark, hint }: { label: string; value
 export function SectionTitle({ children, action, className }: { children: ReactNode; action?: ReactNode; className?: string }) {
   return (
     <div className={cn("mb-4 flex items-end justify-between gap-4", className)}>
-      <h2 className="font-serif text-[28px] leading-tight md:text-[34px]">{children}</h2>
+      <h2 className="np-t-h2 font-serif">{children}</h2>
       {action}
     </div>
   );

@@ -159,7 +159,7 @@ export function PriceFields({ locale, f, set }: { locale: Locale; f: FilterValue
       </div>
       <div className="mt-4 grid grid-cols-2 gap-2">
         <label className="block">
-          <span className="mb-1.5 block text-xs text-muted">{tx(locale, "Mínimo", "Minimum")}</span>
+          <span className="mb-1.5 block text-[13px] text-muted">{tx(locale, "Mínimo", "Minimum")}</span>
           <select value={f.min ?? ""} onChange={(e) => set({ min: e.target.value || null })} className={cn(pill, "w-full appearance-none border-line bg-white", f.min && on)} aria-label={tx(locale, "Precio mínimo", "Min price")}>
             <option value="">{tx(locale, "Sin mínimo", "No min")}</option>
             {withValue(steps.slice(0, -1), f.min).map((v) => (
@@ -168,7 +168,7 @@ export function PriceFields({ locale, f, set }: { locale: Locale; f: FilterValue
           </select>
         </label>
         <label className="block">
-          <span className="mb-1.5 block text-xs text-muted">{tx(locale, "Máximo", "Maximum")}</span>
+          <span className="mb-1.5 block text-[13px] text-muted">{tx(locale, "Máximo", "Maximum")}</span>
           <select value={f.max ?? ""} onChange={(e) => set({ max: e.target.value || null })} className={cn(pill, "w-full appearance-none border-line bg-white", f.max && on)} aria-label={tx(locale, "Precio máximo", "Max price")}>
             <option value="">{tx(locale, "Sin máximo", "No max")}</option>
             {withValue(steps, f.max).map((v) => (
@@ -177,7 +177,7 @@ export function PriceFields({ locale, f, set }: { locale: Locale; f: FilterValue
           </select>
         </label>
       </div>
-      {per && <p className="mt-2 text-xs text-muted">{tx(locale, `Precios en dólares${per}.`, `Prices in US dollars${per}.`)}</p>}
+      {per && <p className="mt-2 text-[13px] text-muted">{tx(locale, `Precios en dólares${per}.`, `Prices in US dollars${per}.`)}</p>}
     </div>
   );
 }

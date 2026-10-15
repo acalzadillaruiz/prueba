@@ -22,7 +22,7 @@ export function OwnerNextSteps({ locale, slug, title, live }: { locale: Locale; 
 
   return (
     <section className="mt-10 text-left" aria-labelledby="next-steps" data-testid="owner-next-steps">
-      <h2 id="next-steps" className="text-center font-serif text-[26px] font-light leading-tight">{tx(locale, "Y ahora, ¿qué sigue?", "What’s next?")}</h2>
+      <h2 id="next-steps" className="np-t-h2 text-center font-serif">{tx(locale, "Y ahora, ¿qué sigue?", "What’s next?")}</h2>
       <div className="mt-4 space-y-3">
         {live && (
           <div className={card}>
@@ -50,7 +50,7 @@ export function OwnerNextSteps({ locale, slug, title, live }: { locale: Locale; 
               </a>
             </div>
             <span className="sr-only" role="status">{copied ? tx(locale, "Enlace copiado", "Link copied") : ""}</span>
-            {copyErr && <p role="alert" className="mt-2 break-all text-xs text-muted">{tx(locale, "No pudimos copiarlo. Este es el enlace:", "We couldn’t copy it. Here’s the link:")} {url()}</p>}
+            {copyErr && <p role="alert" className="mt-2 break-all text-[13px] text-muted">{tx(locale, "No pudimos copiarlo. Este es el enlace:", "We couldn’t copy it. Here’s the link:")} {url()}</p>}
           </div>
         )}
         <div className={card}>

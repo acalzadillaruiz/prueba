@@ -133,7 +133,7 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
       <section id="explorar" className="mx-auto max-w-[1320px] px-4 pb-14 pt-14 md:px-8 md:pb-20 md:pt-20 lg:pt-24">
         <div data-reveal className="mb-5 grid items-end gap-2 md:mb-8 md:grid-cols-[1fr_auto] md:gap-4 lg:mb-10">
           <div><h2 className="np-t-h1">{tx(locale, "Busca por zona", "Search by area")}</h2></div>
-          <p className="max-w-[380px] text-[15px] leading-relaxed text-muted md:text-right">
+          <p className="np-t-body max-w-[380px] text-ink md:text-right">
             {tx(locale, "Mira en el mapa dónde está cada casa y cuánto cuesta.", "See on the map where each home is and what it costs.")}
           </p>
         </div>
@@ -232,7 +232,7 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
       {/* THE PROMISE — a solid Taupe block with light text (AMALI's quote blocks). */}
       <section className="bg-[#6B5D52] text-[#F6F2EC]" aria-label={tx(locale, "Nuestra promesa", "Our promise")}>
         <div className="mx-auto max-w-[1100px] px-6 py-14 text-center md:px-10 md:py-20">
-          <p className="font-display text-[12px] font-medium text-[#F6F2EC]/80">New Place</p>
+          <p className="font-display text-[13px] font-medium text-[#F6F2EC]/80">New Place</p>
           <blockquote className="mx-auto mt-5 max-w-[820px] font-title text-[24px] font-light leading-[1.25] tracking-[.01em] md:text-[34px]">
             {tx(
               locale,
@@ -249,7 +249,7 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
       <section className="relative overflow-hidden bg-ivory">
         <div className="relative mx-auto grid max-w-[1320px] items-center gap-6 px-5 pt-14 md:gap-10 md:px-10 md:pt-16 lg:grid-cols-2 lg:gap-16 lg:pt-16">
           <div data-reveal className="pb-0 md:pb-4 lg:pb-12">
-            <h2 className="mt-3 text-[30px] md:text-[48px]">{tx(locale, "Vende tu casa al precio justo", "Sell your home at a fair price")}</h2>
+            <h2 className="np-t-h1 mt-3">{tx(locale, "Vende tu casa al precio justo", "Sell your home at a fair price")}</h2>
             <ul className="mt-5 space-y-2.5 md:mt-7 md:space-y-3">
               {owner.map((o) => (
                 <li key={o} className="flex items-center gap-3 text-[15px] text-ink/80">

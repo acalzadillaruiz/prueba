@@ -294,7 +294,7 @@ function CompactAsk({
         {/* Desktop: the compact bar replaces the header, so it keeps the header's everyday shortcuts. */}
         <Link href={`/${locale}/saved`} aria-label={tx(locale, "Guardados", "Saved")} className={cn("relative ml-1 hidden h-11 w-11 shrink-0 items-center justify-center rounded-full hover:bg-black/5 lg:flex", ring)}>
           <Heart size={19} aria-hidden />
-          {saved.length > 0 && <span className="absolute right-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-navy px-1 text-[11px] font-bold leading-none text-ivory outline outline-2 outline-offset-0 outline-ivory">{saved.length}</span>}
+          {saved.length > 0 && <span className="absolute right-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-navy px-1 text-[13px] font-bold leading-none text-ivory outline outline-2 outline-offset-0 outline-ivory">{saved.length}</span>}
         </Link>
         {ready && (
           <Link

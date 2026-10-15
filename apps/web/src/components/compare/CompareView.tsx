@@ -95,7 +95,7 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
   // A sale price, a monthly rent and a nightly rate are different units: only pick a "best" price among like units.
   const mixedOperation = cmp.some(isSale) && cmp.some((l) => !isSale(l));
   const sameUnit = new Set(cmp.map((l) => l.pricePeriod ?? "sale")).size <= 1;
-  const unit = (l: Listing) => <span className="text-xs font-normal text-muted">{priceSuffix(l, locale)}</span>;
+  const unit = (l: Listing) => <span className="text-[13px] font-normal text-muted">{priceSuffix(l, locale)}</span>;
   const ppm = (l: Listing) => (l.areaM2 > 0 ? l.priceAmount / l.areaM2 : NaN);
   const allRows: Row[] = [
     { label: tx(locale, "Precio", "Price"), render: (l) => <span className="font-serif text-[17px] font-light leading-tight md:text-[22px]"><span className="whitespace-nowrap md:hidden">{shortMoney(l.priceAmount, locale)}</span><span className="hidden md:inline">{money(l.priceAmount, locale)}</span><span className="whitespace-nowrap">{unit(l)}</span></span>, val: sameUnit ? (l) => l.priceAmount : undefined, best: "min" },
@@ -141,7 +141,7 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
   });
   // The winner of a row: green cell + a small "Mejor" pill (distinct from the ✓ of the yes/no rows).
   const bestMark = (cls: string) => (
-    <span className={cn("inline-flex items-center whitespace-nowrap rounded-full bg-[#2F6F4E1F] px-1.5 py-px align-[2px] font-display text-[11px] font-semibold leading-4 text-ok dark:bg-[#8FCBA626] dark:text-[#8FCBA6]", cls)} data-compare-best>
+    <span className={cn("inline-flex items-center whitespace-nowrap rounded-full bg-[#2F6F4E1F] px-1.5 py-px align-[2px] font-display text-[13px] font-semibold leading-4 text-ok dark:bg-[#8FCBA626] dark:text-[#8FCBA6]", cls)} data-compare-best>
       {tx(locale, "Mejor", "Best")}
     </span>
   );
@@ -156,7 +156,7 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <div className={k.caption}>{tx(locale, "Comparador", "Compare")}</div>
-          <h1 className="mt-1 font-serif text-[40px] font-light leading-[1.05] md:text-[48px]">{tx(locale, "¿Cuál te conviene más?", "Which one suits you best?")}</h1>
+          <h1 className="np-t-h1 mt-1 font-serif">{tx(locale, "¿Cuál te conviene más?", "Which one suits you best?")}</h1>
           <p className="mt-1 text-muted">{tx(locale, "Pon hasta 3 casas lado a lado. La mejor de cada fila lleva la marca «Mejor».", "Put up to 3 homes side by side. The best in each row gets a “Best” tag.")}</p>
         </div>
         {cmp.length > 0 && cmp.length < 3 && (

@@ -74,7 +74,7 @@ export function SignupPrompt({ locale, reason, onClose }: { locale: Locale; reas
             <X size={20} aria-hidden />
           </button>
         </div>
-        <h2 id={titleId} className="mt-3 font-serif text-[28px] font-light leading-tight text-navy">
+        <h2 id={titleId} className="np-t-h2 mt-3 font-serif text-navy">
           {alert ? tx(locale, "Crea tu cuenta para que te avisemos", "Create your account and we’ll let you know") : tx(locale, "Crea tu cuenta para guardar tus casas", "Create your account to keep your homes")}
         </h2>
         <p id={descId} className="mt-2 text-[15px] text-muted">

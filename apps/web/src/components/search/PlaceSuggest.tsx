@@ -132,7 +132,7 @@ export function usePlaceSuggest({
             <span className="font-semibold">{s.name}</span>
             {s.city && <span className="text-ink/60">, {s.city}</span>}
           </span>
-          <span className="ml-auto shrink-0 text-[12px] text-ink/50">{s.city ? tx(locale, "Zona", "Area") : tx(locale, "Ciudad", "City")}</span>
+          <span className="ml-auto shrink-0 text-[13px] text-ink/50">{s.city ? tx(locale, "Zona", "Area") : tx(locale, "Ciudad", "City")}</span>
         </li>
       ))}
     </ul>

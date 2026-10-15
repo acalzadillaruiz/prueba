@@ -78,7 +78,7 @@ export function HubSectionNav({ locale, sections }: { locale: Locale; sections: 
                 >
                   {s.label}
                   {!!s.badge && (
-                    <span className={cn("flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[11px] font-bold", on ? "bg-[#E9E1D3] text-[#1A2026]" : "bg-navy text-ivory")}>
+                    <span className={cn("flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[13px] font-bold", on ? "bg-[#E9E1D3] text-[#1A2026]" : "bg-navy text-ivory")}>
                       {s.badge}
                       <span className="sr-only">{tx(locale, " sin leer", " unread")}</span>
                     </span>

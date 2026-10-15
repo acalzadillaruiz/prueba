@@ -73,7 +73,7 @@ export async function PublicFooter({ locale }: { locale: Locale }) {
             {DEMO_ENABLED && (
               <>
                 {" · "}
-                <Link href={`/${locale}/login?preview=1`} rel="nofollow" className="inline-block max-h-6 text-xs leading-6 text-ink/45 underline-offset-2 hover:text-ink/70 hover:underline" data-private-preview>
+                <Link href={`/${locale}/login?preview=1`} rel="nofollow" className="inline-block max-h-6 text-[13px] leading-6 text-ink/45 underline-offset-2 hover:text-ink/70 hover:underline" data-private-preview>
                   {tx(locale, "Vista previa privada", "Private preview")}
                 </Link>
               </>

@@ -103,7 +103,7 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
             }}
           >
             <table className="w-full text-sm">
-              <thead className={cn("text-left text-xs", dark ? "bg-white/5 text-mist" : "bg-ivory text-muted")}>
+              <thead className={cn("text-left text-[13px]", dark ? "bg-white/5 text-mist" : "bg-ivory text-muted")}>
                 <tr>
                   <th className="w-[45%] min-w-[150px] px-3 py-2 font-semibold">{tx(locale, "Inmueble", "Property")}</th>
                   <th className="whitespace-nowrap px-3 py-2 text-right font-semibold">m²</th>
@@ -118,7 +118,7 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
                     <tr key={c.id} className={cn("border-t", dark ? "border-navy-line" : "border-line")}>
                       <td className="px-3 py-2">
                         <div className="line-clamp-2 break-words font-semibold leading-snug">{(locale === "en" && (c as { title_en?: string }).title_en) || c.title}</div>
-                        <div className={cn("text-xs", muted)}>{c.zone}</div>
+                        <div className={cn("text-[13px]", muted)}>{c.zone}</div>
                       </td>
                       <td className="whitespace-nowrap px-3 py-2 text-right">{num(c.areaM2, locale)}</td>
                       <td className="whitespace-nowrap px-3 py-2 text-right">{dark ? shortMoney(c.priceAmount, locale) : money(c.priceAmount, locale)}</td>

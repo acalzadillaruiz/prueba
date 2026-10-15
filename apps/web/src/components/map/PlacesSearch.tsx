@@ -81,7 +81,7 @@ export function PlacesSearch({ locale, zones, value, onPick, describedBy }: { lo
                 </span>
               </button>
             ))}
-            <div className="border-t border-line px-4 py-1.5 text-right text-[10px] text-muted">{tx(locale, "Elige la urbanización; después puedes ajustar el punto en el mapa", "Pick the neighborhood; you can fine-tune the point on the map afterwards")}</div>
+            <div className="border-t border-line px-4 py-1.5 text-right text-[13px] text-muted">{tx(locale, "Elige la urbanización; después puedes ajustar el punto en el mapa", "Pick the neighborhood; you can fine-tune the point on the map afterwards")}</div>
           </div>
         )}
       </div>

@@ -56,7 +56,7 @@ export function OwnerInbox({ locale, leads, tours, onChanged, manage = true }: {
   if (!leads.length && !upcoming.length) return null;
   return (
     <div className="mt-4 space-y-3">
-      {err && <div role="alert" className="rounded-lg bg-[#B3261E1A] px-3 py-2 text-xs text-danger">{err}</div>}
+      {err && <div role="alert" className="rounded-lg bg-[#B3261E1A] px-3 py-2 text-[13px] text-danger">{err}</div>}
       {upcoming.length > 0 && (
         <div className="rounded-lg border border-line" data-testid="owner-tours">
           <div className="border-b border-line px-3 py-2 text-[13px] font-bold text-muted">{tx(locale, "Visitas", "Visits")} · {upcoming.length}</div>
@@ -82,7 +82,7 @@ export function OwnerInbox({ locale, leads, tours, onChanged, manage = true }: {
               </li>
             ))}
           </ul>
-          <div className="border-t border-line px-3 py-2 text-[11px] text-muted">{tx(locale, "Tú atiendes las visitas: avisa a la persona si cambias algo.", "You attend the visits: let the person know if anything changes.")}</div>
+          <div className="border-t border-line px-3 py-2 text-[13px] text-muted">{tx(locale, "Tú atiendes las visitas: avisa a la persona si cambias algo.", "You attend the visits: let the person know if anything changes.")}</div>
         </div>
       )}
       {leads.length > 0 && (
@@ -97,7 +97,7 @@ export function OwnerInbox({ locale, leads, tours, onChanged, manage = true }: {
                     <span className="font-semibold">{ld.name}</span>
                     <a href={`mailto:${ld.email}`} className="font-semibold text-navy underline decoration-navy/30 underline-offset-4">{ld.email}</a>
                     {ld.phone && <a href={`tel:${ld.phone}`} className="font-semibold text-navy underline decoration-navy/30 underline-offset-4">{ld.phone}</a>}
-                    <TimeAgo iso={ld.createdAt} locale={locale} className="ml-auto text-xs text-muted" />
+                    <TimeAgo iso={ld.createdAt} locale={locale} className="ml-auto text-[13px] text-muted" />
                   </div>
                   <p className="mt-0.5 line-clamp-2 text-ink/70">{ld.message}</p>
                   {proposing === ld.id ? (
@@ -118,11 +118,11 @@ export function OwnerInbox({ locale, leads, tours, onChanged, manage = true }: {
                         {busy === `tour-${ld.id}` ? <Loader2 size={13} className="animate-spin" /> : <Check size={13} />} {tx(locale, "Confirmar visita", "Confirm visit")}
                       </Button>
                       <Button size="sm" type="button" variant="ghost" onClick={() => setProposing(null)}>{tx(locale, "Cancelar", "Cancel")}</Button>
-                      <span className="w-full text-[11px] text-muted">{tx(locale, "Le enviamos un correo con la confirmación.", "We email them the confirmation.")}</span>
+                      <span className="w-full text-[13px] text-muted">{tx(locale, "Le enviamos un correo con la confirmación.", "We email them the confirmation.")}</span>
                     </form>
                   ) : (
                     manage && !booked && (
-                      <button type="button" className={cn("mt-1.5 inline-flex min-h-9 items-center gap-1.5 text-xs font-semibold text-navy underline decoration-navy/30 underline-offset-4")} onClick={() => { setProposing(ld.id); setAt(""); setErr(null); }}>
+                      <button type="button" className={cn("mt-1.5 inline-flex min-h-9 items-center gap-1.5 text-[13px] font-semibold text-navy underline decoration-navy/30 underline-offset-4")} onClick={() => { setProposing(ld.id); setAt(""); setErr(null); }}>
                         <CalendarPlus size={13} /> {tx(locale, "Proponer una visita", "Propose a visit")}
                       </button>
                     )
@@ -132,7 +132,7 @@ export function OwnerInbox({ locale, leads, tours, onChanged, manage = true }: {
             })}
           </ul>
           {leads.length > 5 && (
-            <button type="button" className="w-full border-t border-line px-3 py-2 text-left text-[11px] font-semibold text-navy" onClick={() => setShowAll((v) => !v)}>
+            <button type="button" className="w-full border-t border-line px-3 py-2 text-left text-[13px] font-semibold text-navy" onClick={() => setShowAll((v) => !v)}>
               {showAll ? tx(locale, "Ver menos", "Show less") : tx(locale, `Ver ${leads.length - 5} más`, `Show ${leads.length - 5} more`)}
             </button>
           )}

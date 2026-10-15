@@ -21,7 +21,7 @@ export function BilingualBody({ l, locale, dark }: { l: Listing; locale: Locale;
         <span className={cn("text-sm", dark ? "text-mist" : "text-muted")}>{tx(locale, "En español e inglés", "In Spanish and English")}</span>
       </div>
       {/* The title is already the page's H1: this section is the description. */}
-      <h2 className="font-serif text-[26px] leading-tight">{tx(locale, "Descripción", "Description")}</h2>
+      <h2 className="np-t-h2 font-serif">{tx(locale, "Descripción", "Description")}</h2>
       {lang !== locale && (
         <p lang={lang} className="mt-2 text-[17px] font-semibold">
           {lang === "es" ? l.title_es : l.title_en}
@@ -53,7 +53,7 @@ export function PriceHistory({ events, locale, dark }: { events: PriceEvent[]; l
                 <td className={cn("px-4 py-2.5", dark ? "text-mist" : "text-muted")}>{dateTime(e.date, locale, { day: "numeric", month: "short", year: "numeric" })}</td>
                 <td className="px-4 py-2.5 font-semibold">{tx(locale, label[e.kind][0], label[e.kind][1])}</td>
                 <td className="px-4 py-2.5 text-right font-serif text-[17px] font-light">{money(e.amount, locale)}</td>
-                <td className={cn("w-20 px-4 py-2.5 text-right text-xs font-bold", d < 0 ? "text-ok" : d > 0 ? "text-danger" : "text-transparent")}>{d ? `${d.toFixed(1)} %` : "—"}</td>
+                <td className={cn("w-20 px-4 py-2.5 text-right text-[13px] font-bold", d < 0 ? "text-ok" : d > 0 ? "text-danger" : "text-transparent")}>{d ? `${d.toFixed(1)} %` : "—"}</td>
               </tr>
             );
           })}

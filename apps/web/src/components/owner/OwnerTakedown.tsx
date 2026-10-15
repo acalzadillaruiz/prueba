@@ -26,11 +26,11 @@ export function OwnerTakedown({ locale, listingId, reason, appealedAt, onAppeale
           <div className="mt-0.5 text-ink/80">
             {tx(locale, "Motivo:", "Reason:")} <span className="font-semibold">{reason}</span>
           </div>
-          <div className="mt-1 text-xs text-muted">{tx(locale, "Mientras esté retirado no aparece en el buscador. Si crees que es un error, cuéntanos por qué.", "While it’s down it doesn’t show in search. If you think it’s a mistake, tell us why.")}</div>
+          <div className="mt-1 text-[13px] text-muted">{tx(locale, "Mientras esté retirado no aparece en el buscador. Si crees que es un error, cuéntanos por qué.", "While it’s down it doesn’t show in search. If you think it’s a mistake, tell us why.")}</div>
         </div>
       </div>
       {sentAt ? (
-        <div className="mt-2.5 rounded-lg bg-white px-3 py-2 text-xs dark:bg-white/[.05]" role="status">
+        <div className="mt-2.5 rounded-lg bg-white px-3 py-2 text-[13px] dark:bg-white/[.05]" role="status">
           {tx(locale, "Recibimos tu apelación", "We got your appeal")} (<TimeAgo iso={sentAt} locale={locale} />). {tx(locale, "Te escribimos por correo cuando la revisemos.", "We’ll email you once we’ve reviewed it.")}
         </div>
       ) : open ? (
@@ -63,7 +63,7 @@ export function OwnerTakedown({ locale, listingId, reason, appealedAt, onAppeale
             placeholder={tx(locale, "Por ejemplo: las fotos son de mi casa y puedo mostrar el documento de propiedad.", "For example: the photos are of my home and I can show the title deed.")}
             aria-label={tx(locale, "¿Por qué debería volver a publicarse?", "Why should it go back online?")}
           />
-          {err && <p role="alert" className="text-xs font-semibold text-danger">{err}</p>}
+          {err && <p role="alert" className="text-[13px] font-semibold text-danger">{err}</p>}
           <div className="flex flex-wrap gap-2">
             <Button size="sm" variant="navy" type="submit" disabled={busy}>{busy && <Loader2 size={13} className="animate-spin" />} {tx(locale, "Enviar apelación", "Send appeal")}</Button>
             <Button size="sm" variant="ghost" type="button" onClick={() => setOpen(false)}>{tx(locale, "Cancelar", "Cancel")}</Button>

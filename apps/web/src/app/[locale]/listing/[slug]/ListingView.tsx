@@ -205,8 +205,8 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
               </div>
               <div className="lg:flex lg:items-end lg:justify-between lg:gap-12">
                 <div className="min-w-0">
-                  <h1 className="mt-5 max-w-[760px] text-[21px] max-md:[font-size-adjust:none] md:text-[52px] lg:mt-4 lg:text-[48px]">{tx(locale, l.title_es, l.title_en)}</h1>
-                  <p className="mt-2 text-[15px] text-muted">{l.address} · {l.zone}, {l.city}{l.state && l.state !== l.city ? `, ${l.state}` : ""}</p>
+                  <h1 className="np-t-h1 mt-5 max-w-[760px] max-md:[font-size-adjust:none] lg:mt-4">{tx(locale, l.title_es, l.title_en)}</h1>
+                  <p className="np-t-body mt-2 text-ink">{l.address} · {l.zone}, {l.city}{l.state && l.state !== l.city ? `, ${l.state}` : ""}</p>
                 </div>
                 {/* Desktop: aligned to the title's baseline, but never higher than the title's own top margin: with a one-line
                     title the price block is the taller one, and it used to climb into the Compare/Share row. */}
@@ -356,7 +356,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
 
         {similar.length > 0 && (
           <section className="mx-auto max-w-[1320px] pb-20 pt-10 md:px-8" aria-labelledby="similar-title" data-testid="similar">
-            <h2 id="similar-title" className="mb-6 px-4 text-[30px] leading-tight tracking-[-0.02em] md:mb-8 md:px-0 md:text-[46px]">{tx(locale, "También te pueden gustar", "You might also like")}</h2>
+            <h2 id="similar-title" className="np-t-h1 mb-6 px-4 md:mb-8 md:px-0">{tx(locale, "También te pueden gustar", "You might also like")}</h2>
             {/* Phones: a swipe row (snap per card, the next one peeking). From sm up: a grid. */}
             <ul className="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-px-4 px-4 pb-2 sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:px-4 md:px-0 lg:grid-cols-4">
               {similar.map((s) => (

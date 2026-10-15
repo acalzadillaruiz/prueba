@@ -58,7 +58,7 @@ export default async function SellPage({ params }: { params: Promise<{ locale: L
       <section className="np-grain relative overflow-hidden">
         <div className="mx-auto grid max-w-[1320px] items-start gap-10 px-4 pb-16 pt-10 md:px-8 lg:grid-cols-[1.1fr_480px] lg:gap-16 lg:pb-24 lg:pt-20">
           <div className="lg:pt-6">
-            <h1 className="mt-3 max-w-[640px] text-[40px] leading-[1.04] tracking-[-0.02em] md:text-[60px]">
+            <h1 className="np-t-h1 mt-3 max-w-[640px]">
               {tx(locale, "Vende tu casa", "Sell your home")} <span className="text-gold-text">{tx(locale, "al precio justo.", "at the right price.")}</span>
             </h1>
             <p className="mt-5 max-w-[520px] text-[17px] leading-relaxed text-ink/75">
@@ -78,7 +78,7 @@ export default async function SellPage({ params }: { params: Promise<{ locale: L
       </section>
 
       <section className="mx-auto max-w-[1320px] px-4 py-14 md:px-8 lg:py-20" aria-labelledby="sell-why">
-        <h2 id="sell-why" className="mt-3 max-w-[720px] text-[32px] leading-[1.08] tracking-[-0.02em] md:text-[44px]">
+        <h2 id="sell-why" className="np-t-h1 mt-3 max-w-[720px]">
           {tx(locale, "Sabes qué recibes y qué pagas.", "You know what you get and what you pay.")}
         </h2>
         <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -86,7 +86,7 @@ export default async function SellPage({ params }: { params: Promise<{ locale: L
             <li key={t} className="rounded-[4px] bg-white/70 p-6 outline outline-1 -outline-offset-1 outline-black/[.04]">
               <Icon size={22} strokeWidth={1.5} className="text-[#0E1A2B]" aria-hidden />
               <h3 className="mt-4 font-serif text-[24px] leading-tight">{t}</h3>
-              <p className="mt-2 text-[15px] leading-relaxed text-muted">{d}</p>
+              <p className="np-t-body mt-2 text-ink">{d}</p>
             </li>
           ))}
         </ul>
@@ -94,13 +94,13 @@ export default async function SellPage({ params }: { params: Promise<{ locale: L
 
       <section id="como-funciona" className="scroll-mt-24 border-t border-line" aria-labelledby="sell-steps">
         <div className="mx-auto max-w-[1320px] px-4 py-14 md:px-8 lg:py-20">
-          <h2 id="sell-steps" className="mt-3 text-[32px] leading-[1.08] tracking-[-0.02em] md:text-[44px]">{tx(locale, "Publica en tres pasos", "List in three steps")}</h2>
+          <h2 id="sell-steps" className="np-t-h1 mt-3">{tx(locale, "Publica en tres pasos", "List in three steps")}</h2>
           <ol className="mt-10 grid gap-8 md:grid-cols-3">
             {steps.map(([t, d], i) => (
               <li key={t} className="border-t border-ink/15 pt-5">
                 <span className="font-serif text-[44px] leading-none text-[#C9BFAE] [font-feature-settings:'lnum']">{i + 1}</span>
                 <h3 className="mt-3 font-display text-[18px] font-semibold text-ink">{t}</h3>
-                <p className="mt-1.5 text-[15px] leading-relaxed text-muted">{d}</p>
+                <p className="np-t-body mt-1.5 text-ink">{d}</p>
               </li>
             ))}
           </ol>

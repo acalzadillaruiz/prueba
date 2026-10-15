@@ -9,6 +9,8 @@ import { platformDaysOnMarket } from "@/server/zone-stats";
 import { pageMeta } from "@/lib/seo";
 import { plural, tx } from "@/lib/i18n";
 import sellPhoto from "../../../../public/brand/patio.jpg";
+import { PhotoBand } from "@/components/home/PhotoBand";
+import { PHOTOS } from "@/lib/media";
 
 // Public, cacheable landing for owners ("Vender con nosotros"); the wizard itself lives at /owner/new.
 export const revalidate = 3600;
@@ -75,21 +77,29 @@ export default async function SellPage({ params }: { params: Promise<{ locale: L
         </div>
       </section>
 
-      {/* 043 · night band: one large photo beside the three steps, an ordered list (no row of equal icon cards). */}
-      <section id="como-funciona" className="scroll-mt-24 bg-navy text-ivory" aria-labelledby="sell-steps">
+      {/* 043-C · night band, full-bleed photo. */}
+      <PhotoBand
+        photo={PHOTOS.salonMar}
+        locale={locale}
+        title={tx(locale, "Tu casa, bien mostrada.", "Your home, shown well.")}
+        body={tx(locale, "Fotos que la hacen justicia, un precio con sentido y compradores que ya saben lo que buscan.", "Photos that do it justice, a price that makes sense and buyers who already know what they want.")}
+      />
+
+      {/* 043 · bone band: one large photo beside the three steps, an ordered list (no row of equal icon cards). */}
+      <section id="como-funciona" className="scroll-mt-24 bg-ivory text-ink" aria-labelledby="sell-steps">
         <div className="mx-auto grid max-w-[1280px] items-center gap-10 px-[clamp(16px,4vw,40px)] py-[clamp(64px,10vw,128px)] lg:grid-cols-[1.1fr_1fr] lg:gap-16">
-          <div className="relative aspect-[4/3] w-full overflow-hidden bg-navy-2 lg:aspect-[4/5]">
+          <div className="relative aspect-[4/3] w-full overflow-hidden bg-arena lg:aspect-[4/5]">
             <Image src={sellPhoto} alt={tx(locale, "Entrada de una casa blanca con jardín, lista para enseñar", "Entrance of a white house with a garden, ready to show")} fill placeholder="blur" sizes="(max-width: 1024px) 92vw, 620px" className="object-cover" />
           </div>
           <div>
-            <h2 id="sell-steps" className="np-t-h1 text-ivory">{tx(locale, "Publica en tres pasos", "List in three steps")}</h2>
+            <h2 id="sell-steps" className="np-t-band">{tx(locale, "Publica en tres pasos", "List in three steps")}</h2>
             <ol className="mt-8 space-y-7">
               {steps.map(([t, d], i) => (
                 <li key={t} className="grid grid-cols-[2.5rem_1fr] gap-x-4">
-                  <span aria-hidden className="font-title text-[36px] leading-none text-mist">{i + 1}</span>
+                  <span aria-hidden className="font-title text-[36px] leading-none text-muted">{i + 1}</span>
                   <div>
-                    <h3 className="font-display text-[20px] font-medium text-ivory">{t}</h3>
-                    <p className="np-t-body mt-1 text-mist">{d}</p>
+                    <h3 className="font-display text-[20px] font-medium text-ink">{t}</h3>
+                    <p className="np-t-body mt-1 text-ink">{d}</p>
                   </div>
                 </li>
               ))}

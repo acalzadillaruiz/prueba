@@ -9,6 +9,8 @@ import { factsLine } from "@/components/listing/ListingCard";
 import { HomeMotion } from "@/components/home/HomeMotion";
 import { HeroAura } from "@/components/home/HeroAura";
 import { HowWeWork } from "@/components/home/HowWeWork";
+import { PhotoBand } from "@/components/home/PhotoBand";
+import { PHOTOS } from "@/lib/media";
 import salonMar from "../../../public/brand/salon-mar.jpg";
 import { CollectionRail } from "@/components/home/CollectionRail";
 import { RemoteRoute } from "@/components/home/RemoteRoute";
@@ -226,20 +228,18 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
         </RemoteRoute>
       </div>
 
-      {/* THE PROMISE — a solid Taupe block with light text (AMALI's quote blocks). */}
-      <section className="bg-[#6B5D52] text-[#F6F2EC]" aria-label={tx(locale, "Nuestra promesa", "Our promise")}>
-        <div className="mx-auto max-w-[1100px] px-6 py-14 text-center md:px-10 md:py-20">
-          <blockquote className="mx-auto max-w-[820px] font-title text-[24px] font-light leading-[1.25] tracking-[.01em] md:text-[34px]">
-            {tx(
-              locale,
-              "Pocas casas, bien elegidas. Sabemos lo que valen y te acompañamos hasta las llaves.",
-              "A few homes, well chosen. We know what they're worth and we stay with you until the keys.",
-            )}
-          </blockquote>
-
-          <p className="mt-6 font-display text-[13px] font-light tracking-[.14em] text-[#F6F2EC]/85">{tx(locale, "Un asesor te atiende a cualquier hora", "An advisor answers at any hour")}</p>
-        </div>
-      </section>
+      {/* 043-C · night band, full-bleed photo: «Entre el Ávila y el mar», one idea on it. */}
+      <PhotoBand
+        id="entre-el-avila-y-el-mar"
+        photo={PHOTOS.torreAtardecer}
+        locale={locale}
+        title={tx(locale, "Pocas casas, bien elegidas.", "A few homes, well chosen.")}
+        body={tx(locale, "Sabemos lo que valen y te acompañamos hasta las llaves. Un asesor te atiende a cualquier hora.", "We know what they're worth and we stay with you until the keys. An advisor answers at any hour.")}
+      >
+        <Button href={`/${locale}/search?type=SALE`} size="lg">
+          {tx(locale, "Ver casas", "See homes")}
+        </Button>
+      </PhotoBand>
 
       {/* VENDA EN PRIVADO */}
       <section className="relative overflow-hidden bg-ivory">

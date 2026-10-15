@@ -106,7 +106,6 @@ export function ListingCard({ l, locale, compact, className, compareToggle }: { 
   const metaId = `card-${l.id}-meta`;
   return (
     <article
-      data-spotlight
       data-listing-card
       className={cn(
         "group relative isolate rounded-[2px] has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-navy has-[a:focus-visible]:ring-offset-4 has-[a:focus-visible]:ring-offset-ivory",

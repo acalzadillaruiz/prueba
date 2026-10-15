@@ -55,7 +55,7 @@ export default async function SellPage({ params }: { params: Promise<{ locale: L
   ];
   return (
     <PublicPage locale={locale} tabbar>
-      <section className="np-grain relative overflow-hidden">
+      <section className="relative overflow-hidden">
         <div className="mx-auto grid max-w-[1320px] items-start gap-10 px-4 pb-16 pt-10 md:px-8 lg:grid-cols-[1.1fr_480px] lg:gap-16 lg:pb-24 lg:pt-20">
           <div className="lg:pt-6">
             <h1 className="np-t-h1 mt-3 max-w-[640px]">

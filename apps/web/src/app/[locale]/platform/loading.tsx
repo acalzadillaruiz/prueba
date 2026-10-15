@@ -6,7 +6,7 @@ export default function Loading() {
     <div className="min-h-svh bg-ivory lg:pl-[264px] dark:bg-[#0E1A2B]" aria-busy="true" aria-live="polite">
       <div className="fixed inset-y-0 left-0 hidden w-[264px] bg-navy lg:block" />
       <div className="h-[104px] bg-navy lg:hidden" />
-      <div className="mx-auto max-w-[1360px] animate-pulse space-y-6 px-4 pb-16 pt-6 md:px-10 md:pt-10">
+      <div className="mx-auto max-w-[1360px] opacity-70 space-y-6 px-4 pb-16 pt-6 md:px-10 md:pt-10">
         <div className="space-y-3">
           <div className={`h-3 w-40 ${bone}`} />
           <div className={`h-10 w-72 max-w-full ${bone}`} />

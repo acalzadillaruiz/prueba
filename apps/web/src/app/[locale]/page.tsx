@@ -110,16 +110,13 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
       {/* HERO — cinema, full screen: the coast at sunset with the search on it. */}
       <HeroAura locale={locale} available={available.length} />
 
-      {/* ZONES — they glide by, endlessly. */}
-      <div className="relative overflow-hidden bg-ivory py-5 md:py-7" aria-label={tx(locale, "Dónde estamos", "Where we are")}>
-        <div className="np-marquee gap-12 pr-12">
-          {[...marquee, ...marquee].map((z, i) => (
-            <span key={i} aria-hidden={i >= marquee.length || undefined} className="flex shrink-0 items-center gap-12 font-title text-[24px] font-light tracking-[.01em] text-ink/80 md:text-[36px]">
-              {z}
-              <span className="text-muted" aria-hidden>·</span>
-            </span>
+      {/* ZONES (043): a still line of places, no endless marquee. */}
+      <div className="bg-ivory px-[clamp(16px,4vw,40px)] py-6 md:py-8">
+        <ul aria-label={tx(locale, "Dónde estamos", "Where we are")} className="mx-auto flex max-w-[1280px] flex-wrap gap-x-6 gap-y-1 font-title text-[24px] text-ink md:gap-x-10 md:text-[32px]">
+          {marquee.map((z) => (
+            <li key={z}>{z}</li>
           ))}
-        </div>
+        </ul>
       </div>
 
       {/* COLECCIÓN PRIVADA — real homes right after the hero: horizontal gallery */}
@@ -149,7 +146,7 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
             <ul data-reveal="stagger" data-zone-rail className="no-scrollbar -mx-4 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 md:mx-0 md:grid md:snap-none md:grid-cols-2 md:overflow-visible md:px-0 lg:flex lg:flex-col">
               {saleZones.map((z) => (
                 <li key={z.zone} className="w-[78%] shrink-0 snap-start sm:w-[46%] md:w-auto">
-                  <Link href={z.href} data-spotlight className="np-glass group flex h-full min-h-[88px] items-stretch overflow-hidden rounded-[4px] transition-transform duration-500 hover:-translate-y-0.5 md:min-h-[104px]">
+                  <Link href={z.href} className="np-glass group flex h-full min-h-[88px] items-stretch overflow-hidden rounded-[4px] transition-transform duration-500 hover:-translate-y-0.5 md:min-h-[104px]">
                     <span className="relative m-2 w-[56px] shrink-0 overflow-hidden rounded-[4px] sm:w-[84px] lg:w-[100px]">
                       <Image src={z.photo} alt="" fill sizes="112px" className="object-cover transition-transform duration-700 group-hover:scale-105" />
                     </span>

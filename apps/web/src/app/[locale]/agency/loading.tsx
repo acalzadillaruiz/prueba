@@ -7,7 +7,7 @@ export default function Loading() {
       <div className="fixed inset-y-0 left-0 hidden w-[264px] bg-navy lg:block" />
       <div className="h-14 bg-navy lg:hidden" />
       <div className="fixed inset-x-0 bottom-0 h-[60px] border-t border-[#E6DFD3] bg-white lg:hidden dark:border-white/10 dark:bg-[#0E1A2B]" />
-      <div className="mx-auto max-w-[1360px] animate-pulse space-y-6 px-4 pb-16 pt-6 md:px-10 md:pt-10">
+      <div className="mx-auto max-w-[1360px] opacity-70 space-y-6 px-4 pb-16 pt-6 md:px-10 md:pt-10">
         <div className="space-y-3">
           <div className={`h-3 w-40 ${bone}`} />
           <div className={`h-10 w-72 max-w-full ${bone}`} />

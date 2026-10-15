@@ -217,7 +217,7 @@ export function MediaView({ locale, jobs, listings, names = {}, manage = null }:
                 </button>
               ))}
             </div>
-            <div className="mt-3 h-1.5 rounded-full bg-[#E6DFD3] dark:bg-white/10"><div className="h-full rounded-full bg-navy transition-all duration-500 dark:bg-ivory" style={{ width: `${Math.min(100, (photos.length / 20) * 100)}%` }} /></div>
+            <div className="mt-3 h-1.5 rounded-full bg-[#E6DFD3] dark:bg-white/10"><div className="h-full rounded-full bg-navy transition-[width] duration-500 dark:bg-ivory" style={{ width: `${Math.min(100, (photos.length / 20) * 100)}%` }} /></div>
             {photos.length ? (
               <div className="mt-5 grid grid-cols-3 gap-2 sm:grid-cols-5 lg:grid-cols-6">
                 {photos.map((src, i) => (

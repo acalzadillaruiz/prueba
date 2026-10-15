@@ -143,7 +143,7 @@ export function Freshness({ iso, locale, className }: { iso: string; locale: Loc
   return (
     <span className={cn("inline-flex items-center gap-1.5 text-[13px]", className)}>
       {/* Relative time differs between the cached server HTML and the browser: not a hydration error. */}
-      <span className={cn("relative h-2 w-2 rounded-full", minutes < 60 ? "np-pulse bg-[#2F6F4E]" : "bg-mist")} suppressHydrationWarning />
+      <span className={cn("relative h-2 w-2 rounded-full", minutes < 60 ? "bg-[#2F6F4E]" : "bg-mist")} suppressHydrationWarning />
       <span>
         {tx(locale, "Actualizado", "Updated")}{" "}
         <time dateTime={iso} suppressHydrationWarning>

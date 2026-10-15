@@ -11,32 +11,9 @@ import { gsap, ScrollTrigger } from "./motion";
  *  - [data-magnetic]    leans toward the cursor (buttons)
  * Nothing runs when the visitor prefers reduced motion: the page is fully readable without it.
  * Everything starts after first paint (requestIdleCallback, setTimeout fallback) so it never competes with the
- * hero for the main thread. The hero aurora is paused while the hero is off screen.
+ * hero for the main thread.
  */
 export function HomeMotion() {
-  // The aurora's blobs (CSS keyframes) stop animating whenever their hero is out of view.
-  useEffect(() => {
-    const auras = Array.from(document.querySelectorAll<HTMLElement>(".np-aura"));
-    if (!auras.length || typeof IntersectionObserver === "undefined") return;
-    const setPlaying = (aura: HTMLElement, on: boolean) => {
-      const state = on ? "" : "paused";
-      aura.style.animationPlayState = state;
-      aura.querySelectorAll<HTMLElement>("i").forEach((b) => (b.style.animationPlayState = state));
-      aura.classList.toggle("is-paused", !on);
-    };
-    const io = new IntersectionObserver((entries) => {
-      for (const en of entries) setPlaying(en.target as HTMLElement, en.isIntersecting);
-    });
-    auras.forEach((a) => io.observe(a));
-    const onVisibility = () => auras.forEach((a) => document.hidden && setPlaying(a, false));
-    document.addEventListener("visibilitychange", onVisibility);
-    return () => {
-      io.disconnect();
-      document.removeEventListener("visibilitychange", onVisibility);
-      auras.forEach((a) => setPlaying(a, true));
-    };
-  }, []);
-
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     let stop: (() => void) | undefined;

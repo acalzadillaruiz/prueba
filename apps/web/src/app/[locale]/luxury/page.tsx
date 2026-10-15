@@ -1,6 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Locale } from "@/types/domain";
+import { PhotoBand } from "@/components/home/PhotoBand";
+import { PHOTOS } from "@/lib/media";
 import { PublicPage } from "@/components/layout/PublicPage";
 import { listingPhoto } from "@/lib/photos";
 import { PropertyArt } from "@/components/art/PropertyArt";
@@ -9,7 +11,7 @@ import { factsLine } from "@/components/listing/ListingCard";
 import { SaveButton } from "@/components/listing/bits";
 import { publicListings } from "@/server/listings";
 import { prisma } from "@newplace/db";
-import { money, tx } from "@/lib/i18n";
+import { money, tx, moneyUi } from "@/lib/i18n";
 import { pageMeta } from "@/lib/seo";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }) {
@@ -42,12 +44,12 @@ export default async function LuxuryPage({ params }: { params: Promise<{ locale:
           className="-z-20 object-cover"
         />
         <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-[rgb(14_26_43/.55)]" />
-        <div className="relative mx-auto w-full max-w-[1320px] px-4 pb-14 pt-[140px] md:px-8 lg:pb-20">
-                    <h1 className="np-t-h1 mt-5 max-w-[860px] text-white">
-            {tx(locale, "Casas exclusivas", "Exclusive homes")} <span className="text-white/75">{tx(locale, "que ves en privado.", "you see in private.")}</span>
+        <div data-reveal="stagger" className="np-gutter relative mx-auto w-full max-w-[1280px] box-content pb-[clamp(56px,8vw,120px)] pt-[140px]">
+          <h1 className="np-t-band max-w-[900px] text-ivory">
+            {tx(locale, "Casas exclusivas", "Exclusive homes")} <span className="text-mist">{tx(locale, "que ves en privado.", "you see in private.")}</span>
           </h1>
 
-          <p className="mt-6 max-w-[560px] text-[17px] font-light leading-relaxed text-white/90">
+          <p className="np-t-lead mt-7 max-w-[560px] text-ivory">
             {tx(
               locale,
               `${lux.length} ${lux.length === 1 ? "casa elegida" : "casas elegidas"} una a una y valoradas con ventas reales. Algunas solo se ven en privado: pide acceso.`,
@@ -57,9 +59,9 @@ export default async function LuxuryPage({ params }: { params: Promise<{ locale:
         </div>
       </section>
 
-      <section className="mx-auto max-w-[1320px] px-4 py-20 md:px-8 lg:py-28">
-        <div className="mb-10 flex flex-wrap items-end justify-between gap-4 pb-6">
-          <h2 className="np-t-h1">{tx(locale, "Un asesor y un precio claro", "An advisor and a clear price")}</h2>
+      <section className="np-gutter mx-auto max-w-[1280px] box-content py-[var(--np-section)]">
+        <div data-reveal className="mb-12 flex flex-wrap items-end justify-between gap-6">
+          <h2 className="np-t-band">{tx(locale, "Un asesor y un precio claro", "An advisor and a clear price")}</h2>
           <p className="np-t-body max-w-md text-ink">{tx(locale, "Cada casa tiene su asesor y un valor calculado con ventas reales de la zona.", "Each home has its own advisor and a value worked out from real sales nearby.")}</p>
         </div>
         {!hero ? (
@@ -71,16 +73,16 @@ export default async function LuxuryPage({ params }: { params: Promise<{ locale:
               const wide = i === 0 || (i === lux.length - 1 && (lux.length - 1) % 2 === 1);
               return (
               <Link key={l.id} href={`/${locale}/listing/${l.slug}`} className={wide ? "group md:col-span-2" : "group"}>
-                <div className={(wide ? "aspect-[4/3] md:aspect-[21/9]" : "aspect-[4/3]") + " relative overflow-hidden rounded-[2px] bg-arena"}>
+                <div className={(wide ? "aspect-[4/3] md:aspect-[21/9]" : "aspect-[4/3]") + " relative overflow-hidden bg-arena"}>
                   <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="h-full w-full transition-transform duration-700 group-hover:scale-[1.02]" />
                   <div className="absolute left-4 top-4"><Badge tone="exclusive">{tx(locale, "Exclusiva New Place", "New Place exclusive")}</Badge></div>
                   <SaveButton id={l.id} locale={locale} className="absolute right-3 top-3" />
                 </div>
                 <div className="mt-5 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                  <span className="font-display text-[14px] font-medium md:text-[15px]">{tx(locale, l.title_es, l.title_en)}</span>
-                  <span className="font-serif text-[26px] font-light text-ink">{money(l.priceAmount, locale)}</span>
+                  <span className="font-display text-[17px] font-medium">{tx(locale, l.title_es, l.title_en)}</span>
+                  <span className="font-title text-[28px] text-ink [font-variant-numeric:lining-nums_tabular-nums]">{moneyUi(l.priceAmount, locale)}</span>
                 </div>
-                <div className="mt-1 text-[15px] text-muted">{l.zone}, {l.city} · {factsLine(l, locale).join(" · ")}</div>
+                <div className="mt-1 text-[16px] text-muted">{l.zone}, {l.city} · {factsLine(l, locale).join(" · ")}</div>
               </Link>
               );
             })}
@@ -88,13 +90,20 @@ export default async function LuxuryPage({ params }: { params: Promise<{ locale:
         )}
       </section>
 
-      <section id="acceso" data-hide-fab className="np-navy-panel scroll-mt-24 bg-navy text-ivory">
-        <div className="mx-auto grid max-w-[1320px] items-center gap-10 px-4 py-20 md:px-8 lg:grid-cols-[1.2fr_1fr] lg:py-24">
+      <PhotoBand
+        photo={PHOTOS.salonMar}
+        locale={locale}
+        title={tx(locale, "Algunas casas solo se ven en privado.", "Some homes are only shown in private.")}
+        body={tx(locale, "Sin fotos públicas ni dirección en el mapa: te las enseña tu asesor, con cita.", "No public photos or map address: your advisor shows them to you, by appointment.")}
+      />
+
+      <section id="acceso" data-hide-fab className="np-band scroll-mt-24 bg-arena text-ink">
+        <div data-reveal="stagger" className="np-gutter mx-auto grid max-w-[1280px] box-content items-center gap-12 py-[var(--np-section)] lg:grid-cols-[1.2fr_1fr]">
           <div>
-            <h2 className="np-t-h1 mt-3">
+            <h2 className="np-t-band">
               {tx(locale, `${privateCount} ${privateCount === 1 ? "casa privada disponible" : "casas privadas disponibles"}`, `${privateCount} private home${privateCount === 1 ? "" : "s"} available`)}
             </h2>
-            <ul className="mt-6 space-y-3 text-[15px] text-ivory/80">
+            <ul className="mt-8 space-y-3 text-[17px] text-ink">
               {[
                 tx(locale, "Solo por enlace, después de una breve charla para conocerte", "By link only, after a short chat to get to know you"),
                 tx(locale, "Visitas privadas, con la agenda real de tu asesor", "Private viewings, on your advisor’s real calendar"),
@@ -104,8 +113,8 @@ export default async function LuxuryPage({ params }: { params: Promise<{ locale:
               ))}
             </ul>
           </div>
-          <div className="rounded-[4px] border border-[#C9BFAE]/40 p-8 text-center">
-            <p className="mx-auto max-w-sm text-[15px] text-ivory/80">{tx(locale, "Escríbele a un asesor de la colección. Tras una breve charla, te enviamos el enlace.", "Write to a collection advisor. After a short chat, we’ll send you the link.")}</p>
+          <div className="bg-ivory p-8 text-center md:p-10">
+            <p className="np-t-body mx-auto max-w-sm text-ink">{tx(locale, "Escríbele a un asesor de la colección. Tras una breve charla, te enviamos el enlace.", "Write to a collection advisor. After a short chat, we’ll send you the link.")}</p>
             {hero && (
               <Button href={`/${locale}/listing/${hero.slug}#contact`} variant="primary" size="lg" className="mt-6">
                 {tx(locale, "Pedir acceso", "Ask for access")}

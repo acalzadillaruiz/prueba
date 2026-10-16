@@ -10,7 +10,6 @@ import { HeroAura } from "@/components/home/HeroAura";
 import { HowWeWork } from "@/components/home/HowWeWork";
 import { PhotoBand } from "@/components/home/PhotoBand";
 import { PHOTOS } from "@/lib/media";
-import salonMar from "../../../public/brand/salon-mar.jpg";
 import { CollectionRail } from "@/components/home/CollectionRail";
 import { RemoteRoute } from "@/components/home/RemoteRoute";
 import { listingHref } from "@/lib/listing-href";
@@ -261,7 +260,7 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
           {/* Portrait only beside the copy (lg); stacked below it (phones, tablets) a landscape band. */}
           <div data-reveal className="relative aspect-[16/10] w-full overflow-hidden bg-[#E9E1D3] lg:aspect-[4/3]">
             <div className="absolute inset-0">
-              <Image src={salonMar} alt={tx(locale, "Imagen ilustrativa", "Illustrative image")} fill placeholder="blur" sizes="(max-width: 1024px) 90vw, 560px" className="object-cover" />
+              <Image src={PHOTOS.costaAtardecer.src} alt={tx(locale, PHOTOS.costaAtardecer.alt.es, PHOTOS.costaAtardecer.alt.en)} fill sizes="(max-width: 1024px) 90vw, 560px" className="object-cover" style={{ objectPosition: PHOTOS.costaAtardecer.focus }} />
             </div>
           </div>
         </div>

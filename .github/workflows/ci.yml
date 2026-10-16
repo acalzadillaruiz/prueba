@@ -30,6 +30,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - run: npm run generate -w packages/db
       - run: npx playwright install --with-deps chromium
       - run: npm run db:setup
       - run: npm run lint

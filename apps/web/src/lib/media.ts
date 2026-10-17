@@ -6,27 +6,27 @@
  */
 export type Photo = { src: string; width: number; height: number; focus: string; alt: { es: string; en: string } };
 
-const p = (name: string, focus: string, es: string, en: string): Photo => ({
-  src: `/media/032/032-${name}-1280.webp`,
-  width: 1280,
-  height: 720,
-  focus,
-  alt: { es, en },
-});
+const q = (file: string, width: number, height: number, focus: string, es: string, en: string): Photo => ({ src: `/media/048/${file}`, width, height, focus, alt: { es, en } });
 
+/**
+ * 048 · real photographs (Unsplash Licence, free use; credits in public/media/048/CREDITOS.txt). No renders, and no
+ * photo appears twice on a page. Keys keep their historical names so every band follows without code changes.
+ */
 export const PHOTOS = {
-  /** «Entre el Ávila y el mar» band and the provisional hero loop. */
-  torreAtardecer: p("torre-atardecer-2", "70% 50%", "Torre blanca frente al mar al atardecer, con la marina a sus pies", "White seafront tower at sunset, with the marina below"),
-  /** Colección Privada band and /sell. */
-  salonMar: p("interior-salon-mar", "50% 55%", "Salón luminoso con ventanales abiertos al mar", "Bright living room with windows open to the sea"),
-  torreMarina: p("hero-torre-marina", "40% 50%", "Torre residencial sobre la marina de Lechería", "Residential tower over the Lechería marina"),
-  costaAtardecer: p("hero-costa-atardecer", "50% 50%", "Costa con casas sobre el mar al atardecer", "Coastline with homes over the sea at sunset"),
+  /** «Pocas casas, bien elegidas» band. */
+  torreAtardecer: q("villa-piscina-1800.webp", 1800, 1012, "50% 60%", "Casa moderna blanca con piscina bajo el cielo azul", "White modern house with a pool under a blue sky"),
+  /** Colección privada band. */
+  salonMar: q("salon-luz-1200.webp", 1200, 1500, "45% 50%", "Salón luminoso con grandes ventanales", "Bright living room with large windows"),
+  /** «Compra sin sorpresas». */
+  torreMarina: q("villa-terraza-1800.webp", 1800, 1012, "50% 50%", "Villa contemporánea con terrazas y piscina", "Contemporary villa with terraces and a pool"),
+  /** «Vende tu casa» and /sell. */
+  costaAtardecer: q("casa-patio-1800.webp", 1800, 1350, "45% 50%", "Patio con piscina junto a una casa blanca de líneas rectas", "Pool terrace beside a white, clean-lined house"),
 } as const;
 
 /** Hero: the poster is the LCP (16:9 desktop, 4:5 phone); the loop is mounted after load and only when motion and
  *  data allow it. Every file stays under 3 MB (scripts/check-media-size.mjs). */
 export const HERO_MEDIA = {
-  poster: { desktop: "/media/hero-poster.webp", mobile: "/media/hero-poster-mobile.webp", width: 1280, height: 720, mobileWidth: 720, mobileHeight: 900 },
+  poster: { desktop: "/media/048/hero-playa-1920.webp", mobile: "/media/048/hero-playa-movil-900.webp", width: 1920, height: 1080, mobileWidth: 900, mobileHeight: 1125 },
   video: {
     desktop: { webm: "/media/hero-720.webm", mp4: "/media/hero-720.mp4" },
     mobile: { webm: "/media/hero-720x1280.webm", mp4: "/media/hero-720x1280.mp4" },

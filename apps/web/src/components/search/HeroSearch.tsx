@@ -60,8 +60,8 @@ export function HeroSearch({ locale }: { locale: Locale }) {
   };
   // Picking a suggested place searches straight away, with the tab, type and budget already chosen.
   const suggest = usePlaceSuggest({ locale, text, setText, onPick: (next) => void go(next) });
-  const label = "block font-display text-[14px] font-medium text-[#735D3F]";
-  const field = "w-full bg-transparent font-display text-[15px] text-[#1A2026] placeholder:text-[#1A2026]/50 focus:outline-none";
+  const label = "block font-display text-[14px] font-medium text-[#3A6A92]";
+  const field = "w-full bg-transparent font-display text-[15px] text-[#1F3A4D] placeholder:text-[#1F3A4D]/50 focus:outline-none";
   return (
     <form
       data-hide-fab-mobile
@@ -71,7 +71,7 @@ export function HeroSearch({ locale }: { locale: Locale }) {
       }}
       role="search"
       aria-label={tx(locale, "Busca tu casa", "Find your home")}
-      className="w-full max-w-[980px] rounded-[4px] bg-[#F6F2EC] p-3 text-[#1A2026] lg:rounded-full lg:p-2"
+      className="w-full max-w-[980px] rounded-[16px] bg-[#FAF8F4] p-3 text-[#1F3A4D] lg:rounded-full lg:p-2"
     >
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:gap-0">
         <div className="grid grid-cols-3 gap-1 rounded-full bg-[#EDE4D5] p-1 lg:flex lg:shrink-0" role="group" aria-label={tx(locale, "¿Qué quieres hacer?", "What are you looking to do?")}>
@@ -85,15 +85,15 @@ export function HeroSearch({ locale }: { locale: Locale }) {
               }}
               aria-pressed={tab === k}
               className={cn(
-                "min-h-11 rounded-[2px] border-2 px-4 font-display text-[15px] transition-colors duration-np",
-                tab === k ? "border-[#1A2026] bg-[#E9E1D3] font-semibold text-[#1A2026]" : "border-transparent text-[#1A2026]/70 hover:text-[#1A2026]",
+                "min-h-11 rounded-[12px] border-2 px-4 font-display text-[15px] transition-colors duration-np",
+                tab === k ? "border-[#1F3A4D] bg-[#EFE6D8] font-semibold text-[#1F3A4D]" : "border-transparent text-[#1F3A4D]/70 hover:text-[#1F3A4D]",
               )}
             >
               {tx(locale, es, en)}
             </button>
           ))}
         </div>
-        <label className="relative flex min-h-[52px] min-w-0 flex-1 flex-col justify-center rounded-2xl border border-[#8F8370]/50 bg-[#ffffff99] px-4 focus-within:border-[#1A2026] lg:rounded-none lg:border-0 lg:border-r lg:border-[#C9BFAE] lg:bg-transparent lg:px-5">
+        <label className="relative flex min-h-[52px] min-w-0 flex-1 flex-col justify-center rounded-2xl border border-[#8F8370]/50 bg-[#ffffff99] px-4 focus-within:border-[#1F3A4D] lg:rounded-none lg:border-0 lg:border-r lg:border-[#D6DEE5] lg:bg-transparent lg:px-5">
           <span className={cn(label, "hidden lg:block")}>{tx(locale, "Ubicación", "Location")}</span>
           <input
             {...suggest.inputProps}
@@ -105,7 +105,7 @@ export function HeroSearch({ locale }: { locale: Locale }) {
           {suggest.listbox}
         </label>
         <div className="hidden lg:contents">
-          <label className="flex min-h-[52px] w-[170px] shrink-0 flex-col justify-center border-r border-[#C9BFAE] px-5">
+          <label className="flex min-h-[52px] w-[170px] shrink-0 flex-col justify-center border-r border-[#D6DEE5] px-5">
             <span className={label}>{tx(locale, "Tipo", "Type")}</span>
             <select value={kind} onChange={(e) => setKind(e.target.value)} className={cn(field, "-ml-1 cursor-pointer appearance-none")} aria-label={tx(locale, "Tipo de casa o inmueble", "Type of home")}>
               <option value="">{tx(locale, "Cualquier tipo", "Any type")}</option>
@@ -127,7 +127,7 @@ export function HeroSearch({ locale }: { locale: Locale }) {
         <button
           type="submit"
           aria-busy={busy}
-          className="flex min-h-[52px] shrink-0 items-center justify-center gap-2 rounded-[2px] bg-coral-cta px-8 font-display text-[15px] font-semibold text-white transition-colors duration-np hover:bg-coral-cta-hover lg:min-h-12"
+          className="flex min-h-[52px] shrink-0 items-center justify-center gap-2 rounded-[12px] bg-coral-cta px-8 font-display text-[15px] font-semibold text-white transition-colors duration-np hover:bg-coral-cta-hover lg:min-h-12"
         >
           <Search size={17} aria-hidden className="lg:hidden" />
           <span className="lg:hidden">{tx(locale, "Buscar casas", "Find homes")}</span>

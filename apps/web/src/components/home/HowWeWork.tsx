@@ -11,7 +11,7 @@ export function HowWeWork({ heading, intro, steps, photoAlt }: { heading: string
   return (
     <section className="np-band bg-arena" aria-labelledby="np-how-we-work">
       <div className="np-gutter mx-auto grid max-w-[1280px] box-content items-center gap-10 pb-[var(--np-section)] pt-16 lg:grid-cols-[1fr_1.05fr] lg:gap-16 lg:pt-24">
-        <div data-reveal className="relative aspect-[4/3] w-full overflow-hidden bg-[#E9E1D3] lg:aspect-[4/5]">
+        <div data-reveal className="relative aspect-[4/3] w-full overflow-hidden bg-[#EFE6D8] lg:aspect-[4/5]">
           <Image src={PHOTOS.torreMarina.src} alt={photoAlt} fill sizes="(max-width: 1024px) 92vw, 600px" className="object-cover" style={{ objectPosition: PHOTOS.torreMarina.focus }} />
         </div>
         <div>

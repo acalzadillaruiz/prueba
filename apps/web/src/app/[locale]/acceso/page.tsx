@@ -21,14 +21,14 @@ export default async function Acceso({ params, searchParams }: { params: Promise
         ? tx(locale, "Vas muy rápido. Espera unos minutos y vuelve a intentarlo.", "That’s a lot of tries. Wait a few minutes and try again.")
         : null;
   return (
-    <main id="main" className="relative isolate grid min-h-[100svh] place-items-center overflow-hidden bg-navy px-4 py-16 text-ivory">
-      <Image src="/brand/hero-costa-atardecer.jpg" alt="" fill priority sizes="100vw" className="-z-10 object-cover opacity-40" />
-      <div className="absolute inset-0 -z-10 bg-[rgb(14_26_43/.78)]" aria-hidden />
-      <form action="/api/access" method="post" className="grid w-full max-w-[400px] justify-items-center gap-6 text-center">
-        <Logo tone="ivory" size="lg" />
+    <main id="main" className="relative isolate grid min-h-[100svh] place-items-center overflow-hidden bg-[#CFE3F1] px-4 py-16 text-ink">
+      <Image src="/media/048/hero-playa-1920.webp" alt="" fill priority sizes="100vw" className="-z-10 object-cover" />
+      <div className="absolute inset-0 -z-10 bg-[rgb(31_58_77/.25)]" aria-hidden />
+      <form action="/api/access" method="post" className="np-soft-card grid w-full max-w-[420px] justify-items-center gap-6 rounded-[24px] bg-[#FAF8F4] px-6 py-10 text-center sm:px-10">
+        <Logo tone="navy" size="lg" />
         <div className="grid gap-2">
-          <h1 className="np-t-h2 text-ivory">{tx(locale, "Acceso privado", "Private access")}</h1>
-          <p className="text-[15px] text-ivory/80">{tx(locale, "Estamos en vista previa privada. Escribe el código que te compartimos.", "We’re in private preview. Enter the code we shared with you.")}</p>
+          <h1 className="np-t-h2 text-ink">{tx(locale, "Acceso privado", "Private access")}</h1>
+          <p className="text-[15px] text-muted">{tx(locale, "Estamos en vista previa privada. Escribe el código que te compartimos.", "We’re in private preview. Enter the code we shared with you.")}</p>
         </div>
         <input type="hidden" name="locale" value={locale} />
         <input type="hidden" name="next" value={safeNext(next, `/${locale}`)} />
@@ -45,10 +45,10 @@ export default async function Acceso({ params, searchParams }: { params: Promise
           aria-invalid={error === "code" || undefined}
           aria-describedby={msg ? "gate-error" : undefined}
           placeholder="••••••"
-          className="h-14 w-full rounded-full border border-ivory/30 bg-white/10 px-6 text-center font-display text-[24px] tracking-[0.5em] text-ivory placeholder:text-ivory/40 focus:border-ivory focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E9E1D3]"
+          className="h-14 w-full rounded-full border border-ink/20 bg-white px-6 text-center font-display text-[24px] tracking-[0.5em] text-ink placeholder:text-ink/40 focus:border-coral focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral"
          spellCheck={false} />
         {msg && (
-          <p id="gate-error" role="alert" className="text-[14px] font-semibold text-[#F3B4A3]">
+          <p id="gate-error" role="alert" className="text-[14px] font-semibold text-danger">
             {msg}
           </p>
         )}

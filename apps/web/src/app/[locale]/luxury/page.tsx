@@ -33,7 +33,7 @@ export default async function LuxuryPage({ params }: { params: Promise<{ locale:
   return (
     <PublicPage locale={locale} header="transparent" tabbar contact={{ href: "#acceso", label: tx(locale, "Hablar con un asesor", "Talk to an advisor") }}>
       {/* Cinema hero (AMALI): the collection's first home edge to edge, white title over a soft shade. */}
-      <section className="relative isolate flex min-h-[100svh] items-end overflow-hidden bg-[#0E1A2B] text-white md:min-h-[78svh]">
+      <section className="relative isolate flex min-h-[100svh] items-end overflow-hidden bg-[#3A6A92] text-white md:min-h-[78svh]">
         <Image
           src={(hero && listingPhoto(hero, 0)) || "/brand/hero-costa-atardecer.jpg"}
           alt={hero ? tx(locale, hero.title_es, hero.title_en) : tx(locale, "Villa frente al mar al atardecer", "A villa by the sea at sunset")}

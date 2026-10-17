@@ -1,50 +1,56 @@
 ---
-version: 1.0
-name: New Place — Caracas Night
+version: 2.0
+name: New Place — Brisa
 description: >
-  Inmobiliaria premium de Venezuela. Fotografía primero (Airbnb), lienzo silencioso y ritmo de bandas
-  claro/oscuro (Apple), sobre la paleta aprobada Caracas Night (night #0E1A2B) y la pareja tipográfica
-  aprobada Cormorant Garamond + Jost. Este archivo es la fuente de verdad visual; la paleta y las fuentes
-  NO se cambian.
-sources: awesome-design-md/airbnb (tarjetas, buscador, ficha, objetivos táctiles) + awesome-design-md/apple (bandas alternas, una sola sombra, UI que se retira) + decisiones D1-A / D2-1 / oleada 3 (15-10-2026)
+  Inmobiliaria de lujo en Venezuela. Paleta A «Brisa» aprobada por Adolfo el 17/10/2026 (orden 048): blanco roto,
+  arena clara, azul mar suave y petróleo. Lujo sobrio con capa Dubái: mucho aire, mucho blanco, tipografía grande y
+  fina, esquinas suaves, sombras muy ligeras. Sustituye a Caracas Night (043), AMALI y la azul de la 042-a.
 colors:
-  night: "#0E1A2B"      # acción principal, superficies oscuras, hero, pie, modo noche
-  night-2: "#14243A"    # un paso tonal sobre night (paneles oscuros, hover en oscuro)
-  ink: "#1A2026"        # texto principal sobre claro
-  bone: "#F6F2EC"       # lienzo claro (fondo de página)
-  sand: "#E9E1D3"       # banda clara alterna, superficies de tarjeta, inputs
-  stone: "#57534D"      # texto secundario (AA sobre sand y bone)
-  mist: "#A9B1BC"       # texto secundario sobre night
-  gold: "#B89A6A"       # SOLO decorativo (filetes de marca, iconos de colección); nunca texto pequeño ni fondo de botón
-  gold-deep: "#735D3F"  # texto dorado legible (AA) cuando haga falta
+  canvas: "#FAF8F4"       # blanco roto: fondo de página
+  sand: "#EFE6D8"         # arena clara: bandas y superficies secundarias
+  sea: "#5B8DB8"          # azul mar suave: marca, filetes, iconos, trazos del mapa (sin texto encima)
+  sea-deep: "#3A6A92"     # mar profundo: botones, enlaces, pin activo, insignias (AA: 5,7:1 con blanco; 5,4:1 sobre canvas)
+  sea-deep-hover: "#2F5A7E"
+  sea-light: "#DCE8F2"    # principal claro: chips, hovers, tarjetas destacadas
+  gold: "#C9B48F"         # arena dorada: SOLO detalles (filetes, «Exclusiva», iconos); nunca fondo grande ni texto
+  ink: "#1F3A4D"          # azul petróleo profundo: texto (11:1 sobre canvas)
+  muted: "#4A6275"        # texto secundario (6:1 sobre canvas, 5,2:1 sobre sand)
+  line: "#D6DEE5"         # filetes de campos y tablas
+  map-water: "#CFE3F1"
   ok: "#2F6F4E"
-  warn: "#C9862A"
   danger: "#B42318"
-  scrim: "rgba(14,26,43,0.55)"  # velo night sobre fotos y modales
 typography:
-  display: "'Cormorant Garamond', 'Times New Roman', serif"  # variable, pesos 300/400/500; solo ≥ 24 px
-  text: "'Jost', ui-sans-serif, system-ui, sans-serif"       # variable, pesos 300/400/500/600
-  wordmark: "'Lexend Zetta' (solo logotipo, sin precarga)"
-  scale:  # 6 tamaños, separados (Taste: ≤ 6; Airbnb: display modesto, foto da el peso)
-    hero:  { font: display, size: "clamp(44px, 7vw, 96px)", weight: 300, leading: 1.0, tracking: "0.02em", case: upper, wrap: balance }
-    h1:    { font: display, size: "clamp(34px, 4.5vw, 56px)", weight: 400, leading: 1.08, wrap: balance }
-    h2:    { font: display, size: "clamp(26px, 3vw, 36px)", weight: 400, leading: 1.15, wrap: balance }
+  display: "'Jost', ui-sans-serif, system-ui, sans-serif"   # titulares: Light 300 o Regular 400, mayúscula solo la primera letra
+  text: "'Inter', ui-sans-serif, system-ui, sans-serif"     # texto e interfaz
+  wordmark: "'Lexend Zetta' (solo logotipo)"
+  scale:
+    hero:  { font: display, size: "clamp(44px, 8vw, 112px)", weight: 300, leading: 1.02, tracking: "-0.015em" }
+    band:  { font: display, size: "clamp(36px, 5vw, 68px)", weight: 300, leading: 1.08 }
+    h1:    { font: display, size: "clamp(34px, 4.5vw, 56px)", weight: 300 }
+    h2:    { font: display, size: "clamp(26px, 3vw, 36px)", weight: 300 }
     lead:  { font: text, size: "20px", weight: 300, leading: 1.5 }
-    body:  { font: text, size: "17px", weight: 400, leading: 1.6, color: ink }
-    small: { font: text, size: "14px", weight: 400, leading: 1.45 }  # mínimo absoluto 13 px para texto que se lee
-  numerals: "font-variant-numeric: tabular-nums lining-nums en precios, m², tablas y comparador"
-rounded:
-  none: 0px       # fotos, tarjetas, bandas
-  control: 2px    # botones, inputs, chips de filtro
-  full: 9999px    # SOLO controles circulares sobre foto (guardar ♥, flechas de galería, orbe de buscar)
-spacing: { base: 8px, section: "clamp(64px, 10vw, 128px)", gutter: "clamp(16px, 4vw, 40px)", max-content: 1280px, max-search: 1440px }
+    body:  { font: text, size: "17px", weight: 400, leading: 1.6 }
+    small: { font: text, size: "14px" }   # mínimo absoluto 12 px
+rounded: { control: 12px, card: 16px, panel-and-map: 24px, pill: 9999px }
 elevation:
-  flat: "todo por defecto"
-  float: "0 8px 24px rgba(14,26,43,0.18) — SOLO menús, diálogos, hoja inferior y barra pegajosa"
-motion: { duration: "180ms / 320ms", easing: "cubic-bezier(.2,.7,.2,1)", reduced: "prefers-reduced-motion: sin desplazamientos, solo opacidad" }
+  soft: "0 1px 2px rgb(31 58 77/.04), 0 8px 24px rgb(31 58 77/.06) — tarjetas (sube un poco al pasar el ratón)"
+  float: "0 10px 30px rgb(31 58 77/.10) — menús, diálogos, hoja inferior, barra pegajosa"
+motion: { duration: "180ms / 320ms / 500ms", easing: "cubic-bezier(.2,.7,.2,1)", reduced: "prefers-reduced-motion: todo visible, sin desplazamientos" }
 ---
 
-# New Place · DESIGN.md (Caracas Night)
+# New Place · DESIGN.md (Brisa · 048)
+
+## 0. Cambios de la 048 sobre lo que sigue
+
+1. Paleta Brisa (arriba). Prohibido cualquier marrón y cualquier fondo oscuro pesado en la web pública. Las bandas «night» pasan a canvas o sand; sobre foto, un degradado inferior suave en petróleo (nunca un velo plano).
+2. Texto sobre color: nunca blanco sobre #5B8DB8 (3,5:1). Lo que lleva texto usa mar profundo #3A6A92.
+3. Tipografía: Jost (titulares) + Inter (texto). Sin mayúsculas en titulares salvo la primera letra.
+4. Esquinas suaves: 12 px controles, 16 px tarjetas y fotos, 24 px mapa y paneles grandes.
+5. Carruseles nativos (scroll-snap), nunca secuestran el scroll vertical (048-A). Mapa Leaflet en teselas claras, pins píldora (048-B).
+6. Fotos reales sin repetir, nada de renders (048-C). Créditos en public/media/048/CREDITOS.txt.
+
+Lo que sigue (§1–§11) es la guía 043; donde choque con §0, manda §0. Nombres de color antiguos: night → sea-deep, bone → canvas, stone → muted, gold-deep → sea-deep.
+
 
 ## 1. Idea
 

@@ -25,9 +25,9 @@ export function SaveButton({ id, className, locale }: { id: string; className?: 
         if (!on) setPop((n) => n + 1);
         setSaid(on ? tx(locale, "Quitado de guardados", "Removed from saved") : tx(locale, "Guardado", "Saved"));
       }}
-      className={cn("flex h-11 w-11 items-center justify-center rounded-full bg-[#ffffffe6] text-[#1A2026] transition-[background-color] duration-np ease-np hover:bg-[#F6F2EC]", className)}
+      className={cn("flex h-11 w-11 items-center justify-center rounded-full bg-[#ffffffe6] text-[#1F3A4D] transition-[background-color] duration-np ease-np hover:bg-[#FAF8F4]", className)}
     >
-      <Heart key={pop} size={18} strokeWidth={1.7} aria-hidden className={cn(on ? "fill-[#0E1A2B] text-[#0E1A2B]" : "text-[#1A2026]", pop > 0 && on && "np-heart-pop")} />
+      <Heart key={pop} size={18} strokeWidth={1.7} aria-hidden className={cn(on ? "fill-[#3A6A92] text-[#3A6A92]" : "text-[#1F3A4D]", pop > 0 && on && "np-heart-pop")} />
     </button>
     <span className="sr-only" aria-live="polite">{said}</span>
     </>
@@ -51,7 +51,7 @@ export function CompareButton({ id, locale, dark, className }: { id: string; loc
       }}
       className={cn(
         // after: invisible 44 px hit area around the compact pill (tap target) without changing the card layout
-        "relative inline-flex items-center gap-1.5 rounded-[2px] border px-2.5 py-1 text-[13px] font-semibold transition-colors duration-np after:absolute after:-inset-x-1 after:-inset-y-2.5 after:content-['']",
+        "relative inline-flex items-center gap-1.5 rounded-[12px] border px-2.5 py-1 text-[13px] font-semibold transition-colors duration-np after:absolute after:-inset-x-1 after:-inset-y-2.5 after:content-['']",
         on ? "np-sel border-2" : dark ? "border-white/20 text-ivory" : "border-line bg-white text-ink/70 hover:border-navy/40",
         className,
       )}
@@ -89,7 +89,7 @@ export function CardCompareToggle({ id, locale }: { id: string; locale: Locale }
         data-card-compare
         className={cn(
           "absolute right-[3.75rem] top-2.5 z-[2] flex h-11 w-11 items-center justify-center rounded-full transition-transform duration-np hover:scale-105 [@media(hover:hover)]:hidden",
-          on ? "bg-[#0E1A2B] text-[#F6F2EC]" : "bg-[#ffffffe6] text-[#1A2026]",
+          on ? "bg-[#3A6A92] text-[#FAF8F4]" : "bg-[#ffffffe6] text-[#1F3A4D]",
         )}
       >
         <Scale size={17} strokeWidth={1.8} aria-hidden />
@@ -100,14 +100,14 @@ export function CardCompareToggle({ id, locale }: { id: string; locale: Locale }
         onClick={click}
         data-card-compare
         className={cn(
-          "absolute bottom-2.5 left-2.5 z-[2] hidden min-h-9 items-center gap-1.5 rounded-[2px] px-3 font-display text-[13px] font-semibold transition-opacity duration-np focus-visible:opacity-100 [@media(hover:hover)]:inline-flex",
-          on ? "bg-[#0E1A2B] text-[#F6F2EC] opacity-100" : "bg-[#ffffffe6] text-[#1A2026] opacity-0 group-hover:opacity-100",
+          "absolute bottom-2.5 left-2.5 z-[2] hidden min-h-9 items-center gap-1.5 rounded-[12px] px-3 font-display text-[13px] font-semibold transition-opacity duration-np focus-visible:opacity-100 [@media(hover:hover)]:inline-flex",
+          on ? "bg-[#3A6A92] text-[#FAF8F4] opacity-100" : "bg-[#ffffffe6] text-[#1F3A4D] opacity-0 group-hover:opacity-100",
         )}
       >
         <Scale size={14} aria-hidden /> {on ? tx(locale, "Comparando", "Comparing") : label}
       </button>
       {full && (
-        <span role="status" className="np-in absolute inset-x-2.5 bottom-14 z-[3] rounded-2xl bg-[#0E1A2B] px-3.5 py-2.5 text-[13px] leading-snug text-[#F6F2EC] shadow-float">
+        <span role="status" className="np-in absolute inset-x-2.5 bottom-14 z-[3] rounded-2xl bg-[#3A6A92] px-3.5 py-2.5 text-[13px] leading-snug text-[#FAF8F4] shadow-float">
           {tx(locale, "Ya tienes 3 casas para comparar. Quita una del comparador y añade esta.", "You already have 3 homes to compare. Remove one and add this one.")}
         </span>
       )}
@@ -118,11 +118,11 @@ export function CardCompareToggle({ id, locale }: { id: string; locale: Locale }
 // Brand pills: egeo / arena for market states, navy for closed deals; status colours only where they warn.
 const STATUS_TONE: Record<ListingStatus, string> = {
   DRAFT: "bg-[#5A534D] text-white",
-  COMING_SOON: "bg-[#C9BFAE] text-[#0E1A2B]",
+  COMING_SOON: "bg-[#D6DEE5] text-[#3A6A92]",
   ACTIVE: "bg-[#2F6F4E] text-white",
-  UNDER_OFFER: "bg-[#E9E1D3] text-[#1A2026]",
-  SOLD: "bg-[#0E1A2B] text-[#F6F2EC]",
-  RENTED: "bg-[#0E1A2B] text-[#F6F2EC]",
+  UNDER_OFFER: "bg-[#EFE6D8] text-[#1F3A4D]",
+  SOLD: "bg-[#3A6A92] text-[#FAF8F4]",
+  RENTED: "bg-[#3A6A92] text-[#FAF8F4]",
   WITHDRAWN: "bg-danger text-white",
   EXPIRED: "bg-[#5A534D] text-white",
 };
@@ -134,13 +134,13 @@ const STATUS_TONE: Record<ListingStatus, string> = {
 export function StatusBadge({ status, locale, className, review }: { status: ListingStatus; locale: Locale; className?: string; review?: "PENDING" | "APPROVED" | "REJECTED" }) {
   if (review && review !== "APPROVED" && status !== "DRAFT" && status !== "WITHDRAWN") {
     return (
-      <span className={cn("inline-flex items-center whitespace-nowrap rounded-[2px] px-2 py-0.5 text-[13px] font-bold", review === "PENDING" ? "bg-[#8A5A00] text-white" : "bg-danger text-white", className)}>
+      <span className={cn("inline-flex items-center whitespace-nowrap rounded-[12px] px-2 py-0.5 text-[13px] font-bold", review === "PENDING" ? "bg-[#8A5A00] text-white" : "bg-danger text-white", className)}>
         {review === "PENDING" ? tx(locale, "En revisión", "In review") : tx(locale, "Rechazado", "Rejected")}
       </span>
     );
   }
   return (
-    <span className={cn("inline-flex items-center whitespace-nowrap rounded-[2px] px-2.5 py-0.5 text-[13px] font-semibold", STATUS_TONE[status], className)}>
+    <span className={cn("inline-flex items-center whitespace-nowrap rounded-[12px] px-2.5 py-0.5 text-[13px] font-semibold", STATUS_TONE[status], className)}>
       <span className="min-w-0 truncate">{lbl(STATUS_LABEL[status], locale)}</span>
     </span>
   );

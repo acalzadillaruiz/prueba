@@ -28,7 +28,7 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
   const rough = nComp < 2;
   const source = nComp > 0 ? plural(nComp, locale, ["comparable", "comparables"], ["comparable", "comparables"]) : aiProvider === "heuristic" ? tx(locale, "modelo local", "local model") : tx(locale, "IA externa", "external AI");
   return (
-    <div className={cn("overflow-hidden rounded-[4px]", dark ? "border border-navy-line bg-navy-card" : "border border-line bg-white")}>
+    <div className={cn("overflow-hidden rounded-[16px]", dark ? "border border-navy-line bg-navy-card" : "border border-line bg-white")}>
       {/* Navy valuation panel (brand): range in Cormorant, gold fillet scale, the asking price as a dot. */}
       <div className="np-navy-panel bg-navy px-6 py-7 text-ivory md:px-8">
         <div className="flex flex-wrap items-center justify-between gap-2">
@@ -59,11 +59,11 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
           {conf} · {source} · {tx(locale, "Valor central", "Mid value")} {money(e.mid, locale)}
         </div>
         <div className="relative mt-9 h-[3px] rounded-full bg-white/15">
-          <div className="absolute inset-y-0 rounded-full bg-[#C9BFAE]" style={{ left: `${aLow}%`, right: `${100 - aHigh}%` }} />
+          <div className="absolute inset-y-0 rounded-full bg-[#D6DEE5]" style={{ left: `${aLow}%`, right: `${100 - aHigh}%` }} />
           <div className="absolute -top-8 whitespace-nowrap text-[13px] font-semibold text-ivory/85" style={{ left: `${pos}%`, transform: `translateX(-${clampPct(pos)}%)` }}>
             {tx(locale, "Precio pedido", "Asking")} · {usdShort(l.priceAmount)}
           </div>
-          <div className="absolute top-1/2 h-[18px] w-[18px] -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] border-[#C9BFAE] bg-ivory" style={{ left: `${pos}%` }} />
+          <div className="absolute top-1/2 h-[18px] w-[18px] -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] border-[#D6DEE5] bg-ivory" style={{ left: `${pos}%` }} />
         </div>
         {/* The range ends are labelled where they sit on the bar (not at the bar's edges). Each label leans inward by its
             own position (0 % → left-aligned, 100 % → right-aligned), so it never overflows the panel; when the two ends are

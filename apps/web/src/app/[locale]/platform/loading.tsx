@@ -1,9 +1,9 @@
 /** Cockpit skeleton (brand v4): navy sidebar, Cal canvas, warm sand placeholders. */
-const bone = "rounded-[4px] bg-[#E9E1D3] dark:bg-white/[.06]";
+const bone = "rounded-[16px] bg-[#EFE6D8] dark:bg-white/[.06]";
 
 export default function Loading() {
   return (
-    <div className="min-h-svh bg-ivory lg:pl-[264px] dark:bg-[#0E1A2B]" aria-busy="true" aria-live="polite">
+    <div className="min-h-svh bg-ivory lg:pl-[264px] dark:bg-[#3A6A92]" aria-busy="true" aria-live="polite">
       <div className="fixed inset-y-0 left-0 hidden w-[264px] bg-navy lg:block" />
       <div className="h-[104px] bg-navy lg:hidden" />
       <div className="mx-auto max-w-[1360px] opacity-70 space-y-6 px-4 pb-16 pt-6 md:px-10 md:pt-10">

@@ -152,16 +152,16 @@ export function CaptureView({ locale, rows: initialRows, zones, titles, canConve
               {c.duplicateOf && <div className={cn("mt-1.5 flex items-center gap-1 text-xs font-semibold", k.warnText)}><Fingerprint size={12} className="shrink-0" /> <span className="min-w-0 [overflow-wrap:anywhere]">= {titles[c.duplicateOf] ?? c.duplicateOf}</span></div>}
               <dl className={cn("mt-3 grid grid-cols-[minmax(0,1fr)_auto_auto] gap-x-4 gap-y-2 rounded-xl px-3 py-2.5", k.soft)}>
                 <div className="min-w-0">
-                  <dt className={cn(k.label, "text-[10px]")}>{tx(locale, "Dueño", "Owner")}</dt>
+                  <dt className={cn(k.label, "text-[12px]")}>{tx(locale, "Dueño", "Owner")}</dt>
                   <dd className="mt-0.5 text-sm font-semibold leading-snug [overflow-wrap:anywhere]">{c.ownerName}</dd>
                   <dd className={cn("text-xs [overflow-wrap:anywhere]", k.muted)}>{c.phone}</dd>
                 </div>
                 <div className="min-w-0">
-                  <dt className={cn(k.label, "text-[10px]")}>m²</dt>
+                  <dt className={cn(k.label, "text-[12px]")}>m²</dt>
                   <dd className="mt-0.5 text-sm font-semibold">{c.areaM2}</dd>
                 </div>
                 <div className="min-w-0 text-right">
-                  <dt className={cn(k.label, "text-[10px]")}>{tx(locale, "Pide", "Asking")}</dt>
+                  <dt className={cn(k.label, "text-[12px]")}>{tx(locale, "Pide", "Asking")}</dt>
                   <dd className={cn("mt-0.5 whitespace-nowrap text-sm tracking-normal", k.num)}>{money(c.askingPrice, locale)}</dd>
                 </div>
               </dl>
@@ -257,7 +257,7 @@ export function CaptureView({ locale, rows: initialRows, zones, titles, canConve
             <div className={cn("np-in mt-4", dup ? k.warnBox : k.okBox)}>
               <div className="flex items-center gap-2 font-semibold">{checking ? <Loader2 size={16} className="animate-spin" /> : dup ? <AlertTriangle size={16} /> : <CheckCircle2 size={16} />}{dup ? tx(locale, "Posible duplicado", "Possible duplicate") : tx(locale, "Sin duplicados", "No duplicates")}</div>
               <div className="mt-1 text-xs text-navy/75 dark:text-ivory/75">{dup ? (dup.zone ? `${dup.title} · ${dup.zone} · ${dup.areaM2} m²` : dup.title ?? tx(locale, "Ya existe en otra agencia (no público)", "Already listed by another agency (not public)")) : tx(locale, "Fingerprint: lat/lng + m² + hash de dirección", "Fingerprint: lat/lng + m² + address hash")}</div>
-              <div className="mt-1 font-mono text-[10px] text-navy/55 dark:text-ivory/55">{dup?.fingerprint ?? fp}</div>
+              <div className="mt-1 font-mono text-[12px] text-navy/55 dark:text-ivory/55">{dup?.fingerprint ?? fp}</div>
             </div>
           )}
           {err && <div role="alert" className={cn("mt-3", k.err)}>{err}</div>}

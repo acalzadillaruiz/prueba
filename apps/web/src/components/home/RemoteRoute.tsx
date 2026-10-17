@@ -20,28 +20,28 @@ export function RemoteRoute({ title, subtitle, steps, children }: { title: strin
             <svg viewBox="0 0 1000 460" className="block h-auto w-full" role="img" aria-label="Madrid, Miami, Panamá → Lechería">
               <defs>
                 <pattern id="np-dots" width="14" height="14" patternUnits="userSpaceOnUse">
-                  <circle cx="2" cy="2" r="1.3" fill="#1A2026" opacity=".12" />
+                  <circle cx="2" cy="2" r="1.3" fill="#1F3A4D" opacity=".12" />
                 </pattern>
               </defs>
               <rect width="1000" height="460" fill="url(#np-dots)" />
               {/* Coastlines, abstracted: the Caribbean arc and the Iberian edge */}
-              <path d="M0 300 C 120 260, 220 360, 330 350 S 520 330, 600 380 L 600 460 L 0 460 Z" fill="#C9BFAE" opacity=".45" />
-              <path d="M860 60 C 900 90, 940 80, 1000 100 L 1000 0 L 840 0 Z" fill="#C9BFAE" opacity=".45" />
+              <path d="M0 300 C 120 260, 220 360, 330 350 S 520 330, 600 380 L 600 460 L 0 460 Z" fill="#D6DEE5" opacity=".45" />
+              <path d="M860 60 C 900 90, 940 80, 1000 100 L 1000 0 L 840 0 Z" fill="#D6DEE5" opacity=".45" />
               {CITIES.map((c, i) => (
                 <g key={c.name}>
-                  <path d={c.d} fill="none" stroke="#1A2026" strokeOpacity=".14" strokeWidth="2" strokeDasharray="4 7" />
-                  <path d={c.d} fill="none" stroke={i === 0 ? "#0E1A2B" : "#1A2026"} strokeWidth={i === 0 ? 3 : 2} strokeLinecap="round" />
-                  <circle cx={c.x} cy={c.y} r="6" fill="#1A2026" />
-                  <text x={c.x + (c.x > 500 ? -14 : 14)} y={c.y - 12} textAnchor={c.x > 500 ? "end" : "start"} fontFamily="var(--font-display)" fontSize="20" fontWeight="600" fill="#1A2026">
+                  <path d={c.d} fill="none" stroke="#1F3A4D" strokeOpacity=".14" strokeWidth="2" strokeDasharray="4 7" />
+                  <path d={c.d} fill="none" stroke={i === 0 ? "#3A6A92" : "#1F3A4D"} strokeWidth={i === 0 ? 3 : 2} strokeLinecap="round" />
+                  <circle cx={c.x} cy={c.y} r="6" fill="#1F3A4D" />
+                  <text x={c.x + (c.x > 500 ? -14 : 14)} y={c.y - 12} textAnchor={c.x > 500 ? "end" : "start"} fontFamily="var(--font-display)" fontSize="20" fontWeight="600" fill="#1F3A4D">
                     {c.name}
                   </text>
                 </g>
               ))}
               <g>
-                <circle cx={LECHERIA.x} cy={LECHERIA.y} r="26" fill="#0E1A2B" opacity=".16" />
-                <path d={`M${LECHERIA.x - 18} ${LECHERIA.y + 6} L${LECHERIA.x} ${LECHERIA.y - 8} L${LECHERIA.x + 18} ${LECHERIA.y + 6}`} fill="none" stroke="#1A2026" strokeWidth="3.5" />
-                <path d={`M${LECHERIA.x - 9} ${LECHERIA.y + 7} L${LECHERIA.x} ${LECHERIA.y} L${LECHERIA.x + 9} ${LECHERIA.y + 7}`} fill="none" stroke="#0E1A2B" strokeWidth="3" />
-                <text x={LECHERIA.x + 34} y={LECHERIA.y + 8} fontFamily="var(--font-title)" fontSize="34" fill="#1A2026">
+                <circle cx={LECHERIA.x} cy={LECHERIA.y} r="26" fill="#3A6A92" opacity=".16" />
+                <path d={`M${LECHERIA.x - 18} ${LECHERIA.y + 6} L${LECHERIA.x} ${LECHERIA.y - 8} L${LECHERIA.x + 18} ${LECHERIA.y + 6}`} fill="none" stroke="#1F3A4D" strokeWidth="3.5" />
+                <path d={`M${LECHERIA.x - 9} ${LECHERIA.y + 7} L${LECHERIA.x} ${LECHERIA.y} L${LECHERIA.x + 9} ${LECHERIA.y + 7}`} fill="none" stroke="#3A6A92" strokeWidth="3" />
+                <text x={LECHERIA.x + 34} y={LECHERIA.y + 8} fontFamily="var(--font-title)" fontSize="34" fill="#1F3A4D">
                   Lechería
                 </text>
               </g>

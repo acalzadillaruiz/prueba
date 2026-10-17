@@ -36,8 +36,8 @@ const config: Config = {
         logo: ["var(--font-logo)"],
         title: ["var(--font-title)"],
       },
-      // Caracas Night (043): photos, cards and bands square (0); controls 2px; rounded-full only for circular controls.
-      borderRadius: { np: "var(--radius)", sm: "0px", DEFAULT: "2px", md: "2px", lg: "2px", xl: "2px", "2xl": "2px", "3xl": "2px" },
+      // Brisa (048): soft corners — controls 12px, cards and photos 16px, map and large panels 24px.
+      borderRadius: { np: "var(--radius)", sm: "8px", DEFAULT: "12px", md: "12px", lg: "16px", xl: "16px", "2xl": "20px", "3xl": "24px" },
       // Flat by default; the one "float" shadow is for menus, dialogs, sheets and the sticky rail.
       boxShadow: { np: "var(--shadow)", float: "var(--np-float)" },
       transitionTimingFunction: { np: "cubic-bezier(.2,.7,.2,1)" },

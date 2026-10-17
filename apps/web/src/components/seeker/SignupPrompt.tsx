@@ -56,18 +56,18 @@ export function SignupPrompt({ locale, reason, onClose }: { locale: Locale; reas
   const Icon = alert ? Bell : Heart;
   const ring = "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy";
   return createPortal(
-    <div className="fixed inset-0 z-[70] flex items-end justify-center bg-[#0E1A2B]/45 sm:items-center sm:p-6 print:hidden" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+    <div className="fixed inset-0 z-[70] flex items-end justify-center bg-[#1F3A4D]/45 sm:items-center sm:p-6 print:hidden" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
       <div
         ref={panel}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descId}
-        className="np-in w-full rounded-t-[4px] bg-ivory p-6 text-ink sm:max-w-[420px] sm:rounded-[4px]"
+        className="np-in w-full rounded-t-[4px] bg-ivory p-6 text-ink sm:max-w-[420px] sm:rounded-[16px]"
         style={{ paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))" }}
       >
         <div className="flex items-start justify-between gap-4">
-          <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#0E1A2B]/10 text-[#0E1A2B]">
+          <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#1F3A4D]/10 text-[#3A6A92]">
             <Icon size={20} strokeWidth={1.7} aria-hidden />
           </span>
           <button type="button" onClick={onClose} aria-label={tx(locale, "Cerrar", "Close")} className={cn("-mr-2 -mt-1 flex h-11 w-11 items-center justify-center rounded-full text-navy hover:bg-navy/5", ring)}>
@@ -83,10 +83,10 @@ export function SignupPrompt({ locale, reason, onClose }: { locale: Locale; reas
             : tx(locale, "Tus casas guardadas te esperan en cualquier dispositivo. Es gratis.", "Your saved homes will wait for you on any device. It’s free.")}
         </p>
         <div className="mt-6 flex flex-col gap-2.5">
-          <Link ref={first} href={register} className={cn("inline-flex h-12 items-center justify-center rounded-[2px] bg-coral-cta px-6 font-display font-semibold text-white hover:bg-coral-cta-hover", ring)}>
+          <Link ref={first} href={register} className={cn("inline-flex h-12 items-center justify-center rounded-[12px] bg-coral-cta px-6 font-display font-semibold text-white hover:bg-coral-cta-hover", ring)}>
             {tx(locale, "Crear cuenta gratis", "Create a free account")}
           </Link>
-          <Link href={login} className={cn("inline-flex h-12 items-center justify-center rounded-[2px] border-[1.5px] border-navy px-6 font-display font-semibold text-navy hover:bg-navy/5", ring)}>
+          <Link href={login} className={cn("inline-flex h-12 items-center justify-center rounded-[12px] border-[1.5px] border-navy px-6 font-display font-semibold text-navy hover:bg-navy/5", ring)}>
             {tx(locale, "Ya tengo cuenta · Entrar", "I have an account · Sign in")}
           </Link>
         </div>

@@ -37,7 +37,7 @@ export function LazyMount({ className, children, loadingLabel = "Cargando el map
       ) : (
         // Until the map mounts (037b): a quiet map-like texture and a label, never a plain empty block.
         <div aria-hidden className="absolute inset-0 flex items-center justify-center bg-arena">
-          <span className="rounded-[2px] bg-white/70 px-3 py-1 font-display text-[13px] text-muted">{loadingLabel}</span>
+          <span className="rounded-[12px] bg-white/70 px-3 py-1 font-display text-[13px] text-muted">{loadingLabel}</span>
         </div>
       )}
     </div>

@@ -67,7 +67,7 @@ export function OwnerEditForm({ l, locale, onDone }: { l: Listing; locale: Local
   return (
     <form
       noValidate
-      className="mt-4 space-y-4 rounded-[4px] border border-line bg-[#F6F2EA] p-4 dark:bg-white/[.03]"
+      className="mt-4 space-y-4 rounded-[16px] border border-line bg-[#FAF8F4] p-4 dark:bg-white/[.03]"
       aria-label={tx(locale, "Editar anuncio", "Edit listing")}
       onSubmit={async (ev) => {
         ev.preventDefault();
@@ -128,7 +128,7 @@ export function OwnerEditForm({ l, locale, onDone }: { l: Listing; locale: Local
           {chips.map((a) => {
             const on = d.amenities.includes(a);
             return (
-              <button key={a} type="button" aria-pressed={on} onClick={() => set({ amenities: on ? d.amenities.filter((x) => x !== a) : [...d.amenities, a] })} className={cn("inline-flex min-h-9 items-center gap-1.5 rounded-[2px] border px-3.5 py-1.5 text-sm font-semibold", on ? "border-navy bg-navy text-ivory" : "border-line bg-white")}>
+              <button key={a} type="button" aria-pressed={on} onClick={() => set({ amenities: on ? d.amenities.filter((x) => x !== a) : [...d.amenities, a] })} className={cn("inline-flex min-h-9 items-center gap-1.5 rounded-[12px] border px-3.5 py-1.5 text-sm font-semibold", on ? "border-navy bg-navy text-ivory" : "border-line bg-white")}>
                 {on && <Check size={14} />} {AMENITY_LABEL[a] ? lbl(AMENITY_LABEL[a], locale) : a}
               </button>
             );

@@ -112,10 +112,10 @@ export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: bo
     ["street", MapPinned, tx(locale, "Vista de calle", "Street view"), !!GOOGLE_MAPS_KEY],
   ];
   const tag = illustrated && (
-    <span className="pointer-events-none absolute bottom-4 left-4 np-glass rounded-[2px] px-3 py-1 font-display text-[13px] text-ink">{tx(locale, "Ilustración · aún sin fotos reales", "Illustration · real photos to come")}</span>
+    <span className="pointer-events-none absolute bottom-4 left-4 np-glass rounded-[12px] px-3 py-1 font-display text-[13px] text-ink">{tx(locale, "Ilustración · aún sin fotos reales", "Illustration · real photos to come")}</span>
   );
     const allLabel = illustrated ? tx(locale, `Ver las ${total} ilustraciones`, `View all ${total} illustrations`) : tx(locale, `Ver las ${total} fotos`, `View all ${total} photos`);
-  const chip = "inline-flex min-h-11 items-center gap-1.5 rounded-[2px] bg-arena px-4 font-display text-[15px] text-ink transition-colors duration-np ease-np hover:bg-[#DDD3C2]";
+  const chip = "inline-flex min-h-11 items-center gap-1.5 rounded-[12px] bg-arena px-4 font-display text-[15px] text-ink transition-colors duration-np ease-np hover:bg-[#DDD3C2]";
   return (
     <>
       {/* Main photo with the brand's arched top-left corner; four thumbnails on the right (desktop). Phones: the main photo
@@ -160,11 +160,11 @@ export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: bo
             ))}
           </div>
           {illustrated && (
-            <span className="pointer-events-none absolute left-4 top-4 np-glass rounded-[2px] px-3 py-1 font-display text-[13px] text-ink md:bottom-4 md:top-auto">{tx(locale, "Ilustración · aún sin fotos reales", "Illustration · real photos to come")}</span>
+            <span className="pointer-events-none absolute left-4 top-4 np-glass rounded-[12px] px-3 py-1 font-display text-[13px] text-ink md:bottom-4 md:top-auto">{tx(locale, "Ilustración · aún sin fotos reales", "Illustration · real photos to come")}</span>
           )}
           {total > 1 && (
             <>
-              <span aria-hidden data-testid="gallery-hero-counter" className="pointer-events-none absolute right-3 top-3 np-glass rounded-[2px] px-3 py-1 font-display text-[13px] font-semibold tabular-nums text-ink md:hidden">
+              <span aria-hidden data-testid="gallery-hero-counter" className="pointer-events-none absolute right-3 top-3 np-glass rounded-[12px] px-3 py-1 font-display text-[13px] font-semibold tabular-nums text-ink md:hidden">
                 {idx + 1} / {total}
               </span>
               <div aria-hidden className="pointer-events-none absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-1.5 md:hidden">
@@ -180,7 +180,7 @@ export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: bo
           <button
             type="button"
             onClick={() => show(0)}
-            className="absolute bottom-[clamp(16px,3vw,32px)] right-[clamp(16px,4vw,40px)] z-[2] inline-flex min-h-12 items-center gap-2 rounded-[2px] bg-[#F6F2EC] px-5 font-display text-[16px] font-medium text-[#0E1A2B] transition-[background-color,transform] duration-np ease-np hover:bg-[#E9E1D3] active:scale-[.98] max-md:bottom-10"
+            className="absolute bottom-[clamp(16px,3vw,32px)] right-[clamp(16px,4vw,40px)] z-[2] inline-flex min-h-12 items-center gap-2 rounded-[12px] bg-[#FAF8F4] px-5 font-display text-[16px] font-medium text-[#3A6A92] transition-[background-color,transform] duration-np ease-np hover:bg-[#EFE6D8] active:scale-[.98] max-md:bottom-10"
           >
             <Camera size={17} aria-hidden /> {allLabel}
           </button>
@@ -214,7 +214,7 @@ export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: bo
         >
           <div className="no-scrollbar flex items-center gap-2 overflow-x-auto px-4 py-3">
             {tabs.filter((t) => t[3]).map(([k, Icon, label]) => (
-              <button key={k} onClick={() => setTab(k)} aria-pressed={tab === k} className={cn("inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-[2px] px-3 font-display text-sm", tab === k ? "border-2 border-ivory bg-white/15 text-ivory" : "border-2 border-transparent text-ivory/75 hover:bg-white/10")}>
+              <button key={k} onClick={() => setTab(k)} aria-pressed={tab === k} className={cn("inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-[12px] px-3 font-display text-sm", tab === k ? "border-2 border-ivory bg-white/15 text-ivory" : "border-2 border-transparent text-ivory/75 hover:bg-white/10")}>
                 <Icon size={15} aria-hidden /> {label}
               </button>
             ))}
@@ -273,7 +273,7 @@ export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: bo
           {tab === "photos" && (
             <div className="no-scrollbar flex gap-2 overflow-x-auto px-4 py-3">
               {shots.map((s, n) => (
-                <button key={n} onClick={() => setI(n)} aria-label={What(n + 1)} aria-current={n === i || undefined} className={cn("h-16 w-24 shrink-0 overflow-hidden rounded-[2px] outline outline-2 -outline-offset-2", n === i ? "outline-[#E9E1D3]" : "outline-transparent opacity-60")}>
+                <button key={n} onClick={() => setI(n)} aria-label={What(n + 1)} aria-current={n === i || undefined} className={cn("h-16 w-24 shrink-0 overflow-hidden rounded-[12px] outline outline-2 -outline-offset-2", n === i ? "outline-[#EFE6D8]" : "outline-transparent opacity-60")}>
                   <PropertyArt scene={s} seed={n === 0 ? l.id : l.id + (n - 1)} photo={listingPhoto(l, n)} className="h-full w-full" />
                 </button>
               ))}

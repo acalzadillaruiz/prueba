@@ -41,7 +41,7 @@ export function SavedView({ locale, all }: { locale: Locale; all: Listing[] }) {
 
       {!user && saved.length > 0 && (
         <div className={cn("np-in mt-6 flex flex-col gap-4 p-5 sm:flex-row sm:items-center", k.card)} role="note">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#0E1A2B]/10 text-[#0E1A2B]">
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#1F3A4D]/10 text-[#3A6A92]">
             <Heart size={20} strokeWidth={1.7} aria-hidden />
           </span>
           <div className="min-w-0 flex-1">
@@ -57,7 +57,7 @@ export function SavedView({ locale, all }: { locale: Locale; all: Listing[] }) {
 
       {loading && items.length === 0 && (
         <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" aria-label={tx(locale, "Un momento…", "One moment…")}>
-          {saved.slice(0, 4).map((id) => <div key={id} className="np-skeleton aspect-[4/5] rounded-[4px]" />)}
+          {saved.slice(0, 4).map((id) => <div key={id} className="np-skeleton aspect-[4/5] rounded-[16px]" />)}
         </div>
       )}
       <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

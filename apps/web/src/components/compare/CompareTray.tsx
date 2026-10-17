@@ -126,7 +126,7 @@ export function CompareTray({ locale }: { locale: Locale }) {
       style={{ bottom: `calc(${inset}px + 0.75rem + ${inset ? "0px" : "env(safe-area-inset-bottom)"})` }}
     >
       {/* Phones: slim bar with the chosen homes. */}
-      <div className="np-glass flex items-center gap-3 rounded-[4px] p-2.5 pl-3 md:hidden">
+      <div className="np-glass flex items-center gap-3 rounded-[16px] p-2.5 pl-3 md:hidden">
         <ul className="flex shrink-0 gap-1.5" aria-label={tx(locale, "Casas para comparar", "Homes to compare")}>
           {compare.slice(0, 3).map((id) => {
             const l = items.find((x) => x.id === id);
@@ -148,7 +148,7 @@ export function CompareTray({ locale }: { locale: Locale }) {
         </ul>
         <div className="min-w-0 flex-1 leading-tight">
           <div className="flex items-center gap-1.5 font-display text-[14px] font-semibold text-ink">
-            <Scale size={14} aria-hidden className="shrink-0 text-[#0E1A2B]" />
+            <Scale size={14} aria-hidden className="shrink-0 text-[#3A6A92]" />
             <span aria-live="polite">{tx(locale, `Comparar (${compare.length}/3)`, `Compare (${compare.length}/3)`)}</span>
           </div>
           <button type="button" onClick={clearCompare} className="mt-0.5 text-[13px] text-muted underline-offset-4 hover:underline">
@@ -159,7 +159,7 @@ export function CompareTray({ locale }: { locale: Locale }) {
           href={href}
           aria-label={tx(locale, "Ver comparación", "View comparison")}
           className={cn(
-            "inline-flex h-11 shrink-0 items-center gap-1 rounded-[2px] px-4 font-display text-[14px] font-semibold transition-colors duration-np",
+            "inline-flex h-11 shrink-0 items-center gap-1 rounded-[12px] px-4 font-display text-[14px] font-semibold transition-colors duration-np",
             ready ? "bg-navy text-ivory hover:bg-navy-2" : "border-[1.5px] border-navy text-navy hover:bg-navy/5",
           )}
         >
@@ -171,19 +171,19 @@ export function CompareTray({ locale }: { locale: Locale }) {
       <div className="np-glass hidden items-center gap-2.5 rounded-full py-1.5 pl-1.5 pr-1.5 md:flex">
         <ul className="flex -space-x-2.5 pl-0.5" aria-hidden>
           {compare.slice(0, 3).map((id) => (
-            <li key={id} className="h-9 w-9 rounded-full outline outline-2 -outline-offset-2 outline-[#F6F2EC]">
+            <li key={id} className="h-9 w-9 rounded-full outline outline-2 -outline-offset-2 outline-[#FAF8F4]">
               {thumb(id, "h-full w-full rounded-full")}
             </li>
           ))}
         </ul>
         <span className="flex items-center gap-1.5 whitespace-nowrap font-display text-[14px] font-semibold text-ink">
-          <Scale size={14} aria-hidden className="shrink-0 text-[#0E1A2B]" />
+          <Scale size={14} aria-hidden className="shrink-0 text-[#3A6A92]" />
           <span aria-live="polite">{tx(locale, `Comparar (${compare.length}/3)`, `Compare (${compare.length}/3)`)}</span>
         </span>
         <Link
           href={href}
           className={cn(
-            "inline-flex h-10 shrink-0 items-center gap-1 rounded-[2px] px-4 font-display text-[14px] font-semibold transition-colors duration-np",
+            "inline-flex h-10 shrink-0 items-center gap-1 rounded-[12px] px-4 font-display text-[14px] font-semibold transition-colors duration-np",
             ready ? "bg-navy text-ivory hover:bg-navy-2" : "border-[1.5px] border-navy text-navy hover:bg-navy/5",
           )}
         >
@@ -211,7 +211,7 @@ export function CompareLink({ locale, className }: { locale: Locale; className?:
   const { compare } = useApp();
   if (!compare.length) return null;
   return (
-    <Link href={compareHref(locale, compare)} className={cn("inline-flex min-h-11 items-center gap-1.5 rounded-[2px] px-3 font-display text-[13px] font-semibold text-navy underline-offset-4 hover:underline", className)}>
+    <Link href={compareHref(locale, compare)} className={cn("inline-flex min-h-11 items-center gap-1.5 rounded-[12px] px-3 font-display text-[13px] font-semibold text-navy underline-offset-4 hover:underline", className)}>
       {tx(locale, `Ver comparación (${compare.length})`, `View comparison (${compare.length})`)} <ArrowRight size={14} aria-hidden />
     </Link>
   );

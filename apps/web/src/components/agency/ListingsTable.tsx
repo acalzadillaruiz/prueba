@@ -142,7 +142,7 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
     if (m) {
       const p = mPhase(m);
       // Table: "Encargo" as a small kicker over the phase pill, so the Estado column stays as narrow as a single pill.
-      if (stacked) return <span className="flex flex-col items-start gap-0.5"><span className={cn("text-[11px] font-semibold", k.muted)}>{tx(locale, "Encargo", "Mandate")}</span><Pill tone={MANDATE_PHASE[p].tone}><span title={mandateHint(p, locale)}>{mandateLabel(p, locale)}</span></Pill></span>;
+      if (stacked) return <span className="flex flex-col items-start gap-0.5"><span className={cn("text-[12px] font-semibold", k.muted)}>{tx(locale, "Encargo", "Mandate")}</span><Pill tone={MANDATE_PHASE[p].tone}><span title={mandateHint(p, locale)}>{mandateLabel(p, locale)}</span></Pill></span>;
       return <Pill tone={MANDATE_PHASE[p].tone}><span title={mandateHint(p, locale)}>{tx(locale, "Encargo", "Mandate")} · {mandateLabel(p, locale)}</span></Pill>;
     }
     return <StatusPill status={l.status} review={l.review} takedownReason={l.takedownReason} locale={locale} />;
@@ -155,8 +155,8 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
   );
   /** Price and agent get their own columns from xl; below it (1024 beside the sidebar, tablets) they stack in the listing cell. */
   const xlCol = "hidden xl:table-cell";
-  const box = "h-[18px] w-[18px] shrink-0 cursor-pointer accent-navy dark:accent-[#E9E1D3]";
-  const qualityBar = (l: Listing, w: string) => <span className={cn("inline-block h-1.5 rounded-full bg-[#E6DFD3] dark:bg-white/10", w)} aria-hidden><span className={cn("block h-full rounded-full", l.quality >= 85 ? "bg-ok" : l.quality >= 65 ? "bg-warn" : "bg-danger")} style={{ width: `${l.quality}%` }} /></span>;
+  const box = "h-[18px] w-[18px] shrink-0 cursor-pointer accent-navy dark:accent-[#EFE6D8]";
+  const qualityBar = (l: Listing, w: string) => <span className={cn("inline-block h-1.5 rounded-full bg-[#E3E8EC] dark:bg-white/10", w)} aria-hidden><span className={cn("block h-full rounded-full", l.quality >= 85 ? "bg-ok" : l.quality >= 65 ? "bg-warn" : "bg-danger")} style={{ width: `${l.quality}%` }} /></span>;
   /** Columns that only fit from 2xl (≥ 1536 px); below it they ride on a meta line under the title. */
   const wide = "hidden 2xl:table-cell";
 
@@ -192,7 +192,7 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
       {error && <div className={cn("mb-3", k.err)} role="alert">{error}</div>}
       {mandates.length > 0 && (
         <section className={cn(k.card, "mb-6 p-5 md:p-6")} aria-labelledby="mandates-title" data-testid="mandates">
-          <h2 id="mandates-title" className={cn(k.title, "mb-1 flex items-center gap-2.5")}><FileSignature size={18} strokeWidth={1.6} className="text-gold-text dark:text-[#C9BFAE]" /> {tx(locale, "Encargos de propietarios", "Owner mandates")} <Count>{mandates.length}</Count></h2>
+          <h2 id="mandates-title" className={cn(k.title, "mb-1 flex items-center gap-2.5")}><FileSignature size={18} strokeWidth={1.6} className="text-gold-text dark:text-[#D6DEE5]" /> {tx(locale, "Encargos de propietarios", "Owner mandates")} <Count>{mandates.length}</Count></h2>
           <p className={cn("mb-3 text-[13px]", k.muted)}>{tx(locale, "Solicitado → Asignado → En preparación → Publicado. Asigna un agente y, cuando la ficha esté lista, revísala y publícala en un solo paso.", "Requested → Assigned → In preparation → Published. Assign an agent and, when the listing is ready, review and publish it in one step.")}</p>
           <div className={cn("divide-y", k.divide)}>
             {mandates.map((m) => {
@@ -242,7 +242,7 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
           const title = tx(locale, l.title_es, l.title_en);
           const edit = `/${locale}/agency/listings/${l.id}/edit`;
           return (
-            <li key={l.id} className={cn(k.card, "p-4", picked.has(l.id) && "outline outline-2 -outline-offset-2 outline-navy/70 dark:outline-[#E9E1D3]/70")} data-listing={l.id}>
+            <li key={l.id} className={cn(k.card, "p-4", picked.has(l.id) && "outline outline-2 -outline-offset-2 outline-navy/70 dark:outline-[#EFE6D8]/70")} data-listing={l.id}>
               <div className="flex items-start gap-3">
                 {selectable && <input type="checkbox" className={cn(box, "mt-1")} checked={picked.has(l.id)} onChange={() => toggle(l.id)} aria-label={tx(locale, `Seleccionar ${title}`, `Select ${title}`)} />}
                 <Link href={edit} className="flex min-w-0 flex-1 items-start gap-3">
@@ -261,18 +261,18 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
               </div>
               <dl className={cn("mt-3 grid grid-cols-3 gap-2 rounded-xl px-3 py-2.5 text-center", k.soft)}>
                 <div className="min-w-0">
-                  <dt className={cn(k.label, "text-[10px]")}>{tx(locale, "Calidad", "Quality")}</dt>
+                  <dt className={cn(k.label, "text-[12px]")}>{tx(locale, "Calidad", "Quality")}</dt>
                   <dd className="mt-1 flex items-center justify-center gap-1.5">
-                    <span className="h-1.5 w-10 rounded-full bg-[#E6DFD3] dark:bg-white/10" aria-hidden><span className={cn("block h-full rounded-full", l.quality >= 85 ? "bg-ok" : l.quality >= 65 ? "bg-warn" : "bg-danger")} style={{ width: `${l.quality}%` }} /></span>
+                    <span className="h-1.5 w-10 rounded-full bg-[#E3E8EC] dark:bg-white/10" aria-hidden><span className={cn("block h-full rounded-full", l.quality >= 85 ? "bg-ok" : l.quality >= 65 ? "bg-warn" : "bg-danger")} style={{ width: `${l.quality}%` }} /></span>
                     <span className="text-xs font-semibold">{l.quality}</span>
                   </dd>
                 </div>
                 <div>
-                  <dt className={cn(k.label, "text-[10px]")}>Leads</dt>
+                  <dt className={cn(k.label, "text-[12px]")}>Leads</dt>
                   <dd className="mt-0.5 font-semibold">{l.stats.leads}</dd>
                 </div>
                 <div>
-                  <dt className={cn(k.label, "text-[10px]")}>{tx(locale, "Días", "Days")}</dt>
+                  <dt className={cn(k.label, "text-[12px]")}>{tx(locale, "Días", "Days")}</dt>
                   <dd className="mt-0.5 font-semibold">{l.daysOnMarket}</dd>
                 </div>
               </dl>
@@ -377,7 +377,7 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
       )}
       {chosen.length > 0 && (
         <div className="sticky bottom-3 z-20 mt-4" role="region" aria-label={tx(locale, "Acciones en lote", "Bulk actions")}>
-          <div className={cn(k.card, "flex flex-wrap items-center gap-2 p-3 outline outline-1 -outline-offset-1 outline-[#E9E1D3] md:gap-3 md:px-4")}>
+          <div className={cn(k.card, "flex flex-wrap items-center gap-2 p-3 outline outline-1 -outline-offset-1 outline-[#EFE6D8] md:gap-3 md:px-4")}>
             <span className="text-sm font-semibold">{tx(locale, `${chosen.length} ${chosen.length === 1 ? "seleccionado" : "seleccionados"}`, `${chosen.length} selected`)}</span>
             {manager && (
               <Select compact value="" disabled={bulk?.running} onChange={(e) => e.target.value && bulkAssign(e.target.value)} className="h-10" aria-label={tx(locale, "Asignar los seleccionados a…", "Assign selected to…")}>

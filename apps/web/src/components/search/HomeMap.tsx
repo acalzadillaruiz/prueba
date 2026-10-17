@@ -15,7 +15,7 @@ const MapView = dynamic(() => import("@/components/map/MapView").then((m) => m.M
 export function HomeMap({ listings, locale, className, region = "venezuela", focus, initialScale = 2.4, phoneScale }: { listings: Listing[]; locale: Locale; className?: string; region?: "caracas" | "venezuela"; focus?: LatLng; initialScale?: number; phoneScale?: number }) {
   const [sel, setSel] = useState<string | null>(null);
   return (
-    <LazyMount className={cn("h-[420px] rounded-[4px] lg:h-[520px]", className)} loadingLabel={locale === "es" ? "Cargando el mapa…" : "Loading the map…"}>
+    <LazyMount className={cn("h-[420px] rounded-[16px] lg:h-[520px]", className)} loadingLabel={locale === "es" ? "Cargando el mapa…" : "Loading the map…"}>
       <MapView
         listings={listings}
         locale={locale}

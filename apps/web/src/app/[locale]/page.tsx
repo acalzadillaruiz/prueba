@@ -1,9 +1,8 @@
 import Image from "next/image";
-import Link from "next/link";
 import { ArrowRight, ArrowUpRight, Check } from "lucide-react";
 import type { Listing, Locale } from "@/types/domain";
 import { PublicPage } from "@/components/layout/PublicPage";
-import { HomeMap } from "@/components/search/HomeMap";
+import { HomeZoneMap } from "@/components/search/HomeZoneMap";
 import { mapListing } from "@/components/map/mapListing";
 import { factsLine } from "@/components/listing/ListingCard";
 import { HeroAura } from "@/components/home/HeroAura";
@@ -15,46 +14,13 @@ import { RemoteRoute } from "@/components/home/RemoteRoute";
 import { listingHref } from "@/lib/listing-href";
 import { listingPhoto } from "@/lib/photos";
 import { Button } from "@/components/ui";
-import { cn } from "@/lib/cn";
 import { publicListings } from "@/server/listings";
-import { zoneStats } from "@/server/zone-stats";
-import { money, plural, priceSuffix, tx } from "@/lib/i18n";
+import { money, priceSuffix, tx } from "@/lib/i18n";
 
 // Static and cached (ISR): no session is read on public pages; data refreshes every 60 s and on listing changes.
 export const revalidate = 60;
 
-/** Zones featured next to the map (the brand's coast first), with a brand photo each. Figures come from zoneStats. */
-const FEATURED_ZONES: { zone: string; photo: string }[] = [
-  { zone: "Lechería", photo: "/brand/marina.jpg" },
-  { zone: "Playa El Agua", photo: "/brand/terraza.jpg" },
-  { zone: "Country Club", photo: "/brand/villa.jpg" },
-  { zone: "Altamira", photo: "/brand/salon.jpg" },
-];
-
 const AVAILABLE = ["ACTIVE", "COMING_SOON", "UNDER_OFFER"];
-
-/** What a rentals-only zone offers, shown in its own group under the sale zones (es, en). */
-const RENT_LABEL: Record<string, [string, string]> = {
-  SHORT_RENT: ["Vacacional", "Holiday rentals"],
-  LONG_RENT: ["Alquiler", "Long-term rent"],
-  COMMERCIAL: ["Comercial", "Commercial"],
-};
-
-/**
- * The search tab where a zone's listings live (Lechería today is vacation rentals only, for example), and the figure
- * shown on its card for that same tab: the sale price per m² for SALE, otherwise the lowest price of that type
- * ("desde $220/noche"). Card figure and link always speak about the same kind of home.
- */
-function zoneCard(locale: Locale, zone: string, all: Listing[]) {
-  const counts = new Map<string, number>();
-  const kindOf = (l: Listing) => (l.listingType.startsWith("COMMERCIAL") ? "COMMERCIAL" : l.listingType);
-  for (const l of all) if (l.zone === zone) counts.set(kindOf(l), (counts.get(kindOf(l)) ?? 0) + 1);
-  const type = [...counts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? "SALE";
-  const href = `/${locale}/search?type=${type}&zone=${encodeURIComponent(zone)}`;
-  if (type === "SALE") return { href, type, from: null };
-  const cheapest = all.filter((l) => l.zone === zone && kindOf(l) === type).sort((a, b) => a.priceAmount - b.priceAmount)[0];
-  return { href, type, from: cheapest ? { price: money(cheapest.priceAmount, locale), suffix: priceSuffix(cheapest, locale) } : null };
-}
 
 export default async function Home({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params;
@@ -70,18 +36,9 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
     price: price(l),
     facts: factsLine(l, locale).join(" · "),
     photo: listingPhoto(l, 0),
-    badge: l.luxury ? tx(locale, "Colección Privada", "Private Collection") : undefined,
+    badge: l.luxury ? tx(locale, "Exclusiva", "Exclusive") : undefined,
   }));
   const pins = available.map(mapListing);
-  // Each zone shows one of its own homes when it has one (the brand photos are the fallback).
-  const zonePhoto = (zone: string, fallback: string) => {
-    const l = available.find((x) => x.zone === zone && x.photos?.length);
-    return (l && listingPhoto(l, 0)) || fallback;
-  };
-  const zones = await Promise.all(FEATURED_ZONES.map(async (z) => ({ ...z, photo: zonePhoto(z.zone, z.photo), stats: await zoneStats(z.zone), ...zoneCard(locale, z.zone, available) })));
-  const saleZones = zones.filter((z) => z.type === "SALE");
-  const otherZones = zones.filter((z) => z.type !== "SALE");
-  const zoneCount = (n: number) => (n > 0 ? plural(n, locale, ["propiedad", "propiedades"], ["property", "properties"]) : tx(locale, "Próximamente", "Coming soon"));
 
   // "Así trabajamos": what the buyer gets, then how (035: short, concrete, at most two lines on a phone).
   const chapters = [
@@ -114,77 +71,14 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
         <div data-reveal className="mb-10 grid items-end gap-6 md:grid-cols-[1fr_auto] md:gap-8 lg:mb-12">
           <div><h2 className="np-t-band">{tx(locale, "Busca por zona", "Search by area")}</h2></div>
           <p className="np-t-body max-w-[380px] text-ink md:text-right">
-            {tx(locale, "Mira en el mapa dónde está cada casa y cuánto cuesta.", "See on the map where each home is and what it costs.")}
+            {tx(locale, "Explora las casas sobre el mapa. Precios en dólares.", "Explore the homes on the map. Prices in US dollars.")}
           </p>
         </div>
-        <div className="grid grid-cols-[minmax(0,1fr)] gap-4 md:gap-6 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
-          {/* Framed on the coast from Los Roques / Caracas to Margarita, with room for the edge clusters and price pills. */}
-          <HomeMap listings={pins} locale={locale} focus={{ lat: 10.95, lng: -65.45 }} initialScale={2.9} phoneScale={2.15} className="h-[340px] sm:h-[420px]" />
-          <div className="flex min-w-0 flex-col gap-3">
-            {/* One metric per list: the sale zones show the price per m²; zones that today only have rentals (Lechería:
-                vacation homes) go in their own small group, with their "from" price per night / month. */}
-            {saleZones.length > 0 && <p className="font-display text-[13px] font-semibold text-muted">{tx(locale, "En venta · precio por m²", "For sale · price per m²")}</p>}
-            {/* Phones: a sideways rail (one row, swipe) instead of a tall stack; md+: the stacked list. */}
-            {/* Tablets (md, map above): two columns, so the list isn't four tall rows; lg: the stack beside the map. */}
-            <ul data-reveal="stagger" data-zone-rail className="no-scrollbar -mx-4 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 md:mx-0 md:grid md:snap-none md:grid-cols-2 md:overflow-visible md:px-0 lg:flex lg:flex-col">
-              {saleZones.map((z) => (
-                <li key={z.zone} className="w-[78%] shrink-0 snap-start sm:w-[46%] md:w-auto">
-                  <Link href={z.href} className="np-glass group flex h-full min-h-[88px] items-stretch overflow-hidden rounded-[4px] md:min-h-[104px]">
-                    <span className="relative m-2 w-[56px] shrink-0 overflow-hidden rounded-[4px] sm:w-[84px] lg:w-[100px]">
-                      <Image src={z.photo} alt="" fill sizes="112px" className="np-card-photo object-cover" />
-                    </span>
-                    <span className="flex min-w-0 flex-1 items-center justify-between gap-2.5 px-2.5 py-3 sm:gap-3 sm:px-4 sm:py-4 lg:px-5">
-                      <span className="min-w-0">
-                        {/* Up to two balanced lines: "Playa El Agua", "Country Club" read whole on a 390 px rail card and in the 768 px two-column grid. */}
-                        <span className="line-clamp-2 break-words font-serif text-[19px] leading-[1.12] [text-wrap:balance] sm:text-[22px] lg:text-[25px]">{z.zone}</span>
-                        <span className="block text-sm text-muted">{zoneCount(z.stats.activeListings)}</span>
-                      </span>
-                      <span className="shrink-0 text-right">
-                        <span className="block font-display text-[15px] font-semibold text-ink">{money(z.stats.salePpm, locale)}</span>
-                        <span className="block text-sm text-muted">{tx(locale, "por m²", "per m²")}</span>
-                      </span>
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-            {otherZones.length > 0 && (
-              <>
-                <p className={cn("font-display text-[13px] font-semibold text-muted", saleZones.length > 0 && "mt-1 md:mt-3")}>{tx(locale, "Solo en alquiler · desde", "Rentals only · from")}</p>
-                <ul className="flex flex-col gap-2">
-                  {otherZones.map((z) => (
-                    <li key={z.zone}>
-                      <Link href={z.href} className="np-glass group flex min-h-[64px] items-center gap-3 rounded-[4px] p-1.5 pr-4">
-                        <span className="relative h-[52px] w-[52px] shrink-0 overflow-hidden rounded-[4px]">
-                          <Image src={z.photo} alt="" fill sizes="56px" className="object-cover" />
-                        </span>
-                        <span className="min-w-0 flex-1">
-                          <span className="block truncate font-serif text-[19px] leading-tight">{z.zone}</span>
-                          <span className="block truncate text-[13px] text-muted">
-                            {RENT_LABEL[z.type] ? tx(locale, RENT_LABEL[z.type][0], RENT_LABEL[z.type][1]) : ""}
-                            {RENT_LABEL[z.type] ? " · " : ""}
-                            {zoneCount(z.stats.activeListings)}
-                          </span>
-                        </span>
-                        {z.from && (
-                          <span className="shrink-0 font-display text-[15px] font-semibold text-ink">
-                            <span className="sr-only">{tx(locale, "desde ", "from ")}</span>
-                            {z.from.price}
-                            <span className="font-normal text-muted">{z.from.suffix}</span>
-                          </span>
-                        )}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </>
-            )}
-            <div className="pt-1">
-              <Button href={`/${locale}/search?type=SALE`} variant="outline" className="w-full">
-                {tx(locale, "Abrir el mapa", "Open the map")} <ArrowRight size={16} aria-hidden />
-              </Button>
-            </div>
-          </div>
+        <HomeZoneMap listings={pins} locale={locale} />
+        <div className="mt-8">
+          <Button href={`/${locale}/search?type=SALE`} variant="outline">
+            {tx(locale, "Abrir el buscador con mapa", "Open the map search")} <ArrowRight size={16} aria-hidden />
+          </Button>
         </div>
       </section>
 
@@ -220,12 +114,13 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
 
       {/* COLECCIÓN PRIVADA — real homes right after the hero: horizontal gallery */}
       <CollectionRail
-        title={tx(locale, "Casas elegidas una a una", "Homes chosen one by one")}
-        lead={tx(locale, "La Colección Privada: casas que vemos en persona y enseñamos con cita.", "The Private Collection: homes we see in person and show by appointment.")}
+        title={tx(locale, "Colección privada", "Private collection")}
+        lead={tx(locale, "Casas fuera de mercado que vemos en persona y enseñamos solo con cita.", "Off-market homes we see in person and show by appointment only.")}
         photo={PHOTOS.salonMar}
         photoAlt={tx(locale, PHOTOS.salonMar.alt.es, PHOTOS.salonMar.alt.en)}
         items={rail}
         more={{ href: `/${locale}/luxury`, label: tx(locale, "Ver toda la colección", "See the whole collection") }}
+        labels={{ prev: tx(locale, "Casa anterior", "Previous home"), next: tx(locale, "Casa siguiente", "Next home"), hint: tx(locale, "Desliza", "Swipe") }}
       />
 
       {/* COMPRA A DISTANCIA — the diaspora's routes draw in to Lechería as the steps light up. */}
@@ -258,7 +153,7 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
             </span>
           </div>
           {/* Portrait only beside the copy (lg); stacked below it (phones, tablets) a landscape band. */}
-          <div data-reveal className="relative aspect-[16/10] w-full overflow-hidden bg-[#E9E1D3] lg:aspect-[4/3]">
+          <div data-reveal className="relative aspect-[16/10] w-full overflow-hidden bg-[#EFE6D8] lg:aspect-[4/3]">
             <div className="absolute inset-0">
               <Image src={PHOTOS.costaAtardecer.src} alt={tx(locale, PHOTOS.costaAtardecer.alt.es, PHOTOS.costaAtardecer.alt.en)} fill sizes="(max-width: 1024px) 90vw, 560px" className="object-cover" style={{ objectPosition: PHOTOS.costaAtardecer.focus }} />
             </div>

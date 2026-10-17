@@ -86,7 +86,7 @@ export function PlatformHome({ locale, data }: { locale: Locale; data: PlatformH
                 {h.ok ? <CheckCircle2 size={16} strokeWidth={1.7} className={k.okText} aria-hidden /> : <AlertTriangle size={16} strokeWidth={1.7} className={k.warnText} aria-hidden />}
                 <span className="font-semibold">{h.k}</span>
                 <span className="col-start-2 flex flex-wrap items-center gap-x-2 gap-y-1">
-                  <Pill tone={h.ok ? "ok" : "warn"} className="px-2 py-0.5 text-[10px]">{h.ok ? tx(locale, "Operativo", "OK") : tx(locale, "Revisar", "Check")}</Pill>
+                  <Pill tone={h.ok ? "ok" : "warn"} className="px-2 py-0.5 text-[12px]">{h.ok ? tx(locale, "Operativo", "OK") : tx(locale, "Revisar", "Check")}</Pill>
                   <span className={cn("min-w-0 text-xs", k.muted)}>{h.v}</span>
                 </span>
               </li>
@@ -113,7 +113,7 @@ export function PlatformHome({ locale, data }: { locale: Locale; data: PlatformH
               <li key={i} className="flex flex-wrap items-center gap-x-3 gap-y-1 py-2.5 text-sm first:pt-0 sm:flex-nowrap">
                 <span className={cn("w-20 shrink-0 text-xs", k.muted)}><TimeAgo iso={a.at} locale={locale} /></span>
                 <span className="shrink-0 font-semibold">{a.actor || tx(locale, "Sistema", "System")}</span>
-                <Chip className="shrink-0 py-0.5 text-[11px]">{auditLabel(a.action, locale)}</Chip>
+                <Chip className="shrink-0 py-0.5 text-[12px]">{auditLabel(a.action, locale)}</Chip>
                 <span className={cn("min-w-0 flex-1 basis-full truncate sm:basis-auto", k.muted)}>{a.target}</span>
               </li>
             ))}
@@ -141,9 +141,9 @@ export function PlatformAgencies({ locale, agencies }: { locale: Locale; agencie
         : tx(locale, `¿Seguro? ${a.name} pasará de «${STATUS[a.status]?.[0] ?? a.status}» a «${STATUS[p.value]?.[0] ?? p.value}».`, `Sure? ${a.name} will go from “${STATUS[a.status]?.[1] ?? a.status}” to “${STATUS[p.value]?.[1] ?? p.value}”.`);
   return (
     <AdminShell locale={locale} area="platform" title={tx(locale, "Agencias", "Agencies")} actions={<Button className={k.primary} onClick={() => setCreating(!creating)} aria-expanded={creating}><Plus size={16} /> {tx(locale, "Nueva agencia", "New agency")}</Button>}>
-      {err && <div role="alert" className="mb-4 rounded-lg bg-[#B3261E33] px-3 py-2 text-sm text-[#E9E1D3]">{err}</div>}
+      {err && <div role="alert" className="mb-4 rounded-lg bg-[#B3261E33] px-3 py-2 text-sm text-[#EFE6D8]">{err}</div>}
       {current && (
-        <div className="np-in mb-4 flex flex-wrap items-center gap-3 rounded-[4px] bg-rosa/70 px-4 py-3 text-sm text-navy dark:bg-white/[.08] dark:text-ivory">
+        <div className="np-in mb-4 flex flex-wrap items-center gap-3 rounded-[16px] bg-rosa/70 px-4 py-3 text-sm text-navy dark:bg-white/[.08] dark:text-ivory">
           <LogIn size={16} strokeWidth={1.7} /> {tx(locale, `Estás dentro de ${current.name} como su equipo. Todo lo que hagas queda en el registro de auditoría.`, `You’re inside ${current.name} as its team. Everything you do is recorded in the audit log.`)}
           <a href={`/${locale}/agency`} className={cn("ml-auto", k.link)}>{tx(locale, "Abrir panel", "Open dashboard")} →</a>
           <button onClick={() => run("exit", () => api("platform/impersonate", { method: "POST", json: { agencyId: null } }))} className={cn("rounded-full px-3 py-1", k.ghost)}>{tx(locale, "Salir", "Exit")}</button>
@@ -265,7 +265,7 @@ export function PlatformUsers({ locale, users, providers }: { locale: Locale; us
                 <td className="px-4 py-2.5"><div className="flex items-center gap-3"><Initials name={u.name} size={36} /><div><div className="font-semibold">{u.name}</div><div className={cn("text-xs", k.muted)}>{u.email}</div></div></div></td>
                 <td className="px-3">
                   {u.id === me?.id ? (
-                    <Chip className="py-0.5 text-[11px]">{tr(u.role)}</Chip>
+                    <Chip className="py-0.5 text-[12px]">{tr(u.role)}</Chip>
                   ) : (
                     <Select
                       value={u.role}
@@ -288,7 +288,7 @@ export function PlatformUsers({ locale, users, providers }: { locale: Locale; us
                       // Suspending is confirmed inline (below the row); restoring needs no confirmation.
                       if (!u.suspended) return setSuspending(suspending === u.id ? null : u.id);
                       run(u.id, () => api(`platform/users/${u.id}`, { method: "PATCH", json: { suspended: false } }));
-                    }} className={cn("rounded-full p-2 hover:bg-[#E9E1D3] dark:hover:bg-white/5", u.suspended ? k.okText : k.dangerText)} aria-label={u.suspended ? tx(locale, "Reactivar", "Restore") : tx(locale, "Suspender", "Suspend")} title={u.suspended ? tx(locale, "Reactivar", "Restore") : tx(locale, "Suspender", "Suspend")}>
+                    }} className={cn("rounded-full p-2 hover:bg-[#EFE6D8] dark:hover:bg-white/5", u.suspended ? k.okText : k.dangerText)} aria-label={u.suspended ? tx(locale, "Reactivar", "Restore") : tx(locale, "Suspender", "Suspend")} title={u.suspended ? tx(locale, "Reactivar", "Restore") : tx(locale, "Suspender", "Suspend")}>
                       {u.suspended ? <RotateCcw size={14} /> : <Ban size={14} />}
                     </button>
                   )}
@@ -459,7 +459,7 @@ export function PlatformAI({ locale, settings, fx, counts }: { locale: Locale; s
               ["heuristic", tx(locale, "Reglas internas", "Internal rules"), tx(locale, "Funciona sin servicios externos. Es la opción por defecto.", "Works without outside services. The default.")],
               ["openai-compatible", tx(locale, "Proveedor de IA externo", "External AI provider"), tx(locale, "Un servicio de IA contratado (OpenAI, Groq…). Necesita su clave.", "A paid AI service (OpenAI, Groq…). Needs its key.")],
             ] as const).map(([key, n, d]) => (
-              <button key={key} disabled={busy === "ai"} onClick={() => run("ai", () => api("platform/settings", { method: "PUT", json: { aiProvider: key } }))} aria-pressed={settings.aiProvider === key} className={cn("rounded-[4px] p-4 text-left transition-shadow duration-np", settings.aiProvider === key ? "bg-[#E9E1D3] outline outline-2 -outline-offset-2 outline-[#1A2026] dark:bg-white/10 dark:outline dark:outline-2 dark:-outline-offset-2 dark:outline-[#E9E1D3]" : cn("outline outline-1 -outline-offset-1 outline-[#C9BFAE] dark:outline dark:outline-1 dark:-outline-offset-1 dark:outline-[rgba(255,255,255,.15)]", k.hover))}>
+              <button key={key} disabled={busy === "ai"} onClick={() => run("ai", () => api("platform/settings", { method: "PUT", json: { aiProvider: key } }))} aria-pressed={settings.aiProvider === key} className={cn("rounded-[16px] p-4 text-left transition-shadow duration-np", settings.aiProvider === key ? "bg-[#EFE6D8] outline outline-2 -outline-offset-2 outline-[#1F3A4D] dark:bg-white/10 dark:outline dark:outline-2 dark:-outline-offset-2 dark:outline-[#EFE6D8]" : cn("outline outline-1 -outline-offset-1 outline-[#D6DEE5] dark:outline dark:outline-1 dark:-outline-offset-1 dark:outline-[rgba(255,255,255,.15)]", k.hover))}>
                 <div className="flex items-center justify-between"><span className="font-display text-sm font-semibold">{n}</span>{settings.aiProvider === key && <CheckCircle2 size={16} />}</div>
                 <div className={cn("mt-1 text-xs", k.muted)}>{d}</div>
               </button>
@@ -584,7 +584,7 @@ export function PlatformAudit({
               <tr key={a.id} className={cn("border-t align-top first:border-t-0", k.line)} data-testid="audit-row">
                 <td className={cn("whitespace-nowrap px-4 py-2.5 text-xs", k.muted)} title={a.at}>{dateTime(a.at, locale, { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}</td>
                 <td className="px-3 py-2.5 font-semibold">{a.actor || system}</td>
-                <td className="px-3 py-2.5"><span title={a.action}><Chip className="py-0.5 text-[11px]">{auditLabel(a.action, locale)}</Chip></span></td>
+                <td className="px-3 py-2.5"><span title={a.action}><Chip className="py-0.5 text-[12px]">{auditLabel(a.action, locale)}</Chip></span></td>
                 <td className="max-w-xs truncate px-3 py-2.5" title={a.target}>{a.target === "-" ? "—" : a.target}</td>
                 <td className={cn("px-3 py-2.5 text-xs", k.muted)}>{auditDetail(a.data, locale)}</td>
               </tr>

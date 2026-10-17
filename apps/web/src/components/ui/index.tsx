@@ -11,7 +11,7 @@ import { Monogram } from "@/components/brand/Logo";
  */
 type BtnVariant = "primary" | "coral" | "navy" | "ghost" | "outline" | "light" | "dark-ghost" | "dark-outline" | "gold";
 const PRIMARY = "bg-coral-cta text-white hover:bg-coral-cta-hover active:bg-coral-cta-hover";
-const LIGHT = "bg-[#F6F2EC] text-[#0E1A2B] hover:bg-[#E9E1D3]"; // fixed hexes: stays bone on night in dark mode too
+const LIGHT = "bg-[#FAF8F4] text-[#3A6A92] hover:bg-[#EFE6D8]"; // fixed hexes: stays bone on night in dark mode too
 const BTN: Record<BtnVariant, string> = {
   primary: PRIMARY,
   coral: PRIMARY,
@@ -55,7 +55,7 @@ export function Button({
 } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
   const withArrow = arrow ?? false;
   const cls = cn(
-    "inline-flex items-center justify-center gap-2 rounded-[2px] font-display font-medium transition-[background-color,color,transform] duration-np ease-np active:scale-[.98] disabled:cursor-not-allowed disabled:bg-[#E9E1D3] disabled:text-[#77706A] disabled:border-transparent whitespace-nowrap",
+    "inline-flex items-center justify-center gap-2 rounded-[12px] font-display font-medium transition-[background-color,color,transform] duration-np ease-np active:scale-[.98] disabled:cursor-not-allowed disabled:bg-[#EFE6D8] disabled:text-[#77706A] disabled:border-transparent whitespace-nowrap",
     BTN[variant],
     withArrow ? cn(SIZE[size].split(" ").filter((c) => c.startsWith("text-")).join(" "), SIZE_ARROW[size]) : SIZE[size],
     className,
@@ -79,22 +79,22 @@ type BadgeTone = "neutral" | "coral" | "gold" | "ok" | "warn" | "danger" | "navy
  */
 export function Badge({ children, tone = "neutral", className }: { children: ReactNode; tone?: BadgeTone; className?: string }) {
   const t = {
-    neutral: "bg-black/5 text-ink dark:bg-white/10 dark:text-[#F6F2EC]",
-    coral: "bg-[#0E1A2B1F] text-coral-hover dark:bg-[#E9E1D326] dark:text-[#E9E1D3]",
-    gold: "bg-[#C9BFAE29] text-gold-text dark:text-[#C9BFAE]",
+    neutral: "bg-black/5 text-ink dark:bg-white/10 dark:text-[#FAF8F4]",
+    coral: "bg-[#3A6A921F] text-coral-hover dark:bg-[#EFE6D826] dark:text-[#EFE6D8]",
+    gold: "bg-[#D6DEE529] text-gold-text dark:text-[#D6DEE5]",
     ok: "bg-[#2F6F4E1F] text-ok dark:bg-[#7FC8A426] dark:text-[#7FC8A4]",
     warn: "bg-[#8A5A0024] text-[#7A4F00] dark:bg-[#F2B86626] dark:text-[#F2B866]",
     danger: "bg-[#B3261E1A] text-danger dark:bg-[#F2A09A26] dark:text-[#F2A09A]",
     navy: "bg-navy text-ivory",
-    mist: "bg-[#A9B1BC2E] text-[#4E453F] dark:text-[#DECEB9]",
+    mist: "bg-[#B9C7D32E] text-[#4E453F] dark:text-[#DECEB9]",
     dark: "bg-white/10 text-ivory",
-    exclusive: "bg-white/90 text-[#0E1A2B] outline outline-1 -outline-offset-1 outline-[rgb(14_26_43/.3)]",
-    egeo: "bg-[#C9BFAE] text-[#0E1A2B]",
-    arena: "bg-[#E9E1D3] text-[#1A2026]",
+    exclusive: "bg-white/90 text-[#3A6A92] outline outline-1 -outline-offset-1 outline-[rgb(14_26_43/.3)]",
+    egeo: "bg-[#D6DEE5] text-[#3A6A92]",
+    arena: "bg-[#EFE6D8] text-[#1F3A4D]",
   }[tone];
   const caps = tone === "exclusive" || tone === "egeo" || tone === "arena";
   return (
-    <span className={cn("inline-flex items-center gap-1.5 whitespace-nowrap rounded-[2px]", caps ? "px-3 py-1 text-[13px] font-semibold" : "px-2.5 py-0.5 text-[13px] font-semibold", t, className)}>
+    <span className={cn("inline-flex items-center gap-1.5 whitespace-nowrap rounded-[12px]", caps ? "px-3 py-1 text-[13px] font-semibold" : "px-2.5 py-0.5 text-[13px] font-semibold", t, className)}>
       {children}
     </span>
   );
@@ -125,7 +125,7 @@ export function Field({ label, children, hint, dark, error }: { label: string; c
       <span className={cn("mb-1.5 block text-sm font-semibold", dark ? "text-ivory/80" : "text-ink/80")}>{label}</span>
       {children}
       {error ? (
-        <span role="alert" className={cn("mt-1 block text-[13px] font-semibold", dark ? "text-[#E9E1D3]" : "text-danger")}>{error}</span>
+        <span role="alert" className={cn("mt-1 block text-[13px] font-semibold", dark ? "text-[#EFE6D8]" : "text-danger")}>{error}</span>
       ) : (
         hint && <span className={cn("mt-1 block text-[13px]", dark ? "text-mist" : "text-muted")}>{hint}</span>
       )}
@@ -134,9 +134,9 @@ export function Field({ label, children, hint, dark, error }: { label: string; c
 }
 
 export const inputCls =
-  "h-11 w-full rounded-np border border-line bg-white px-3.5 text-[15px] text-ink placeholder:text-muted transition-colors duration-np focus:border-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#735D3F] aria-[invalid=true]:border-danger";
+  "h-11 w-full rounded-np border border-line bg-white px-3.5 text-[15px] text-ink placeholder:text-muted transition-colors duration-np focus:border-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3A6A92] aria-[invalid=true]:border-danger";
 export const darkInputCls =
-  "h-10 w-full rounded-np border border-navy-line bg-navy-2 px-3 text-sm text-ivory placeholder:text-mist/60 focus:border-coral focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E9E1D3]";
+  "h-10 w-full rounded-np border border-navy-line bg-navy-2 px-3 text-sm text-ivory placeholder:text-mist/60 focus:border-coral focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#EFE6D8]";
 
 export function Stat({ label, value, delta, dark, hint }: { label: string; value: ReactNode; delta?: string; dark?: boolean; hint?: string }) {
   const up = delta?.startsWith("+");
@@ -175,9 +175,9 @@ export function EmptyState({ icon, title, body, cta, dark, monogram }: { icon?: 
   return (
     <div className={cn("flex flex-col items-center rounded-np border px-6 py-12 text-center", dark ? "border-navy-line" : "border-line bg-white")}>
       {monogram || !icon ? (
-        <Monogram className="mb-4 h-16 w-16" bg={dark ? "#1E3049" : "#E9E1D3"} ink={dark ? "#F6F2EC" : "#1A2026"} teja={dark ? "#E9E1D3" : "#0E1A2B"} animate />
+        <Monogram className="mb-4 h-16 w-16" bg={dark ? "#2C4A60" : "#EFE6D8"} ink={dark ? "#FAF8F4" : "#1F3A4D"} teja={dark ? "#EFE6D8" : "#3A6A92"} animate />
       ) : (
-        <div className={cn("mb-4 flex h-14 w-14 items-center justify-center rounded-full", dark ? "bg-white/5 text-[#E9E1D3]" : "bg-rosa text-coral")}>{icon}</div>
+        <div className={cn("mb-4 flex h-14 w-14 items-center justify-center rounded-full", dark ? "bg-white/5 text-[#EFE6D8]" : "bg-rosa text-coral")}>{icon}</div>
       )}
       <div className="font-serif text-2xl">{title}</div>
       <p className={cn("mt-1.5 max-w-sm text-[15px]", dark ? "text-mist" : "text-muted")}>{body}</p>

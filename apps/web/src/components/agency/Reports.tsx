@@ -48,7 +48,7 @@ function SourceBars({ locale, rows }: { locale: Locale; rows: ReportData["bySour
         return (
           <li key={r.source} className="grid grid-cols-[minmax(0,9.5rem)_1fr_auto] items-center gap-3 text-[14px]">
             <span className="truncate">{label}</span>
-            <span className="h-2.5 rounded-full bg-[#F6F2EC] dark:bg-white/[.06]" aria-hidden>
+            <span className="h-2.5 rounded-full bg-[#FAF8F4] dark:bg-white/[.06]" aria-hidden>
               <span className="block h-full rounded-full bg-[#81776F] dark:bg-[#8C817A]" style={{ width: `${(r.count / max) * 100}%` }} />
             </span>
             <span className="min-w-[4.5rem] text-right font-display font-semibold [font-feature-settings:'lnum','tnum']">
@@ -65,7 +65,7 @@ function SourceBars({ locale, rows }: { locale: Locale; rows: ReportData["bySour
 function Cell({ label, children, muted, className }: { label: ReactNode; children: ReactNode; muted?: boolean; className?: string }) {
   return (
     <div className={cn("min-w-0", className)}>
-      <dt className="text-[10px] font-semibold uppercase leading-tight tracking-[.1em] text-muted dark:text-mist">{label}</dt>
+      <dt className="text-[12px] font-semibold uppercase leading-tight tracking-[.1em] text-muted dark:text-mist">{label}</dt>
       <dd className={cn("mt-0.5 font-display text-[15px] font-semibold [font-feature-settings:'lnum','tnum']", muted && k.muted)}>{children}</dd>
     </div>
   );
@@ -208,7 +208,7 @@ export function ReportsView({ locale, data, days }: { locale: Locale; data: Repo
           <p className={cn("mt-3 text-[13px]", k.muted)}>{tx(locale, "Foto de hoy (no depende del periodo). Vacacional (precio por noche) y comercial no se promedian por m².", "Today's snapshot (not tied to the period). Vacation rentals (nightly price) and commercial listings are not averaged per m².")}</p>
         </Panel>
       </div>
-      <div className={cn("mt-6 flex items-center gap-3 rounded-[4px] border border-dashed p-4 text-sm", k.line, k.muted)}>
+      <div className={cn("mt-6 flex items-center gap-3 rounded-[16px] border border-dashed p-4 text-sm", k.line, k.muted)}>
         <FileSpreadsheet size={18} strokeWidth={1.6} className="shrink-0 text-navy dark:text-ivory" /> {tx(locale, "El CSV incluye inmuebles, estado, precio, valor estimado New Place, impresiones, guardados, leads y calidad. Listo para Excel o Google Sheets.", "The CSV includes listings, status, price, PlaceEstimate, impressions, saves, leads and quality. Ready for Excel or Google Sheets.")}
       </div>
     </AdminShell>

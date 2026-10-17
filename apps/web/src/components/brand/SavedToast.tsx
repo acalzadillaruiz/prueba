@@ -75,10 +75,10 @@ export function SavedToast({ locale, nonce, onClose }: { locale: Locale; nonce: 
       style={bottom != null ? { bottom } : undefined}
       className="np-in fixed inset-x-0 bottom-[calc(1.25rem+env(safe-area-inset-bottom))] z-[60] mx-auto flex w-fit max-w-[calc(100vw-2rem)] items-center gap-3 rounded-full bg-navy py-2 pl-4 pr-2 font-display text-[15px] text-ivory shadow-float transition-[bottom] duration-300 print:hidden"
     >
-      <Heart size={16} className="shrink-0 fill-[#E9E1D3] text-[#E9E1D3]" aria-hidden />
+      <Heart size={16} className="shrink-0 fill-[#EFE6D8] text-[#EFE6D8]" aria-hidden />
       <span>{tx(locale, "Guardada", "Saved")}</span>
       <span aria-hidden className="text-ivory/40">·</span>
-      <Link href={`/${locale}/saved`} onClick={onClose} className="flex min-h-9 items-center rounded-[2px] px-3 font-semibold text-[#E9E1D3] underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#E9E1D3]">
+      <Link href={`/${locale}/saved`} onClick={onClose} className="flex min-h-9 items-center rounded-[12px] px-3 font-semibold text-[#EFE6D8] underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#EFE6D8]">
         {tx(locale, "Ver guardadas", "See saved")}
       </Link>
     </div>

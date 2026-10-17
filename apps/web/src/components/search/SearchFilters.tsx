@@ -74,7 +74,7 @@ export interface FilterValues {
 }
 export type SetFilters = (patch: Record<string, string | null>) => void;
 
-export const pill = "flex h-11 md:h-10 shrink-0 items-center gap-1.5 rounded-[2px] border px-4 font-display text-sm transition-colors duration-np";
+export const pill = "flex h-11 md:h-10 shrink-0 items-center gap-1.5 rounded-[12px] border px-4 font-display text-sm transition-colors duration-np";
 // Selected filter = navy tint + 2 px navy border (brand v4).
 export const on = "np-sel border-2 px-[15px]";
 const sectionTitle = "mb-2.5 block text-[13px] font-semibold text-muted";
@@ -326,7 +326,7 @@ export function MoreFields({ locale, f, set, withLux = false }: { locale: Locale
 /** "Ver 12 casas" with a spinner while the count refreshes. */
 export function SeeHomes({ locale, total, fetching, onClick, className }: { locale: Locale; total: number; fetching: boolean; onClick: () => void; className?: string }) {
   return (
-    <button type="button" onClick={onClick} className={cn("np-btn-navy inline-flex min-h-12 items-center justify-center gap-1.5 rounded-[2px] bg-navy px-6 font-display text-[15px] font-semibold text-ivory", className)}>
+    <button type="button" onClick={onClick} className={cn("np-btn-navy inline-flex min-h-12 items-center justify-center gap-1.5 rounded-[12px] bg-navy px-6 font-display text-[15px] font-semibold text-ivory", className)}>
       {fetching && <Loader2 size={15} aria-hidden className="animate-spin" />}
       {tx(locale, `Ver ${plural(total, locale, ["casa", "casas"], ["home", "homes"])}`, `Show ${plural(total, locale, ["casa", "casas"], ["home", "homes"])}`)}
     </button>
@@ -409,7 +409,7 @@ export function FilterSheet({
         </div>
       </div>
       <div className="flex shrink-0 items-center gap-3 bg-arena px-4 pt-3" style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}>
-        <button type="button" onClick={onClear} disabled={!activeCount} className="min-h-12 rounded-[2px] px-3 font-display text-[15px] font-semibold underline underline-offset-4 disabled:cursor-default disabled:bg-[#E3DDD3] disabled:text-[#5E5650] disabled:no-underline dark:disabled:bg-white/10 dark:disabled:text-[#CDC5B9]">
+        <button type="button" onClick={onClear} disabled={!activeCount} className="min-h-12 rounded-[12px] px-3 font-display text-[15px] font-semibold underline underline-offset-4 disabled:cursor-default disabled:bg-[#E3DDD3] disabled:text-[#5E5650] disabled:no-underline dark:disabled:bg-white/10 dark:disabled:text-[#CDC5B9]">
           {tx(locale, "Borrar todo", "Clear all")}
         </button>
         <SeeHomes locale={locale} total={total} fetching={fetching} onClick={onClose} className="ml-auto flex-1" />

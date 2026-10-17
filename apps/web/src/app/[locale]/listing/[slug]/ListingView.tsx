@@ -199,8 +199,8 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
                 <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
                   <CompareLink locale={locale} className="hidden md:inline-flex" />
                   <CompareButton id={l.id} locale={locale} className="min-h-11 px-3.5 text-[13px]" />
-                  <ShareButton locale={locale} title={tx(locale, l.title_es, l.title_en)} className="inline-flex min-h-11 items-center gap-1.5 rounded-[2px] bg-arena px-3.5 text-[14px] font-medium" />
-                  <SaveButton id={l.id} locale={locale} className="bg-[#E9E1D3]" />
+                  <ShareButton locale={locale} title={tx(locale, l.title_es, l.title_en)} className="inline-flex min-h-11 items-center gap-1.5 rounded-[12px] bg-arena px-3.5 text-[14px] font-medium" />
+                  <SaveButton id={l.id} locale={locale} className="bg-[#EFE6D8]" />
                 </div>
               </div>
               <div className="lg:flex lg:items-end lg:justify-between lg:gap-12">
@@ -232,7 +232,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
               <Gallery l={l} locale={locale} />
               {isPublic && <ViewBeacon id={l.id} />}
               {l.luxury && l.brochurePdf && (
-                <a href={l.brochurePdf} target="_blank" rel="noreferrer" className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-[2px] border-[1.5px] border-navy px-5 font-display text-sm font-semibold text-navy hover:bg-navy/5">
+                <a href={l.brochurePdf} target="_blank" rel="noreferrer" className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-[12px] border-[1.5px] border-navy px-5 font-display text-sm font-semibold text-navy hover:bg-navy/5">
                   {tx(locale, "Descargar el folleto (PDF)", "Download the brochure (PDF)")}
                 </a>
               )}

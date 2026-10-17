@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { fontVars } from "../../fonts";
 import "../../globals.css";
 
-export const viewport: Viewport = { themeColor: "#0E1A2B", width: "device-width", initialScale: 1, viewportFit: "cover" };
+export const viewport: Viewport = { themeColor: "#3A6A92", width: "device-width", initialScale: 1, viewportFit: "cover" };
 export const metadata: Metadata = { title: "Offline · New Place", robots: { index: false, follow: false }, manifest: "/manifest.webmanifest" };
 
 /** Standalone root layout: the offline fallback must render with no session, data or locale middleware. */

@@ -74,28 +74,28 @@ export function MenuDrawer({
           {searchTypes.map((n) => (
             <Link key={n.href} href={n.href} onClick={() => onClose()} aria-current={n.active ? "page" : undefined} className="flex min-h-[50px] items-center gap-3 rounded-lg px-3 font-serif text-[23px] hover:bg-white/5">
               {/* Current section: a gold underline (a chevron-like mark read as "expand"). */}
-              <span className={cn(n.active && "underline decoration-[#E9E1D3] decoration-2 underline-offset-[7px]")}>{n.label}</span>
+              <span className={cn(n.active && "underline decoration-[#EFE6D8] decoration-2 underline-offset-[7px]")}>{n.label}</span>
             </Link>
           ))}
           <div className="my-3" aria-hidden />
           <Link href={luxury.href} onClick={() => onClose()} aria-current={luxury.active ? "page" : undefined} className={drawerItem}>
-            <Gem size={18} strokeWidth={1.6} aria-hidden className="text-[#E9E1D3]" />
-            <span className={cn(luxury.active && "underline decoration-[#E9E1D3] decoration-2 underline-offset-[6px]")}>{luxury.label}</span>
+            <Gem size={18} strokeWidth={1.6} aria-hidden className="text-[#EFE6D8]" />
+            <span className={cn(luxury.active && "underline decoration-[#EFE6D8] decoration-2 underline-offset-[6px]")}>{luxury.label}</span>
           </Link>
           <Link href={remote.href} onClick={() => onClose()} className={drawerItem}>
-            <span aria-hidden className="w-[18px] text-center text-[#E9E1D3]">↗</span> {remote.label}
+            <span aria-hidden className="w-[18px] text-center text-[#EFE6D8]">↗</span> {remote.label}
           </Link>
           <Link href={`/${locale}/saved`} onClick={() => onClose()} className={drawerItem}>
             <Heart size={18} aria-hidden /> {t("saved")} {saved.length > 0 && <span className="text-sm text-mist">({saved.length})</span>}
           </Link>
           {seeker && (
             <>
-              <div className="mx-3 mb-1 mt-4 font-display text-[13px] font-semibold text-[#E9E1D3]">{tx(locale, "Tu espacio", "Your space")}</div>
+              <div className="mx-3 mb-1 mt-4 font-display text-[13px] font-semibold text-[#EFE6D8]">{tx(locale, "Tu espacio", "Your space")}</div>
               {space.map(({ href, label, Icon, badge }) => (
                 <Link key={href} href={href} onClick={() => onClose()} className={drawerItem}>
                   <Icon size={18} aria-hidden /> {label}
                   {!!badge && (
-                    <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-[#E9E1D3] px-1.5 text-[13px] font-bold text-navy">
+                    <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-[#EFE6D8] px-1.5 text-[13px] font-bold text-navy">
                       {badge}
                       <span className="sr-only">{tx(locale, " sin leer", " unread")}</span>
                     </span>
@@ -116,7 +116,7 @@ export function MenuDrawer({
           {demo && (
             <div className="mt-2 rounded-xl border border-navy-line">
               <button type="button" onClick={() => setDrawerDemo((o) => !o)} aria-expanded={drawerDemo} className="flex min-h-12 w-full items-center gap-2.5 rounded-xl px-3 font-display text-[15px] text-mist hover:bg-white/5">
-                <FlaskConical size={16} className="text-[#E9E1D3]" aria-hidden /> {tx(locale, "Modo demo · entrar como…", "Demo mode · sign in as…")}
+                <FlaskConical size={16} className="text-[#EFE6D8]" aria-hidden /> {tx(locale, "Modo demo · entrar como…", "Demo mode · sign in as…")}
                 <ChevronDown size={16} aria-hidden className={cn("ml-auto transition-transform", drawerDemo && "rotate-180")} />
               </button>
               {drawerDemo && <DemoLoginList locale={locale} onDone={onClose} className="px-1 pb-1" />}

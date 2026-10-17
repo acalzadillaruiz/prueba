@@ -15,11 +15,11 @@ import { cn } from "@/lib/cn";
 import { useListingsByIds } from "./useListingsByIds";
 
 const isSale = (l: Listing) => l.listingType === "SALE" || l.listingType === "COMMERCIAL_SALE";
-/** Green / amber that keep ≥ 4.5:1 on the dark card (#14243A) too. */
+/** Green / amber that keep ≥ 4.5:1 on the dark card (#2F5A7E) too. */
 const OK = "text-ok dark:text-[#8FCBA6]";
 const WARN = "text-warn dark:text-[#E0A84A]";
 /** Remove ("×") on a photo: its own light/dark colours (not the remapped bg-white, which turned it dark-on-dark). */
-const REMOVE_BTN = "absolute flex items-center justify-center rounded-full bg-[#F6F2EC] text-[#1A2026] outline outline-1 -outline-offset-1 outline-black/10 after:absolute after:content-[''] dark:bg-[#0E1A2B]/85 dark:text-[#F6F2EC] dark:outline-[#F6F2EC]/45";
+const REMOVE_BTN = "absolute flex items-center justify-center rounded-full bg-[#FAF8F4] text-[#1F3A4D] outline outline-1 -outline-offset-1 outline-black/10 after:absolute after:content-[''] dark:bg-[#1F3A4D]/85 dark:text-[#FAF8F4] dark:outline-[#FAF8F4]/45";
 /** Pinned row (phones): the thumbnail is the "Ver ficha" link, then one 36 px text pill ("Visita" / "Fechas") filling the rest of the column. */
 const PIN_PILL = "flex h-9 min-w-0 flex-1 items-center justify-center whitespace-nowrap rounded-full px-1.5 font-display text-[13px] font-semibold leading-none";
 /** Phone actions row: full column width, the label may wrap to 2 lines in a third of 360 px. */
@@ -167,7 +167,7 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
       </div>
 
       {mixedOperation && (
-        <div role="status" className="mt-6 flex items-start gap-3 rounded-[4px] bg-[#8A5A00]/10 px-4 py-3 text-[15px] text-[#5C3D00] dark:text-[#E9C77E]">
+        <div role="status" className="mt-6 flex items-start gap-3 rounded-[16px] bg-[#8A5A00]/10 px-4 py-3 text-[15px] text-[#5C3D00] dark:text-[#E9C77E]">
           <AlertTriangle size={18} className="mt-0.5 shrink-0" aria-hidden />
           <p>
             <strong className="font-semibold">{tx(locale, "Estás comparando una venta con un alquiler.", "You’re comparing a sale with a rental.")}</strong>{" "}
@@ -176,18 +176,18 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
         </div>
       )}
       {!mixedOperation && !sameUnit && (
-        <div role="status" className="mt-6 flex items-start gap-3 rounded-[4px] bg-[#8A5A00]/10 px-4 py-3 text-[15px] text-[#5C3D00] dark:text-[#E9C77E]">
+        <div role="status" className="mt-6 flex items-start gap-3 rounded-[16px] bg-[#8A5A00]/10 px-4 py-3 text-[15px] text-[#5C3D00] dark:text-[#E9C77E]">
           <AlertTriangle size={18} className="mt-0.5 shrink-0" aria-hidden />
           <p>{tx(locale, "Estás comparando un alquiler por mes con uno por noche: en precio no marcamos ganadora.", "You’re comparing a monthly rent with a nightly one: we don’t pick a winner on price.")}</p>
         </div>
       )}
 
-      {loading && cmp.length === 0 && <div className="np-skeleton mt-8 h-[420px] rounded-[4px]" aria-label={tx(locale, "Un momento…", "One moment…")} />}
+      {loading && cmp.length === 0 && <div className="np-skeleton mt-8 h-[420px] rounded-[16px]" aria-label={tx(locale, "Un momento…", "One moment…")} />}
 
       {cmp.length > 0 && (
         <section className={cn("np-in mt-8 overflow-clip", k.card)} aria-label={tx(locale, "Comparación", "Comparison")}>
           <div className="flex items-center gap-2 border-b border-line bg-navy px-5 py-3 text-ivory">
-            <Scale size={18} strokeWidth={1.6} className="text-[#E9E1D3]" aria-hidden />
+            <Scale size={18} strokeWidth={1.6} className="text-[#EFE6D8]" aria-hidden />
             <span className="font-serif text-[20px] font-light">{tx(locale, `${cmp.length} ${cmp.length === 1 ? "casa" : "casas"}`, `${cmp.length} ${cmp.length === 1 ? "home" : "homes"}`)}</span>
             <span className="text-sm text-mist">{cmp.length}/3</span>
           </div>

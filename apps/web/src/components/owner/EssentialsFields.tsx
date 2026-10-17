@@ -72,10 +72,10 @@ export function EssentialsFields({
   const set = (p: Partial<EssentialsDraft>) => onChange({ ...value, ...p });
   const cls = admin ? k.input : inputCls;
   const seg = (on: boolean) =>
-    admin ? cn(tab(on), "min-h-11 md:min-h-9") : cn("min-h-11 rounded-[2px] border px-4 font-display text-sm", on ? "border-navy bg-[#E9E1D3] font-semibold text-navy outline outline-1 -outline-offset-1 outline-navy" : "border-line bg-white");
+    admin ? cn(tab(on), "min-h-11 md:min-h-9") : cn("min-h-11 rounded-[12px] border px-4 font-display text-sm", on ? "border-navy bg-[#EFE6D8] font-semibold text-navy outline outline-1 -outline-offset-1 outline-navy" : "border-line bg-white");
   const toggle = (key: "ownWell" | "viewAvila" | "viewSea", label: string) => (
     <label key={key} className="flex min-h-11 items-center gap-2 text-sm font-semibold md:min-h-0">
-      <input type="checkbox" disabled={disabled} checked={value[key]} onChange={(e) => set({ [key]: e.target.checked })} className="h-4 w-4 accent-navy dark:accent-[#E9E1D3]" />
+      <input type="checkbox" disabled={disabled} checked={value[key]} onChange={(e) => set({ [key]: e.target.checked })} className="h-4 w-4 accent-navy dark:accent-[#EFE6D8]" />
       {label}
     </label>
   );

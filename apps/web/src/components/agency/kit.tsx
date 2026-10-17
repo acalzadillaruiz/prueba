@@ -7,7 +7,7 @@ import { cn } from "@/lib/cn";
 
 /**
  * Private-area kit (brand v4): light "Cal" cockpit with white cards, Cormorant titles and Manrope UI.
- * Every class carries its dark-mode twin (navy surfaces #14243A, accent #E9E1D3) for the theme toggle.
+ * Every class carries its dark-mode twin (navy surfaces #2F5A7E, accent #EFE6D8) for the theme toggle.
  * Terracotta is reserved for the single main action of a view: never in charts, chips or data.
  */
 /**
@@ -21,55 +21,55 @@ export const k = {
   /** White card, radius 18, soft navy shadow. */
   /** Last table column stays in view (actions never hide behind a horizontal scroll). */
   stickyCol: "bg-white dark:bg-navy-card",
-  card: "rounded-[4px] bg-white dark:bg-navy-card dark:shadow-none dark:ring-1 dark:ring-white/[.07]",
-  line: "border-[#E6DFD3] dark:border-white/10",
-  divide: "divide-[#E6DFD3] dark:divide-white/10",
+  card: "rounded-[16px] bg-white dark:bg-navy-card dark:shadow-none dark:ring-1 dark:ring-white/[.07]",
+  line: "border-[#E3E8EC] dark:border-white/10",
+  divide: "divide-[#E3E8EC] dark:divide-white/10",
   muted: "text-muted dark:text-mist",
   soft: "bg-[#F4EFE7] dark:bg-white/[.05]",
-  hover: "hover:bg-[#F6F2EA] dark:hover:bg-white/[.04]",
+  hover: "hover:bg-[#FAF8F4] dark:hover:bg-white/[.04]",
   /** Table head / KPI label: uppercase 11–12 px, tracking .12em. */
-  th: "text-[11px] font-semibold uppercase tracking-[.12em] text-muted dark:text-mist [&_th]:whitespace-nowrap",
+  th: "text-[12px] font-semibold uppercase tracking-[.12em] text-muted dark:text-mist [&_th]:whitespace-nowrap",
   label: "text-[13px] font-semibold text-muted dark:text-mist",
-  caption: "text-[13px] font-medium text-gold-text dark:text-[#C9BFAE]",
+  caption: "text-[13px] font-medium text-gold-text dark:text-[#D6DEE5]",
   /** Card titles in Cormorant. */
   title: "font-serif text-[24px] font-medium leading-tight text-navy dark:text-ivory",
   titleSm: "font-serif text-[20px] font-medium leading-tight text-navy dark:text-ivory",
   /** Data figures: Manrope 600 with lining proportional numerals, tight tracking so "14" never splits. */
   num: "font-display font-semibold tracking-[-0.05em] [font-feature-settings:'lnum','pnum'] text-navy dark:text-ivory",
   input:
-    "h-11 w-full rounded-xl border border-[#C9BFAE] bg-white px-3.5 text-[15px] text-navy placeholder:text-muted/70 transition-colors duration-np focus:border-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E9E1D3] disabled:cursor-not-allowed disabled:bg-[#F4EFE7] disabled:text-muted md:h-10 dark:border-white/15 dark:bg-navy dark:text-ivory dark:placeholder:text-mist/60 dark:focus:border-[#E9E1D3] dark:disabled:bg-white/[.04] dark:disabled:text-mist",
+    "h-11 w-full rounded-xl border border-[#D6DEE5] bg-white px-3.5 text-[15px] text-navy placeholder:text-muted/70 transition-colors duration-np focus:border-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#EFE6D8] disabled:cursor-not-allowed disabled:bg-[#F4EFE7] disabled:text-muted md:h-10 dark:border-white/15 dark:bg-navy dark:text-ivory dark:placeholder:text-mist/60 dark:focus:border-[#EFE6D8] dark:disabled:bg-white/[.04] dark:disabled:text-mist",
   /** Compact select inside tables. */
   select:
-    "h-9 rounded-lg border border-[#C9BFAE] bg-white px-2.5 text-[13px] text-navy focus:border-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E9E1D3] disabled:cursor-not-allowed disabled:opacity-60 dark:border-white/15 dark:bg-navy dark:text-ivory",
-  link: "font-semibold text-navy underline decoration-navy/30 underline-offset-4 hover:decoration-navy dark:text-[#E9E1D3] dark:decoration-[#E9E1D3]/40",
-  err: "rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-sm text-danger dark:border-[#E9E1D3]/30 dark:bg-[#B3261E26] dark:text-[#F3B4A3]",
+    "h-9 rounded-lg border border-[#D6DEE5] bg-white px-2.5 text-[13px] text-navy focus:border-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#EFE6D8] disabled:cursor-not-allowed disabled:opacity-60 dark:border-white/15 dark:bg-navy dark:text-ivory",
+  link: "font-semibold text-navy underline decoration-navy/30 underline-offset-4 hover:decoration-navy dark:text-[#EFE6D8] dark:decoration-[#EFE6D8]/40",
+  err: "rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-sm text-danger dark:border-[#EFE6D8]/30 dark:bg-[#B3261E26] dark:text-[#F3B4A3]",
   warnBox: "rounded-xl border border-warn/25 bg-[#8A5A000F] px-3.5 py-2.5 text-sm text-warn dark:border-[#F2B866]/30 dark:bg-[#8A5A0026] dark:text-[#F2C987]",
   okBox: "rounded-xl border border-ok/25 bg-[#2F6F4E0F] px-3.5 py-2.5 text-sm text-ok dark:border-[#7FC8A4]/30 dark:bg-[#2F6F4E33] dark:text-[#9AD6B6]",
   /** Button skins (pass as className to ui/Button). */
-  primary: "dark:bg-[#E9E1D3] dark:text-navy dark:hover:bg-[#EDAE97]",
+  primary: "dark:bg-[#EFE6D8] dark:text-navy dark:hover:bg-[#EDAE97]",
   navy: "dark:bg-ivory dark:text-navy dark:hover:bg-white",
   /** On top of ui/Button "outline" (1.5 px navy): selected-state hover + dark-theme twin. */
-  outline: "border-navy bg-transparent text-navy hover:bg-[#E9E1D3] dark:border-ivory/50 dark:bg-transparent dark:text-ivory dark:hover:bg-white/[.06]",
-  ghost: "text-navy hover:bg-[#E9E1D3] dark:text-ivory dark:hover:bg-white/[.06]",
+  outline: "border-navy bg-transparent text-navy hover:bg-[#EFE6D8] dark:border-ivory/50 dark:bg-transparent dark:text-ivory dark:hover:bg-white/[.06]",
+  ghost: "text-navy hover:bg-[#EFE6D8] dark:text-ivory dark:hover:bg-white/[.06]",
   okText: "text-ok dark:text-[#7FC8A4]",
   warnText: "text-warn dark:text-[#F2B866]",
   dangerText: "text-danger dark:text-[#F3A493]",
   /** Dark-mode token remap for the admin wrapper (ui primitives use the ink/line/muted tokens). */
-  darkVars: "dark:[--np-ink-rgb:238_241_244] dark:[--np-ink:#F6F2EC] dark:[--np-line-rgb:42_62_85] dark:[--np-muted-rgb:169_180_194]",
+  darkVars: "dark:[--np-ink-rgb:238_241_244] dark:[--np-ink:#FAF8F4] dark:[--np-line-rgb:42_62_85] dark:[--np-muted-rgb:169_180_194]",
 };
 
-/** Filter tab / segmented choice. Selected = #E9E1D3 with a 2 px navy border (brand interaction states). */
+/** Filter tab / segmented choice. Selected = #EFE6D8 with a 2 px navy border (brand interaction states). */
 export const tab = (on: boolean) =>
   cn(
     "inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 font-display text-[14px] font-medium transition-colors duration-np",
     on
-      ? "bg-[#E9E1D3] text-navy outline outline-2 -outline-offset-2 outline-[#1A2026] dark:bg-white/10 dark:text-ivory dark:outline dark:outline-2 dark:-outline-offset-2 dark:outline-[#E9E1D3]"
-      : "bg-white text-navy/80 outline outline-1 -outline-offset-1 outline-[#C9BFAE] hover:text-navy hover:outline hover:outline-1 hover:-outline-offset-1 hover:outline-[#1A2026] dark:bg-transparent dark:text-ivory/75 dark:outline dark:outline-1 dark:-outline-offset-1 dark:outline-[rgba(255,255,255,.18)] dark:hover:text-ivory",
+      ? "bg-[#EFE6D8] text-navy outline outline-2 -outline-offset-2 outline-[#1F3A4D] dark:bg-white/10 dark:text-ivory dark:outline dark:outline-2 dark:-outline-offset-2 dark:outline-[#EFE6D8]"
+      : "bg-white text-navy/80 outline outline-1 -outline-offset-1 outline-[#D6DEE5] hover:text-navy hover:outline hover:outline-1 hover:-outline-offset-1 hover:outline-[#1F3A4D] dark:bg-transparent dark:text-ivory/75 dark:outline dark:outline-1 dark:-outline-offset-1 dark:outline-[rgba(255,255,255,.18)] dark:hover:text-ivory",
   );
 
 /** Counter inside a tab or nav item: neutral, never terracotta. */
 export function Count({ children, className }: { children: ReactNode; className?: string }) {
-  return <span className={cn("inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[#F6F2EC] px-1.5 text-[11px] font-semibold text-navy [font-feature-settings:'lnum','tnum']", className)}>{children}</span>;
+  return <span className={cn("inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[#FAF8F4] px-1.5 text-[12px] font-semibold text-navy [font-feature-settings:'lnum','tnum']", className)}>{children}</span>;
 }
 
 export function Panel({ title, eyebrow, action, children, className, bodyClass, id, as: As = "section" }: { title?: ReactNode; eyebrow?: ReactNode; action?: ReactNode; children: ReactNode; className?: string; bodyClass?: string; id?: string; as?: "section" | "div" | "form" }) {
@@ -107,21 +107,21 @@ export function Kpi({ label, value, delta, hint, down, deltaNote, className }: {
 
 type Tone = "neutral" | "egeo" | "arena" | "ok" | "warn" | "danger" | "navy" | "exclusive" | "muted";
 const TONE: Record<Tone, string> = {
-  neutral: "bg-[#E9E1D3] text-navy dark:bg-white/10 dark:text-ivory",
+  neutral: "bg-[#EFE6D8] text-navy dark:bg-white/10 dark:text-ivory",
   egeo: "bg-egeo/55 text-[#413934] dark:bg-egeo/20 dark:text-[#E3D8CA]",
-  arena: "bg-arena text-[#5E4A2A] dark:bg-arena/15 dark:text-[#E9E1D3]",
+  arena: "bg-arena text-[#5E4A2A] dark:bg-arena/15 dark:text-[#EFE6D8]",
   ok: "bg-[#2F6F4E14] text-ok dark:bg-[#2F6F4E40] dark:text-[#9AD6B6]",
   warn: "bg-[#8A5A0014] text-warn dark:bg-[#8A5A0033] dark:text-[#F2C987]",
   danger: "bg-[#B3261E12] text-danger dark:bg-[#B3261E33] dark:text-[#F3B4A3]",
   navy: "bg-navy text-ivory dark:bg-ivory dark:text-navy",
-  muted: "bg-transparent text-muted outline outline-1 -outline-offset-1 outline-[#C9BFAE] dark:text-mist dark:outline dark:outline-1 dark:-outline-offset-1 dark:outline-[rgba(255,255,255,.18)]",
-  exclusive: "bg-white text-coral outline outline-1 -outline-offset-1 outline-[rgb(168_69_42/.3)] dark:bg-transparent dark:text-[#E9E1D3] dark:outline dark:outline-1 dark:-outline-offset-1 dark:outline-[rgb(231_154_127/.4)]",
+  muted: "bg-transparent text-muted outline outline-1 -outline-offset-1 outline-[#D6DEE5] dark:text-mist dark:outline dark:outline-1 dark:-outline-offset-1 dark:outline-[rgba(255,255,255,.18)]",
+  exclusive: "bg-white text-coral outline outline-1 -outline-offset-1 outline-[rgb(168_69_42/.3)] dark:bg-transparent dark:text-[#EFE6D8] dark:outline dark:outline-1 dark:-outline-offset-1 dark:outline-[rgb(231_154_127/.4)]",
 };
 
 /** Status badge: uppercase, tracking .12em; "Exclusiva" carries the roof glyph. */
 export function Pill({ tone = "neutral", children, className }: { tone?: Tone; children: ReactNode; className?: string }) {
   return (
-    <span className={cn("inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-[3px] text-[11px] font-semibold uppercase tracking-[.12em]", TONE[tone], className)}>
+    <span className={cn("inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-[3px] text-[12px] font-semibold uppercase tracking-[.12em]", TONE[tone], className)}>
       {tone === "exclusive" && <RoofMark className="h-[7px] w-[18px]" ink="currentColor" teja="currentColor" small />}
       {children}
     </span>
@@ -130,7 +130,7 @@ export function Pill({ tone = "neutral", children, className }: { tone?: Tone; c
 
 /** Neutral data chip (e.g. "Interés 92"): never terracotta. */
 export function Chip({ children, className }: { children: ReactNode; className?: string }) {
-  return <span className={cn("inline-flex items-center whitespace-nowrap rounded-full bg-[#E9E1D3] px-2.5 py-1 text-[12px] font-semibold text-navy [font-feature-settings:'lnum','pnum'] dark:bg-white/10 dark:text-ivory", className)}>{children}</span>;
+  return <span className={cn("inline-flex items-center whitespace-nowrap rounded-full bg-[#EFE6D8] px-2.5 py-1 text-[12px] font-semibold text-navy [font-feature-settings:'lnum','pnum'] dark:bg-white/10 dark:text-ivory", className)}>{children}</span>;
 }
 
 /** Listing status for the private areas, with the shared lifecycle labels (@/lib/lifecycle): review wins while it isn't approved. */
@@ -157,7 +157,7 @@ export function Initials({ name, size = 44, className }: { name: string; size?: 
 export function Empty({ title, body, cta, className }: { title: string; body?: string; cta?: ReactNode; className?: string }) {
   return (
     <div className={cn("flex flex-col items-center px-6 py-12 text-center", className)}>
-      <Monogram className="h-20 w-20" bg="#E9E1D3" ink="#1A2026" teja="#0E1A2B" />
+      <Monogram className="h-20 w-20" bg="#EFE6D8" ink="#1F3A4D" teja="#3A6A92" />
       <div className="mt-4 max-w-sm font-serif text-[26px] font-light leading-tight text-navy dark:text-ivory">{title}</div>
       {body && <p className={cn("mt-2 max-w-sm text-[15px]", k.muted)}>{body}</p>}
       {cta && <div className="mt-5">{cta}</div>}

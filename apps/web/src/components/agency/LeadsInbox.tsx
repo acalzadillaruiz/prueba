@@ -52,7 +52,7 @@ function ScoreRing({ score }: { score: number }) {
   const c = 2 * Math.PI * r;
   return (
     <svg viewBox="0 0 80 80" className="h-20 w-20">
-      <circle cx={40} cy={40} r={r} fill="none" strokeWidth={6} className="stroke-[#E9E1D3] dark:stroke-white/10" />
+      <circle cx={40} cy={40} r={r} fill="none" strokeWidth={6} className="stroke-[#EFE6D8] dark:stroke-white/10" />
       <circle cx={40} cy={40} r={r} fill="none" strokeWidth={6} strokeDasharray={`${(score / 100) * c} ${c}`} strokeLinecap="round" transform="rotate(-90 40 40)" className={score >= 45 ? "stroke-navy dark:stroke-ivory" : "stroke-[#81776F]"} />
       <text x={40} y={47} textAnchor="middle" fontSize={22} fontWeight={600} letterSpacing="-1" fontFamily="var(--font-display)" className="fill-navy dark:fill-ivory">{score}</text>
     </svg>
@@ -63,13 +63,13 @@ function Sla({ lead, locale }: { lead: Lead; locale: Locale }) {
   const mounted = useMounted();
   if (!mounted) return null;
   const m = minsAgo(lead.createdAt);
-  if (lead.stage !== "NEW") return lead.firstResponseMin != null ? <span className={cn("text-[11px]", k.muted)}>{tx(locale, "resp.", "resp.")} {lead.firstResponseMin} min</span> : null;
+  if (lead.stage !== "NEW") return lead.firstResponseMin != null ? <span className={cn("text-[12px]", k.muted)}>{tx(locale, "resp.", "resp.")} {lead.firstResponseMin} min</span> : null;
   const left = 15 - m;
   const pct = Math.max(0, Math.min(100, (m / 15) * 100));
   return (
     <div className="w-20">
-      <div className={cn("text-right text-[11px] font-semibold", left > 5 ? k.okText : left > 0 ? k.warnText : k.dangerText)} suppressHydrationWarning>{left > 0 ? `${left} min` : tx(locale, "A destiempo", "Overdue")}</div>
-      <div className="mt-1 h-1 rounded-full bg-[#E6DFD3] dark:bg-white/10"><div className={cn("h-full rounded-full", left > 5 ? "bg-ok" : left > 0 ? "bg-warn" : "bg-danger")} style={{ width: `${pct}%` }} /></div>
+      <div className={cn("text-right text-[12px] font-semibold", left > 5 ? k.okText : left > 0 ? k.warnText : k.dangerText)} suppressHydrationWarning>{left > 0 ? `${left} min` : tx(locale, "A destiempo", "Overdue")}</div>
+      <div className="mt-1 h-1 rounded-full bg-[#E3E8EC] dark:bg-white/10"><div className={cn("h-full rounded-full", left > 5 ? "bg-ok" : left > 0 ? "bg-warn" : "bg-danger")} style={{ width: `${pct}%` }} /></div>
     </div>
   );
 }
@@ -100,7 +100,7 @@ function TourPicker({ locale, listingId, agentId, busy, onPropose, onClose }: { 
         <div className="mt-2 max-h-40 space-y-2 overflow-y-auto scrollbar-thin">
           {days.map((d) => (
             <div key={d.date}>
-              <div className={cn("text-[11px] first-letter:uppercase", k.muted)}>{dateTime(d.date, locale, { weekday: "long", day: "numeric", month: "short" })}</div>
+              <div className={cn("text-[12px] first-letter:uppercase", k.muted)}>{dateTime(d.date, locale, { weekday: "long", day: "numeric", month: "short" })}</div>
               <div className="mt-1 flex flex-wrap gap-1.5">
                 {d.hours.map((h) => (
                   <button key={h.iso} type="button" aria-pressed={pick === h.iso} onClick={() => { setPick(h.iso); setCustom(""); setErr(null); }} className={cn(tab(pick === h.iso), "px-3 py-1 text-[13px]")}>
@@ -148,7 +148,7 @@ function useNarrow() {
   return narrow;
 }
 
-const BOX = "mt-0.5 h-[18px] w-[18px] shrink-0 cursor-pointer accent-navy dark:accent-[#E9E1D3]";
+const BOX = "mt-0.5 h-[18px] w-[18px] shrink-0 cursor-pointer accent-navy dark:accent-[#EFE6D8]";
 
 function SelectAll({ checked, indeterminate, onChange, label }: { checked: boolean; indeterminate: boolean; onChange: () => void; label: string }) {
   const ref = useRef<HTMLInputElement>(null);
@@ -399,7 +399,7 @@ export function LeadsInbox({ locale, initial, listings, agents, assignable = [],
             const tint = selId === l.id ? "" : sel?.id === l.id ? "xl" : null;
             const onTint = tint === "" ? "bg-white dark:bg-white/15" : tint === "xl" ? "xl:bg-white xl:dark:bg-white/15" : "";
             return (
-              <div key={l.id} className={cn("flex items-stretch border-b last:border-b-0", k.line, tint === "" ? "bg-[#E9E1D3] border-l-[3px] border-l-[#1A2026] dark:bg-white/[.07] dark:border-l-[3px] dark:border-l-[#E9E1D3]" : picked.has(l.id) ? k.soft : k.hover, tint === "xl" && "xl:bg-[#E9E1D3] xl:border-l-[3px] xl:border-l-[#1A2026] xl:dark:bg-white/[.07] xl:dark:border-l-[3px] xl:dark:border-l-[#E9E1D3]")}>
+              <div key={l.id} className={cn("flex items-stretch border-b last:border-b-0", k.line, tint === "" ? "bg-[#EFE6D8] border-l-[3px] border-l-[#1F3A4D] dark:bg-white/[.07] dark:border-l-[3px] dark:border-l-[#EFE6D8]" : picked.has(l.id) ? k.soft : k.hover, tint === "xl" && "xl:bg-[#EFE6D8] xl:border-l-[3px] xl:border-l-[#1F3A4D] xl:dark:bg-white/[.07] xl:dark:border-l-[3px] xl:dark:border-l-[#EFE6D8]")}>
               <label className="flex shrink-0 cursor-pointer items-start py-3.5 pl-4 pr-1">
                 <input type="checkbox" className={BOX} checked={picked.has(l.id)} onChange={() => toggle(l.id)} aria-label={tx(locale, `Seleccionar ${l.name}`, `Select ${l.name}`)} />
               </label>
@@ -409,7 +409,7 @@ export function LeadsInbox({ locale, initial, listings, agents, assignable = [],
                 className="flex min-w-0 flex-1 items-start gap-3 py-3.5 pl-2 pr-4 text-left transition-colors duration-np">
                 <div className="relative">
                   <Initials name={l.name} size={40} />
-                  {l.stage === "NEW" && <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-white bg-navy dark:border-navy-card dark:bg-[#E9E1D3]" />}
+                  {l.stage === "NEW" && <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-white bg-navy dark:border-navy-card dark:bg-[#EFE6D8]" />}
                 </div>
                 <div className="min-w-0 flex-1">
                   {/* Phones: the name gets the full row; the badges (Nuevo / Interés / SLA) drop to a line of their own. */}
@@ -422,12 +422,12 @@ export function LeadsInbox({ locale, initial, listings, agents, assignable = [],
                   <div className="mt-1 truncate text-sm text-navy/75 dark:text-ivory/70">{l.message}</div>
                   <div className="mt-2 flex flex-wrap items-center gap-2 sm:hidden">
                     {mounted && minsAgo(l.createdAt) < 60 && l.stage === "NEW" && <Pill tone="neutral" className={onTint}>{tx(locale, "Nuevo", "New")}</Pill>}
-                    <Chip className={score < 45 ? "bg-transparent text-muted outline outline-1 -outline-offset-1 outline-[#C9BFAE] dark:text-mist" : onTint}>{tx(locale, "Interés", "Interest")} {score}</Chip>
+                    <Chip className={score < 45 ? "bg-transparent text-muted outline outline-1 -outline-offset-1 outline-[#D6DEE5] dark:text-mist" : onTint}>{tx(locale, "Interés", "Interest")} {score}</Chip>
                     <Sla lead={l} locale={locale} />
                   </div>
                 </div>
                 <div className="hidden flex-col items-end gap-1.5 sm:flex">
-                  <Chip className={score < 45 ? "bg-transparent text-muted outline outline-1 -outline-offset-1 outline-[#C9BFAE] dark:text-mist" : onTint}>{tx(locale, "Interés", "Interest")} {score}</Chip>
+                  <Chip className={score < 45 ? "bg-transparent text-muted outline outline-1 -outline-offset-1 outline-[#D6DEE5] dark:text-mist" : onTint}>{tx(locale, "Interés", "Interest")} {score}</Chip>
                   <Sla lead={l} locale={locale} />
                 </div>
               </button>
@@ -445,7 +445,7 @@ export function LeadsInbox({ locale, initial, listings, agents, assignable = [],
             className={cn(
               "np-in space-y-4",
               sheet
-                ? "max-xl:fixed max-xl:inset-0 max-xl:z-[60] max-xl:overflow-y-auto max-xl:overscroll-contain max-xl:bg-ivory max-xl:px-4 max-xl:pb-[calc(1.5rem+env(safe-area-inset-bottom))] max-xl:dark:bg-[#0E1A2B] md:max-xl:px-10"
+                ? "max-xl:fixed max-xl:inset-0 max-xl:z-[60] max-xl:overflow-y-auto max-xl:overscroll-contain max-xl:bg-ivory max-xl:px-4 max-xl:pb-[calc(1.5rem+env(safe-area-inset-bottom))] max-xl:dark:bg-[#3A6A92] md:max-xl:px-10"
                 : "max-xl:hidden",
             )}
             role={sheet ? "dialog" : undefined}
@@ -453,7 +453,7 @@ export function LeadsInbox({ locale, initial, listings, agents, assignable = [],
             aria-label={sheet ? sel.name : undefined}
           >
             {sheet && (
-              <div className="sticky top-0 z-10 -mx-4 flex h-14 items-center border-b border-[#E6DFD3] bg-ivory px-2 md:-mx-10 md:px-8 xl:hidden dark:border-white/10 dark:bg-[#0E1A2B]">
+              <div className="sticky top-0 z-10 -mx-4 flex h-14 items-center border-b border-[#E3E8EC] bg-ivory px-2 md:-mx-10 md:px-8 xl:hidden dark:border-white/10 dark:bg-[#3A6A92]">
                 <button ref={backRef} type="button" onClick={closeLead} className={cn("flex min-h-11 items-center gap-2 rounded-full px-3 font-display text-[15px] font-semibold", k.hover)} aria-label={tx(locale, `Volver a Leads (${visible.length})`, `Back to Leads (${visible.length})`)}>
                   <ArrowLeft size={18} aria-hidden /> Leads ({visible.length})
                 </button>
@@ -503,7 +503,7 @@ export function LeadsInbox({ locale, initial, listings, agents, assignable = [],
                   <div>
                     <div className={k.title} data-testid="next-action" data-action={sel.nextAction ?? ""}>{tx(locale, A[0], A[1])}</div>
                     <div className={cn("text-sm", k.muted)}>{sel.reason}</div>
-                    <div className={cn("mt-1 text-[11px] opacity-80", k.muted)}>{tx(locale, "Siguiente acción sugerida por la IA", "Next action suggested by AI")}</div>
+                    <div className={cn("mt-1 text-[12px] opacity-80", k.muted)}>{tx(locale, "Siguiente acción sugerida por la IA", "Next action suggested by AI")}</div>
                   </div>
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2">
@@ -552,11 +552,11 @@ export function LeadsInbox({ locale, initial, listings, agents, assignable = [],
             <div className={k.card}>
               <div className={cn("flex items-center gap-2 border-b px-5 py-4", k.line)}><MessageCircle size={17} strokeWidth={1.6} /> <span className={k.titleSm}>{tx(locale, "Conversación", "Conversation")}</span></div>
               <div className="max-h-80 space-y-3 overflow-y-auto p-4 scrollbar-thin">
-                <div className={cn("max-w-[80%] rounded-2xl rounded-bl-md px-3.5 py-2 text-sm", k.soft)}>{sel.message}<div className={cn("mt-1 text-[10px]", k.muted)}><TimeAgo iso={sel.createdAt} locale={locale} /></div></div>
+                <div className={cn("max-w-[80%] rounded-2xl rounded-bl-md px-3.5 py-2 text-sm", k.soft)}>{sel.message}<div className={cn("mt-1 text-[12px]", k.muted)}><TimeAgo iso={sel.createdAt} locale={locale} /></div></div>
                 {(detail.data?.messages ?? []).filter((m) => m.body !== sel.message).map((m) => (
                   <div key={m.id} className={cn("max-w-[80%] rounded-2xl px-3.5 py-2 text-sm", m.mine ? "np-in ml-auto rounded-br-md bg-navy text-ivory dark:bg-ivory dark:text-navy" : cn("rounded-bl-md", k.soft))}>
                     {m.body}
-                    <div className={cn("mt-1 text-[10px]", m.mine ? "opacity-70" : k.muted)}><TimeAgo iso={m.at} locale={locale} /> · {m.from}</div>
+                    <div className={cn("mt-1 text-[12px]", m.mine ? "opacity-70" : k.muted)}><TimeAgo iso={m.at} locale={locale} /> · {m.from}</div>
                   </div>
                 ))}
               </div>
@@ -611,7 +611,7 @@ export function LeadsInbox({ locale, initial, listings, agents, assignable = [],
       )}
       {chosen.length > 0 && (
         <div className="sticky bottom-3 z-20 mt-4" role="region" aria-label={tx(locale, "Acciones en lote", "Bulk actions")}>
-          <div className={cn(k.card, "flex flex-wrap items-center gap-2 p-3 outline outline-1 -outline-offset-1 outline-[#E9E1D3] md:gap-3 md:px-4")}>
+          <div className={cn(k.card, "flex flex-wrap items-center gap-2 p-3 outline outline-1 -outline-offset-1 outline-[#EFE6D8] md:gap-3 md:px-4")}>
             <span className="text-sm font-semibold">{tx(locale, `${chosen.length} ${chosen.length === 1 ? "lead seleccionado" : "leads seleccionados"}`, `${chosen.length} ${chosen.length === 1 ? "lead" : "leads"} selected`)}</span>
             {manager && assignable.length > 0 && (
               <Select value="" disabled={bulk?.running} onChange={(e) => {

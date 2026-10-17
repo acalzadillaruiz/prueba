@@ -105,7 +105,7 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
                     {custom && <div className="mt-0.5 text-[13px] leading-snug text-muted">{summary}</div>}
                     <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-muted">
                       <span>{freq[s.frequency]} · {s.lastSentAt ? `${tx(locale, "último aviso", "last sent")} ${ago(s.lastSentAt, locale)}` : tx(locale, "aún sin avisos", "nothing sent yet")}</span>
-                      {s.newCount > 0 && <Badge className="bg-[#E9E1D3] text-navy dark:bg-white/10">{s.newCount} {tx(locale, "nuevos", "new")}</Badge>}
+                      {s.newCount > 0 && <Badge className="bg-[#EFE6D8] text-navy dark:bg-white/10">{s.newCount} {tx(locale, "nuevos", "new")}</Badge>}
                     </div>
                   </div>
                 </div>
@@ -120,7 +120,7 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
                   </Link>
                   {!editing && confirmId !== s.id && (
                     <div className="relative z-10 flex items-center gap-1">
-                      <button type="button" aria-label={`${tx(locale, "Editar", "Edit")} · ${title}`} onClick={() => { setConfirmId(null); setEditId(s.id); setDraft(custom ? s.name : ""); }} className="flex min-h-11 items-center gap-1.5 rounded-[2px] px-3 text-[14px] font-semibold text-ink hover:bg-black/5 dark:hover:bg-white/10">
+                      <button type="button" aria-label={`${tx(locale, "Editar", "Edit")} · ${title}`} onClick={() => { setConfirmId(null); setEditId(s.id); setDraft(custom ? s.name : ""); }} className="flex min-h-11 items-center gap-1.5 rounded-[12px] px-3 text-[14px] font-semibold text-ink hover:bg-black/5 dark:hover:bg-white/10">
                         <Pencil size={15} aria-hidden /> {tx(locale, "Editar", "Edit")}
                       </button>
                       <button type="button" className="flex h-11 w-11 items-center justify-center rounded-full text-danger hover:bg-black/5 dark:hover:bg-white/10" aria-label={`${tx(locale, "Eliminar", "Delete")} · ${title}`} onClick={() => setConfirmId(s.id)}>
@@ -152,7 +152,7 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
                         maxLength={120}
                         onChange={(e) => setDraft(e.target.value)}
                         placeholder={summary}
-                        className="h-11 rounded-xl border border-[#C9BFAE] bg-white px-3 text-[16px] font-normal text-navy focus:border-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E9E1D3] dark:bg-white/5 dark:text-ivory sm:text-[15px]"
+                        className="h-11 rounded-xl border border-[#D6DEE5] bg-white px-3 text-[16px] font-normal text-navy focus:border-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#EFE6D8] dark:bg-white/5 dark:text-ivory sm:text-[15px]"
                       />
                     </label>
                     <label className="grid gap-1 text-[13px] font-semibold">
@@ -160,7 +160,7 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
                       <select
                         value={s.frequency}
                         onChange={(e) => void changeFrequency(s, e.target.value as Search["frequency"])}
-                        className="h-11 rounded-xl border border-[#C9BFAE] bg-white px-3 text-[15px] font-normal text-navy focus:border-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E9E1D3] dark:bg-white/5 dark:text-ivory"
+                        className="h-11 rounded-xl border border-[#D6DEE5] bg-white px-3 text-[15px] font-normal text-navy focus:border-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#EFE6D8] dark:bg-white/5 dark:text-ivory"
                       >
                         <option value="INSTANT">{freq.INSTANT}</option>
                         <option value="DAILY">{freq.DAILY}</option>
@@ -191,7 +191,7 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
             {emails.map((e) => (
               <li key={e.id} className="py-3">
                 <div className="flex items-center justify-between gap-2">
-                  <Badge tone={e.kind === "TOUR" ? "ok" : "mist"} className={e.kind === "ALERT" ? "bg-[#E9E1D3] text-navy dark:bg-white/10" : undefined}>{lbl(EMAIL_KIND_LABEL[e.kind] ?? [e.kind, e.kind], locale)}</Badge>
+                  <Badge tone={e.kind === "TOUR" ? "ok" : "mist"} className={e.kind === "ALERT" ? "bg-[#EFE6D8] text-navy dark:bg-white/10" : undefined}>{lbl(EMAIL_KIND_LABEL[e.kind] ?? [e.kind, e.kind], locale)}</Badge>
                   <span className="text-[13px] text-muted">{ago(e.at, locale)}</span>
                 </div>
                 <div className="mt-1.5 text-sm font-semibold">{localizeEmailSubject(e.subject, locale)}</div>

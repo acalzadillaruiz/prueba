@@ -22,8 +22,8 @@ export default async function NotFound() {
         <h1 className="np-t-h1 mt-3 max-w-xl">{t("notFound")}</h1>
         <p className="mt-3 max-w-md text-[16px] text-muted">{t("notFoundBody")}</p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <Link href={`/${locale}`} className="np-btn-navy inline-flex h-12 items-center rounded-[2px] bg-navy px-7 font-display text-[15px] font-semibold text-ivory hover:bg-navy-2">{t("back")}</Link>
-          <Link href={`/${locale}/search?type=SALE`} className="np-btn-outline inline-flex h-12 items-center rounded-[2px] border-[1.5px] border-navy px-7 font-display text-[15px] font-semibold text-navy hover:bg-navy/5">
+          <Link href={`/${locale}`} className="np-btn-navy inline-flex h-12 items-center rounded-[12px] bg-navy px-7 font-display text-[15px] font-semibold text-ivory hover:bg-navy-2">{t("back")}</Link>
+          <Link href={`/${locale}/search?type=SALE`} className="np-btn-outline inline-flex h-12 items-center rounded-[12px] border-[1.5px] border-navy px-7 font-display text-[15px] font-semibold text-navy hover:bg-navy/5">
             {es ? "Ver casas" : "Browse homes"}
           </Link>
         </div>

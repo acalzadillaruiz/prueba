@@ -346,14 +346,14 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
     }
   };
 
-  const opt = (active: boolean) => cn("rounded-[4px] p-4 text-left transition-shadow duration-np", active ? "bg-[#E9E1D3] outline outline-2 -outline-offset-2 outline-[#1A2026] dark:bg-white/10 dark:outline dark:outline-2 dark:-outline-offset-2 dark:outline-[#E9E1D3]" : "bg-white outline outline-1 -outline-offset-1 outline-[#C9BFAE] hover:outline hover:outline-1 hover:-outline-offset-1 hover:outline-[#1A2026]");
+  const opt = (active: boolean) => cn("rounded-[16px] p-4 text-left transition-shadow duration-np", active ? "bg-[#EFE6D8] outline outline-2 -outline-offset-2 outline-[#1F3A4D] dark:bg-white/10 dark:outline dark:outline-2 dark:-outline-offset-2 dark:outline-[#EFE6D8]" : "bg-white outline outline-1 -outline-offset-1 outline-[#D6DEE5] hover:outline hover:outline-1 hover:-outline-offset-1 hover:outline-[#1F3A4D]");
   const stepper = (label: string, v: number, onChange: (n: number) => void) => (
-    <div className="flex items-center justify-between rounded-[4px] bg-white px-4 py-3">
+    <div className="flex items-center justify-between rounded-[16px] bg-white px-4 py-3">
       <span className="font-semibold">{label}</span>
       <div className="flex items-center gap-3">
-        <button type="button" aria-label={`${label} −`} onClick={() => onChange(Math.max(0, v - 1))} className="h-11 w-11 rounded-[2px] border border-line text-lg">−</button>
+        <button type="button" aria-label={`${label} −`} onClick={() => onChange(Math.max(0, v - 1))} className="h-11 w-11 rounded-[12px] border border-line text-lg">−</button>
         <span className="w-5 text-center font-display text-lg">{v}</span>
-        <button type="button" aria-label={`${label} +`} onClick={() => onChange(v + 1)} className="h-11 w-11 rounded-[2px] border border-line text-lg">+</button>
+        <button type="button" aria-label={`${label} +`} onClick={() => onChange(v + 1)} className="h-11 w-11 rounded-[12px] border border-line text-lg">+</button>
       </div>
     </div>
   );
@@ -398,7 +398,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
           ) : (
             <Button href={`/${locale}/owner/listings`}>{tx(locale, "Ver mis inmuebles", "My properties")}</Button>
           )}
-          {done.mode === "FSBO" && !done.pending && <Button href={`/${locale}/listing/${done.slug}`} variant="outline" className="border-navy/70 bg-transparent text-navy hover:bg-[#E9E1D3]">{tx(locale, "Ver el anuncio", "View listing")}</Button>}
+          {done.mode === "FSBO" && !done.pending && <Button href={`/${locale}/listing/${done.slug}`} variant="outline" className="border-navy/70 bg-transparent text-navy hover:bg-[#EFE6D8]">{tx(locale, "Ver el anuncio", "View listing")}</Button>}
         </div>
         {done.mode === "FSBO" && <OwnerNextSteps locale={locale} slug={done.slug} title={(locale === "es" ? d.copy.title_es : d.copy.title_en || d.copy.title_es) || tx(locale, "mi casa", "my home")} live={!done.pending} />}
       </div>
@@ -535,7 +535,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               <div className="mb-2 font-semibold">{tx(locale, "Operación", "Operation")}</div>
               <div className="flex flex-wrap gap-2">
                 {[["SALE", "Venta", "Sale"], ["LONG_RENT", "Alquiler", "Rent"], ["SHORT_RENT", "Vacacional", "Vacation"], ["COMMERCIAL_SALE", "Comercial · venta", "Commercial · sale"], ["COMMERCIAL_RENT", "Comercial · alquiler", "Commercial · rent"]].map(([k, es, en]) => (
-                  <button key={k} onClick={() => setOp(k)} aria-pressed={d.op === k} className={cn("rounded-[2px] border px-4 py-2 font-display text-sm", d.op === k ? "border-navy bg-[#E9E1D3] text-navy outline outline-1 -outline-offset-1 outline-navy dark:bg-white/10 dark:outline-[#E9E1D3]" : "border-line bg-white")}>{tx(locale, es, en)}</button>
+                  <button key={k} onClick={() => setOp(k)} aria-pressed={d.op === k} className={cn("rounded-[12px] border px-4 py-2 font-display text-sm", d.op === k ? "border-navy bg-[#EFE6D8] text-navy outline outline-1 -outline-offset-1 outline-navy dark:bg-white/10 dark:outline-[#EFE6D8]" : "border-line bg-white")}>{tx(locale, es, en)}</button>
                 ))}
               </div>
             </div>
@@ -543,7 +543,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               <div className="mb-2 font-semibold">{tx(locale, "Tipo de inmueble", "Property type")}</div>
               <div className="flex flex-wrap gap-2">
                 {([["apartment", "Apartamento", "Apartment"], ["house", "Casa", "House"], ["penthouse", "Ático", "Penthouse"], ["townhouse", "Townhouse", "Townhouse"], ["studio", "Estudio", "Studio"], ["office", "Oficina", "Office"], ["retail", "Local", "Retail"], ["warehouse", "Galpón", "Warehouse"], ["land", "Terreno", "Land"]] as [Kind, string, string][]).map(([k, es, en]) => (
-                  <button key={k} onClick={() => set({ kind: k })} className={cn("rounded-[2px] border px-4 py-2 font-display text-sm", d.kind === k ? "border-navy bg-[#E9E1D3] text-navy outline outline-1 -outline-offset-1 outline-navy dark:bg-white/10 dark:outline-[#E9E1D3]" : "border-line bg-white")}>{tx(locale, es, en)}</button>
+                  <button key={k} onClick={() => set({ kind: k })} className={cn("rounded-[12px] border px-4 py-2 font-display text-sm", d.kind === k ? "border-navy bg-[#EFE6D8] text-navy outline outline-1 -outline-offset-1 outline-navy dark:bg-white/10 dark:outline-[#EFE6D8]" : "border-line bg-white")}>{tx(locale, es, en)}</button>
                 ))}
               </div>
             </div>
@@ -621,19 +621,19 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                 {(["generator", "waterTank", "security", "elevator", "terrace", "pool", "gym", "view", "garden", "bbq", "pets", "furnished", "ac"] as Amenity[]).map((a) => {
                   const on = d.amen.includes(a);
                   return (
-                    <button key={a} onClick={() => set({ amen: on ? d.amen.filter((x) => x !== a) : [...d.amen, a] })} className={cn("inline-flex items-center gap-1.5 rounded-[2px] border px-3.5 py-2 text-sm font-semibold", on ? "border-navy bg-navy text-ivory" : "border-line bg-white")}>
+                    <button key={a} onClick={() => set({ amen: on ? d.amen.filter((x) => x !== a) : [...d.amen, a] })} className={cn("inline-flex items-center gap-1.5 rounded-[12px] border px-3.5 py-2 text-sm font-semibold", on ? "border-navy bg-navy text-ivory" : "border-line bg-white")}>
                       {on && <Check size={14} />} {lbl(AMENITY_LABEL[a], locale)}
                     </button>
                   );
                 })}
               </div>
             </div>
-            <div data-wiz="ess" className="rounded-[4px] bg-white p-5 ">
+            <div data-wiz="ess" className="rounded-[16px] bg-white p-5 ">
               <EssentialsFields locale={locale} value={d.ess} onChange={(x) => set({ ess: x })} showErrors={showExtrasErr} />
             </div>
             {!listingType.startsWith("COMMERCIAL") && RESIDENTIAL_KINDS.includes(d.kind) && (
               <label className="flex items-center gap-2 text-sm font-semibold">
-                <input type="checkbox" checked={d.luxury} onChange={(e) => set({ luxury: e.target.checked })} className="h-4 w-4 accent-navy dark:accent-[#E9E1D3]" />
+                <input type="checkbox" checked={d.luxury} onChange={(e) => set({ luxury: e.target.checked })} className="h-4 w-4 accent-navy dark:accent-[#EFE6D8]" />
                 {tx(locale, "Inmueble de lujo", "Luxury property")}
               </label>
             )}
@@ -642,7 +642,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
             </div>
             {luxury && (
               <label className="flex items-start gap-2 text-sm">
-                <input type="checkbox" checked={d.privateListing} onChange={(e) => set({ privateListing: e.target.checked })} className="mt-0.5 h-4 w-4 shrink-0 accent-navy dark:accent-[#E9E1D3]" />
+                <input type="checkbox" checked={d.privateListing} onChange={(e) => set({ privateListing: e.target.checked })} className="mt-0.5 h-4 w-4 shrink-0 accent-navy dark:accent-[#EFE6D8]" />
                 <span>
                   <span className="font-semibold">{tx(locale, "Anuncio privado", "Private listing")}</span>
                   <span className="block text-muted">{tx(locale, "No aparece en el buscador ni en el mapa; solo quien tenga el enlace puede verlo.", "Hidden from search and the map; only people with the link can see it.")}</span>
@@ -696,9 +696,9 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                     <span className="absolute left-1.5 top-1.5 rounded bg-navy/80 px-1.5 text-[13px] font-bold text-ivory">{i + 1}</span>
                     <button onClick={() => { setFiles(files.filter((_, j) => j !== i)); if (cover >= i && cover > 0) setCover(cover - 1); }} className="absolute right-1.5 top-1.5 rounded-full bg-navy/70 p-0.5 text-white" aria-label={tx(locale, "Quitar", "Remove")}><X size={14} /></button>
                     {cover === i ? (
-                      <span className="absolute bottom-1.5 left-1.5 inline-flex items-center gap-1 rounded-[2px] bg-navy px-2 py-0.5 text-[13px] font-bold text-ivory"><Star size={11} /> {tx(locale, "Portada", "Cover")}</span>
+                      <span className="absolute bottom-1.5 left-1.5 inline-flex items-center gap-1 rounded-[12px] bg-navy px-2 py-0.5 text-[13px] font-bold text-ivory"><Star size={11} /> {tx(locale, "Portada", "Cover")}</span>
                     ) : (
-                      <button onClick={() => setCover(i)} className="absolute bottom-1.5 left-1.5 rounded-[2px] bg-white/90 px-2 py-0.5 text-[13px] font-bold">{tx(locale, "Usar de portada", "Set cover")}</button>
+                      <button onClick={() => setCover(i)} className="absolute bottom-1.5 left-1.5 rounded-[12px] bg-white/90 px-2 py-0.5 text-[13px] font-bold">{tx(locale, "Usar de portada", "Set cover")}</button>
                     )}
                   </div>
                 ))}
@@ -716,7 +716,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
         {step === 4 && (
           <div className="np-in space-y-5">
             <h1 className="np-t-h1 font-serif">{tx(locale, "Precio y descripción", "Price & description")}</h1>
-            <div className="rounded-[4px] bg-white p-5">
+            <div className="rounded-[16px] bg-white p-5">
               <div className="flex items-center gap-2 font-display font-semibold"><Sparkles size={17} strokeWidth={1.6} /> {tx(locale, "Valor estimado New Place", "PlaceEstimate")} · {zone?.name}</div>
               {estimate ? (
                 <>
@@ -757,16 +757,16 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               )}
               {fxVes > 0 && d.price > 0 && <div className="mt-2 text-[13px] text-muted">≈ Bs. {num(Math.round(d.price * fxVes), locale)} ({tx(locale, "tasa referencial", "reference rate")})</div>}
             </div>
-            <div className="rounded-[4px] bg-white p-5">
+            <div className="rounded-[16px] bg-white p-5">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="font-display font-semibold">{tx(locale, "Título y descripción (ES / EN)", "Title & description (ES / EN)")}</div>
                 <Button size="sm" variant="navy" onClick={writeAI} disabled={writing}>
-                  {writing ? <Loader2 size={15} className="animate-spin" /> : <Sparkles size={15} className="text-[#E9E1D3]" />} {tx(locale, "Redactar con IA", "Write with AI")}
+                  {writing ? <Loader2 size={15} className="animate-spin" /> : <Sparkles size={15} className="text-[#EFE6D8]" />} {tx(locale, "Redactar con IA", "Write with AI")}
                 </Button>
               </div>
               <div className="mt-3 flex gap-2">
                 {(["es", "en"] as Locale[]).map((x) => (
-                  <button key={x} onClick={() => setLang(x)} className={cn("rounded-[2px] px-3 py-0.5 text-[13px] font-bold", lang === x ? "bg-[#E9E1D3] text-navy outline outline-2 -outline-offset-2 outline-[#1A2026]" : "bg-black/5")}>{x.toUpperCase()}</button>
+                  <button key={x} onClick={() => setLang(x)} className={cn("rounded-[12px] px-3 py-0.5 text-[13px] font-bold", lang === x ? "bg-[#EFE6D8] text-navy outline outline-2 -outline-offset-2 outline-[#1F3A4D]" : "bg-black/5")}>{x.toUpperCase()}</button>
                 ))}
               </div>
               <input
@@ -798,7 +798,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                 <DupNotice locale={locale} dup={dup} override={dupOverride} onOverride={() => { setDupOverride(true); setErr(null); }} hasUnit={!!d.unit.trim()} />
               </div>
             )}
-            <div className="overflow-hidden rounded-[4px] bg-white ">
+            <div className="overflow-hidden rounded-[16px] bg-white ">
               <div className="grid sm:grid-cols-[260px_1fr]">
                 {files.length ? (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -812,11 +812,11 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                   <div className="text-sm text-muted" data-testid="review-address">{address}</div>
                   <div className="mt-2 text-sm" data-testid="review-facts">{facts}</div>
                   {extrasSummary && <div className="mt-1 text-sm text-muted">{extrasSummary}</div>}
-                  <div className="mt-3 inline-flex items-center gap-1.5 rounded-[2px] bg-[#E9E1D3] px-2.5 py-1 text-[13px] font-semibold text-navy">{d.mode === "AGENCY" ? tx(locale, "Inventario de la agencia", "Agency inventory") : d.mode === "FSBO" ? tx(locale, "Publicado por el propietario", "Listed by the owner") : tx(locale, "Encargo a agencia", "Agency mandate")}</div>
+                  <div className="mt-3 inline-flex items-center gap-1.5 rounded-[12px] bg-[#EFE6D8] px-2.5 py-1 text-[13px] font-semibold text-navy">{d.mode === "AGENCY" ? tx(locale, "Inventario de la agencia", "Agency inventory") : d.mode === "FSBO" ? tx(locale, "Publicado por el propietario", "Listed by the owner") : tx(locale, "Encargo a agencia", "Agency mandate")}</div>
                 </div>
               </div>
             </div>
-            <div className="rounded-[4px] bg-white p-5">
+            <div className="rounded-[16px] bg-white p-5">
               <div className="flex items-center justify-between"><span className="font-display font-semibold">{tx(locale, "Calidad del anuncio", "Listing quality")}</span><span className="font-display text-2xl font-semibold text-ok">{quality}/100</span></div>
               <Progress value={quality} tone="ok" className="mt-2" />
               <ul className="mt-3 grid gap-1.5 text-sm sm:grid-cols-2">
@@ -825,20 +825,20 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                 ))}
               </ul>
             </div>
-            <label className="flex items-start gap-2 text-sm text-muted"><input type="checkbox" checked={confirm} onChange={(e) => setConfirm(e.target.checked)} className="mt-1 h-4 w-4 shrink-0 accent-navy dark:accent-[#E9E1D3]" /> {tx(locale, "Confirmo que soy el propietario o tengo autorización para publicar.", "I confirm I’m the owner or authorised to list.")}</label>
+            <label className="flex items-start gap-2 text-sm text-muted"><input type="checkbox" checked={confirm} onChange={(e) => setConfirm(e.target.checked)} className="mt-1 h-4 w-4 shrink-0 accent-navy dark:accent-[#EFE6D8]" /> {tx(locale, "Confirmo que soy el propietario o tengo autorización para publicar.", "I confirm I’m the owner or authorised to list.")}</label>
             {!confirm && <p className="text-[13px] text-muted">{tx(locale, "Marca la casilla para poder publicar.", "Tick the box to publish.")}</p>}
-            {!user && <p className="rounded-lg bg-[#0E1A2B0D] px-3 py-2 text-sm">{tx(locale, "Para publicar te pediremos que entres a tu cuenta. Tu borrador no se pierde.", "We’ll ask you to sign in before publishing. Your draft stays safe.")}</p>}
+            {!user && <p className="rounded-lg bg-[#3A6A920D] px-3 py-2 text-sm">{tx(locale, "Para publicar te pediremos que entres a tu cuenta. Tu borrador no se pierde.", "We’ll ask you to sign in before publishing. Your draft stays safe.")}</p>}
             {err && <div className="rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-sm text-danger" role="alert">{err}</div>}
           </div>
         )}
 
         {blocked.length > 0 && step < 5 && (
-          <div id="wizard-blocked" tabIndex={-1} role="alert" data-testid="wizard-blocked" className="mt-8 rounded-[4px] border border-[#0E1A2B]/30 bg-[#0E1A2B0D] px-4 py-3 text-sm outline-none">
+          <div id="wizard-blocked" tabIndex={-1} role="alert" data-testid="wizard-blocked" className="mt-8 rounded-[16px] border border-[#1F3A4D]/30 bg-[#3A6A920D] px-4 py-3 text-sm outline-none">
             <div className="font-display font-semibold text-ink">{tx(locale, "Para continuar, te falta:", "To continue, you still need:")}</div>
             <ul className="mt-1.5 list-disc space-y-1 pl-5 text-ink/80">
               {blocked.map(([b, zone]) => (
                 <li key={b}>
-                  <button type="button" onClick={() => focusZone(zone)} className="text-left underline decoration-[#0E1A2B]/40 underline-offset-4 hover:decoration-[#0E1A2B] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0E1A2B]">
+                  <button type="button" onClick={() => focusZone(zone)} className="text-left underline decoration-[#1F3A4D]/40 underline-offset-4 hover:decoration-[#3A6A92] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3A6A92]">
                     {b}
                   </button>
                 </li>
@@ -853,7 +853,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
           data-hide-fab-mobile
           className={cn(
             "mt-8 flex items-center justify-between gap-3 border-t border-line pt-5",
-            "max-md:sticky max-md:z-30 max-md:-mx-4 max-md:mt-6 max-md:bg-ivory max-md:px-4 max-md:pb-[calc(12px+env(safe-area-inset-bottom))] max-md:pt-3 max-md:shadow-float dark:max-md:bg-[#0E1A2B]",
+            "max-md:sticky max-md:z-30 max-md:-mx-4 max-md:mt-6 max-md:bg-ivory max-md:px-4 max-md:pb-[calc(12px+env(safe-area-inset-bottom))] max-md:pt-3 max-md:shadow-float dark:max-md:bg-[#3A6A92]",
             staff ? "max-lg:sticky max-lg:bottom-[calc(57px+env(safe-area-inset-bottom))] max-md:pb-3" : "max-md:bottom-0",
           )}
         >
@@ -871,7 +871,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
 
       <aside className="hidden lg:block">
         <div className="sticky top-24 space-y-4">
-          <div className="overflow-hidden rounded-[4px] bg-white ">
+          <div className="overflow-hidden rounded-[16px] bg-white ">
             {files.length ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={previews[cover]} alt="" className="aspect-[4/3] w-full object-cover" />
@@ -886,7 +886,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
             </div>
           </div>
           <div className="rounded-np bg-navy p-4 text-ivory">
-            <div className="flex items-center gap-2 font-display font-semibold"><Sparkles size={16} className="text-[#E9E1D3]" /> {tx(locale, "Valor estimado New Place", "PlaceEstimate")}</div>
+            <div className="flex items-center gap-2 font-display font-semibold"><Sparkles size={16} className="text-[#EFE6D8]" /> {tx(locale, "Valor estimado New Place", "PlaceEstimate")}</div>
             <div className="mt-1 font-display text-2xl">{estimate ? money(estimate.mid, locale) : "—"}</div>
             <div className="text-[13px] text-mist">{tx(locale, "Cambia a medida que avanzas", "Updates as you go")}</div>
           </div>
@@ -912,7 +912,7 @@ function DupNotice({ locale, dup, override, onOverride, hasUnit }: { locale: Loc
         {tx(locale, "Puede que ya esté publicado:", "It may already be listed:")} {link}
         {!hasUnit && <span className="block text-[13px] text-muted">{tx(locale, "Si es otro apartamento o casa, escribe arriba el piso / apto / casa.", "If it’s another flat or house, add the floor / unit above.")}</span>}
       </span>
-      <button type="button" onClick={onOverride} className="rounded-[2px] border border-navy/70 bg-white px-3 py-1.5 font-display text-sm font-semibold text-navy hover:bg-[#E9E1D3]">
+      <button type="button" onClick={onOverride} className="rounded-[12px] border border-navy/70 bg-white px-3 py-1.5 font-display text-sm font-semibold text-navy hover:bg-[#EFE6D8]">
         {tx(locale, "No es la misma casa — es otra unidad", "Not the same home — it’s another unit")}
       </button>
     </span>

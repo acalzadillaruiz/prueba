@@ -111,7 +111,7 @@ export function AskBar({ locale, className, sticky = false }: { locale: Locale; 
         e.preventDefault();
         void go(text);
       }}
-      className={cn("w-full max-w-[860px] rounded-[2px] bg-ivory p-2 text-ink sm:p-3", className)}
+      className={cn("w-full max-w-[860px] rounded-[12px] bg-ivory p-2 text-ink sm:p-3", className)}
     >
       {/* 043 · Airbnb search bar on solid bone: the modes are text segments with a 2 px night underline. */}
       <div className="flex items-center gap-1 px-1 pb-1" role="group" aria-label={tx(locale, "Qué buscas", "What you're after")}>
@@ -133,7 +133,7 @@ export function AskBar({ locale, className, sticky = false }: { locale: Locale; 
           <Sparkles size={14} aria-hidden /> {tx(locale, "Escribe zona, tipo de casa o presupuesto", "Type an area, a kind of home or a budget")}
         </span>
       </div>
-      <div className="relative flex items-center gap-2 rounded-[2px] bg-arena py-1 pl-4 pr-1 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[#735D3F]">
+      <div className="relative flex items-center gap-2 rounded-[12px] bg-arena py-1 pl-4 pr-1 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[#3A6A92]">
         <input
           ref={input}
           {...suggest.inputProps}
@@ -150,7 +150,7 @@ export function AskBar({ locale, className, sticky = false }: { locale: Locale; 
           type="submit"
           aria-busy={busy}
           aria-label={tx(locale, "Buscar casas", "Find homes")}
-          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-navy text-ivory transition-[background-color,transform] duration-np ease-np hover:bg-navy-2 active:scale-[.98] [html.dark_&]:bg-[#F6F2EC] [html.dark_&]:text-[#0E1A2B]"
+          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-navy text-ivory transition-[background-color,transform] duration-np ease-np hover:bg-navy-2 active:scale-[.98] [html.dark_&]:bg-[#FAF8F4] [html.dark_&]:text-[#3A6A92]"
         >
           <Search size={20} strokeWidth={1.8} aria-hidden />
         </button>
@@ -165,7 +165,7 @@ export function AskBar({ locale, className, sticky = false }: { locale: Locale; 
               setText(v);
               void go(v);
             }}
-            className="min-h-11 shrink-0 rounded-[2px] px-3 font-display text-[14px] text-ink underline-offset-4 transition-colors duration-np hover:bg-arena hover:underline"
+            className="min-h-11 shrink-0 rounded-[12px] px-3 font-display text-[14px] text-ink underline-offset-4 transition-colors duration-np hover:bg-arena hover:underline"
           >
             {tx(locale, es, en)}
           </button>
@@ -242,7 +242,7 @@ function CompactAsk({
           e.preventDefault();
           onSubmit();
         }}
-        className={cn("np-glass relative mx-auto flex h-14 max-w-[720px] items-center gap-1 rounded-[2px] p-1.5 text-ink lg:max-w-[940px]", shown && "pointer-events-auto")}
+        className={cn("np-glass relative mx-auto flex h-14 max-w-[720px] items-center gap-1 rounded-[12px] p-1.5 text-ink lg:max-w-[940px]", shown && "pointer-events-auto")}
       >
         <Link href={`/${locale}`} aria-label={tx(locale, "New Place, inicio", "New Place, home")} className={cn("flex h-11 w-11 shrink-0 items-center justify-center rounded-full hover:bg-black/5", ring)}>
           <span aria-hidden className="font-display text-[14px] font-light tracking-[.16em] text-ink">NP</span>
@@ -252,7 +252,7 @@ function CompactAsk({
         </label>
         {/* Mode chip: always the short word ("Compra", "Alquila", "Vaca.") so it never reads as a "home" button; the icon
             joins it from sm. The native select sits invisibly on top: one tap opens the system picker with the full names. */}
-        <span data-mode-chip className="relative flex h-11 shrink-0 items-center gap-1 rounded-[2px] bg-ink pl-3 pr-2 font-display text-[14px] font-medium text-ivory has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ink sm:gap-1.5 sm:pl-3.5 sm:pr-2.5 [html.dark_&]:text-[#1A2026]">
+        <span data-mode-chip className="relative flex h-11 shrink-0 items-center gap-1 rounded-[12px] bg-[#DCE8F2] pl-3 pr-2 font-display text-[14px] font-medium text-ink has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ink sm:gap-1.5 sm:pl-3.5 sm:pr-2.5 [html.dark_&]:text-[#1F3A4D]">
           <chip.Icon size={16} strokeWidth={1.8} aria-hidden className="hidden sm:block" />
           <span aria-hidden>{tx(locale, chip.es, chip.en)}</span>
           <ChevronDown size={14} aria-hidden className="opacity-80" />
@@ -260,7 +260,7 @@ function CompactAsk({
             id={`${id}-mode`}
             value={mode}
             onChange={(e) => setMode(e.target.value as (typeof MODES)[number][0])}
-            className="absolute inset-0 h-full w-full cursor-pointer appearance-none rounded-[2px] opacity-0"
+            className="absolute inset-0 h-full w-full cursor-pointer appearance-none rounded-[12px] opacity-0"
           >
             {MODES.map(([k, es, en]) => (
               <option key={k} value={k}>
@@ -287,7 +287,7 @@ function CompactAsk({
           type="submit"
           aria-busy={busy}
           aria-label={tx(locale, "Buscar", "Search")}
-          className={cn("flex h-11 w-11 shrink-0 items-center justify-center rounded-[2px] bg-coral-cta text-white transition-[background-color,transform] duration-np ease-np hover:bg-coral-cta-hover active:scale-[.98] md:w-auto md:gap-2 md:rounded-[2px] md:px-5", ring)}
+          className={cn("flex h-11 w-11 shrink-0 items-center justify-center rounded-[12px] bg-coral-cta text-white transition-[background-color,transform] duration-np ease-np hover:bg-coral-cta-hover active:scale-[.98] md:w-auto md:gap-2 md:rounded-[12px] md:px-5", ring)}
         >
           <ArrowUp size={18} aria-hidden className="rotate-45 md:hidden" />
           <span className="hidden font-display text-[15px] font-medium md:inline">{tx(locale, "Buscar", "Search")}</span>
@@ -306,7 +306,7 @@ function CompactAsk({
             {user ? <Avatar initials={user.initials} hue={user.hue} size={32} /> : <User size={19} aria-hidden />}
           </Link>
         )}
-        <Link href={`/${locale}/sell`} className={cn("hidden h-11 shrink-0 items-center rounded-[2px] border-[1.5px] border-ink/70 px-4 font-display text-[14px] font-semibold text-ink hover:bg-black/5 xl:flex", ring)}>
+        <Link href={`/${locale}/sell`} className={cn("hidden h-11 shrink-0 items-center rounded-[12px] border-[1.5px] border-ink/70 px-4 font-display text-[14px] font-semibold text-ink hover:bg-black/5 xl:flex", ring)}>
           {tx(locale, "Vender", "Sell")}
         </Link>
         <button

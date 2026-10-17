@@ -80,11 +80,11 @@ export function StickyContactBar({ locale, price, amount, meta, suffix, tour, st
           tabIndex={shown ? 0 : -1}
           data-compare-chip
           className={cn(
-            "-mt-1 mb-2.5 flex min-h-9 items-center gap-2 rounded-[2px] px-3 font-display text-[13px] font-semibold",
-            dark ? "bg-white/10 text-ivory" : "bg-[#F6F2EC] text-ink",
+            "-mt-1 mb-2.5 flex min-h-9 items-center gap-2 rounded-[12px] px-3 font-display text-[13px] font-semibold",
+            dark ? "bg-white/10 text-ivory" : "bg-[#FAF8F4] text-ink",
           )}
         >
-          <Scale size={14} aria-hidden className={dark ? "text-[#C9BFAE]" : "text-[#0E1A2B]"} />
+          <Scale size={14} aria-hidden className={dark ? "text-[#D6DEE5]" : "text-[#3A6A92]"} />
           <span className="flex-1">{tx(locale, `Comparando ${compare.length} de 3`, `Comparing ${compare.length} of 3`)}</span>
           <span className="inline-flex items-center gap-1 underline-offset-4">{tx(locale, "Ver comparación", "View comparison")} <ArrowRight size={14} aria-hidden /></span>
         </Link>
@@ -106,19 +106,19 @@ export function StickyContactBar({ locale, price, amount, meta, suffix, tour, st
         {whatsapp ? (
           <>
             {/* One terracotta action: WhatsApp with the advisor. The tour form stays one tap away (navy outline). */}
-            <button onClick={go} tabIndex={shown ? 0 : -1} aria-label={label} className={cn("np-btn-outline inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-1.5 rounded-[2px] border-[1.5px] px-3.5 font-display text-sm font-semibold max-[399px]:gap-1 max-[399px]:px-2.5", dark ? "border-ivory text-ivory" : "border-navy text-navy")}>
+            <button onClick={go} tabIndex={shown ? 0 : -1} aria-label={label} className={cn("np-btn-outline inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-1.5 rounded-[12px] border-[1.5px] px-3.5 font-display text-sm font-semibold max-[399px]:gap-1 max-[399px]:px-2.5", dark ? "border-ivory text-ivory" : "border-navy text-navy")}>
               <Icon size={17} aria-hidden />
               <span>{short}</span>
             </button>
             {/* Below 380 px WhatsApp keeps only its (universally known) glyph; the name stays for screen readers.
                 "Disponibilidad" (vacation rentals) is longer than "Visita", so there the glyph-only button starts at 420 px. */}
-            <a href={whatsapp} target="_blank" rel="noopener noreferrer" tabIndex={shown ? 0 : -1} className={cn("inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-2 rounded-[2px] bg-coral-cta px-3.5 font-display text-sm font-semibold text-white hover:bg-coral-cta-hover max-[399px]:px-3 max-[379px]:px-0", stay && "max-[419px]:px-0")}>
+            <a href={whatsapp} target="_blank" rel="noopener noreferrer" tabIndex={shown ? 0 : -1} className={cn("inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-2 rounded-[12px] bg-coral-cta px-3.5 font-display text-sm font-semibold text-white hover:bg-coral-cta-hover max-[399px]:px-3 max-[379px]:px-0", stay && "max-[419px]:px-0")}>
               <WhatsAppIcon size={17} /> <span className={stay ? "max-[419px]:sr-only" : "max-[379px]:sr-only"}>WhatsApp</span>
               {agentFirst && <span className="sr-only">{tx(locale, ` con ${agentFirst}`, ` ${agentFirst}`)}</span>}
             </a>
           </>
         ) : (
-          <button onClick={go} tabIndex={shown ? 0 : -1} aria-label={stay ? label : undefined} className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-[2px] bg-coral-cta px-5 font-display text-sm font-semibold text-white hover:bg-coral-cta-hover">
+          <button onClick={go} tabIndex={shown ? 0 : -1} aria-label={stay ? label : undefined} className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-[12px] bg-coral-cta px-5 font-display text-sm font-semibold text-white hover:bg-coral-cta-hover">
             <Icon size={16} aria-hidden />
             {/* "Consultar disponibilidad" doesn't fit beside the price on phones: the bar shows "Disponibilidad". */}
             {stay ? short : label}

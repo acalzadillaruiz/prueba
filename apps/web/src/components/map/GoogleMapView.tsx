@@ -22,8 +22,8 @@ function pillIcon(label: string, active: boolean): google.maps.Icon {
   const W = w + 12;
   const cx = W / 2;
   const svg = active
-    ? `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="48"><path d="M${cx - 20} 14 L${cx} 2 L${cx + 20} 14 Z" fill="#0E1A2B"/><rect x="2" y="15" width="${W - 4}" height="31" rx="10" fill="#E9E1D3"/><rect x="6" y="18" width="${w}" height="25" rx="7" fill="#1A2026"/><text x="${cx}" y="35" text-anchor="middle" font-family="Manrope,Arial" font-weight="600" font-size="13" fill="#FFFFFF">${label}</text></svg>`
-    : `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="48"><path d="M${cx - 16} 19 L${cx} 9 L${cx + 16} 19 Z" fill="#FFFFFF"/><rect x="6" y="18" width="${w}" height="25" rx="7" fill="#FFFFFF" stroke="#E9E1D3"/><text x="${cx}" y="35" text-anchor="middle" font-family="Manrope,Arial" font-weight="600" font-size="13" fill="#1A2026">${label}</text></svg>`;
+    ? `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="48"><path d="M${cx - 20} 14 L${cx} 2 L${cx + 20} 14 Z" fill="#3A6A92"/><rect x="2" y="15" width="${W - 4}" height="31" rx="10" fill="#EFE6D8"/><rect x="6" y="18" width="${w}" height="25" rx="7" fill="#1F3A4D"/><text x="${cx}" y="35" text-anchor="middle" font-family="Manrope,Arial" font-weight="600" font-size="13" fill="#FFFFFF">${label}</text></svg>`
+    : `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="48"><path d="M${cx - 16} 19 L${cx} 9 L${cx + 16} 19 Z" fill="#FFFFFF"/><rect x="6" y="18" width="${w}" height="25" rx="7" fill="#FFFFFF" stroke="#EFE6D8"/><text x="${cx}" y="35" text-anchor="middle" font-family="Manrope,Arial" font-weight="600" font-size="13" fill="#1F3A4D">${label}</text></svg>`;
   return { url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`, anchor: new google.maps.Point(W / 2, 46), scaledSize: new google.maps.Size(W, 48) };
 }
 
@@ -43,8 +43,8 @@ function Layers({ props, theme, mode, setMode, draft, setDraft }: { props: MapVi
         render: ({ count, position }) =>
           new google.maps.Marker({
             position,
-            label: { text: String(count), color: "#F6F2EC", fontWeight: "600", fontFamily: "Manrope, Arial" },
-            icon: { path: google.maps.SymbolPath.CIRCLE, scale: 17, fillColor: "#1A2026", fillOpacity: 1, strokeColor: "#F6F2EC", strokeWeight: 2 },
+            label: { text: String(count), color: "#FAF8F4", fontWeight: "600", fontFamily: "Manrope, Arial" },
+            icon: { path: google.maps.SymbolPath.CIRCLE, scale: 17, fillColor: "#1F3A4D", fillOpacity: 1, strokeColor: "#FAF8F4", strokeWeight: 2 },
             zIndex: 1000 + count,
           }),
       },
@@ -87,7 +87,7 @@ function Layers({ props, theme, mode, setMode, draft, setDraft }: { props: MapVi
     if (!map) return;
     shapeRefs.current.forEach((s) => s.setMap(null));
     shapeRefs.current = [];
-    const coral = "#0E1A2B"; // terracotta drawn areas
+    const coral = "#3A6A92"; // terracotta drawn areas
     if (shape?.type === "poly") shapeRefs.current.push(new google.maps.Polygon({ map, paths: shape.pts, strokeColor: coral, strokeWeight: 2, fillColor: coral, fillOpacity: 0.12, clickable: false }));
     if (shape?.type === "radius") shapeRefs.current.push(new google.maps.Circle({ map, center: shape.center, radius: shape.km * 1000, strokeColor: coral, strokeWeight: 2, fillColor: coral, fillOpacity: 0.12, clickable: false }));
     if (draft.length) shapeRefs.current.push(new google.maps.Polyline({ map, path: draft, strokeColor: coral, strokeWeight: 2, clickable: false }));
@@ -121,12 +121,12 @@ function Layers({ props, theme, mode, setMode, draft, setDraft }: { props: MapVi
 export function GoogleMapView(props: MapViewProps) {
   const { locale, onShape, shape, controls = true, className, focus, initialScale, region = "caracas" } = props;
   const [theme, setTheme] = useState<"night" | "light">(props.initialTheme ?? "light");
-  const ctl = theme === "light" ? "border-[#E9E1D3] bg-[#ffffff] text-[#1A2026]" : "border-white/10 bg-navy/90 text-ivory";
+  const ctl = theme === "light" ? "border-[#EFE6D8] bg-[#ffffff] text-[#1F3A4D]" : "border-white/10 bg-navy/90 text-ivory";
   const [mode, setMode] = useState<"pan" | "draw" | "radius">("pan");
   const [draft, setDraft] = useState<LatLng[]>([]);
   const zoom = region === "venezuela" ? 6 : Math.round(11 + Math.log2(Math.max(1, initialScale ?? 1.5)));
   return (
-    <div className={cn("relative overflow-hidden bg-[#E9E1D3]", className)}>
+    <div className={cn("relative overflow-hidden bg-[#EFE6D8]", className)}>
       <APIProvider apiKey={GOOGLE_MAPS_KEY} language={locale} libraries={["geometry"]}>
         <Map
           defaultCenter={focus ?? (region === "venezuela" ? { lat: 8, lng: -66.3 } : CARACAS)}
@@ -202,7 +202,7 @@ function SearchArea({ locale, onArea }: { locale: MapViewProps["locale"]; onArea
           setMoved(false);
           onArea([b.getSouthWest().lat(), b.getSouthWest().lng(), b.getNorthEast().lat(), b.getNorthEast().lng()]);
         }}
-        className="pointer-events-auto flex min-h-11 items-center gap-2 whitespace-nowrap rounded-[2px] bg-[#0E1A2B] px-4 font-display text-sm font-semibold text-[#F6F2EC] "
+        className="pointer-events-auto flex min-h-11 items-center gap-2 whitespace-nowrap rounded-[12px] bg-[#3A6A92] px-4 font-display text-sm font-semibold text-[#FAF8F4] "
       >
         <Search size={15} aria-hidden /> {tx(locale, "Buscar en esta zona", "Search this area")}
       </button>

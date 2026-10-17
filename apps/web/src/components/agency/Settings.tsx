@@ -35,10 +35,10 @@ const contrast = (a: string, b: string) => {
 };
 /** Text on the accent: white or Navy, whichever reads better; `ratio` is that pair's contrast. */
 function accentText(accent: string) {
-  const hex = /^#[0-9a-fA-F]{6}$/.test(accent) ? accent : "#1A2026";
+  const hex = /^#[0-9a-fA-F]{6}$/.test(accent) ? accent : "#1F3A4D";
   const white = contrast(hex, "#FFFFFF");
-  const dark = contrast(hex, "#1A2026");
-  return white >= dark ? { color: "#FFFFFF", ratio: white } : { color: "#1A2026", ratio: dark };
+  const dark = contrast(hex, "#1F3A4D");
+  return white >= dark ? { color: "#FFFFFF", ratio: white } : { color: "#1F3A4D", ratio: dark };
 }
 
 export function SettingsView({
@@ -80,7 +80,7 @@ export function SettingsView({
   const logo = b.logoUrl.trim();
   const brandErr = {
     name: b.name.trim().length >= 2 && b.name.trim().length <= 80 ? null : tx(locale, "Escribe el nombre de la agencia (2 a 80 caracteres).", "Enter the agency name (2 to 80 characters)."),
-    color: /^#[0-9a-fA-F]{6}$/.test(b.color) ? null : tx(locale, "Usa un color como #E9E1D3.", "Use a colour like #E9E1D3."),
+    color: /^#[0-9a-fA-F]{6}$/.test(b.color) ? null : tx(locale, "Usa un color como #EFE6D8.", "Use a colour like #EFE6D8."),
     logoUrl: !logo || /^https:\/\/[^\s]+$/.test(logo) || /^\/uploads\//.test(logo) ? null : tx(locale, "El logo debe ser un enlace que empiece por https://", "The logo must be a link starting with https://"),
   };
   const verifiedIds = new Set(advisors.filter((a) => a.verified !== false).map((a) => a.id));
@@ -137,9 +137,9 @@ export function SettingsView({
             </div>
           </div>
           {/* The public listing is light: the preview pins the light tokens even in the dark cockpit (Cal surface, Navy ink,
-              muted #57534D = 6.4:1), and the button text follows the accent's luminance (white or Navy). */}
-          <div className="mt-5 rounded-xl bg-[#F6F2EC] p-4 text-[#1A2026] outline outline-1 -outline-offset-1 outline-[#E6DFD3] [--np-ink-rgb:30_26_24] [--np-line-rgb:216_203_183] [--np-logo-ink:#1A2026] [--np-logo-teja:#0E1A2B] [--np-muted-rgb:94_82_72] [color-scheme:light] dark:outline-white/10" data-testid="brand-preview">
-            <div className="text-[11px] font-semibold uppercase tracking-[.12em] text-[#57534D]">{tx(locale, "Vista previa en ficha pública", "Public listing preview")}</div>
+              muted #4A6275 = 6.4:1), and the button text follows the accent's luminance (white or Navy). */}
+          <div className="mt-5 rounded-xl bg-[#FAF8F4] p-4 text-[#1F3A4D] outline outline-1 -outline-offset-1 outline-[#E3E8EC] [--np-ink-rgb:30_26_24] [--np-line-rgb:216_203_183] [--np-logo-ink:#1F3A4D] [--np-logo-teja:#3A6A92] [--np-muted-rgb:94_82_72] [color-scheme:light] dark:outline-white/10" data-testid="brand-preview">
+            <div className="text-[12px] font-semibold uppercase tracking-[.12em] text-[#4A6275]">{tx(locale, "Vista previa en ficha pública", "Public listing preview")}</div>
             <div className="mt-2 flex flex-wrap items-center gap-3">
               {/^https:\/\/|^\/uploads\//.test(b.logoUrl.trim()) ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -147,10 +147,10 @@ export function SettingsView({
               ) : (
                 <span className="flex h-10 w-10 items-center justify-center rounded-lg font-display font-bold" style={{ background: b.color, color: onAccent.color }}>{agency.initials}</span>
               )}
-              <div className="min-w-0 flex-1"><div className="truncate font-display font-semibold">{b.name}</div><div className="text-sm text-[#57534D]">{b.whatsapp}</div></div>
+              <div className="min-w-0 flex-1"><div className="truncate font-display font-semibold">{b.name}</div><div className="text-sm text-[#4A6275]">{b.whatsapp}</div></div>
               <span className="rounded-np px-3 py-2 font-display text-sm font-semibold" style={{ background: b.color, color: onAccent.color }}>{tx(locale, "Contactar", "Contact")}</span>
             </div>
-            <div className="mt-3 flex items-center justify-between border-t border-[#C9BFAE] pt-2 text-xs text-[#57534D]"><span>{tx(locale, "Publicado en New Place", "Listed on New Place")}</span><Logo size="sm" /></div>
+            <div className="mt-3 flex items-center justify-between border-t border-[#D6DEE5] pt-2 text-xs text-[#4A6275]"><span>{tx(locale, "Publicado en New Place", "Listed on New Place")}</span><Logo size="sm" /></div>
           </div>
           {!brandErr.color && onAccent.ratio < 4.5 && (
             <p className={cn("mt-3", k.warnBox)} role="status">
@@ -183,7 +183,7 @@ export function SettingsView({
             <h2 className={cn(k.title, "flex items-center gap-2")}><Lock size={16} strokeWidth={1.6} className={k.muted} /> {tx(locale, "Plan (solo lectura)", "Plan (read-only)")}</h2>
             <div className="mt-3 grid grid-cols-3 gap-2 text-center text-sm">
               {["FREE", "PRO", "ENTERPRISE"].map((p) => (
-                <div key={p} aria-current={p === agency.plan ? "true" : undefined} className={p === agency.plan ? "rounded-xl bg-[#E9E1D3] p-3 text-navy outline outline-2 -outline-offset-2 outline-[#1A2026] dark:bg-white/10 dark:text-ivory dark:outline dark:outline-2 dark:-outline-offset-2 dark:outline-[#E9E1D3]" : cn("rounded-xl border p-3", k.line, k.muted)}><div className="font-display font-semibold">{p === "FREE" ? tx(locale, "Gratis", "Free") : p === "PRO" ? tx(locale, "Profesional", "Professional") : tx(locale, "Empresa", "Enterprise")}</div><div className="text-xs">{p === "FREE" ? tx(locale, "Hasta 10 inmuebles", "Up to 10 listings") : p === "PRO" ? tx(locale, "Hasta 100 inmuebles · textos y valoraciones automáticas", "Up to 100 listings · automatic texts and valuations") : tx(locale, "Inmuebles ilimitados", "Unlimited listings")}</div></div>
+                <div key={p} aria-current={p === agency.plan ? "true" : undefined} className={p === agency.plan ? "rounded-xl bg-[#EFE6D8] p-3 text-navy outline outline-2 -outline-offset-2 outline-[#1F3A4D] dark:bg-white/10 dark:text-ivory dark:outline dark:outline-2 dark:-outline-offset-2 dark:outline-[#EFE6D8]" : cn("rounded-xl border p-3", k.line, k.muted)}><div className="font-display font-semibold">{p === "FREE" ? tx(locale, "Gratis", "Free") : p === "PRO" ? tx(locale, "Profesional", "Professional") : tx(locale, "Empresa", "Enterprise")}</div><div className="text-xs">{p === "FREE" ? tx(locale, "Hasta 10 inmuebles", "Up to 10 listings") : p === "PRO" ? tx(locale, "Hasta 100 inmuebles · textos y valoraciones automáticas", "Up to 100 listings · automatic texts and valuations") : tx(locale, "Inmuebles ilimitados", "Unlimited listings")}</div></div>
               ))}
             </div>
             <p className={cn("mt-3 text-xs", k.muted)}>{tx(locale, "Por ahora no cobramos ningún plan. Si necesitas cambiarlo, escríbenos y lo hace el equipo de New Place.", "We don’t charge for any plan for now. If you need a change, write to us and the New Place team will do it.")}</p>
@@ -212,10 +212,10 @@ export function SettingsView({
                 const isToday = today === Number(d);
                 const label = tx(locale, ...WEEKDAY_LABEL[d]);
                 return (
-                  <label key={d} className={cn("block rounded-xl border p-3", k.line, isToday && "border-navy/40 dark:border-[#E9E1D3]/50")}>
+                  <label key={d} className={cn("block rounded-xl border p-3", k.line, isToday && "border-navy/40 dark:border-[#EFE6D8]/50")}>
                     <span className="mb-1.5 flex items-center justify-between gap-2 text-sm font-semibold text-navy dark:text-ivory">
                       {label}
-                      {isToday && <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[.12em]", k.soft)}>{tx(locale, "Hoy", "Today")}</span>}
+                      {isToday && <span className={cn("rounded-full px-2 py-0.5 text-[12px] font-semibold uppercase tracking-[.12em]", k.soft)}>{tx(locale, "Hoy", "Today")}</span>}
                     </span>
                     <Select
                       disabled={!owner}

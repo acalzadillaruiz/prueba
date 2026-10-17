@@ -190,10 +190,10 @@ export function HubView({ locale, data, emailOn = false }: { locale: Locale; dat
           <h2 className="np-t-h2 flex items-center gap-2 font-serif"><CircleDollarSign size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Precalificación orientativa", "Indicative pre-qualification")}</h2>
           <p className="mt-1 text-[13px] text-muted">{tx(locale, "Es solo una referencia: New Place no otorga créditos.", "Just a reference: New Place doesn’t provide loans.")}</p>
           <div className="mt-4 space-y-4 text-sm">
-            <label className="block"><div className="flex justify-between"><span>{tx(locale, "Precio", "Price")}</span><b>{money(price, locale)}</b></div><input type="range" min={50000} max={500000} step={5000} value={price} onChange={(e) => setPrice(+e.target.value)} className="w-full accent-navy dark:accent-[#E9E1D3]" aria-label={tx(locale, "Precio", "Price")} /></label>
-            <label className="block"><div className="flex justify-between"><span>{tx(locale, "Inicial", "Down payment")}</span><b>{down} %</b></div><input type="range" min={10} max={70} value={down} onChange={(e) => setDown(+e.target.value)} className="w-full accent-navy dark:accent-[#E9E1D3]" aria-label={tx(locale, "Inicial (%)", "Down payment (%)")} /></label>
-            <label className="block"><div className="flex justify-between"><span>{tx(locale, "Plazo", "Term")}</span><b>{years} {tx(locale, "años", "yrs")}</b></div><input type="range" min={5} max={25} value={years} onChange={(e) => setYears(+e.target.value)} className="w-full accent-navy dark:accent-[#E9E1D3]" aria-label={tx(locale, "Plazo (años)", "Term (years)")} /></label>
-            <label className="block"><div className="flex justify-between"><span>{tx(locale, "Tasa anual", "Annual rate")}</span><b>{ratePct.toLocaleString(locale === "es" ? "es-VE" : "en-US")} %</b></div><input type="range" min={0} max={30} step={0.5} value={ratePct} onChange={(e) => setRatePct(+e.target.value)} className="w-full accent-navy dark:accent-[#E9E1D3]" aria-label={tx(locale, "Tasa anual (%)", "Annual rate (%)")} /></label>
+            <label className="block"><div className="flex justify-between"><span>{tx(locale, "Precio", "Price")}</span><b>{money(price, locale)}</b></div><input type="range" min={50000} max={500000} step={5000} value={price} onChange={(e) => setPrice(+e.target.value)} className="w-full accent-navy dark:accent-[#EFE6D8]" aria-label={tx(locale, "Precio", "Price")} /></label>
+            <label className="block"><div className="flex justify-between"><span>{tx(locale, "Inicial", "Down payment")}</span><b>{down} %</b></div><input type="range" min={10} max={70} value={down} onChange={(e) => setDown(+e.target.value)} className="w-full accent-navy dark:accent-[#EFE6D8]" aria-label={tx(locale, "Inicial (%)", "Down payment (%)")} /></label>
+            <label className="block"><div className="flex justify-between"><span>{tx(locale, "Plazo", "Term")}</span><b>{years} {tx(locale, "años", "yrs")}</b></div><input type="range" min={5} max={25} value={years} onChange={(e) => setYears(+e.target.value)} className="w-full accent-navy dark:accent-[#EFE6D8]" aria-label={tx(locale, "Plazo (años)", "Term (years)")} /></label>
+            <label className="block"><div className="flex justify-between"><span>{tx(locale, "Tasa anual", "Annual rate")}</span><b>{ratePct.toLocaleString(locale === "es" ? "es-VE" : "en-US")} %</b></div><input type="range" min={0} max={30} step={0.5} value={ratePct} onChange={(e) => setRatePct(+e.target.value)} className="w-full accent-navy dark:accent-[#EFE6D8]" aria-label={tx(locale, "Tasa anual (%)", "Annual rate (%)")} /></label>
           </div>
           <div className="mt-4 rounded-np bg-navy p-4 text-ivory">
             <div className="text-[13px] text-mist">{tx(locale, `Cuota estimada (${ratePct.toLocaleString("es-VE")} % anual)`, `Est. payment (${ratePct}% APR)`)}</div>
@@ -254,7 +254,7 @@ export function HubView({ locale, data, emailOn = false }: { locale: Locale; dat
             {SAVED_SEARCHES.map((s) => (
               <div key={s.id} className="mt-3 flex items-center justify-between gap-2 text-sm">
                 <span className="line-clamp-1">{isMachineName(s.name) ? alertTitle(s.query, !!s.polygon, locale) : s.name}</span>
-                {s.newCount > 0 && <Badge className="bg-[#E9E1D3] text-navy dark:bg-white/10">+{s.newCount}</Badge>}
+                {s.newCount > 0 && <Badge className="bg-[#EFE6D8] text-navy dark:bg-white/10">+{s.newCount}</Badge>}
               </div>
             ))}
           </Card>

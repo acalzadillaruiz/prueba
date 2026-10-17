@@ -280,7 +280,7 @@ export function PublicHeader({ locale, variant = "light", autoHide = false }: { 
             }
           : undefined
       }
-      className="sr-only-focusable fixed left-3 top-3 z-[70] rounded-[2px] bg-navy px-4 py-2 font-display text-ivory"
+      className="sr-only-focusable fixed left-3 top-3 z-[70] rounded-[12px] bg-navy px-4 py-2 font-display text-ivory"
     >
       {onSearch ? tx(locale, "Saltar a los resultados", "Skip to results") : tx(locale, "Saltar al contenido", "Skip to content")}
     </a>
@@ -389,7 +389,7 @@ export function PublicHeader({ locale, variant = "light", autoHide = false }: { 
               <span className="hidden font-display text-sm xl:inline">{u.name.split(" ")[0]}</span>
             </Link>
           ) : (
-            <Link href={`/${locale}/login`} className={cn("hidden min-h-11 items-center gap-1.5 rounded-[2px] px-3 font-display text-[15px] md:flex", inv ? "text-ivory/85 hover:bg-white/10" : "text-ink/80 hover:bg-black/5")}>
+            <Link href={`/${locale}/login`} className={cn("hidden min-h-11 items-center gap-1.5 rounded-[12px] px-3 font-display text-[15px] md:flex", inv ? "text-ivory/85 hover:bg-white/10" : "text-ink/80 hover:bg-black/5")}>
               <User size={17} aria-hidden /> {t("signIn")}
             </Link>
           )}
@@ -418,7 +418,7 @@ export function PublicHeader({ locale, variant = "light", autoHide = false }: { 
             {t("sell")}
           </Button>
           {/* AMALI capsule: the on-call advisor (Arena circle with a phone) and the two-line menu, always together. */}
-          <div className={cn("ml-1 flex h-12 items-center gap-0.5 rounded-[2px] p-1", inv ? "bg-transparent" : "bg-arena")}>
+          <div className={cn("ml-1 flex h-12 items-center gap-0.5 rounded-[12px] p-1", inv ? "bg-transparent" : "bg-arena")}>
             <OnCallButton
               locale={locale}
               aria-label={tx(locale, "Asesor 24/7: llama o escribe a un asesor", "Advisor 24/7: call or message an advisor")}

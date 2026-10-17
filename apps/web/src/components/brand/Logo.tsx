@@ -64,7 +64,7 @@ function Wordmark({ size, color }: { size: number; color: string }) {
 export function Logo({ tone = "navy", className, size = "md", animate = false }: { tone?: "navy" | "ivory"; className?: string; size?: "sm" | "md" | "lg"; animate?: boolean }) {
   const dark = tone === "ivory";
   // --np-logo-ink lets the public dark mode turn the Noche wordmark into Travertino.
-  const ink = dark ? "#F6F2EC" : "var(--np-logo-ink, var(--np-ink))";
+  const ink = dark ? "#FAF8F4" : "var(--np-logo-ink, var(--np-ink))";
   if (size === "lg")
     return (
       <span translate="no" className={cn("inline-grid justify-items-center gap-2", animate && "np-roof-fade", className)} aria-label="New Place Venezuela">

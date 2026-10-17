@@ -12,8 +12,8 @@ import "../globals.css";
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#F6F2EC" },
-    { media: "(prefers-color-scheme: dark)", color: "#0E1A2B" },
+    { media: "(prefers-color-scheme: light)", color: "#FAF8F4" },
+    { media: "(prefers-color-scheme: dark)", color: "#3A6A92" },
   ],
   // 043: the site supports both schemes (meta color-scheme); globals.css pins the one actually shown (html.dark or not).
   colorScheme: "light dark",

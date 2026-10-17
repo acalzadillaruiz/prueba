@@ -84,7 +84,7 @@ export function OwnerVisitHours({ listingId, locale, initial, onDone }: { listin
     <form
       noValidate
       data-testid="visit-hours-form"
-      className="mt-4 space-y-4 rounded-[4px] border border-line bg-[#F6F2EA] p-4 dark:bg-white/[.03]"
+      className="mt-4 space-y-4 rounded-[16px] border border-line bg-[#FAF8F4] p-4 dark:bg-white/[.03]"
       aria-label={tx(locale, "Horario de visitas", "Visit hours")}
       onSubmit={(e) => {
         e.preventDefault();
@@ -108,7 +108,7 @@ export function OwnerVisitHours({ listingId, locale, initial, onDone }: { listin
         <div className="mb-2 text-sm font-semibold">{tx(locale, "Cuánto dura cada visita", "How long each visit lasts")}</div>
         <div className="flex flex-wrap gap-2" role="radiogroup" aria-label={tx(locale, "Duración de cada visita", "Length of each visit")}>
           {SLOT_MINUTES.map((m) => (
-            <button key={m} type="button" role="radio" aria-checked={slotMin === m} onClick={() => setSlotMin(m)} className={cn("inline-flex min-h-9 items-center gap-1.5 rounded-[2px] border px-3.5 py-1.5 text-sm font-semibold", slotMin === m ? "border-navy bg-navy text-ivory" : "border-line bg-white dark:bg-transparent")}>
+            <button key={m} type="button" role="radio" aria-checked={slotMin === m} onClick={() => setSlotMin(m)} className={cn("inline-flex min-h-9 items-center gap-1.5 rounded-[12px] border px-3.5 py-1.5 text-sm font-semibold", slotMin === m ? "border-navy bg-navy text-ivory" : "border-line bg-white dark:bg-transparent")}>
               {slotMin === m && <Check size={14} aria-hidden />} {m} min
             </button>
           ))}

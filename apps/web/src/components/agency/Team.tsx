@@ -116,11 +116,11 @@ export function TeamView({ locale, members, listingsByAgent, invites: initialInv
               {u.role === "AGENT" && <div className="mt-3 flex flex-wrap items-center gap-2 [&>span]:flex-wrap">{verification(u)}</div>}
               <dl className={cn("mt-3 grid grid-cols-2 gap-2 rounded-xl px-3 py-2.5", k.soft)}>
                 <div className="min-w-0">
-                  <dt className={cn(k.label, "text-[10px]")}>{tx(locale, "Inmuebles", "Listings")}</dt>
+                  <dt className={cn(k.label, "text-[12px]")}>{tx(locale, "Inmuebles", "Listings")}</dt>
                   <dd className="mt-0.5 text-sm font-semibold">{listingsByAgent[u.id] ?? "—"}</dd>
                 </div>
                 <div className="min-w-0">
-                  <dt className={cn(k.label, "text-[10px]")}>{tx(locale, "Última actividad", "Last active")}</dt>
+                  <dt className={cn(k.label, "text-[12px]")}>{tx(locale, "Última actividad", "Last active")}</dt>
                   <dd className="mt-0.5 text-sm"><TimeAgo iso={u.lastSeen} locale={locale} /></dd>
                 </div>
               </dl>
@@ -201,7 +201,7 @@ export function TeamView({ locale, members, listingsByAgent, invites: initialInv
                 <Chip>{tr(i.role)}</Chip>
                 {manager && (
                   <button
-                    className={cn("flex h-9 w-9 items-center justify-center rounded-full", k.muted, "hover:bg-[#E9E1D3] hover:text-navy dark:hover:bg-white/10 dark:hover:text-ivory")}
+                    className={cn("flex h-9 w-9 items-center justify-center rounded-full", k.muted, "hover:bg-[#EFE6D8] hover:text-navy dark:hover:bg-white/10 dark:hover:text-ivory")}
                     aria-label={tx(locale, `Revocar invitación a ${i.email}`, `Revoke invite to ${i.email}`)}
                     onClick={async () => {
                       try {

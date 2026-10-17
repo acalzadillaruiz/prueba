@@ -134,7 +134,7 @@ export function HubMessages({
       <div className="flex items-center justify-between gap-2">
         <h2 className="np-t-h2 flex items-center gap-2 font-serif">
           <MessageSquare size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {direct ? tx(locale, "Mensajes directos", "Direct messages") : tx(locale, "Mensajes", "Messages")}
-          {totalUnread > 0 && <Badge className="bg-[#E9E1D3] text-navy dark:bg-white/10">{totalUnread} {tx(locale, totalUnread === 1 ? "nuevo" : "nuevos", "new")}</Badge>}
+          {totalUnread > 0 && <Badge className="bg-[#EFE6D8] text-navy dark:bg-white/10">{totalUnread} {tx(locale, totalUnread === 1 ? "nuevo" : "nuevos", "new")}</Badge>}
         </h2>
         {open && (
           <Button size="sm" variant="ghost" onClick={() => setOpenId(null)}>

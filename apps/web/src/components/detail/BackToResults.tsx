@@ -60,7 +60,7 @@ export function BackToResults({ locale }: { locale: Locale }) {
         else router.push(target.href);
       }}
       data-back-to-results
-      className="np-glass np-in inline-flex min-h-11 items-center gap-2 rounded-[2px] px-4 font-display text-[14px] font-semibold text-ink transition-colors duration-np hover:text-navy"
+      className="np-glass np-in inline-flex min-h-11 items-center gap-2 rounded-[12px] px-4 font-display text-[14px] font-semibold text-ink transition-colors duration-np hover:text-navy"
     >
       <ArrowLeft size={16} aria-hidden />
       {label}

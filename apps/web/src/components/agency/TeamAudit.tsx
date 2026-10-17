@@ -90,7 +90,7 @@ function Performance({ locale, days, rows }: { locale: Locale; days: AuditPeriod
   const n = (v: number) => <span className={cn(k.num, "tracking-normal")}>{v}</span>;
   const metric = (label: string, value: React.ReactNode) => (
     <div className="min-w-0">
-      <dt className="line-clamp-2 text-[10px] font-semibold uppercase leading-tight tracking-[.1em] text-muted dark:text-mist">{label}</dt>
+      <dt className="line-clamp-2 text-[12px] font-semibold uppercase leading-tight tracking-[.1em] text-muted dark:text-mist">{label}</dt>
       <dd className={cn("mt-0.5 text-[16px] leading-tight", tnum)}>{value}</dd>
     </div>
   );
@@ -136,7 +136,7 @@ function Performance({ locale, days, rows }: { locale: Locale; days: AuditPeriod
               <button
                 type="button"
                 onClick={() => setSort((s) => ({ ...s, dir: s.dir === 1 ? -1 : 1 }))}
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-navy outline outline-1 -outline-offset-1 outline-[#C9BFAE] dark:text-ivory dark:outline dark:outline-1 dark:-outline-offset-1 dark:outline-[rgba(255,255,255,.18)]"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-navy outline outline-1 -outline-offset-1 outline-[#D6DEE5] dark:text-ivory dark:outline dark:outline-1 dark:-outline-offset-1 dark:outline-[rgba(255,255,255,.18)]"
                 aria-label={sort.dir === 1 ? tx(locale, "Orden ascendente (cambiar a descendente)", "Ascending order (switch to descending)") : tx(locale, "Orden descendente (cambiar a ascendente)", "Descending order (switch to ascending)")}
               >
                 {sort.dir === 1 ? <ArrowUp size={16} aria-hidden /> : <ArrowDown size={16} aria-hidden />}
@@ -167,7 +167,7 @@ function Performance({ locale, days, rows }: { locale: Locale; days: AuditPeriod
                       tx(locale, "1.ª respuesta", "1st response"),
                       <>
                         <span className={cn(k.num, "tracking-normal")}>{formatMinutes(r.respMedianMin, locale)}</span>
-                        {r.respMeanMin != null && <span className={cn("block text-[11px] font-normal", k.muted)}>{tx(locale, "media", "mean")} {formatMinutes(r.respMeanMin, locale)}</span>}
+                        {r.respMeanMin != null && <span className={cn("block text-[12px] font-normal", k.muted)}>{tx(locale, "media", "mean")} {formatMinutes(r.respMeanMin, locale)}</span>}
                       </>,
                     )}
                     {metric(tx(locale, "Visitas", "Tours"), <>{n(r.toursBooked)} <span className={cn("text-xs font-normal", k.muted)}>/ {r.toursDone} {tx(locale, "hechas", "done")}</span></>)}
@@ -301,7 +301,7 @@ function Chats({ locale, advisors, threads, agentId, onAgent, pending }: { local
               const active = open?.id === t.id;
               return (
                 <li key={t.id}>
-                  <button type="button" onClick={() => show(t.id)} aria-current={active ? "true" : undefined} className={cn("block w-full px-4 py-3 text-left transition-colors", active ? "bg-[#E9E1D3] dark:bg-white/10" : k.hover)}>
+                  <button type="button" onClick={() => show(t.id)} aria-current={active ? "true" : undefined} className={cn("block w-full px-4 py-3 text-left transition-colors", active ? "bg-[#EFE6D8] dark:bg-white/10" : k.hover)}>
                     <div className="flex items-baseline justify-between gap-2">
                       <span className="min-w-0 font-semibold leading-snug">{names(t.participants)}</span>
                       <span className={cn("shrink-0 text-xs", k.muted)}><TimeAgo iso={t.last ? t.last.at : t.updatedAt} locale={locale} /></span>
@@ -343,7 +343,7 @@ function Chats({ locale, advisors, threads, agentId, onAgent, pending }: { local
                     const staff = open.participants.find((p) => p.id === m.senderId)?.member ?? false;
                     return (
                       <li key={m.id} className={cn("flex", staff ? "justify-end" : "justify-start")}>
-                        <div className={cn("max-w-[80%] rounded-2xl px-3.5 py-2.5 text-[14px]", staff ? "bg-navy text-ivory dark:bg-[#1E3049]" : "bg-[#F4EFE7] text-navy dark:bg-white/[.06] dark:text-ivory")}>
+                        <div className={cn("max-w-[80%] rounded-2xl px-3.5 py-2.5 text-[14px]", staff ? "bg-navy text-ivory dark:bg-[#2C4A60]" : "bg-[#F4EFE7] text-navy dark:bg-white/[.06] dark:text-ivory")}>
                           <div className={cn("mb-0.5 text-[12px] font-semibold", staff ? "text-ivory/85" : "text-muted dark:text-mist")}>
                             {m.senderName} · <time dateTime={m.at}>{dateTime(m.at, locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</time>
                           </div>

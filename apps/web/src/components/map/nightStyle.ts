@@ -1,16 +1,16 @@
-/** Alternative night style (toggle) (brief §10): water #0E1A2B, roads #14243A, labels #A9B1BC (043). Used when no Map ID is set. */
+/** Alternative night style (toggle) (brief §10): water #3A6A92, roads #2F5A7E, labels #B9C7D3 (043). Used when no Map ID is set. */
 export const NIGHT_STYLE: google.maps.MapTypeStyle[] = [
-  { elementType: "geometry", stylers: [{ color: "#0E1A2B" }] },
-  { elementType: "labels.text.fill", stylers: [{ color: "#A9B1BC" }] },
-  { elementType: "labels.text.stroke", stylers: [{ color: "#0E1A2B" }] },
-  { featureType: "water", elementType: "geometry", stylers: [{ color: "#0E1A2B" }] },
-  { featureType: "road", elementType: "geometry", stylers: [{ color: "#14243A" }] },
-  { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#1E3049" }] },
+  { elementType: "geometry", stylers: [{ color: "#3A6A92" }] },
+  { elementType: "labels.text.fill", stylers: [{ color: "#B9C7D3" }] },
+  { elementType: "labels.text.stroke", stylers: [{ color: "#3A6A92" }] },
+  { featureType: "water", elementType: "geometry", stylers: [{ color: "#3A6A92" }] },
+  { featureType: "road", elementType: "geometry", stylers: [{ color: "#2F5A7E" }] },
+  { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#2C4A60" }] },
   { featureType: "road", elementType: "labels.icon", stylers: [{ visibility: "off" }] },
   { featureType: "poi", stylers: [{ visibility: "off" }] },
   { featureType: "poi.park", elementType: "geometry", stylers: [{ visibility: "on" }, { color: "#12231F" }] },
   { featureType: "transit", stylers: [{ visibility: "off" }] },
-  { featureType: "administrative", elementType: "geometry.stroke", stylers: [{ color: "#1E3049" }] },
+  { featureType: "administrative", elementType: "geometry.stroke", stylers: [{ color: "#2C4A60" }] },
   { featureType: "landscape.natural", elementType: "geometry", stylers: [{ color: "#101E31" }] },
 ];
 
@@ -18,15 +18,15 @@ export const NIGHT_STYLE: google.maps.MapTypeStyle[] = [
 export const LIGHT_STYLE: google.maps.MapTypeStyle[] = [
   { elementType: "geometry", stylers: [{ color: "#F1ECE4" }] },
   { elementType: "labels.text.fill", stylers: [{ color: "#8F8370" }] },
-  { elementType: "labels.text.stroke", stylers: [{ color: "#F6F2EC" }] },
-  { featureType: "water", elementType: "geometry", stylers: [{ color: "#E9E1D3" }] },
+  { elementType: "labels.text.stroke", stylers: [{ color: "#FAF8F4" }] },
+  { featureType: "water", elementType: "geometry", stylers: [{ color: "#EFE6D8" }] },
   { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#5A534D" }] },
-  { featureType: "landscape.natural", elementType: "geometry", stylers: [{ color: "#E9E1D3" }] },
-  { featureType: "road", elementType: "geometry", stylers: [{ color: "#E9E1D3" }] },
-  { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#C9BFAE" }] },
+  { featureType: "landscape.natural", elementType: "geometry", stylers: [{ color: "#EFE6D8" }] },
+  { featureType: "road", elementType: "geometry", stylers: [{ color: "#EFE6D8" }] },
+  { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#D6DEE5" }] },
   { featureType: "road", elementType: "labels.icon", stylers: [{ visibility: "off" }] },
   { featureType: "poi", stylers: [{ visibility: "off" }] },
   { featureType: "poi.park", elementType: "geometry", stylers: [{ visibility: "on" }, { color: "#E6E5D3" }] },
   { featureType: "transit", stylers: [{ visibility: "off" }] },
-  { featureType: "administrative", elementType: "geometry.stroke", stylers: [{ color: "#C9BFAE" }] },
+  { featureType: "administrative", elementType: "geometry.stroke", stylers: [{ color: "#D6DEE5" }] },
 ];

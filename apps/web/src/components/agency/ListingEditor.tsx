@@ -247,8 +247,8 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
               })}
             </div>
             <div className="mt-4 flex flex-wrap gap-4 text-sm">
-              <label className="flex items-center gap-2"><input type="checkbox" disabled={!canEdit} checked={f.hasFloorplan} onChange={(e) => { setF({ ...f, hasFloorplan: e.target.checked }); dirty(); }} className="h-4 w-4 accent-navy dark:accent-[#E9E1D3]" /> {tx(locale, "Tiene plano", "Has floor plan")}</label>
-              <label className="flex items-center gap-2"><input type="checkbox" disabled={!canEdit} checked={f.hasVirtualTour} onChange={(e) => { setF({ ...f, hasVirtualTour: e.target.checked }); dirty(); }} className="h-4 w-4 accent-navy dark:accent-[#E9E1D3]" /> {tx(locale, "Tour virtual", "Virtual tour")}</label>
+              <label className="flex items-center gap-2"><input type="checkbox" disabled={!canEdit} checked={f.hasFloorplan} onChange={(e) => { setF({ ...f, hasFloorplan: e.target.checked }); dirty(); }} className="h-4 w-4 accent-navy dark:accent-[#EFE6D8]" /> {tx(locale, "Tiene plano", "Has floor plan")}</label>
+              <label className="flex items-center gap-2"><input type="checkbox" disabled={!canEdit} checked={f.hasVirtualTour} onChange={(e) => { setF({ ...f, hasVirtualTour: e.target.checked }); dirty(); }} className="h-4 w-4 accent-navy dark:accent-[#EFE6D8]" /> {tx(locale, "Tour virtual", "Virtual tour")}</label>
             </div>
             {f.hasVirtualTour && (
               <div className="mt-3 max-w-md">
@@ -336,9 +336,9 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
                       <button onClick={() => move(i, 1)} className="rounded-full bg-navy/85 p-1 text-ivory" aria-label={tx(locale, "Mover después", "Move later")}><ArrowRight size={12} /></button>
                     </div>}
                     {p.isCover ? (
-                      <span className="absolute bottom-1 left-1 rounded-[2px] bg-navy px-1.5 text-[13px] font-bold text-ivory"><Star size={9} className="inline" /> {tx(locale, "Portada", "Cover")}</span>
+                      <span className="absolute bottom-1 left-1 rounded-[12px] bg-navy px-1.5 text-[13px] font-bold text-ivory"><Star size={9} className="inline" /> {tx(locale, "Portada", "Cover")}</span>
                     ) : canPhotos && (
-                      <button onClick={() => photoOp({ cover: p.id })} className="absolute bottom-1 left-1 rounded-[2px] bg-white/90 px-1.5 text-[13px] font-bold text-navy [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 [@media(hover:hover)]:group-focus-within:opacity-100">{tx(locale, "Portada", "Cover")}</button>
+                      <button onClick={() => photoOp({ cover: p.id })} className="absolute bottom-1 left-1 rounded-[12px] bg-white/90 px-1.5 text-[13px] font-bold text-navy [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 [@media(hover:hover)]:group-focus-within:opacity-100">{tx(locale, "Portada", "Cover")}</button>
                     )}
                   </div>
                 ))}
@@ -358,7 +358,7 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
               <h2 className={k.title}>{tx(locale, "Calidad de ficha", "Listing quality")}</h2>
               <span className={cn(k.num, "text-[36px] leading-none", quality >= 85 ? k.okText : k.warnText)}>{quality}</span>
             </div>
-            <div className="mt-3 h-2 rounded-full bg-[#E6DFD3] dark:bg-white/10"><div className="h-full rounded-full bg-ok" style={{ width: `${quality}%` }} /></div>
+            <div className="mt-3 h-2 rounded-full bg-[#E3E8EC] dark:bg-white/10"><div className="h-full rounded-full bg-ok" style={{ width: `${quality}%` }} /></div>
             <ul className="mt-4 space-y-2 text-sm">
               {checks.map(([ok, t, pts]) => (
                 <li key={t} className={cn("flex items-center gap-2", ok ? "text-navy dark:text-ivory" : k.muted)}>

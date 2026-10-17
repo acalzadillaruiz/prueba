@@ -17,7 +17,7 @@ export function BilingualBody({ l, locale, dark }: { l: Listing; locale: Locale;
         {(["es", "en"] as Locale[]).map((x) => (
           // 44 px tap area around the small pill
           <button key={x} onClick={() => setLang(x)} aria-pressed={lang === x} className="-my-2.5 flex min-h-11 min-w-11 items-center justify-center">
-            <span className={cn("rounded-[2px] border-2 px-2.5 py-0.5 text-[13px] font-semibold", lang === x ? "np-sel" : cn("border-transparent", dark ? "text-mist" : "text-muted"))}>{x.toUpperCase()}</span>
+            <span className={cn("rounded-[12px] border-2 px-2.5 py-0.5 text-[13px] font-semibold", lang === x ? "np-sel" : cn("border-transparent", dark ? "text-mist" : "text-muted"))}>{x.toUpperCase()}</span>
           </button>
         ))}
         <span className={cn("text-sm", dark ? "text-mist" : "text-muted")}>{tx(locale, "En español e inglés", "In Spanish and English")}</span>

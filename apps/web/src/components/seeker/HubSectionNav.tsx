@@ -72,13 +72,13 @@ export function HubSectionNav({ locale, sections }: { locale: Locale; sections: 
                   aria-current={on ? "location" : undefined}
                   onClick={() => setActive(s.id)}
                   className={cn(
-                    "flex min-h-10 items-center gap-1.5 whitespace-nowrap rounded-[2px] px-4 font-display text-[14px] font-medium transition-colors duration-np focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink",
-                    on ? "bg-ink text-ivory [html.dark_&]:bg-[#F6F2EC] [html.dark_&]:text-[#1A2026]" : "text-ink/75 hover:bg-black/5 hover:text-ink",
+                    "flex min-h-10 items-center gap-1.5 whitespace-nowrap rounded-[12px] px-4 font-display text-[14px] font-medium transition-colors duration-np focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink",
+                    on ? "bg-ink text-ivory [html.dark_&]:bg-[#FAF8F4] [html.dark_&]:text-[#1F3A4D]" : "text-ink/75 hover:bg-black/5 hover:text-ink",
                   )}
                 >
                   {s.label}
                   {!!s.badge && (
-                    <span className={cn("flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[13px] font-bold", on ? "bg-[#E9E1D3] text-[#1A2026]" : "bg-navy text-ivory")}>
+                    <span className={cn("flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[13px] font-bold", on ? "bg-[#EFE6D8] text-[#1F3A4D]" : "bg-navy text-ivory")}>
                       {s.badge}
                       <span className="sr-only">{tx(locale, " sin leer", " unread")}</span>
                     </span>

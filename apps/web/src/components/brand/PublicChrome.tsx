@@ -88,7 +88,7 @@ export function FloatingContact({ href, label, whatsapp = false, tabbar = false,
   // On a listing page the Guardia shows only that listing's agency (same as the contact panel's link).
   const listingSlug = pathname?.match(/^\/(?:es|en)\/listing\/([^/?#]+)/)?.[1];
   const item = "flex min-h-12 w-full items-center gap-3 rounded-2xl px-3 text-left font-display text-[15px] text-ink transition-colors hover:bg-black/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy";
-  const glyph = "flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-ink text-ivory";
+  const glyph = "flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#DCE8F2] text-ink";
   return (
     <div
       ref={root}
@@ -101,7 +101,7 @@ export function FloatingContact({ href, label, whatsapp = false, tabbar = false,
       )}
     >
       {open && (
-        <div id={menuId} role="group" aria-label={tx(locale, "Hablar con un asesor", "Talk to an advisor")} className="np-glass-nav np-in w-[min(300px,calc(100vw-2rem))] rounded-[4px] p-2 ">
+        <div id={menuId} role="group" aria-label={tx(locale, "Hablar con un asesor", "Talk to an advisor")} className="np-glass-nav np-in w-[min(300px,calc(100vw-2rem))] rounded-[16px] p-2 ">
           <button
             type="button"
             aria-haspopup="dialog"
@@ -135,7 +135,7 @@ export function FloatingContact({ href, label, whatsapp = false, tabbar = false,
         aria-controls={open ? menuId : undefined}
         tabIndex={hidden ? -1 : undefined}
         onClick={() => setOpen((o) => !o)}
-        className="flex h-14 w-14 items-center justify-center rounded-full bg-navy text-ivory transition-colors hover:bg-navy-2 [html.dark_&]:bg-[#F6F2EC] [html.dark_&]:text-[#0E1A2B] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-navy"
+        className="flex h-14 w-14 items-center justify-center rounded-full bg-navy text-ivory transition-colors hover:bg-navy-2 [html.dark_&]:bg-[#FAF8F4] [html.dark_&]:text-[#3A6A92] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-navy"
       >
         {open ? <X size={22} aria-hidden /> : <MessageCircle size={23} aria-hidden />}
       </button>

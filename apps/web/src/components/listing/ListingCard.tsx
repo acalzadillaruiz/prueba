@@ -109,7 +109,7 @@ export function ListingCard({ l, locale, compact, className, compareToggle }: { 
       data-listing-card
       data-reveal
       className={cn(
-        "group relative isolate rounded-[2px] has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-navy has-[a:focus-visible]:ring-offset-4 has-[a:focus-visible]:ring-offset-ivory",
+        "group relative isolate rounded-[12px] has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-navy has-[a:focus-visible]:ring-offset-4 has-[a:focus-visible]:ring-offset-ivory",
         className,
       )}
     >
@@ -120,7 +120,7 @@ export function ListingCard({ l, locale, compact, className, compareToggle }: { 
         {compareToggle && <CardCompareToggle id={l.id} locale={locale} />}
         {/* Honest label for illustration-only listings. Several photos: dots on the carousel (no static "1/N"). */}
         {!l.photos?.length && (
-          <span className="pointer-events-none absolute bottom-2.5 right-2.5 z-[2] rounded-[2px] bg-[#F6F2EC] px-2.5 py-0.5 font-display text-[13px] font-medium text-[#1A2026]">{tx(locale, "Ilustración", "Illustration")}</span>
+          <span className="pointer-events-none absolute bottom-2.5 right-2.5 z-[2] rounded-[12px] bg-[#FAF8F4] px-2.5 py-0.5 font-display text-[13px] font-medium text-[#1F3A4D]">{tx(locale, "Ilustración", "Illustration")}</span>
         )}
       </div>
       <div className={cn("pb-2 pt-4", compact && "pb-1.5 pt-3.5")}>
@@ -130,7 +130,7 @@ export function ListingCard({ l, locale, compact, className, compareToggle }: { 
           <Link
             href={href}
             aria-describedby={metaId}
-            className="outline-none after:absolute after:inset-0 after:z-[1] after:rounded-[2px] after:content-['']"
+            className="outline-none after:absolute after:inset-0 after:z-[1] after:rounded-[12px] after:content-['']"
           >
             {title}
           </Link>
@@ -174,8 +174,8 @@ export function MapPreviewCard({ l, locale, variant = "card" }: { l: Listing; lo
   );
   if (variant === "sheet")
     return (
-      <article className="relative isolate flex h-[120px] gap-3 overflow-hidden rounded-[4px] bg-white p-1.5 outline outline-1 -outline-offset-1 outline-black/[.05] has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-navy">
-        <div className="relative w-[40%] max-w-[160px] shrink-0 overflow-hidden rounded-[4px] bg-arena">
+      <article className="relative isolate flex h-[120px] gap-3 overflow-hidden rounded-[16px] bg-white p-1.5 outline outline-1 -outline-offset-1 outline-black/[.05] has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-navy">
+        <div className="relative w-[40%] max-w-[160px] shrink-0 overflow-hidden rounded-[16px] bg-arena">
           <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="h-full w-full" label={label} sizes="160px" />
         </div>
         <div className="min-w-0 flex-1 py-1.5 pr-12">
@@ -190,8 +190,8 @@ export function MapPreviewCard({ l, locale, variant = "card" }: { l: Listing; lo
       </article>
     );
   return (
-    <article className="np-glass relative isolate overflow-hidden rounded-[4px] p-1.5 has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-navy">
-      <div className="relative aspect-[16/9] overflow-hidden rounded-[4px] bg-arena">
+    <article className="np-glass relative isolate overflow-hidden rounded-[16px] p-1.5 has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-navy">
+      <div className="relative aspect-[16/9] overflow-hidden rounded-[16px] bg-arena">
         <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="h-full w-full" label={label} sizes="256px" />
         <SaveButton id={l.id} locale={locale} className="absolute right-2 top-2 z-[2]" />
       </div>

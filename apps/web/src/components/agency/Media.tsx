@@ -145,7 +145,7 @@ export function MediaView({ locale, jobs, listings, names = {}, manage = null }:
             const jl = byId.get(j.listingId);
             if (!jl) return null;
             return (
-              <button key={j.id} onClick={() => setSel(j.id)} aria-pressed={sel === j.id} className={cn("flex w-full gap-3 rounded-[4px] p-3 text-left transition-shadow duration-np", sel === j.id ? "bg-[#E9E1D3] outline outline-2 -outline-offset-2 outline-[#1A2026] dark:bg-white/[.08] dark:outline dark:outline-2 dark:-outline-offset-2 dark:outline-[#E9E1D3]" : cn(k.card, ""))}>
+              <button key={j.id} onClick={() => setSel(j.id)} aria-pressed={sel === j.id} className={cn("flex w-full gap-3 rounded-[16px] p-3 text-left transition-shadow duration-np", sel === j.id ? "bg-[#EFE6D8] outline outline-2 -outline-offset-2 outline-[#1F3A4D] dark:bg-white/[.08] dark:outline dark:outline-2 dark:-outline-offset-2 dark:outline-[#EFE6D8]" : cn(k.card, ""))}>
                 <PropertyArt scene={jl.scenes[0]} seed={jl.id} photo={listingPhoto(jl, 0)} className="h-16 w-20 shrink-0 rounded-xl" />
                 <div className="min-w-0 flex-1">
                   <div className="line-clamp-1 font-semibold">{tx(locale, jl.title_es, jl.title_en)}</div>
@@ -217,15 +217,15 @@ export function MediaView({ locale, jobs, listings, names = {}, manage = null }:
                 </button>
               ))}
             </div>
-            <div className="mt-3 h-1.5 rounded-full bg-[#E6DFD3] dark:bg-white/10"><div className="h-full rounded-full bg-navy transition-[width] duration-500 dark:bg-ivory" style={{ width: `${Math.min(100, (photos.length / 20) * 100)}%` }} /></div>
+            <div className="mt-3 h-1.5 rounded-full bg-[#E3E8EC] dark:bg-white/10"><div className="h-full rounded-full bg-navy transition-[width] duration-500 dark:bg-ivory" style={{ width: `${Math.min(100, (photos.length / 20) * 100)}%` }} /></div>
             {photos.length ? (
               <div className="mt-5 grid grid-cols-3 gap-2 sm:grid-cols-5 lg:grid-cols-6">
                 {photos.map((src, i) => (
                   <div key={src} className={cn("relative overflow-hidden rounded-lg outline outline-2 -outline-offset-2", i === 0 ? "ring-navy dark:ring-ivory" : "ring-transparent")}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={src} alt="" className="aspect-[4/3] w-full object-cover" />
-                    <span className="absolute left-1 top-1 rounded bg-navy/80 px-1 text-[10px] font-bold text-ivory">{i + 1}</span>
-                    {i === 0 && <span className="absolute bottom-1 left-1 rounded-full bg-white px-1.5 text-[10px] font-bold uppercase tracking-wider text-navy">{tx(locale, "Portada", "Cover")}</span>}
+                    <span className="absolute left-1 top-1 rounded bg-navy/80 px-1 text-[12px] font-bold text-ivory">{i + 1}</span>
+                    {i === 0 && <span className="absolute bottom-1 left-1 rounded-full bg-white px-1.5 text-[12px] font-bold uppercase tracking-wider text-navy">{tx(locale, "Portada", "Cover")}</span>}
                   </div>
                 ))}
               </div>

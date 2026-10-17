@@ -7,10 +7,14 @@ import { Button } from "@/components/ui";
 import { getZones } from "@/server/data";
 import { platformDaysOnMarket } from "@/server/zone-stats";
 import { pageMeta } from "@/lib/seo";
-import { plural, tx } from "@/lib/i18n";
+import { moneyUi, plural, tx } from "@/lib/i18n";
 import sellPhoto from "../../../../public/brand/patio.jpg";
 import { PhotoBand } from "@/components/home/PhotoBand";
 import { PHOTOS } from "@/lib/media";
+import Link from "next/link";
+import { PropertyArt } from "@/components/art/PropertyArt";
+import { listingPhoto } from "@/lib/photos";
+import { publicListings } from "@/server/listings";
 
 // Public, cacheable landing for owners ("Vender con nosotros"); the wizard itself lives at /owner/new.
 export const revalidate = 3600;
@@ -26,7 +30,9 @@ export default async function SellPage({ params }: { params: Promise<{ locale: L
   const { locale } = await params;
   // Same figure (and definition) as the listing pages and agency reports: median days since publication of the homes
   // available today. The static zone reference figures (getZones) are not what any other page shows.
-  const [zones, dom] = await Promise.all([getZones(), platformDaysOnMarket()]);
+  const [zones, dom, live] = await Promise.all([getZones(), platformDaysOnMarket(), publicListings()]);
+  // 051-G 14: three homes published today, as they look on New Place (real listings, never examples).
+  const shown = live.filter((l) => !l.luxury && l.listingType === "SALE").slice(0, 3);
   const start = `/${locale}/owner/new`;
   const values = [
     {
@@ -68,7 +74,7 @@ export default async function SellPage({ params }: { params: Promise<{ locale: L
               <Button href={start} size="lg">
                 {tx(locale, "Publicar mi casa", "List my home")} <ArrowRight size={17} aria-hidden />
               </Button>
-              <a href="#como-funciona" className="inline-flex min-h-12 items-center px-2 font-display text-[16px] font-medium text-navy underline-offset-4 hover:underline">
+              <a href="#como-funciona" className="inline-flex min-h-12 items-center px-2 font-display text-[17px] font-medium text-navy underline-offset-4 hover:underline">
                 {tx(locale, "Cómo funciona", "How it works")}
               </a>
             </div>
@@ -112,6 +118,28 @@ export default async function SellPage({ params }: { params: Promise<{ locale: L
           </div>
         </div>
       </section>
+
+      {/* 051-G 14: three real published homes, so owners see how theirs will look. */}
+      {shown.length === 3 && (
+        <section className="bg-ivory text-ink" aria-labelledby="sell-live">
+          <div className="mx-auto max-w-[1280px] px-[clamp(16px,4vw,40px)] pb-[clamp(64px,10vw,128px)]">
+            <h2 id="sell-live" className="np-t-band max-w-[720px]">{tx(locale, "Así se ve tu casa publicada", "How your home will look")}</h2>
+            <ul data-reveal="stagger" className="mt-10 grid gap-6 md:grid-cols-3">
+              {shown.map((l) => (
+                <li key={l.id}>
+                  <Link href={`/${locale}/listing/${encodeURIComponent(l.slug)}`} className="group block">
+                    <div className="relative aspect-[4/5] overflow-hidden rounded-[16px] bg-arena">
+                      <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="h-full w-full transition-transform duration-500 ease-[cubic-bezier(.2,.7,.2,1)] group-hover:scale-[1.03] motion-reduce:transition-none" label={tx(locale, l.title_es, l.title_en)} sizes="(max-width: 768px) 92vw, 400px" />
+                    </div>
+                    <p className="mt-3 font-display text-[20px] font-medium text-ink [font-variant-numeric:lining-nums_tabular-nums]">{moneyUi(l.priceAmount, locale)}</p>
+                    <p className="np-t-small mt-0.5 text-muted">{l.zone} · {l.city}</p>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )}
 
       {/* Sand band: what you get, as plain text (term + detail), no boxes. */}
       <section className="bg-arena" aria-labelledby="sell-why">

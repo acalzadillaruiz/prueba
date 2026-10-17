@@ -112,7 +112,7 @@ export function Avatar({ initials, hue = 12, size = 36, className }: { initials:
   return (
     <span
       className={cn("inline-flex shrink-0 items-center justify-center rounded-full font-display font-semibold text-white", className)}
-      style={{ width: size, height: size, fontSize: size * 0.38, background: `hsl(${hue} 30% 38%)` }}
+      style={{ width: size, height: size, fontSize: Math.max(12, size * 0.38), background: `hsl(${198 + (hue % 24)} 34% 36%)` }}
     >
       {initials}
     </span>

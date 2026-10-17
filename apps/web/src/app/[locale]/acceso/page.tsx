@@ -22,7 +22,7 @@ export default async function Acceso({ params, searchParams }: { params: Promise
         : null;
   return (
     <main id="main" className="relative isolate grid min-h-[100svh] place-items-center overflow-hidden bg-[#CFE3F1] px-4 py-16 text-ink">
-      <Image src="/media/048/hero-playa-1920.webp" alt="" fill priority sizes="100vw" className="-z-10 object-cover" />
+      <Image src="/media/048/hero-playa-2400.webp" alt="" fill priority sizes="100vw" className="-z-10 object-cover" />
       <div className="absolute inset-0 -z-10 bg-[rgb(31_58_77/.25)]" aria-hidden />
       <form action="/api/access" method="post" className="np-soft-card grid w-full max-w-[420px] justify-items-center gap-6 rounded-[24px] bg-[#FAF8F4] px-6 py-10 text-center sm:px-10">
         <Logo tone="navy" size="lg" />

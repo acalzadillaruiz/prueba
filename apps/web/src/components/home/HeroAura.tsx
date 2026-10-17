@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getImageProps } from "next/image";
+import { preload } from "react-dom";
 import type { Locale } from "@/types/domain";
 import { tx } from "@/lib/i18n";
 import { AskBar } from "@/components/search/AskBar";
@@ -18,6 +19,9 @@ export function HeroAura({ locale, available }: { locale: Locale; available: num
   const common = { alt: tx(locale, "Playa del Caribe al atardecer", "Caribbean beach at sunset"), sizes: "100vw", quality: 70, priority: true, fetchPriority: "high" as const };
   const desktop = getImageProps({ ...common, src: poster.desktop, width: poster.width, height: poster.height }).props.srcSet;
   const mobileImg = getImageProps({ ...common, src: poster.mobile, width: poster.mobileWidth, height: poster.mobileHeight }).props;
+  // 048-Q (LCP): the art-directed hero is preloaded from the head, each source only for its own screen size.
+  preload(mobileImg.src, { as: "image", imageSrcSet: mobileImg.srcSet, imageSizes: "100vw", fetchPriority: "high", media: "(max-width: 639px)" } as Parameters<typeof preload>[1]);
+  if (desktop) preload(desktop.split(" ")[0], { as: "image", imageSrcSet: desktop, imageSizes: "100vw", fetchPriority: "high", media: "(min-width: 640px)" } as Parameters<typeof preload>[1]);
   return (
     <section data-hide-fab className="relative isolate flex min-h-[100svh] flex-col overflow-hidden bg-[#1F3A4D] text-ivory" aria-labelledby="hero-title">
       {/* Art direction: the beach at sunset, 16:9 on wide screens and 4:5 on phones with the sea in frame. One <img> (the LCP). */}

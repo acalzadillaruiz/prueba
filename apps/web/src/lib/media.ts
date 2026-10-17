@@ -26,7 +26,7 @@ export const PHOTOS = {
 /** Hero: the poster is the LCP (16:9 desktop, 4:5 phone); the loop is mounted after load and only when motion and
  *  data allow it. Every file stays under 3 MB (scripts/check-media-size.mjs). */
 export const HERO_MEDIA = {
-  poster: { desktop: "/media/048/hero-playa-1920.webp", mobile: "/media/048/hero-playa-movil-900.webp", width: 1920, height: 1080, mobileWidth: 900, mobileHeight: 1125 },
+  poster: { desktop: "/media/048/hero-playa-2400.webp", mobile: "/media/048/hero-playa-movil-1800.webp", width: 2400, height: 1350, mobileWidth: 1800, mobileHeight: 2250 },
   video: {
     desktop: { webm: "/media/hero-720.webm", mp4: "/media/hero-720.mp4" },
     mobile: { webm: "/media/hero-720x1280.webm", mp4: "/media/hero-720x1280.mp4" },

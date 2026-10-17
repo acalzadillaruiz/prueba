@@ -50,7 +50,7 @@ export function CollectionRail({
           <li key={it.href} className="w-[80vw] sm:w-[46vw] md:w-[34vw] lg:w-[28vw] xl:w-[380px]">
             <Link href={it.href} className="np-card np-soft-card group block overflow-hidden">
               <span className="relative block aspect-[4/3] overflow-hidden bg-arena">
-                {it.photo && <Image src={it.photo} alt="" fill sizes="(max-width: 768px) 80vw, 380px" className="np-card-photo object-cover" />}
+                {it.photo && <Image src={it.photo} alt="" fill sizes="(max-width: 768px) 120vw, 600px" className="np-card-photo object-cover" />}
                 {it.badge && (
                   <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1 text-[13px] font-medium text-ink">
                     <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-gold" />

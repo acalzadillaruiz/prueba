@@ -7,10 +7,10 @@ Banda «Pocas casas» (villa-piscina): 1613490493576-7fde63acd811
 Colección privada (salon-luz): 1600607687939-ce8a6c25118c
 «Vende tu casa» (casa-patio): 1512917774080-9991f1c4c750
 Portadas demo de la colección (public/photos/<id>-1.jpg):
-  10kskk ← 1582268611958-ebfd161ef9cf
-  14o349 ← 1600047509807-ba8f99d2cdde
-  1e4hxf ← 1499793983690-e29da59ef1c2
-  1icjk8 ← 1580587771525-78b9dba3b914
-  eoaur5 ← 1520250497591-112f2f40a3f4
-  qqcmi5 ← 1602343168117-bb8ffe3e2e9f
+  10kskk Penthouse El Morro ← 1582268611958-ebfd161ef9cf
+  14o349 Casa de autor entre jardines ← 1600585154340-be6161a56a0c
+  1e4hxf Villa frente al mar ← 1499793983690-e29da59ef1c2
+  1icjk8 Quinta clásica ← 1564013799919-ab600027ffc6
+  eoaur5 Residencia contemporánea ← 1600047509807-ba8f99d2cdde
+  qqcmi5 Casa privada ← 1580587771525-78b9dba3b914
 Cuando el cliente entregue fotos reales, sustituyen a estas.

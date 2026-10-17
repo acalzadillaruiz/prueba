@@ -11,7 +11,7 @@ import { cn } from "@/lib/cn";
 
 const IMG = "h-full w-full"; // the 1 → 1.03 lean on hover lives in globals.css (.np-card-media, pointer: fine only)
 /** Cards are at most a third of the screen on desktop, full width on phones. */
-const SIZES = "(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw";
+const SIZES = "(max-width: 640px) 100vw, (max-width: 1280px) 75vw, 50vw"; // 048-Q: ≥ 1.5× the painted width
 
 /**
  * Card photos: a scroll-snap mini carousel when the listing has several photos (swipe on touch, arrows on desktop
@@ -53,7 +53,8 @@ export function CardPhotos({ l, locale, label, href }: { l: Listing; locale: Loc
           if (i !== idx) setIdx(i);
           ahead(i);
         }}
-        // Touch only (with a mouse the stretched link is on top and gets the click).
+        // 048-Q: the strip sits above the stretched title link on every device, so a sideways trackpad gesture or
+        // swipe moves the photos; a click or tap opens the listing (a scroll gesture never navigates).
         onClick={href ? () => router.push(href) : undefined}
         // Not a Tab stop (browsers make scrollers focusable): the keyboard opens the listing through the title link,
         // and the strip is named for screen readers.
@@ -61,7 +62,7 @@ export function CardPhotos({ l, locale, label, href }: { l: Listing; locale: Loc
         role="group"
         aria-roledescription={tx(locale, "carrusel", "carousel")}
         aria-label={tx(locale, `Fotos de ${label}`, `Photos of ${label}`)}
-        className="no-scrollbar flex h-full w-full snap-x snap-mandatory overflow-x-auto overscroll-x-contain [@media(hover:none)]:relative [@media(hover:none)]:z-[2]"
+        className="no-scrollbar relative z-[1] flex h-full w-full cursor-pointer snap-x snap-mandatory overflow-x-auto overscroll-x-contain"
       >
         {Array.from({ length: n }, (_, i) => (
           <div key={i} className="relative h-full w-full shrink-0 snap-start snap-always overflow-hidden bg-arena">

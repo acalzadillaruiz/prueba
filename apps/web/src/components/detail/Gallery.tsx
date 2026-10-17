@@ -115,7 +115,7 @@ export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: bo
     <span className="pointer-events-none absolute bottom-4 left-4 np-glass rounded-[12px] px-3 py-1 font-display text-[13px] text-ink">{tx(locale, "Ilustración · aún sin fotos reales", "Illustration · real photos to come")}</span>
   );
     const allLabel = illustrated ? tx(locale, `Ver las ${total} ilustraciones`, `View all ${total} illustrations`) : tx(locale, `Ver las ${total} fotos`, `View all ${total} photos`);
-  const chip = "inline-flex min-h-11 items-center gap-1.5 rounded-[12px] bg-arena px-4 font-display text-[15px] text-ink transition-colors duration-np ease-np hover:bg-[#DDD3C2]";
+  const chip = "inline-flex min-h-11 items-center gap-1.5 rounded-[12px] bg-arena px-4 font-display text-[15px] text-ink transition-colors duration-np ease-np hover:bg-[#DCE8F2]";
   return (
     <>
       {/* Main photo with the brand's arched top-left corner; four thumbnails on the right (desktop). Phones: the main photo
@@ -132,16 +132,16 @@ export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: bo
               if (n !== idx) setIdx(n);
               ahead(n);
             }}
-            className="no-scrollbar flex h-full w-full snap-x snap-mandatory overflow-x-auto overscroll-x-contain md:overflow-hidden"
+            className="no-scrollbar flex h-full w-full snap-x snap-mandatory overflow-x-auto overscroll-x-contain"
           >
             {shots.map((sc, n) => (
               <button
                 key={n}
                 type="button"
                 onClick={() => show(n)}
-                // Only the photo on screen is in the tab order; from md up only the first one exists (thumbnails do the rest).
+                // Only the photo on screen is in the tab order. 048-Q: every size can swipe or trackpad through the photos.
                 tabIndex={n === idx ? 0 : -1}
-                className={cn("relative block h-full w-full shrink-0 snap-start snap-always overflow-hidden", n > 0 && "md:hidden")}
+                className="relative block h-full w-full shrink-0 snap-start snap-always overflow-hidden"
                 aria-label={n === 0 ? undefined : view(n + 1)}
               >
                 <span className="sr-only">{view(n + 1)}</span>
@@ -164,15 +164,15 @@ export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: bo
           )}
           {total > 1 && (
             <>
-              <span aria-hidden data-testid="gallery-hero-counter" className="pointer-events-none absolute right-3 top-3 np-glass rounded-[12px] px-3 py-1 font-display text-[13px] font-semibold tabular-nums text-ink md:hidden">
+              <span aria-hidden data-testid="gallery-hero-counter" className="pointer-events-none absolute right-3 top-3 np-glass rounded-[12px] px-3 py-1 font-display text-[13px] font-semibold tabular-nums text-ink">
                 {idx + 1} / {total}
               </span>
-              <div aria-hidden className="pointer-events-none absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-1.5 md:hidden">
+              <div aria-hidden className="pointer-events-none absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-1.5">
                 {shots.map((_, n) => (
                   <span key={n} className={cn("h-1.5 rounded-full outline outline-1 outline-[rgb(31_58_77/.25)] transition-[width,background-color] duration-np", n === idx ? "w-3 bg-white" : "w-1.5 bg-white/60")} />
                 ))}
               </div>
-              <span className="sr-only md:hidden" aria-live="polite">{What(idx + 1)}</span>
+              <span className="sr-only" aria-live="polite">{What(idx + 1)}</span>
             </>
           )}
         </div>

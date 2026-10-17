@@ -118,7 +118,7 @@ export function CardCompareToggle({ id, locale }: { id: string; locale: Locale }
 // Brand pills: egeo / arena for market states, navy for closed deals; status colours only where they warn.
 const STATUS_TONE: Record<ListingStatus, string> = {
   DRAFT: "bg-[#5A534D] text-white",
-  COMING_SOON: "bg-[#D6DEE5] text-[#3A6A92]",
+  COMING_SOON: "bg-[#DCE8F2] text-[#1F3A4D]",
   ACTIVE: "bg-[#2F6F4E] text-white",
   UNDER_OFFER: "bg-[#EFE6D8] text-[#1F3A4D]",
   SOLD: "bg-[#3A6A92] text-[#FAF8F4]",

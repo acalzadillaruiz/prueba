@@ -256,7 +256,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
           <div className="relative aspect-[3/4] w-full max-w-[400px] overflow-hidden rounded-[12px]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/media/048/villa-piscina-1800.webp" alt="" className="h-full w-full object-cover object-[50%_60%]" />
-            <div className="absolute inset-0 bg-[rgb(14_26_43/.45)]" />
+            <div className="absolute inset-0 bg-[rgb(31_58_77/.45)]" />
             <div className="absolute inset-x-0 bottom-8 px-8 text-center text-ivory">
               <div className="text-[13px] font-semibold text-[#EFE6D8]">{tx(locale, "Guarda, compara y pide visitas", "Save, compare and book visits")}</div>
               <div className="mt-3 font-display text-[17px] font-light leading-snug">{tx(locale, "Casas revisadas y un asesor que te atiende a cualquier hora.", "Checked homes and an advisor who answers at any hour.")}</div>

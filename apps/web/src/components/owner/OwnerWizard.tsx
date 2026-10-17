@@ -861,7 +861,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
           {step < 5 ? (
             <Button onClick={next} aria-describedby={blocked.length ? "wizard-blocked" : undefined}>{outlierPending ? tx(locale, "Continuar igualmente", "Continue anyway") : tx(locale, "Continuar", "Continue")} <ArrowRight size={16} /></Button>
           ) : (
-            <Button size="lg" onClick={publish} disabled={!!busy || !confirm || !d.addr} className="disabled:text-[#5E5650] dark:disabled:bg-white/10 dark:disabled:text-[#CDC5B9]">
+            <Button size="lg" onClick={publish} disabled={!!busy || !confirm || !d.addr} className="disabled:text-[#4A6275] dark:disabled:bg-white/10 dark:disabled:text-[#D6DEE5]">
               {busy && <Loader2 size={16} className="animate-spin" />}
               {busy === "photos" ? tx(locale, "Subiendo fotos…", "Uploading photos…") : d.mode === "MANDATE" ? tx(locale, "Enviar encargo", "Send request") : tx(locale, "Publicar ahora", "Publish now")}
             </Button>

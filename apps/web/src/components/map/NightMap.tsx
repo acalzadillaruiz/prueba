@@ -21,7 +21,7 @@ const BOUNDS: Record<Region, { latMin: number; latMax: number; lngMin: number; l
 // "night" is kept as the alternative style behind the toggle.
 const PAL: Record<Theme, Record<string, string>> = {
   night: { land: "#1D1917", land2: "#29231F", water: "#1F3A4D", mountain: "#27221E", contour: "#322B26", park: "#13261F", road: "#302925", hwy: "#3A6A92", label: "#B9C7D3", label2: "#81776F", runway: "#312A26", pin: "#3A6A92", note: "#B9C7D3" },
-  light: { land: "#F1ECE4", land2: "#EFE6D8", water: "#EFE6D8", mountain: "#EFE6D8", contour: "#EFE6D8", park: "#E6E5D3", road: "#EFE6D8", hwy: "#D6DEE5", label: "#8F8370", label2: "#A3977F", runway: "#E8DFCF", pin: "#3A6A92", note: "#5A534D" },
+  light: { land: "#FAF8F4", land2: "#F4F1EA", water: "#CFE3F1", mountain: "#EEF2EE", contour: "#E2E8E4", park: "#E4EFE6", road: "#E9EDF1", hwy: "#D6DEE5", label: "#6E8496", label2: "#8CA0B0", runway: "#ECEFF2", pin: "#3A6A92", note: "#4A6275" },
 };
 
 const L = (lat: number, lng: number) => ({ lat, lng });
@@ -344,7 +344,7 @@ export function NightMap({
   const selected = listings.find((l) => l.id === selectedId);
   // Map controls: white on the light map, navy glass on the night map.
   const ctl = theme === "light" ? "border-[#EFE6D8] bg-[#ffffff] text-[#1F3A4D]" : "border-white/10 bg-navy text-ivory";
-  const ctlHover = theme === "light" ? "hover:bg-[#F1ECE4]" : "hover:bg-white/10";
+  const ctlHover = theme === "light" ? "hover:bg-[#DCE8F2]" : "hover:bg-white/10";
   const ctlLine = theme === "light" ? "border-[#EFE6D8]" : "border-white/10";
 
   // CSS px inside the map box ⇄ map coordinates (same "slice" geometry as the pins).
@@ -443,6 +443,8 @@ export function NightMap({
         onClick={onClick}
         onDoubleClick={() => mode === "draw" && closePoly()}
         onWheel={(e) => {
+          // 048-B: the wheel scrolls the page; only a trackpad pinch (ctrlKey) or ⌘/Ctrl + wheel zooms the map.
+          if (!e.ctrlKey && !e.metaKey) return;
           const { x, y } = toSvg(e);
           zoom(e.deltaY < 0 ? 1.15 : 1 / 1.15, x, y);
         }}
@@ -563,7 +565,7 @@ export function NightMap({
               {(() => {
                 const p = P(11.55, -65.6);
                 return (
-                  <text transform={labelAt(p.x, p.y)} fill={theme === "light" ? "#5A534D" : pal.label2} fontStyle="italic" fontFamily="var(--font-serif)" fontSize={20}>
+                  <text transform={labelAt(p.x, p.y)} fill={theme === "light" ? "#5B8DB8" : pal.label2} fontStyle="italic" fontFamily="var(--font-serif)" fontSize={20}>
                     {tx(locale, "Mar Caribe", "Caribbean Sea")}
                   </text>
                 );
@@ -602,11 +604,11 @@ export function NightMap({
             >
               <g className="opacity-0 group-focus-visible:opacity-100">
                 <circle r={26} fill="none" stroke="#FAF8F4" strokeWidth={4.5} />
-                <circle r={26} fill="none" stroke="#1F3A4D" strokeWidth={2} />
+                <circle r={26} fill="none" stroke="#3A6A92" strokeWidth={2} />
               </g>
-              <circle r={22} fill="#1F3A4D" opacity={0.14} />
-              <circle r={16.5} fill="#1F3A4D" stroke="#FAF8F4" strokeWidth={2} filter={`url(#${uid}-pin)`} />
-              <text textAnchor="middle" dy={4.5} fontSize={13} fontWeight={600} fill="#FAF8F4" fontFamily="var(--font-display)">
+              <circle r={22} fill="#5B8DB8" opacity={0.25} />
+              <circle r={16.5} fill="#FFFFFF" stroke="#FFFFFF" strokeWidth={2} filter={`url(#${uid}-pin)`} />
+              <text textAnchor="middle" dy={4.5} fontSize={13} fontWeight={600} fill="#1F3A4D" fontFamily="var(--font-display)">
                 {g.items.length}
               </text>
             </g>
@@ -762,13 +764,13 @@ function PricePin({ l, x, y, active, locale, onClick, k, shadow }: { l: Listing;
     >
       <g className="opacity-0 group-focus-visible:opacity-100">
         <rect x={-w / 2 - 6} y={top - 18} width={w + 12} height={H + 24} rx={10} fill="none" stroke="#FAF8F4" strokeWidth={4.5} />
-        <rect x={-w / 2 - 6} y={top - 18} width={w + 12} height={H + 24} rx={10} fill="none" stroke="#1F3A4D" strokeWidth={2} />
+        <rect x={-w / 2 - 6} y={top - 18} width={w + 12} height={H + 24} rx={10} fill="none" stroke="#3A6A92" strokeWidth={2} />
       </g>
       {active ? (
         <g>
           <path d={`M-20 ${top - 5} L0 ${top - 17} L20 ${top - 5} Z`} fill="#3A6A92" />
-          <rect x={-w / 2 - 4} y={top - 4} width={w + 8} height={H + 8} rx={10} fill="#EFE6D8" opacity={0.95} />
-          <rect x={-w / 2} y={top} width={w} height={H} rx={7} fill="#1F3A4D" filter={shadow} />
+          <rect x={-w / 2 - 4} y={top - 4} width={w + 8} height={H + 8} rx={(H + 8) / 2} fill="#DCE8F2" opacity={0.95} />
+          <rect x={-w / 2} y={top} width={w} height={H} rx={H / 2} fill="#3A6A92" filter={shadow} />
           <text textAnchor="middle" y={top + 17} fontSize={13} fontWeight={600} fontFamily="var(--font-display)" fill="#FFFFFF">
             {label}
           </text>
@@ -776,7 +778,7 @@ function PricePin({ l, x, y, active, locale, onClick, k, shadow }: { l: Listing;
       ) : (
         <g filter={shadow}>
           <path d={`M-16 ${top + 1} L0 ${top - 9} L16 ${top + 1} Z`} fill="#FFFFFF" />
-          <rect x={-w / 2} y={top} width={w} height={H} rx={7} fill="#FFFFFF" />
+          <rect x={-w / 2} y={top} width={w} height={H} rx={H / 2} fill="#FFFFFF" />
           <text textAnchor="middle" y={top + 17} fontSize={13} fontWeight={600} fontFamily="var(--font-display)" fill="#1F3A4D">
             {label}
           </text>

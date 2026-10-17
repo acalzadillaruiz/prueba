@@ -97,7 +97,7 @@ export function HeroVideo({ locale }: { locale: Locale }) {
         onClick={toggle}
         aria-pressed={paused}
         aria-label={paused ? tx(locale, "Reproducir el vídeo de fondo", "Play the background video") : tx(locale, "Pausar el vídeo de fondo", "Pause the background video")}
-        className="absolute bottom-[calc(env(safe-area-inset-bottom)+16px)] right-[clamp(16px,4vw,40px)] z-10 flex h-11 w-11 items-center justify-center rounded-full bg-[rgb(14_26_43/.55)] text-ivory transition-colors duration-np ease-np hover:bg-[rgb(14_26_43/.75)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ivory max-sm:bottom-auto max-sm:top-[calc(env(safe-area-inset-top)+76px)]"
+        className="absolute bottom-[calc(env(safe-area-inset-bottom)+16px)] right-[clamp(16px,4vw,40px)] z-10 flex h-11 w-11 items-center justify-center rounded-full bg-[rgb(31_58_77/.55)] text-ivory transition-colors duration-np ease-np hover:bg-[rgb(31_58_77/.75)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ivory max-sm:bottom-auto max-sm:top-[calc(env(safe-area-inset-top)+76px)]"
       >
         {paused ? <Play size={18} aria-hidden /> : <Pause size={18} aria-hidden />}
       </button>

@@ -418,7 +418,7 @@ export function PublicHeader({ locale, variant = "light", autoHide = false }: { 
             {t("sell")}
           </Button>
           {/* AMALI capsule: the on-call advisor (Arena circle with a phone) and the two-line menu, always together. */}
-          <div className={cn("ml-1 flex h-12 items-center gap-0.5 rounded-[12px] p-1", inv ? "bg-transparent" : "bg-arena")}>
+          <div className={"ml-1 flex h-12 items-center gap-0.5 rounded-[12px] bg-transparent p-1"}>
             <OnCallButton
               locale={locale}
               aria-label={tx(locale, "Asesor 24/7: llama o escribe a un asesor", "Advisor 24/7: call or message an advisor")}

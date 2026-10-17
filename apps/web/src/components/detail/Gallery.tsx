@@ -169,7 +169,7 @@ export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: bo
               </span>
               <div aria-hidden className="pointer-events-none absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-1.5 md:hidden">
                 {shots.map((_, n) => (
-                  <span key={n} className={cn("h-1.5 rounded-full outline outline-1 outline-[rgb(14_26_43/.25)] transition-[width,background-color] duration-np", n === idx ? "w-3 bg-white" : "w-1.5 bg-white/60")} />
+                  <span key={n} className={cn("h-1.5 rounded-full outline outline-1 outline-[rgb(31_58_77/.25)] transition-[width,background-color] duration-np", n === idx ? "w-3 bg-white" : "w-1.5 bg-white/60")} />
                 ))}
               </div>
               <span className="sr-only md:hidden" aria-live="polite">{What(idx + 1)}</span>
@@ -208,7 +208,7 @@ export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: bo
             e.preventDefault();
             setOpen(false);
           }}
-          className="fixed inset-0 z-[60] m-0 flex h-[100dvh] max-h-none w-screen max-w-none flex-col overscroll-contain bg-[rgb(14_26_43/.96)] p-0 text-ivory backdrop:bg-transparent"
+          className="fixed inset-0 z-[60] m-0 flex h-[100dvh] max-h-none w-screen max-w-none flex-col overscroll-contain bg-[rgb(31_58_77/.96)] p-0 text-ivory backdrop:bg-transparent"
           aria-label={tx(locale, l.title_es, l.title_en)}
           data-testid="gallery-lightbox"
         >

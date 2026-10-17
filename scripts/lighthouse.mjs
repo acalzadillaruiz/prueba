@@ -8,7 +8,7 @@ const BASE = process.env.BASE ?? "http://localhost:3001";
 const OUT = new URL("../.lighthouse/", import.meta.url).pathname;
 mkdirSync(OUT, { recursive: true });
 const MIN = { performance: +(process.env.LH_MIN_PERF ?? 85), accessibility: +(process.env.LH_MIN_A11Y ?? 95), "best-practices": +(process.env.LH_MIN_BP ?? 95), seo: +(process.env.LH_MIN_SEO ?? 95) };
-const PAGES = ["/es", "/es/search?type=SALE", "/es/listing/los-palos-grandes-3h-118m-l5u136", "/es/luxury"];
+const PAGES = (process.env.LH_PAGES ?? "/es,/es/acceso,/es/search?type=SALE,/es/listing/los-palos-grandes-3h-118m-l5u136,/es/luxury,/es/sell").split(",");
 const bin = new URL("../node_modules/.bin/lighthouse", import.meta.url).pathname;
 
 let failed = false;

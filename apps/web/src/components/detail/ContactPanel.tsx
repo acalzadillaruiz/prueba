@@ -212,13 +212,13 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
           {tour ? tx(locale, "Visita pedida", "Viewing requested") : stayDone ? tx(locale, "Tu consulta ya llegó", "Your availability request is in") : asked ? tx(locale, "Tu pedido de visita ya llegó", "Your visit request is in") : tx(locale, "Tu mensaje ya llegó", "Your message is on its way")}
         </div>
         {stayDone && (
-          <div className="mt-2 inline-flex items-center gap-1.5 rounded-[12px] bg-[#F1ECE4] px-3 py-1 font-display text-[15px] font-semibold text-ink first-letter:uppercase">
+          <div className="mt-2 inline-flex items-center gap-1.5 rounded-[12px] bg-[#EEF2F5] px-3 py-1 font-display text-[15px] font-semibold text-ink first-letter:uppercase">
             <CalendarDays size={15} aria-hidden /> {done}
           </div>
         )}
         {tour && (
           <>
-            <div className="mt-2 inline-flex items-center gap-1.5 rounded-[12px] bg-[#F1ECE4] px-3 py-1 font-display text-[15px] font-semibold text-ink">
+            <div className="mt-2 inline-flex items-center gap-1.5 rounded-[12px] bg-[#EEF2F5] px-3 py-1 font-display text-[15px] font-semibold text-ink">
               <Clock size={15} aria-hidden /> {tx(locale, `Pendiente de que ${confirmer} la confirme`, `Waiting for ${confirmer} to confirm`)}
             </div>
             <div className="mt-2 font-display text-[17px] font-semibold first-letter:uppercase">{done}</div>
@@ -288,7 +288,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
         </div>
       )}
       {!agent && !agency && <div className={cn("text-sm", muted)}>{tx(locale, "Publicada por su dueño · sin intermediarios", "Listed by the owner · no middlemen")}</div>}
-      <div role="tablist" aria-label={tx(locale, "Cómo quieres contactar", "How to get in touch")} className={cn("mt-5 grid gap-1 rounded-[12px] bg-[#F1ECE4] p-1 dark:bg-white/5", modes.length > 1 ? "grid-cols-2" : "grid-cols-1")} onKeyDown={onTabKey}>
+      <div role="tablist" aria-label={tx(locale, "Cómo quieres contactar", "How to get in touch")} className={cn("mt-5 grid gap-1 rounded-[12px] bg-[#EEF2F5] p-1 dark:bg-white/5", modes.length > 1 ? "grid-cols-2" : "grid-cols-1")} onKeyDown={onTabKey}>
         {modes.map((m) => (
           <button
             key={m}
@@ -371,7 +371,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
               </div>
             </div>
             {stayOk && (
-              <div className={cn("np-in mt-3 rounded-xl px-3.5 py-3 text-[15px]", dark ? "bg-white/5" : "bg-[#F1ECE4]")} data-testid="stay-summary" aria-live="polite">
+              <div className={cn("np-in mt-3 rounded-xl px-3.5 py-3 text-[15px]", dark ? "bg-white/5" : "bg-[#EEF2F5]")} data-testid="stay-summary" aria-live="polite">
                 <div className="flex justify-between gap-3">
                   <span>{est ? `${money(l.priceAmount, locale)} × ${plural(stayCheck.nights, locale, ["noche", "noches"], ["night", "nights"])}` : plural(stayCheck.nights, locale, ["noche", "noches"], ["night", "nights"])}</span>
                   {est && <span className="whitespace-nowrap">{money(est.subtotal, locale)}</span>}
@@ -557,7 +557,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
           {err && <div role="alert" className="rounded-xl bg-[#B3261E1A] px-3 py-2 text-sm text-danger">{err}</div>}
           {/* The one terracotta action of each tab: confirm the visit (naming the chosen time) or send the message. */}
           <div ref={actions} className="!mt-3 flex items-center gap-2">
-            <Button type="submit" className="h-[52px] min-w-0 flex-1 disabled:text-[#5E5650] md:h-[52px] dark:disabled:bg-white/10 dark:disabled:text-[#CDC5B9]" size="lg" disabled={busy || (mode === "tour" && !chosen && !(askMode && askReady)) || (mode === "stay" && !stayOk)} variant="primary">
+            <Button type="submit" className="h-[52px] min-w-0 flex-1 disabled:text-[#4A6275] md:h-[52px] dark:disabled:bg-white/10 dark:disabled:text-[#D6DEE5]" size="lg" disabled={busy || (mode === "tour" && !chosen && !(askMode && askReady)) || (mode === "stay" && !stayOk)} variant="primary">
               {busy && <Loader2 size={16} className="animate-spin" aria-hidden />}
               {primaryLabel}
             </Button>

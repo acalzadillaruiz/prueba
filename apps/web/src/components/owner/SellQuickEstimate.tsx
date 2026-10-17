@@ -46,7 +46,7 @@ export function SellQuickEstimate({ locale, zones }: { locale: Locale; zones: { 
         <h2 id="quick-estimate-title">{tx(locale, "¿Cuánto vale tu casa?", "What’s your home worth?")}</h2>
       </div>
       <p className="mt-1 text-sm text-muted">{tx(locale, "Gratis y sin registrarte. Una primera cifra en segundos.", "Free, no sign-up. A first figure in seconds.")}</p>
-      <div role="radiogroup" aria-label={tx(locale, "Operación", "Operation")} className="mt-5 inline-flex rounded-full bg-black/[.04] p-1">
+      <div role="radiogroup" aria-label={tx(locale, "Operación", "Operation")} className="mt-5 inline-flex rounded-full bg-[#DCE8F2] p-1">
         {(
           [
             ["SALE", tx(locale, "Vender", "Sell")],
@@ -62,7 +62,7 @@ export function SellQuickEstimate({ locale, zones }: { locale: Locale; zones: { 
               setOp(k);
               setRes(null);
             }}
-            className={cn("min-h-10 rounded-[12px] px-4 font-display text-sm font-semibold transition-colors duration-np", op === k ? "bg-white text-ink " : "text-muted hover:text-ink")}
+            className={cn("min-h-11 rounded-full px-5 font-display text-[15px] font-medium transition-colors duration-np", op === k ? "bg-[#3A6A92] text-white" : "text-ink hover:bg-white/60")}
           >
             {label}
           </button>

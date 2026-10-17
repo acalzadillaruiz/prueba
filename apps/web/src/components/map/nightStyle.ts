@@ -16,7 +16,7 @@ export const NIGHT_STYLE: google.maps.MapTypeStyle[] = [
 
 /** Brand v4 default: light Mediterranean style (land Cal/arena, sea Egeo, sand roads, warm-grey labels). */
 export const LIGHT_STYLE: google.maps.MapTypeStyle[] = [
-  { elementType: "geometry", stylers: [{ color: "#F1ECE4" }] },
+  { elementType: "geometry", stylers: [{ color: "#EEF2F5" }] },
   { elementType: "labels.text.fill", stylers: [{ color: "#8F8370" }] },
   { elementType: "labels.text.stroke", stylers: [{ color: "#FAF8F4" }] },
   { featureType: "water", elementType: "geometry", stylers: [{ color: "#EFE6D8" }] },

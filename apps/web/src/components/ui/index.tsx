@@ -86,10 +86,10 @@ export function Badge({ children, tone = "neutral", className }: { children: Rea
     warn: "bg-[#8A5A0024] text-[#7A4F00] dark:bg-[#F2B86626] dark:text-[#F2B866]",
     danger: "bg-[#B3261E1A] text-danger dark:bg-[#F2A09A26] dark:text-[#F2A09A]",
     navy: "bg-navy text-ivory",
-    mist: "bg-[#B9C7D32E] text-[#4E453F] dark:text-[#DECEB9]",
+    mist: "bg-[#EEF2F5] text-[#4A6275] dark:bg-white/10 dark:text-[#E4EDF5]",
     dark: "bg-white/10 text-ivory",
-    exclusive: "bg-white/90 text-[#3A6A92] outline outline-1 -outline-offset-1 outline-[rgb(14_26_43/.3)]",
-    egeo: "bg-[#D6DEE5] text-[#3A6A92]",
+    exclusive: "bg-white/90 text-[#3A6A92] outline outline-1 -outline-offset-1 outline-[rgb(31_58_77/.25)]",
+    egeo: "bg-[#DCE8F2] text-[#1F3A4D]",
     arena: "bg-[#EFE6D8] text-[#1F3A4D]",
   }[tone];
   const caps = tone === "exclusive" || tone === "egeo" || tone === "arena";

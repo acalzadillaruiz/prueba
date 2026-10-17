@@ -411,7 +411,7 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
 
 /** Header / phone "select all visible" checkbox with the indeterminate state when only some rows are picked. */
 /** Disabled bulk actions still say what they are: legible text on the disabled fill (≥ 4.5:1, ≥ 3:1 in dark). */
-const DISABLED = "disabled:border-transparent disabled:bg-[#E3DDD3] disabled:text-[#5E5650] dark:disabled:bg-white/10 dark:disabled:text-[#CDC5B9]";
+const DISABLED = "disabled:border-transparent disabled:bg-[#E3DDD3] disabled:text-[#4A6275] dark:disabled:bg-white/10 dark:disabled:text-[#D6DEE5]";
 
 function SelectAll({ checked, indeterminate, onChange, label, className, disabled }: { checked: boolean; indeterminate: boolean; onChange: () => void; label: string; className?: string; disabled?: boolean }) {
   const ref = useRef<HTMLInputElement>(null);

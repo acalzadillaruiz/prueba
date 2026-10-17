@@ -210,8 +210,9 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
                 </div>
                 {/* Desktop: aligned to the title's baseline, but never higher than the title's own top margin: with a one-line
                     title the price block is the taller one, and it used to climb into the Compare/Share row. */}
-                {/* Desktop shows the price in the sticky rail instead (one price on screen). */}
-                <div className="mt-7 shrink-0 lg:hidden">
+                {/* 048 (043-D): the price is on the first screen on every device — beside the title on desktop. The rail
+                    below keeps the visit card only (one price on screen). */}
+                <div className="mt-7 shrink-0 lg:mt-0 lg:text-right">
                   {/* Fluid size + nowrap: "USD 118.000" never breaks after the currency at 360 px. */}
                   <div className="font-title text-[clamp(36px,10vw,44px)] leading-none text-ink [font-variant-numeric:lining-nums_tabular-nums] lg:whitespace-nowrap" data-testid="listing-price">
                     <span className="whitespace-nowrap">{moneyUi(l.priceAmount, locale)}</span>
@@ -289,7 +290,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
           <aside id="contact" className="scroll-mt-24 lg:sticky lg:top-[84px] lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:-mx-8 lg:-mb-12 lg:-mt-3 lg:max-h-[calc(100dvh-84px)] lg:self-start lg:overflow-y-auto lg:overscroll-contain lg:px-8 lg:pb-12 lg:pt-3">
             {/* 043 · Airbnb rail: the price in Cormorant 56 px on desktop (043-C, tabular) and its badge above the visit card, desktop only
                 (phones have the sticky bar with price + «Pedir visita»). */}
-            <div className="mb-4 hidden lg:block" data-testid="rail-price">
+            <div className="mb-4 hidden" data-testid="rail-price">
               <div className="font-title text-[56px] font-light leading-none text-ink [font-variant-numeric:lining-nums_tabular-nums]">
                 <span className="whitespace-nowrap">{moneyUi(l.priceAmount, locale)}</span>
                 <span className="whitespace-nowrap font-display text-[17px] text-muted">{priceSuffix(l, locale)}</span>

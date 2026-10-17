@@ -67,7 +67,7 @@ export function Logo({ tone = "navy", className, size = "md", animate = false }:
   const ink = dark ? "#FAF8F4" : "var(--np-logo-ink, var(--np-ink))";
   if (size === "lg")
     return (
-      <span translate="no" className={cn("inline-grid justify-items-center gap-2", animate && "np-roof-fade", className)} aria-label="New Place Venezuela">
+      <span translate="no" className={cn("inline-grid justify-items-center gap-2", animate && "np-roof-fade", className)} role="img" aria-label="New Place Venezuela">
         <Wordmark size={30} color={ink} />
         <span className="text-[13px] font-medium uppercase tracking-[0.34em]" style={{ color: dark ? "rgb(255 255 255 / .8)" : "var(--np-muted)", paddingLeft: "0.34em" }}>
           Venezuela

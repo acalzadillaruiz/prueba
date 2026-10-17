@@ -32,7 +32,8 @@ export function FooterPrefs({ locale, className }: { locale: Locale; className?:
     } catch {}
   };
   const href = pathname.replace(/^\/(es|en)/, `/${other}`);
-  const pill = "inline-flex min-h-11 items-center gap-2 rounded-[12px] px-3.5 font-display text-[14px] text-mist outline outline-1 -outline-offset-1 outline-white/20 transition-colors duration-np hover:bg-white/5 hover:text-ivory focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ivory";
+  // 051-G · 9: the footer bar is light (Brisa) — ink on sand is 8.9:1 (the old mist-on-sand was 1.1:1, invisible).
+  const pill = "inline-flex min-h-11 items-center gap-2 rounded-[12px] px-3.5 font-display text-[14px] text-ink outline outline-1 -outline-offset-1 outline-ink/20 transition-colors duration-np hover:bg-white/60 dark:hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink";
   return (
     <div className={cn("flex flex-wrap items-center gap-2", className)}>
       <Link

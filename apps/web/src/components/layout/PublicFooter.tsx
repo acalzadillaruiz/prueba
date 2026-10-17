@@ -65,7 +65,7 @@ export async function PublicFooter({ locale }: { locale: Locale }) {
         {col(t("owners"), [[t("sellWithUs"), `/${locale}/sell`], [t("valuation"), `/${locale}/sell#estimar`], [t("myProperties"), `/${locale}/owner/listings`]])}
         {col(t("agencies"), [[t("forAgencies"), `/${locale}/register`]], <FooterAccountLink locale={locale} signIn={nav("signIn")} className={linkCls} />)}
       </div>
-      <div className="relative bg-[#E8DECD]">
+      <div className="relative bg-[#E8DECD] dark:bg-[#132634]">
         {/* TODO(legal): Privacidad · Términos · Cookies links go here once the client provides and approves the texts. */}
         <div className="np-gutter mx-auto flex max-w-[1280px] box-content flex-wrap items-center justify-between gap-x-6 gap-y-3 py-5 text-[14px] text-muted">
           <span>

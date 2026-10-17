@@ -500,7 +500,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
                   type="button"
                   onClick={() => set({ type: k, max: null, min: null })}
                   aria-pressed={type === k}
-                  className={cn("min-h-8 rounded-[12px] border-2 px-3.5 font-display text-sm", type === k ? "np-sel font-semibold" : "border-transparent text-ink/70 hover:text-ink")}
+                  className={cn("min-h-8 rounded-[12px] border-2 px-3.5 font-display text-sm", type === k ? "np-sel font-semibold" : "border-transparent text-muted hover:text-ink")}
                 >
                   {tx(locale, es, en)}
                 </button>

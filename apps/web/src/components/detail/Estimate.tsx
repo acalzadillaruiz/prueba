@@ -38,29 +38,29 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
           <>
             <div className="mt-4 font-title text-[36px] leading-tight md:text-[44px]">
               ≈ {money(e.mid, locale)}
-              <span className="font-display text-base font-normal text-ivory/60">{priceSuffix(l, locale)}</span>
+              <span className="font-display text-base font-normal text-ivory/90">{priceSuffix(l, locale)}</span>
             </div>
-            <p className="mt-2 max-w-[520px] text-sm leading-relaxed text-ivory/70">
+            <p className="mt-2 max-w-[520px] text-sm leading-relaxed text-ivory/90">
               {source} · {nComp === 1
                 ? tx(locale, "Estimación orientativa: por ahora solo hay una casa comparable cerca, así que no te damos un rango.", "Indicative estimate: there’s only one comparable home nearby for now, so we don’t show a range.")
                 : tx(locale, "Estimación orientativa: aún no hay casas comparables cerca, así que no te damos un rango.", "Indicative estimate: there are no comparable homes nearby yet, so we don’t show a range.")}
             </p>
-            <div className="mt-4 text-sm font-semibold text-ivory/85">
-              {tx(locale, "Precio pedido", "Asking")} · {money(l.priceAmount, locale)} · <span className={cn(Math.abs(diff) > 4 && diff > 0 ? "text-[#E9C98F]" : "text-[#9ED7B8]")}>{verdict}</span>
+            <div className="mt-4 text-sm font-semibold text-ivory/90">
+              {tx(locale, "Precio pedido", "Asking")} · {money(l.priceAmount, locale)} · <span className={cn(Math.abs(diff) > 4 && diff > 0 ? "text-[#F6E6C6]" : "text-[#DCEFE3]")}>{verdict}</span>
             </div>
           </>
         ) : (
           <>
         <div className="mt-4 font-title text-[36px] leading-tight md:text-[44px]">
           {money(e.low, locale)} – {money(e.high, locale)}
-          <span className="font-display text-base font-normal text-ivory/60">{priceSuffix(l, locale)}</span>
+          <span className="font-display text-base font-normal text-ivory/90">{priceSuffix(l, locale)}</span>
         </div>
-        <div className="mt-1 text-sm text-ivory/70">
+        <div className="mt-1 text-sm text-ivory/90">
           {conf} · {source} · {tx(locale, "Valor central", "Mid value")} {money(e.mid, locale)}
         </div>
         <div className="relative mt-9 h-[3px] rounded-full bg-white/15">
           <div className="absolute inset-y-0 rounded-full bg-[#D6DEE5]" style={{ left: `${aLow}%`, right: `${100 - aHigh}%` }} />
-          <div className="absolute -top-8 whitespace-nowrap text-[13px] font-semibold text-ivory/85" style={{ left: `${pos}%`, transform: `translateX(-${clampPct(pos)}%)` }}>
+          <div className="absolute -top-8 whitespace-nowrap text-[13px] font-semibold text-ivory/90" style={{ left: `${pos}%`, transform: `translateX(-${clampPct(pos)}%)` }}>
             {tx(locale, "Precio pedido", "Asking")} · {usdShort(l.priceAmount)}
           </div>
           <div className="absolute top-1/2 h-[18px] w-[18px] -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] border-[#D6DEE5] bg-ivory" style={{ left: `${pos}%` }} />
@@ -68,14 +68,14 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
         {/* The range ends are labelled where they sit on the bar (not at the bar's edges). Each label leans inward by its
             own position (0 % → left-aligned, 100 % → right-aligned), so it never overflows the panel; when the two ends are
             too close for that, each label hangs outward from its end instead, so they never collide. */}
-        <div className="relative mt-3 h-5 text-sm text-ivory/70" data-testid="estimate-range-labels">
+        <div className="relative mt-3 h-5 text-sm text-ivory/90" data-testid="estimate-range-labels">
           <span className="absolute whitespace-nowrap" style={{ left: `${aLow}%`, transform: `translateX(-${close ? 100 : clampPct(aLow)}%)` }}>{usdShort(e.low)}</span>
           <span className="absolute whitespace-nowrap" style={{ left: `${aHigh}%`, transform: `translateX(-${close ? 0 : clampPct(aHigh)}%)` }}>{usdShort(e.high)}</span>
         </div>
-        <div className={cn("mt-3 text-center text-sm font-semibold", Math.abs(diff) > 4 && diff > 0 ? "text-[#E9C98F]" : "text-[#9ED7B8]")}>
+        <div className={cn("mt-3 text-center text-sm font-semibold", Math.abs(diff) > 4 && diff > 0 ? "text-[#F6E6C6]" : "text-[#DCEFE3]")}>
           {inRange ? tx(locale, "El precio pedido está dentro de lo esperado", "The asking price sits within the range") : verdict}
         </div>
-        {inRange && <div className="mt-1 text-center text-[13px] text-ivory/55">{verdict}</div>}
+        {inRange && <div className="mt-1 text-center text-[13px] text-ivory/90">{verdict}</div>}
           </>
         )}
       </div>

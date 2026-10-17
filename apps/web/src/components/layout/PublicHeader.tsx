@@ -295,12 +295,14 @@ export function PublicHeader({ locale, variant = "light", autoHide = false }: { 
         away && "-translate-y-[calc(100%+12px)]",
         variant === "dark" && "np-navy-panel sticky bg-navy text-ivory",
         float && cn("inset-x-0", onPhoto ? "text-white" : "text-ink"),
+        // 051-G: over a bright photo the white logo and links vanished; a soft petróleo veil from the top keeps them AA.
+        onPhoto && "before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-[168px] before:bg-[linear-gradient(to_bottom,rgb(31_58_77/.62),rgb(31_58_77/.34)_45%,rgb(31_58_77/0))] before:content-['']",
         variant === "transparent" ? "fixed" : variant === "light" && "sticky",
       )}
     >
       <div
         className={cn(
-          "mx-auto flex items-center gap-8 transition-[background-color] duration-[240ms] ease-np",
+          "relative mx-auto flex items-center gap-8 transition-[background-color] duration-[240ms] ease-np",
           // 043: a flat full-width bar (no floating pill). Transparent over the hero; solid bone (the one blur) once scrolled.
           float ? "h-16 px-[clamp(16px,4vw,40px)] md:h-[72px]" : "h-[72px] max-w-[1320px] px-4 md:px-8",
           float && (variant === "light" || scrolled || menuOpen ? "np-glass" : "bg-transparent"),

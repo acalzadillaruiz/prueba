@@ -10,7 +10,8 @@ test.describe.serial("Criterios de aceptación §15", () => {
     await expect(page.getByRole("heading", { level: 1, name: /Entre el Ávila y el mar/i })).toBeVisible();
     // The map lives in the "#explorar" section (mounted when it nears the viewport).
     await page.locator("#explorar").scrollIntoViewIfNeeded();
-    const map = page.locator('[role="application"]').first();
+    // 048-B: the home zone map (Leaflet, BrisaMap) is a named region; the search map stays role=application.
+    const map = page.locator('[role="application"], [role="region"][aria-label^="Mapa"]').first();
     await expect(map).toBeVisible();
     await expect(map.locator(".np-pin, .np-pin-cluster").first()).toBeVisible();
   });

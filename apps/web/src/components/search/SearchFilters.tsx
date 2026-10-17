@@ -74,7 +74,7 @@ export interface FilterValues {
 }
 export type SetFilters = (patch: Record<string, string | null>) => void;
 
-export const pill = "flex h-11 md:h-10 shrink-0 items-center gap-1.5 rounded-[12px] border px-4 font-display text-sm transition-colors duration-np";
+export const pill = "flex h-11 md:h-10 shrink-0 items-center gap-1.5 rounded-[12px] border px-4 font-display text-[15px] transition-colors duration-np";
 // Selected filter = navy tint + 2 px navy border (brand v4).
 export const on = "np-sel border-2 px-[15px]";
 const sectionTitle = "mb-2.5 block text-[13px] font-semibold text-muted";
@@ -293,7 +293,7 @@ export function MoreFields({ locale, f, set, withLux = false }: { locale: Locale
         <div id="search-essentials-title" className={sectionTitle}>{tx(locale, "Servicios esenciales", "Essential services")}</div>
         <div className="grid gap-6 md:grid-cols-4">
           <div>
-            <div className="mb-2 text-sm font-semibold">{tx(locale, "Planta eléctrica", "Backup power")}</div>
+            <div className="mb-2 text-[15px] font-semibold">{tx(locale, "Planta eléctrica", "Backup power")}</div>
             <div className="flex flex-wrap gap-2">
               {([["full", "100 %", "100%"], ["partial", "Al menos parcial", "At least partial"]] as const).map(([k, es, en]) => (
                 <button key={k} type="button" aria-pressed={ess.power === k} onClick={() => set({ power: ess.power === k ? null : k })} className={cn(pill, "md:h-9", ess.power === k ? on : "border-line")}>{tx(locale, es, en)}</button>
@@ -301,7 +301,7 @@ export function MoreFields({ locale, f, set, withLux = false }: { locale: Locale
             </div>
           </div>
           <label className="block">
-            <span className="mb-2 block text-sm font-semibold">{tx(locale, "Tanque de agua", "Water tank")}</span>
+            <span className="mb-2 block text-[15px] font-semibold">{tx(locale, "Tanque de agua", "Water tank")}</span>
             <select value={ess.tank ?? ""} onChange={(e) => set({ tank: e.target.value || null })} className={cn(pill, "w-full appearance-none border-line bg-white md:h-9", ess.tank && on)}>
               <option value="">{tx(locale, "Cualquiera", "Any")}</option>
               {(ess.tank && !TANK_STEPS.includes(ess.tank) ? [...TANK_STEPS, ess.tank].sort((a, b) => a - b) : TANK_STEPS).map((v) => (
@@ -310,7 +310,7 @@ export function MoreFields({ locale, f, set, withLux = false }: { locale: Locale
             </select>
           </label>
           <div className="md:col-span-2">
-            <div className="mb-2 text-sm font-semibold">{tx(locale, "Agua, muelle y vistas", "Water, dock and views")}</div>
+            <div className="mb-2 text-[15px] font-semibold">{tx(locale, "Agua, muelle y vistas", "Water, dock and views")}</div>
             <div className="flex flex-wrap gap-2">
               {([["well", "Pozo propio", "Own well"], ["dock", "Con muelle", "With dock"], ["avila", "Vista al Ávila", "Ávila view"], ["sea", "Vista al mar", "Sea view"]] as const).map(([k, es, en]) => (
                 <button key={k} type="button" aria-pressed={!!ess[k]} onClick={() => set({ [k]: ess[k] ? null : "1" })} className={cn(pill, "md:h-9", ess[k] ? on : "border-line")}>{tx(locale, es, en)}</button>
@@ -367,7 +367,7 @@ export function FilterSheet({
   return (
     <div ref={panel} id="search-filters-sheet" role="dialog" aria-modal="true" aria-labelledby={titleId} className="np-in fixed inset-0 z-[70] flex flex-col bg-ivory text-ink lg:hidden">
       <div className="flex h-14 shrink-0 items-center justify-between px-2 pl-4">
-        <h2 id={titleId} className="font-serif text-[22px]">{tx(locale, "Filtros", "Filters")}</h2>
+        <h2 id={titleId} className="font-serif text-[20px]">{tx(locale, "Filtros", "Filters")}</h2>
         <button type="button" data-autofocus onClick={onClose} aria-label={tx(locale, "Cerrar filtros", "Close filters")} className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-black/5">
           <X size={20} aria-hidden />
         </button>

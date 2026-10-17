@@ -100,7 +100,7 @@ export function OwnerEditForm({ l, locale, onDone }: { l: Listing; locale: Local
         }
       }}
     >
-      <div className="font-serif text-[22px] font-light leading-tight">{tx(locale, "Editar tu anuncio", "Edit your listing")}</div>
+      <div className="font-serif text-[20px] font-light leading-tight">{tx(locale, "Editar tu anuncio", "Edit your listing")}</div>
       <div className="grid gap-3 sm:grid-cols-2">
         <Field label={tx(locale, "Título (español)", "Title (Spanish)")} error={e("title_es")}>
           <input className={inputCls} maxLength={120} value={d.title_es} aria-invalid={!!e("title_es")} onChange={(ev) => set({ title_es: ev.target.value })} />
@@ -123,12 +123,12 @@ export function OwnerEditForm({ l, locale, onDone }: { l: Listing; locale: Local
         {numInput("yearBuilt", tx(locale, "Año de construcción", "Year built"), 1800, THIS_YEAR + 5)}
       </div>
       <div>
-        <div className="mb-2 text-sm font-semibold">{tx(locale, "Servicios", "Amenities")}</div>
+        <div className="mb-2 text-[15px] font-semibold">{tx(locale, "Servicios", "Amenities")}</div>
         <div className="flex flex-wrap gap-2">
           {chips.map((a) => {
             const on = d.amenities.includes(a);
             return (
-              <button key={a} type="button" aria-pressed={on} onClick={() => set({ amenities: on ? d.amenities.filter((x) => x !== a) : [...d.amenities, a] })} className={cn("inline-flex min-h-9 items-center gap-1.5 rounded-[12px] border px-3.5 py-1.5 text-sm font-semibold", on ? "border-navy bg-navy text-ivory" : "border-line bg-white")}>
+              <button key={a} type="button" aria-pressed={on} onClick={() => set({ amenities: on ? d.amenities.filter((x) => x !== a) : [...d.amenities, a] })} className={cn("inline-flex min-h-9 items-center gap-1.5 rounded-[12px] border px-3.5 py-1.5 text-[15px] font-semibold", on ? "border-navy bg-navy text-ivory" : "border-line bg-white")}>
                 {on && <Check size={14} />} {AMENITY_LABEL[a] ? lbl(AMENITY_LABEL[a], locale) : a}
               </button>
             );
@@ -136,8 +136,8 @@ export function OwnerEditForm({ l, locale, onDone }: { l: Listing; locale: Local
         </div>
       </div>
       <EssentialsFields locale={locale} value={ess} onChange={setEss} showErrors={showErr} />
-      {err && <div role="alert" className="rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-sm text-danger">{err}</div>}
-      {showErr && (Object.keys(errors).length > 0 || !essV.ok) && <p role="alert" className="text-sm font-semibold text-danger">{tx(locale, "Revisa los campos marcados.", "Check the highlighted fields.")}</p>}
+      {err && <div role="alert" className="rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-[15px] text-danger">{err}</div>}
+      {showErr && (Object.keys(errors).length > 0 || !essV.ok) && <p role="alert" className="text-[15px] font-semibold text-danger">{tx(locale, "Revisa los campos marcados.", "Check the highlighted fields.")}</p>}
       <div className="flex flex-wrap gap-2">
         <Button type="submit" variant="navy" size="sm" disabled={busy}>{busy ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />} {tx(locale, "Guardar cambios", "Save changes")}</Button>
         <Button type="button" variant="ghost" size="sm" onClick={() => onDone(false)}>{tx(locale, "Cancelar", "Cancel")}</Button>

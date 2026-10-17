@@ -94,7 +94,7 @@ export function CaptureView({ locale, rows: initialRows, zones, titles, canConve
       {c.result === "PENDING" && (
         <div className="flex flex-wrap items-center gap-1">
           {canConvert && (
-            <button onClick={() => setConverting(converting?.id === c.id ? null : { id: c.id, listingType: "SALE" })} className={cn("flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-2.5 text-xs font-semibold md:py-1.5", "border-[1.5px]", k.outline)} aria-expanded={converting?.id === c.id}>
+            <button onClick={() => setConverting(converting?.id === c.id ? null : { id: c.id, listingType: "SALE" })} className={cn("flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-2.5 text-[13px] font-semibold md:py-1.5", "border-[1.5px]", k.outline)} aria-expanded={converting?.id === c.id}>
               <Building2 size={14} /> {tx(locale, "Convertir en inmueble", "Convert to listing")}
             </button>
           )}
@@ -103,7 +103,7 @@ export function CaptureView({ locale, rows: initialRows, zones, titles, canConve
         </div>
       )}
       {c.listingId && (
-        <Link href={`/${locale}/agency/listings/${c.listingId}/edit`} className={cn("flex items-center gap-1 whitespace-nowrap text-xs", k.link)}>
+        <Link href={`/${locale}/agency/listings/${c.listingId}/edit`} className={cn("flex items-center gap-1 whitespace-nowrap text-[13px]", k.link)}>
           <ExternalLink size={13} /> {tx(locale, "Ver inmueble", "Open listing")}
         </Link>
       )}
@@ -119,7 +119,7 @@ export function CaptureView({ locale, rows: initialRows, zones, titles, canConve
             </Select>
           </Field>
         </div>
-        <p className={cn("max-w-sm flex-1 text-xs", k.muted)}>{tx(locale, "Se crea un borrador en tu agencia con la dirección, zona, m² y precio de la captación. Podrás completarlo antes de publicar.", "A draft is created in your agency with the capture’s address, area, m² and price. You can complete it before publishing.")}</p>
+        <p className={cn("max-w-sm flex-1 text-[13px]", k.muted)}>{tx(locale, "Se crea un borrador en tu agencia con la dirección, zona, m² y precio de la captación. Podrás completarlo antes de publicar.", "A draft is created in your agency with the capture’s address, area, m² and price. You can complete it before publishing.")}</p>
         <Button size="sm" variant="navy" className={k.navy} disabled={rowBusy === c.id} onClick={convert}>
           {rowBusy === c.id ? <Loader2 size={14} className="animate-spin" /> : <Building2 size={14} />} {tx(locale, "Crear borrador", "Create draft")}
         </Button>
@@ -145,24 +145,24 @@ export function CaptureView({ locale, rows: initialRows, zones, titles, canConve
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="font-semibold leading-snug [overflow-wrap:anywhere]">{c.address}</div>
-                  <div className={cn("mt-0.5 text-xs", k.muted)}>{c.zone} · <TimeAgo iso={c.createdAt} locale={locale} /></div>
+                  <div className={cn("mt-0.5 text-[13px]", k.muted)}>{c.zone} · <TimeAgo iso={c.createdAt} locale={locale} /></div>
                 </div>
                 <Pill tone={TONE[c.result]} className="shrink-0">{label[c.result]}</Pill>
               </div>
-              {c.duplicateOf && <div className={cn("mt-1.5 flex items-center gap-1 text-xs font-semibold", k.warnText)}><Fingerprint size={12} className="shrink-0" /> <span className="min-w-0 [overflow-wrap:anywhere]">= {titles[c.duplicateOf] ?? c.duplicateOf}</span></div>}
+              {c.duplicateOf && <div className={cn("mt-1.5 flex items-center gap-1 text-[13px] font-semibold", k.warnText)}><Fingerprint size={12} className="shrink-0" /> <span className="min-w-0 [overflow-wrap:anywhere]">= {titles[c.duplicateOf] ?? c.duplicateOf}</span></div>}
               <dl className={cn("mt-3 grid grid-cols-[minmax(0,1fr)_auto_auto] gap-x-4 gap-y-2 rounded-xl px-3 py-2.5", k.soft)}>
                 <div className="min-w-0">
-                  <dt className={cn(k.label, "text-[12px]")}>{tx(locale, "Dueño", "Owner")}</dt>
-                  <dd className="mt-0.5 text-sm font-semibold leading-snug [overflow-wrap:anywhere]">{c.ownerName}</dd>
-                  <dd className={cn("text-xs [overflow-wrap:anywhere]", k.muted)}>{c.phone}</dd>
+                  <dt className={cn(k.label, "text-[13px]")}>{tx(locale, "Dueño", "Owner")}</dt>
+                  <dd className="mt-0.5 text-[15px] font-semibold leading-snug [overflow-wrap:anywhere]">{c.ownerName}</dd>
+                  <dd className={cn("text-[13px] [overflow-wrap:anywhere]", k.muted)}>{c.phone}</dd>
                 </div>
                 <div className="min-w-0">
-                  <dt className={cn(k.label, "text-[12px]")}>m²</dt>
-                  <dd className="mt-0.5 text-sm font-semibold">{c.areaM2}</dd>
+                  <dt className={cn(k.label, "text-[13px]")}>m²</dt>
+                  <dd className="mt-0.5 text-[15px] font-semibold">{c.areaM2}</dd>
                 </div>
                 <div className="min-w-0 text-right">
-                  <dt className={cn(k.label, "text-[12px]")}>{tx(locale, "Pide", "Asking")}</dt>
-                  <dd className={cn("mt-0.5 whitespace-nowrap text-sm tracking-normal", k.num)}>{money(c.askingPrice, locale)}</dd>
+                  <dt className={cn(k.label, "text-[13px]")}>{tx(locale, "Pide", "Asking")}</dt>
+                  <dd className={cn("mt-0.5 whitespace-nowrap text-[15px] tracking-normal", k.num)}>{money(c.askingPrice, locale)}</dd>
                 </div>
               </dl>
               {(c.result === "PENDING" || c.listingId) && <div className="mt-3">{actions(c)}</div>}
@@ -172,7 +172,7 @@ export function CaptureView({ locale, rows: initialRows, zones, titles, canConve
           {rows.length === 0 && <li className={cn(k.card, "px-4 py-10 text-center", k.muted)}>{tx(locale, "La cola está vacía. Registra la primera captación con el formulario.", "The queue is empty. Log the first capture with the form.")}</li>}
         </ul>
         <ScrollRegion fade={false} label={tx(locale, "Cola de captación", "Capture queue")} className={cn("hidden self-start md:block", k.card)}>
-          <table className="np-sticky-last w-full min-w-[640px] text-sm">
+          <table className="np-sticky-last w-full min-w-[640px] text-[15px]">
             <thead className={cn("border-b text-left", k.line, k.th)}>
               <tr><th className="px-4 py-3">{tx(locale, "Dirección", "Address")}</th><th className="px-3 py-3 text-right">{tx(locale, "Pide", "Asking")}</th><th className="px-3 py-3">{tx(locale, "Resultado", "Result")}</th><th className="px-3 py-3"><span className="sr-only">{tx(locale, "Acciones", "Actions")}</span></th></tr>
             </thead>
@@ -182,13 +182,13 @@ export function CaptureView({ locale, rows: initialRows, zones, titles, canConve
                 <tr className={cn("border-t align-top first:border-t-0", k.line)}>
                   <td className="min-w-[220px] px-4 py-3">
                     <div className="font-semibold [overflow-wrap:anywhere]">{c.address}</div>
-                    <div className={cn("text-xs", k.muted)}>{c.zone} · <TimeAgo iso={c.createdAt} locale={locale} /></div>
-                    <div className="mt-1 text-xs [overflow-wrap:anywhere]"><span className="font-semibold">{c.ownerName}</span> <span className={k.muted}>· {c.phone}</span></div>
-                    {c.duplicateOf && <div className={cn("mt-1 flex items-center gap-1 text-xs font-semibold", k.warnText)}><Fingerprint size={12} className="shrink-0" /> <span className="min-w-0 [overflow-wrap:anywhere]">= {titles[c.duplicateOf] ?? c.duplicateOf}</span></div>}
+                    <div className={cn("text-[13px]", k.muted)}>{c.zone} · <TimeAgo iso={c.createdAt} locale={locale} /></div>
+                    <div className="mt-1 text-[13px] [overflow-wrap:anywhere]"><span className="font-semibold">{c.ownerName}</span> <span className={k.muted}>· {c.phone}</span></div>
+                    {c.duplicateOf && <div className={cn("mt-1 flex items-center gap-1 text-[13px] font-semibold", k.warnText)}><Fingerprint size={12} className="shrink-0" /> <span className="min-w-0 [overflow-wrap:anywhere]">= {titles[c.duplicateOf] ?? c.duplicateOf}</span></div>}
                   </td>
                   <td className="px-3 py-3 text-right">
                     <div className={cn("whitespace-nowrap tracking-normal", k.num)}>{money(c.askingPrice, locale)}</div>
-                    <div className={cn("whitespace-nowrap text-xs", k.muted)}>{num(c.areaM2, locale)} m²</div>
+                    <div className={cn("whitespace-nowrap text-[13px]", k.muted)}>{num(c.areaM2, locale)} m²</div>
                   </td>
                   <td className="px-3 py-3"><Pill tone={TONE[c.result]}>{label[c.result]}</Pill></td>
                   <td className="px-3 py-3">{actions(c)}</td>
@@ -256,8 +256,8 @@ export function CaptureView({ locale, rows: initialRows, zones, titles, canConve
           {f.address.length >= 6 && !!zone && f.areaM2 > 0 && (
             <div className={cn("np-in mt-4", dup ? k.warnBox : k.okBox)}>
               <div className="flex items-center gap-2 font-semibold">{checking ? <Loader2 size={16} className="animate-spin" /> : dup ? <AlertTriangle size={16} /> : <CheckCircle2 size={16} />}{dup ? tx(locale, "Posible duplicado", "Possible duplicate") : tx(locale, "Sin duplicados", "No duplicates")}</div>
-              <div className="mt-1 text-xs text-navy/75 dark:text-ivory/75">{dup ? (dup.zone ? `${dup.title} · ${dup.zone} · ${dup.areaM2} m²` : dup.title ?? tx(locale, "Ya existe en otra agencia (no público)", "Already listed by another agency (not public)")) : tx(locale, "Fingerprint: lat/lng + m² + hash de dirección", "Fingerprint: lat/lng + m² + address hash")}</div>
-              <div className="mt-1 font-mono text-[12px] text-navy/55 dark:text-ivory/55">{dup?.fingerprint ?? fp}</div>
+              <div className="mt-1 text-[13px] text-navy/75 dark:text-ivory/75">{dup ? (dup.zone ? `${dup.title} · ${dup.zone} · ${dup.areaM2} m²` : dup.title ?? tx(locale, "Ya existe en otra agencia (no público)", "Already listed by another agency (not public)")) : tx(locale, "Fingerprint: lat/lng + m² + hash de dirección", "Fingerprint: lat/lng + m² + address hash")}</div>
+              <div className="mt-1 font-mono text-[13px] text-navy/55 dark:text-ivory/55">{dup?.fingerprint ?? fp}</div>
             </div>
           )}
           {err && <div role="alert" className={cn("mt-3", k.err)}>{err}</div>}

@@ -81,7 +81,7 @@ export function AgencyMobileNav({
     };
   }, [open, close]);
 
-  const barItem = "relative flex min-h-[56px] flex-1 flex-col items-center justify-center gap-1 rounded-xl px-1 pb-1.5 pt-2 text-[12px] font-semibold leading-none transition-colors duration-np focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy dark:focus-visible:ring-[#EFE6D8]";
+  const barItem = "relative flex min-h-[56px] flex-1 flex-col items-center justify-center gap-1 rounded-xl px-1 pb-1.5 pt-2 text-[13px] font-semibold leading-none transition-colors duration-np focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy dark:focus-visible:ring-[#EFE6D8]";
   const on = "text-navy dark:text-ivory";
   const off = "text-muted hover:text-navy dark:text-mist dark:hover:text-ivory";
   const indicator = <span aria-hidden className="absolute inset-x-[22%] top-0 h-[3px] rounded-b-full bg-gold-text dark:bg-[#D6DEE5]" />;
@@ -102,7 +102,7 @@ export function AgencyMobileNav({
                 {i.active && indicator}
                 <span className="relative">
                   <i.icon size={21} strokeWidth={i.active ? 2 : 1.6} aria-hidden />
-                  {(i.badge ?? 0) > 0 && <Count className="absolute -right-3 -top-2 h-[18px] min-w-[18px] bg-navy px-1 text-[12px] text-ivory dark:bg-[#EFE6D8] dark:text-navy">{i.badge}</Count>}
+                  {(i.badge ?? 0) > 0 && <Count className="absolute -right-3 -top-2 h-[18px] min-w-[18px] bg-navy px-1 text-[13px] text-ivory dark:bg-[#EFE6D8] dark:text-navy">{i.badge}</Count>}
                 </span>
                 <span className="max-w-full truncate">{i.label}</span>
               </Link>
@@ -121,7 +121,7 @@ export function AgencyMobileNav({
               {moreActive && indicator}
               <span className="relative">
                 <Menu size={21} strokeWidth={moreActive ? 2 : 1.6} aria-hidden />
-                {moreBadge > 0 && <Count className="absolute -right-3 -top-2 h-[18px] min-w-[18px] bg-navy px-1 text-[12px] text-ivory dark:bg-[#EFE6D8] dark:text-navy">{moreBadge}</Count>}
+                {moreBadge > 0 && <Count className="absolute -right-3 -top-2 h-[18px] min-w-[18px] bg-navy px-1 text-[13px] text-ivory dark:bg-[#EFE6D8] dark:text-navy">{moreBadge}</Count>}
               </span>
               <span>{tx(locale, "Más", "More")}</span>
               {moreActive && <span className="sr-only">{tx(locale, ` (estás en ${moreActive.label})`, ` (you are in ${moreActive.label})`)}</span>}
@@ -161,10 +161,10 @@ export function AgencyMobileNav({
             <div className="px-4">
               {agency && (
                 <div className={cn("mb-3 flex items-center gap-3 rounded-2xl px-3.5 py-3", k.soft)}>
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg font-display text-[12px] font-bold text-navy" style={{ background: agency.color }} aria-hidden>{agency.initials}</span>
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg font-display text-[13px] font-bold text-navy" style={{ background: agency.color }} aria-hidden>{agency.initials}</span>
                   <div className="min-w-0 leading-tight">
-                    <div className="truncate text-[14px] font-semibold">{agency.name}</div>
-                    <div className={cn("text-[12px]", k.muted)}>Plan {agency.plan} · {agency.city}</div>
+                    <div className="truncate text-[15px] font-semibold">{agency.name}</div>
+                    <div className={cn("text-[13px]", k.muted)}>Plan {agency.plan} · {agency.city}</div>
                   </div>
                 </div>
               )}

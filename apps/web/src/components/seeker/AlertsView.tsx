@@ -89,7 +89,7 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
         <div className={k.caption}>{tx(locale, "Avisos a tu medida", "Made for you")}</div>
         <h1 className="np-t-h1 mt-1 font-serif">{tx(locale, "Alertas de búsqueda", "Search alerts")}</h1>
         <p className="mt-1 text-muted">{tx(locale, "Te escribimos cuando llega una casa que encaja contigo o cuando alguna baja de precio.", "We’ll write when a home that fits you comes along, or when one drops in price.")}</p>
-        {error && <div role="alert" className="mt-4 rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-sm text-danger">{error}</div>}
+        {error && <div role="alert" className="mt-4 rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-[15px] text-danger">{error}</div>}
         <div className="mt-6 space-y-3">
           {items.map((s) => {
             const summary = alertTitle(s.query, !!s.polygon, locale);
@@ -101,7 +101,7 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
                 <div className="flex items-start gap-3.5">
                   <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-egeo/40 text-navy dark:bg-white/10 dark:text-ivory">{s.polygon || /(^|&)(poly|radius)=/.test(s.query) ? <MapPin size={18} strokeWidth={1.6} aria-hidden /> : <Bell size={18} strokeWidth={1.6} aria-hidden />}</span>
                   <div className="min-w-0 flex-1">
-                    <h2 className="font-display text-[16px] font-semibold leading-snug text-ink">{title}</h2>
+                    <h2 className="font-display text-[17px] font-semibold leading-snug text-ink">{title}</h2>
                     {custom && <div className="mt-0.5 text-[13px] leading-snug text-muted">{summary}</div>}
                     <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-muted">
                       <span>{freq[s.frequency]} · {s.lastSentAt ? `${tx(locale, "último aviso", "last sent")} ${ago(s.lastSentAt, locale)}` : tx(locale, "aún sin avisos", "nothing sent yet")}</span>
@@ -114,13 +114,13 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
                   <Link
                     href={`/${locale}/search?${s.query}`}
                     aria-label={`${tx(locale, "Ver casas", "See homes")} · ${title}`}
-                    className="font-display text-[14px] font-semibold text-navy underline-offset-4 after:absolute after:inset-0 after:rounded-[inherit] after:content-[''] hover:underline focus-visible:outline-none focus-visible:after:outline focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-ink dark:text-ivory"
+                    className="font-display text-[15px] font-semibold text-navy underline-offset-4 after:absolute after:inset-0 after:rounded-[inherit] after:content-[''] hover:underline focus-visible:outline-none focus-visible:after:outline focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-ink dark:text-ivory"
                   >
                     {tx(locale, "Ver casas", "See homes")} <span aria-hidden>→</span>
                   </Link>
                   {!editing && confirmId !== s.id && (
                     <div className="relative z-10 flex items-center gap-1">
-                      <button type="button" aria-label={`${tx(locale, "Editar", "Edit")} · ${title}`} onClick={() => { setConfirmId(null); setEditId(s.id); setDraft(custom ? s.name : ""); }} className="flex min-h-11 items-center gap-1.5 rounded-[12px] px-3 text-[14px] font-semibold text-ink hover:bg-black/5 dark:hover:bg-white/10">
+                      <button type="button" aria-label={`${tx(locale, "Editar", "Edit")} · ${title}`} onClick={() => { setConfirmId(null); setEditId(s.id); setDraft(custom ? s.name : ""); }} className="flex min-h-11 items-center gap-1.5 rounded-[12px] px-3 text-[15px] font-semibold text-ink hover:bg-black/5 dark:hover:bg-white/10">
                         <Pencil size={15} aria-hidden /> {tx(locale, "Editar", "Edit")}
                       </button>
                       <button type="button" className="flex h-11 w-11 items-center justify-center rounded-full text-danger hover:bg-black/5 dark:hover:bg-white/10" aria-label={`${tx(locale, "Eliminar", "Delete")} · ${title}`} onClick={() => setConfirmId(s.id)}>
@@ -131,7 +131,7 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
                 </div>
                 {confirmId === s.id && (
                   <div className="relative z-10 mt-3 flex flex-wrap items-center justify-end gap-2 border-t border-line pt-3" role="group" aria-label={tx(locale, "Confirmar eliminación", "Confirm deletion")}>
-                    <span className="mr-auto text-sm font-semibold">{tx(locale, "¿Eliminar esta alerta?", "Delete this alert?")}</span>
+                    <span className="mr-auto text-[15px] font-semibold">{tx(locale, "¿Eliminar esta alerta?", "Delete this alert?")}</span>
                     <Button size="sm" variant="outline" className={k.outline} onClick={() => setConfirmId(null)}>{tx(locale, "Cancelar", "Cancel")}</Button>
                     <Button size="sm" className="bg-danger hover:bg-danger" disabled={busyId === s.id} onClick={() => void remove(s)}>{tx(locale, "Eliminar", "Delete")}</Button>
                   </div>
@@ -152,7 +152,7 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
                         maxLength={120}
                         onChange={(e) => setDraft(e.target.value)}
                         placeholder={summary}
-                        className="h-11 rounded-xl border border-[#D6DEE5] bg-white px-3 text-[16px] font-normal text-navy focus:border-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#EFE6D8] dark:bg-white/5 dark:text-ivory sm:text-[15px]"
+                        className="h-11 rounded-xl border border-[#D6DEE5] bg-white px-3 text-[17px] font-normal text-navy focus:border-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#EFE6D8] dark:bg-white/5 dark:text-ivory sm:text-[15px]"
                       />
                     </label>
                     <label className="grid gap-1 text-[13px] font-semibold">
@@ -185,7 +185,7 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
       </div>
       <aside>
         <Card className={cn(k.card, "border-0 p-5")}>
-          <div className="flex items-center gap-2 font-serif text-[24px] font-light leading-tight"><Mail size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Avisos enviados", "Sent to you")}</div>
+          <div className="flex items-center gap-2 font-serif text-[28px] font-light leading-tight"><Mail size={18} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" /> {tx(locale, "Avisos enviados", "Sent to you")}</div>
           <p className="mt-1 text-[13px] text-muted">{tx(locale, "Lo último que te hemos escrito.", "The latest we’ve written to you.")}</p>
           <ul className="mt-4 divide-y divide-line">
             {emails.map((e) => (
@@ -194,7 +194,7 @@ export function AlertsView({ locale, searches, emails }: { locale: Locale; searc
                   <Badge tone={e.kind === "TOUR" ? "ok" : "mist"} className={e.kind === "ALERT" ? "bg-[#EFE6D8] text-navy dark:bg-white/10" : undefined}>{lbl(EMAIL_KIND_LABEL[e.kind] ?? [e.kind, e.kind], locale)}</Badge>
                   <span className="text-[13px] text-muted">{ago(e.at, locale)}</span>
                 </div>
-                <div className="mt-1.5 text-sm font-semibold">{localizeEmailSubject(e.subject, locale)}</div>
+                <div className="mt-1.5 text-[15px] font-semibold">{localizeEmailSubject(e.subject, locale)}</div>
                 <div className="text-[13px] text-muted">{e.to}{e.status !== "SIMULATED" && EMAIL_STATUS_LABEL[e.status as keyof typeof EMAIL_STATUS_LABEL] ? ` · ${lbl(EMAIL_STATUS_LABEL[e.status as keyof typeof EMAIL_STATUS_LABEL], locale)}` : ""}</div>
               </li>
             ))}

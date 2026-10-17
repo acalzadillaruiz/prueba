@@ -77,7 +77,7 @@ export function HubOffers({ id, className, locale, offers: initial, offerable, l
             void submit();
           }}
         >
-          <label className="block text-sm sm:col-span-2">
+          <label className="block text-[15px] sm:col-span-2">
             <span className="mb-1 block font-semibold">{tx(locale, "Inmueble", "Property")}</span>
             <select value={listingId} onChange={(ev) => setListingId(ev.target.value)} className={cn(inputCls, "h-11")} aria-invalid={!!errors.listing}>
               {offerable.map((id) => {
@@ -91,12 +91,12 @@ export function HubOffers({ id, className, locale, offers: initial, offerable, l
             </select>
             {errors.listing && <span role="alert" className="mt-1 block text-[13px] font-semibold text-danger">{errors.listing}</span>}
           </label>
-          <label className="block text-sm">
+          <label className="block text-[15px]">
             <span className="mb-1 block font-semibold">{tx(locale, "Nota para el asesor (opcional)", "Note for the advisor (optional)")}</span>
             <input value={note} onChange={(ev) => setNote(ev.target.value)} maxLength={500} className={cn(inputCls, "h-11")} aria-invalid={!!errors.note} placeholder={tx(locale, "Ej.: pago de contado, entrega en 60 días…", "E.g. cash, closing in 60 days…")} />
             {errors.note && <span role="alert" className="mt-1 block text-[13px] font-semibold text-danger">{errors.note}</span>}
           </label>
-          <label className="block text-sm">
+          <label className="block text-[15px]">
             <span className="mb-1 block font-semibold">{tx(locale, "Monto (USD)", "Amount (USD)")}</span>
             <input value={amount} onChange={(ev) => setAmount(ev.target.value.replace(/[^\d]/g, ""))} inputMode="numeric" className={cn(inputCls, "h-11")} aria-invalid={!!errors.amount} placeholder={listingById(listingId) ? String(listingById(listingId)!.priceAmount) : "150000"} />
             {errors.amount && <span role="alert" className="mt-1 block text-[13px] font-semibold text-danger">{errors.amount}</span>}
@@ -105,12 +105,12 @@ export function HubOffers({ id, className, locale, offers: initial, offerable, l
             <Button type="submit" disabled={busy} className="w-full sm:w-auto">
               {busy && <Loader2 size={16} className="animate-spin" />} {tx(locale, "Enviar oferta", "Send offer")}
             </Button>
-            {sent && <span role="status" className="ml-0 mt-2 block text-sm font-semibold text-ok sm:ml-3 sm:mt-0 sm:inline">{tx(locale, "Listo. Tu oferta ya está con el asesor.", "Done. Your offer is with the advisor.")}</span>}
+            {sent && <span role="status" className="ml-0 mt-2 block text-[15px] font-semibold text-ok sm:ml-3 sm:mt-0 sm:inline">{tx(locale, "Listo. Tu oferta ya está con el asesor.", "Done. Your offer is with the advisor.")}</span>}
           </div>
-          {errors.form && <div role="alert" className="rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-sm text-danger sm:col-span-2">{errors.form}</div>}
+          {errors.form && <div role="alert" className="rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-[15px] text-danger sm:col-span-2">{errors.form}</div>}
         </form>
       ) : (
-        <p className="mt-3 text-sm text-muted">{tx(locale, "Para hacer una oferta, primero escríbele al asesor o pide una visita desde la casa que te interesa.", "To make an offer, first message the advisor or book a visit from the home you like.")}</p>
+        <p className="mt-3 text-[15px] text-muted">{tx(locale, "Para hacer una oferta, primero escríbele al asesor o pide una visita desde la casa que te interesa.", "To make an offer, first message the advisor or book a visit from the home you like.")}</p>
       )}
 
       <div className="mt-5">
@@ -129,7 +129,7 @@ export function HubOffers({ id, className, locale, offers: initial, offerable, l
                     ) : (
                       <div className="line-clamp-1 font-semibold">{listingTitle(o.listingId)}</div>
                     )}
-                    <div className="text-sm text-muted">{ago(o.createdAt, locale)}{o.note ? ` · ${o.note}` : ""}</div>
+                    <div className="text-[15px] text-muted">{ago(o.createdAt, locale)}{o.note ? ` · ${o.note}` : ""}</div>
                   </div>
                   <div className="font-display font-semibold">{money(o.amount, locale)}</div>
                   <Badge tone={st.tone}>{tx(locale, st.es, st.en)}</Badge>

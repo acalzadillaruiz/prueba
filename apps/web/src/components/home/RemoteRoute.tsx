@@ -41,7 +41,7 @@ export function RemoteRoute({ title, subtitle, steps, children }: { title: strin
                 <circle cx={LECHERIA.x} cy={LECHERIA.y} r="26" fill="#3A6A92" opacity=".16" />
                 <path d={`M${LECHERIA.x - 18} ${LECHERIA.y + 6} L${LECHERIA.x} ${LECHERIA.y - 8} L${LECHERIA.x + 18} ${LECHERIA.y + 6}`} fill="none" stroke="#1F3A4D" strokeWidth="3.5" />
                 <path d={`M${LECHERIA.x - 9} ${LECHERIA.y + 7} L${LECHERIA.x} ${LECHERIA.y} L${LECHERIA.x + 9} ${LECHERIA.y + 7}`} fill="none" stroke="#3A6A92" strokeWidth="3" />
-                <text x={LECHERIA.x + 34} y={LECHERIA.y + 8} fontFamily="var(--font-title)" fontSize="34" fill="#1F3A4D">
+                <text x={LECHERIA.x + 34} y={LECHERIA.y + 8} fontFamily="var(--font-title)" fontSize="36" fill="#1F3A4D">
                   Lechería
                 </text>
               </g>
@@ -53,7 +53,7 @@ export function RemoteRoute({ title, subtitle, steps, children }: { title: strin
             <ol className="np-steps mt-10">
               {steps.map(([t, b], i) => (
                 <li key={t} data-on="1" className="flex items-baseline gap-5 py-2.5 md:items-start md:gap-6 md:py-4 max-md:py-4">
-                  <span className="np-step-n w-6 shrink-0 font-serif text-[22px] leading-none md:text-[28px]">{i + 1}</span>
+                  <span className="np-step-n w-6 shrink-0 font-serif text-[20px] leading-none md:text-[28px]">{i + 1}</span>
                   <span>
                     <span className="block text-[20px] font-medium text-ink">{t}</span>
                     {/* One short line each, phones included (035: at most two lines per block). */}

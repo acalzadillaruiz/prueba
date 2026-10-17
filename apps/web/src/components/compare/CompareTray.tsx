@@ -147,7 +147,7 @@ export function CompareTray({ locale }: { locale: Locale }) {
           })}
         </ul>
         <div className="min-w-0 flex-1 leading-tight">
-          <div className="flex items-center gap-1.5 font-display text-[14px] font-semibold text-ink">
+          <div className="flex items-center gap-1.5 font-display text-[15px] font-semibold text-ink">
             <Scale size={14} aria-hidden className="shrink-0 text-[#3A6A92]" />
             <span aria-live="polite">{tx(locale, `Comparar (${compare.length}/3)`, `Compare (${compare.length}/3)`)}</span>
           </div>
@@ -159,7 +159,7 @@ export function CompareTray({ locale }: { locale: Locale }) {
           href={href}
           aria-label={tx(locale, "Ver comparación", "View comparison")}
           className={cn(
-            "inline-flex h-11 shrink-0 items-center gap-1 rounded-[12px] px-4 font-display text-[14px] font-semibold transition-colors duration-np",
+            "inline-flex h-11 shrink-0 items-center gap-1 rounded-[12px] px-4 font-display text-[15px] font-semibold transition-colors duration-np",
             ready ? "bg-navy text-ivory hover:bg-navy-2" : "border-[1.5px] border-navy text-navy hover:bg-navy/5",
           )}
         >
@@ -176,14 +176,14 @@ export function CompareTray({ locale }: { locale: Locale }) {
             </li>
           ))}
         </ul>
-        <span className="flex items-center gap-1.5 whitespace-nowrap font-display text-[14px] font-semibold text-ink">
+        <span className="flex items-center gap-1.5 whitespace-nowrap font-display text-[15px] font-semibold text-ink">
           <Scale size={14} aria-hidden className="shrink-0 text-[#3A6A92]" />
           <span aria-live="polite">{tx(locale, `Comparar (${compare.length}/3)`, `Compare (${compare.length}/3)`)}</span>
         </span>
         <Link
           href={href}
           className={cn(
-            "inline-flex h-10 shrink-0 items-center gap-1 rounded-[12px] px-4 font-display text-[14px] font-semibold transition-colors duration-np",
+            "inline-flex h-10 shrink-0 items-center gap-1 rounded-[12px] px-4 font-display text-[15px] font-semibold transition-colors duration-np",
             ready ? "bg-navy text-ivory hover:bg-navy-2" : "border-[1.5px] border-navy text-navy hover:bg-navy/5",
           )}
         >

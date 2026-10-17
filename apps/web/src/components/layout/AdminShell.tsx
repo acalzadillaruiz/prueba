@@ -159,7 +159,7 @@ export function AdminShell({
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-[264px] flex-col bg-navy text-ivory lg:flex">
         <div className="px-7 pb-6 pt-8 [@media(max-height:820px)]:pb-3 [@media(max-height:820px)]:pt-5">
           <Link href={`/${locale}`} aria-label="New Place" className="inline-block rounded-md"><Logo tone="ivory" /></Link>
-          <div className="mt-2 text-[12px] font-semibold uppercase tracking-[.22em] text-[#D6DEE5]/80 [@media(max-height:820px)]:mt-1">{area === "agency" ? tx(locale, "Agencia", "Agency") : tx(locale, "Plataforma", "Platform")}</div>
+          <div className="mt-2 text-[13px] font-semibold uppercase tracking-[.22em] text-[#D6DEE5]/80 [@media(max-height:820px)]:mt-1">{area === "agency" ? tx(locale, "Agencia", "Agency") : tx(locale, "Plataforma", "Platform")}</div>
         </div>
         <nav className="min-h-0 flex-1 space-y-0.5 overflow-y-auto px-4 scrollbar-thin" aria-label={area === "agency" ? tx(locale, "Panel de agencia", "Agency dashboard") : tx(locale, "Consola de plataforma", "Platform console")}>
           {items.map((i) => {
@@ -187,10 +187,10 @@ export function AdminShell({
             card={
               area === "agency" && agency ? (
                 <>
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg font-display text-[12px] font-bold text-navy" style={{ background: agency.color }}>{agency.initials}</span>
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg font-display text-[13px] font-bold text-navy" style={{ background: agency.color }}>{agency.initials}</span>
                   <span className="min-w-0 flex-1 leading-tight">
                     <span className="block truncate text-[13px] font-semibold">{agency.name}</span>
-                    <span className="block truncate text-[12px] text-mist">Plan {agency.plan} · {agency.city}</span>
+                    <span className="block truncate text-[13px] text-mist">Plan {agency.plan} · {agency.city}</span>
                   </span>
                 </>
               ) : (
@@ -198,7 +198,7 @@ export function AdminShell({
                   <Avatar initials={u.initials} hue={u.hue} size={32} />
                   <span className="min-w-0 flex-1 leading-tight">
                     <span className="block truncate text-[13px] font-semibold">{u.name}</span>
-                    <span className="block truncate text-[12px] text-mist">{tr(u.role)}</span>
+                    <span className="block truncate text-[13px] text-mist">{tr(u.role)}</span>
                   </span>
                 </>
               )
@@ -242,15 +242,15 @@ export function AdminShell({
                   key={i.href}
                   href={base + i.href}
                   aria-current={active ? "page" : undefined}
-                  className={cn("flex shrink-0 items-center gap-1.5 rounded-[12px] px-3.5 py-2 text-[14px]", active ? "bg-[#2F5A7E] text-ivory border-b-[2px] border-b-[#D6DEE5]" : "text-ivory/70")}
+                  className={cn("flex shrink-0 items-center gap-1.5 rounded-[12px] px-3.5 py-2 text-[15px]", active ? "bg-[#2F5A7E] text-ivory border-b-[2px] border-b-[#D6DEE5]" : "text-ivory/70")}
                 >
                   <i.icon size={15} strokeWidth={1.6} /> {t(i.label)}
                   {(badges[i.href] ?? 0) > 0 && <Count>{badges[i.href]}</Count>}
                 </Link>
               );
             })}
-            <Link href={`/${locale}`} className="flex shrink-0 items-center gap-1.5 rounded-[12px] px-3.5 py-2 text-[14px] text-ivory/60"><ExternalLink size={15} strokeWidth={1.6} /> {t("publicSite")}</Link>
-            <button type="button" onClick={() => logout(locale)} className="flex shrink-0 items-center gap-1.5 rounded-[12px] px-3.5 py-2 text-[14px] text-ivory/60"><LogOut size={15} strokeWidth={1.6} /> {tx(locale, "Salir", "Sign out")}</button>
+            <Link href={`/${locale}`} className="flex shrink-0 items-center gap-1.5 rounded-[12px] px-3.5 py-2 text-[15px] text-ivory/60"><ExternalLink size={15} strokeWidth={1.6} /> {t("publicSite")}</Link>
+            <button type="button" onClick={() => logout(locale)} className="flex shrink-0 items-center gap-1.5 rounded-[12px] px-3.5 py-2 text-[15px] text-ivory/60"><LogOut size={15} strokeWidth={1.6} /> {tx(locale, "Salir", "Sign out")}</button>
           </nav>}
         </div>
         {area === "agency" && (
@@ -265,7 +265,7 @@ export function AdminShell({
         )}
 
         {area === "agency" && u.role === "SUPERADMIN" && (
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-[#E9D2C6] bg-rosa/60 px-4 py-2.5 text-sm text-navy md:px-10 dark:border-white/10 dark:bg-[#2F5A7E] dark:text-ivory">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-[#E9D2C6] bg-rosa/60 px-4 py-2.5 text-[15px] text-navy md:px-10 dark:border-white/10 dark:bg-[#2F5A7E] dark:text-ivory">
             {agency ? tx(locale, `Viendo como superadmin: ${agency.name}`, `Viewing as superadmin: ${agency.name}`) : tx(locale, "Elige una agencia en Platform → Agencias para impersonarla.", "Pick an agency in Platform → Agencies to impersonate it.")}
             <Link href={`/${locale}/platform/agencies`} className={cn("ml-auto", k.link)}>Platform →</Link>
           </div>
@@ -274,12 +274,12 @@ export function AdminShell({
         <header className="mx-auto flex max-w-[1360px] flex-wrap items-end gap-x-4 gap-y-3 px-4 pb-2 pt-6 md:px-10 md:pt-10">
           <div className="min-w-0 flex-1 basis-64">
             {back && (
-              <Link href={back.href} className="mb-2 inline-flex min-h-10 items-center gap-1.5 rounded-full text-[14px] font-semibold text-navy hover:underline hover:underline-offset-4 dark:text-ivory">
+              <Link href={back.href} className="mb-2 inline-flex min-h-10 items-center gap-1.5 rounded-full text-[15px] font-semibold text-navy hover:underline hover:underline-offset-4 dark:text-ivory">
                 <ArrowLeft size={16} strokeWidth={1.8} aria-hidden /> {back.label}
               </Link>
             )}
             <div className={cn(k.caption, "truncate")}>{headless ? `${kicker} · ${title}` : kicker}</div>
-            {!headless && <h1 className="mt-1.5 font-serif text-[34px] font-light leading-[1.05] text-navy md:text-[44px] dark:text-ivory" suppressHydrationWarning>{title}</h1>}
+            {!headless && <h1 className="mt-1.5 font-serif text-[34px] font-light leading-[1.05] text-navy md:text-[36px] dark:text-ivory" suppressHydrationWarning>{title}</h1>}
           </div>
           <div className="flex flex-wrap items-center gap-2.5">
             {actions}
@@ -288,7 +288,7 @@ export function AdminShell({
               <Avatar initials={u.initials} hue={u.hue} size={36} />
               <div className="leading-tight">
                 <div className="text-[13px] font-semibold">{u.name}</div>
-                <div className={cn("text-[12px]", k.muted)}>{tr(u.role)}</div>
+                <div className={cn("text-[13px]", k.muted)}>{tr(u.role)}</div>
               </div>
             </div>
           </div>

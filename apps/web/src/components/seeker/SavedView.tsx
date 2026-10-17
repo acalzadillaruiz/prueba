@@ -45,12 +45,12 @@ export function SavedView({ locale, all }: { locale: Locale; all: Listing[] }) {
             <Heart size={20} strokeWidth={1.7} aria-hidden />
           </span>
           <div className="min-w-0 flex-1">
-            <p className="font-display text-[16px] font-semibold text-navy dark:text-ivory">{tx(locale, "Crea tu cuenta para no perderlas y recibir avisos", "Create your account so you don’t lose them and get alerts")}</p>
-            <p className="mt-0.5 text-sm text-muted">{tx(locale, "Ahora viven solo en este dispositivo. Con tu cuenta te esperan en cualquier lugar y te avisamos si bajan de precio.", "Right now they live only on this device. With an account they follow you anywhere, and we’ll tell you if their price drops.")}</p>
+            <p className="font-display text-[17px] font-semibold text-navy dark:text-ivory">{tx(locale, "Crea tu cuenta para no perderlas y recibir avisos", "Create your account so you don’t lose them and get alerts")}</p>
+            <p className="mt-0.5 text-[15px] text-muted">{tx(locale, "Ahora viven solo en este dispositivo. Con tu cuenta te esperan en cualquier lugar y te avisamos si bajan de precio.", "Right now they live only on this device. With an account they follow you anywhere, and we’ll tell you if their price drops.")}</p>
           </div>
           <div className="flex shrink-0 flex-wrap items-center gap-3">
             <Button href={auth.register} variant="primary">{tx(locale, "Crear cuenta", "Create account")}</Button>
-            <Link href={auth.login} className="text-sm font-semibold text-navy underline underline-offset-4 dark:text-ivory">{tx(locale, "Ya tengo cuenta", "I have an account")}</Link>
+            <Link href={auth.login} className="text-[15px] font-semibold text-navy underline underline-offset-4 dark:text-ivory">{tx(locale, "Ya tengo cuenta", "I have an account")}</Link>
           </div>
         </div>
       )}

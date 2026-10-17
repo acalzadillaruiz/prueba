@@ -122,14 +122,14 @@ export function AskBar({ locale, className, sticky = false }: { locale: Locale; 
             aria-pressed={mode === k}
             onClick={() => setMode(k)}
             className={cn(
-              "min-h-11 border-b-2 px-3 font-display text-[16px] transition-[color,border-color] duration-np ease-np",
+              "min-h-11 border-b-2 px-3 font-display text-[17px] transition-[color,border-color] duration-np ease-np",
               mode === k ? "border-navy font-medium text-ink" : "border-transparent text-muted hover:text-ink",
             )}
           >
             {tx(locale, es, en)}
           </button>
         ))}
-        <span className="ml-auto hidden items-center gap-1.5 pr-2 font-display text-[14px] text-muted sm:flex">
+        <span className="ml-auto hidden items-center gap-1.5 pr-2 font-display text-[15px] text-muted sm:flex">
           <Sparkles size={14} aria-hidden /> {tx(locale, "Escribe zona, tipo de casa o presupuesto", "Type an area, a kind of home or a budget")}
         </span>
       </div>
@@ -142,7 +142,7 @@ export function AskBar({ locale, className, sticky = false }: { locale: Locale; 
           autoComplete="off"
           spellCheck={false}
           aria-label={tx(locale, "Describe la casa que buscas", "Describe the home you're looking for")}
-          className="min-h-12 w-full bg-transparent font-display text-[16px] text-ink placeholder:text-muted focus:outline-none sm:text-[17px]"
+          className="min-h-12 w-full bg-transparent font-display text-[17px] text-ink placeholder:text-muted focus:outline-none sm:text-[17px]"
           placeholder={wide ? tx(locale, "¿Dónde quieres vivir? Ej.: casa con muelle en El Morro…", "Where do you want to live? E.g. a house with a pier in El Morro…") : tx(locale, "Zona, casa o presupuesto…", "Area, home or budget…")}
         />
         {suggest.listbox}
@@ -165,7 +165,7 @@ export function AskBar({ locale, className, sticky = false }: { locale: Locale; 
               setText(v);
               void go(v);
             }}
-            className="min-h-11 shrink-0 rounded-[12px] px-3 font-display text-[14px] text-ink underline-offset-4 transition-colors duration-np hover:bg-arena hover:underline"
+            className="min-h-11 shrink-0 rounded-[12px] px-3 font-display text-[15px] text-ink underline-offset-4 transition-colors duration-np hover:bg-arena hover:underline"
           >
             {tx(locale, es, en)}
           </button>
@@ -245,14 +245,14 @@ function CompactAsk({
         className={cn("np-glass relative mx-auto flex h-14 max-w-[720px] items-center gap-1 rounded-[12px] p-1.5 text-ink lg:max-w-[940px]", shown && "pointer-events-auto")}
       >
         <Link href={`/${locale}`} aria-label={tx(locale, "New Place, inicio", "New Place, home")} className={cn("flex h-11 w-11 shrink-0 items-center justify-center rounded-full hover:bg-black/5", ring)}>
-          <span aria-hidden className="font-display text-[14px] font-light tracking-[.16em] text-ink">NP</span>
+          <span aria-hidden className="font-display text-[15px] font-light tracking-[.16em] text-ink">NP</span>
         </Link>
         <label htmlFor={`${id}-mode`} className="sr-only">
           {tx(locale, "Qué buscas", "What you're after")}
         </label>
         {/* Mode chip: always the short word ("Compra", "Alquila", "Vaca.") so it never reads as a "home" button; the icon
             joins it from sm. The native select sits invisibly on top: one tap opens the system picker with the full names. */}
-        <span data-mode-chip className="relative flex h-11 shrink-0 items-center gap-1 rounded-[12px] bg-[#DCE8F2] pl-3 pr-2 font-display text-[14px] font-medium text-ink has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ink sm:gap-1.5 sm:pl-3.5 sm:pr-2.5 [html.dark_&]:text-[#1F3A4D]">
+        <span data-mode-chip className="relative flex h-11 shrink-0 items-center gap-1 rounded-[12px] bg-[#DCE8F2] pl-3 pr-2 font-display text-[15px] font-medium text-ink has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ink sm:gap-1.5 sm:pl-3.5 sm:pr-2.5 [html.dark_&]:text-[#1F3A4D]">
           <chip.Icon size={16} strokeWidth={1.8} aria-hidden className="hidden sm:block" />
           <span aria-hidden>{tx(locale, chip.es, chip.en)}</span>
           <ChevronDown size={14} aria-hidden className="opacity-80" />
@@ -278,7 +278,7 @@ function CompactAsk({
             enterKeyHint="search"
             aria-label={tx(locale, "Describe la casa que buscas", "Describe the home you're looking for")}
             placeholder={wide ? tx(locale, "¿Dónde quieres vivir?", "Where do you want to live?") : tx(locale, "¿Dónde?", "Where?")}
-            className="h-11 min-w-0 flex-1 bg-transparent px-1.5 font-display text-[16px] text-ink placeholder:text-ink/60 focus:outline-none"
+            className="h-11 min-w-0 flex-1 bg-transparent px-1.5 font-display text-[17px] text-ink placeholder:text-ink/60 focus:outline-none"
           />
         </span>
         {/* Anchored to the whole bar (the form is `relative`): full place names, never "Mara…". */}
@@ -306,7 +306,7 @@ function CompactAsk({
             {user ? <Avatar initials={user.initials} hue={user.hue} size={32} /> : <User size={19} aria-hidden />}
           </Link>
         )}
-        <Link href={`/${locale}/sell`} className={cn("hidden h-11 shrink-0 items-center rounded-[12px] border-[1.5px] border-ink/70 px-4 font-display text-[14px] font-semibold text-ink hover:bg-black/5 xl:flex", ring)}>
+        <Link href={`/${locale}/sell`} className={cn("hidden h-11 shrink-0 items-center rounded-[12px] border-[1.5px] border-ink/70 px-4 font-display text-[15px] font-semibold text-ink hover:bg-black/5 xl:flex", ring)}>
           {tx(locale, "Vender", "Sell")}
         </Link>
         <button

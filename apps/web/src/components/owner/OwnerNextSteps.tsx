@@ -18,7 +18,7 @@ export function OwnerNextSteps({ locale, slug, title, live }: { locale: Locale; 
   const url = () => (typeof window !== "undefined" ? `${window.location.origin}${path}` : path);
   const shareText = (u: string) => tx(locale, `Estoy vendiendo «${title}». Mírala en New Place: ${u}`, `I’m selling “${title}”. Take a look on New Place: ${u}`);
   const card = "rounded-[16px] bg-white p-4 text-left dark:bg-navy-card";
-  const link = "inline-flex min-h-11 items-center gap-1.5 rounded-[12px] border-[1.5px] border-navy px-4 text-sm font-semibold text-navy hover:bg-navy/5 dark:border-ivory dark:text-ivory";
+  const link = "inline-flex min-h-11 items-center gap-1.5 rounded-[12px] border-[1.5px] border-navy px-4 text-[15px] font-semibold text-navy hover:bg-navy/5 dark:border-ivory dark:text-ivory";
 
   return (
     <section className="mt-10 text-left" aria-labelledby="next-steps" data-testid="owner-next-steps">
@@ -27,7 +27,7 @@ export function OwnerNextSteps({ locale, slug, title, live }: { locale: Locale; 
         {live && (
           <div className={card}>
             <div className="flex items-center gap-2 font-display font-semibold"><Share2 size={16} aria-hidden /> {tx(locale, "Comparte tu casa", "Share your home")}</div>
-            <p className="mt-0.5 text-sm text-muted">{tx(locale, "Mándala a familiares, amigos y grupos de tu zona: así llegan las primeras visitas.", "Send it to family, friends and local groups: that’s how the first visits come in.")}</p>
+            <p className="mt-0.5 text-[15px] text-muted">{tx(locale, "Mándala a familiares, amigos y grupos de tu zona: así llegan las primeras visitas.", "Send it to family, friends and local groups: that’s how the first visits come in.")}</p>
             <div className="mt-3 flex flex-wrap gap-2">
               <button
                 type="button"
@@ -55,12 +55,12 @@ export function OwnerNextSteps({ locale, slug, title, live }: { locale: Locale; 
         )}
         <div className={card}>
           <div className="flex items-center gap-2 font-display font-semibold"><ImagePlus size={16} aria-hidden /> {tx(locale, "Añade más fotos", "Add more photos")}</div>
-          <p className="mt-0.5 text-sm text-muted">{tx(locale, "Los anuncios con 8 fotos o más reciben muchas más visitas. Súbelas desde «Mis inmuebles».", "Listings with 8 photos or more get far more visits. Upload them from “My properties”.")}</p>
+          <p className="mt-0.5 text-[15px] text-muted">{tx(locale, "Los anuncios con 8 fotos o más reciben muchas más visitas. Súbelas desde «Mis inmuebles».", "Listings with 8 photos or more get far more visits. Upload them from “My properties”.")}</p>
           <Link href={`/${locale}/owner/listings`} className={`${link} mt-3`}>{tx(locale, "Subir fotos", "Upload photos")}</Link>
         </div>
         <div className={card}>
           <div className="flex items-center gap-2 font-display font-semibold"><MessagesSquare size={16} aria-hidden /> {tx(locale, "Ver tus mensajes", "See your messages")}</div>
-          <p className="mt-0.5 text-sm text-muted">{tx(locale, "Ahí te llegan las consultas y las visitas. Tú las confirmas y atiendes a cada persona.", "Enquiries and visit requests land there. You confirm them and meet each person.")}</p>
+          <p className="mt-0.5 text-[15px] text-muted">{tx(locale, "Ahí te llegan las consultas y las visitas. Tú las confirmas y atiendes a cada persona.", "Enquiries and visit requests land there. You confirm them and meet each person.")}</p>
           <Link href={`/${locale}/owner/listings#mensajes`} className={`${link} mt-3`}>{tx(locale, "Ir a mis mensajes", "Go to my messages")}</Link>
         </div>
       </div>

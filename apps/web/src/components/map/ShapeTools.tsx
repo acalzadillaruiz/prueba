@@ -59,7 +59,7 @@ export function ShapeTools({
   }, [open]);
 
   if (!enabled && !toolbar) return null;
-  const pillCls = "flex min-h-11 items-center gap-1.5 rounded-[12px] border px-3.5 font-display text-sm transition-colors duration-np";
+  const pillCls = "flex min-h-11 items-center gap-1.5 rounded-[12px] border px-3.5 font-display text-[15px] transition-colors duration-np";
   const items = [
     ["draw", PenLine, tx(locale, "Dibujar zona", "Draw an area"), tx(locale, "Toca el mapa punto a punto", "Tap the map point by point")],
     ["radius", Circle, tx(locale, "Radio 1,2 km", "1.2 km radius"), tx(locale, "Toca el centro en el mapa", "Tap the centre on the map")],
@@ -109,7 +109,7 @@ export function ShapeTools({
                   key={m}
                   type="button"
                   role="menuitem"
-                  className={cn("flex min-h-11 w-full items-center gap-2.5 rounded-xl px-3 py-1.5 text-left font-display text-sm", ctlHover)}
+                  className={cn("flex min-h-11 w-full items-center gap-2.5 rounded-xl px-3 py-1.5 text-left font-display text-[15px]", ctlHover)}
                   onKeyDown={(e) => {
                     if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
                     e.preventDefault();
@@ -137,7 +137,7 @@ export function ShapeTools({
       {enabled && mode === "draw" && draftCount >= 3 && (
         <button
           type="button"
-          className="np-btn-navy min-h-11 rounded-[12px] bg-navy px-4 font-display text-sm font-semibold text-ivory "
+          className="np-btn-navy min-h-11 rounded-[12px] bg-navy px-4 font-display text-[15px] font-semibold text-ivory "
           onClick={(e) => {
             e.stopPropagation();
             onClosePoly();

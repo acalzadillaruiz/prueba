@@ -60,7 +60,7 @@ export function HeroSearch({ locale }: { locale: Locale }) {
   };
   // Picking a suggested place searches straight away, with the tab, type and budget already chosen.
   const suggest = usePlaceSuggest({ locale, text, setText, onPick: (next) => void go(next) });
-  const label = "block font-display text-[14px] font-medium text-[#3A6A92]";
+  const label = "block font-display text-[15px] font-medium text-[#3A6A92]";
   const field = "w-full bg-transparent font-display text-[15px] text-[#1F3A4D] placeholder:text-[#1F3A4D]/50 focus:outline-none";
   return (
     <form

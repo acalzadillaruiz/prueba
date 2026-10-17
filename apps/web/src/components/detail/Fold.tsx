@@ -17,7 +17,7 @@ export function Fold({ title, hint, children, className, testId, openFrom = 1024
   }, [openFrom]);
   return (
     <section className={className} data-testid={testId} data-open={open || undefined}>
-      <h3 className="font-title text-[26px] font-normal leading-[1.15] [text-wrap:balance] md:text-[30px]">
+      <h3 className="font-title text-[28px] font-normal leading-[1.15] [text-wrap:balance] md:text-[28px]">
         <button
           type="button"
           aria-expanded={open}
@@ -33,7 +33,7 @@ export function Fold({ title, hint, children, className, testId, openFrom = 1024
         </button>
       </h3>
       {/* The hint sits under the heading (not inside it), so the heading itself stays short. */}
-      {hint && !open && <p id={`${id}-hint`} className="mt-1 pr-14 font-display text-[14px] leading-snug text-muted">{hint}</p>}
+      {hint && !open && <p id={`${id}-hint`} className="mt-1 pr-14 font-display text-[15px] leading-snug text-muted">{hint}</p>}
       <div id={id} hidden={!open} className="pt-5">
         {children}
       </div>

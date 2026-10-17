@@ -78,7 +78,7 @@ export function OwnerVisitHours({ listingId, locale, initial, onDone }: { listin
       setBusy(null);
     }
   };
-  const sel = "h-10 rounded-lg border border-line bg-white px-2 text-sm aria-[invalid=true]:border-danger dark:bg-white/5";
+  const sel = "h-10 rounded-lg border border-line bg-white px-2 text-[15px] aria-[invalid=true]:border-danger dark:bg-white/5";
 
   return (
     <form
@@ -98,17 +98,17 @@ export function OwnerVisitHours({ listingId, locale, initial, onDone }: { listin
       }}
     >
       <div>
-        <div className="font-serif text-[22px] font-light leading-tight">{tx(locale, "Horario de visitas", "Visit hours")}</div>
-        <p className="mt-1 text-sm text-muted">
+        <div className="font-serif text-[20px] font-light leading-tight">{tx(locale, "Horario de visitas", "Visit hours")}</div>
+        <p className="mt-1 text-[15px] text-muted">
           {tx(locale, "Elige cuándo puedes enseñar tu casa. Quien la vea en New Place podrá reservar una de esas horas y tú la confirmas desde aquí.", "Choose when you can show your home. People on New Place can book one of those times and you confirm it from here.")}
         </p>
       </div>
 
       <div>
-        <div className="mb-2 text-sm font-semibold">{tx(locale, "Cuánto dura cada visita", "How long each visit lasts")}</div>
+        <div className="mb-2 text-[15px] font-semibold">{tx(locale, "Cuánto dura cada visita", "How long each visit lasts")}</div>
         <div className="flex flex-wrap gap-2" role="radiogroup" aria-label={tx(locale, "Duración de cada visita", "Length of each visit")}>
           {SLOT_MINUTES.map((m) => (
-            <button key={m} type="button" role="radio" aria-checked={slotMin === m} onClick={() => setSlotMin(m)} className={cn("inline-flex min-h-9 items-center gap-1.5 rounded-[12px] border px-3.5 py-1.5 text-sm font-semibold", slotMin === m ? "border-navy bg-navy text-ivory" : "border-line bg-white dark:bg-transparent")}>
+            <button key={m} type="button" role="radio" aria-checked={slotMin === m} onClick={() => setSlotMin(m)} className={cn("inline-flex min-h-9 items-center gap-1.5 rounded-[12px] border px-3.5 py-1.5 text-[15px] font-semibold", slotMin === m ? "border-navy bg-navy text-ivory" : "border-line bg-white dark:bg-transparent")}>
               {slotMin === m && <Check size={14} aria-hidden />} {m} min
             </button>
           ))}
@@ -120,9 +120,9 @@ export function OwnerVisitHours({ listingId, locale, initial, onDone }: { listin
           const mine = ranges.map((r, i) => [r, i] as const).filter(([r]) => r.day === day);
           return (
             <li key={day} className="flex flex-wrap items-start gap-x-3 gap-y-2 px-3 py-2.5">
-              <span className="w-24 shrink-0 pt-2 text-sm font-semibold">{tx(locale, ...name)}</span>
+              <span className="w-24 shrink-0 pt-2 text-[15px] font-semibold">{tx(locale, ...name)}</span>
               <div className="min-w-0 flex-1 space-y-2">
-                {mine.length === 0 && <div className="pt-2 text-sm text-muted">{tx(locale, "Sin visitas", "No visits")}</div>}
+                {mine.length === 0 && <div className="pt-2 text-[15px] text-muted">{tx(locale, "Sin visitas", "No visits")}</div>}
                 {mine.map(([r, i]) => {
                   const issue = showErr ? issues.ranges[i] : undefined;
                   const label = `${tx(locale, ...name)} ${r.from}–${r.to}`;
@@ -155,13 +155,13 @@ export function OwnerVisitHours({ listingId, locale, initial, onDone }: { listin
         })}
       </ul>
       {ranges.some((r) => r.day === 0) && (
-        <button type="button" className="inline-flex min-h-9 items-center gap-1.5 text-sm font-semibold text-navy underline decoration-navy/30 underline-offset-4 dark:text-ivory" onClick={copyMondayToWeekdays}>
+        <button type="button" className="inline-flex min-h-9 items-center gap-1.5 text-[15px] font-semibold text-navy underline decoration-navy/30 underline-offset-4 dark:text-ivory" onClick={copyMondayToWeekdays}>
           <Copy size={14} aria-hidden /> {tx(locale, "Copiar el lunes de martes a viernes", "Copy Monday to Tuesday–Friday")}
         </button>
       )}
       <p className="text-[13px] text-muted">{tx(locale, "Hora de Caracas. Se reserva con al menos 2 horas de antelación y hasta 8 días antes. Tus datos de contacto no se muestran: te llega cada pedido aquí y por correo.", "Caracas time. Bookings need at least 2 hours’ notice, up to 8 days ahead. Your contact details aren’t shown: each request reaches you here and by email.")}</p>
-      {err && <div role="alert" className="rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-sm text-danger">{err}</div>}
-      {showErr && hasIssues && <p role="alert" className="text-sm font-semibold text-danger">{tx(locale, "Revisa las franjas marcadas.", "Check the highlighted ranges.")}</p>}
+      {err && <div role="alert" className="rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-[15px] text-danger">{err}</div>}
+      {showErr && hasIssues && <p role="alert" className="text-[15px] font-semibold text-danger">{tx(locale, "Revisa las franjas marcadas.", "Check the highlighted ranges.")}</p>}
       <div className="flex flex-wrap gap-2">
         <Button type="submit" variant="navy" size="sm" disabled={!!busy}>{busy === "save" ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />} {tx(locale, "Guardar horario", "Save hours")}</Button>
         {initial && (

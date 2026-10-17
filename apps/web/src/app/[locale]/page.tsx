@@ -97,7 +97,7 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
 
       {/* ZONES (043): a still line of places, no endless marquee. */}
       <div className="np-gutter bg-arena pt-[var(--np-section)]">
-        <ul aria-label={tx(locale, "Dónde estamos", "Where we are")} data-reveal className="mx-auto flex max-w-[1280px] flex-wrap gap-x-6 gap-y-1 font-title text-[28px] font-light text-ink md:gap-x-10 md:text-[40px]">
+        <ul aria-label={tx(locale, "Dónde estamos", "Where we are")} data-reveal className="mx-auto flex max-w-[1280px] flex-wrap gap-x-6 gap-y-1 font-title text-[28px] font-light text-ink md:gap-x-10 md:text-[36px]">
           {marquee.map((z) => (
             <li key={z}>{z}</li>
           ))}

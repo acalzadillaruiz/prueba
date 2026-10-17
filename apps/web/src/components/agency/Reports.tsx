@@ -46,7 +46,7 @@ function SourceBars({ locale, rows }: { locale: Locale; rows: ReportData["bySour
         const label = tx(locale, SOURCE[r.source]?.[0] ?? r.source, SOURCE[r.source]?.[1] ?? r.source);
         const share = total ? Math.round((r.count / total) * 100) : 0;
         return (
-          <li key={r.source} className="grid grid-cols-[minmax(0,9.5rem)_1fr_auto] items-center gap-3 text-[14px]">
+          <li key={r.source} className="grid grid-cols-[minmax(0,9.5rem)_1fr_auto] items-center gap-3 text-[15px]">
             <span className="truncate">{label}</span>
             <span className="h-2.5 rounded-full bg-[#FAF8F4] dark:bg-white/[.06]" aria-hidden>
               <span className="block h-full rounded-full bg-[#81776F] dark:bg-[#8C817A]" style={{ width: `${(r.count / max) * 100}%` }} />
@@ -65,7 +65,7 @@ function SourceBars({ locale, rows }: { locale: Locale; rows: ReportData["bySour
 function Cell({ label, children, muted, className }: { label: ReactNode; children: ReactNode; muted?: boolean; className?: string }) {
   return (
     <div className={cn("min-w-0", className)}>
-      <dt className="text-[12px] font-semibold uppercase leading-tight tracking-[.1em] text-muted dark:text-mist">{label}</dt>
+      <dt className="text-[13px] font-semibold uppercase leading-tight tracking-[.1em] text-muted dark:text-mist">{label}</dt>
       <dd className={cn("mt-0.5 font-display text-[15px] font-semibold [font-feature-settings:'lnum','tnum']", muted && k.muted)}>{children}</dd>
     </div>
   );
@@ -86,7 +86,7 @@ export function ReportsView({ locale, data, days }: { locale: Locale; data: Repo
       }
     >
       <nav className="mb-5 flex flex-wrap items-center gap-2" aria-label={tx(locale, "Periodo del informe", "Report period")}>
-        <span className={cn("mr-1 text-[14px]", k.muted)}>{tx(locale, "Periodo", "Period")}</span>
+        <span className={cn("mr-1 text-[15px]", k.muted)}>{tx(locale, "Periodo", "Period")}</span>
         {PERIODS.map((p) => (
           <Link key={p} href={`/${locale}/agency/reports?d=${p}`} aria-current={p === days ? "page" : undefined} className={tab(p === days)} scroll={false}>
             {tx(locale, `${p} días`, `${p} days`)}
@@ -107,7 +107,7 @@ export function ReportsView({ locale, data, days }: { locale: Locale; data: Repo
       <div className="mt-6 grid gap-6 [&>*]:min-w-0">
         <div className="grid content-start gap-6 [&>*]:min-w-0 2xl:grid-cols-2">
           <Panel title={tx(locale, `Leads por origen (${d})`, `Leads by source (${d})`)}>
-            {data.bySource.length ? <SourceBars locale={locale} rows={data.bySource} /> : <p className={cn("text-[14px]", k.muted)}>{tx(locale, "Sin leads en este periodo.", "No leads in this period.")}</p>}
+            {data.bySource.length ? <SourceBars locale={locale} rows={data.bySource} /> : <p className={cn("text-[15px]", k.muted)}>{tx(locale, "Sin leads en este periodo.", "No leads in this period.")}</p>}
           </Panel>
           <Panel title={tx(locale, `Por agente (${d})`, `By agent (${d})`)}>
             {data.byAgent.length ? (
@@ -131,8 +131,8 @@ export function ReportsView({ locale, data, days }: { locale: Locale; data: Repo
                 ))}
               </ul>
               <ScrollRegion label={tx(locale, "Por agente", "By agent")} className="hidden md:block">
-              <table className="w-full min-w-[26rem] text-[14px]" data-testid="report-agents">
-                <thead className={cn("text-left", k.th, "text-[12px]")}>
+              <table className="w-full min-w-[26rem] text-[15px]" data-testid="report-agents">
+                <thead className={cn("text-left", k.th, "text-[13px]")}>
                   <tr>
                     <th className="pb-2">{tx(locale, "Agente", "Agent")}</th>
                     <th className="pb-2 text-right">Leads</th>
@@ -156,7 +156,7 @@ export function ReportsView({ locale, data, days }: { locale: Locale; data: Repo
               </ScrollRegion>
               </>
             ) : (
-              <p className={cn("text-[14px]", k.muted)}>{tx(locale, "Aún no hay agentes en el equipo.", "No agents on the team yet.")}</p>
+              <p className={cn("text-[15px]", k.muted)}>{tx(locale, "Aún no hay agentes en el equipo.", "No agents on the team yet.")}</p>
             )}
             <p className={cn("mt-3 text-[13px]", k.muted)}>{tx(locale, "Los cierres se cuentan igual que en el panel y en Auditoría.", "Closings are counted the same way as on the dashboard and in Audit.")}</p>
           </Panel>
@@ -180,8 +180,8 @@ export function ReportsView({ locale, data, days }: { locale: Locale; data: Repo
             ))}
           </ul>
           <ScrollRegion label={tx(locale, "Por zona", "By area")} className="hidden md:block">
-          <table className="w-full min-w-[34rem] text-[14px] [&_td+td]:whitespace-nowrap [&_td+td]:pl-4 [&_th+th]:pl-4">
-            <thead className={cn("text-left", k.th, "text-[12px]")}>
+          <table className="w-full min-w-[34rem] text-[15px] [&_td+td]:whitespace-nowrap [&_td+td]:pl-4 [&_th+th]:pl-4">
+            <thead className={cn("text-left", k.th, "text-[13px]")}>
               <tr>
                 <th className="w-[34%] pb-2">{tx(locale, "Zona", "Area")}</th>
                 <th className="pb-2 text-right">{tx(locale, "Activos", "Active")}</th>
@@ -208,7 +208,7 @@ export function ReportsView({ locale, data, days }: { locale: Locale; data: Repo
           <p className={cn("mt-3 text-[13px]", k.muted)}>{tx(locale, "Foto de hoy (no depende del periodo). Vacacional (precio por noche) y comercial no se promedian por m².", "Today's snapshot (not tied to the period). Vacation rentals (nightly price) and commercial listings are not averaged per m².")}</p>
         </Panel>
       </div>
-      <div className={cn("mt-6 flex items-center gap-3 rounded-[16px] border border-dashed p-4 text-sm", k.line, k.muted)}>
+      <div className={cn("mt-6 flex items-center gap-3 rounded-[16px] border border-dashed p-4 text-[15px]", k.line, k.muted)}>
         <FileSpreadsheet size={18} strokeWidth={1.6} className="shrink-0 text-navy dark:text-ivory" /> {tx(locale, "El CSV incluye inmuebles, estado, precio, valor estimado New Place, impresiones, guardados, leads y calidad. Listo para Excel o Google Sheets.", "The CSV includes listings, status, price, PlaceEstimate, impressions, saves, leads and quality. Ready for Excel or Google Sheets.")}
       </div>
     </AdminShell>

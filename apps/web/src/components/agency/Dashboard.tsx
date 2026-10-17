@@ -68,7 +68,7 @@ export function AgencyDashboard({ locale, stats, listings, newLeads, tours, agen
         <Panel className="flex flex-col" bodyClass="flex min-h-0 flex-1 flex-col" title={tx(locale, "Leads por día", "Leads per day")} action={<span className={cn("pt-2 text-[13px]", k.muted)}>{tx(locale, "Últimos 14 días", "Last 14 days")}</span>}>
           <BarChart data={days} height={220} fill />
         </Panel>
-        <Panel title={tx(locale, "Leads sin responder", "Unanswered leads")} action={<Link href={`/${locale}/agency/leads`} className={cn("pt-2 text-[14px]", k.link)}>{tx(locale, "Bandeja", "Inbox")} <ArrowUpRight size={13} className="inline" /></Link>}>
+        <Panel title={tx(locale, "Leads sin responder", "Unanswered leads")} action={<Link href={`/${locale}/agency/leads`} className={cn("pt-2 text-[15px]", k.link)}>{tx(locale, "Bandeja", "Inbox")} <ArrowUpRight size={13} className="inline" /></Link>}>
           {newLeads.length === 0 && <p className={cn("text-[15px]", k.muted)}>{tx(locale, "Todos los leads tienen respuesta.", "Every lead has been answered.")}</p>}
           <ul className={cn("divide-y", k.divide)}>
             {newLeads.slice(0, 4).map((ld) => {
@@ -92,7 +92,7 @@ export function AgencyDashboard({ locale, stats, listings, newLeads, tours, agen
         </Panel>
       </div>
 
-      <Panel className="mt-6" title={tx(locale, "Rendimiento por inmueble", "Performance by listing")} action={<Link href={`/${locale}/agency/listings`} className={cn("pt-2 text-[14px]", k.link)}>{tx(locale, "Ver todos", "See all")}</Link>}>
+      <Panel className="mt-6" title={tx(locale, "Rendimiento por inmueble", "Performance by listing")} action={<Link href={`/${locale}/agency/listings`} className={cn("pt-2 text-[15px]", k.link)}>{tx(locale, "Ver todos", "See all")}</Link>}>
         {top.length === 0 && <Empty title={tx(locale, "Aún no hay inmuebles", "No listings yet")} body={tx(locale, "Publica el primero y aquí verás vistas, guardados y leads.", "Publish the first one to see views, saves and leads here.")} />}
         <ul className={cn("divide-y", k.divide)}>
           {top.map((l) => (
@@ -125,13 +125,13 @@ export function AgencyDashboard({ locale, stats, listings, newLeads, tours, agen
           <ul className="space-y-3.5">
             {stats.ranking.map(({ id, name, leads: n, won, respMin, gmv }, i) => (
               <li key={id} className="flex items-center gap-3">
-                <span className={cn("w-4 font-serif text-[18px]", k.muted)}>{i + 1}</span>
+                <span className={cn("w-4 font-serif text-[20px]", k.muted)}>{i + 1}</span>
                 <Initials name={name} size={38} />
                 <div className="min-w-0 flex-1">
                   <div className="truncate font-semibold">{name}</div>
                   <div className={cn("text-[13px]", k.muted)}>{n} leads · {won} {tx(locale, "cierres", "won")} · <span className="whitespace-nowrap">{tx(locale, "resp.", "resp.")} {respMin == null ? "—" : `${respMin}\u00a0min`}</span></div>
                 </div>
-                <div className={cn(k.num, "text-right text-[14px] tracking-normal")}>{gmv ? money(gmv, locale) : "—"}</div>
+                <div className={cn(k.num, "text-right text-[15px] tracking-normal")}>{gmv ? money(gmv, locale) : "—"}</div>
               </li>
             ))}
           </ul>
@@ -146,7 +146,7 @@ export function AgencyDashboard({ locale, stats, listings, newLeads, tours, agen
               const w = weekOffset(t.start);
               return (
                 <li key={t.id}>
-                  <Link href={`/${locale}/agency/calendar${w ? `?w=${w}` : ""}`} className={cn("-mx-2 block rounded-xl px-2 py-2.5 text-[14px]", k.hover)}>
+                  <Link href={`/${locale}/agency/calendar${w ? `?w=${w}` : ""}`} className={cn("-mx-2 block rounded-xl px-2 py-2.5 text-[15px]", k.hover)}>
                     <span className="flex items-center justify-between gap-3">
                       <span className="font-semibold first-letter:uppercase">{dateTime(t.start, locale)}</span>
                       <Pill tone={t.status === "CONFIRMED" ? "ok" : "warn"}>{t.status === "CONFIRMED" ? tx(locale, "Confirmada", "Confirmed") : tx(locale, "Pendiente", "Pending")}</Pill>
@@ -161,7 +161,7 @@ export function AgencyDashboard({ locale, stats, listings, newLeads, tours, agen
             })}
           </ul>
           {tours.length > 0 && (
-            <Link href={`/${locale}/agency/calendar`} className={cn("mt-3 inline-block text-[14px]", k.link)}>
+            <Link href={`/${locale}/agency/calendar`} className={cn("mt-3 inline-block text-[15px]", k.link)}>
               {tx(locale, "Ver calendario", "Open calendar")} <ArrowUpRight size={13} className="inline" />
             </Link>
           )}

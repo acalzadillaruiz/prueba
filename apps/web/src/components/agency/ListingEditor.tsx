@@ -246,7 +246,7 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
                 );
               })}
             </div>
-            <div className="mt-4 flex flex-wrap gap-4 text-sm">
+            <div className="mt-4 flex flex-wrap gap-4 text-[15px]">
               <label className="flex items-center gap-2"><input type="checkbox" disabled={!canEdit} checked={f.hasFloorplan} onChange={(e) => { setF({ ...f, hasFloorplan: e.target.checked }); dirty(); }} className="h-4 w-4 accent-navy dark:accent-[#EFE6D8]" /> {tx(locale, "Tiene plano", "Has floor plan")}</label>
               <label className="flex items-center gap-2"><input type="checkbox" disabled={!canEdit} checked={f.hasVirtualTour} onChange={(e) => { setF({ ...f, hasVirtualTour: e.target.checked }); dirty(); }} className="h-4 w-4 accent-navy dark:accent-[#EFE6D8]" /> {tx(locale, "Tour virtual", "Virtual tour")}</label>
             </div>
@@ -359,7 +359,7 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
               <span className={cn(k.num, "text-[36px] leading-none", quality >= 85 ? k.okText : k.warnText)}>{quality}</span>
             </div>
             <div className="mt-3 h-2 rounded-full bg-[#E3E8EC] dark:bg-white/10"><div className="h-full rounded-full bg-ok" style={{ width: `${quality}%` }} /></div>
-            <ul className="mt-4 space-y-2 text-sm">
+            <ul className="mt-4 space-y-2 text-[15px]">
               {checks.map(([ok, t, pts]) => (
                 <li key={t} className={cn("flex items-center gap-2", ok ? "text-navy dark:text-ivory" : k.muted)}>
                   {ok ? <Check size={15} className={k.okText} /> : <span className="h-3.5 w-3.5 rounded-full border-2 border-current" />} {t}
@@ -372,13 +372,13 @@ export function ListingEditor({ l, locale, photos: initialPhotos, commission, ca
           {showCommission && <div className={section}>
             <h2 className={k.title}>{tx(locale, "Comisión estimada", "Estimated commission")}</h2>
             <div className={cn(k.num, "mt-3 text-[36px] leading-none")}>{money(commissionValue, locale)}</div>
-            <div className={cn("mt-2 text-sm", k.muted)}>{l.listingType === "SHORT_RENT" ? tx(locale, `${commission.pct} % de 30 noches`, `${commission.pct} % of 30 nights`) : l.listingType.includes("RENT") ? tx(locale, `${commission.rentMonths} ${commission.rentMonths === 1 ? "mes" : "meses"} de canon`, `${commission.rentMonths} month${commission.rentMonths === 1 ? "" : "s"} of rent`) : `${commission.pct} %`} · {tx(locale, "agente", "agent")} {commission.split} % = {money((commissionValue * commission.split) / 100, locale)}</div>
+            <div className={cn("mt-2 text-[15px]", k.muted)}>{l.listingType === "SHORT_RENT" ? tx(locale, `${commission.pct} % de 30 noches`, `${commission.pct} % of 30 nights`) : l.listingType.includes("RENT") ? tx(locale, `${commission.rentMonths} ${commission.rentMonths === 1 ? "mes" : "meses"} de canon`, `${commission.rentMonths} month${commission.rentMonths === 1 ? "" : "s"} of rent`) : `${commission.pct} %`} · {tx(locale, "agente", "agent")} {commission.split} % = {money((commissionValue * commission.split) / 100, locale)}</div>
           </div>}
           <div className={section}>
             <h2 className={cn(k.title, "mb-3")}>{tx(locale, "Rendimiento", "Performance")}</h2>
-            <div className="grid grid-cols-2 gap-3 text-sm">
+            <div className="grid grid-cols-2 gap-3 text-[15px]">
               {[[tx(locale, "Impresiones", "Impressions"), num2(l.stats.impressions, locale)], [tx(locale, "Guardados", "Saves"), l.stats.saves], ["Leads", l.stats.leads], [tx(locale, "Tiempo medio", "Avg. time"), dwell(l.stats.avgTimeSec)], [tx(locale, "Interacciones", "Interactions"), l.stats.interactions], [tx(locale, "Días en mercado", "Days on market"), l.daysOnMarket]].map(([t, v]) => (
-                <div key={String(t)} className={cn("rounded-xl p-3.5", k.soft)}><div className={cn("text-[13px] font-semibold", k.muted)}>{t}</div><div className={cn(k.num, "mt-1 text-[22px] leading-none")}>{v}</div></div>
+                <div key={String(t)} className={cn("rounded-xl p-3.5", k.soft)}><div className={cn("text-[13px] font-semibold", k.muted)}>{t}</div><div className={cn(k.num, "mt-1 text-[20px] leading-none")}>{v}</div></div>
               ))}
             </div>
           </div>

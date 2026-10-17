@@ -92,33 +92,33 @@ export function StickyContactBar({ locale, price, amount, meta, suffix, tour, st
       <div className="flex items-center gap-2">
         <div ref={box} className="relative min-w-0 flex-1">
           {/* Off-screen copy of the full price + suffix, measured to decide whether the compact figure is needed. */}
-          <span ref={probe} aria-hidden className="pointer-events-none invisible absolute left-0 top-0 whitespace-nowrap font-title text-[24px] leading-tight [font-variant-numeric:lining-nums_tabular-nums] min-[400px]:text-[26px]">
+          <span ref={probe} aria-hidden className="pointer-events-none invisible absolute left-0 top-0 whitespace-nowrap font-title text-[28px] leading-tight [font-variant-numeric:lining-nums_tabular-nums] min-[400px]:text-[28px]">
             {price}
-            <span className="font-display text-sm font-normal">{suffix}</span>
+            <span className="font-display text-[15px] font-normal">{suffix}</span>
           </span>
-          <div className="whitespace-nowrap font-title text-[24px] leading-tight [font-variant-numeric:lining-nums_tabular-nums] min-[400px]:text-[26px]" data-sticky-price>
+          <div className="whitespace-nowrap font-title text-[28px] leading-tight [font-variant-numeric:lining-nums_tabular-nums] min-[400px]:text-[28px]" data-sticky-price>
             {compact && <span className="sr-only">{price}{suffix}</span>}
             <span aria-hidden={compact || undefined}>{shownPrice}</span>
-            <span aria-hidden={compact || undefined} className={cn("font-display text-sm font-normal", dark ? "text-mist" : "text-muted")}>{suffix}</span>
+            <span aria-hidden={compact || undefined} className={cn("font-display text-[15px] font-normal", dark ? "text-mist" : "text-muted")}>{suffix}</span>
           </div>
           {meta && <div className={cn("truncate font-display text-[13px] leading-snug", dark ? "text-mist" : "text-muted")}>{meta}</div>}
         </div>
         {whatsapp ? (
           <>
             {/* One terracotta action: WhatsApp with the advisor. The tour form stays one tap away (navy outline). */}
-            <button onClick={go} tabIndex={shown ? 0 : -1} aria-label={label} className={cn("np-btn-outline inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-1.5 rounded-[12px] border-[1.5px] px-3.5 font-display text-sm font-semibold max-[399px]:gap-1 max-[399px]:px-2.5", dark ? "border-ivory text-ivory" : "border-navy text-navy")}>
+            <button onClick={go} tabIndex={shown ? 0 : -1} aria-label={label} className={cn("np-btn-outline inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-1.5 rounded-[12px] border-[1.5px] px-3.5 font-display text-[15px] font-semibold max-[399px]:gap-1 max-[399px]:px-2.5", dark ? "border-ivory text-ivory" : "border-navy text-navy")}>
               <Icon size={17} aria-hidden />
               <span>{short}</span>
             </button>
             {/* Below 380 px WhatsApp keeps only its (universally known) glyph; the name stays for screen readers.
                 "Disponibilidad" (vacation rentals) is longer than "Visita", so there the glyph-only button starts at 420 px. */}
-            <a href={whatsapp} target="_blank" rel="noopener noreferrer" tabIndex={shown ? 0 : -1} className={cn("inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-2 rounded-[12px] bg-coral-cta px-3.5 font-display text-sm font-semibold text-white hover:bg-coral-cta-hover max-[399px]:px-3 max-[379px]:px-0", stay && "max-[419px]:px-0")}>
+            <a href={whatsapp} target="_blank" rel="noopener noreferrer" tabIndex={shown ? 0 : -1} className={cn("inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-2 rounded-[12px] bg-coral-cta px-3.5 font-display text-[15px] font-semibold text-white hover:bg-coral-cta-hover max-[399px]:px-3 max-[379px]:px-0", stay && "max-[419px]:px-0")}>
               <WhatsAppIcon size={17} /> <span className={stay ? "max-[419px]:sr-only" : "max-[379px]:sr-only"}>WhatsApp</span>
               {agentFirst && <span className="sr-only">{tx(locale, ` con ${agentFirst}`, ` ${agentFirst}`)}</span>}
             </a>
           </>
         ) : (
-          <button onClick={go} tabIndex={shown ? 0 : -1} aria-label={stay ? label : undefined} className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-[12px] bg-coral-cta px-5 font-display text-sm font-semibold text-white hover:bg-coral-cta-hover">
+          <button onClick={go} tabIndex={shown ? 0 : -1} aria-label={stay ? label : undefined} className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-[12px] bg-coral-cta px-5 font-display text-[15px] font-semibold text-white hover:bg-coral-cta-hover">
             <Icon size={16} aria-hidden />
             {/* "Consultar disponibilidad" doesn't fit beside the price on phones: the bar shows "Disponibilidad". */}
             {stay ? short : label}

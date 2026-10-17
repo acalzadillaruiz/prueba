@@ -99,7 +99,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
   const a11y = (k: keyof F) => ({ "aria-invalid": !!fieldMsg[k], "aria-describedby": fieldMsg[k] ? errId(k) : undefined });
   const fieldErr = (k: keyof F) =>
     fieldMsg[k] ? (
-      <p id={errId(k)} className="mt-1 px-1 text-sm font-semibold text-danger">
+      <p id={errId(k)} className="mt-1 px-1 text-[15px] font-semibold text-danger">
         {fieldMsg[k]}
       </p>
     ) : null;
@@ -174,8 +174,8 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
   const confirmer = first || (fsbo ? tx(locale, "su dueño", "the owner") : tx(locale, "el anunciante", "the lister"));
   const initials = (agent?.name ?? agency?.name ?? "NP").split(" ").map((p) => p[0]).slice(0, 2).join("");
   const box = dark ? "bg-navy-card text-ivory outline-navy-line" : "np-glass outline-0";
-  const seg = (active: boolean) => cn("flex min-h-11 items-center justify-center gap-1.5 rounded-[12px] border-2 font-display text-sm transition-colors duration-np focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2", dark ? "focus-visible:outline-ivory" : "focus-visible:outline-ink", active ? "np-sel font-semibold" : "border-transparent text-muted hover:text-ink");
-  const quietLink = cn("inline-flex min-h-11 items-center gap-1.5 rounded-[12px] px-1 text-sm font-semibold underline decoration-current/30 underline-offset-4 hover:decoration-current focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-60", dark ? "text-ivory focus-visible:outline-ivory" : "text-navy focus-visible:outline-navy");
+  const seg = (active: boolean) => cn("flex min-h-11 items-center justify-center gap-1.5 rounded-[12px] border-2 font-display text-[15px] transition-colors duration-np focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2", dark ? "focus-visible:outline-ivory" : "focus-visible:outline-ink", active ? "np-sel font-semibold" : "border-transparent text-muted hover:text-ink");
+  const quietLink = cn("inline-flex min-h-11 items-center gap-1.5 rounded-[12px] px-1 text-[15px] font-semibold underline decoration-current/30 underline-offset-4 hover:decoration-current focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-60", dark ? "text-ivory focus-visible:outline-ivory" : "text-navy focus-visible:outline-navy");
   const modes: Mode[] = stay ? ["stay", "msg"] : bookable ? ["tour", "msg"] : ["msg"];
   const onTabKey = (e: React.KeyboardEvent) => {
     if (e.key !== "ArrowRight" && e.key !== "ArrowLeft" && e.key !== "Home" && e.key !== "End") return;
@@ -269,13 +269,13 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
     <div id="contact-panel" tabIndex={-1} data-hide-fab className={cn("rounded-[16px] p-6 outline outline-1 -outline-offset-1", box)}>
       {(agent || agency) && (
         <div className="flex items-center gap-4">
-          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#EFE6D8] font-serif text-[22px] font-light text-[#1F3A4D]" aria-hidden>{initials}</span>
+          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#EFE6D8] font-serif text-[20px] font-light text-[#1F3A4D]" aria-hidden>{initials}</span>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-1.5 text-[17px] font-semibold">
               {agent?.name ?? agency?.name}
               {agent?.verified && <ShieldCheck size={15} className="text-ok" aria-label={tx(locale, "Verificado", "Verified")} />}
             </div>
-            <div className={cn("text-sm", muted)}>
+            <div className={cn("text-[15px]", muted)}>
               {/* FSBO: the person shown is the owner (no agent), never "Asesor". Gender-neutral wording. */}
               {fsbo
                 ? tx(locale, "Dueño · publica sin intermediarios", "Owner · no middlemen")
@@ -287,7 +287,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
           </div>
         </div>
       )}
-      {!agent && !agency && <div className={cn("text-sm", muted)}>{tx(locale, "Publicada por su dueño · sin intermediarios", "Listed by the owner · no middlemen")}</div>}
+      {!agent && !agency && <div className={cn("text-[15px]", muted)}>{tx(locale, "Publicada por su dueño · sin intermediarios", "Listed by the owner · no middlemen")}</div>}
       <div role="tablist" aria-label={tx(locale, "Cómo quieres contactar", "How to get in touch")} className={cn("mt-5 grid gap-1 rounded-[12px] bg-[#EEF2F5] p-1 dark:bg-white/5", modes.length > 1 ? "grid-cols-2" : "grid-cols-1")} onKeyDown={onTabKey}>
         {modes.map((m) => (
           <button
@@ -312,14 +312,14 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
       <div role="tabpanel" id={`${uid}-panel`} aria-labelledby={`${uid}-tab-${mode}`}>
         {mode === "stay" && (
           <div className="mt-5" data-testid="stay-ask">
-            <div className="font-display text-[14px] font-medium text-gold-text">{tx(locale, "¿Cuándo quieres venir?", "When would you like to stay?")}</div>
-            <p className={cn("mb-3 mt-1 text-sm", muted)} data-testid="stay-card-terms">
+            <div className="font-display text-[15px] font-medium text-gold-text">{tx(locale, "¿Cuándo quieres venir?", "When would you like to stay?")}</div>
+            <p className={cn("mb-3 mt-1 text-[15px]", muted)} data-testid="stay-card-terms">
               {tx(locale, "Mín.", "Min.")} {plural(minNights, locale, ["noche", "noches"], ["night", "nights"])}
               {cleaningFee > 0 && ` · ${tx(locale, "limpieza", "cleaning")} ${money(cleaningFee, locale)}`}
             </p>
             <div className="grid grid-cols-2 gap-2">
               <div className="min-w-0">
-                <div className="mb-1 flex items-baseline justify-between gap-1 px-1 text-sm">
+                <div className="mb-1 flex items-baseline justify-between gap-1 px-1 text-[15px]">
                   <label htmlFor={`${uid}-in`} className={cn("font-semibold", muted)}>{tx(locale, "Llegada", "Arrival")}</label>
                   {checkIn && <span className="truncate font-semibold" data-testid="stay-in-words">{stayDay(checkIn, locale)}</span>}
                 </div>
@@ -341,7 +341,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
                 />
               </div>
               <div className="min-w-0">
-                <div className="mb-1 flex items-baseline justify-between gap-1 px-1 text-sm">
+                <div className="mb-1 flex items-baseline justify-between gap-1 px-1 text-[15px]">
                   <label htmlFor={`${uid}-out`} className={cn("font-semibold", muted)}>{tx(locale, "Salida", "Departure")}</label>
                   {checkOut && <span className="truncate font-semibold" data-testid="stay-out-words">{stayDay(checkOut, locale)}</span>}
                 </div>
@@ -358,9 +358,9 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
                 />
               </div>
             </div>
-            {stayMsg && <p id={`${uid}-stay-err`} role="alert" className="mt-1.5 px-1 text-sm font-semibold text-danger">{stayMsg}</p>}
+            {stayMsg && <p id={`${uid}-stay-err`} role="alert" className="mt-1.5 px-1 text-[15px] font-semibold text-danger">{stayMsg}</p>}
             <div className="mt-3 flex items-center justify-between gap-3">
-              <span id={`${uid}-guests`} className="text-sm font-semibold">
+              <span id={`${uid}-guests`} className="text-[15px] font-semibold">
                 {tx(locale, "Huéspedes", "Guests")}
                 {l.shortRent?.maxGuests ? <span className={cn("block text-[13px] font-normal", muted)}>{tx(locale, `Hasta ${maxGuests}`, `Up to ${maxGuests}`)}</span> : null}
               </span>
@@ -394,7 +394,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
         )}
         {mode === "tour" && askMode && (
           <div className="mt-5" data-testid="visit-ask">
-            <div className="font-display text-[14px] font-medium mb-2 text-gold-text">{tx(locale, "Pide una visita", "Ask for a visit")}</div>
+            <div className="font-display text-[15px] font-medium mb-2 text-gold-text">{tx(locale, "Pide una visita", "Ask for a visit")}</div>
             <p className={cn("text-[15px]", muted)}>
               {slots.data?.hasCalendar
                 ? tx(locale, "Esta semana ya no quedan horas libres. Cuéntale a su dueño cuándo te viene bien y te propone un momento.", "No free times left this week. Tell the owner when suits you and they’ll suggest a time.")
@@ -409,7 +409,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
                     type="button"
                     aria-pressed={on}
                     onClick={() => setPrefs(on ? prefs.filter((x) => x !== p) : [...prefs, p])}
-                    className={cn("inline-flex min-h-11 items-center gap-1.5 rounded-[12px] border px-3.5 font-display text-sm font-semibold", on ? "np-sel border-2" : dark ? "border-navy-line" : "border-[#D6DEE5] hover:border-navy/50")}
+                    className={cn("inline-flex min-h-11 items-center gap-1.5 rounded-[12px] border px-3.5 font-display text-[15px] font-semibold", on ? "np-sel border-2" : dark ? "border-navy-line" : "border-[#D6DEE5] hover:border-navy/50")}
                   >
                     {on && <CheckCircle2 size={14} aria-hidden />} {tx(locale, ...VISIT_PREF_LABEL[p])}
                   </button>
@@ -425,7 +425,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
               onChange={(e) => setVisitNote(e.target.value)}
               placeholder={tx(locale, "Opcional: p. ej. sábado por la mañana…", "Optional: e.g. Saturday morning…")}
             />
-            <label className={cn("mt-2 flex min-h-11 cursor-pointer items-center gap-2 text-sm", muted)}>
+            <label className={cn("mt-2 flex min-h-11 cursor-pointer items-center gap-2 text-[15px]", muted)}>
               <input type="checkbox" checked={virtual} onChange={(e) => setVirtual(e.target.checked)} className="h-5 w-5 accent-[#1F3A4D]" />
               <Video size={14} aria-hidden /> {tx(locale, "Prefiero verla por videollamada", "I’d rather see it on a video call")}
             </label>
@@ -433,13 +433,13 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
         )}
         {mode === "tour" && !askMode && (
           <div className="mt-5">
-            <div className="font-display text-[14px] font-medium mb-3 text-gold-text">{tx(locale, "Elige cuándo quieres verla", "Choose when to see it")}</div>
+            <div className="font-display text-[15px] font-medium mb-3 text-gold-text">{tx(locale, "Elige cuándo quieres verla", "Choose when to see it")}</div>
             {slots.isLoading && (
               <div className="grid grid-cols-4 gap-2" aria-label={tx(locale, "Buscando horarios libres…", "Finding free times…")}>
                 {[0, 1, 2, 3].map((i) => <div key={i} className="np-skeleton h-[86px] rounded-xl" />)}
               </div>
             )}
-            {!slots.isLoading && days.length === 0 && <div className={cn("text-sm", muted)}>{tx(locale, "Esta semana no hay horarios abiertos. Escribe un mensaje y te proponemos otro momento.", "No open times this week. Send a message and we’ll suggest another.")}</div>}
+            {!slots.isLoading && days.length === 0 && <div className={cn("text-[15px]", muted)}>{tx(locale, "Esta semana no hay horarios abiertos. Escribe un mensaje y te proponemos otro momento.", "No open times this week. Send a message and we’ll suggest another.")}</div>}
             <div className="no-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
               {days.map((d, i) => {
                 const label = fmt(d.date, { weekday: "short", day: "numeric" });
@@ -455,18 +455,18 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
                     aria-pressed={day === i}
                     data-month={fmt(d.date, { month: "short" }).replace(".", "")}
                     className={cn(
-                      "min-w-[62px] flex-1 rounded-xl border px-2 py-2.5 text-center font-display text-sm first-letter:uppercase after:mt-0.5 after:block after:text-[13px] after:text-muted after:content-[attr(data-month)]",
+                      "min-w-[62px] flex-1 rounded-xl border px-2 py-2.5 text-center font-display text-[15px] first-letter:uppercase after:mt-0.5 after:block after:text-[13px] after:text-muted after:content-[attr(data-month)]",
                       day === i ? "np-sel border-2" : dark ? "border-navy-line" : "border-[#D6DEE5] hover:border-navy/50",
                     )}
                   >
-                    <span className="block">{label.slice(0, cut)}</span> <span className="mt-0.5 block font-serif text-[24px] font-light leading-none">{label.slice(cut + 1)}</span>
+                    <span className="block">{label.slice(0, cut)}</span> <span className="mt-0.5 block font-serif text-[28px] font-light leading-none">{label.slice(cut + 1)}</span>
                     <span className="sr-only">{fmt(d.date, { weekday: "long", day: "numeric", month: "long" })}</span>
                   </button>
                 );
               })}
             </div>
             {days.length > 0 && !days[day]?.hours.some((h) => h.available) && (
-              <div className={cn("mt-3 text-sm", muted)} role="status">
+              <div className={cn("mt-3 text-[15px]", muted)} role="status">
                 {firstOpenDay === -1 ? tx(locale, "Esta semana ya está completa. Escribe un mensaje y te proponemos otro momento.", "This week is fully booked. Send a message and we’ll suggest another time.") : tx(locale, "Ese día ya está completo. Prueba con otro.", "That day is fully booked. Try another.")}
               </div>
             )}
@@ -506,7 +506,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
           {reveal && (
             <div className="np-in space-y-2" data-testid="contact-fields">
               {mode === "tour" && !askMode && (
-                <label className={cn("flex min-h-11 cursor-pointer items-center gap-2 text-sm", muted)}>
+                <label className={cn("flex min-h-11 cursor-pointer items-center gap-2 text-[15px]", muted)}>
                   <input type="checkbox" checked={virtual} onChange={(e) => setVirtual(e.target.checked)} className="h-5 w-5 accent-[#1F3A4D]" />
                   <Video size={14} aria-hidden /> {tx(locale, "Prefiero verla por videollamada", "I’d rather see it on a video call")}
                 </label>
@@ -554,7 +554,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
               )}
             </div>
           )}
-          {err && <div role="alert" className="rounded-xl bg-[#B3261E1A] px-3 py-2 text-sm text-danger">{err}</div>}
+          {err && <div role="alert" className="rounded-xl bg-[#B3261E1A] px-3 py-2 text-[15px] text-danger">{err}</div>}
           {/* The one terracotta action of each tab: confirm the visit (naming the chosen time) or send the message. */}
           <div ref={actions} className="!mt-3 flex items-center gap-2">
             <Button type="submit" className="h-[52px] min-w-0 flex-1 disabled:text-[#4A6275] md:h-[52px] dark:disabled:bg-white/10 dark:disabled:text-[#D6DEE5]" size="lg" disabled={busy || (mode === "tour" && !chosen && !(askMode && askReady)) || (mode === "stay" && !stayOk)} variant="primary">
@@ -577,13 +577,13 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
             )}
           </div>
           {mode === "stay" && !stayOk && !stayMsg && (
-            <p className={cn("text-center text-sm", muted)}>{tx(locale, "Elige tus fechas para consultar la disponibilidad", "Pick your dates to check availability")}</p>
+            <p className={cn("text-center text-[15px]", muted)}>{tx(locale, "Elige tus fechas para consultar la disponibilidad", "Pick your dates to check availability")}</p>
           )}
           {mode === "tour" && askMode && !askReady && (
-            <p className={cn("text-center text-sm", muted)}>{tx(locale, "Elige cuándo te viene bien para pedir la visita", "Pick when suits you to request the visit")}</p>
+            <p className={cn("text-center text-[15px]", muted)}>{tx(locale, "Elige cuándo te viene bien para pedir la visita", "Pick when suits you to request the visit")}</p>
           )}
           {mode === "tour" && !chosen && days.some((d) => d.hours.some((h) => h.available)) && (
-            <p className={cn("text-center text-sm", muted)}>{/* A day is always preselected (the first with free slots): ask only for what's still missing. */}
+            <p className={cn("text-center text-[15px]", muted)}>{/* A day is always preselected (the first with free slots): ask only for what's still missing. */}
               {!days[day]
                 ? tx(locale, "Elige un día y una hora para pedir la visita", "Pick a day and a time to request the viewing")
                 : days[day].hours.some((h) => h.available)
@@ -609,7 +609,7 @@ export function ContactPanel({ l, locale, dark }: { l: Listing; locale: Locale; 
           )}
         </div>
       )}
-      <p className={cn("mt-3 text-center text-sm", muted)}>
+      <p className={cn("mt-3 text-center text-[15px]", muted)}>
         {mode === "stay"
           ? tx(locale, "Sin costo ni compromiso · Te confirma fechas y precio final", "Free, no commitment · They confirm dates and final price")
           : bookable && mode === "tour"

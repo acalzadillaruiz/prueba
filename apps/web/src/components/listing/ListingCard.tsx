@@ -54,13 +54,13 @@ export function CardAdvisor({ agent, locale, owner }: { agent: NonNullable<Listi
   const label = tx(locale, "Asesor verificado", "Verified advisor");
   if (owner)
     return (
-      <div className="mt-2.5 flex min-w-0 items-center gap-2 text-sm text-muted" data-testid="card-advisor" data-owner>
+      <div className="mt-2.5 flex min-w-0 items-center gap-2 text-[15px] text-muted" data-testid="card-advisor" data-owner>
         <span aria-hidden className="contents"><Avatar initials={initials} hue={agent.hue} size={24} /></span>
         <span className="truncate">{tx(locale, "Dueño · sin intermediarios", "Owner · no middlemen")}</span>
       </div>
     );
   return (
-    <div className="mt-2.5 flex min-w-0 items-center gap-2 text-sm text-muted" data-testid="card-advisor">
+    <div className="mt-2.5 flex min-w-0 items-center gap-2 text-[15px] text-muted" data-testid="card-advisor">
       <span aria-hidden className="contents"><Avatar initials={initials} hue={agent.hue} size={24} /></span>
       <span className="sr-only">{tx(locale, "Asesor:", "Advisor:")}</span>
       <span className="truncate">{agent.name}</span>
@@ -126,7 +126,7 @@ export function ListingCard({ l, locale, compact, className, compareToggle, prio
       <div className={cn("pb-2 pt-4", compact && "pb-1.5 pt-3.5")}>
         {/* 043 (Airbnb property card): the title (the link), zone · city in stone, the price in Jost 600 tabular, the
             facts. Sentence case throughout; two title lines reserved from md so cards in a row stay aligned. */}
-        <div className="line-clamp-2 font-display text-[16px] font-medium leading-snug text-ink md:min-h-[2.75em]">
+        <div className="line-clamp-2 font-display text-[17px] font-medium leading-snug text-ink md:min-h-[2.75em]">
           <Link
             href={href}
             aria-describedby={metaId}
@@ -135,17 +135,17 @@ export function ListingCard({ l, locale, compact, className, compareToggle, prio
             {title}
           </Link>
         </div>
-        <div className="mt-1 line-clamp-1 text-[16px] text-muted">{l.zone} · {l.city}</div>
+        <div className="mt-1 line-clamp-1 text-[17px] text-muted">{l.zone} · {l.city}</div>
         {/* Above the stretched link (z-[2]) so nothing paints over the price; clicks still fall through to the link. */}
         <div className="np-card-meta pointer-events-none relative z-[2] mt-3 flex flex-wrap items-baseline justify-between gap-x-2 gap-y-1" id={metaId}>
           <div className="np-card-price np-num min-w-0 whitespace-nowrap font-semibold leading-none text-ink" style={priceVars(price, suffix, compact)}>
             {price}
-            <span className="font-display text-sm font-normal text-muted">{suffix}</span>
+            <span className="font-display text-[15px] font-normal text-muted">{suffix}</span>
             <span className="sr-only">, {l.zone}, {l.city}</span>
           </div>
-          {!compact && <span className="shrink-0 text-sm text-muted">{lbl(TYPE_LABEL[l.listingType], locale)}</span>}
+          {!compact && <span className="shrink-0 text-[15px] text-muted">{lbl(TYPE_LABEL[l.listingType], locale)}</span>}
         </div>
-        <div className="mt-2 flex items-center justify-between gap-2 text-[16px] text-muted">
+        <div className="mt-2 flex items-center justify-between gap-2 text-[17px] text-muted">
           <span className="flex flex-wrap gap-x-4">
             {factsLine(l, locale).map((f) => (
               <span key={f}>{f}</span>
@@ -183,7 +183,7 @@ export function MapPreviewCard({ l, locale, variant = "card" }: { l: Listing; lo
             {money(l.priceAmount, locale)}
             <span className="font-display text-[13px] font-normal text-muted">{priceSuffix(l, locale)}</span>
           </div>
-          <div className="mt-1.5 line-clamp-2 text-[14px] font-semibold leading-snug text-ink">{link}</div>
+          <div className="mt-1.5 line-clamp-2 text-[15px] font-semibold leading-snug text-ink">{link}</div>
           <div className="mt-0.5 truncate text-[13px] text-muted">{factsLine(l, locale).join(" · ")}</div>
         </div>
         <SaveButton id={l.id} locale={locale} className="absolute right-1.5 top-1.5 z-[2]" />
@@ -196,12 +196,12 @@ export function MapPreviewCard({ l, locale, variant = "card" }: { l: Listing; lo
         <SaveButton id={l.id} locale={locale} className="absolute right-2 top-2 z-[2]" />
       </div>
       <div className="p-3.5">
-        <div id={metaId} className="np-num pointer-events-none relative z-[2] whitespace-nowrap text-[22px] leading-none text-ink">
+        <div id={metaId} className="np-num pointer-events-none relative z-[2] whitespace-nowrap text-[20px] leading-none text-ink">
           {money(l.priceAmount, locale)}
-          <span className="font-display text-sm font-normal text-muted">{priceSuffix(l, locale)}</span>
+          <span className="font-display text-[15px] font-normal text-muted">{priceSuffix(l, locale)}</span>
         </div>
-        <div className="mt-1.5 line-clamp-1 text-sm font-semibold">{link}</div>
-        <div className="text-sm text-muted">{factsLine(l, locale).join(" · ")}</div>
+        <div className="mt-1.5 line-clamp-1 text-[15px] font-semibold">{link}</div>
+        <div className="text-[15px] text-muted">{factsLine(l, locale).join(" · ")}</div>
       </div>
     </article>
   );

@@ -45,7 +45,7 @@ export function SellQuickEstimate({ locale, zones }: { locale: Locale; zones: { 
         <Sparkles size={16} strokeWidth={1.7} className="text-[#D6DEE5]" aria-hidden />
         <h2 id="quick-estimate-title">{tx(locale, "¿Cuánto vale tu casa?", "What’s your home worth?")}</h2>
       </div>
-      <p className="mt-1 text-sm text-muted">{tx(locale, "Gratis y sin registrarte. Una primera cifra en segundos.", "Free, no sign-up. A first figure in seconds.")}</p>
+      <p className="mt-1 text-[15px] text-muted">{tx(locale, "Gratis y sin registrarte. Una primera cifra en segundos.", "Free, no sign-up. A first figure in seconds.")}</p>
       <div role="radiogroup" aria-label={tx(locale, "Operación", "Operation")} className="mt-5 inline-flex rounded-full bg-[#DCE8F2] p-1">
         {(
           [
@@ -108,19 +108,19 @@ export function SellQuickEstimate({ locale, zones }: { locale: Locale; zones: { 
         {tx(locale, "Ver la estimación", "See the estimate")}
       </Button>
       {err && areaOk && (
-        <p role="alert" className="mt-3 text-sm text-danger">
+        <p role="alert" className="mt-3 text-[15px] text-danger">
           {err}
         </p>
       )}
       <div aria-live="polite">
         {res && (
           <div className="np-in mt-5 rounded-[16px] bg-white/70 p-4 outline outline-1 -outline-offset-1 outline-black/[.04]" data-testid="quick-estimate">
-            <div className="font-display text-[14px] font-medium text-gold-text">{tx(locale, "Valor estimado New Place", "PlaceEstimate")}</div>
+            <div className="font-display text-[15px] font-medium text-gold-text">{tx(locale, "Valor estimado New Place", "PlaceEstimate")}</div>
             <div className="mt-2 font-serif text-[34px] font-light leading-none text-ink">
               {res.n < 2 ? `≈ ${money(res.mid, locale)}` : `${money(res.low, locale)} – ${money(res.high, locale)}`}
-              <span className="font-display text-base font-normal text-muted">{suffix}</span>
+              <span className="font-display text-[17px] font-normal text-muted">{suffix}</span>
             </div>
-            <p className="mt-2 text-sm text-muted">
+            <p className="mt-2 text-[15px] text-muted">
               {res.n < 2
                 ? tx(locale, "Estimación orientativa: aún hay pocas casas comparables en esta zona. Con tus datos completos lo afinamos.", "Indicative estimate: few comparable homes in this area yet. With your full details we fine-tune it.")
                 : tx(locale, "Con casas reales de la zona. Al añadir habitaciones, año y servicios lo afinamos.", "From real homes in the area. Adding rooms, year and amenities fine-tunes it.")}

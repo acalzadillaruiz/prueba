@@ -60,7 +60,7 @@ export function TeamView({ locale, members, listingsByAgent, invites: initialInv
   );
   /** Listings + last activity, folded under the name in the table (the columns no longer fit beside the sidebar). */
   const meta = (u: User) => (
-    <div className={cn("mt-0.5 text-xs", k.muted)}>
+    <div className={cn("mt-0.5 text-[13px]", k.muted)}>
       {listingsByAgent[u.id] != null && <>{plural(listingsByAgent[u.id], locale, ["inmueble", "inmuebles"], ["listing", "listings"])} · </>}
       <span className="whitespace-nowrap">{tx(locale, "Activo ", "Active ")}<TimeAgo iso={u.lastSeen} locale={locale} /></span>
     </div>
@@ -77,13 +77,13 @@ export function TeamView({ locale, members, listingsByAgent, invites: initialInv
           </span>
         )
       ) : (
-        <span className={cn("text-xs", k.muted)}>—</span>
+        <span className={cn("text-[13px]", k.muted)}>—</span>
       )}
     </>
   );
   const confirmRole = (u: User) =>
     pendingRole?.id === u.id && (
-      <div className="np-in flex flex-wrap items-center gap-3 rounded-xl bg-[#B3261E0D] p-3 text-sm dark:bg-[#B3261E26]" role="alert">
+      <div className="np-in flex flex-wrap items-center gap-3 rounded-xl bg-[#B3261E0D] p-3 text-[15px] dark:bg-[#B3261E26]" role="alert">
         <AlertTriangle size={16} className={k.warnText} />
         <span className="min-w-0 flex-1">
           {tx(locale, `¿Seguro? ${u.name} pasará de ${tr(u.role)} a ${tr(pendingRole.role)}. Esto cambia lo que puede ver y hacer en el panel.`, `Sure? ${u.name} will go from ${tr(u.role)} to ${tr(pendingRole.role)}. This changes what they can see and do in the dashboard.`)}
@@ -105,10 +105,10 @@ export function TeamView({ locale, members, listingsByAgent, invites: initialInv
                 <Initials name={u.name} size={40} />
                 <div className="min-w-0 flex-1">
                   <div className="font-semibold leading-snug">{u.name}</div>
-                  <div className={cn("text-xs [overflow-wrap:anywhere]", k.muted)}>{u.email}</div>
+                  <div className={cn("text-[13px] [overflow-wrap:anywhere]", k.muted)}>{u.email}</div>
                 </div>
               </div>
-              <label className="mt-3 flex items-center gap-3 text-sm">
+              <label className="mt-3 flex items-center gap-3 text-[15px]">
                 <span className={cn("w-16 shrink-0", k.muted)}>{tx(locale, "Rol", "Role")}</span>
                 {roleSelect(u, "min-w-0 flex-1", "h-10")}
               </label>
@@ -116,12 +116,12 @@ export function TeamView({ locale, members, listingsByAgent, invites: initialInv
               {u.role === "AGENT" && <div className="mt-3 flex flex-wrap items-center gap-2 [&>span]:flex-wrap">{verification(u)}</div>}
               <dl className={cn("mt-3 grid grid-cols-2 gap-2 rounded-xl px-3 py-2.5", k.soft)}>
                 <div className="min-w-0">
-                  <dt className={cn(k.label, "text-[12px]")}>{tx(locale, "Inmuebles", "Listings")}</dt>
-                  <dd className="mt-0.5 text-sm font-semibold">{listingsByAgent[u.id] ?? "—"}</dd>
+                  <dt className={cn(k.label, "text-[13px]")}>{tx(locale, "Inmuebles", "Listings")}</dt>
+                  <dd className="mt-0.5 text-[15px] font-semibold">{listingsByAgent[u.id] ?? "—"}</dd>
                 </div>
                 <div className="min-w-0">
-                  <dt className={cn(k.label, "text-[12px]")}>{tx(locale, "Última actividad", "Last active")}</dt>
-                  <dd className="mt-0.5 text-sm"><TimeAgo iso={u.lastSeen} locale={locale} /></dd>
+                  <dt className={cn(k.label, "text-[13px]")}>{tx(locale, "Última actividad", "Last active")}</dt>
+                  <dd className="mt-0.5 text-[15px]"><TimeAgo iso={u.lastSeen} locale={locale} /></dd>
                 </div>
               </dl>
             </li>
@@ -130,7 +130,7 @@ export function TeamView({ locale, members, listingsByAgent, invites: initialInv
         <ScrollRegion label={tx(locale, "Miembros del equipo", "Team members")} className={cn("hidden self-start md:block", k.card)}>
           {/* Fixed layout: name/email take what is left and truncate (full email in the tooltip); the role select and the
               verification pill keep their width; listings and last activity live in a meta line under the name. */}
-          <table className="w-full table-fixed text-sm">
+          <table className="w-full table-fixed text-[15px]">
             <colgroup><col /><col className="w-[176px]" /><col className="w-[38%] xl:w-[300px]" /></colgroup>
             <thead className={cn("border-b text-left", k.line, k.th)}>
               <tr><th className="px-4 py-3">{tx(locale, "Persona", "Member")}</th><th className="px-3 py-3">{tx(locale, "Rol", "Role")}</th><th className="px-3 py-3">{tx(locale, "Verificación", "Verification")}</th></tr>
@@ -144,7 +144,7 @@ export function TeamView({ locale, members, listingsByAgent, invites: initialInv
                       <Initials name={u.name} size={38} />
                       <div className="min-w-0 flex-1">
                         <div className="truncate font-semibold" title={u.name}>{u.name}</div>
-                        <div className={cn("truncate text-xs", k.muted)} title={u.email}>{u.email}</div>
+                        <div className={cn("truncate text-[13px]", k.muted)} title={u.email}>{u.email}</div>
                         {meta(u)}
                       </div>
                     </div>
@@ -193,9 +193,9 @@ export function TeamView({ locale, members, listingsByAgent, invites: initialInv
           )}
           <div className={cn(k.card, "p-5 md:p-6")}>
             <h2 className={k.titleSm}>{tx(locale, "Invitaciones pendientes", "Pending invites")}</h2>
-            {invites.length === 0 && <div className={cn("mt-2 text-sm", k.muted)}>{tx(locale, "No hay invitaciones pendientes.", "No pending invites.")}</div>}
+            {invites.length === 0 && <div className={cn("mt-2 text-[15px]", k.muted)}>{tx(locale, "No hay invitaciones pendientes.", "No pending invites.")}</div>}
             {invites.map((i) => (
-              <div key={i.id} className="np-in mt-3 flex items-center gap-2 text-sm">
+              <div key={i.id} className="np-in mt-3 flex items-center gap-2 text-[15px]">
                 <Mail size={15} strokeWidth={1.6} className={k.muted} />
                 <span className="flex-1 truncate">{i.email}</span>
                 <Chip>{tr(i.role)}</Chip>

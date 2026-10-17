@@ -160,11 +160,11 @@ export function HubMessages({
                   <Avatar initials={initialsOf(who?.name ?? "?")} hue={who?.hue ?? 200} size={36} />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-2">
-                      <span className={cn("line-clamp-1 text-sm", t.unread ? "font-bold" : "font-semibold")}>{title(t)}</span>
+                      <span className={cn("line-clamp-1 text-[15px]", t.unread ? "font-bold" : "font-semibold")}>{title(t)}</span>
                       {last && <span className="shrink-0 text-[13px] text-muted">{ago(last.at, locale)}</span>}
                     </div>
                     <div className="flex items-center justify-between gap-2">
-                      <span className="line-clamp-1 text-sm text-muted">
+                      <span className="line-clamp-1 text-[15px] text-muted">
                         {last ? `${last.mine ? tx(locale, "Tú: ", "You: ") : ""}${last.body}` : tx(locale, "Sin mensajes todavía", "No messages yet")}
                       </span>
                       {t.unread > 0 && <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-navy px-1.5 text-[13px] font-bold text-ivory">{t.unread}</span>}
@@ -182,10 +182,10 @@ export function HubMessages({
           <div className="font-semibold">{title(open)}</div>
           <div className="text-[13px] text-muted">{open.participants.filter((p) => p.id !== meId).map((p) => p.name).join(", ")}</div>
           <div ref={logRef} role="log" aria-live="polite" aria-label={tx(locale, "Conversación", "Conversation")} className="mt-3 max-h-80 space-y-2 overflow-y-auto rounded-np bg-ivory p-3 scrollbar-thin">
-            {open.messages.length === 0 && <p className="text-sm text-muted">{tx(locale, "Todavía no hay mensajes. Escribe el primero.", "No messages yet. Say hello.")}</p>}
+            {open.messages.length === 0 && <p className="text-[15px] text-muted">{tx(locale, "Todavía no hay mensajes. Escribe el primero.", "No messages yet. Say hello.")}</p>}
             {open.messages.map((m) => (
               <div key={m.id} className={cn("flex", m.mine ? "justify-end" : "justify-start")}>
-                <div className={cn("max-w-[85%] break-words rounded-2xl px-3 py-2 text-sm", m.mine ? "bg-navy text-ivory" : "border border-line bg-white")}>
+                <div className={cn("max-w-[85%] break-words rounded-2xl px-3 py-2 text-[15px]", m.mine ? "bg-navy text-ivory" : "border border-line bg-white")}>
                   {!m.mine && <div className="text-[13px] font-semibold text-ink/70">{m.from}</div>}
                   <div className="whitespace-pre-wrap">{m.body}</div>
                   <div className={cn("mt-0.5 text-[13px]", m.mine ? "text-ivory/70" : "text-muted")}>{dateTime(m.at, locale)}</div>
@@ -220,7 +220,7 @@ export function HubMessages({
               <span className="hidden sm:inline">{tx(locale, "Enviar", "Send")}</span>
             </Button>
           </form>
-          {err && <div role="alert" className="mt-2 rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-sm text-danger">{err}</div>}
+          {err && <div role="alert" className="mt-2 rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-[15px] text-danger">{err}</div>}
         </div>
       )}
     </Card>

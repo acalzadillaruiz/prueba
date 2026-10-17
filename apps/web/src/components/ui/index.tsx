@@ -24,7 +24,7 @@ const BTN: Record<BtnVariant, string> = {
   "dark-outline": "border border-current bg-transparent text-ivory hover:bg-white/10",
 };
 // 48 px for the main sizes (DESIGN.md: CTA 48), 40 px for the small one (dense panels).
-const SIZE = { sm: "h-10 px-4 text-[14px]", md: "h-12 px-6 text-[16px]", lg: "h-12 px-8 text-[16px]" };
+const SIZE = { sm: "h-10 px-4 text-[15px]", md: "h-12 px-6 text-[17px]", lg: "h-12 px-8 text-[17px]" };
 const SIZE_ARROW = { sm: "h-10 pl-4 pr-1.5", md: "h-12 pl-6 pr-1.5", lg: "h-12 pl-8 pr-1.5" };
 const CIRCLE = { sm: "h-7 w-7", md: "h-8 w-8", lg: "h-9 w-9" };
 
@@ -112,7 +112,7 @@ export function Avatar({ initials, hue = 12, size = 36, className }: { initials:
   return (
     <span
       className={cn("inline-flex shrink-0 items-center justify-center rounded-full font-display font-semibold text-white", className)}
-      style={{ width: size, height: size, fontSize: Math.max(12, size * 0.38), background: `hsl(${198 + (hue % 24)} 34% 36%)` }}
+      style={{ width: size, height: size, fontSize: size >= 48 ? 20 : 13, background: `hsl(${198 + (hue % 24)} 34% 36%)` }}
     >
       {initials}
     </span>
@@ -122,7 +122,7 @@ export function Avatar({ initials, hue = 12, size = 36, className }: { initials:
 export function Field({ label, children, hint, dark, error }: { label: string; children: ReactNode; hint?: string; dark?: boolean; error?: string }) {
   return (
     <label className="block">
-      <span className={cn("mb-1.5 block text-sm font-semibold", dark ? "text-ivory/80" : "text-ink/80")}>{label}</span>
+      <span className={cn("mb-1.5 block text-[15px] font-semibold", dark ? "text-ivory/80" : "text-ink/80")}>{label}</span>
       {children}
       {error ? (
         <span role="alert" className={cn("mt-1 block text-[13px] font-semibold", dark ? "text-[#EFE6D8]" : "text-danger")}>{error}</span>
@@ -136,7 +136,7 @@ export function Field({ label, children, hint, dark, error }: { label: string; c
 export const inputCls =
   "h-11 w-full rounded-np border border-line bg-white px-3.5 text-[15px] text-ink placeholder:text-muted transition-colors duration-np focus:border-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3A6A92] aria-[invalid=true]:border-danger";
 export const darkInputCls =
-  "h-10 w-full rounded-np border border-navy-line bg-navy-2 px-3 text-sm text-ivory placeholder:text-mist/60 focus:border-coral focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#EFE6D8]";
+  "h-10 w-full rounded-np border border-navy-line bg-navy-2 px-3 text-[15px] text-ivory placeholder:text-mist/60 focus:border-coral focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#EFE6D8]";
 
 export function Stat({ label, value, delta, dark, hint }: { label: string; value: ReactNode; delta?: string; dark?: boolean; hint?: string }) {
   const up = delta?.startsWith("+");
@@ -144,7 +144,7 @@ export function Stat({ label, value, delta, dark, hint }: { label: string; value
     <div className={cn("rounded-np p-4", dark ? "border border-navy-line bg-navy-card" : "border border-line bg-white")}>
       <div className={cn("text-[13px] font-semibold", dark ? "text-mist" : "text-muted")}>{label}</div>
       <div className="mt-1.5 flex items-baseline gap-2">
-        <span className="font-display text-2xl font-semibold">{value}</span>
+        <span className="font-display text-[28px] font-semibold">{value}</span>
         {delta && <span className={cn("text-[13px] font-semibold", up ? "text-[#5FBF8F]" : "text-coral")}>{delta}</span>}
       </div>
       {hint && <div className={cn("mt-1 text-[13px]", dark ? "text-mist/80" : "text-muted")}>{hint}</div>}
@@ -179,7 +179,7 @@ export function EmptyState({ icon, title, body, cta, dark, monogram }: { icon?: 
       ) : (
         <div className={cn("mb-4 flex h-14 w-14 items-center justify-center rounded-full", dark ? "bg-white/5 text-[#EFE6D8]" : "bg-rosa text-coral")}>{icon}</div>
       )}
-      <div className="font-serif text-2xl">{title}</div>
+      <div className="font-serif text-[28px]">{title}</div>
       <p className={cn("mt-1.5 max-w-sm text-[15px]", dark ? "text-mist" : "text-muted")}>{body}</p>
       {cta && <div className="mt-5">{cta}</div>}
     </div>

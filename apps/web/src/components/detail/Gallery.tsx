@@ -182,7 +182,7 @@ export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: bo
           <button
             type="button"
             onClick={() => show(0)}
-            className="absolute bottom-[clamp(16px,3vw,32px)] right-[clamp(16px,4vw,40px)] z-[2] inline-flex min-h-12 items-center gap-2 rounded-[12px] bg-[#FAF8F4] px-5 font-display text-[16px] font-medium text-[#3A6A92] transition-[background-color,transform] duration-np ease-np hover:bg-[#EFE6D8] active:scale-[.98] max-md:bottom-10"
+            className="absolute bottom-[clamp(16px,3vw,32px)] right-[clamp(16px,4vw,40px)] z-[2] inline-flex min-h-12 items-center gap-2 rounded-[12px] bg-[#FAF8F4] px-5 font-display text-[17px] font-medium text-[#3A6A92] transition-[background-color,transform] duration-np ease-np hover:bg-[#EFE6D8] active:scale-[.98] max-md:bottom-10"
           >
             <Camera size={17} aria-hidden /> {allLabel}
           </button>
@@ -216,12 +216,12 @@ export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: bo
         >
           <div className="no-scrollbar flex items-center gap-2 overflow-x-auto px-4 py-3">
             {tabs.filter((t) => t[3]).map(([k, Icon, label]) => (
-              <button key={k} onClick={() => setTab(k)} aria-pressed={tab === k} className={cn("inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-[12px] px-3 font-display text-sm", tab === k ? "border-2 border-ivory bg-white/15 text-ivory" : "border-2 border-transparent text-ivory/75 hover:bg-white/10")}>
+              <button key={k} onClick={() => setTab(k)} aria-pressed={tab === k} className={cn("inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-[12px] px-3 font-display text-[15px]", tab === k ? "border-2 border-ivory bg-white/15 text-ivory" : "border-2 border-transparent text-ivory/75 hover:bg-white/10")}>
                 <Icon size={15} aria-hidden /> {label}
               </button>
             ))}
             {tab === "photos" && total > 1 && (
-              <span className="ml-auto shrink-0 px-2 font-display text-sm tabular-nums text-ivory/80" aria-hidden data-testid="gallery-counter">
+              <span className="ml-auto shrink-0 px-2 font-display text-[15px] tabular-nums text-ivory/80" aria-hidden data-testid="gallery-counter">
                 {i + 1} / {total}
               </span>
             )}
@@ -258,7 +258,7 @@ export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: bo
             {tab === "plan" && (
               <figure className="w-full max-w-4xl">
                 <Floorplan seed={l.id} beds={l.beds} className="max-h-[70vh] w-full rounded-np" />
-                <figcaption className="mt-2 text-center text-sm text-mist">{tx(locale, "Plano orientativo: muestra la distribución aproximada y no está a escala. Pide el plano final a quien la publica.", "Indicative floor plan: an approximate layout, not to scale. Ask the lister for the final plan.")}</figcaption>
+                <figcaption className="mt-2 text-center text-[15px] text-mist">{tx(locale, "Plano orientativo: muestra la distribución aproximada y no está a escala. Pide el plano final a quien la publica.", "Indicative floor plan: an approximate layout, not to scale. Ask the lister for the final plan.")}</figcaption>
               </figure>
             )}
             {tab === "street" && GOOGLE_MAPS_KEY && (

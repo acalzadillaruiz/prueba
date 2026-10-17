@@ -77,7 +77,7 @@ export function PlacesSearch({ locale, zones, value, onPick, describedBy }: { lo
                 <MapPin size={17} className="mt-0.5 text-coral" />
                 <span>
                   <span className="block font-semibold">{q.trim() || z.name}</span>
-                  <span className="text-sm text-muted">{z.name}, {z.city}, {z.state}, Venezuela</span>
+                  <span className="text-[15px] text-muted">{z.name}, {z.city}, {z.state}, Venezuela</span>
                 </span>
               </button>
             ))}

@@ -82,7 +82,7 @@ export default async function LuxuryPage({ params }: { params: Promise<{ locale:
                   <span className="font-display text-[17px] font-medium">{tx(locale, l.title_es, l.title_en)}</span>
                   <span className="font-title text-[28px] text-ink [font-variant-numeric:lining-nums_tabular-nums]">{moneyUi(l.priceAmount, locale)}</span>
                 </div>
-                <div className="mt-1 text-[16px] text-muted">{l.zone}, {l.city} · {factsLine(l, locale).join(" · ")}</div>
+                <div className="mt-1 text-[17px] text-muted">{l.zone}, {l.city} · {factsLine(l, locale).join(" · ")}</div>
               </Link>
               );
             })}

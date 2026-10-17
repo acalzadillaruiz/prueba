@@ -12,7 +12,7 @@ import { tx } from "@/lib/i18n";
 export async function PublicFooter({ locale }: { locale: Locale }) {
   const t = await getTranslations({ locale, namespace: "footer" });
   const nav = await getTranslations({ locale, namespace: "nav" });
-  const linkCls = "np-link inline-flex min-h-11 items-center text-[16px] text-muted transition-colors duration-np hover:text-ink md:min-h-0 md:py-1";
+  const linkCls = "np-link inline-flex min-h-11 items-center text-[17px] text-muted transition-colors duration-np hover:text-ink md:min-h-0 md:py-1";
   // Phones: each column is a closed accordion (native details/summary: keyboard and screen-reader ready), so the
   // footer doesn't repeat ~1,000 px of links the tab bar and the menu already offer. md+: the open columns as before.
   const list = (links: [string, string][], extra?: React.ReactNode) => (
@@ -26,14 +26,14 @@ export async function PublicFooter({ locale }: { locale: Locale }) {
   const col = (title: string, links: [string, string][], extra?: React.ReactNode) => (
     <div className="col-span-2 md:col-span-1">
       <details data-footer-group className="group py-1 md:hidden">
-        <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between font-display text-[16px] font-medium text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral [&::-webkit-details-marker]:hidden">
+        <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between font-display text-[17px] font-medium text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral [&::-webkit-details-marker]:hidden">
           {title}
           <ChevronDown size={18} aria-hidden className="text-muted transition-transform duration-np group-open:rotate-180" />
         </summary>
         <div className="pb-3">{list(links, extra)}</div>
       </details>
       <div className="hidden md:block">
-        <div className="mb-4 font-display text-[16px] font-medium text-ink">{title}</div>
+        <div className="mb-4 font-display text-[17px] font-medium text-ink">{title}</div>
         {list(links, extra)}
       </div>
     </div>
@@ -52,7 +52,7 @@ export async function PublicFooter({ locale }: { locale: Locale }) {
       <div className="np-gutter relative mx-auto grid max-w-[1280px] box-content grid-cols-2 gap-x-6 gap-y-0 pb-16 pt-10 md:grid-cols-[1.3fr_1fr_1fr_1fr] md:gap-12 md:pt-16">
         <div className="col-span-2 mb-6 flex flex-col items-start md:col-span-1 md:mb-0 md:items-center md:text-center">
           <Logo tone="navy" size="lg" />
-          <p className="mt-4 max-w-[280px] text-[16px] leading-relaxed text-muted md:mt-6">{t("about")}</p>
+          <p className="mt-4 max-w-[280px] text-[17px] leading-relaxed text-muted md:mt-6">{t("about")}</p>
         </div>
         {col(t("search"), [
           [nav("buy"), `/${locale}/search?type=SALE`],
@@ -67,7 +67,7 @@ export async function PublicFooter({ locale }: { locale: Locale }) {
       </div>
       <div className="relative bg-[#E8DECD] dark:bg-[#132634]">
         {/* TODO(legal): Privacidad · Términos · Cookies links go here once the client provides and approves the texts. */}
-        <div className="np-gutter mx-auto flex max-w-[1280px] box-content flex-wrap items-center justify-between gap-x-6 gap-y-3 py-5 text-[14px] text-muted">
+        <div className="np-gutter mx-auto flex max-w-[1280px] box-content flex-wrap items-center justify-between gap-x-6 gap-y-3 py-5 text-[15px] text-muted">
           <span>
             © {new Date().getFullYear()} <span translate="no">New Place</span> · {t("legal")}
             {/* Demo login (DEMO_AUTH) only: a quiet link to the "sign in as…" chooser, never a floating control. */}

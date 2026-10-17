@@ -31,7 +31,7 @@ export function DemoLoginList({ locale, onDone, className }: { locale: Locale; o
   return (
     <div className={className}>
       {DEMO_LOGINS.map((d) => (
-        <button key={d.email} type="button" className="flex min-h-11 w-full items-center gap-2.5 rounded-lg px-3 py-1.5 text-left text-sm text-ivory hover:bg-white/5" onClick={() => go(d.email, d.home)} disabled={!!busy}>
+        <button key={d.email} type="button" className="flex min-h-11 w-full items-center gap-2.5 rounded-lg px-3 py-1.5 text-left text-[15px] text-ivory hover:bg-white/5" onClick={() => go(d.email, d.home)} disabled={!!busy}>
           <Avatar initials={d.initials} hue={d.hue} size={26} />
           <span className="min-w-0 flex-1">
             <span className="block font-semibold leading-tight">{tx(locale, d.label.es, d.label.en)}</span>
@@ -41,7 +41,7 @@ export function DemoLoginList({ locale, onDone, className }: { locale: Locale; o
         </button>
       ))}
       {user && (
-        <button type="button" className="mt-1 flex min-h-11 w-full items-center gap-2.5 rounded-lg border-t border-navy-line px-3 py-2 text-left text-sm text-mist hover:bg-white/5" onClick={() => import("@/lib/logout").then((m) => m.logout(locale))}>
+        <button type="button" className="mt-1 flex min-h-11 w-full items-center gap-2.5 rounded-lg border-t border-navy-line px-3 py-2 text-left text-[15px] text-mist hover:bg-white/5" onClick={() => import("@/lib/logout").then((m) => m.logout(locale))}>
           <LogOut size={15} aria-hidden /> {tx(locale, "Cerrar sesión", "Sign out")}
         </button>
       )}

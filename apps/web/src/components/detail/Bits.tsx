@@ -20,7 +20,7 @@ export function BilingualBody({ l, locale, dark }: { l: Listing; locale: Locale;
             <span className={cn("rounded-[12px] border-2 px-2.5 py-0.5 text-[13px] font-semibold", lang === x ? "np-sel" : cn("border-transparent", dark ? "text-mist" : "text-muted"))}>{x.toUpperCase()}</span>
           </button>
         ))}
-        <span className={cn("text-sm", dark ? "text-mist" : "text-muted")}>{tx(locale, "En español e inglés", "In Spanish and English")}</span>
+        <span className={cn("text-[15px]", dark ? "text-mist" : "text-muted")}>{tx(locale, "En español e inglés", "In Spanish and English")}</span>
       </div>
       {lang !== locale && (
         <p lang={lang} className="mt-2 text-[17px] font-semibold">
@@ -43,7 +43,7 @@ export function PriceHistory({ events, locale, dark }: { events: PriceEvent[]; l
   return (
     // The scroller can take keyboard focus (to scroll on narrow screens), so it is a named region, not a bare div.
     <div role="region" aria-label={tx(locale, "Historial de precio", "Price history")} tabIndex={0} className={cn("overflow-x-auto rounded-xl border focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink", dark ? "border-navy-line" : "border-line bg-white")}>
-      <table className="w-full whitespace-nowrap text-sm">
+      <table className="w-full whitespace-nowrap text-[15px]">
         <tbody>
           {[...events].reverse().map((e, i, arr) => {
             const prev = arr[i + 1];

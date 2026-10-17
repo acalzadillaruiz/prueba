@@ -28,11 +28,11 @@ export const k = {
   soft: "bg-[#F4EFE7] dark:bg-white/[.05]",
   hover: "hover:bg-[#FAF8F4] dark:hover:bg-white/[.04]",
   /** Table head / KPI label: uppercase 11–12 px, tracking .12em. */
-  th: "text-[12px] font-semibold uppercase tracking-[.12em] text-muted dark:text-mist [&_th]:whitespace-nowrap",
+  th: "text-[13px] font-semibold uppercase tracking-[.12em] text-muted dark:text-mist [&_th]:whitespace-nowrap",
   label: "text-[13px] font-semibold text-muted dark:text-mist",
   caption: "text-[13px] font-medium text-gold-text dark:text-[#D6DEE5]",
   /** Card titles in Cormorant. */
-  title: "font-serif text-[24px] font-medium leading-tight text-navy dark:text-ivory",
+  title: "font-serif text-[28px] font-medium leading-tight text-navy dark:text-ivory",
   titleSm: "font-serif text-[20px] font-medium leading-tight text-navy dark:text-ivory",
   /** Data figures: Manrope 600 with lining proportional numerals, tight tracking so "14" never splits. */
   num: "font-display font-semibold tracking-[-0.05em] [font-feature-settings:'lnum','pnum'] text-navy dark:text-ivory",
@@ -42,9 +42,9 @@ export const k = {
   select:
     "h-9 rounded-lg border border-[#D6DEE5] bg-white px-2.5 text-[13px] text-navy focus:border-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#EFE6D8] disabled:cursor-not-allowed disabled:opacity-60 dark:border-white/15 dark:bg-navy dark:text-ivory",
   link: "font-semibold text-navy underline decoration-navy/30 underline-offset-4 hover:decoration-navy dark:text-[#EFE6D8] dark:decoration-[#EFE6D8]/40",
-  err: "rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-sm text-danger dark:border-[#EFE6D8]/30 dark:bg-[#B3261E26] dark:text-[#F3B4A3]",
-  warnBox: "rounded-xl border border-warn/25 bg-[#8A5A000F] px-3.5 py-2.5 text-sm text-warn dark:border-[#F2B866]/30 dark:bg-[#8A5A0026] dark:text-[#F2C987]",
-  okBox: "rounded-xl border border-ok/25 bg-[#2F6F4E0F] px-3.5 py-2.5 text-sm text-ok dark:border-[#7FC8A4]/30 dark:bg-[#2F6F4E33] dark:text-[#9AD6B6]",
+  err: "rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-[15px] text-danger dark:border-[#EFE6D8]/30 dark:bg-[#B3261E26] dark:text-[#F3B4A3]",
+  warnBox: "rounded-xl border border-warn/25 bg-[#8A5A000F] px-3.5 py-2.5 text-[15px] text-warn dark:border-[#F2B866]/30 dark:bg-[#8A5A0026] dark:text-[#F2C987]",
+  okBox: "rounded-xl border border-ok/25 bg-[#2F6F4E0F] px-3.5 py-2.5 text-[15px] text-ok dark:border-[#7FC8A4]/30 dark:bg-[#2F6F4E33] dark:text-[#9AD6B6]",
   /** Button skins (pass as className to ui/Button). */
   primary: "dark:bg-[#EFE6D8] dark:text-navy dark:hover:bg-[#EDAE97]",
   navy: "dark:bg-ivory dark:text-navy dark:hover:bg-white",
@@ -61,7 +61,7 @@ export const k = {
 /** Filter tab / segmented choice. Selected = #EFE6D8 with a 2 px navy border (brand interaction states). */
 export const tab = (on: boolean) =>
   cn(
-    "inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 font-display text-[14px] font-medium transition-colors duration-np",
+    "inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 font-display text-[15px] font-medium transition-colors duration-np",
     on
       ? "bg-[#EFE6D8] text-navy outline outline-2 -outline-offset-2 outline-[#1F3A4D] dark:bg-white/10 dark:text-ivory dark:outline dark:outline-2 dark:-outline-offset-2 dark:outline-[#EFE6D8]"
       : "bg-white text-navy/80 outline outline-1 -outline-offset-1 outline-[#D6DEE5] hover:text-navy hover:outline hover:outline-1 hover:-outline-offset-1 hover:outline-[#1F3A4D] dark:bg-transparent dark:text-ivory/75 dark:outline dark:outline-1 dark:-outline-offset-1 dark:outline-[rgba(255,255,255,.18)] dark:hover:text-ivory",
@@ -69,7 +69,7 @@ export const tab = (on: boolean) =>
 
 /** Counter inside a tab or nav item: neutral, never terracotta. */
 export function Count({ children, className }: { children: ReactNode; className?: string }) {
-  return <span className={cn("inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[#FAF8F4] px-1.5 text-[12px] font-semibold text-navy [font-feature-settings:'lnum','tnum']", className)}>{children}</span>;
+  return <span className={cn("inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[#FAF8F4] px-1.5 text-[13px] font-semibold text-navy [font-feature-settings:'lnum','tnum']", className)}>{children}</span>;
 }
 
 export function Panel({ title, eyebrow, action, children, className, bodyClass, id, as: As = "section" }: { title?: ReactNode; eyebrow?: ReactNode; action?: ReactNode; children: ReactNode; className?: string; bodyClass?: string; id?: string; as?: "section" | "div" | "form" }) {
@@ -93,9 +93,9 @@ export function Kpi({ label, value, delta, hint, down, deltaNote, className }: {
   return (
     <div className={cn(k.card, "min-w-0 px-4 pb-4 pt-4 sm:px-5 sm:pb-5 sm:pt-[18px] md:px-6", className)}>
       <div className={cn(k.label, "line-clamp-2 min-h-[2.5em] leading-[1.25] sm:line-clamp-1 sm:min-h-0 xl:line-clamp-2 xl:min-h-[2.5em]")}>{label}</div>
-      <div className={cn(k.num, "mt-2 text-[30px] leading-none sm:text-[34px] md:text-[40px]")}>{value}</div>
+      <div className={cn(k.num, "mt-2 text-[28px] leading-none sm:text-[34px] md:text-[40px]")}>{value}</div>
       {(delta || hint || deltaNote) && (
-        <div className="mt-2.5 flex flex-wrap items-baseline gap-x-1.5 text-[13px] sm:text-[14px]">
+        <div className="mt-2.5 flex flex-wrap items-baseline gap-x-1.5 text-[13px] sm:text-[15px]">
           {!delta && deltaNote && <span className={cn("cursor-help font-semibold", k.muted)} title={deltaNote}><span aria-hidden>—</span><span className="sr-only">{deltaNote}</span></span>}
           {delta && <span className={cn("font-semibold", down ? k.dangerText : k.okText)}>{down ? "▼" : "▲"}&#8239;{delta}</span>}
           {hint && <span className={delta ? k.muted : cn(k.muted)}>{hint}</span>}
@@ -121,7 +121,7 @@ const TONE: Record<Tone, string> = {
 /** Status badge: uppercase, tracking .12em; "Exclusiva" carries the roof glyph. */
 export function Pill({ tone = "neutral", children, className }: { tone?: Tone; children: ReactNode; className?: string }) {
   return (
-    <span className={cn("inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-[3px] text-[12px] font-semibold uppercase tracking-[.12em]", TONE[tone], className)}>
+    <span className={cn("inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-[3px] text-[13px] font-semibold uppercase tracking-[.12em]", TONE[tone], className)}>
       {tone === "exclusive" && <RoofMark className="h-[7px] w-[18px]" ink="currentColor" teja="currentColor" small />}
       {children}
     </span>
@@ -130,7 +130,7 @@ export function Pill({ tone = "neutral", children, className }: { tone?: Tone; c
 
 /** Neutral data chip (e.g. "Interés 92"): never terracotta. */
 export function Chip({ children, className }: { children: ReactNode; className?: string }) {
-  return <span className={cn("inline-flex items-center whitespace-nowrap rounded-full bg-[#EFE6D8] px-2.5 py-1 text-[12px] font-semibold text-navy [font-feature-settings:'lnum','pnum'] dark:bg-white/10 dark:text-ivory", className)}>{children}</span>;
+  return <span className={cn("inline-flex items-center whitespace-nowrap rounded-full bg-[#EFE6D8] px-2.5 py-1 text-[13px] font-semibold text-navy [font-feature-settings:'lnum','pnum'] dark:bg-white/10 dark:text-ivory", className)}>{children}</span>;
 }
 
 /** Listing status for the private areas, with the shared lifecycle labels (@/lib/lifecycle): review wins while it isn't approved. */

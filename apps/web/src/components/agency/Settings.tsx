@@ -139,7 +139,7 @@ export function SettingsView({
           {/* The public listing is light: the preview pins the light tokens even in the dark cockpit (Cal surface, Navy ink,
               muted #4A6275 = 6.4:1), and the button text follows the accent's luminance (white or Navy). */}
           <div className="mt-5 rounded-xl bg-[#FAF8F4] p-4 text-[#1F3A4D] outline outline-1 -outline-offset-1 outline-[#E3E8EC] [--np-ink-rgb:30_26_24] [--np-line-rgb:216_203_183] [--np-logo-ink:#1F3A4D] [--np-logo-teja:#3A6A92] [--np-muted-rgb:94_82_72] [color-scheme:light] dark:outline-white/10" data-testid="brand-preview">
-            <div className="text-[12px] font-semibold uppercase tracking-[.12em] text-[#4A6275]">{tx(locale, "Vista previa en ficha pública", "Public listing preview")}</div>
+            <div className="text-[13px] font-semibold uppercase tracking-[.12em] text-[#4A6275]">{tx(locale, "Vista previa en ficha pública", "Public listing preview")}</div>
             <div className="mt-2 flex flex-wrap items-center gap-3">
               {/^https:\/\/|^\/uploads\//.test(b.logoUrl.trim()) ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -147,10 +147,10 @@ export function SettingsView({
               ) : (
                 <span className="flex h-10 w-10 items-center justify-center rounded-lg font-display font-bold" style={{ background: b.color, color: onAccent.color }}>{agency.initials}</span>
               )}
-              <div className="min-w-0 flex-1"><div className="truncate font-display font-semibold">{b.name}</div><div className="text-sm text-[#4A6275]">{b.whatsapp}</div></div>
-              <span className="rounded-np px-3 py-2 font-display text-sm font-semibold" style={{ background: b.color, color: onAccent.color }}>{tx(locale, "Contactar", "Contact")}</span>
+              <div className="min-w-0 flex-1"><div className="truncate font-display font-semibold">{b.name}</div><div className="text-[15px] text-[#4A6275]">{b.whatsapp}</div></div>
+              <span className="rounded-np px-3 py-2 font-display text-[15px] font-semibold" style={{ background: b.color, color: onAccent.color }}>{tx(locale, "Contactar", "Contact")}</span>
             </div>
-            <div className="mt-3 flex items-center justify-between border-t border-[#D6DEE5] pt-2 text-xs text-[#4A6275]"><span>{tx(locale, "Publicado en New Place", "Listed on New Place")}</span><Logo size="sm" /></div>
+            <div className="mt-3 flex items-center justify-between border-t border-[#D6DEE5] pt-2 text-[13px] text-[#4A6275]"><span>{tx(locale, "Publicado en New Place", "Listed on New Place")}</span><Logo size="sm" /></div>
           </div>
           {!brandErr.color && onAccent.ratio < 4.5 && (
             <p className={cn("mt-3", k.warnBox)} role="status">
@@ -171,7 +171,7 @@ export function SettingsView({
               <Field label={tx(locale, "Alquiler (meses de canon)", "Rent (months of rent)")} error={ruleErr.rentMonths ?? undefined}><input className={k.input} aria-invalid={!!ruleErr.rentMonths} disabled={!owner} type="number" step="0.5" min={0} max={3} value={r.rentMonths} onChange={(e) => { setR({ ...r, rentMonths: +e.target.value }); dirty(); }} /></Field>
               <Field label={tx(locale, "Captador (%)", "Captor (%)")} error={ruleErr.captorPct ?? undefined}><input className={k.input} aria-invalid={!!ruleErr.captorPct} disabled={!owner} type="number" min={0} max={50} value={r.captorPct} onChange={(e) => { setR({ ...r, captorPct: +e.target.value }); dirty(); }} /></Field>
             </div>
-            <div className={cn("mt-4 rounded-xl p-3.5 text-sm", k.soft)}>
+            <div className={cn("mt-4 rounded-xl p-3.5 text-[15px]", k.soft)}>
               {ruleErr.salePct || ruleErr.agentSplitPct ? (
                 <span className={k.muted}>{tx(locale, "Corrige la comisión para ver el ejemplo.", "Fix the commission to see the example.")}</span>
               ) : (
@@ -181,12 +181,12 @@ export function SettingsView({
           </div>
           <div className={cn(k.card, "p-5 md:p-6")}>
             <h2 className={cn(k.title, "flex items-center gap-2")}><Lock size={16} strokeWidth={1.6} className={k.muted} /> {tx(locale, "Plan (solo lectura)", "Plan (read-only)")}</h2>
-            <div className="mt-3 grid grid-cols-3 gap-2 text-center text-sm">
+            <div className="mt-3 grid grid-cols-3 gap-2 text-center text-[15px]">
               {["FREE", "PRO", "ENTERPRISE"].map((p) => (
-                <div key={p} aria-current={p === agency.plan ? "true" : undefined} className={p === agency.plan ? "rounded-xl bg-[#EFE6D8] p-3 text-navy outline outline-2 -outline-offset-2 outline-[#1F3A4D] dark:bg-white/10 dark:text-ivory dark:outline dark:outline-2 dark:-outline-offset-2 dark:outline-[#EFE6D8]" : cn("rounded-xl border p-3", k.line, k.muted)}><div className="font-display font-semibold">{p === "FREE" ? tx(locale, "Gratis", "Free") : p === "PRO" ? tx(locale, "Profesional", "Professional") : tx(locale, "Empresa", "Enterprise")}</div><div className="text-xs">{p === "FREE" ? tx(locale, "Hasta 10 inmuebles", "Up to 10 listings") : p === "PRO" ? tx(locale, "Hasta 100 inmuebles · textos y valoraciones automáticas", "Up to 100 listings · automatic texts and valuations") : tx(locale, "Inmuebles ilimitados", "Unlimited listings")}</div></div>
+                <div key={p} aria-current={p === agency.plan ? "true" : undefined} className={p === agency.plan ? "rounded-xl bg-[#EFE6D8] p-3 text-navy outline outline-2 -outline-offset-2 outline-[#1F3A4D] dark:bg-white/10 dark:text-ivory dark:outline dark:outline-2 dark:-outline-offset-2 dark:outline-[#EFE6D8]" : cn("rounded-xl border p-3", k.line, k.muted)}><div className="font-display font-semibold">{p === "FREE" ? tx(locale, "Gratis", "Free") : p === "PRO" ? tx(locale, "Profesional", "Professional") : tx(locale, "Empresa", "Enterprise")}</div><div className="text-[13px]">{p === "FREE" ? tx(locale, "Hasta 10 inmuebles", "Up to 10 listings") : p === "PRO" ? tx(locale, "Hasta 100 inmuebles · textos y valoraciones automáticas", "Up to 100 listings · automatic texts and valuations") : tx(locale, "Inmuebles ilimitados", "Unlimited listings")}</div></div>
               ))}
             </div>
-            <p className={cn("mt-3 text-xs", k.muted)}>{tx(locale, "Por ahora no cobramos ningún plan. Si necesitas cambiarlo, escríbenos y lo hace el equipo de New Place.", "We don’t charge for any plan for now. If you need a change, write to us and the New Place team will do it.")}</p>
+            <p className={cn("mt-3 text-[13px]", k.muted)}>{tx(locale, "Por ahora no cobramos ningún plan. Si necesitas cambiarlo, escríbenos y lo hace el equipo de New Place.", "We don’t charge for any plan for now. If you need a change, write to us and the New Place team will do it.")}</p>
           </div>
         </div>
       </div>
@@ -195,7 +195,7 @@ export function SettingsView({
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="min-w-0">
               <h2 id="oncall-title" className={cn(k.title, "flex items-center gap-2")}><PhoneCall size={18} strokeWidth={1.6} className={k.muted} aria-hidden /> {tx(locale, "Guardia 24/7", "24/7 on-call")}</h2>
-              <p className={cn("mt-1 max-w-[60ch] text-sm", k.muted)}>
+              <p className={cn("mt-1 max-w-[60ch] text-[15px]", k.muted)}>
                 {tx(
                   locale,
                   "Elige quién atiende cada día (hora de Caracas). El asesor de guardia aparece en la web pública con su nombre, teléfono y WhatsApp; nunca su email.",
@@ -213,9 +213,9 @@ export function SettingsView({
                 const label = tx(locale, ...WEEKDAY_LABEL[d]);
                 return (
                   <label key={d} className={cn("block rounded-xl border p-3", k.line, isToday && "border-navy/40 dark:border-[#EFE6D8]/50")}>
-                    <span className="mb-1.5 flex items-center justify-between gap-2 text-sm font-semibold text-navy dark:text-ivory">
+                    <span className="mb-1.5 flex items-center justify-between gap-2 text-[15px] font-semibold text-navy dark:text-ivory">
                       {label}
-                      {isToday && <span className={cn("rounded-full px-2 py-0.5 text-[12px] font-semibold uppercase tracking-[.12em]", k.soft)}>{tx(locale, "Hoy", "Today")}</span>}
+                      {isToday && <span className={cn("rounded-full px-2 py-0.5 text-[13px] font-semibold uppercase tracking-[.12em]", k.soft)}>{tx(locale, "Hoy", "Today")}</span>}
                     </span>
                     <Select
                       disabled={!owner}
@@ -236,7 +236,7 @@ export function SettingsView({
                       ))}
                     </Select>
                     {unverifiedDays.includes(d) && (
-                      <span role="alert" className="mt-1 block text-xs font-semibold text-danger">{tx(locale, "Esta persona aún no está verificada: elige a otra.", "This person isn’t verified yet: pick someone else.")}</span>
+                      <span role="alert" className="mt-1 block text-[13px] font-semibold text-danger">{tx(locale, "Esta persona aún no está verificada: elige a otra.", "This person isn’t verified yet: pick someone else.")}</span>
                     )}
                   </label>
                 );
@@ -244,10 +244,10 @@ export function SettingsView({
             </div>
           )}
           {advisors.some((a) => a.verified === false) && (
-            <p className={cn("mt-3 text-sm", k.muted)}>{tx(locale, "Solo pueden estar de guardia los asesores verificados. Verifica a tu equipo en «Equipo».", "Only verified advisors can be on call. Verify your team under “Team”.")}</p>
+            <p className={cn("mt-3 text-[15px]", k.muted)}>{tx(locale, "Solo pueden estar de guardia los asesores verificados. Verifica a tu equipo en «Equipo».", "Only verified advisors can be on call. Verify your team under “Team”.")}</p>
           )}
           {advisors.length > 0 && WEEK_ORDER.some((d) => !onCall[d]) && (
-            <p className={cn("mt-3 text-sm", k.muted)}>{tx(locale, "Los días sin guardia no muestran asesor en la web pública.", "Days with nobody on call show no advisor on the public site.")}</p>
+            <p className={cn("mt-3 text-[15px]", k.muted)}>{tx(locale, "Los días sin guardia no muestran asesor en la web pública.", "Days with nobody on call show no advisor on the public site.")}</p>
           )}
         </section>
       )}

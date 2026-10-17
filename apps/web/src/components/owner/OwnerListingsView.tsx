@@ -94,7 +94,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
         <Button href={`/${locale}/owner/new`}><Plus size={16} /> {tx(locale, "Publicar otro", "List another")}</Button>
       </div>
       {error && (
-        <div className="mt-4 rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-sm text-danger" role="alert">
+        <div className="mt-4 rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-[15px] text-danger" role="alert">
           {error}
         </div>
       )}
@@ -122,10 +122,10 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
           {mandates.map((m) => (
             <Card key={m.id} className={cn(k.card, "border-0 p-5")}>
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <div className="font-serif text-[24px] font-light leading-tight">{tx(locale, `Encargo a ${m.agencyName}`, `Mandate with ${m.agencyName}`)}</div>
+                <div className="font-serif text-[28px] font-light leading-tight">{tx(locale, `Encargo a ${m.agencyName}`, `Mandate with ${m.agencyName}`)}</div>
                 <Badge tone={m.status === "ACTIVE" ? "ok" : m.status === "CANCELLED" ? "danger" : "warn"}>{mandateLabel(mandatePhase(m), locale)}</Badge>
               </div>
-              <div className="mt-1 text-sm text-muted">{listings.find((l) => l.id === m.listingId)?.[locale === "es" ? "title_es" : "title_en"]}</div>
+              <div className="mt-1 text-[15px] text-muted">{listings.find((l) => l.id === m.listingId)?.[locale === "es" ? "title_es" : "title_en"]}</div>
               <ol className="mt-5 grid grid-cols-3 gap-2">
                 {[
                   [tx(locale, "Solicitado", "Requested"), <TimeAgo key="t" iso={m.createdAt} locale={locale} />],
@@ -134,7 +134,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
                 ].map(([t, d], i) => (
                   <li key={i}>
                     <div className={cn("h-1.5 rounded-full", i <= stageIdx[m.status] ? "bg-navy dark:bg-ivory" : "bg-black/10")} />
-                    <div className="mt-2 flex items-center gap-1.5 font-display text-sm font-semibold">{i <= stageIdx[m.status] ? <Check size={14} className="text-ok" /> : <span className="h-3 w-3 rounded-full border-2 border-black/20" />}{t}</div>
+                    <div className="mt-2 flex items-center gap-1.5 font-display text-[15px] font-semibold">{i <= stageIdx[m.status] ? <Check size={14} className="text-ok" /> : <span className="h-3 w-3 rounded-full border-2 border-black/20" />}{t}</div>
                     <div className="text-[13px] text-muted">{d as React.ReactNode}</div>
                   </li>
                 ))}
@@ -168,7 +168,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
                       <span className="text-[13px] font-semibold text-muted">{isMandate ? tx(locale, "Encargo", "Mandate") : tx(locale, "Publicado por ti", "Listed by you")}</span>
                       <span className="text-[13px] text-muted">· {plural(l.photos?.length ?? 0, locale, ["foto", "fotos"], ["photo", "photos"])} · {tx(locale, "calidad", "quality")} {l.quality}</span>
                     </div>
-                    <Link href={listingHref(locale, l)} className="mt-1 block font-serif text-[24px] font-light leading-tight underline-offset-4 hover:underline">{tx(locale, l.title_es, l.title_en)}</Link>
+                    <Link href={listingHref(locale, l)} className="mt-1 block font-serif text-[28px] font-light leading-tight underline-offset-4 hover:underline">{tx(locale, l.title_es, l.title_en)}</Link>
                     {editing === l.id ? (
                       <form
                         className="mt-2"
@@ -215,7 +215,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
                         {priceErr && <p id={`price-err-${l.id}`} role="alert" className="mt-1 text-[13px] font-semibold text-danger">{priceErr}</p>}
                       </form>
                     ) : (
-                      <div className="text-sm text-muted">{l.zone}, {l.city} · {money(l.priceAmount, locale)}{priceSuffix(l, locale)}</div>
+                      <div className="text-[15px] text-muted">{l.zone}, {l.city} · {money(l.priceAmount, locale)}{priceSuffix(l, locale)}</div>
                     )}
                     <div className="mt-3 grid grid-cols-4 gap-2 text-center">
                       {[[Eye, num(l.stats.impressions, locale), tx(locale, "vistas", "views")], [Heart, l.stats.saves, tx(locale, "guardados", "saves")], [Inbox, l.stats.leads, "leads"], [TrendingDown, `${Math.round(((l.priceAmount - l.estimate.mid) / l.estimate.mid) * 100)} %`, tx(locale, "vs estimado", "vs estimate")]].map(([I, v, t], i) => {
@@ -263,7 +263,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
                           (confirmSold === l.id ? (
                             // Taking a listing off the market is not undoable from here: ask first.
                             <span className="flex flex-wrap items-center gap-2" role="group" aria-label={tx(locale, "Confirmar", "Confirm")}>
-                              <span className="text-sm font-semibold">{l.listingType.includes("RENT") ? tx(locale, "¿Marcar como alquilado? Dejará de aparecer en el buscador.", "Mark as rented? It will no longer appear in search.") : tx(locale, "¿Marcar como vendido? Dejará de aparecer en el buscador.", "Mark as sold? It will no longer appear in search.")}</span>
+                              <span className="text-[15px] font-semibold">{l.listingType.includes("RENT") ? tx(locale, "¿Marcar como alquilado? Dejará de aparecer en el buscador.", "Mark as rented? It will no longer appear in search.") : tx(locale, "¿Marcar como vendido? Dejará de aparecer en el buscador.", "Mark as sold? It will no longer appear in search.")}</span>
                               <Button size="sm" variant="navy" disabled={busy === `sold-${l.id}`} onClick={() => act(() => api(`listings/${l.id}`, { method: "PATCH", json: { status: l.listingType.includes("RENT") ? "RENTED" : "SOLD" } }), `sold-${l.id}`).then(() => setConfirmSold(null))}>
                                 {busy === `sold-${l.id}` && <Loader2 size={13} className="animate-spin" />} {tx(locale, "Sí, confirmar", "Yes, confirm")}
                               </Button>
@@ -277,7 +277,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
                         {!takenDown &&
                           (confirmDelete === l.id ? (
                             <span className="flex flex-wrap items-center gap-2" role="group" aria-label={tx(locale, "Confirmar borrado", "Confirm deletion")}>
-                              <span className="text-sm font-semibold">{tx(locale, "¿Borrar esta casa? No se puede deshacer.", "Delete this home? This can’t be undone.")}</span>
+                              <span className="text-[15px] font-semibold">{tx(locale, "¿Borrar esta casa? No se puede deshacer.", "Delete this home? This can’t be undone.")}</span>
                               <Button size="sm" variant="ghost" className="bg-danger text-white hover:bg-danger/90" disabled={busy === `del-${l.id}`} onClick={() => act(() => api(`listings/${l.id}`, { method: "DELETE" }), `del-${l.id}`).then(() => setConfirmDelete(null))}>
                                 {busy === `del-${l.id}` ? <Loader2 size={13} className="animate-spin" /> : <Trash2 size={13} />} {tx(locale, "Sí, borrar", "Yes, delete")}
                               </Button>
@@ -304,8 +304,8 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
                       <div className="mt-4 rounded-lg border border-line">
                         <div className="border-b border-line px-3 py-2 text-[13px] font-bold text-muted">{tx(locale, "Ofertas recibidas", "Offers received")} · {lo.length}</div>
                         {lo.map((o) => (
-                          <div key={o.id} className="flex flex-wrap items-center gap-3 px-3 py-2.5 text-sm">
-                            <span className="font-display text-base font-semibold">{money(o.amount, locale)}</span>
+                          <div key={o.id} className="flex flex-wrap items-center gap-3 px-3 py-2.5 text-[15px]">
+                            <span className="font-display text-[17px] font-semibold">{money(o.amount, locale)}</span>
                             <span className="text-muted">{o.bidder}</span>
                             <TimeAgo iso={o.createdAt} locale={locale} className="text-muted" />
                             <Badge tone={o.status === "ACCEPTED" ? "ok" : o.status === "REJECTED" ? "danger" : o.status === "COUNTERED" ? "warn" : "mist"} className="ml-auto">{tx(locale, ...OFFER_LABEL[o.status])}</Badge>
@@ -350,21 +350,21 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
               </div>
               <div className="flex-1 space-y-3 overflow-y-auto p-4 scrollbar-thin">
                 {threadLead && !other && (
-                  <div className="rounded-2xl rounded-bl-md bg-ivory px-3.5 py-2 text-sm">
+                  <div className="rounded-2xl rounded-bl-md bg-ivory px-3.5 py-2 text-[15px]">
                     <div className="text-[13px] font-semibold text-ink/70">{threadLead.name} · {threadLead.email}{threadLead.phone ? ` · ${threadLead.phone}` : ""}</div>
                     <div className="whitespace-pre-wrap">{threadLead.message}</div>
                     <TimeAgo iso={threadLead.createdAt} locale={locale} className="mt-1 block text-[13px] text-muted" />
                   </div>
                 )}
                 {thread.messages.map((m) => (
-                  <div key={m.id} className={cn("max-w-[85%] rounded-2xl px-3.5 py-2 text-sm", m.mine ? "ml-auto rounded-br-md bg-navy text-ivory" : "rounded-bl-md bg-ivory")}>
+                  <div key={m.id} className={cn("max-w-[85%] rounded-2xl px-3.5 py-2 text-[15px]", m.mine ? "ml-auto rounded-br-md bg-navy text-ivory" : "rounded-bl-md bg-ivory")}>
                     {m.body}
                     <TimeAgo iso={m.at} locale={locale} className={cn("mt-1 block text-[13px]", m.mine ? "text-mist" : "text-muted")} />
                   </div>
                 ))}
               </div>
               {threadLead && !other ? (
-                <div className="border-t border-line p-3 text-center text-sm text-muted">
+                <div className="border-t border-line p-3 text-center text-[15px] text-muted">
                   {tx(locale, "Te escribió sin crear una cuenta. Respóndele por correo o teléfono.", "They wrote without an account. Reply by email or phone.")}{" "}
                   <a href={`mailto:${threadLead.email}`} className="font-semibold font-semibold text-navy underline decoration-navy/30 underline-offset-4">{tx(locale, "Responder por correo", "Reply by email")}</a>
                 </div>
@@ -389,7 +389,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
                   }
                 }}
               >
-                <input value={draft} onChange={(e) => setDraft(e.target.value)} maxLength={2000} className="h-11 min-w-0 flex-1 rounded-[12px] border border-[#D6DEE5] bg-white px-4 text-sm focus:border-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3A6A92]" placeholder={tx(locale, "Escribe un mensaje…", "Write a message…")} aria-label={tx(locale, "Mensaje", "Message")} />
+                <input value={draft} onChange={(e) => setDraft(e.target.value)} maxLength={2000} className="h-11 min-w-0 flex-1 rounded-[12px] border border-[#D6DEE5] bg-white px-4 text-[15px] focus:border-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3A6A92]" placeholder={tx(locale, "Escribe un mensaje…", "Write a message…")} aria-label={tx(locale, "Mensaje", "Message")} />
                 <button disabled={sending} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-navy text-ivory hover:bg-navy-2 disabled:opacity-60 dark:bg-ivory dark:text-navy" aria-label={tx(locale, "Enviar", "Send")}>{sending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}</button>
               </form>
               )}
@@ -397,7 +397,7 @@ export function OwnerListingsView({ locale, listings, offers, threads, mandates,
               <div className="pb-2 text-center text-[13px] text-muted">{tx(locale, "Tus mensajes · se actualizan cada 15 s", "Your messages · refresh every 15 s")}</div>
             </>
           ) : (
-            <div className="m-auto p-6 text-center text-sm text-muted">{tx(locale, "Cuando un comprador o tu asesor te escriba, verás la conversación aquí.", "When a buyer or your advisor writes to you, you’ll see the conversation here.")}</div>
+            <div className="m-auto p-6 text-center text-[15px] text-muted">{tx(locale, "Cuando un comprador o tu asesor te escriba, verás la conversación aquí.", "When a buyer or your advisor writes to you, you’ll see the conversation here.")}</div>
           )}
         </Card>
         </div>
@@ -424,7 +424,7 @@ function NoPhotos({ locale, busy, onAdd }: { locale: Locale; busy: boolean; onAd
         <p className="mt-0.5 text-[13px] text-muted dark:text-mist">{tx(locale, "Con fotos, tu anuncio recibe muchas más visitas.", "With photos, your listing gets far more views.")}</p>
       </div>
       {onAdd && (
-        <button type="button" onClick={onAdd} disabled={busy} className="inline-flex min-h-10 items-center gap-1.5 rounded-[12px] bg-[#3A6A92] px-4 font-display text-sm font-semibold text-[#FAF8F4] transition-colors duration-np hover:bg-[#2F5A7E] disabled:opacity-60 dark:bg-[#FAF8F4] dark:text-[#1F3A4D] dark:hover:bg-white">
+        <button type="button" onClick={onAdd} disabled={busy} className="inline-flex min-h-10 items-center gap-1.5 rounded-[12px] bg-[#3A6A92] px-4 font-display text-[15px] font-semibold text-[#FAF8F4] transition-colors duration-np hover:bg-[#2F5A7E] disabled:opacity-60 dark:bg-[#FAF8F4] dark:text-[#1F3A4D] dark:hover:bg-white">
           {busy ? <Loader2 size={14} className="animate-spin" aria-hidden /> : <ImagePlus size={14} aria-hidden />} {tx(locale, "Añade fotos", "Add photos")}
         </button>
       )}

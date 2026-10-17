@@ -142,7 +142,7 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
     if (m) {
       const p = mPhase(m);
       // Table: "Encargo" as a small kicker over the phase pill, so the Estado column stays as narrow as a single pill.
-      if (stacked) return <span className="flex flex-col items-start gap-0.5"><span className={cn("text-[12px] font-semibold", k.muted)}>{tx(locale, "Encargo", "Mandate")}</span><Pill tone={MANDATE_PHASE[p].tone}><span title={mandateHint(p, locale)}>{mandateLabel(p, locale)}</span></Pill></span>;
+      if (stacked) return <span className="flex flex-col items-start gap-0.5"><span className={cn("text-[13px] font-semibold", k.muted)}>{tx(locale, "Encargo", "Mandate")}</span><Pill tone={MANDATE_PHASE[p].tone}><span title={mandateHint(p, locale)}>{mandateLabel(p, locale)}</span></Pill></span>;
       return <Pill tone={MANDATE_PHASE[p].tone}><span title={mandateHint(p, locale)}>{tx(locale, "Encargo", "Mandate")} · {mandateLabel(p, locale)}</span></Pill>;
     }
     return <StatusPill status={l.status} review={l.review} takedownReason={l.takedownReason} locale={locale} />;
@@ -199,10 +199,10 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
               const title = m.listing ? tx(locale, m.listing.title_es, m.listing.title_en) : "—";
               const p = mPhase(m);
               return (
-                <div key={m.id} className="flex flex-wrap items-center gap-3 py-2.5 text-sm" data-mandate={m.id}>
+                <div key={m.id} className="flex flex-wrap items-center gap-3 py-2.5 text-[15px]" data-mandate={m.id}>
                   <div className="min-w-0 flex-1 basis-60">
                     {m.status === "ASSIGNED" && m.listing ? <Link href={`/${locale}/agency/listings/${m.listing.id}/edit`} className="line-clamp-1 font-semibold underline-offset-4 hover:underline">{title}</Link> : <div className="line-clamp-1 font-semibold">{title}</div>}
-                    <div className={cn("text-xs", k.muted)}>{m.ownerName}{m.listing ? ` · ${m.listing.zone}, ${m.listing.city} · ${money(m.listing.priceAmount, locale)}` : ""} · <TimeAgo iso={m.createdAt} locale={locale} /></div>
+                    <div className={cn("text-[13px]", k.muted)}>{m.ownerName}{m.listing ? ` · ${m.listing.zone}, ${m.listing.city} · ${money(m.listing.priceAmount, locale)}` : ""} · <TimeAgo iso={m.createdAt} locale={locale} /></div>
                   </div>
                   <Pill tone={MANDATE_PHASE[p].tone}><span title={mandateHint(p, locale)}>{mandateLabel(p, locale)}</span></Pill>
                   {manager && (
@@ -218,7 +218,7 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
                     <Button size="sm" variant="ghost" className={k.ghost} disabled={busy === m.id} onClick={() => setDeclineId(m.id)} aria-label={tx(locale, `Rechazar encargo ${title}`, `Decline mandate ${title}`)}><XCircle size={14} /> {tx(locale, "Rechazar", "Decline")}</Button>
                   )}
                   {manager && declineId === m.id && (
-                    <span role="group" aria-label={tx(locale, "Confirmar rechazo", "Confirm decline")} className="flex flex-wrap items-center gap-2 text-sm">
+                    <span role="group" aria-label={tx(locale, "Confirmar rechazo", "Confirm decline")} className="flex flex-wrap items-center gap-2 text-[15px]">
                       <span className="font-semibold">{tx(locale, "¿Rechazar este encargo? El propietario dejará de verlo como activo.", "Decline this mandate? The owner will no longer see it as active.")}</span>
                       <Button size="sm" variant="navy" className={k.navy} disabled={busy === m.id} onClick={() => { setDeclineId(null); patch(m.id, { status: "CANCELLED" }, `mandates/${m.id}`); }}>{tx(locale, "Sí, rechazar", "Yes, decline")}</Button>
                       <Button size="sm" variant="ghost" className={k.ghost} onClick={() => setDeclineId(null)}>{tx(locale, "Cancelar", "Cancel")}</Button>
@@ -231,7 +231,7 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
         </section>
       )}
       {selectable && rows.length > 0 && (
-        <label className={cn("mb-3 inline-flex min-h-10 cursor-pointer items-center gap-2.5 text-sm md:hidden", k.muted)}>
+        <label className={cn("mb-3 inline-flex min-h-10 cursor-pointer items-center gap-2.5 text-[15px] md:hidden", k.muted)}>
           <SelectAll className={box} checked={allOn} indeterminate={someOn} onChange={toggleAll} label={tx(locale, `Seleccionar los ${rows.length} visibles`, `Select all ${rows.length} visible`)} />
           {tx(locale, `Seleccionar los ${rows.length} visibles`, `Select all ${rows.length} visible`)}
         </label>
@@ -249,51 +249,51 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
                   <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="h-[68px] w-[88px] shrink-0 rounded-xl" />
                   <div className="min-w-0 flex-1">
                     <div className="line-clamp-2 font-semibold leading-snug">{title}</div>
-                    <div className={cn("mt-0.5 text-xs", k.muted)}>{lbl(TYPE_LABEL[l.listingType], locale)} · {l.zone} · {num(l.areaM2, locale)} m²</div>
-                    <div className={cn("mt-1 text-[17px] leading-tight", k.num, "tracking-normal")}>{money(l.priceAmount, locale)}<span className={cn("text-xs font-normal", k.muted)}>{priceSuffix(l, locale)}</span></div>
+                    <div className={cn("mt-0.5 text-[13px]", k.muted)}>{lbl(TYPE_LABEL[l.listingType], locale)} · {l.zone} · {num(l.areaM2, locale)} m²</div>
+                    <div className={cn("mt-1 text-[17px] leading-tight", k.num, "tracking-normal")}>{money(l.priceAmount, locale)}<span className={cn("text-[13px] font-normal", k.muted)}>{priceSuffix(l, locale)}</span></div>
                   </div>
                 </Link>
               </div>
               <div className="mt-3 flex flex-wrap items-center gap-1.5">
                 {statusPills(l)}
                 {l.luxury && <Pill tone="exclusive">{tx(locale, "Exclusiva", "Exclusive")}</Pill>}
-                <span className={cn("ml-auto text-xs", k.muted)}><TimeAgo iso={l.updatedAt} locale={locale} /></span>
+                <span className={cn("ml-auto text-[13px]", k.muted)}><TimeAgo iso={l.updatedAt} locale={locale} /></span>
               </div>
               <dl className={cn("mt-3 grid grid-cols-3 gap-2 rounded-xl px-3 py-2.5 text-center", k.soft)}>
                 <div className="min-w-0">
-                  <dt className={cn(k.label, "text-[12px]")}>{tx(locale, "Calidad", "Quality")}</dt>
+                  <dt className={cn(k.label, "text-[13px]")}>{tx(locale, "Calidad", "Quality")}</dt>
                   <dd className="mt-1 flex items-center justify-center gap-1.5">
                     <span className="h-1.5 w-10 rounded-full bg-[#E3E8EC] dark:bg-white/10" aria-hidden><span className={cn("block h-full rounded-full", l.quality >= 85 ? "bg-ok" : l.quality >= 65 ? "bg-warn" : "bg-danger")} style={{ width: `${l.quality}%` }} /></span>
-                    <span className="text-xs font-semibold">{l.quality}</span>
+                    <span className="text-[13px] font-semibold">{l.quality}</span>
                   </dd>
                 </div>
                 <div>
-                  <dt className={cn(k.label, "text-[12px]")}>Leads</dt>
+                  <dt className={cn(k.label, "text-[13px]")}>Leads</dt>
                   <dd className="mt-0.5 font-semibold">{l.stats.leads}</dd>
                 </div>
                 <div>
-                  <dt className={cn(k.label, "text-[12px]")}>{tx(locale, "Días", "Days")}</dt>
+                  <dt className={cn(k.label, "text-[13px]")}>{tx(locale, "Días", "Days")}</dt>
                   <dd className="mt-0.5 font-semibold">{l.daysOnMarket}</dd>
                 </div>
               </dl>
-              <label className="mt-3 flex items-center gap-3 text-sm">
+              <label className="mt-3 flex items-center gap-3 text-[15px]">
                 <span className={cn("shrink-0", k.muted)}>{tx(locale, "Agente", "Agent")}</span>
                 {agentSelect(l, tx(locale, `Agente de ${title}`, `Agent for ${title}`), "min-w-0 flex-1", "h-10")}
               </label>
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 {reviewActions(l, title, false)}
-                <Link href={edit} className={cn("ml-auto inline-flex min-h-10 items-center gap-1.5 rounded-full px-3 text-sm", k.link)} aria-label={tx(locale, `Editar ${title}`, `Edit ${title}`)}><Pencil size={14} aria-hidden /> {tx(locale, "Editar", "Edit")}</Link>
+                <Link href={edit} className={cn("ml-auto inline-flex min-h-10 items-center gap-1.5 rounded-full px-3 text-[15px]", k.link)} aria-label={tx(locale, `Editar ${title}`, `Edit ${title}`)}><Pencil size={14} aria-hidden /> {tx(locale, "Editar", "Edit")}</Link>
               </div>
             </li>
           );
         })}
-        {rows.length === 0 && <li className={cn(k.card, "px-4 py-10 text-center text-sm", k.muted)}>{tx(locale, "No hay inmuebles con este filtro.", "No listings match this filter.")}</li>}
+        {rows.length === 0 && <li className={cn(k.card, "px-4 py-10 text-center text-[15px]", k.muted)}>{tx(locale, "No hay inmuebles con este filtro.", "No listings match this filter.")}</li>}
       </ul>
       <ScrollRegion fade={false} label={tx(locale, "Tabla de inmuebles", "Listings table")} className={cn("hidden md:block", k.card)}>
         {/* Below xl (tablets, 1024 beside the sidebar = 680 px): checkbox · listing (+ price and agent, + meta line) · status ·
             action, so nothing hides under the actions. xl: price and agent get columns (≈ 830 px, fits 936 px at 1280).
             From 2xl every column has its own. */}
-        <table className="np-sticky-last w-full text-sm xl:min-w-[800px] 2xl:min-w-[1160px]">
+        <table className="np-sticky-last w-full text-[15px] xl:min-w-[800px] 2xl:min-w-[1160px]">
           <thead className={cn("border-b text-left", k.line, k.th)}>
             <tr>
               {selectable && (
@@ -329,14 +329,14 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
                       <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className="h-12 w-16 shrink-0 rounded-lg" />
                       <div className="min-w-0">
                         <div className="line-clamp-2 font-semibold leading-snug underline-offset-4 hover:underline">{title}</div>
-                        <div className={cn("text-xs", k.muted)}>{lbl(TYPE_LABEL[l.listingType], locale)} · {l.zone} · {num(l.areaM2, locale)} m²</div>
+                        <div className={cn("text-[13px]", k.muted)}>{lbl(TYPE_LABEL[l.listingType], locale)} · {l.zone} · {num(l.areaM2, locale)} m²</div>
                       </div>
                     </Link>
                     <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5 pl-[76px] xl:hidden" data-testid="listing-price-agent">
-                      <span className={cn("whitespace-nowrap text-[15px]", k.num, "tracking-normal")}>{money(l.priceAmount, locale)}<span className={cn("text-xs font-normal", k.muted)}>{priceSuffix(l, locale)}</span></span>
+                      <span className={cn("whitespace-nowrap text-[15px]", k.num, "tracking-normal")}>{money(l.priceAmount, locale)}<span className={cn("text-[13px] font-normal", k.muted)}>{priceSuffix(l, locale)}</span></span>
                       {agentSelect(l, tx(locale, `Agente de ${title}`, `Agent for ${title}`), "max-w-[200px]")}
                     </div>
-                    <div className={cn("mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 pl-[76px] text-xs 2xl:hidden", k.muted)} data-testid="listing-meta">
+                    <div className={cn("mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 pl-[76px] text-[13px] 2xl:hidden", k.muted)} data-testid="listing-meta">
                       <span className="inline-flex items-center gap-1.5" title={tx(locale, "Calidad de la ficha", "Listing quality")}>{qualityBar(l, "w-8")}<span className="font-semibold text-navy dark:text-ivory">{l.quality}</span></span>
                       <span>· {l.stats.leads} {l.stats.leads === 1 ? "lead" : "leads"}</span>
                       <span title={tx(locale, "Días en el mercado", "Days on market")}>· {tx(locale, `${l.daysOnMarket} ${l.daysOnMarket === 1 ? "día" : "días"}`, `${l.daysOnMarket} ${l.daysOnMarket === 1 ? "day" : "days"}`)}</span>
@@ -344,18 +344,18 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
                     </div>
                   </td>
                   <td className="whitespace-nowrap px-3"><div className="flex flex-col items-start gap-1">{statusPills(l, true)}{l.luxury && <Pill tone="exclusive">{tx(locale, "Exclusiva", "Exclusive")}</Pill>}</div></td>
-                  <td className={cn("whitespace-nowrap px-3 text-right", xlCol, k.num, "tracking-normal")}>{money(l.priceAmount, locale)}<span className={cn("text-xs font-normal", k.muted)}>{priceSuffix(l, locale)}</span></td>
+                  <td className={cn("whitespace-nowrap px-3 text-right", xlCol, k.num, "tracking-normal")}>{money(l.priceAmount, locale)}<span className={cn("text-[13px] font-normal", k.muted)}>{priceSuffix(l, locale)}</span></td>
                   {/* The select sizes to its longest option, so full agent names always show. */}
                   <td className={cn("px-3", xlCol)}>{agentSelect(l, tx(locale, `Agente de ${title}`, `Agent for ${title}`))}</td>
                   <td className={cn("px-3", wide)}>
                     <div className="flex items-center gap-2">
                       {qualityBar(l, "w-16")}
-                      <span className="text-xs font-semibold">{l.quality}</span>
+                      <span className="text-[13px] font-semibold">{l.quality}</span>
                     </div>
                   </td>
                   <td className={cn("px-3 text-right font-semibold", wide)}>{l.stats.leads}</td>
                   <td className={cn("px-3 text-right", wide)}>{l.daysOnMarket}</td>
-                  <td className={cn("px-3 text-xs", wide, k.muted)}><TimeAgo iso={l.updatedAt} locale={locale} /></td>
+                  <td className={cn("px-3 text-[13px]", wide, k.muted)}><TimeAgo iso={l.updatedAt} locale={locale} /></td>
                   <td className="px-3">{action ?? (a && <span title={a.name}><Initials name={a.name} size={28} /></span>)}</td>
                 </tr>
               );
@@ -368,7 +368,7 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
           </tbody>
         </table>
       </ScrollRegion>
-      <div className={cn("mt-3 flex items-center gap-2 text-xs", k.muted)}><UserPlus size={13} /> {tx(locale, "Backoffice y dueño pueden reasignar agentes. Los agentes solo editan sus inmuebles.", "Backoffice and owner can reassign agents. Agents only edit their own listings.")}</div>
+      <div className={cn("mt-3 flex items-center gap-2 text-[13px]", k.muted)}><UserPlus size={13} /> {tx(locale, "Backoffice y dueño pueden reasignar agentes. Los agentes solo editan sus inmuebles.", "Backoffice and owner can reassign agents. Agents only edit their own listings.")}</div>
 
       {bulk && !chosen.length && (
         <div className={cn("mt-4", bulk.failed.length ? k.warnBox : k.okBox)} role="status" aria-live="polite">
@@ -378,7 +378,7 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
       {chosen.length > 0 && (
         <div className="sticky bottom-3 z-20 mt-4" role="region" aria-label={tx(locale, "Acciones en lote", "Bulk actions")}>
           <div className={cn(k.card, "flex flex-wrap items-center gap-2 p-3 outline outline-1 -outline-offset-1 outline-[#EFE6D8] md:gap-3 md:px-4")}>
-            <span className="text-sm font-semibold">{tx(locale, `${chosen.length} ${chosen.length === 1 ? "seleccionado" : "seleccionados"}`, `${chosen.length} selected`)}</span>
+            <span className="text-[15px] font-semibold">{tx(locale, `${chosen.length} ${chosen.length === 1 ? "seleccionado" : "seleccionados"}`, `${chosen.length} selected`)}</span>
             {manager && (
               <Select compact value="" disabled={bulk?.running} onChange={(e) => e.target.value && bulkAssign(e.target.value)} className="h-10" aria-label={tx(locale, "Asignar los seleccionados a…", "Assign selected to…")}>
                 <option value="" disabled>{tx(locale, "Asignar a…", "Assign to…")}</option>
@@ -398,7 +398,7 @@ export function ListingsTable({ locale, listings, agents, mandates = [] }: { loc
             </Button>
             <Button size="sm" variant="ghost" className={cn(k.ghost, "ml-auto min-h-10")} disabled={bulk?.running} onClick={() => setPicked(new Set())}><X size={14} /> {tx(locale, "Quitar selección", "Clear selection")}</Button>
             {bulk && (
-              <div className="w-full text-sm" role="status" aria-live="polite">
+              <div className="w-full text-[15px]" role="status" aria-live="polite">
                 <BulkResult locale={locale} bulk={bulk} onClose={() => setBulk(null)} />
               </div>
             )}

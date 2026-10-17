@@ -160,14 +160,14 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
           <div className={k.caption}>{mode === "login" ? tx(locale, "Entrar", "Sign in") : tx(locale, "Te damos la bienvenida", "Welcome to New Place")}</div>
           <h1 className="np-t-h1 mt-2 font-serif text-navy">{title}</h1>
           {inv && (
-            <div className="mt-5 rounded-[16px] bg-rosa/60 p-4 text-sm text-navy" role="status">
+            <div className="mt-5 rounded-[16px] bg-rosa/60 p-4 text-[15px] text-navy" role="status">
               {tx(locale, `${inv.agencyName} te invita a su equipo como ${ROLE_LABEL[inv.role]?.[0] ?? inv.role}.`, `${inv.agencyName} invited you to their team as ${ROLE_LABEL[inv.role]?.[1] ?? inv.role}.`)}{" "}
               {mode === "register" ? (
                 <Link className={k.link} href={`/${locale}/login${carry}`}>{tx(locale, "¿Ya tienes cuenta? Entra", "Already have an account? Sign in")}</Link>
               ) : null}
             </div>
           )}
-          <p className={cn("mt-3 text-[16px]", k.muted)}>{lead}</p>
+          <p className={cn("mt-3 text-[17px]", k.muted)}>{lead}</p>
           {mode === "login" && sp.get("reset") === "1" && (
             <div className={cn(k.okBox, "mt-5")} role="status">{tx(locale, "Listo, tu contraseña cambió. Entra con la nueva.", "Done, your password changed. Sign in with the new one.")}</div>
           )}
@@ -199,7 +199,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
             </Field>
             {mode === "login" && (
               <div className="-mt-1 text-right">
-                <Link className={cn(k.link, "inline-flex min-h-11 items-center text-[14px]")} href={forgotHref} onClick={rememberForgotEmail}>{tx(locale, "¿Olvidaste tu contraseña?", "Forgot your password?")}</Link>
+                <Link className={cn(k.link, "inline-flex min-h-11 items-center text-[15px]")} href={forgotHref} onClick={rememberForgotEmail}>{tx(locale, "¿Olvidaste tu contraseña?", "Forgot your password?")}</Link>
               </div>
             )}
             {mode === "register" && !inv && (
@@ -207,7 +207,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
                 <input type="checkbox" checked={agency} onChange={(e) => setAgency(e.target.checked)} className="mt-1 h-4 w-4 accent-navy" />
                 <span>
                   <span className="flex items-center gap-1.5 font-display font-semibold"><Building2 size={16} strokeWidth={1.7} /> {tx(locale, "¿Eres agencia?", "Are you an agency?")}</span>
-                  <span className="text-sm text-muted">{tx(locale, "Crea el espacio de tu inmobiliaria y empieza con el plan Free.", "Set up your agency and start on the Free plan.")}</span>
+                  <span className="text-[15px] text-muted">{tx(locale, "Crea el espacio de tu inmobiliaria y empieza con el plan Free.", "Set up your agency and start on the Free plan.")}</span>
                 </span>
               </label>
             )}
@@ -238,7 +238,7 @@ export function AuthForm({ locale, mode }: { locale: Locale; mode: "login" | "re
                       await signIn("demo", { email: d.email, redirect: false });
                       finish(d.home);
                     }}
-                    className="flex items-center gap-2 rounded-xl bg-white p-2 text-left text-sm outline outline-1 -outline-offset-1 outline-[#E4DCCD] transition-[outline-color] hover:outline hover:outline-1 hover:-outline-offset-1 hover:outline-[#1F3A4D]"
+                    className="flex items-center gap-2 rounded-xl bg-white p-2 text-left text-[15px] outline outline-1 -outline-offset-1 outline-[#E4DCCD] transition-[outline-color] hover:outline hover:outline-1 hover:-outline-offset-1 hover:outline-[#1F3A4D]"
                   >
                     {busy === d.email ? <Loader2 size={18} className="animate-spin" /> : <Avatar initials={d.initials} hue={d.hue} size={26} />}
                     <span className="font-semibold leading-tight">{tx(locale, d.label.es, d.label.en)}</span>

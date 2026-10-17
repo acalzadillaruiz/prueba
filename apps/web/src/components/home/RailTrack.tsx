@@ -82,13 +82,13 @@ export function RailTrack({
         {children}
       </ul>
       <div className="np-gutter mx-auto mt-8 flex max-w-[1280px] box-content items-center gap-5">
-        <span className="np-num shrink-0 text-[14px] text-muted" aria-live="polite">
+        <span className="np-num shrink-0 text-[15px] text-muted" aria-live="polite">
           {pad(state.index + 1)} / {pad(count)}
         </span>
         <span aria-hidden className="relative h-[2px] flex-1 overflow-hidden rounded-full bg-ink/10">
           <span className="absolute inset-y-0 left-0 rounded-full bg-[#5B8DB8] transition-[width] duration-np ease-np" style={{ width: `${state.progress * 100}%` }} />
         </span>
-        <span className="text-[14px] text-muted [@media(hover:hover)_and_(pointer:fine)]:hidden">{hint}</span>
+        <span className="text-[15px] text-muted [@media(hover:hover)_and_(pointer:fine)]:hidden">{hint}</span>
         <span className="hidden gap-2 [@media(hover:hover)_and_(pointer:fine)]:flex">
           <button type="button" className={cn(arrow)} aria-label={prevLabel} disabled={state.atStart} onClick={() => go(-1)}>
             <ArrowLeft size={18} aria-hidden />

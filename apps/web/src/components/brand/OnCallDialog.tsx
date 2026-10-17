@@ -75,7 +75,7 @@ export function OnCallDialog({ locale, listingSlug, onClose }: { locale: Locale;
       >
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
-            <div className="font-display text-[14px] font-medium text-gold-text">{tx(locale, "Asesor 24/7", "Advisor 24/7")}</div>
+            <div className="font-display text-[15px] font-medium text-gold-text">{tx(locale, "Asesor 24/7", "Advisor 24/7")}</div>
             <h2 id={titleId} className="np-t-h2 mt-1 font-serif text-navy">{tx(locale, "Un asesor te atiende hoy", "An advisor can help you today")}</h2>
           </div>
           <button ref={closeBtn} type="button" onClick={onClose} aria-label={tx(locale, "Cerrar", "Close")} className={cn("-mr-2 -mt-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-navy hover:bg-navy/5", ring)}>
@@ -93,7 +93,7 @@ export function OnCallDialog({ locale, listingSlug, onClose }: { locale: Locale;
           </div>
         )}
         {q.isError && (
-          <div role="alert" className="mt-5 rounded-xl bg-[#B3261E1A] px-3.5 py-2.5 text-sm text-danger">
+          <div role="alert" className="mt-5 rounded-xl bg-[#B3261E1A] px-3.5 py-2.5 text-[15px] text-danger">
             {tx(locale, "No pudimos ver quién está de guardia. ", "We couldn’t check who’s on call. ")}
             <button type="button" onClick={() => q.refetch()} className={cn("font-semibold underline underline-offset-4", ring)}>{tx(locale, "Intentar de nuevo", "Try again")}</button>
           </div>
@@ -116,7 +116,7 @@ export function OnCallDialog({ locale, listingSlug, onClose }: { locale: Locale;
                       <span className="truncate">{o.advisor.name}</span>
                       {o.advisor.verified && <ShieldCheck size={15} className="shrink-0 text-ok" aria-label={tx(locale, "Verificado", "Verified")} />}
                     </div>
-                    <div className="truncate text-sm text-muted">
+                    <div className="truncate text-[15px] text-muted">
                       {o.agency.name}
                       {listingSlug && i === 0 ? tx(locale, " · agencia de esta casa", " · this home’s agency") : ""}
                     </div>
@@ -141,7 +141,7 @@ export function OnCallDialog({ locale, listingSlug, onClose }: { locale: Locale;
             ))}
           </ul>
         )}
-        <p className="mt-4 text-center text-sm text-muted">{tx(locale, "La guardia sigue el horario de Caracas (UTC−4).", "On-call hours follow Caracas time (UTC−4).")}</p>
+        <p className="mt-4 text-center text-[15px] text-muted">{tx(locale, "La guardia sigue el horario de Caracas (UTC−4).", "On-call hours follow Caracas time (UTC−4).")}</p>
       </div>
     </div>,
     document.body,

@@ -61,21 +61,21 @@ function Essentials({ l, locale, title }: { l: Listing; locale: Locale; title: R
           // A declared absence ("no backup power") is information, not a perk: muted, dashed, with an "x" — never styled like a feature.
           if (key === "power" && l.powerBackup === "NONE")
             return (
-              <li key={key} data-absent className="flex items-center gap-3 py-1 text-[16px] text-muted">
+              <li key={key} data-absent className="flex items-center gap-3 py-1 text-[17px] text-muted">
                 <X size={18} strokeWidth={1.7} className="shrink-0" aria-hidden />
                 <span>{tx(locale, "Planta eléctrica: no tiene", "Backup power: none")}</span>
               </li>
             );
           const Icon = ESSENTIAL_ICON[key];
           return (
-            <li key={key} className="flex items-center gap-3 py-1 text-[16px] font-medium text-ink [font-feature-settings:'lnum']">
+            <li key={key} className="flex items-center gap-3 py-1 text-[17px] font-medium text-ink [font-feature-settings:'lnum']">
               <Icon size={18} strokeWidth={1.7} className="shrink-0 text-navy" aria-hidden />
               <span>{label}</span>
             </li>
           );
         })}
       </ul>
-      <p className="mt-3 text-[16px] text-muted">{tx(locale, "Lo indica quien publica la casa. Si un servicio no aparece, es porque no lo informó.", "As stated by the lister. If a service isn’t shown, it wasn’t reported.")}</p>
+      <p className="mt-3 text-[17px] text-muted">{tx(locale, "Lo indica quien publica la casa. Si un servicio no aparece, es porque no lo informó.", "As stated by the lister. If a service isn’t shown, it wasn’t reported.")}</p>
     </div>
   );
 }
@@ -113,8 +113,8 @@ function Facts({ l, locale }: { l: Listing; locale: Locale }) {
       <dl className={cn("grid gap-x-6 gap-y-5 py-6", cols)} data-testid="facts">
         {items.map(([v, t], i) => (
           <div key={t} className={cn("flex min-w-0 flex-col-reverse", i === n - 1 && lastWide)}>
-            <dt className="mt-1.5 break-words text-[14px] leading-snug text-muted">{t}</dt>
-            <dd className="break-words font-title text-[30px] leading-none text-ink [font-variant-numeric:lining-nums_tabular-nums]">{v}</dd>
+            <dt className="mt-1.5 break-words text-[15px] leading-snug text-muted">{t}</dt>
+            <dd className="break-words font-title text-[28px] leading-none text-ink [font-variant-numeric:lining-nums_tabular-nums]">{v}</dd>
           </div>
         ))}
       </dl>
@@ -150,7 +150,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
   const sec = "py-10";
   const amenities = amenitiesBeyondEssentials(l);
   const views = viewFeatures(l, locale);
-  const tile = "py-1 text-[16px]";
+  const tile = "py-1 text-[17px]";
   const searchType = l.listingType.startsWith("COMMERCIAL") ? "COMMERCIAL" : l.listingType;
 
   const crumbs: { key: string; label: string; href?: string }[] = [
@@ -183,7 +183,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
             </nav>
           </div>
           {!isPublic && (
-            <div className="mb-3 rounded-xl border border-warn/60 bg-[#8A5A001a] px-4 py-2.5 text-sm font-semibold text-[#8A5A00]">
+            <div className="mb-3 rounded-xl border border-warn/60 bg-[#8A5A001a] px-4 py-2.5 text-[15px] font-semibold text-[#8A5A00]">
               {l.review === "PENDING" ? tx(locale, "En revisión: por ahora solo tu equipo puede verla.", "Under review: for now only your team can see it.") : tx(locale, `Aún no está publicada (${l.status}). Solo tu equipo puede verla.`, `Not public yet (${l.status}). Only your team can see it.`)}
               {l.takedownReason && ` · ${l.takedownReason}`}
             </div>
@@ -199,13 +199,13 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
                 <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
                   <CompareLink locale={locale} className="hidden md:inline-flex" />
                   <CompareButton id={l.id} locale={locale} className="min-h-11 px-3.5 text-[13px]" />
-                  <ShareButton locale={locale} title={tx(locale, l.title_es, l.title_en)} className="inline-flex min-h-11 items-center gap-1.5 rounded-[12px] bg-arena px-3.5 text-[14px] font-medium" />
+                  <ShareButton locale={locale} title={tx(locale, l.title_es, l.title_en)} className="inline-flex min-h-11 items-center gap-1.5 rounded-[12px] bg-arena px-3.5 text-[15px] font-medium" />
                   <SaveButton id={l.id} locale={locale} className="bg-[#EFE6D8]" />
                 </div>
               </div>
               <div className="lg:flex lg:items-end lg:justify-between lg:gap-12">
                 <div className="min-w-0">
-                  <h1 className="np-t-h1 mt-5 max-w-[760px] max-md:text-[30px] lg:mt-4">{tx(locale, l.title_es, l.title_en)}</h1>
+                  <h1 className="np-t-h1 mt-5 max-w-[760px] max-md:!text-[28px] lg:mt-4">{tx(locale, l.title_es, l.title_en)}</h1>
                   <p className="np-t-body mt-2 text-ink">{l.address} · {l.zone}, {l.city}{l.state && l.state !== l.city ? `, ${l.state}` : ""}</p>
                 </div>
                 {/* Desktop: aligned to the title's baseline, but never higher than the title's own top margin: with a one-line
@@ -214,11 +214,11 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
                     below keeps the visit card only (one price on screen). */}
                 <div className="mt-7 shrink-0 lg:mt-0 lg:text-right">
                   {/* Fluid size + nowrap: "USD 118.000" never breaks after the currency at 360 px. */}
-                  <div className="font-title text-[clamp(36px,10vw,44px)] leading-none text-ink [font-variant-numeric:lining-nums_tabular-nums] lg:whitespace-nowrap" data-testid="listing-price">
+                  <div className="font-title text-[36px] leading-none text-ink [font-variant-numeric:lining-nums_tabular-nums] lg:whitespace-nowrap" data-testid="listing-price">
                     <span className="whitespace-nowrap">{moneyUi(l.priceAmount, locale)}</span>
                     <span className="whitespace-nowrap font-display text-[17px] font-normal text-muted">{priceSuffix(l, locale)}</span>
                   </div>
-                  <div className="mt-1.5 text-[14px] text-muted">
+                  <div className="mt-1.5 text-[15px] text-muted">
                     {stayTerms && <div className="font-semibold text-ink" data-testid="stay-terms">{stayTerms}</div>}
                     {ppm ? <><span className="whitespace-nowrap">{money(ppm, locale)} / m²</span> · </> : ""}
                     <span className="whitespace-nowrap">≈ Bs. {num(Math.round(l.priceAmount * ves), locale)}</span> · <span className="whitespace-nowrap">€ {num(Math.round(l.priceAmount * eur), locale)}</span>{" "}
@@ -233,7 +233,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
               <Gallery l={l} locale={locale} />
               {isPublic && <ViewBeacon id={l.id} />}
               {l.luxury && l.brochurePdf && (
-                <a href={l.brochurePdf} target="_blank" rel="noreferrer" className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-[12px] border-[1.5px] border-navy px-5 font-display text-sm font-semibold text-navy hover:bg-navy/5">
+                <a href={l.brochurePdf} target="_blank" rel="noreferrer" className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-[12px] border-[1.5px] border-navy px-5 font-display text-[15px] font-semibold text-navy hover:bg-navy/5">
                   {tx(locale, "Descargar el folleto (PDF)", "Download the brochure (PDF)")}
                 </a>
               )}
@@ -248,7 +248,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
 
 
             <div data-reveal className="mt-8 py-6"><BilingualBody l={l} locale={locale} /></div>
-            <div className="-mt-2 mb-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted">
+            <div className="-mt-2 mb-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-[15px] text-muted">
               <Freshness iso={l.updatedAt} locale={locale} />
               {savesLabel && <span className="inline-flex items-center gap-1.5"><Heart size={15} aria-hidden /> {savesLabel}</span>}
               <span className="inline-flex items-center gap-1.5"><Clock size={15} aria-hidden /> {l.daysOnMarket === 0 ? tx(locale, "Publicado hoy", "Listed today") : plural(l.daysOnMarket, locale, ["día en New Place", "días en New Place"], ["day on New Place", "days on New Place"])}</span>
@@ -295,7 +295,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
                 <span className="whitespace-nowrap">{moneyUi(l.priceAmount, locale)}</span>
                 <span className="whitespace-nowrap font-display text-[17px] text-muted">{priceSuffix(l, locale)}</span>
               </div>
-              <div className="mt-1.5 text-[14px] text-muted">
+              <div className="mt-1.5 text-[15px] text-muted">
                 {stayTerms && <div className="font-semibold text-ink">{stayTerms}</div>}
                 {ppm ? <><span className="whitespace-nowrap">{moneyUi(ppm, locale)} / m²</span> · </> : ""}
                 <span className="whitespace-nowrap">≈ Bs. {num(Math.round(l.priceAmount * ves), locale)}</span> · <span className="whitespace-nowrap">€ {num(Math.round(l.priceAmount * eur), locale)}</span>
@@ -313,7 +313,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
             <div className={sec}>
               <H>{tx(locale, "Ubicación", "Location")}</H>
               <DetailMap l={mapListing(l)} locale={locale} nearby={nearby.map(mapListing)} />
-              <p className="mt-3 text-[16px] text-muted">
+              <p className="mt-3 text-[17px] text-muted">
                 {tx(locale, "Te mostramos colegios y tiempos de trayecto solo cuando los hemos verificado en la zona.", "We show schools and travel times only once we’ve verified them for the area.")}
               </p>
             </div>
@@ -321,12 +321,12 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
             <Fold className={sec} testId="history-section" title={tx(locale, "Historial de precio y la zona", "Price history and the area")} hint={historyHint}>
               <div className="grid grid-cols-1 gap-10 md:grid-cols-2">
                 <div>
-                  <h4 className="mb-4 font-display text-[14px] font-medium leading-tight">{tx(locale, "Historial de precio", "Price history")}</h4>
+                  <h4 className="mb-4 font-display text-[15px] font-medium leading-tight">{tx(locale, "Historial de precio", "Price history")}</h4>
                   <PriceHistory events={l.priceHistory} locale={locale} />
                 </div>
                 <div>
-                  <h4 className="mb-4 font-display text-[14px] font-medium leading-tight">{tx(locale, `La zona en cifras · ${l.zone}`, `The area in numbers · ${l.zone}`)}</h4>
-                  <p className="-mt-2 mb-4 text-sm text-muted">{zone.live ? tx(locale, "Calculado con las casas publicadas en New Place.", "Worked out from the homes listed on New Place.") : tx(locale, "Aún hay pocas casas publicadas aquí: tómalo como una referencia.", "Only a few homes listed here so far: treat these as a guide.")}</p>
+                  <h4 className="mb-4 font-display text-[15px] font-medium leading-tight">{tx(locale, `La zona en cifras · ${l.zone}`, `The area in numbers · ${l.zone}`)}</h4>
+                  <p className="-mt-2 mb-4 text-[15px] text-muted">{zone.live ? tx(locale, "Calculado con las casas publicadas en New Place.", "Worked out from the homes listed on New Place.") : tx(locale, "Aún hay pocas casas publicadas aquí: tómalo como una referencia.", "Only a few homes listed here so far: treat these as a guide.")}</p>
                   <div className="grid grid-cols-2 gap-3">
                     {[
                       [money(zone.salePpm, locale), tx(locale, "USD/m² venta", "USD/m² sale")],
@@ -336,7 +336,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
                     ].map(([v, t]) => (
                       <div key={String(t)} className="bg-arena p-4">
                         <div className="font-title text-[28px] leading-none [font-variant-numeric:lining-nums_tabular-nums]">{v}</div>
-                        <div className="mt-1.5 text-[16px] text-muted">{t}</div>
+                        <div className="mt-1.5 text-[17px] text-muted">{t}</div>
                       </div>
                     ))}
                   </div>
@@ -348,7 +348,7 @@ export async function ListingView({ locale, l }: { locale: Locale; l: Listing })
               <Fold className={sec} testId="sold-nearby" title={tx(locale, "Se vendieron cerca", "Recently sold nearby")} hint={plural(soldNearby.length, locale, ["operación reciente en la zona", "operaciones recientes en la zona"], ["recent deal in the area", "recent deals in the area"])}>
                 <div className="space-y-1">
                   {soldNearby.map((s) => (
-                    <div key={s.t} className="flex items-center justify-between gap-3 bg-arena px-4 py-3 text-[16px]">
+                    <div key={s.t} className="flex items-center justify-between gap-3 bg-arena px-4 py-3 text-[17px]">
                       <span className="font-semibold">{s.t}</span>
                       <span className="text-muted">{s.d}</span>
                       <span className="np-num font-semibold">{money(s.p, locale)}</span>

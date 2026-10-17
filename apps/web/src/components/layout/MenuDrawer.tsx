@@ -58,7 +58,7 @@ export function MenuDrawer({
     { href: `/${locale}/alerts`, label: tx(locale, "Alertas", "Alerts"), Icon: Bell },
     { href: `/${locale}/account`, label: tx(locale, "Ajustes", "Settings"), Icon: Settings },
   ];
-  const drawerItem = "flex min-h-12 items-center gap-3 rounded-lg px-3 font-display text-[16px] hover:bg-white/5";
+  const drawerItem = "flex min-h-12 items-center gap-3 rounded-lg px-3 font-display text-[17px] hover:bg-white/5";
   return (
     // Not lg:hidden: on desktop it only opens from the compact search's menu button (np:open-menu).
     <div className="fixed inset-0 z-[65]" role="dialog" aria-modal="true" aria-label={t("menu")} id="np-mobile-menu">
@@ -72,7 +72,7 @@ export function MenuDrawer({
         </div>
         <nav className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 pb-4 pt-1" aria-label={locale === "es" ? "Principal" : "Main"}>
           {searchTypes.map((n) => (
-            <Link key={n.href} href={n.href} onClick={() => onClose()} aria-current={n.active ? "page" : undefined} className="flex min-h-[50px] items-center gap-3 rounded-lg px-3 font-serif text-[23px] hover:bg-white/5">
+            <Link key={n.href} href={n.href} onClick={() => onClose()} aria-current={n.active ? "page" : undefined} className="flex min-h-[50px] items-center gap-3 rounded-lg px-3 font-serif text-[20px] hover:bg-white/5">
               {/* Current section: a gold underline (a chevron-like mark read as "expand"). */}
               <span className={cn(n.active && "underline decoration-[#EFE6D8] decoration-2 underline-offset-[7px]")}>{n.label}</span>
             </Link>
@@ -86,7 +86,7 @@ export function MenuDrawer({
             <span aria-hidden className="w-[18px] text-center text-[#EFE6D8]">↗</span> {remote.label}
           </Link>
           <Link href={`/${locale}/saved`} onClick={() => onClose()} className={drawerItem}>
-            <Heart size={18} aria-hidden /> {t("saved")} {saved.length > 0 && <span className="text-sm text-mist">({saved.length})</span>}
+            <Heart size={18} aria-hidden /> {t("saved")} {saved.length > 0 && <span className="text-[15px] text-mist">({saved.length})</span>}
           </Link>
           {seeker && (
             <>
@@ -106,10 +106,10 @@ export function MenuDrawer({
           )}
           <div className="my-3" aria-hidden />
           <div className="flex items-center gap-2 px-1">
-            <Link href={switchHref} prefetch={false} onClick={onSwitchLang} hrefLang={other} lang={other} className="flex min-h-12 items-center rounded-lg px-2 font-display text-[16px] hover:bg-white/5">
+            <Link href={switchHref} prefetch={false} onClick={onSwitchLang} hrefLang={other} lang={other} className="flex min-h-12 items-center rounded-lg px-2 font-display text-[17px] hover:bg-white/5">
               {other === "en" ? "English" : "Español"}
             </Link>
-            <button onClick={onToggleTheme} aria-pressed={isDark} className="ml-auto flex min-h-12 items-center gap-2 rounded-lg px-3 font-display text-[16px] hover:bg-white/5">
+            <button onClick={onToggleTheme} aria-pressed={isDark} className="ml-auto flex min-h-12 items-center gap-2 rounded-lg px-3 font-display text-[17px] hover:bg-white/5">
               {isDark ? <Sun size={18} aria-hidden /> : <Moon size={18} aria-hidden />} {isDark ? (locale === "es" ? "Modo claro" : "Light mode") : locale === "es" ? "Modo oscuro" : "Dark mode"}
             </button>
           </div>

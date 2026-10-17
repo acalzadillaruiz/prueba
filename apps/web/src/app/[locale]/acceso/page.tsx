@@ -45,10 +45,10 @@ export default async function Acceso({ params, searchParams }: { params: Promise
           aria-invalid={error === "code" || undefined}
           aria-describedby={msg ? "gate-error" : undefined}
           placeholder="••••••"
-          className="h-14 w-full rounded-full border border-ink/20 bg-white px-6 text-center font-display text-[24px] tracking-[0.5em] text-ink placeholder:text-ink/40 focus:border-coral focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral"
+          className="h-14 w-full rounded-full border border-ink/20 bg-white px-6 text-center font-display text-[28px] tracking-[0.5em] text-ink placeholder:text-ink/40 focus:border-coral focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral"
          spellCheck={false} />
         {msg && (
-          <p id="gate-error" role="alert" className="text-[14px] font-semibold text-danger">
+          <p id="gate-error" role="alert" className="text-[15px] font-semibold text-danger">
             {msg}
           </p>
         )}

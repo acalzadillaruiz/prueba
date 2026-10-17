@@ -40,7 +40,7 @@ export function HeroAura({ locale, available }: { locale: Locale; available: num
           <h1 id="hero-title" className="np-t-hero text-ivory">
             {tx(locale, "Entre el Ávila y el mar", "Between the Ávila and the sea")}
           </h1>
-          <p className="mt-5 max-w-[540px] text-[18px] font-light leading-[1.5] text-ivory sm:text-[20px] lg:mt-7">
+          <p className="mt-5 max-w-[540px] text-[20px] font-light leading-[1.5] text-ivory sm:text-[20px] lg:mt-7">
             {tx(
               locale,
               `${available} casas revisadas hoy en Caracas, Lechería y El Morro. Un asesor te atiende a cualquier hora.`,
@@ -50,13 +50,13 @@ export function HeroAura({ locale, available }: { locale: Locale; available: num
           <div className="mt-7 flex flex-wrap items-center gap-3 lg:mt-9">
             <Link
               href={`/${locale}/search`}
-              className="inline-flex min-h-12 items-center rounded-[12px] bg-[#3A6A92] px-6 font-display text-[16px] font-medium text-white transition-colors duration-np ease-np hover:bg-[#2F5A7E] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ivory"
+              className="inline-flex min-h-12 items-center rounded-[12px] bg-[#3A6A92] px-6 font-display text-[17px] font-medium text-white transition-colors duration-np ease-np hover:bg-[#2F5A7E] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ivory"
             >
               {tx(locale, "Ver casas", "See homes")}
             </Link>
             <OnCallButton
               locale={locale}
-              className="inline-flex min-h-12 items-center rounded-[12px] border border-current px-6 font-display text-[16px] font-medium text-ivory transition-colors duration-np ease-np hover:bg-ivory/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ivory"
+              className="inline-flex min-h-12 items-center rounded-[12px] border border-current px-6 font-display text-[17px] font-medium text-ivory transition-colors duration-np ease-np hover:bg-ivory/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ivory"
             >
               {tx(locale, "Habla con un asesor", "Talk to an advisor")}
             </OnCallButton>

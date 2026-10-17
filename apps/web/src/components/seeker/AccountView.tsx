@@ -70,7 +70,7 @@ export function AccountView({ locale, data }: { locale: Locale; data: AccountDat
           <Avatar initials={data.initials} hue={data.hue} size={64} />
           <div>
             <div className="font-display text-xl font-semibold">{f.name}</div>
-            <div className="flex flex-wrap items-center gap-2 text-sm text-muted">
+            <div className="flex flex-wrap items-center gap-2 text-[15px] text-muted">
               {data.email}
               {data.verified ? <Badge tone="ok"><BadgeCheck size={12} /> {tx(locale, "Correo verificado", "Email verified")}</Badge> : <Badge tone="warn">{tx(locale, "Correo sin verificar", "Email not verified")}</Badge>}
             </div>
@@ -88,7 +88,7 @@ export function AccountView({ locale, data }: { locale: Locale; data: AccountDat
           <Globe size={20} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" />
           <div className="flex-1">
             <div className="font-semibold">{tx(locale, "Idioma", "Language")}</div>
-            <div className="text-sm text-muted">{tx(locale, "Te mostramos los precios en USD, con su referencia en VES y EUR.", "We show prices in USD, with VES and EUR for reference.")}</div>
+            <div className="text-[15px] text-muted">{tx(locale, "Te mostramos los precios en USD, con su referencia en VES y EUR.", "We show prices in USD, with VES and EUR for reference.")}</div>
           </div>
           <select className="h-10 rounded-lg border border-line bg-white px-3" value={f.locale} onChange={(e) => setF({ ...f, locale: e.target.value as "es" | "en" })} aria-label={tx(locale, "Idioma", "Language")}>
             <option value="es">Español</option>
@@ -99,13 +99,13 @@ export function AccountView({ locale, data }: { locale: Locale; data: AccountDat
           <Lock size={20} strokeWidth={1.6} className="text-navy/70 dark:text-ivory/70" />
           <div className="flex-1">
             <div className="font-semibold">{tx(locale, "Cómo entras", "How you sign in")}</div>
-            <div className="text-sm text-muted">
+            <div className="text-[15px] text-muted">
               {[data.providers.includes("google") && "Google", data.hasPassword && tx(locale, "correo y contraseña", "email & password")].filter(Boolean).join(" · ") || "—"}
             </div>
           </div>
         </div>
       </Card>
-      {err && <div role="alert" className="mt-4 rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-sm text-danger">{err}</div>}
+      {err && <div role="alert" className="mt-4 rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-[15px] text-danger">{err}</div>}
       <div className="mt-6 flex justify-between">
         <Button variant="ghost" onClick={() => logout(locale)}>
           <LogOut size={16} /> {tx(locale, "Cerrar sesión", "Sign out")}

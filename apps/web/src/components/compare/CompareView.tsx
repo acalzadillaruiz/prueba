@@ -98,7 +98,7 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
   const unit = (l: Listing) => <span className="text-[13px] font-normal text-muted">{priceSuffix(l, locale)}</span>;
   const ppm = (l: Listing) => (l.areaM2 > 0 ? l.priceAmount / l.areaM2 : NaN);
   const allRows: Row[] = [
-    { label: tx(locale, "Precio", "Price"), render: (l) => <span className="font-serif text-[17px] font-light leading-tight md:text-[22px]"><span className="whitespace-nowrap md:hidden">{shortMoney(l.priceAmount, locale)}</span><span className="hidden md:inline">{money(l.priceAmount, locale)}</span><span className="whitespace-nowrap">{unit(l)}</span></span>, val: sameUnit ? (l) => l.priceAmount : undefined, best: "min" },
+    { label: tx(locale, "Precio", "Price"), render: (l) => <span className="font-serif text-[17px] font-light leading-tight md:text-[20px]"><span className="whitespace-nowrap md:hidden">{shortMoney(l.priceAmount, locale)}</span><span className="hidden md:inline">{money(l.priceAmount, locale)}</span><span className="whitespace-nowrap">{unit(l)}</span></span>, val: sameUnit ? (l) => l.priceAmount : undefined, best: "min" },
     // A rent per m² next to a sale per m² (or a nightly next to a monthly one) isn't comparable: "—" for the rents.
     { label: tx(locale, "Precio por m²", "Price per m²"), render: (l) => (Number.isFinite(ppm(l)) && (sameUnit || !l.pricePeriod) ? <>{num(Math.round(ppm(l) * (l.pricePeriod ? 10 : 1)) / (l.pricePeriod ? 10 : 1), locale)} USD/m²{unit(l)}</> : <span aria-label={tx(locale, "No comparable", "Not comparable")}>—</span>), val: sameUnit ? ppm : undefined, best: "min" },
     { label: tx(locale, "Valor estimado New Place", "PlaceEstimate"), render: (l) => <>{money(l.estimate.mid, locale)}{unit(l)}</> },
@@ -189,7 +189,7 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
           <div className="flex items-center gap-2 border-b border-line bg-navy px-5 py-3 text-ivory">
             <Scale size={18} strokeWidth={1.6} className="text-[#EFE6D8]" aria-hidden />
             <span className="font-serif text-[20px] font-light">{tx(locale, `${cmp.length} ${cmp.length === 1 ? "casa" : "casas"}`, `${cmp.length} ${cmp.length === 1 ? "home" : "homes"}`)}</span>
-            <span className="text-sm text-mist">{cmp.length}/3</span>
+            <span className="text-[15px] text-mist">{cmp.length}/3</span>
           </div>
           {/* Phones and small tablets: every home in view at once (a column each, 33–50 %), each row's label above its
               values, and the photos + titles pinned under the header while the rows scroll. */}
@@ -208,7 +208,7 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
                         <X size={13} aria-hidden />
                       </button>
                     </div>
-                    <Link href={listingUrl(l, locale)} className="mt-1.5 line-clamp-2 block break-words font-serif text-[14px] font-light leading-tight underline-offset-4 hover:underline">
+                    <Link href={listingUrl(l, locale)} className="mt-1.5 line-clamp-2 block break-words font-serif text-[15px] font-light leading-tight underline-offset-4 hover:underline">
                       {title}
                     </Link>
                   </div>
@@ -251,7 +251,7 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
                   <dt className="text-[13px] font-semibold text-muted">{label}</dt>
                   <dd className="mt-1 grid gap-2" style={cols}>
                     {cmp.map((l, i) => (
-                      <span key={l.id} className={cn("min-w-0 break-words rounded-md px-1.5 py-1 text-[14px] leading-snug", wins[r](i) && "bg-[#2F6F4E14] dark:bg-[#8FCBA61A]")}>
+                      <span key={l.id} className={cn("min-w-0 break-words rounded-md px-1.5 py-1 text-[15px] leading-snug", wins[r](i) && "bg-[#2F6F4E14] dark:bg-[#8FCBA61A]")}>
                         {render(l)} {wins[r](i) && bestMark("ml-0.5")}
                       </span>
                     ))}
@@ -278,7 +278,7 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
           </div>
           {/* md and up: a table, every home's column the same width. */}
           <div className="hidden overflow-x-auto md:block">
-            <table className="w-full table-fixed text-sm" style={{ minWidth: `${9 + cmp.length * 11.5}rem` }}>
+            <table className="w-full table-fixed text-[15px]" style={{ minWidth: `${9 + cmp.length * 11.5}rem` }}>
               <colgroup>
                 <col className="w-36 lg:w-48" />
                 {cmp.map((l) => <col key={l.id} />)}
@@ -301,7 +301,7 @@ export function CompareView({ locale, urlIds, initial }: { locale: Locale; urlId
                             <X size={14} aria-hidden />
                           </button>
                         </div>
-                        <Link href={listingUrl(l, locale)} className="mt-2 line-clamp-2 block font-serif text-[19px] font-light leading-tight underline-offset-4 hover:underline">
+                        <Link href={listingUrl(l, locale)} className="mt-2 line-clamp-2 block font-serif text-[20px] font-light leading-tight underline-offset-4 hover:underline">
                           {title}
                         </Link>
                       </th>

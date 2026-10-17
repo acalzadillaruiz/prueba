@@ -72,9 +72,9 @@ export function EssentialsFields({
   const set = (p: Partial<EssentialsDraft>) => onChange({ ...value, ...p });
   const cls = admin ? k.input : inputCls;
   const seg = (on: boolean) =>
-    admin ? cn(tab(on), "min-h-11 md:min-h-9") : cn("min-h-11 rounded-[12px] border px-4 font-display text-sm", on ? "border-navy bg-[#EFE6D8] font-semibold text-navy outline outline-1 -outline-offset-1 outline-navy" : "border-line bg-white");
+    admin ? cn(tab(on), "min-h-11 md:min-h-9") : cn("min-h-11 rounded-[12px] border px-4 font-display text-[15px]", on ? "border-navy bg-[#EFE6D8] font-semibold text-navy outline outline-1 -outline-offset-1 outline-navy" : "border-line bg-white");
   const toggle = (key: "ownWell" | "viewAvila" | "viewSea", label: string) => (
-    <label key={key} className="flex min-h-11 items-center gap-2 text-sm font-semibold md:min-h-0">
+    <label key={key} className="flex min-h-11 items-center gap-2 text-[15px] font-semibold md:min-h-0">
       <input type="checkbox" disabled={disabled} checked={value[key]} onChange={(e) => set({ [key]: e.target.checked })} className="h-4 w-4 accent-navy dark:accent-[#EFE6D8]" />
       {label}
     </label>
@@ -94,7 +94,7 @@ export function EssentialsFields({
           value={value[key]}
           onChange={(e) => set({ [key]: e.target.value })}
         />
-        <span className={cn("pointer-events-none absolute inset-y-0 right-3.5 flex items-center text-sm font-semibold", admin ? k.muted : "text-muted")} aria-hidden>{unit}</span>
+        <span className={cn("pointer-events-none absolute inset-y-0 right-3.5 flex items-center text-[15px] font-semibold", admin ? k.muted : "text-muted")} aria-hidden>{unit}</span>
       </span>
     </Field>
   );
@@ -103,7 +103,7 @@ export function EssentialsFields({
     <div className="space-y-4" data-testid="essentials-fields">
       <div className={admin ? k.title : "font-semibold"}>{tx(locale, "Servicios esenciales", "Essential services")}</div>
       <div role="group" aria-label={tx(locale, "Planta eléctrica", "Backup power")}>
-        <div className="mb-2 text-sm font-semibold">{tx(locale, "Planta eléctrica", "Backup power")}</div>
+        <div className="mb-2 text-[15px] font-semibold">{tx(locale, "Planta eléctrica", "Backup power")}</div>
         <div className="flex flex-wrap gap-2">
           {POWER_OPTIONS.map(([v, es, en]) => (
             <button key={String(v)} type="button" aria-pressed={value.powerBackup === v} disabled={disabled} onClick={() => set({ powerBackup: v })} className={seg(value.powerBackup === v)}>

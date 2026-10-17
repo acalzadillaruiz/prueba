@@ -62,7 +62,7 @@ export function OwnerInbox({ locale, leads, tours, onChanged, manage = true }: {
           <div className="border-b border-line px-3 py-2 text-[13px] font-bold text-muted">{tx(locale, "Visitas", "Visits")} · {upcoming.length}</div>
           <ul className="divide-y divide-line">
             {upcoming.map((t) => (
-              <li key={t.id} className="flex flex-wrap items-center gap-x-3 gap-y-1.5 px-3 py-2.5 text-sm">
+              <li key={t.id} className="flex flex-wrap items-center gap-x-3 gap-y-1.5 px-3 py-2.5 text-[15px]">
                 <CalendarCheck size={15} className="text-muted" aria-hidden />
                 <span className="font-display font-semibold">{when(t.start, locale)}</span>
                 <span>{t.seekerName}</span>
@@ -92,7 +92,7 @@ export function OwnerInbox({ locale, leads, tours, onChanged, manage = true }: {
             {shown.map((ld) => {
               const booked = upcoming.some((t) => t.leadId === ld.id);
               return (
-                <li key={ld.id} className="px-3 py-2.5 text-sm">
+                <li key={ld.id} className="px-3 py-2.5 text-[15px]">
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5">
                     <span className="font-semibold">{ld.name}</span>
                     <a href={`mailto:${ld.email}`} className="font-semibold text-navy underline decoration-navy/30 underline-offset-4">{ld.email}</a>
@@ -113,7 +113,7 @@ export function OwnerInbox({ locale, leads, tours, onChanged, manage = true }: {
                         if (await run(`tour-${ld.id}`, () => api(`leads/${ld.id}/tour`, { method: "POST", json: { start: d.toISOString() } }))) setProposing(null);
                       }}
                     >
-                      <input type="datetime-local" min={minAt} step={900} value={at} onChange={(e) => setAt(e.target.value)} className="h-9 rounded-lg border border-line bg-white px-2 text-sm" aria-label={tx(locale, `Día y hora de la visita con ${ld.name}`, `Day and time of the visit with ${ld.name}`)} />
+                      <input type="datetime-local" min={minAt} step={900} value={at} onChange={(e) => setAt(e.target.value)} className="h-9 rounded-lg border border-line bg-white px-2 text-[15px]" aria-label={tx(locale, `Día y hora de la visita con ${ld.name}`, `Day and time of the visit with ${ld.name}`)} />
                       <Button size="sm" type="submit" variant="navy" disabled={busy === `tour-${ld.id}`}>
                         {busy === `tour-${ld.id}` ? <Loader2 size={13} className="animate-spin" /> : <Check size={13} />} {tx(locale, "Confirmar visita", "Confirm visit")}
                       </Button>

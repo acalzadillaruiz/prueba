@@ -18,7 +18,7 @@ export function OwnerTakedown({ locale, listingId, reason, appealedAt, onAppeale
   const short = msg.trim().length < 10;
 
   return (
-    <div className="mt-3 rounded-lg border border-danger/25 bg-[#B3261E0D] px-3.5 py-3 text-sm" data-testid="owner-takedown">
+    <div className="mt-3 rounded-lg border border-danger/25 bg-[#B3261E0D] px-3.5 py-3 text-[15px]" data-testid="owner-takedown">
       <div className="flex items-start gap-2">
         <ShieldAlert size={16} className="mt-0.5 shrink-0 text-danger" aria-hidden />
         <div className="min-w-0">
@@ -59,7 +59,7 @@ export function OwnerTakedown({ locale, listingId, reason, appealedAt, onAppeale
             value={msg}
             onChange={(e) => setMsg(e.target.value)}
             maxLength={1000}
-            className="h-24 w-full rounded-lg border border-line bg-white px-3 py-2 text-sm focus:border-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3A6A92]"
+            className="h-24 w-full rounded-lg border border-line bg-white px-3 py-2 text-[15px] focus:border-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3A6A92]"
             placeholder={tx(locale, "Por ejemplo: las fotos son de mi casa y puedo mostrar el documento de propiedad…", "For example: the photos are of my home and I can show the title deed…")}
             aria-label={tx(locale, "¿Por qué debería volver a publicarse?", "Why should it go back online?")}
           />

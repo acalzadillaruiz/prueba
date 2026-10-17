@@ -77,9 +77,9 @@ export function BarChart({ data, height = 180, format = (v: number) => String(v)
         </svg>
       )}
       {hover !== null && (
-        <div className="pointer-events-none absolute -top-2 rounded-lg bg-navy px-2.5 py-1.5 text-xs text-ivory dark:bg-ivory dark:text-navy" style={{ left: `${((pad.l + hover * bw + bw / 2) / W) * 100}%`, transform: "translate(-50%,-100%)" }}>
+        <div className="pointer-events-none absolute -top-2 rounded-lg bg-navy px-2.5 py-1.5 text-[13px] text-ivory dark:bg-ivory dark:text-navy" style={{ left: `${((pad.l + hover * bw + bw / 2) / W) * 100}%`, transform: "translate(-50%,-100%)" }}>
           <div className="opacity-75">{data[hover].hint ?? data[hover].label}</div>
-          <div className="font-display text-sm font-semibold">{format(data[hover].value)}</div>
+          <div className="font-display text-[15px] font-semibold">{format(data[hover].value)}</div>
         </div>
       )}
     </div>
@@ -91,7 +91,7 @@ export function Funnel({ steps }: { steps: { label: string; value: number }[] })
   return (
     <div className="space-y-3">
       {steps.map((s, i) => (
-        <div key={s.label} className="grid grid-cols-[96px_1fr_64px] items-center gap-3 text-sm">
+        <div key={s.label} className="grid grid-cols-[96px_1fr_64px] items-center gap-3 text-[15px]">
           <span className="text-muted dark:text-mist">{s.label}</span>
           <div className="h-6 rounded-md bg-[#FAF8F4] dark:bg-white/[.06]">
             <div className={cn("h-full rounded-md", i === steps.length - 1 ? "bg-navy dark:bg-ivory" : "bg-[#81776F] dark:bg-[#605751]")} style={{ width: `${max > 0 ? (s.value / max) * 100 : 0}%` }} />
@@ -99,7 +99,7 @@ export function Funnel({ steps }: { steps: { label: string; value: number }[] })
           <span className="text-right font-display font-semibold [font-feature-settings:'lnum','pnum']">
             {s.value}
             {/* No step % from a base under 5: "100 %" of 1 lead is noise. */}
-            {i > 0 && steps[i - 1].value >= 5 && <span className="ml-1 text-xs font-normal text-muted dark:text-mist">{Math.round((s.value / steps[i - 1].value) * 100)}%</span>}
+            {i > 0 && steps[i - 1].value >= 5 && <span className="ml-1 text-[13px] font-normal text-muted dark:text-mist">{Math.round((s.value / steps[i - 1].value) * 100)}%</span>}
           </span>
         </div>
       ))}

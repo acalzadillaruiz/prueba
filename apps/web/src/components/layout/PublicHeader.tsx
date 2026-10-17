@@ -347,7 +347,7 @@ export function PublicHeader({ locale, variant = "light", autoHide = false }: { 
           ))}
         </nav>
         <div className="ml-auto flex items-center gap-1.5">
-          <div className={cn("hidden items-center font-display text-[14px] font-semibold tracking-[0.14em] md:flex", inv ? "text-ivory/70" : "text-ink/70")}>
+          <div className={cn("hidden items-center font-display text-[15px] font-semibold tracking-[0.14em] md:flex", inv ? "text-ivory/70" : "text-ink/70")}>
             {(["es", "en"] as const).map((lng, i) => (
               <span key={lng} className="flex items-center">
                 {i > 0 && <span aria-hidden className="px-1">·</span>}
@@ -388,7 +388,7 @@ export function PublicHeader({ locale, variant = "light", autoHide = false }: { 
           ) : u ? (
             <Link href={`/${locale}${home}`} className={cn("hidden items-center gap-2 rounded-full p-0.5 pr-2 md:flex", inv ? "hover:bg-white/10" : "hover:bg-black/5")}>
               <Avatar initials={u.initials} hue={u.hue} size={32} />
-              <span className="hidden font-display text-sm xl:inline">{u.name.split(" ")[0]}</span>
+              <span className="hidden font-display text-[15px] xl:inline">{u.name.split(" ")[0]}</span>
             </Link>
           ) : (
             <Link href={`/${locale}/login`} className={cn("hidden min-h-11 items-center gap-1.5 rounded-[12px] px-3 font-display text-[15px] md:flex", inv ? "text-ivory/85 hover:bg-white/10" : "text-ink/80 hover:bg-black/5")}>
@@ -429,7 +429,7 @@ export function PublicHeader({ locale, variant = "light", autoHide = false }: { 
               <span className="flex h-10 w-10 items-center justify-center rounded-full bg-egeo text-ink">
                 <Phone size={16} strokeWidth={1.7} aria-hidden />
               </span>
-              <span className="hidden items-center gap-2 whitespace-nowrap font-display text-[14px] font-normal min-[1400px]:flex">
+              <span className="hidden items-center gap-2 whitespace-nowrap font-display text-[15px] font-normal min-[1400px]:flex">
                 {tx(locale, "Asesor 24/7", "Advisor 24/7")}
                 <span className="h-2 w-2 rounded-full bg-[#2F6F4E]" aria-hidden />
               </span>

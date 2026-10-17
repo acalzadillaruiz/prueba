@@ -26,11 +26,11 @@ typography:
   scale:
     hero:  { font: display, size: "clamp(44px, 8vw, 112px)", weight: 300, leading: 1.02, tracking: "-0.015em" }
     band:  { font: display, size: "clamp(36px, 5vw, 68px)", weight: 300, leading: 1.08 }
-    h1:    { font: display, size: "clamp(34px, 4.5vw, 56px)", weight: 300 }
-    h2:    { font: display, size: "clamp(26px, 3vw, 36px)", weight: 300 }
+    h1:    { font: display, size: "clamp(36px, 4.5vw, 56px)", weight: 300 }
+    h2:    { font: display, size: "clamp(28px, 3vw, 36px)", weight: 300 }
     lead:  { font: text, size: "20px", weight: 300, leading: 1.5 }
     body:  { font: text, size: "17px", weight: 400, leading: 1.6 }
-    small: { font: text, size: "14px" }   # mínimo absoluto 12 px
+    small: { font: text, size: "15px" }   # caption 13 px es el mínimo absoluto
 rounded: { control: 12px, card: 16px, panel-and-map: 24px, pill: 9999px }
 elevation:
   soft: "0 1px 2px rgb(31 58 77/.04), 0 8px 24px rgb(31 58 77/.06) — tarjetas (sube un poco al pasar el ratón)"
@@ -48,6 +48,7 @@ motion: { duration: "180ms / 320ms / 500ms", easing: "cubic-bezier(.2,.7,.2,1)",
 4. Esquinas suaves: 12 px controles, 16 px tarjetas y fotos, 24 px mapa y paneles grandes.
 5. Carruseles nativos (scroll-snap), nunca secuestran el scroll vertical (048-A). Mapa Leaflet en teselas claras, pins píldora (048-B).
 6. Fotos reales sin repetir, nada de renders (048-C). Créditos en public/media/048/CREDITOS.txt.
+7. Escala tipográfica cerrada (051-G 15): 13 · 15 · 17 · 20 · 28 · 36 · 56 · 68 px, más el hero 112 px. Ningún otro tamaño en la web pública; cada página usa 8 o menos (prueba: e2e/brisa-051g-b2.spec.ts).
 
 Lo que sigue (§1–§11) es la guía 043; donde choque con §0, manda §0. Nombres de color antiguos: night → sea-deep, bone → canvas, stone → muted, gold-deep → sea-deep.
 

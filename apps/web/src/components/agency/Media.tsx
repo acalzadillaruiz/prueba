@@ -54,9 +54,9 @@ function NewJob({ locale, manage, onDone }: { locale: Locale; manage: NonNullabl
     >
       <h2 className={k.title}>{tx(locale, "Nueva sesión de fotos", "New photo shoot")}</h2>
       {!manage.photographers.length ? (
-        <p className={cn("mt-2 text-sm", k.muted)}>{tx(locale, "Tu agencia no tiene fotógrafos. Invita a uno desde «Equipo».", "Your agency has no photographers. Invite one from “Team”.")}</p>
+        <p className={cn("mt-2 text-[15px]", k.muted)}>{tx(locale, "Tu agencia no tiene fotógrafos. Invita a uno desde «Equipo».", "Your agency has no photographers. Invite one from “Team”.")}</p>
       ) : !manage.listings.length ? (
-        <p className={cn("mt-2 text-sm", k.muted)}>{tx(locale, "No hay inmuebles disponibles para fotografiar.", "There are no listings available to shoot.")}</p>
+        <p className={cn("mt-2 text-[15px]", k.muted)}>{tx(locale, "No hay inmuebles disponibles para fotografiar.", "There are no listings available to shoot.")}</p>
       ) : (
         <div className="mt-3 grid gap-3 md:grid-cols-[2fr_1fr_1fr_auto] md:items-end">
           <Field label={tx(locale, "Inmueble", "Listing")}>
@@ -149,8 +149,8 @@ export function MediaView({ locale, jobs, listings, names = {}, manage = null }:
                 <PropertyArt scene={jl.scenes[0]} seed={jl.id} photo={listingPhoto(jl, 0)} className="h-16 w-20 shrink-0 rounded-xl" />
                 <div className="min-w-0 flex-1">
                   <div className="line-clamp-1 font-semibold">{tx(locale, jl.title_es, jl.title_en)}</div>
-                  <div className={cn("text-xs first-letter:uppercase", k.muted)}>{dateTime(j.date, locale)}</div>
-                  {manage && names[j.photographerId] && <div className={cn("truncate text-xs", k.muted)}>{names[j.photographerId]}</div>}
+                  <div className={cn("text-[13px] first-letter:uppercase", k.muted)}>{dateTime(j.date, locale)}</div>
+                  {manage && names[j.photographerId] && <div className={cn("truncate text-[13px]", k.muted)}>{names[j.photographerId]}</div>}
                   <Pill tone={TONE[j.status]} className="mt-1.5">{statusLabel(j.status)}</Pill>
                 </div>
               </button>
@@ -162,7 +162,7 @@ export function MediaView({ locale, jobs, listings, names = {}, manage = null }:
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <h2 className={k.title}>{tx(locale, l.title_es, l.title_en)}</h2>
-                <div className={cn("text-sm", k.muted)}>{l.address} · {l.zone}</div>
+                <div className={cn("text-[15px]", k.muted)}>{l.address} · {l.zone}</div>
               </div>
               <div className="flex flex-wrap gap-2">
                 {step(job.status, -1) && (
@@ -210,7 +210,7 @@ export function MediaView({ locale, jobs, listings, names = {}, manage = null }:
                   key={t}
                   disabled={i < 2}
                   onClick={() => run(`chk${i}`, () => api(`media/${job.id}`, { method: "PATCH", json: i === 2 ? { floorplan: !job.checklist.floorplan } : { video: !job.checklist.video } }))}
-                  className={cn("flex items-center gap-2 rounded-xl border px-3 py-2 text-left text-sm", ok ? cn("border-ok/40 font-semibold", k.okText) : cn(k.line, k.muted), i >= 2 && "hover:border-navy dark:hover:border-ivory/50")}
+                  className={cn("flex items-center gap-2 rounded-xl border px-3 py-2 text-left text-[15px]", ok ? cn("border-ok/40 font-semibold", k.okText) : cn(k.line, k.muted), i >= 2 && "hover:border-navy dark:hover:border-ivory/50")}
                 >
                   {ok ? <Check size={15} /> : <I size={15} />}
                   {t}
@@ -224,15 +224,15 @@ export function MediaView({ locale, jobs, listings, names = {}, manage = null }:
                   <div key={src} className={cn("relative overflow-hidden rounded-lg outline outline-2 -outline-offset-2", i === 0 ? "ring-navy dark:ring-ivory" : "ring-transparent")}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={src} alt="" className="aspect-[4/3] w-full object-cover" />
-                    <span className="absolute left-1 top-1 rounded bg-navy/80 px-1 text-[12px] font-bold text-ivory">{i + 1}</span>
-                    {i === 0 && <span className="absolute bottom-1 left-1 rounded-full bg-white px-1.5 text-[12px] font-bold uppercase tracking-wider text-navy">{tx(locale, "Portada", "Cover")}</span>}
+                    <span className="absolute left-1 top-1 rounded bg-navy/80 px-1 text-[13px] font-bold text-ivory">{i + 1}</span>
+                    {i === 0 && <span className="absolute bottom-1 left-1 rounded-full bg-white px-1.5 text-[13px] font-bold uppercase tracking-wider text-navy">{tx(locale, "Portada", "Cover")}</span>}
                   </div>
                 ))}
               </div>
             ) : (
-              <div className={cn("mt-5 rounded-xl border border-dashed p-8 text-center text-sm", k.line, k.muted)}>{tx(locale, "Aún no hay fotos. Usa «Subida masiva» (JPG/PNG/WebP, 12 MB máx. cada una).", "No photos yet. Use “Bulk upload” (JPG/PNG/WebP, 12 MB max each).")}</div>
+              <div className={cn("mt-5 rounded-xl border border-dashed p-8 text-center text-[15px]", k.line, k.muted)}>{tx(locale, "Aún no hay fotos. Usa «Subida masiva» (JPG/PNG/WebP, 12 MB máx. cada una).", "No photos yet. Use “Bulk upload” (JPG/PNG/WebP, 12 MB max each).")}</div>
             )}
-            <div className={cn("mt-4 flex flex-wrap items-center justify-between gap-2 text-xs", k.muted)}>
+            <div className={cn("mt-4 flex flex-wrap items-center justify-between gap-2 text-[13px]", k.muted)}>
               <span>{tx(locale, "El orden y la portada se ajustan en «Editar inmueble».", "Order and cover are set in “Edit listing”.")}</span>
               <Pill tone={TONE[job.status]}>{statusLabel(job.status)}</Pill>
             </div>

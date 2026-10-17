@@ -72,7 +72,7 @@ export function HubSectionNav({ locale, sections }: { locale: Locale; sections: 
                   aria-current={on ? "location" : undefined}
                   onClick={() => setActive(s.id)}
                   className={cn(
-                    "flex min-h-10 items-center gap-1.5 whitespace-nowrap rounded-[12px] px-4 font-display text-[14px] font-medium transition-colors duration-np focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink",
+                    "flex min-h-10 items-center gap-1.5 whitespace-nowrap rounded-[12px] px-4 font-display text-[15px] font-medium transition-colors duration-np focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink",
                     on ? "bg-ink text-ivory [html.dark_&]:bg-[#FAF8F4] [html.dark_&]:text-[#1F3A4D]" : "text-ink/75 hover:bg-black/5 hover:text-ink",
                   )}
                 >

@@ -351,9 +351,9 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
     <div className="flex items-center justify-between rounded-[16px] bg-white px-4 py-3">
       <span className="font-semibold">{label}</span>
       <div className="flex items-center gap-3">
-        <button type="button" aria-label={`${label} −`} onClick={() => onChange(Math.max(0, v - 1))} className="h-11 w-11 rounded-[12px] border border-line text-lg">−</button>
-        <span className="w-5 text-center font-display text-lg">{v}</span>
-        <button type="button" aria-label={`${label} +`} onClick={() => onChange(v + 1)} className="h-11 w-11 rounded-[12px] border border-line text-lg">+</button>
+        <button type="button" aria-label={`${label} −`} onClick={() => onChange(Math.max(0, v - 1))} className="h-11 w-11 rounded-[12px] border border-line text-[20px]">−</button>
+        <span className="w-5 text-center font-display text-[20px]">{v}</span>
+        <button type="button" aria-label={`${label} +`} onClick={() => onChange(v + 1)} className="h-11 w-11 rounded-[12px] border border-line text-[20px]">+</button>
       </div>
     </div>
   );
@@ -391,7 +391,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
             ? tx(locale, "Pasó nuestra revisión y ya aparece en el mapa, listo para que lo descubran.", "It passed our checks and is on the map, ready to be discovered.")
             : tx(locale, `${agencies.find((a) => a.id === d.agency)?.name} te asignará un asesor y se pondrá en contacto contigo pronto.`, `${agencies.find((a) => a.id === d.agency)?.name} will assign you an advisor and be in touch soon.`)}
         </p>
-        {photoWarn && <p role="alert" className="mt-4 rounded-lg bg-[#8A5A0014] px-3 py-2 text-sm text-warn">{photoWarn}</p>}
+        {photoWarn && <p role="alert" className="mt-4 rounded-lg bg-[#8A5A0014] px-3 py-2 text-[15px] text-warn">{photoWarn}</p>}
         <div className="mt-6 flex flex-wrap justify-center gap-3">
           {done.mode === "AGENCY" ? (
             <Button href={`/${locale}/agency/listings/${done.id}/edit`}>{tx(locale, "Editar en el panel", "Edit in dashboard")}</Button>
@@ -489,9 +489,9 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
     <div className="mx-auto grid max-w-[1200px] gap-8 px-4 py-8 md:px-6 lg:grid-cols-[1fr_340px]">
       <div ref={formRef}>
         <div className="mb-6">
-          <div className="mb-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5 text-sm">
+          <div className="mb-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5 text-[15px]">
             <span className="whitespace-nowrap font-display font-semibold">{tx(locale, `Paso ${step + 1} de 6`, `Step ${step + 1} of 6`)} · {tx(locale, STEPS[step][0], STEPS[step][1])}</span>
-            <span className="w-full text-[13px] text-muted sm:w-auto sm:text-sm">{tx(locale, "Tu borrador se guarda en este dispositivo", "Your draft is saved on this device")}</span>
+            <span className="w-full text-[13px] text-muted sm:w-auto sm:text-[15px]">{tx(locale, "Tu borrador se guarda en este dispositivo", "Your draft is saved on this device")}</span>
           </div>
           <div className="grid grid-cols-6 gap-1.5">
             {STEPS.map((s, i) => (
@@ -509,13 +509,13 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
             {!staff && <div className="grid gap-3 sm:grid-cols-2">
               <button className={opt(d.mode === "FSBO")} onClick={() => set({ mode: "FSBO" })}>
                 <User strokeWidth={1.6} className="text-navy dark:text-ivory" />
-                <div className="mt-2 font-display text-lg font-semibold">{tx(locale, "Publicar yo mismo", "List it myself")}</div>
-                <div className="text-sm text-muted">{tx(locale, "Gratis. Tú atiendes las visitas y las ofertas.", "Free. You handle tours and offers yourself.")}</div>
+                <div className="mt-2 font-display text-[20px] font-semibold">{tx(locale, "Publicar yo mismo", "List it myself")}</div>
+                <div className="text-[15px] text-muted">{tx(locale, "Gratis. Tú atiendes las visitas y las ofertas.", "Free. You handle tours and offers yourself.")}</div>
               </button>
               <button className={opt(d.mode === "MANDATE")} onClick={() => set({ mode: "MANDATE" })}>
                 <Building2 strokeWidth={1.6} className="text-navy dark:text-ivory" />
-                <div className="mt-2 font-display text-lg font-semibold">{tx(locale, "Encargar a una agencia", "Hire an agency")}</div>
-                <div className="text-sm text-muted">{tx(locale, "Un asesor verificado se encarga de todo.", "A verified advisor handles everything.")}</div>
+                <div className="mt-2 font-display text-[20px] font-semibold">{tx(locale, "Encargar a una agencia", "Hire an agency")}</div>
+                <div className="text-[15px] text-muted">{tx(locale, "Un asesor verificado se encarga de todo.", "A verified advisor handles everything.")}</div>
               </button>
             </div>}
             {d.mode === "MANDATE" && (
@@ -535,7 +535,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               <div className="mb-2 font-semibold">{tx(locale, "Operación", "Operation")}</div>
               <div className="flex flex-wrap gap-2">
                 {[["SALE", "Venta", "Sale"], ["LONG_RENT", "Alquiler", "Rent"], ["SHORT_RENT", "Vacacional", "Vacation"], ["COMMERCIAL_SALE", "Comercial · venta", "Commercial · sale"], ["COMMERCIAL_RENT", "Comercial · alquiler", "Commercial · rent"]].map(([k, es, en]) => (
-                  <button key={k} onClick={() => setOp(k)} aria-pressed={d.op === k} className={cn("rounded-[12px] border px-4 py-2 font-display text-sm", d.op === k ? "border-navy bg-[#EFE6D8] text-navy outline outline-1 -outline-offset-1 outline-navy dark:bg-white/10 dark:outline-[#EFE6D8]" : "border-line bg-white")}>{tx(locale, es, en)}</button>
+                  <button key={k} onClick={() => setOp(k)} aria-pressed={d.op === k} className={cn("rounded-[12px] border px-4 py-2 font-display text-[15px]", d.op === k ? "border-navy bg-[#EFE6D8] text-navy outline outline-1 -outline-offset-1 outline-navy dark:bg-white/10 dark:outline-[#EFE6D8]" : "border-line bg-white")}>{tx(locale, es, en)}</button>
                 ))}
               </div>
             </div>
@@ -543,7 +543,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               <div className="mb-2 font-semibold">{tx(locale, "Tipo de inmueble", "Property type")}</div>
               <div className="flex flex-wrap gap-2">
                 {([["apartment", "Apartamento", "Apartment"], ["house", "Casa", "House"], ["penthouse", "Ático", "Penthouse"], ["townhouse", "Townhouse", "Townhouse"], ["studio", "Estudio", "Studio"], ["office", "Oficina", "Office"], ["retail", "Local", "Retail"], ["warehouse", "Galpón", "Warehouse"], ["land", "Terreno", "Land"]] as [Kind, string, string][]).map(([k, es, en]) => (
-                  <button key={k} onClick={() => set({ kind: k })} className={cn("rounded-[12px] border px-4 py-2 font-display text-sm", d.kind === k ? "border-navy bg-[#EFE6D8] text-navy outline outline-1 -outline-offset-1 outline-navy dark:bg-white/10 dark:outline-[#EFE6D8]" : "border-line bg-white")}>{tx(locale, es, en)}</button>
+                  <button key={k} onClick={() => set({ kind: k })} className={cn("rounded-[12px] border px-4 py-2 font-display text-[15px]", d.kind === k ? "border-navy bg-[#EFE6D8] text-navy outline outline-1 -outline-offset-1 outline-navy dark:bg-white/10 dark:outline-[#EFE6D8]" : "border-line bg-white")}>{tx(locale, es, en)}</button>
                 ))}
               </div>
             </div>
@@ -555,9 +555,9 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
             <h1 className="np-t-h1 font-serif">{tx(locale, "¿Dónde está?", "Where is it?")}</h1>
             <div data-wiz="addr" className="space-y-3">
               <PlacesSearch locale={locale} zones={zones} value={d.addr} onPick={(p) => set({ addr: p })} describedBy="wizard-addr-help" />
-              <p id="wizard-addr-help" className="-mt-1 text-sm text-muted dark:text-mist">{tx(locale, "Escribe la calle y el edificio (o el nombre de la casa) y elige la urbanización en la lista.", "Type the street and building (or the house name), then pick the neighborhood from the list.")}</p>
-              {streetErr && <p role="alert" id="wizard-street-error" className="-mt-1 text-sm text-danger" data-testid="street-error">{streetErr}</p>}
-              {tried && !d.addr && <p role="alert" id="wizard-street-error" className="-mt-1 text-sm font-semibold text-danger">{tx(locale, "Falta la dirección: escríbela y elige una opción.", "Address missing: type it and pick an option.")}</p>}
+              <p id="wizard-addr-help" className="-mt-1 text-[15px] text-muted dark:text-mist">{tx(locale, "Escribe la calle y el edificio (o el nombre de la casa) y elige la urbanización en la lista.", "Type the street and building (or the house name), then pick the neighborhood from the list.")}</p>
+              {streetErr && <p role="alert" id="wizard-street-error" className="-mt-1 text-[15px] text-danger" data-testid="street-error">{streetErr}</p>}
+              {tried && !d.addr && <p role="alert" id="wizard-street-error" className="-mt-1 text-[15px] font-semibold text-danger">{tx(locale, "Falta la dirección: escríbela y elige una opción.", "Address missing: type it and pick an option.")}</p>}
             </div>
             <div className="grid gap-3 sm:grid-cols-3">
               <Field label={tx(locale, "Piso / apto / casa", "Floor / unit")}><input className={inputCls} value={d.unit} onChange={(e) => set({ unit: e.target.value })} placeholder="Piso 6, apto 6-B…" /></Field>
@@ -578,7 +578,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
             />
             {d.addr && <p className="text-[13px] text-muted">{tx(locale, "Toca el mapa para ajustar el punto exacto.", "Tap the map to fine-tune the exact point.")}</p>}
             {d.addr && !streetErr && (
-              <div data-wiz="dup" className={cn("np-in flex items-start gap-3 rounded-np border p-3 text-sm", dup && !dupOverride ? "border-warn/60 bg-[#8A5A0014]" : "border-[#2F6F4E55] bg-[#2F6F4E0D]")}>
+              <div data-wiz="dup" className={cn("np-in flex items-start gap-3 rounded-np border p-3 text-[15px]", dup && !dupOverride ? "border-warn/60 bg-[#8A5A0014]" : "border-[#2F6F4E55] bg-[#2F6F4E0D]")}>
                 {checking ? <Loader2 size={18} className="mt-px shrink-0 animate-spin" /> : dup && !dupOverride ? <AlertTriangle size={18} className="mt-px shrink-0 text-warn" /> : <CheckCircle2 size={18} className="mt-px shrink-0 text-ok" />}
                 {/* Title, then the duplicate check on its own line (an inline "·" separator wrapped to a stray leading dot). */}
                 <div className="min-w-0 flex-1 space-y-1">
@@ -621,7 +621,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                 {(["generator", "waterTank", "security", "elevator", "terrace", "pool", "gym", "view", "garden", "bbq", "pets", "furnished", "ac"] as Amenity[]).map((a) => {
                   const on = d.amen.includes(a);
                   return (
-                    <button key={a} onClick={() => set({ amen: on ? d.amen.filter((x) => x !== a) : [...d.amen, a] })} className={cn("inline-flex items-center gap-1.5 rounded-[12px] border px-3.5 py-2 text-sm font-semibold", on ? "border-navy bg-navy text-ivory" : "border-line bg-white")}>
+                    <button key={a} onClick={() => set({ amen: on ? d.amen.filter((x) => x !== a) : [...d.amen, a] })} className={cn("inline-flex items-center gap-1.5 rounded-[12px] border px-3.5 py-2 text-[15px] font-semibold", on ? "border-navy bg-navy text-ivory" : "border-line bg-white")}>
                       {on && <Check size={14} />} {lbl(AMENITY_LABEL[a], locale)}
                     </button>
                   );
@@ -632,7 +632,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               <EssentialsFields locale={locale} value={d.ess} onChange={(x) => set({ ess: x })} showErrors={showExtrasErr} />
             </div>
             {!listingType.startsWith("COMMERCIAL") && RESIDENTIAL_KINDS.includes(d.kind) && (
-              <label className="flex items-center gap-2 text-sm font-semibold">
+              <label className="flex items-center gap-2 text-[15px] font-semibold">
                 <input type="checkbox" checked={d.luxury} onChange={(e) => set({ luxury: e.target.checked })} className="h-4 w-4 accent-navy dark:accent-[#EFE6D8]" />
                 {tx(locale, "Inmueble de lujo", "Luxury property")}
               </label>
@@ -641,7 +641,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               <ListingTypeFields locale={locale} listingType={listingType} luxury={luxury} value={d.extras} onChange={(x) => set({ extras: x })} showErrors={showExtrasErr} />
             </div>
             {luxury && (
-              <label className="flex items-start gap-2 text-sm">
+              <label className="flex items-start gap-2 text-[15px]">
                 <input type="checkbox" checked={d.privateListing} onChange={(e) => set({ privateListing: e.target.checked })} className="mt-0.5 h-4 w-4 shrink-0 accent-navy dark:accent-[#EFE6D8]" />
                 <span>
                   <span className="font-semibold">{tx(locale, "Anuncio privado", "Private listing")}</span>
@@ -684,9 +684,9 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
             >
               <ImagePlus size={30} strokeWidth={1.5} className="text-navy dark:text-ivory" />
               <span className="mt-2 font-display font-semibold">{tx(locale, "Arrastra tus fotos o elígelas", "Drop your photos or browse")}</span>
-              <span className="text-sm text-muted">JPG / PNG / WebP · {tx(locale, "hasta 12 MB cada una · lo ideal, entre 8 y 20", "up to 12 MB each · 8 to 20 is ideal")}</span>
+              <span className="text-[15px] text-muted">JPG / PNG / WebP · {tx(locale, "hasta 12 MB cada una · lo ideal, entre 8 y 20", "up to 12 MB each · 8 to 20 is ideal")}</span>
             </button>
-            {fileNote && <p role="alert" className="text-sm font-semibold text-warn">{fileNote}</p>}
+            {fileNote && <p role="alert" className="text-[15px] font-semibold text-warn">{fileNote}</p>}
             {files.length > 0 && (
               <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
                 {previews.map((src, i) => (
@@ -704,12 +704,12 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                 ))}
               </div>
             )}
-            <div className="grid gap-2 text-sm sm:grid-cols-2">
+            <div className="grid gap-2 text-[15px] sm:grid-cols-2">
               {[[files.length >= 8, tx(locale, `${files.length}/8 fotos recomendadas`, `${files.length}/8 recommended photos`)], [files.length > 0, tx(locale, "Portada elegida", "Cover set")]].map(([ok, t]) => (
                 <div key={String(t)} className={cn("flex items-center gap-2 rounded-lg border px-3 py-2", ok ? "border-[#2F6F4E55] text-ok" : "border-line text-muted")}>{ok ? <CheckCircle2 size={16} /> : <span className="h-4 w-4 rounded-full border-2 border-current" />}{t as string}</div>
               ))}
             </div>
-            {files.length === 0 && <p className="text-sm text-muted">{tx(locale, "Puedes continuar sin fotos y subirlas después desde «Mis inmuebles».", "You can continue without photos and add them later from “My properties”.")}</p>}
+            {files.length === 0 && <p className="text-[15px] text-muted">{tx(locale, "Puedes continuar sin fotos y subirlas después desde «Mis inmuebles».", "You can continue without photos and add them later from “My properties”.")}</p>}
           </div>
         )}
 
@@ -720,8 +720,8 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
               <div className="flex items-center gap-2 font-display font-semibold"><Sparkles size={17} strokeWidth={1.6} /> {tx(locale, "Valor estimado New Place", "PlaceEstimate")} · {zone?.name}</div>
               {estimate ? (
                 <>
-                  <div className="mt-2 font-serif text-[36px] font-light leading-[1.05] md:text-[44px]">{money(estimate.low, locale)} – {money(estimate.high, locale)}</div>
-                  <div className="text-sm text-muted">{tx(locale, "Valor medio", "Mid value")} {money(estimate.mid, locale)} · {estimate.comparables.length < 2 ? tx(locale, "estimación orientativa", "indicative estimate") : plural(estimate.comparables.length, locale, ["comparable", "comparables"], ["comparable", "comparables"])}</div>
+                  <div className="mt-2 font-serif text-[36px] font-light leading-[1.05] md:text-[36px]">{money(estimate.low, locale)} – {money(estimate.high, locale)}</div>
+                  <div className="text-[15px] text-muted">{tx(locale, "Valor medio", "Mid value")} {money(estimate.mid, locale)} · {estimate.comparables.length < 2 ? tx(locale, "estimación orientativa", "indicative estimate") : plural(estimate.comparables.length, locale, ["comparable", "comparables"], ["comparable", "comparables"])}</div>
                 </>
               ) : (
                 <div className="mt-2 flex items-center gap-2 text-muted"><Loader2 size={16} className="animate-spin" /> {tx(locale, "Calculando…", "Calculating…")}</div>
@@ -735,13 +735,13 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                     }} onChange={(price) => set({ price })} />
                 </Field>
                 {estimate && d.price > 0 && !priceOutlier && (
-                  <div className="self-end pb-2.5 text-sm" data-testid="price-verdict">
+                  <div className="self-end pb-2.5 text-[15px]" data-testid="price-verdict">
                     {d.price > estimate.high ? <span className="font-semibold text-warn">{tx(locale, "Por encima del rango", "Above range")}</span> : d.price < estimate.low ? <span className="font-semibold text-ok">{tx(locale, "Por debajo: venta rápida", "Below: quick sale")}</span> : <span className="font-semibold text-ok">{tx(locale, "Dentro del rango ✓", "Within range ✓")}</span>}
                   </div>
                 )}
               </div>
               {priceOutlier && (
-                <div id="price-outlier" role="status" data-testid="price-outlier" className="np-in mt-3 flex gap-2.5 rounded-np border border-warn/60 bg-[#8A5A0014] px-3.5 py-3 text-sm">
+                <div id="price-outlier" role="status" data-testid="price-outlier" className="np-in mt-3 flex gap-2.5 rounded-np border border-warn/60 bg-[#8A5A0014] px-3.5 py-3 text-[15px]">
                   <AlertTriangle size={18} className="mt-0.5 shrink-0 text-warn" aria-hidden />
                   <div>
                     <div className="font-semibold text-ink">
@@ -783,7 +783,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                 value={lang === "es" ? d.copy.body_es : d.copy.body_en}
                 onChange={(e) => set({ copy: { ...d.copy, [lang === "es" ? "body_es" : "body_en"]: e.target.value } })}
               />
-              {aiErr && <div role="alert" className="mt-2 rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-sm text-danger">{aiErr}</div>}
+              {aiErr && <div role="alert" className="mt-2 rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-[15px] text-danger">{aiErr}</div>}
               <div className="mt-2 text-[13px] text-muted">{tx(locale, "Si lo dejas en blanco, escribimos un primer texto por ti al publicar.", "Leave it blank and we’ll write a first draft for you when you publish.")}</div>
             </div>
           </div>
@@ -793,7 +793,7 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
           <div className="np-in space-y-5">
             <h1 className="np-t-h1 font-serif">{tx(locale, "Revisa y publica", "Review & publish")}</h1>
             {dup && (
-              <div className={cn("flex items-start gap-2 rounded-np border p-3 text-sm [&>svg]:mt-px [&>svg]:shrink-0", dupOverride ? "border-[#2F6F4E55] bg-[#2F6F4E0D]" : "border-warn/60 bg-[#8A5A0014]")} role="alert">
+              <div className={cn("flex items-start gap-2 rounded-np border p-3 text-[15px] [&>svg]:mt-px [&>svg]:shrink-0", dupOverride ? "border-[#2F6F4E55] bg-[#2F6F4E0D]" : "border-warn/60 bg-[#8A5A0014]")} role="alert">
                 {dupOverride ? <CheckCircle2 size={18} className="text-ok" /> : <AlertTriangle size={18} className="text-warn" />}
                 <DupNotice locale={locale} dup={dup} override={dupOverride} onOverride={() => { setDupOverride(true); setErr(null); }} hasUnit={!!d.unit.trim()} />
               </div>
@@ -807,33 +807,33 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
                   <PropertyArt scene={d.kind === "house" ? "house-dusk" : "tower-day"} seed="wiz" className="aspect-[4/3] w-full" />
                 )}
                 <div className="p-5">
-                  <div className="font-display text-2xl font-semibold">{money(d.price, locale)}<span className="text-sm font-normal text-muted">{priceUnit}</span></div>
+                  <div className="font-display text-[28px] font-semibold">{money(d.price, locale)}<span className="text-[15px] font-normal text-muted">{priceUnit}</span></div>
                   <div className="font-semibold">{(lang === "es" ? d.copy.title_es : d.copy.title_en) || tx(locale, "(título automático)", "(auto title)")}</div>
-                  <div className="text-sm text-muted" data-testid="review-address">{address}</div>
-                  <div className="mt-2 text-sm" data-testid="review-facts">{facts}</div>
-                  {extrasSummary && <div className="mt-1 text-sm text-muted">{extrasSummary}</div>}
+                  <div className="text-[15px] text-muted" data-testid="review-address">{address}</div>
+                  <div className="mt-2 text-[15px]" data-testid="review-facts">{facts}</div>
+                  {extrasSummary && <div className="mt-1 text-[15px] text-muted">{extrasSummary}</div>}
                   <div className="mt-3 inline-flex items-center gap-1.5 rounded-[12px] bg-[#EFE6D8] px-2.5 py-1 text-[13px] font-semibold text-navy">{d.mode === "AGENCY" ? tx(locale, "Inventario de la agencia", "Agency inventory") : d.mode === "FSBO" ? tx(locale, "Publicado por el propietario", "Listed by the owner") : tx(locale, "Encargo a agencia", "Agency mandate")}</div>
                 </div>
               </div>
             </div>
             <div className="rounded-[16px] bg-white p-5">
-              <div className="flex items-center justify-between"><span className="font-display font-semibold">{tx(locale, "Calidad del anuncio", "Listing quality")}</span><span className="font-display text-2xl font-semibold text-ok">{quality}/100</span></div>
+              <div className="flex items-center justify-between"><span className="font-display font-semibold">{tx(locale, "Calidad del anuncio", "Listing quality")}</span><span className="font-display text-[28px] font-semibold text-ok">{quality}/100</span></div>
               <Progress value={quality} tone="ok" className="mt-2" />
-              <ul className="mt-3 grid gap-1.5 text-sm sm:grid-cols-2">
+              <ul className="mt-3 grid gap-1.5 text-[15px] sm:grid-cols-2">
                 {[[files.length >= 8, tx(locale, "8+ fotos (+35)", "8+ photos (+35)")], [!!(d.copy.title_en && d.copy.body_en), tx(locale, "Bilingüe ES/EN (+20)", "Bilingual ES/EN (+20)")], [!!d.addr, tx(locale, "Geolocalizado (+20)", "Geolocated (+20)")], [false, tx(locale, "Plano (+15, después)", "Floor plan (+15, later)")]].map(([ok, t]) => (
                   <li key={String(t)} className={cn("flex items-center gap-2", ok ? "text-ok" : "text-muted")}>{ok ? <Check size={15} /> : <span className="h-3.5 w-3.5 rounded-full border-2 border-current" />}{t as string}</li>
                 ))}
               </ul>
             </div>
-            <label className="flex items-start gap-2 text-sm text-muted"><input type="checkbox" checked={confirm} onChange={(e) => setConfirm(e.target.checked)} className="mt-1 h-4 w-4 shrink-0 accent-navy dark:accent-[#EFE6D8]" /> {tx(locale, "Confirmo que soy el propietario o tengo autorización para publicar.", "I confirm I’m the owner or authorised to list.")}</label>
+            <label className="flex items-start gap-2 text-[15px] text-muted"><input type="checkbox" checked={confirm} onChange={(e) => setConfirm(e.target.checked)} className="mt-1 h-4 w-4 shrink-0 accent-navy dark:accent-[#EFE6D8]" /> {tx(locale, "Confirmo que soy el propietario o tengo autorización para publicar.", "I confirm I’m the owner or authorised to list.")}</label>
             {!confirm && <p className="text-[13px] text-muted">{tx(locale, "Marca la casilla para poder publicar.", "Tick the box to publish.")}</p>}
-            {!user && <p className="rounded-lg bg-[#3A6A920D] px-3 py-2 text-sm">{tx(locale, "Para publicar te pediremos que entres a tu cuenta. Tu borrador no se pierde.", "We’ll ask you to sign in before publishing. Your draft stays safe.")}</p>}
-            {err && <div className="rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-sm text-danger" role="alert">{err}</div>}
+            {!user && <p className="rounded-lg bg-[#3A6A920D] px-3 py-2 text-[15px]">{tx(locale, "Para publicar te pediremos que entres a tu cuenta. Tu borrador no se pierde.", "We’ll ask you to sign in before publishing. Your draft stays safe.")}</p>}
+            {err && <div className="rounded-xl border border-danger/25 bg-[#B3261E0D] px-3.5 py-2.5 text-[15px] text-danger" role="alert">{err}</div>}
           </div>
         )}
 
         {blocked.length > 0 && step < 5 && (
-          <div id="wizard-blocked" tabIndex={-1} role="alert" data-testid="wizard-blocked" className="mt-8 rounded-[16px] border border-[#1F3A4D]/30 bg-[#3A6A920D] px-4 py-3 text-sm outline-none">
+          <div id="wizard-blocked" tabIndex={-1} role="alert" data-testid="wizard-blocked" className="mt-8 rounded-[16px] border border-[#1F3A4D]/30 bg-[#3A6A920D] px-4 py-3 text-[15px] outline-none">
             <div className="font-display font-semibold text-ink">{tx(locale, "Para continuar, te falta:", "To continue, you still need:")}</div>
             <ul className="mt-1.5 list-disc space-y-1 pl-5 text-ink/80">
               {blocked.map(([b, zone]) => (
@@ -880,17 +880,17 @@ export function OwnerWizard({ locale, zones, agencies, fxVes, staff = false }: {
             )}
             <div className="p-4">
               <div className="text-[13px] font-semibold text-muted">{tx(locale, "Vista previa", "Preview")}</div>
-              <div className="font-display text-xl font-semibold">{d.price ? <>{money(d.price, locale)}<span className="text-sm font-normal text-muted">{priceUnit}</span></> : <span className="text-muted">{tx(locale, "Precio pendiente", "Price to come")}</span>}</div>
-              <div className="text-sm">{d.m2 ? facts : <span className="text-muted">{tx(locale, "Aquí verás los datos de tu casa", "Your home's details will show here")}</span>}</div>
-              <div className="text-sm text-muted">{d.addr ? fullAddress([d.addr.zone, d.addr.city]) : tx(locale, "Dirección pendiente", "Address pending")}</div>
+              <div className="font-display text-xl font-semibold">{d.price ? <>{money(d.price, locale)}<span className="text-[15px] font-normal text-muted">{priceUnit}</span></> : <span className="text-muted">{tx(locale, "Precio pendiente", "Price to come")}</span>}</div>
+              <div className="text-[15px]">{d.m2 ? facts : <span className="text-muted">{tx(locale, "Aquí verás los datos de tu casa", "Your home's details will show here")}</span>}</div>
+              <div className="text-[15px] text-muted">{d.addr ? fullAddress([d.addr.zone, d.addr.city]) : tx(locale, "Dirección pendiente", "Address pending")}</div>
             </div>
           </div>
           <div className="rounded-np bg-navy p-4 text-ivory">
             <div className="flex items-center gap-2 font-display font-semibold"><Sparkles size={16} className="text-[#EFE6D8]" /> {tx(locale, "Valor estimado New Place", "PlaceEstimate")}</div>
-            <div className="mt-1 font-display text-2xl">{estimate ? money(estimate.mid, locale) : "—"}</div>
+            <div className="mt-1 font-display text-[28px]">{estimate ? money(estimate.mid, locale) : "—"}</div>
             <div className="text-[13px] text-mist">{tx(locale, "Cambia a medida que avanzas", "Updates as you go")}</div>
           </div>
-          <Link href={`/${locale}/owner/listings`} className="block text-center text-sm text-muted underline-offset-4 hover:text-navy hover:underline"><MapPin size={13} className="inline" /> {tx(locale, "Guardar y salir", "Save & exit")}</Link>
+          <Link href={`/${locale}/owner/listings`} className="block text-center text-[15px] text-muted underline-offset-4 hover:text-navy hover:underline"><MapPin size={13} className="inline" /> {tx(locale, "Guardar y salir", "Save & exit")}</Link>
         </div>
       </aside>
     </div>
@@ -912,7 +912,7 @@ function DupNotice({ locale, dup, override, onOverride, hasUnit }: { locale: Loc
         {tx(locale, "Puede que ya esté publicado:", "It may already be listed:")} {link}
         {!hasUnit && <span className="block text-[13px] text-muted">{tx(locale, "Si es otro apartamento o casa, escribe arriba el piso / apto / casa.", "If it’s another flat or house, add the floor / unit above.")}</span>}
       </span>
-      <button type="button" onClick={onOverride} className="rounded-[12px] border border-navy/70 bg-white px-3 py-1.5 font-display text-sm font-semibold text-navy hover:bg-[#EFE6D8]">
+      <button type="button" onClick={onOverride} className="rounded-[12px] border border-navy/70 bg-white px-3 py-1.5 font-display text-[15px] font-semibold text-navy hover:bg-[#EFE6D8]">
         {tx(locale, "No es la misma casa — es otra unidad", "Not the same home — it’s another unit")}
       </button>
     </span>

@@ -90,8 +90,8 @@ function Performance({ locale, days, rows }: { locale: Locale; days: AuditPeriod
   const n = (v: number) => <span className={cn(k.num, "tracking-normal")}>{v}</span>;
   const metric = (label: string, value: React.ReactNode) => (
     <div className="min-w-0">
-      <dt className="line-clamp-2 text-[12px] font-semibold uppercase leading-tight tracking-[.1em] text-muted dark:text-mist">{label}</dt>
-      <dd className={cn("mt-0.5 text-[16px] leading-tight", tnum)}>{value}</dd>
+      <dt className="line-clamp-2 text-[13px] font-semibold uppercase leading-tight tracking-[.1em] text-muted dark:text-mist">{label}</dt>
+      <dd className={cn("mt-0.5 text-[17px] leading-tight", tnum)}>{value}</dd>
     </div>
   );
   const sortOptions: [SortKey, string][] = [
@@ -120,7 +120,7 @@ function Performance({ locale, days, rows }: { locale: Locale; days: AuditPeriod
         <>
           {/* Phones: one card per advisor with every metric; tablets and up keep the sortable table. */}
           <div className="px-5 md:hidden">
-            <div className="flex items-center gap-2 text-sm">
+            <div className="flex items-center gap-2 text-[15px]">
               <label htmlFor="audit-sort" className={cn("shrink-0", k.muted)}>{tx(locale, "Ordenar por", "Sort by")}</label>
               <Select
                 id="audit-sort"
@@ -149,10 +149,10 @@ function Performance({ locale, days, rows }: { locale: Locale; days: AuditPeriod
                     <Initials name={r.name} size={40} />
                     <div className="min-w-0 flex-1">
                       <div className="font-semibold leading-snug">{r.name}</div>
-                      <div className={cn("truncate text-xs", k.muted)}>{r.role === "AGENCY_OWNER" ? tx(locale, "Dueño · con cartera asignada", "Owner · with assigned listings") : r.email}</div>
+                      <div className={cn("truncate text-[13px]", k.muted)}>{r.role === "AGENCY_OWNER" ? tx(locale, "Dueño · con cartera asignada", "Owner · with assigned listings") : r.email}</div>
                       <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1">
                         {r.suspended ? <Pill tone="danger">{tx(locale, "Suspendido", "Suspended")}</Pill> : r.verified ? <Pill tone="ok">{tx(locale, "Verificado", "Verified")}</Pill> : <Pill tone="warn">{tx(locale, "Sin verificar", "Unverified")}</Pill>}
-                        <span className={cn("text-xs", k.muted)} title={dateTime(r.lastSeenAt, locale)}>{tx(locale, "Último acceso", "Last seen")} <TimeAgo iso={r.lastSeenAt} locale={locale} /></span>
+                        <span className={cn("text-[13px]", k.muted)} title={dateTime(r.lastSeenAt, locale)}>{tx(locale, "Último acceso", "Last seen")} <TimeAgo iso={r.lastSeenAt} locale={locale} /></span>
                       </div>
                     </div>
                   </div>
@@ -167,10 +167,10 @@ function Performance({ locale, days, rows }: { locale: Locale; days: AuditPeriod
                       tx(locale, "1.ª respuesta", "1st response"),
                       <>
                         <span className={cn(k.num, "tracking-normal")}>{formatMinutes(r.respMedianMin, locale)}</span>
-                        {r.respMeanMin != null && <span className={cn("block text-[12px] font-normal", k.muted)}>{tx(locale, "media", "mean")} {formatMinutes(r.respMeanMin, locale)}</span>}
+                        {r.respMeanMin != null && <span className={cn("block text-[13px] font-normal", k.muted)}>{tx(locale, "media", "mean")} {formatMinutes(r.respMeanMin, locale)}</span>}
                       </>,
                     )}
-                    {metric(tx(locale, "Visitas", "Tours"), <>{n(r.toursBooked)} <span className={cn("text-xs font-normal", k.muted)}>/ {r.toursDone} {tx(locale, "hechas", "done")}</span></>)}
+                    {metric(tx(locale, "Visitas", "Tours"), <>{n(r.toursBooked)} <span className={cn("text-[13px] font-normal", k.muted)}>/ {r.toursDone} {tx(locale, "hechas", "done")}</span></>)}
                     {metric(tx(locale, "Lead → visita", "Lead → tour"), <span className={cn(k.num, "tracking-normal")}>{dash(r.leadToTourPct, " %")}</span>)}
                     {metric(tx(locale, "Captaciones", "Captures"), n(r.captures))}
                     {metric(tx(locale, "Cierres", "Closings"), n(r.closings))}
@@ -181,7 +181,7 @@ function Performance({ locale, days, rows }: { locale: Locale; days: AuditPeriod
             </ul>
           </div>
           <ScrollRegion fade={false} label={tx(locale, "Desempeño por asesor", "Performance by advisor")} className="hidden md:block">
-            <table className="np-sticky-last w-full min-w-[1180px] text-sm">
+            <table className="np-sticky-last w-full min-w-[1180px] text-[15px]">
               <caption className="sr-only">{tx(locale, `Desempeño por asesor, últimos ${days} días. Pulse un encabezado para ordenar.`, `Performance by advisor, last ${days} days. Press a header to sort.`)}</caption>
               <thead className={cn("border-b text-left", k.line, k.th)}>
                 <tr>
@@ -207,7 +207,7 @@ function Performance({ locale, days, rows }: { locale: Locale; days: AuditPeriod
                         <Initials name={r.name} size={36} />
                         <div className="min-w-0">
                           <div className="font-semibold">{r.name}</div>
-                          <div className={cn("text-xs", k.muted)}>{r.role === "AGENCY_OWNER" ? tx(locale, "Dueño · con cartera asignada", "Owner · with assigned listings") : r.email}</div>
+                          <div className={cn("text-[13px]", k.muted)}>{r.role === "AGENCY_OWNER" ? tx(locale, "Dueño · con cartera asignada", "Owner · with assigned listings") : r.email}</div>
                         </div>
                       </div>
                     </td>
@@ -215,7 +215,7 @@ function Performance({ locale, days, rows }: { locale: Locale; days: AuditPeriod
                       <div className="flex flex-wrap items-center gap-1.5">
                         {r.suspended ? <Pill tone="danger">{tx(locale, "Suspendido", "Suspended")}</Pill> : r.verified ? <Pill tone="ok">{tx(locale, "Verificado", "Verified")}</Pill> : <Pill tone="warn">{tx(locale, "Sin verificar", "Unverified")}</Pill>}
                       </div>
-                      <div className={cn("mt-1 whitespace-nowrap text-xs", k.muted)} title={dateTime(r.lastSeenAt, locale)}>
+                      <div className={cn("mt-1 whitespace-nowrap text-[13px]", k.muted)} title={dateTime(r.lastSeenAt, locale)}>
                         {tx(locale, "Último acceso", "Last seen")} <TimeAgo iso={r.lastSeenAt} locale={locale} />
                       </div>
                     </td>
@@ -225,7 +225,7 @@ function Performance({ locale, days, rows }: { locale: Locale; days: AuditPeriod
                     <td className={cell}>{n(r.answered)}</td>
                     <td className={cell}>
                       <div className={cn(k.num, "tracking-normal")}>{formatMinutes(r.respMedianMin, locale)}</div>
-                      {r.respMeanMin != null && <div className={cn("text-xs", k.muted)}>{tx(locale, "media", "mean")} {formatMinutes(r.respMeanMin, locale)}</div>}
+                      {r.respMeanMin != null && <div className={cn("text-[13px]", k.muted)}>{tx(locale, "media", "mean")} {formatMinutes(r.respMeanMin, locale)}</div>}
                     </td>
                     <td className={cell}>
                       <span className={cn(k.num, "tracking-normal", r.slaPct != null && (r.slaPct >= 80 ? k.okText : r.slaPct < 50 ? k.dangerText : k.warnText))}>{dash(r.slaPct, " %")}</span>
@@ -278,7 +278,7 @@ function Chats({ locale, advisors, threads, agentId, onAgent, pending }: { local
       eyebrow={tx(locale, "Supervisión", "Oversight")}
       title={tx(locale, "Chats del equipo", "Team chats")}
       action={
-        <label className="flex items-center gap-2 text-sm">
+        <label className="flex items-center gap-2 text-[15px]">
           <span className={k.muted}>{tx(locale, "Asesor", "Advisor")}</span>
           <Select compact value={agentId ?? ""} disabled={pending} onChange={(e) => { setOpen(null); onAgent(e.target.value || null); }}>
             <option value="">{tx(locale, "Todo el equipo", "Whole team")}</option>
@@ -304,13 +304,13 @@ function Chats({ locale, advisors, threads, agentId, onAgent, pending }: { local
                   <button type="button" onClick={() => show(t.id)} aria-current={active ? "true" : undefined} className={cn("block w-full px-4 py-3 text-left transition-colors", active ? "bg-[#EFE6D8] dark:bg-white/10" : k.hover)}>
                     <div className="flex items-baseline justify-between gap-2">
                       <span className="min-w-0 font-semibold leading-snug">{names(t.participants)}</span>
-                      <span className={cn("shrink-0 text-xs", k.muted)}><TimeAgo iso={t.last ? t.last.at : t.updatedAt} locale={locale} /></span>
+                      <span className={cn("shrink-0 text-[13px]", k.muted)}><TimeAgo iso={t.last ? t.last.at : t.updatedAt} locale={locale} /></span>
                     </div>
-                    <div className={cn("mt-0.5 truncate text-xs", k.muted)}>{t.listing ? tx(locale, t.listing.titleEs, t.listing.titleEn) : t.subject ?? tx(locale, "Sin inmueble", "No listing")}</div>
+                    <div className={cn("mt-0.5 truncate text-[13px]", k.muted)}>{t.listing ? tx(locale, t.listing.titleEs, t.listing.titleEn) : t.subject ?? tx(locale, "Sin inmueble", "No listing")}</div>
                     <div className="mt-1.5 line-clamp-2 text-[13px]">
                       {t.last ? <><span className="font-semibold">{t.last.senderName}:</span> {t.last.body}</> : <span className={k.muted}>{tx(locale, "Sin mensajes todavía", "No messages yet")}</span>}
                     </div>
-                    <div className={cn("mt-1 flex items-center gap-1 text-xs", k.muted)}>
+                    <div className={cn("mt-1 flex items-center gap-1 text-[13px]", k.muted)}>
                       {loading === t.id ? <Loader2 size={12} className="animate-spin" aria-hidden /> : <MessageSquare size={12} aria-hidden />}
                       <span className={tnum}>{t.messages}</span> {tx(locale, t.messages === 1 ? "mensaje" : "mensajes", t.messages === 1 ? "message" : "messages")}
                     </div>
@@ -321,7 +321,7 @@ function Chats({ locale, advisors, threads, agentId, onAgent, pending }: { local
           </ul>
           <section aria-live="polite" aria-label={tx(locale, "Conversación", "Conversation")} className={cn("flex min-h-[320px] flex-col rounded-xl border", k.line)}>
             {!open ? (
-              <div className={cn("m-auto flex max-w-xs flex-col items-center gap-2 p-8 text-center text-sm", k.muted)}>
+              <div className={cn("m-auto flex max-w-xs flex-col items-center gap-2 p-8 text-center text-[15px]", k.muted)}>
                 <Eye size={20} aria-hidden />
                 {tx(locale, "Elige una conversación para leerla. Abrirla queda registrado en la auditoría y no la marca como leída para el equipo.", "Pick a conversation to read it. Opening it is logged in the audit trail and does not mark it as read for the team.")}
               </div>
@@ -329,7 +329,7 @@ function Chats({ locale, advisors, threads, agentId, onAgent, pending }: { local
               <>
                 <header className={cn("border-b px-4 py-3", k.line)}>
                   <div className="font-semibold">{names(open.participants)}</div>
-                  <div className={cn("mt-0.5 flex flex-wrap gap-x-3 text-xs", k.muted)}>
+                  <div className={cn("mt-0.5 flex flex-wrap gap-x-3 text-[13px]", k.muted)}>
                     {open.listing && <Link className={k.link} href={`/${locale}/agency/listings/${open.listing.id}/edit`}>{tx(locale, open.listing.titleEs, open.listing.titleEn)}</Link>}
                     {open.lead && <span>{tx(locale, "Lead", "Lead")}: {open.lead.name}</span>}
                   </div>
@@ -338,13 +338,13 @@ function Chats({ locale, advisors, threads, agentId, onAgent, pending }: { local
                   </div>
                 </header>
                 <ol className="max-h-[440px] flex-1 space-y-3 overflow-y-auto px-4 py-4">
-                  {open.messages.length === 0 && <li className={cn("text-sm", k.muted)}>{tx(locale, "La conversación aún no tiene mensajes.", "This conversation has no messages yet.")}</li>}
+                  {open.messages.length === 0 && <li className={cn("text-[15px]", k.muted)}>{tx(locale, "La conversación aún no tiene mensajes.", "This conversation has no messages yet.")}</li>}
                   {open.messages.map((m) => {
                     const staff = open.participants.find((p) => p.id === m.senderId)?.member ?? false;
                     return (
                       <li key={m.id} className={cn("flex", staff ? "justify-end" : "justify-start")}>
-                        <div className={cn("max-w-[80%] rounded-2xl px-3.5 py-2.5 text-[14px]", staff ? "bg-navy text-ivory dark:bg-[#2C4A60]" : "bg-[#F4EFE7] text-navy dark:bg-white/[.06] dark:text-ivory")}>
-                          <div className={cn("mb-0.5 text-[12px] font-semibold", staff ? "text-ivory/85" : "text-muted dark:text-mist")}>
+                        <div className={cn("max-w-[80%] rounded-2xl px-3.5 py-2.5 text-[15px]", staff ? "bg-navy text-ivory dark:bg-[#2C4A60]" : "bg-[#F4EFE7] text-navy dark:bg-white/[.06] dark:text-ivory")}>
+                          <div className={cn("mb-0.5 text-[13px] font-semibold", staff ? "text-ivory/85" : "text-muted dark:text-mist")}>
                             {m.senderName} · <time dateTime={m.at}>{dateTime(m.at, locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</time>
                           </div>
                           <p className="whitespace-pre-wrap break-words">{m.body}</p>
@@ -353,7 +353,7 @@ function Chats({ locale, advisors, threads, agentId, onAgent, pending }: { local
                     );
                   })}
                 </ol>
-                <footer className={cn("border-t px-4 py-3 text-xs", k.line, k.muted)}>
+                <footer className={cn("border-t px-4 py-3 text-[13px]", k.line, k.muted)}>
                   <Lock size={12} aria-hidden className="mr-1 inline" />
                   {tx(locale, `Solo lectura · acceso registrado el ${dateTime(open.loggedAt, locale)}. No se marcan mensajes como leídos.`, `Read-only · access logged on ${dateTime(open.loggedAt, locale)}. Messages are not marked as read.`)}
                 </footer>

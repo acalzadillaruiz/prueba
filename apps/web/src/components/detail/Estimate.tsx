@@ -36,26 +36,26 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
         </div>
         {rough ? (
           <>
-            <div className="mt-4 font-title text-[36px] leading-tight md:text-[44px]">
+            <div className="mt-4 font-title text-[36px] leading-tight md:text-[36px]">
               ≈ {money(e.mid, locale)}
-              <span className="font-display text-base font-normal text-ivory/90">{priceSuffix(l, locale)}</span>
+              <span className="font-display text-[17px] font-normal text-ivory/90">{priceSuffix(l, locale)}</span>
             </div>
-            <p className="mt-2 max-w-[520px] text-sm leading-relaxed text-ivory/90">
+            <p className="mt-2 max-w-[520px] text-[15px] leading-relaxed text-ivory/90">
               {source} · {nComp === 1
                 ? tx(locale, "Estimación orientativa: por ahora solo hay una casa comparable cerca, así que no te damos un rango.", "Indicative estimate: there’s only one comparable home nearby for now, so we don’t show a range.")
                 : tx(locale, "Estimación orientativa: aún no hay casas comparables cerca, así que no te damos un rango.", "Indicative estimate: there are no comparable homes nearby yet, so we don’t show a range.")}
             </p>
-            <div className="mt-4 text-sm font-semibold text-ivory/90">
+            <div className="mt-4 text-[15px] font-semibold text-ivory/90">
               {tx(locale, "Precio pedido", "Asking")} · {money(l.priceAmount, locale)} · <span className={cn(Math.abs(diff) > 4 && diff > 0 ? "text-[#F6E6C6]" : "text-[#DCEFE3]")}>{verdict}</span>
             </div>
           </>
         ) : (
           <>
-        <div className="mt-4 font-title text-[36px] leading-tight md:text-[44px]">
+        <div className="mt-4 font-title text-[36px] leading-tight md:text-[36px]">
           {money(e.low, locale)} – {money(e.high, locale)}
-          <span className="font-display text-base font-normal text-ivory/90">{priceSuffix(l, locale)}</span>
+          <span className="font-display text-[17px] font-normal text-ivory/90">{priceSuffix(l, locale)}</span>
         </div>
-        <div className="mt-1 text-sm text-ivory/90">
+        <div className="mt-1 text-[15px] text-ivory/90">
           {conf} · {source} · {tx(locale, "Valor central", "Mid value")} {money(e.mid, locale)}
         </div>
         <div className="relative mt-9 h-[3px] rounded-full bg-white/15">
@@ -68,11 +68,11 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
         {/* The range ends are labelled where they sit on the bar (not at the bar's edges). Each label leans inward by its
             own position (0 % → left-aligned, 100 % → right-aligned), so it never overflows the panel; when the two ends are
             too close for that, each label hangs outward from its end instead, so they never collide. */}
-        <div className="relative mt-3 h-5 text-sm text-ivory/90" data-testid="estimate-range-labels">
+        <div className="relative mt-3 h-5 text-[15px] text-ivory/90" data-testid="estimate-range-labels">
           <span className="absolute whitespace-nowrap" style={{ left: `${aLow}%`, transform: `translateX(-${close ? 100 : clampPct(aLow)}%)` }}>{usdShort(e.low)}</span>
           <span className="absolute whitespace-nowrap" style={{ left: `${aHigh}%`, transform: `translateX(-${close ? 0 : clampPct(aHigh)}%)` }}>{usdShort(e.high)}</span>
         </div>
-        <div className={cn("mt-3 text-center text-sm font-semibold", Math.abs(diff) > 4 && diff > 0 ? "text-[#F6E6C6]" : "text-[#DCEFE3]")}>
+        <div className={cn("mt-3 text-center text-[15px] font-semibold", Math.abs(diff) > 4 && diff > 0 ? "text-[#F6E6C6]" : "text-[#DCEFE3]")}>
           {inRange ? tx(locale, "El precio pedido está dentro de lo esperado", "The asking price sits within the range") : verdict}
         </div>
         {inRange && <div className="mt-1 text-center text-[13px] text-ivory/90">{verdict}</div>}
@@ -94,7 +94,7 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
             aria-label={tx(locale, "Casas comparables", "Comparable homes")}
             className="overflow-x-auto rounded-lg border border-inherit focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
           >
-            <table className="w-full text-sm">
+            <table className="w-full text-[15px]">
               <thead className={cn("text-left text-[13px]", dark ? "bg-white/5 text-mist" : "bg-ivory text-muted")}>
                 <tr>
                   <th className="w-[45%] min-w-[150px] px-3 py-2 font-semibold">{tx(locale, "Inmueble", "Property")}</th>
@@ -109,7 +109,7 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
                   return (
                     <tr key={c.id} className={cn("border-t", dark ? "border-white/10" : "border-line")}>
                       <td className="px-3 py-2">
-                        <div className="line-clamp-2 break-words text-[16px] font-semibold leading-snug">{(locale === "en" && (c as { title_en?: string }).title_en) || c.title}</div>
+                        <div className="line-clamp-2 break-words text-[17px] font-semibold leading-snug">{(locale === "en" && (c as { title_en?: string }).title_en) || c.title}</div>
                         <div className={cn("text-[13px]", muted)}>{c.zone}</div>
                       </td>
                       <td className="whitespace-nowrap px-3 py-2 text-right">{num(c.areaM2, locale)}</td>
@@ -122,7 +122,7 @@ export function EstimateCard({ l, locale, dark, showComparables = true }: { l: L
               </tbody>
             </table>
           </div>
-          <p className={cn("mt-3 text-sm", muted)}>{tx(locale, "Cómo lo calculamos: m² × precio de la zona, ajustado por antigüedad, servicios y casas parecidas cerca.", "How we work it out: m² × area price, adjusted for age, amenities and similar homes nearby.")}</p>
+          <p className={cn("mt-3 text-[15px]", muted)}>{tx(locale, "Cómo lo calculamos: m² × precio de la zona, ajustado por antigüedad, servicios y casas parecidas cerca.", "How we work it out: m² × area price, adjusted for age, amenities and similar homes nearby.")}</p>
         </div>
       )}
       </div>

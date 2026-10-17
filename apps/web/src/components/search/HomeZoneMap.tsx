@@ -27,12 +27,12 @@ export function HomeZoneMap({ listings, locale }: { listings: Listing[]; locale:
           aria-pressed={on}
           onClick={() => setZone(id)}
           className={cn(
-            "flex min-h-12 w-full items-center justify-between gap-4 rounded-[12px] px-4 text-left text-[16px] transition-colors duration-np ease-np",
+            "flex min-h-12 w-full items-center justify-between gap-4 rounded-[12px] px-4 text-left text-[17px] transition-colors duration-np ease-np",
             on ? "bg-[#DCE8F2] text-ink" : "text-ink hover:bg-[#DCE8F2]/60",
           )}
         >
           <span className={cn(on && "font-medium")}>{name}</span>
-          <span className="np-num text-[14px] text-muted">{n > 0 ? plural(n, locale, ["casa", "casas"], ["home", "homes"]) : tx(locale, "Próximamente", "Coming soon")}</span>
+          <span className="np-num text-[15px] text-muted">{n > 0 ? plural(n, locale, ["casa", "casas"], ["home", "homes"]) : tx(locale, "Próximamente", "Coming soon")}</span>
         </button>
       </li>
     );

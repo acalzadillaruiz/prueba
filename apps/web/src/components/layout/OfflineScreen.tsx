@@ -17,7 +17,7 @@ export function OfflineScreen({ locale }: { locale: Locale }) {
       <Logo tone="ivory" size="lg" animate />
       <WifiOff className="mt-10 text-[#EFE6D8]" size={30} aria-hidden />
       <h1 className="np-t-h1">{tx(locale, "Estás sin conexión", "You’re offline")}</h1>
-      <p className="max-w-sm text-[16px] text-ivory/70">
+      <p className="max-w-sm text-[17px] text-ivory/70">
         {tx(locale, "Las páginas que ya visitaste siguen aquí. Cuando vuelva la señal, inténtalo otra vez.", "Pages you’ve already visited are still here. Try again once you’re back online.")}
       </p>
       <div className="mt-2 flex gap-3">
@@ -37,14 +37,14 @@ export function OfflineScreen({ locale }: { locale: Locale }) {
                 <a href={`/${locale}/listing/${c.slug}`} className="flex min-h-12 items-center justify-between gap-3 px-4 py-2 hover:bg-white/5">
                   <span className="min-w-0">
                     <span className="block truncate font-semibold">{locale === "en" ? c.title_en || c.title_es : c.title_es}</span>
-                    <span className="block text-sm text-mist">{c.zone}, {c.city}</span>
+                    <span className="block text-[15px] text-mist">{c.zone}, {c.city}</span>
                   </span>
                   <span className="shrink-0 font-serif text-[17px] font-light">{locale === "en" && c.price_en ? c.price_en : c.price}</span>
                 </a>
               </li>
             ))}
           </ul>
-          <p className="mt-2 text-sm text-mist">{tx(locale, "Las casas que abriste con conexión también te esperan.", "Homes you opened while online will still load.")}</p>
+          <p className="mt-2 text-[15px] text-mist">{tx(locale, "Las casas que abriste con conexión también te esperan.", "Homes you opened while online will still load.")}</p>
         </section>
       )}
     </main>

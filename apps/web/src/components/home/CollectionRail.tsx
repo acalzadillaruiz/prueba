@@ -39,7 +39,7 @@ export function CollectionRail({
           <p className="np-t-lead mt-6 max-w-[480px] text-muted">{lead}</p>
           <Link
             href={more.href}
-            className="mt-10 inline-flex min-h-12 items-center rounded-[12px] bg-navy px-6 font-display text-[16px] font-medium text-white transition-colors duration-np ease-np hover:bg-navy-2 active:scale-[.98]"
+            className="mt-10 inline-flex min-h-12 items-center rounded-[12px] bg-navy px-6 font-display text-[17px] font-medium text-white transition-colors duration-np ease-np hover:bg-navy-2 active:scale-[.98]"
           >
             {more.label}
           </Link>

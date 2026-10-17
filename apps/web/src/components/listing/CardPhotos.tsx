@@ -22,14 +22,14 @@ const SIZES = "(max-width: 640px) 100vw, (max-width: 1280px) 75vw, 50vw"; // 048
  * opens `href`; a swipe scrolls and never navigates (no click after a scroll gesture). One photo or none: a plain
  * image under the link, no "1/1" counter. Unloaded slides show the arena placeholder (dark brown in dark mode).
  */
-export function CardPhotos({ l, locale, label, href }: { l: Listing; locale: Locale; label: string; href?: string }) {
+export function CardPhotos({ l, locale, label, href, priority }: { l: Listing; locale: Locale; label: string; href?: string; priority?: boolean }) {
   const router = useRouter();
   const n = Math.min(5, l.photos?.length ?? 0);
   const [idx, setIdx] = useState(0);
   const [loaded, setLoaded] = useState(1);
   const track = useRef<HTMLDivElement>(null);
   useWheelPager(track, n > 1); // 051-G · 8: one sideways trackpad gesture = one photo
-  if (n <= 1) return <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className={IMG} label={label} sizes={SIZES} />;
+  if (n <= 1) return <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className={IMG} label={label} sizes={SIZES} priority={priority} />;
 
   const ahead = (i: number) => setLoaded((v) => Math.max(v, Math.min(n, i + 2)));
   const go = (e: React.MouseEvent, d: number) => {
@@ -75,6 +75,7 @@ export function CardPhotos({ l, locale, label, href }: { l: Listing; locale: Loc
                 photo={listingPhoto(l, i)}
                 className={IMG}
                 sizes={SIZES}
+                priority={priority && i === 0} // 051-G · 16: the first result's cover is the search page's LCP
                 label={i === 0 ? label : `${label} · ${tx(locale, `foto ${i + 1} de ${n}`, `photo ${i + 1} of ${n}`)}`}
               />
             )}

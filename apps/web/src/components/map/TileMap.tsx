@@ -104,6 +104,10 @@ export function TileMap({
     const markerMap = markers.current;
     (async () => {
       try {
+        // 051-G · 16: Leaflet and its tiles wait until the page has loaded and the browser is idle, so the map never
+        // competes with the first results' photos (the search page's LCP). The tinted placeholder holds the space.
+        if (document.readyState !== "complete") await new Promise((r) => addEventListener("load", r, { once: true }));
+        await new Promise((r) => ("requestIdleCallback" in window ? requestIdleCallback(() => r(null), { timeout: 2000 }) : setTimeout(r, 600)));
         const L = (await import("leaflet")).default;
         await import("leaflet.markercluster");
         if (!alive || !box.current) return;

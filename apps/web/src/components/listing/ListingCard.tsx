@@ -97,7 +97,7 @@ const priceVars = (price: string, suffix: string, compact?: boolean) =>
  * mouse) — search results and saved homes alike. Compact cards (search, similar homes) leave out the operation
  * ("Venta"): the search already filters by it, and the price gets the whole row.
  */
-export function ListingCard({ l, locale, compact, className, compareToggle }: { l: Listing; locale: Locale; compact?: boolean; className?: string; compareToggle?: boolean }) {
+export function ListingCard({ l, locale, compact, className, compareToggle, priority }: { l: Listing; locale: Locale; compact?: boolean; className?: string; compareToggle?: boolean; priority?: boolean }) {
   const price = moneyUi(l.priceAmount, locale);
   const suffix = priceSuffix(l, locale);
   const title = tx(locale, l.title_es, l.title_en);
@@ -114,7 +114,7 @@ export function ListingCard({ l, locale, compact, className, compareToggle }: { 
       )}
     >
       <div className="np-card-media relative aspect-[4/3] overflow-hidden bg-arena">
-        <CardPhotos l={l} locale={locale} label={label} href={href} />
+        <CardPhotos l={l} locale={locale} label={label} href={href} priority={priority} />
         <PhotoBadge l={l} locale={locale} roomRight={compareToggle} compact={compact} />
         <SaveButton id={l.id} locale={locale} className="absolute right-2.5 top-2.5 z-[2]" />
         {compareToggle && <CardCompareToggle id={l.id} locale={locale} />}

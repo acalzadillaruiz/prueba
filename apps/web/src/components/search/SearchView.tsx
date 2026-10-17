@@ -657,9 +657,9 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
             )}
             {/* Phones in map view: the cards are hidden, keep them out of the tab order (the wrapper is inert). */}
             <div id="search-results-grid" tabIndex={-1} aria-label={tx(locale, "Resultados", "Results")} role="region" className="grid scroll-mt-[calc(var(--np-header-offset,80px)+60px)] gap-5 p-4 focus:outline-none sm:grid-cols-2 lg:scroll-mt-14 lg:px-5 xl:grid-cols-3">
-              {results.map((l) => (
+              {results.map((l, i) => (
                 <div key={l.id} onMouseEnter={() => setHover(l.id)} onMouseLeave={() => setHover(null)} onFocus={() => setHover(l.id)} onBlur={() => setHover(null)}>
-                  <ListingCard l={l} locale={locale} compact compareToggle />
+                  <ListingCard l={l} locale={locale} compact compareToggle priority={i < 2} />
                 </div>
               ))}
             </div>

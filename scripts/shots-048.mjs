@@ -18,7 +18,8 @@ const PAGES = [
 ];
 
 const VIEWS = [
-  { name: "390", engine: webkit, opts: { viewport: { width: 390, height: 844 }, deviceScaleFactor: 3, isMobile: true, hasTouch: true } },
+  // WEBKIT=0: no WebKit in this machine → Chromium with the same iPhone metrics.
+  { name: "390", engine: process.env.WEBKIT === "0" ? chromium : webkit, opts: { viewport: { width: 390, height: 844 }, deviceScaleFactor: 3, isMobile: true, hasTouch: true } },
   { name: "1440", engine: chromium, opts: { viewport: { width: 1440, height: 900 } } },
 ];
 

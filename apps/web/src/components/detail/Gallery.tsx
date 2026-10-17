@@ -8,6 +8,7 @@ import { Floorplan, PropertyArt } from "@/components/art/PropertyArt";
 import { plural, tx } from "@/lib/i18n";
 import { GOOGLE_MAPS_KEY } from "@/components/map/config";
 import { cn } from "@/lib/cn";
+import { useWheelPager } from "@/lib/useWheelPager";
 
 type Tab = "photos" | "plan" | "street";
 
@@ -96,6 +97,7 @@ export function Gallery({ l, locale }: { l: Listing; locale: Locale; luxury?: bo
   };
   // Phone hero carousel: the photo on screen, and how many are mounted (the first up front, then one step ahead).
   const track = useRef<HTMLDivElement>(null);
+  useWheelPager(track); // 051-G · 8: a sideways trackpad gesture turns one photo, also at 1440
   const [idx, setIdx] = useState(0);
   const [loaded, setLoaded] = useState(1);
   const ahead = (n: number) => setLoaded((v) => Math.max(v, Math.min(total, n + 2)));

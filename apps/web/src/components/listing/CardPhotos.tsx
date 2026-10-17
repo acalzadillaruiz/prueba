@@ -8,6 +8,7 @@ import { listingPhoto } from "@/lib/photos";
 import { PropertyArt } from "@/components/art/PropertyArt";
 import { tx } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
+import { useWheelPager } from "@/lib/useWheelPager";
 
 const IMG = "h-full w-full"; // the 1 → 1.03 lean on hover lives in globals.css (.np-card-media, pointer: fine only)
 /** Cards are at most a third of the screen on desktop, full width on phones. */
@@ -27,6 +28,7 @@ export function CardPhotos({ l, locale, label, href }: { l: Listing; locale: Loc
   const [idx, setIdx] = useState(0);
   const [loaded, setLoaded] = useState(1);
   const track = useRef<HTMLDivElement>(null);
+  useWheelPager(track, n > 1); // 051-G · 8: one sideways trackpad gesture = one photo
   if (n <= 1) return <PropertyArt scene={l.scenes[0]} seed={l.id} photo={listingPhoto(l, 0)} className={IMG} label={label} sizes={SIZES} />;
 
   const ahead = (i: number) => setLoaded((v) => Math.max(v, Math.min(n, i + 2)));
@@ -53,7 +55,7 @@ export function CardPhotos({ l, locale, label, href }: { l: Listing; locale: Loc
           if (i !== idx) setIdx(i);
           ahead(i);
         }}
-        // 048-Q: the strip sits above the stretched title link on every device, so a sideways trackpad gesture or
+        // 051-G · 8: the strip (z-2) sits above the stretched title link (::after, z-1) on every device, so a sideways trackpad gesture or
         // swipe moves the photos; a click or tap opens the listing (a scroll gesture never navigates).
         onClick={href ? () => router.push(href) : undefined}
         // Not a Tab stop (browsers make scrollers focusable): the keyboard opens the listing through the title link,
@@ -62,7 +64,7 @@ export function CardPhotos({ l, locale, label, href }: { l: Listing; locale: Loc
         role="group"
         aria-roledescription={tx(locale, "carrusel", "carousel")}
         aria-label={tx(locale, `Fotos de ${label}`, `Photos of ${label}`)}
-        className="no-scrollbar relative z-[1] flex h-full w-full cursor-pointer snap-x snap-mandatory overflow-x-auto overscroll-x-contain"
+        className="no-scrollbar relative z-[2] flex h-full w-full cursor-pointer snap-x snap-mandatory overflow-x-auto overscroll-x-contain"
       >
         {Array.from({ length: n }, (_, i) => (
           <div key={i} className="relative h-full w-full shrink-0 snap-start snap-always overflow-hidden bg-arena">

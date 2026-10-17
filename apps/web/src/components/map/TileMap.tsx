@@ -330,7 +330,7 @@ export function TileMap({
   const ctlHover = "hover:bg-[#DCE8F2]";
 
   return (
-    <div className={cn("np-brisa-map relative overflow-hidden bg-[#CFE3F1]", className)}>
+    <div className={cn("np-brisa-map relative overflow-hidden bg-[#EEF4F9]", className)}>
       <div ref={box} className="absolute inset-0" role="application" aria-label={tx(locale, "Mapa de resultados", "Results map")} />
       {failed && (
         <p className="absolute inset-0 grid place-items-center p-6 text-center text-[15px] text-muted">
@@ -371,7 +371,7 @@ export function TileMap({
       {onArea && moved && controls && (
         <div className="relative z-[450]">
           <UnderMapTools>
-            <button type="button" onClick={searchHere} data-search-area className="np-in pointer-events-auto flex min-h-11 items-center gap-2 whitespace-nowrap rounded-[12px] bg-[#3A6A92] px-4 font-display text-sm font-semibold text-white">
+            <button type="button" onClick={searchHere} data-search-area className="np-in pointer-events-auto flex min-h-11 items-center gap-2 whitespace-nowrap rounded-[12px] bg-[#3A6A92] px-4 font-display text-[15px] font-semibold text-white">
               <Search size={15} aria-hidden /> {tx(locale, "Buscar en esta zona", "Search this area")}
             </button>
           </UnderMapTools>

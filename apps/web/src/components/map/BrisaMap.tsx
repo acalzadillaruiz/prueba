@@ -106,7 +106,7 @@ export function BrisaMap({
   }, [zone]);
 
   return (
-    <div className={cn("np-brisa-map relative overflow-hidden rounded-[24px] bg-[#CFE3F1]", className)}>
+    <div className={cn("np-brisa-map relative overflow-hidden rounded-[24px] bg-[#EEF4F9]", className)}>
       <div ref={box} className="absolute inset-0" role="region" aria-label={tx(locale, "Mapa de casas con precio", "Map of homes with prices")} />
       {failed && (
         <p className="absolute inset-0 grid place-items-center p-6 text-center text-[15px] text-muted">

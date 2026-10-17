@@ -26,7 +26,7 @@ export default auth(async (req) => {
     const wantsPage = req.method === "GET" && (req.headers.get("accept") ?? "").includes("text/html");
     if (isApi && !wantsPage) {
       const locked = lockedApiResponse(pathname);
-      return NextResponse.json(locked.body, { status: locked.status, headers: { "X-Robots-Tag": "noindex", "Cache-Control": "private, no-store" } });
+      return NextResponse.json(locked.body, { status: locked.status, headers: { "X-Robots-Tag": "noindex", "Cache-Control": "no-store" } });
     }
     const gate = new URL(`/${pathname.match(/^\/(en)(\/|$)/) ? "en" : "es"}/acceso`, req.url);
     gate.searchParams.set("next", pathname + search);

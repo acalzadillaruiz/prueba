@@ -42,6 +42,13 @@ describe("the preview gate covers /api (middleware)", () => {
     }
   });
 
+  it("046-L B: the session snapshot answers 200 «signed out» while locked (no 401 on the access page)", async () => {
+    const res = await run(req("/api/v1/me/session"));
+    expect(res.status).toBe(200);
+    expect(res.headers.get("cache-control")).toBe("no-store");
+    expect(await res.json()).toEqual({ user: null, agency: null, saved: [] });
+  });
+
   it("rejects a forged gate cookie", async () => {
     const res = await run(req("/api/v1/listings", `${GATE_COOKIE}=${"0".repeat(64)}`));
     expect(res.status).toBe(401);

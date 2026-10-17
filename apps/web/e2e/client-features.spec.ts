@@ -36,7 +36,7 @@ test.describe.serial("Cliente: búsqueda, Hub y precalificación", () => {
     await expect(page.getByRole("button", { name: /Quitar filtro: Zona dibujada/ })).toBeVisible();
     await expect(page.getByText("en la zona que dibujaste")).toBeVisible();
     // The map draws the shape again (NightMap: dashed terracotta path; Google: polygon overlay).
-    await expect(page.locator('[role="application"] path[data-shape="poly"]').first()).toBeAttached();
+    await expect(page.locator('[role="application"] path.np-shape-poly').first()).toBeAttached();
     expect(await resultsCount(page)).toBe(inPoly.json.total);
 
     // Reload keeps everything.

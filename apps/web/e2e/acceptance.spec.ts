@@ -12,7 +12,7 @@ test.describe.serial("Criterios de aceptación §15", () => {
     await page.locator("#explorar").scrollIntoViewIfNeeded();
     const map = page.locator('[role="application"]').first();
     await expect(map).toBeVisible();
-    await expect(map.locator("g.cursor-pointer").first()).toBeVisible();
+    await expect(map.locator(".np-pin, .np-pin-cluster").first()).toBeVisible();
   });
 
   test("2 · filtro comprar · 2+ hab · < 250.000 USD · Chacao", async ({ page }) => {

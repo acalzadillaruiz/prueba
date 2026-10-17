@@ -364,12 +364,12 @@ html.js-reveal [data-reveal="stagger"].is-in > :nth-child(n+3) { transition-dela
 /* Esri light grey water → soft sea blue #CFE3F1; land stays a near-white. */
 .np-tiles-base { filter: sepia(.18) hue-rotate(168deg) saturate(1.6) brightness(1.02); }
 .np-tiles-ref { opacity: .85; }
-.np-pin { background: none; border: 0; }
+.leaflet-marker-icon.np-pin { background: none; border: 0; }
 .np-pin-pill { display: inline-block; transform: translate(-50%, -50%); white-space: nowrap; padding: 6px 11px; border-radius: 999px; background: #fff; color: #1F3A4D; font: 600 13px/1 var(--font-body); font-variant-numeric: tabular-nums; box-shadow: 0 2px 8px rgb(31 58 77 / .18); transition: background-color 180ms var(--np-ease), color 180ms var(--np-ease); }
 .np-pin:hover .np-pin-pill, .np-pin:focus-visible .np-pin-pill, .np-pin.is-active .np-pin-pill { background: #3A6A92; color: #fff; }
 .np-pin:focus-visible { outline: none; }
 .np-pin:focus-visible .np-pin-pill { outline: 2px solid #3A6A92; outline-offset: 2px; }
-.np-pin-cluster { display: grid; place-items: center; border-radius: 999px; background: rgb(255 255 255 / .92); color: #1F3A4D; font: 600 14px/1 var(--font-body); box-shadow: 0 0 0 6px rgb(91 141 184 / .25), 0 2px 8px rgb(31 58 77 / .18); }
+.leaflet-marker-icon.np-pin-cluster { display: grid; place-items: center; border-radius: 999px; background: rgb(255 255 255 / .92); color: #1F3A4D; font: 600 14px/1 var(--font-body); box-shadow: 0 0 0 6px rgb(91 141 184 / .25), 0 2px 8px rgb(31 58 77 / .18); }
 .np-pin-popup .leaflet-popup-content-wrapper { border-radius: 16px; box-shadow: 0 10px 30px rgb(31 58 77 / .16); }
 .np-pin-popup .leaflet-popup-content { margin: 0; }
 .np-pin-card { display: grid; gap: 2px; padding: 14px 16px; color: #1F3A4D; text-decoration: none; min-width: 200px; }
@@ -379,3 +379,4 @@ html.js-reveal [data-reveal="stagger"].is-in > :nth-child(n+3) { transition-dela
 .np-brisa-map .leaflet-control-zoom { border: 0; box-shadow: 0 2px 8px rgb(31 58 77 / .15); border-radius: 12px; overflow: hidden; }
 .np-brisa-map .leaflet-control-zoom a { width: 40px; height: 40px; line-height: 40px; color: #1F3A4D; }
 .np-brisa-map .leaflet-control-attribution { font-size: 12px; background: rgb(255 255 255 / .8); color: #4A6275; }
+.np-pin-dot { display: block; width: 20px; height: 20px; border-radius: 999px; background: #3A6A92; box-shadow: 0 0 0 4px #fff, 0 2px 10px rgb(31 58 77 / .3); }

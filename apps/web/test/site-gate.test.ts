@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { gateCode, gateToken, safeNext } from "@/lib/site-gate";
+import { gateCode, gateToken, lockedApiResponse, safeNext } from "@/lib/site-gate";
 
 describe("pre-launch access gate", () => {
   afterEach(() => {
@@ -25,5 +25,11 @@ describe("pre-launch access gate", () => {
   it("only redirects to same-site paths after unlocking", () => {
     expect(safeNext("/es/search?type=SALE", "/es")).toBe("/es/search?type=SALE");
     for (const bad of ["//evil.com", "/\\evil.com", "https://evil.com", "", null, undefined]) expect(safeNext(bad, "/es")).toBe("/es");
+  });
+
+  it("046-L B: while locked, the session snapshot answers 200 «signed out», every other API 401", () => {
+    expect(lockedApiResponse("/api/v1/me/session")).toEqual({ status: 200, body: { user: null, agency: null, saved: [] } });
+    expect(lockedApiResponse("/api/v1/listings").status).toBe(401);
+    expect(lockedApiResponse("/api/auth/callback/demo").status).toBe(401);
   });
 });

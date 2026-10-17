@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import createIntlMiddleware from "next-intl/middleware";
 import { authConfig } from "./auth.config";
 import { routing } from "./i18n/routing";
-import { GATE_COOKIE, gateCode, gateToken } from "./lib/site-gate";
+import { GATE_COOKIE, gateCode, gateToken, lockedApiResponse } from "./lib/site-gate";
 
 const intl = createIntlMiddleware(routing);
 
@@ -24,7 +24,10 @@ export default auth(async (req) => {
   const isApi = pathname === "/api" || pathname.startsWith("/api/");
   if (gateCode() && !/^\/(es|en)\/acceso\/?$/.test(pathname) && pathname !== "/api/access" && req.cookies.get(GATE_COOKIE)?.value !== (await gateToken())) {
     const wantsPage = req.method === "GET" && (req.headers.get("accept") ?? "").includes("text/html");
-    if (isApi && !wantsPage) return NextResponse.json({ error: "site_locked" }, { status: 401, headers: { "X-Robots-Tag": "noindex", "Cache-Control": "no-store" } });
+    if (isApi && !wantsPage) {
+      const locked = lockedApiResponse(pathname);
+      return NextResponse.json(locked.body, { status: locked.status, headers: { "X-Robots-Tag": "noindex", "Cache-Control": "private, no-store" } });
+    }
     const gate = new URL(`/${pathname.match(/^\/(en)(\/|$)/) ? "en" : "es"}/acceso`, req.url);
     gate.searchParams.set("next", pathname + search);
     const res = NextResponse.redirect(gate);

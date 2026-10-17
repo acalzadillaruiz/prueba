@@ -32,3 +32,13 @@ export async function gatePassed(req: { headers: Headers }): Promise<boolean> {
   if (!gateCode()) return true;
   return readCookie(req.headers.get("cookie"), GATE_COOKIE) === (await gateToken());
 }
+
+/**
+ * What a locked API call gets back (046-L B). The session snapshot is asked for by every page, the access page
+ * included: while locked it answers 200 «nobody signed in» instead of a 401 that shows up as a console error
+ * (Lighthouse Best Practices). Every other API path stays a 401 «site_locked».
+ */
+export function lockedApiResponse(pathname: string): { status: number; body: Record<string, unknown> } {
+  if (pathname === "/api/v1/me/session") return { status: 200, body: { user: null, agency: null, saved: [] } };
+  return { status: 401, body: { error: "site_locked" } };
+}

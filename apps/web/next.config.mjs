@@ -45,6 +45,9 @@ const nextConfig = {
     typescript: { ignoreBuildErrors: true },
     experimental: { cpus: 1, workerThreads: false, webpackMemoryOptimizations: true },
   }),
+  // 046-L A: metadata (title, description, robots, manifest link) is rendered in <head> for every client, not
+  // streamed into <body>, so Lighthouse and browsers find the manifest on /es/acceso and the PWA can be installed there.
+  htmlLimitedBots: /.*/,
   devIndicators: false,
   poweredByHeader: false,
   images: {

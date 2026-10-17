@@ -12,8 +12,10 @@ const walk = () => {
     if (!r.width || !r.height || cs.visibility === "hidden" || +cs.opacity === 0 || el.closest(".sr-only,[aria-hidden=true],.leaflet-tile-pane")) continue;
     let fg = parse(cs.color); if (!fg) continue;
     // Effective background: blend translucent layers up the tree; stop (unknown) at an image/gradient.
-    const layers = []; let img = false;
-    for (let n = el; n; n = n.parentElement) { const s = getComputedStyle(n); if (s.backgroundImage !== "none") { img = true; break; } if (n.tagName === "IMG" || n.tagName === "PICTURE") { img = true; break; } const b = parse(s.backgroundColor); const nr = n.getBoundingClientRect(); const cx = r.x + r.width / 2, cy = r.y + r.height / 2; if (b && b[3] > 0 && cx >= nr.left && cx <= nr.right && cy >= nr.top && cy <= nr.bottom) { layers.push(b); if (b[3] >= 1) break; } }
+    const layers = []; let img = false; let solid = false;
+    for (let n = el; n; n = n.parentElement) { const s = getComputedStyle(n); if (s.backgroundImage !== "none") { img = true; break; } if (n.tagName === "IMG" || n.tagName === "PICTURE") { img = true; break; } const b = parse(s.backgroundColor); const nr = n.getBoundingClientRect(); const cx = r.x + r.width / 2, cy = r.y + r.height / 2; if (b && b[3] > 0 && cx >= nr.left && cx <= nr.right && cy >= nr.top && cy <= nr.bottom) { layers.push(b); if (b[3] >= 1) { solid = n !== document.body && n !== document.documentElement; break; } } }
+    // Text laid over a photo or video that is not its ancestor (a transparent header over the hero): unknown ground too.
+    if (!img && !solid) { const cx = r.x + r.width / 2, cy = r.y + r.height / 2; if (cy >= 0 && cy <= innerHeight && document.elementsFromPoint(cx, cy).some((n) => n.tagName === "IMG" || n.tagName === "VIDEO")) img = true; }
     if (img) continue;
     let bg = [255, 255, 255];
     for (const l of layers.reverse()) bg = bg.map((v, i) => l[i] * l[3] + v * (1 - l[3]));
@@ -32,7 +34,7 @@ for (const w of [390, 1440]) {
   for (const path of PAGES) {
     await p.goto(BASE + path, { waitUntil: "load" });
     await p.waitForTimeout(1200);
-    await p.evaluate(async () => { for (let y = 0; y < document.body.scrollHeight; y += 600) { scrollTo(0, y); await new Promise((r) => setTimeout(r, 60)); } scrollTo(0, 0); });
+    await p.evaluate(async () => { for (let y = 0; y < document.body.scrollHeight; y += 600) { scrollTo(0, y); await new Promise((r) => setTimeout(r, 60)); } scrollTo(0, 0); await new Promise((r) => setTimeout(r, 800)); });
     const found = new Set(await p.evaluate(walk));
     // Hover / active states: the first cards, the first map pins (the pin of a hovered card turns mar profundo).
     for (const sel of ["[data-listing-card]", ".np-pin"]) {

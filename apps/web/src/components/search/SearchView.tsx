@@ -71,6 +71,19 @@ const TRY_INSTEAD: [string, string][] = [
   ["Con terraza", "With a terrace"],
 ];
 
+/** 051-G 14: the desktop results title. Kind of home by operation, then the zone when one is chosen. */
+const RESULTS_TITLE: Record<string, [string, string]> = {
+  SALE: ["Casas en venta", "Homes for sale"],
+  LONG_RENT: ["Casas en alquiler", "Homes for rent"],
+  SHORT_RENT: ["Alquiler vacacional", "Holiday rentals"],
+  COMMERCIAL: ["Espacios comerciales", "Commercial spaces"],
+};
+export function resultsTitle(type: string, zone: string | null, locale: Locale): string {
+  const [es, en] = RESULTS_TITLE[type] ?? RESULTS_TITLE.SALE;
+  const base = tx(locale, es, en);
+  return zone ? `${base} ${tx(locale, "en", "in")} ${zone}` : base;
+}
+
 const useIsoLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 /** URL ⇄ drawn shape, in the exact format the API parses (`poly=lat,lng;lat,lng;…`, `radius=lat,lng,km`). */
@@ -441,6 +454,12 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
   const filtersLabel = tx(locale, "Filtros", "Filters");
   const filtersAria = filterCount ? tx(locale, `Filtros, ${filterCount} activos`, `Filters, ${filterCount} on`) : filtersLabel;
   const countBadge = filterCount > 0 && <span aria-hidden className="rounded-full bg-navy px-1.5 text-[13px] font-semibold text-ivory [font-feature-settings:'lnum']">{filterCount}</span>;
+  // 051-G 16: phones open on the list, so Leaflet (≈ 180 kB of JS) is only built the first time the map is shown;
+  // desktop always shows it. Once built it stays mounted (its view survives list ⇄ map).
+  const [mapWanted, setMapWanted] = useState(false);
+  useEffect(() => {
+    if (desktop || view === "map") setMapWanted(true);
+  }, [desktop, view]);
   const mapHidden = !desktop && view === "list";
   const listHidden = !desktop && view === "map";
   // Phones in map view: the page is exactly one screen (the map fills it). Phones in list view: the document scrolls.
@@ -479,7 +498,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
               enterKeyHint="search"
               placeholder={tx(locale, "¿Dónde quieres vivir?", "Where do you want to live?")}
               aria-label={tx(locale, "Escribe zona, tipo de casa o presupuesto", "Type an area, a kind of home or a budget")}
-              className="h-full min-w-0 flex-1 self-stretch bg-transparent text-[16px] focus:outline-none lg:text-sm"
+              className="h-full min-w-0 flex-1 self-stretch bg-transparent text-[17px] focus:outline-none lg:text-[15px]"
             />
             {suggest.listbox}
           </form>
@@ -500,7 +519,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
                   type="button"
                   onClick={() => set({ type: k, max: null, min: null })}
                   aria-pressed={type === k}
-                  className={cn("min-h-8 rounded-[12px] border-2 px-3.5 font-display text-sm", type === k ? "np-sel font-semibold" : "border-transparent text-muted hover:text-ink")}
+                  className={cn("min-h-8 rounded-[12px] border-2 px-3.5 font-display text-[15px]", type === k ? "np-sel font-semibold" : "border-transparent text-muted hover:text-ink")}
                 >
                   {tx(locale, es, en)}
                 </button>
@@ -550,16 +569,16 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
           </div>
         </div>
         {alertError && (
-          <div role="alert" className=" bg-[#B3261E1A] px-4 py-2 text-sm text-danger md:px-5">{alertError}</div>
+          <div role="alert" className=" bg-[#B3261E1A] px-4 py-2 text-[15px] text-danger md:px-5">{alertError}</div>
         )}
         {moreOpen && desktop && (
           <div ref={morePanel} id="search-more-filters" role="dialog" aria-label={tx(locale, "Más filtros", "More filters")} className="np-in absolute inset-x-0 top-full max-h-[70vh] overflow-y-auto bg-ivory px-5 py-5 shadow-float">
             <MoreFields locale={locale} f={f} set={set} withLux />
             <div className="mt-5 flex items-center justify-end gap-4 pt-4">
-              <button type="button" onClick={() => setMoreOpen(false)} className="min-h-11 px-2 font-display text-sm font-semibold underline underline-offset-4">
+              <button type="button" onClick={() => setMoreOpen(false)} className="min-h-11 px-2 font-display text-[15px] font-semibold underline underline-offset-4">
                 {tx(locale, "Cerrar", "Close")}
               </button>
-              <SeeHomes locale={locale} total={total} fetching={query.isFetching} onClick={() => { setMoreOpen(false); moreBtn.current?.focus(); }} className="min-h-11 text-sm" />
+              <SeeHomes locale={locale} total={total} fetching={query.isFetching} onClick={() => { setMoreOpen(false); moreBtn.current?.focus(); }} className="min-h-11 text-[15px]" />
             </div>
           </div>
         )}
@@ -584,10 +603,13 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
             onClickCapture={saveListScroll}
             className="scrollbar-thin lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:overscroll-contain"
           >
+            {/* 051-G 14: desktop opens on one dominant line (what you are looking at, in the band size); it scrolls away
+                and the sticky count row below takes over. Phones lead with the first photo instead. */}
+            <h2 className="np-t-band hidden px-5 pb-5 pt-8 text-ink lg:block">{resultsTitle(type, zone, locale)}</h2>
             {/* one row: count · sort · filters — phones: pinned under the header (follows it as it hides) */}
             <div className="sticky top-[calc(env(safe-area-inset-top)+var(--np-header-offset,80px)_-_8px)] z-20 flex min-h-[52px] items-center gap-2 bg-arena px-4 py-1 transition-[top] duration-300 ease-[cubic-bezier(.2,.7,.2,1)] lg:top-0 lg:z-10 lg:px-5">
               <div className="flex min-w-0 flex-1 items-center gap-2">
-                <p className="shrink-0 whitespace-nowrap font-serif text-[16px] leading-tight min-[390px]:text-[18px] sm:text-[20px] lg:text-[22px]" aria-live="polite">
+                <p className="shrink-0 whitespace-nowrap font-serif text-[17px] leading-tight min-[390px]:text-[20px] sm:text-[20px] lg:text-[20px]" aria-live="polite">
                   {notUnderstood ? tx(locale, `${total} casas en total`, `${total} homes in all`) : plural(total, locale, ["resultado", "resultados"], ["result", "results"])}
                 </p>
                 {query.isFetching && <Loader2 size={15} aria-hidden className="shrink-0 animate-spin text-muted" />}
@@ -599,12 +621,12 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
                   value={sort}
                   onChange={(e) => set({ sort: e.target.value === "rec" ? null : e.target.value })}
                   aria-label={tx(locale, "Ordenar por", "Sort by")}
-                  className="h-11 max-w-[11rem] appearance-none rounded-[12px] border border-ink/10 bg-arena pl-3 pr-7 text-[13px] lg:h-9 lg:max-w-[14rem] lg:pl-3.5 lg:pr-8 lg:text-sm"
+                  className="h-11 max-w-[11rem] appearance-none rounded-[12px] border border-ink/10 bg-arena pl-3 pr-7 text-[13px] lg:h-9 lg:max-w-[14rem] lg:pl-3.5 lg:pr-8 lg:text-[15px]"
                 >
                   {SORTS.map((k) => {
                     const [es, en, esFull, enFull] = SORT_LABEL[k];
                     return (
-                      <option key={k} value={k} aria-label={tx(locale, esFull, enFull)} title={tx(locale, esFull, enFull)}>
+                      <option key={k} value={k} title={tx(locale, esFull, enFull)}>
                         {desktop ? tx(locale, esFull, enFull) : tx(locale, es, en)}
                       </option>
                     );
@@ -614,7 +636,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
               </span>
               {/* Small phones (and phones with filters on): icon + count — the chips below name them, the button keeps its
                   aria-label — so the sort keeps its room. */}
-              <button type="button" onClick={openSheet} aria-haspopup="dialog" aria-label={filtersAria} className={cn("flex h-11 min-w-11 shrink-0 items-center justify-center gap-1.5 rounded-[12px] border px-3 font-display text-sm max-[389px]:px-2.5 lg:hidden", filterCount ? on : "border-ink/10 bg-white/75")}>
+              <button type="button" onClick={openSheet} aria-haspopup="dialog" aria-label={filtersAria} className={cn("flex h-11 min-w-11 shrink-0 items-center justify-center gap-1.5 rounded-[12px] border px-3 font-display text-[15px] max-[389px]:px-2.5 lg:hidden", filterCount ? on : "border-ink/10 bg-white/75")}>
                 <SlidersHorizontal size={15} aria-hidden /> <span className={cn("max-[389px]:hidden", filterCount > 0 && "max-sm:hidden")}>{filtersLabel}</span> {countBadge}
               </button>
             </div>
@@ -668,7 +690,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
                 <p className="font-display text-[15px] text-ink">{tx(locale, "Si aflojas un filtro, sí hay casas:", "Loosen one filter and there are homes:")}</p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {relax.data.map((r) => (
-                    <button key={r.key} type="button" onClick={() => set(r.patch)} className="np-glass inline-flex min-h-11 items-center gap-2 rounded-[12px] px-4 font-display text-[14px] text-ink transition-transform hover:-translate-y-0.5">
+                    <button key={r.key} type="button" onClick={() => set(r.patch)} className="np-glass inline-flex min-h-11 items-center gap-2 rounded-[12px] px-4 font-display text-[15px] text-ink transition-transform hover:-translate-y-0.5">
                       {tx(locale, "Sin", "Without")} «{r.label}» · <b>{plural(r.total, locale, ["casa", "casas"], ["home", "homes"])}</b>
                     </button>
                   ))}
@@ -700,7 +722,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
           inert={mapHidden || undefined}
           aria-hidden={mapHidden || undefined}
         >
-          <NightMap
+          {!mapWanted ? <div className="h-full w-full bg-[#EEF4F9]" /> : <NightMap
             key={region + mapFilters}
             region={region}
             listings={mapListings}
@@ -722,7 +744,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
             toolbar={
               // Which map: in the tool row (top-left), out of the way of the pins and the docked bar.
               <>
-              <div role="group" aria-label={tx(locale, "Mapa de", "Map of")} className="flex gap-0.5 rounded-[12px] border border-[#EFE6D8] bg-[#ffffff] p-1 font-display text-[13px] text-[#1F3A4D] sm:text-sm">
+              <div role="group" aria-label={tx(locale, "Mapa de", "Map of")} className="flex gap-0.5 rounded-[12px] border border-[#EFE6D8] bg-[#ffffff] p-1 font-display text-[13px] text-[#1F3A4D] sm:text-[15px]">
                 {(["caracas", "venezuela"] as const).map((r) => (
                   <button key={r} type="button" onClick={() => setRegionPick(r)} aria-pressed={region === r} className={cn("min-h-9 rounded-[12px] border-2 px-3 sm:px-3.5", region === r ? "np-sel font-semibold" : "border-transparent text-[#1F3A4D]/70")}>
                     {r === "caracas" ? "Caracas" : "Venezuela"}
@@ -734,7 +756,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
                   type="button"
                   data-map-offregion
                   onClick={() => setRegionPick("venezuela")}
-                  className="flex min-h-11 items-center gap-1 whitespace-nowrap rounded-[12px] border border-[#EFE6D8] bg-[#ffffff] px-3.5 font-display text-[13px] text-[#1F3A4D] sm:text-sm"
+                  className="flex min-h-11 items-center gap-1 whitespace-nowrap rounded-[12px] border border-[#EFE6D8] bg-[#ffffff] px-3.5 font-display text-[13px] text-[#1F3A4D] sm:text-[15px]"
                 >
                   <span className="[font-feature-settings:'lnum']">{tx(locale, `${mapListings.length} de ${results.length} en el mapa`, `${mapListings.length} of ${results.length} on the map`)}</span>
                   <span aria-hidden>·</span>
@@ -743,7 +765,7 @@ export function SearchView({ locale, initial, zones }: { locale: Locale; initial
               )}
               </>
             }
-          />
+          />}
         </div>
 
       </div>

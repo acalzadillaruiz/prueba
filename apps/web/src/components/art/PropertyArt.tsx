@@ -583,7 +583,7 @@ export function PropertyArt({
   const uid = useId().replace(/[^a-zA-Z0-9]/g, "");
   if (photo)
     // next/image: AVIF/WebP, responsive srcset and lazy loading (eager + high priority for the LCP image).
-    return <Image src={photo} alt={label ?? ""}width={1200} height={800} sizes={sizes} priority={priority} className={`${className ?? ""} object-cover`} />;
+    return <Image src={photo} alt={label ?? ""} width={1200} height={800} sizes={sizes} priority={priority} fetchPriority={priority ? "high" : undefined} className={`${className ?? ""} object-cover`} />;
   const n = hashStr(seed + scene);
   const id = `pa${n.toString(36)}${uid}`;
   let content: React.ReactNode;
